@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :nick
       t.string :email
       t.string :bioklubbsnummer
+      t.string :sf_membership_level
       t.string :phone_number
 
       t.timestamps
