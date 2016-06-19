@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :bioord
   resources :time_slots
   resources :showings
   resources :users

@@ -1,0 +1,2 @@
+class Bioord < ApplicationRecord
+end
