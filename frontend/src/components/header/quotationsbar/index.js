@@ -2,23 +2,39 @@ import React from 'react';
 import styles from './style.css';
 
 const Quotationsbar = React.createClass({
-  componentDidMount() {
-    fetch('/api/bioord.json').then(d => d.json()).then(console.log).catch(console.error)
+  getInitialState() {
+    return {
+      loading: false,
+      bioord: {}
+    }
+  },
+  componentWillMount() {
+    this.setState({
+      loading: true
+    })
+    fetch('/api/random_bioord.json')
+    .then(d => d.json())
+    .then(bioord => {
+      this.setState({ bioord, loading: false })
+    }).catch(err => {
+      this.setState({ loading: false })
+      console.error(err)
+    })
   },
   render() {
-    const bioord = this.props.bioord || [];
-    let randomBioord = bioord[Math.floor(Math.random() * (bioord.length - 1))]
-    if (!randomBioord) {
-      randomBioord = {
+    let { loading, bioord } = this.state;
+
+    if (loading && !bioord) {
+      bioord = {
         p: 'Hittar inget bioord :(',
         cite: 'Bapedibopi'
       }
     }
     return (
       <blockquote>
-        <p>{randomBioord.p}</p>
+        <p>{bioord.phrase}</p>
         <footer>
-          <cite>{randomBioord.cite}</cite>
+          <cite>De bio budorden : {bioord.number}</cite>
         </footer>
       </blockquote>
     );

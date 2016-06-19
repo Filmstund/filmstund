@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :gift_cards
   resources :orders
-  resources :bioord
+  get '/random_bioord' => 'bioord#random'
   resources :time_slots
   resources :showings
   resources :users
