@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  imdb_id: MyString
+  sf_movie_id: MyString
+  poster_url: MyString
+  duration: 1
+  status: 1
+
+two:
+  imdb_id: MyString
+  sf_movie_id: MyString
+  poster_url: MyString
+  duration: 1
+  status: 1
