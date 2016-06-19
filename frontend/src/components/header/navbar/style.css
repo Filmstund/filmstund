@@ -1,0 +1,11 @@
+ul li a:hover, ul li a:focus {
+ background-color: rgba(255,0,0,0.3);
+}
+
+ul, li {
+  display: inline;
+}
+
+a {
+  padding: 2em 3em;
+}

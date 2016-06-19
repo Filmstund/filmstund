@@ -1,0 +1,42 @@
+blockquote {
+  border: 0;
+  border-radius: 5px;
+  text-align: center;
+  color: #fff;
+  background: #712;
+  padding: 5px 0;
+  position: relative;
+  quotes: "\201C""\201D""\2018""\2019";
+  margin: 2em -15px 0;
+  font-style: italic;
+  font-size: inherit;
+  box-shadow: 2px 2px 6px #000;
+}
+blockquote:before, blockquote:after {
+  color: #cc0;
+  display: block;
+  font-size: 80px;
+  position: absolute;
+}
+blockquote:before {
+  content: open-quote;
+  left: 0;
+  top: -20px;
+}
+blockquote:after {
+  content: close-quote;
+  bottom: -64px;
+  right: 16px;
+}
+blockquote p {
+  display: inline;
+}
+blockquote footer {
+  color: #c99;
+  font-size: 14px;
+  display: inline;
+  margin-top: 5px;
+}
+blockquote footer:before {
+  content: "\2014 \2009";
+}
