@@ -21,18 +21,22 @@ class Movie
     end
 
     def current
-      parse_collection(download_data '')
+      request
     end
 
     def toplist
-      parse_collection(download_data '/toplist')
+      request '/toplist'
     end
 
     def upcoming
-      parse_collection(download_data '/upcoming')
+      request '/upcoming'
     end
 
 private
+    def request url=''
+      parse_collection(download_data url)
+    end
+
     def download_data url
       resp = get(url, {headers: HEADERS})
       if resp.success?
