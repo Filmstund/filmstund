@@ -1,24 +1,18 @@
-# README
+# ITBio
+A web application for making it easier going to the cinema with your friends
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## How to start development
+Install ruby with your favorite package manager
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```sh
+# gem install ruby
+# git clone <this-repo>
+# cd <this-repo>
+# bundle
+# rails db:migrate
+# touch tmp/caching-dev.txt  # Without this you're going to have a bad time...
+# vim config/secrets.yml   # Add your API-key to themoviedb_api: xxxxx
+<koda koden!>
+# rails server
+<profit?>
+```
