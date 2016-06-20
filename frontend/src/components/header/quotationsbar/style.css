@@ -1,10 +1,11 @@
 blockquote {
+  font-family: Georgia;
   border: 0;
   border-radius: 5px;
   text-align: center;
   color: #fff;
   background: #712;
-  padding: 5px 0;
+  padding: 2em 0;
   position: relative;
   quotes: "\201C""\201D""\2018""\2019";
   margin: 2em -15px 0;
