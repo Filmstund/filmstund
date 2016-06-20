@@ -8,9 +8,11 @@ const MovieItem = React.createClass({
 
     return (
       <div className={styles.container}>
-        <a href={"http://www.imdb.com/title/" + movie.imdbId}>
-          {movie.title}
-        </a>
+        <div className={styles.image} style={{backgroundImage: `url(${movie.poster})`}}></div>
+        <div className={styles.description}>
+          <h3>{movie.title}</h3>
+          {movie.description}
+        </div>
       </div>
     )
   }
