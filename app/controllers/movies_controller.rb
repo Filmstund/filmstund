@@ -4,7 +4,16 @@ class MoviesController < ApplicationController
   # GET /movies
   def index
     @movies = Movie.current
+    render json: @movies
+  end
 
+  def toplist
+    @movies = Movie.toplist
+    render json: @movies
+  end
+
+  def upcoming
+    @movies = Movie.upcoming
     render json: @movies
   end
 

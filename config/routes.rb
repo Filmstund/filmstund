@@ -5,6 +5,12 @@ Rails.application.routes.draw do
   resources :time_slots
   resources :showings
   resources :users
-  resources :movies, only: [:index, :show]
+
+  resources :movies, only: [:index, :show] do
+    collection do
+      get 'toplist'
+      get 'upcoming'
+    end
+  end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
