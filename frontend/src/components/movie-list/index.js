@@ -1,5 +1,6 @@
 import React from 'react';
 import MovieItem from './movie-item';
+import {extendArrayFromEndpoint} from '../../lib/backend.js';
 
 import styles from './style.css';
 
@@ -15,14 +16,8 @@ const MovieList = React.createClass({
       loading: true
     })
 
-    fetch('/api/movies.json')
-    .then(d => d.json())
-    .then(movies => {
-      this.setState({ movies, loading: false })
-    }).catch(err => {
-      this.setState({ loading: false })
-      console.error(err)
-    })
+    extendArrayFromEndpoint(this.state.movies, 'movies')
+      .then( res => this.setState({movies: res}) );
   },
 
   render() {

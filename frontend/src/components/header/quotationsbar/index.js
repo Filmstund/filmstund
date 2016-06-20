@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './style.css';
+import {extendObjectFromEndpoint} from '../../../lib/backend.js';
 
 const Quotationsbar = React.createClass({
   getInitialState() {
@@ -12,14 +13,9 @@ const Quotationsbar = React.createClass({
     this.setState({
       loading: true
     })
-    fetch('/api/random_bioord.json')
-    .then(d => d.json())
-    .then(bioord => {
-      this.setState({ bioord, loading: false })
-    }).catch(err => {
-      this.setState({ loading: false })
-      console.error(err)
-    })
+
+    extendObjectFromEndpoint(this.state.bioord, 'random_bioord')
+      .then(res => this.setState({bioord: res}));
   },
   render() {
     let { loading, bioord } = this.state;
