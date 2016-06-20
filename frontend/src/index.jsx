@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
-import Root from './Root'
-import store from './store'
+import Routes from './Routes';
+import store from './store';
 
 render(
-  <Root/>,
+  <Routes/>,
   document.getElementById('app'));
