@@ -1,6 +1,6 @@
 import React from 'react';
 import MovieItem from './movie-item';
-import {extendArrayFromEndpoint} from '../../lib/backend.js';
+import {extendArrayFromEndpoint} from '../../service/backend.js';
 
 import styles from './style.css';
 

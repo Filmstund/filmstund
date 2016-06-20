@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './style.css';
-import {extendObjectFromEndpoint} from '../../../lib/backend.js';
+import {extendObjectFromEndpoint} from '../../../service/backend.js';
 
 const Quotationsbar = React.createClass({
   getInitialState() {
