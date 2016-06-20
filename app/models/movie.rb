@@ -9,7 +9,43 @@ class Movie
     'Authorization': 'Basic U0ZiaW9BUEk6YlNGNVBGSGNSNFoz'
   }
 
-  attr_accessor :title, :description, :runtime, :poster, :premiere_date, :sf_id, :imdb_id
+  attr_accessor :title, :title_id, :description, :runtime, :poster, :premiere_date, :sf_id
+
+  def themoviedb
+    release_year = (Time.at (premiere_date / 1000)).year
+    Rails.cache.fetch("movie/#{title_id}", expires_in: 48.hours) do
+      self.class.get_themoviedb_info title, release_year
+    end
+  end
+
+  def imdb_id
+    themoviedb['imdb_id']
+  end
+
+  def tagline
+    themoviedb['tagline']
+  end
+
+  def title_orig
+    themoviedb['original_title']
+  end
+
+  def genres
+    themoviedb['genres'].map{|g| g['name']}
+  end
+
+  def overview
+    themoviedb['overview']
+  end
+
+  def alt_poster
+    "http://image.tmdb.org/t/p/w500/#{themoviedb['poster_path']}"
+  end
+
+  def backdrop
+    "http://image.tmdb.org/t/p/w1000/#{themoviedb['backdrop_path']}"
+  end
+
 
   class << self
     def find id
@@ -50,11 +86,11 @@ private
     def parse_sf_movie_data data
       m = Movie.new
       m.title = data['movieName']
+      m.title_id = data['titleId']
       m.description = data['shortDescription']
       m.runtime =  data['length']
       m.poster =  data['placeHolderPosterURL'].sub('_WIDTH_', '512')
       m.sf_id = data['id']
-      m.imdb_id = nil
       m.premiere_date = data['premiereDate']
       m
     end
@@ -63,6 +99,20 @@ private
       data['movies'].collect do |m|
         parse_sf_movie_data m
       end
+    end
+
+    public
+    def get_themoviedb_info title, release_year
+      search = Tmdb::Search.new
+      search.resource 'movie'
+      # The following may yield a subtle bug around new year.
+      search.year release_year
+      search.query title
+      results = search.fetch
+      if results.count == 1
+        return Tmdb::Movie.detail(results[0]['id'])
+      end
+      nil
     end
   end
 end

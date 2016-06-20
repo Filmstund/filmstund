@@ -7,11 +7,13 @@ class MoviesController < ApplicationController
     render json: @movies
   end
 
+  # GET /movies/toplist
   def toplist
     @movies = Movie.toplist
     render json: @movies
   end
 
+  # GET /movies/upcoming
   def upcoming
     @movies = Movie.upcoming
     render json: @movies
