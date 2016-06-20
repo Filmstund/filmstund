@@ -9,7 +9,7 @@ const MovieItem = React.createClass({
     return (
       <div className={styles.container}>
         <a href={"http://www.imdb.com/title/" + movie.imdbId}>
-          {movie.name}
+          {movie.title}
         </a>
       </div>
     )

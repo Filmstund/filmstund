@@ -26,15 +26,15 @@
   },
   "homepage": "https://github.com/tejpbit/itbio#readme",
   "dependencies": {
-    "horizon-react": "^0.3.0",
     "json-loader": "^0.5.4",
     "json5-loader": "^0.6.0",
     "jsx-loader": "^0.13.2",
     "node-libs-browser": "1.0.0",
     "postcss-loader": "~0.9.1",
     "precss": "~1.4.0",
-    "react": "15.0.1",
+    "react": "^15.1.0",
     "react-dom": "15.0.1",
+    "react-router": "^2.4.1",
     "redux": "~3.5.2"
   },
   "devDependencies": {
