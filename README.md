@@ -11,6 +11,7 @@ $ cd <this-repo>
 $ bundle
 $ rails db:migrate
 $ touch tmp/caching-dev.txt  # Without this you're going to have a bad time...
+$ cp config/secrets.yml.example config/secrets.yml
 $ vim config/secrets.yml   # Add your API-key to themoviedb_api: xxxxx
 <koda koden!>
 $ rails server
