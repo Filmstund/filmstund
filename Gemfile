@@ -8,7 +8,7 @@ gem 'sqlite3'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
 gem 'httparty'
-
+gem 'active_model_serializers'
 gem 'themoviedb'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.0'

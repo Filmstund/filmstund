@@ -1,4 +1,5 @@
 class Movie
+  include ActiveModel::Serialization
   include HTTParty
   #debug_output $stdout
   base_uri 'https://mobilebackend.sfbio.se/services/5/movies/GB/'
@@ -15,7 +16,7 @@ class Movie
     release_year = (Time.at (premiere_date / 1000)).year
     Rails.cache.fetch("movie/#{title_id}", expires_in: 48.hours) do
       self.class.get_themoviedb_info title, release_year
-    end
+    end || {}
   end
 
   def imdb_id
@@ -31,7 +32,10 @@ class Movie
   end
 
   def genres
-    themoviedb['genres'].map{|g| g['name']}
+    gens = themoviedb['genres']
+    if gens.present?
+      gens.map{|g| g['name']}
+    end
   end
 
   def overview
@@ -39,11 +43,15 @@ class Movie
   end
 
   def alt_poster
-    "http://image.tmdb.org/t/p/w500/#{themoviedb['poster_path']}"
+    if themoviedb.present?
+      "http://image.tmdb.org/t/p/w500/#{themoviedb['poster_path']}"
+    end
   end
 
   def backdrop
-    "http://image.tmdb.org/t/p/w1000/#{themoviedb['backdrop_path']}"
+    if themoviedb.present?
+      "http://image.tmdb.org/t/p/w1000/#{themoviedb['backdrop_path']}"
+    end
   end
 
 
