@@ -11,7 +11,9 @@ const Root = React.createClass({
     return (
       <div className={styles.main}>
         <Header/>
-        { this.props.children }
+        <div className={styles.rootContainer}>
+          { this.props.children }
+        </div>
       </div>
     );
   }

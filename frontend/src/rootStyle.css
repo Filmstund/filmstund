@@ -2,3 +2,9 @@
 .main {
     height: 100%;
 }
+
+
+.rootContainer {
+  background: white;
+  color: black;
+}
