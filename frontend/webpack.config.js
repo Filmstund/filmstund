@@ -17,6 +17,9 @@ module.exports = {
 	resolve: {
 		extensions: ['', '.js', '.jsx']
 	},
+	postcss() {
+		return [require('precss')]
+	},
 	module: {
 		loaders: loaders
 	},
