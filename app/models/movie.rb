@@ -61,7 +61,11 @@ class Movie
     end
 
     def all
-      current
+      Rails.cache.fetch("movies/all", expires_in: 12.hours) {
+        combined = current + upcoming
+        combined.uniq {|item| item.sf_id}
+        combined.sort! {|x,y| x.premiere_date <=> y.premiere_date}
+      }
     end
 
     def current

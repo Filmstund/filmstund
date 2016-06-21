@@ -3,7 +3,7 @@ class MoviesController < ApplicationController
 
   # GET /movies
   def index
-    @movies = Movie.current
+    @movies = Movie.all
     render json: @movies
   end
 
