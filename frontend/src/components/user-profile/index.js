@@ -31,7 +31,7 @@ const UserProfile = React.createClass({
     const { user } = this.props
     const { userForm } = this.state
     return (
-      <div>
+      <div className={styles.userProfile}>
        {JSON.stringify(user, undefined, 2)}
        <form className={styles.form} onSubmit={this.handleSubmit}>
         <div className={styles.formRow}>

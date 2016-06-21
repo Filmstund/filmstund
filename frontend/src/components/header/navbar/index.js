@@ -2,14 +2,19 @@ import React from 'react';
 import styles from './style.css';
 import {Link} from 'react-router';
 
+console.log(styles);
+
 const Navbar = React.createClass({
   render() {
     return (
-        <ul className={styles.navbar}>
-          <li><Link to="/movies">Besök</Link></li>
-          <li><Link to="/search">Sök</Link></li>
-          <li><Link to="/user">Användare</Link></li>
-        </ul>
+        <div className={styles.navbar}>
+          <img src="./logo.svg" alt="ITbio logo"/>
+          <ul>
+            <li><Link to="/showings" activeClassName={styles.activeLink}>Besök</Link></li>
+            <li><Link to="/movies" activeClassName={styles.activeLink}>Filmer</Link></li>
+            <li><Link to="/user" activeClassName={styles.activeLink}>Användare</Link></li>
+          </ul>
+        </div>
     )
   }
 })

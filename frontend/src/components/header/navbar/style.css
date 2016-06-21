@@ -1,11 +1,25 @@
-ul li a:hover, ul li a:focus {
- background-color: rgba(255,0,0,0.3);
+.navbar {
+    padding: 1em;
+    background: #712;
+
+    img {
+        height: 70px;
+    }
+
+    a {
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+        padding: 1em 2em;
+
+        &:hover, &:focus, &.activeLink {
+            color: #ffd800;
+            background-color: rgba(255,0,0,0.3);
+        }
+    }
 }
 
 ul, li {
   display: inline;
 }
 
-a {
-  padding: 2em 3em;
-}

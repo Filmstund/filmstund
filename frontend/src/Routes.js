@@ -11,6 +11,7 @@ const Routes = React.createClass({
       <Router history={browserHistory}>
         <Route path="/" component={Root}>
           <IndexRoute component={MovieList}/>
+          <Route path="showings" component={MovieList}/>
           <Route path="movies" component={MovieList}/>
           <Route path="user" component={UserProfile}/>
         </Route>
