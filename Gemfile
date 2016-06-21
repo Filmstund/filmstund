@@ -10,6 +10,9 @@ gem 'puma', '~> 3.0'
 gem 'httparty'
 gem 'active_model_serializers'
 gem 'themoviedb'
+
+gem 'omniauth', '~> 1.3'
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.0'
 # Use Redis adapter to run Action Cable in production
