@@ -37,6 +37,10 @@ module.exports = {
 				rewrite(req) {
 					req.url = req.url.replace(/^\/api/, '');
 				}
+			},
+			'/auth/*': {
+				target: 'http://localhost:3000',
+				secure: false
 			}
 		},
 	},

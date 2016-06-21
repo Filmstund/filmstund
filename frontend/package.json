@@ -34,6 +34,8 @@
     "precss": "~1.4.0",
     "react": "^15.1.0",
     "react-dom": "15.0.1",
+    "react-facebook-login": "~3.0.0",
+    "react-google-login": "~2.0.2",
     "react-router": "^2.4.1",
     "redux": "~3.5.2"
   },

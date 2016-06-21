@@ -11,7 +11,7 @@ gem 'httparty'
 gem 'active_model_serializers'
 gem 'themoviedb'
 
-gem 'omniauth', '~> 1.3'
+gem 'fb_graph2', '~> 0.7.7'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.0'
