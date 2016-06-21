@@ -2,8 +2,6 @@ import React from 'react';
 import styles from './style.css';
 import {Link} from 'react-router';
 
-console.log(styles);
-
 const Navbar = React.createClass({
   render() {
     return (
