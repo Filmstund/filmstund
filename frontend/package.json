@@ -5,7 +5,7 @@
   "main": "''",
   "scripts": {
     "build": "NODE_ENV=production webpack -p --config webpack.production.config.js --progress --profile --colors",
-    "start": "webpack-dev-server --progress --profile --colors --hot"
+    "start": "webpack-dev-server --inline --host 0.0.0.0 --port 8080"
   },
   "repository": {
     "type": "git",

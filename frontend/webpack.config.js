@@ -4,7 +4,6 @@ var loaders = require('./webpack.loaders');
 
 module.exports = {
 	entry: [
-		'webpack-dev-server/client?http://0.0.0.0:8080',
 		'webpack/hot/only-dev-server',
 		'./src/index.jsx' // Your appʼs entry point
 	],
@@ -26,20 +25,24 @@ module.exports = {
 	devServer: {
 		historyApiFallback: true,
 		contentBase: './dist',
-		noInfo: true,
 		hot: true,
-		inline: true,
+		stats: {
+				colors: true,
+				chunks: false
+		},
 		proxy: {
 			'/api/*': {
 				target: 'http://localhost:3000',
 				secure: false,
 				rewrite(req) {
-	      	req.url = req.url.replace(/^\/api/, '');
-	      }
-	    }
+					req.url = req.url.replace(/^\/api/, '');
+				}
+			}
 		},
 	},
 	plugins: [
+		new webpack.optimize.OccurenceOrderPlugin(),
+		new webpack.HotModuleReplacementPlugin(),
 		new webpack.NoErrorsPlugin()
 	]
 };
