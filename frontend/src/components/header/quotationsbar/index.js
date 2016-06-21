@@ -1,24 +1,10 @@
 import React from 'react';
 import styles from './style.css';
-import {extendObjectFromEndpoint} from '../../../service/backend.js';
+import loader from '../../loader'
 
 const Quotationsbar = React.createClass({
-  getInitialState() {
-    return {
-      loading: false,
-      bioord: {}
-    }
-  },
-  componentWillMount() {
-    this.setState({
-      loading: true
-    })
-
-    extendObjectFromEndpoint(this.state.bioord, 'random_bioord')
-      .then(res => this.setState({bioord: res}));
-  },
   render() {
-    let { loading, bioord } = this.state;
+    let { bioord, loading } = this.props;
 
     if (loading && !bioord) {
       bioord = {
@@ -37,4 +23,6 @@ const Quotationsbar = React.createClass({
   }
 });
 
-export default Quotationsbar
+export default loader((props) => ({
+  bioord: 'random_bioord'
+}))(Quotationsbar)
