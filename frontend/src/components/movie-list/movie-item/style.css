@@ -16,6 +16,11 @@
     margin: 2em;
 }
 
+.leftSide {
+    flex: 1;
+    display: flex;
+}
+
 .description {
     flex: 1;
     position: relative;
@@ -29,6 +34,9 @@
   }
   h3 {
     padding-top: 0.2em;
+  }
+  time {
+    color: gray;
   }
 }
 
