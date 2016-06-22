@@ -79,7 +79,7 @@ private
       Movie.new do |m|
         m.sf_id = data['id']
         m.title = data['movieName']
-        m.description = data['shortDescription'].sub('&nbsp;', '\n')
+        m.description = data['shortDescription'].gsub("&nbsp;", "\u00a0")
         m.runtime = data['length']
         m.poster = data['placeHolderPosterURL'].sub('_WIDTH_', '512')
         m.premiere_date = Time.at(data['premiereDate']/1000)
