@@ -5,6 +5,9 @@ class UpdateInfoFromImdbIdJob < ApplicationJob
     info = (get_themoviedb_info_from movie.imdb_id)['movie_results']
     if info.size == 1
       movie.update_from_themoviedb info.first
+    else
+      movie.imdb_id = nil
+      movie.save!
     end
   end
 private

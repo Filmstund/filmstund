@@ -3,7 +3,7 @@ class Movie < ApplicationRecord
   include ActiveModel::Serialization
   self.primary_key = :sf_id
 
-  validates :imdb_id, format: {with: /\Att\d{7}\z/, message: 'Invalid IMDb ID'}
+  validates :imdb_id, format: {with: /\Att\d{7}\z/, message: 'Invalid IMDb ID'}, allow_nil: true
 
   def <=> other
     title <=> other.title
