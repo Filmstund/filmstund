@@ -2,7 +2,7 @@ class Movie < ApplicationRecord
   include ActiveModel::Serialization
   include HTTParty
   #debug_output $stdout
-  base_uri 'https://mobilebackend.sfbio.se/services/5/movies/GB/'
+  base_uri 'https://mobilebackend.sfbio.se/services/5'
   HEADERS = {
     'User-Agent': 'SF Bio 541 (Android Nexus 6 , N',
     'X-SF-Android-Version': '541',
@@ -28,12 +28,36 @@ class Movie < ApplicationRecord
     Rails.cache.delete('movies/all_sf')
   end
 
+  def current_show_dates
+    data = Movie.sf_movie sf_id
+    return [] if data.nil?
+
+    #shows = []
+    dates = data['showDatesMs'].map{|d| (Time.zone.at d/1000).to_date}
+    dates.flat_map do |d|
+      shows_hash = Movie.shows_at_date sf_id, d
+      next if shows_hash.nil?
+      shows_hash['shows'].map do |s|
+        tags = s['tags'].map{|t| t['tagName'].downcase}
+        {
+          auditorium_name: s['auditoriumName'],
+          gold_required: s['loyaltyOnlyForGoldMembers'],
+          available_seats: s['numberOfAvailableSeats'],
+          is_vip: tags.include?('vip'),
+          is_3d: tags.include?('3d'),
+          theatre: s['theatreName'],
+          time: Time.zone.at(s['timeMs']/1000)
+        }
+      end
+    end.sort{|x,y| x['time'] <=> y['time']}
+  end
+
   class << self
     def find id
       begin
         movie = super id
       rescue ActiveRecord::RecordNotFound => e
-        movie = parse_sf_movie_data(download_data "/movieid/#{id}")
+        movie = parse_sf_movie_data(sf_movie id)
         if movie.nil?
           raise e
         end
@@ -55,13 +79,26 @@ class Movie < ApplicationRecord
     end
 
     def toplist
-      request '/toplist'
+      request '/movies/GB/toplist'
     end
 
     def upcoming
-      request '/upcoming'
+      request '/movies/GB/upcoming'
     end
 
+    def sf_movie id
+      download_data "/movies/GB/movieid/#{id}"
+    end
+
+    def shows_at_date id, date
+      Rails.cache.fetch "showsatdate/#{id}/#{date.to_s}", expires_in: 30.minutes do
+        shows_at_date_fresh id, date
+      end
+    end
+
+    def shows_at_date_fresh id, date
+      download_data "/shows/GB/movieid/#{id}/day/#{date.strftime "%Y%m%d"}"
+    end
 
 private
     def request url=''
@@ -85,7 +122,7 @@ private
         m.description = data['shortDescription'].gsub("&nbsp;", "\u00a0")
         m.runtime = if data['length'] == 0 then nil else data['length'] end
         m.poster = data['placeHolderPosterURL'].sub('_WIDTH_', '512')
-        m.premiere_date = Time.at(data['premiereDate']/1000)
+        m.premiere_date = Time.zone.at(data['premiereDate']/1000)
       end
     end
 
