@@ -86,12 +86,6 @@ class Movie < ApplicationRecord
     end
 
     def sf_slots_at_date id, date
-      Rails.cache.fetch "sfslotsatdate/#{id}/#{date.to_s}", expires_in: 30.minutes do
-        sf_slots_at_date_fresh id, date
-      end
-    end
-
-    def sf_slots_at_date_fresh id, date
       SFParty::download_data "/shows/GB/movieid/#{id}/day/#{date.strftime "%Y%m%d"}"
     end
 
