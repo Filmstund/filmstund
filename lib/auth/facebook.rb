@@ -9,7 +9,7 @@ module Auth
 
       user = user.fetch(fields: [:name, :email])
 
-      if user.id != user_id
+      if user.id.nil? || user.id != user_id
         raise "User id mismatch"
       end
 

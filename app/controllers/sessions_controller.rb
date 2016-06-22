@@ -11,9 +11,12 @@ class SessionsController < ApplicationController
     token = params[:token]
 
     begin
+      unless user_id.present? && token.present?
+        raise "Missing parameters"
+      end
       user = PROVIDERS[provider].authenticate! user_id, token
-    rescue e
-      render json: { error: e }, status: :unauthorized
+    rescue Exception => e
+      render json: { error: e }, status: :unauthorized and return
     end
 
     @user = User.find_by_email user[:email], nick: user[:name]

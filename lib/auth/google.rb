@@ -8,7 +8,7 @@ module Auth
 
       user = user_response.parsed_response
 
-      if user_id != user["sub"]
+      if user["sub"].nil? || user_id != user["sub"]
         raise "User id mismatch"
       end
 
