@@ -70,7 +70,7 @@ class Movie < ApplicationRecord
     def all_sf
       Rails.cache.fetch("movies/all_sf", expires_in: 12.hours) do
         combined = current + upcoming
-        combined.uniq {|item| item.sf_id}
+        combined.uniq! {|item| item.sf_id}
         combined.sort! {|x,y| x.premiere_date <=> y.premiere_date}
       end
     end
