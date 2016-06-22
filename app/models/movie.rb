@@ -3,6 +3,10 @@ class Movie < ApplicationRecord
   include ActiveModel::Serialization
   self.primary_key = :sf_id
 
+  def <=> other
+    title <=> other.title
+  end
+
   def update_from_imdb_id
     UpdateInfoFromImdbIdJob.perform_later self
   end
@@ -56,6 +60,7 @@ class Movie < ApplicationRecord
         if movie.nil?
           raise e
         end
+        InfoFromThemoviedbJob.perform_later movie
         movie.save!
       end
       movie
@@ -106,19 +111,26 @@ private
     end
 
     def parse_collection data
-      data['movies'].map do |d|
-        movie = Movie.find_by sf_id: d['id']
-        if movie.nil?
-          movie = parse_sf_movie_data d
-          movie.save!
-          InfoFromThemoviedbJob.perform_later movie
-        end
-        if movie.runtime.nil? and d['length'] != 0
-          movie.runtime = d['length']
+      sf_movies = data['movies']
+      ids = sf_movies.map{|d| d['id']}
+      db_movies = Movie.where sf_id: ids
+      sf_movies.delete_if do |e|
+        # Delete movies found in DB already
+        db_movies.any?{|db| db.sf_id == e['id']}
+      end
+
+      sf_movies.map! do |m|
+        movie = parse_sf_movie_data m
+        movie.save!
+        InfoFromThemoviedbJob.perform_later movie
+        if movie.runtime.nil? and m['length'] != 0
+          movie.runtime = m['length']
           movie.save!
         end
         movie
       end
+
+      (db_movies + sf_movies).sort
     end
   end
 end
