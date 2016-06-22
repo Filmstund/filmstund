@@ -20,7 +20,7 @@ class Movie < ApplicationRecord
     Rails.cache.delete('movies/all_sf')
   end
 
-  def current_show_dates
+  def current_sf_slots
     data = Movie.sf_movie sf_id
     return [] if data.nil?
 
