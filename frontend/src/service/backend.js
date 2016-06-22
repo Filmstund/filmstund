@@ -41,11 +41,14 @@ export const fetchEndpoint = (url, options = {}) => {
   })
 }
 
-export const postEndpoint = (url, data) => {
-  const body = Object.keys(data).reduce((formData, key) => {
+const reduceFormData = (data) =>
+  Object.keys(data).reduce((formData, key) => {
     formData.append(key, data[key])
     return formData
-  }, new FormData());
+  }, new FormData())
+
+export const postEndpoint = (url, data) => {
+  const body = reduceFormData(data);
 
   return fetchEndpoint(url, {
     method: 'post',
@@ -53,6 +56,14 @@ export const postEndpoint = (url, data) => {
   });
 }
 
-export const fetchMovie = (sf_id) => {
-  return fetchEndpoint(`/movies/${sf_id}`);
-};
+export const putEndpoint = (url, data) => {
+  const body = JSON.stringify(data)
+
+  return fetchEndpoint(url, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body
+  });
+}

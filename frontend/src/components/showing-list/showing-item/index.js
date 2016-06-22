@@ -1,5 +1,4 @@
 import React from 'react';
-import { fetchMovie } from '../../../service/backend';
 import loader from '../../loader';
 
 import styles from './style.css';

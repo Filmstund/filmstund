@@ -1,5 +1,7 @@
 import React from 'react';
 import moment from 'moment';
+import { connect } from 'react-redux';
+import { putEndpoint } from '../../../service/backend';
 import GoldButton from '../../gold-button';
 
 moment.locale('sv')
@@ -7,8 +9,39 @@ moment.locale('sv')
 import styles from './style.css';
 
 const MovieItem = React.createClass({
-  renderImdbButton(movie) {
-    if (movie.imdb_id) {
+  getInitialState() {
+    return {
+      isEditing: false
+    }
+  },
+  setEdit() {
+    this.setState({
+      isEditing: true
+    })
+  },
+  handleSubmitImdbId(e) {
+    e.preventDefault()
+
+    const movie = this.props.movie
+    const imdb_id = this.imdbIdInput.value
+
+    putEndpoint(`/movies/${movie.sf_id}`, { movie: { imdb_id } })
+    .then(() => {
+      movie.imdb_id = imdb_id
+      this.setState({
+        isEditing: false
+      })
+    })
+  },
+  renderImdbButton(movie, isEditing) {
+    if (isEditing) {
+      return (
+        <form onSubmit={this.handleSubmitImdbId} className={styles.imdbLogo}>
+          <input type="text" ref={(el) => this.imdbIdInput = el} />
+          <button>Submit</button>
+        </form>
+      )
+    } else if (movie.imdb_id) {
       return (
         <a href={`http://www.imdb.com/title/${movie.imdb_id}/`} className={styles.imdbLogo}>
           <img src="/IMDb_logo.svg" />
@@ -16,13 +49,14 @@ const MovieItem = React.createClass({
       )
     } else {
       return (
-        <div className={styles.imdbLogo + ' ' + styles.inactiveLogo}>
+        <div className={styles.imdbLogo + ' ' + styles.inactiveLogo} onClick={this.setEdit}>
           <img src="/IMDb_logo.svg" />
         </div>
       )
     }
   },
   render() {
+    const { isEditing } = this.state
     const { movie } = this.props
 
     return (
@@ -31,7 +65,7 @@ const MovieItem = React.createClass({
         <div className={styles.description}>
           <div className={styles.header}>
             <div className={styles.leftSide}>
-              {this.renderImdbButton(movie)}
+              {this.renderImdbButton(movie, isEditing)}
               <h3>{movie.title}</h3>
             </div>
             <div>
@@ -51,4 +85,4 @@ const MovieItem = React.createClass({
 })
 
 
-export default MovieItem
+export default connect()(MovieItem)

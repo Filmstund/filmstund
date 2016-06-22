@@ -55,4 +55,8 @@
 .inactiveLogo {
   filter: grayscale(100%);
   // opacity: 0.3;
+  &:hover {
+    filter: none;
+    cursor: pointer;
+  }
 }

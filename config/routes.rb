@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   resources :users
   get '/me' => 'users#me'
 
-  resources :movies, only: [:index, :show] do
+  resources :movies, only: [:index, :show, :update] do
     collection do
       get 'toplist'
       get 'upcoming'
