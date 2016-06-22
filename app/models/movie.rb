@@ -80,7 +80,7 @@ private
         m.sf_id = data['id']
         m.title = data['movieName']
         m.description = data['shortDescription'].gsub("&nbsp;", "\u00a0")
-        m.runtime = data['length']
+        m.runtime = if data['length'] == 0 then nil else data['length'] end
         m.poster = data['placeHolderPosterURL'].sub('_WIDTH_', '512')
         m.premiere_date = Time.at(data['premiereDate']/1000)
       end
@@ -94,9 +94,12 @@ private
           movie.save!
           InfoFromThemoviedbJob.perform_later movie
         end
+        if movie.runtime.nil? and d['length'] != 0
+          movie.runtime = d['length']
+          movie.save!
+        end
         movie
       end
     end
-
   end
 end
