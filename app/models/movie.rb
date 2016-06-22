@@ -76,7 +76,7 @@ class Movie < ApplicationRecord
     end
 
     def current
-      request
+      request '/movies/GB'
     end
 
     def toplist
