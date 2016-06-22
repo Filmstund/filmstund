@@ -10,16 +10,22 @@ class SessionsController < ApplicationController
     user_id = params[:user_id]
     token = params[:token]
 
-    @user = PROVIDERS[provider].authenticate! user_id, token
+    begin
+      user = PROVIDERS[provider].authenticate! user_id, token
+    rescue e
+      render json: { error: e }, status: :unauthorized
+    end
 
-    render json: @user
+    @user = User.find_by_email user[:email], nick: user[:name]
+
+    token = @user.tokens.create!
+    @auth_response = AuthResponse.new @user, token.token
+    render json: @auth_response
   end
 
   def destroy
-    redirect_to root_url, :notice => 'Signed out!'
-  end
-
-  def failure
-    redirect_to root_url, :alert => "Authentication error: #{params[:message].humanize}"
+    token = token_and_options(request).first
+    ApiToken.where(token: token).delete_all
+    render json: {}
   end
 end
