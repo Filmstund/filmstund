@@ -41,6 +41,7 @@ class Movie < ApplicationRecord
         tags = s['tags'].map{|t| t['tagName'].downcase}
         {
           auditorium_name: s['auditoriumName'],
+          auditorium_id: s['auditoriumsys99Code'].to_i,
           gold_required: s['loyaltyOnlyForGoldMembers'],
           available_seats: s['numberOfAvailableSeats'],
           is_vip: tags.include?('vip'),

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160622140608) do
+ActiveRecord::Schema.define(version: 20160622162605) do
 
   create_table "attendees", force: :cascade do |t|
     t.integer  "user_id"
@@ -85,8 +85,13 @@ ActiveRecord::Schema.define(version: 20160622140608) do
   create_table "time_slots", force: :cascade do |t|
     t.time     "start_time"
     t.integer  "showing_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.string   "auditorium_name"
+    t.integer  "auditorium_id"
+    t.string   "theatre"
+    t.boolean  "is_vip"
+    t.boolean  "is_3d"
     t.index ["showing_id"], name: "index_time_slots_on_showing_id"
   end
 
