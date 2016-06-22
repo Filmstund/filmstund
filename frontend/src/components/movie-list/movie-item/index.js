@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import GoldButton from '../../gold-button';
 
 moment.locale('sv')
 
@@ -27,7 +28,11 @@ const MovieItem = React.createClass({
             </div>
           </div>
           {movie.description}
-          <div className={styles.footer}>wey</div>
+          <div className={styles.footer}>
+            <GoldButton onClick={() => {window.location = '/apabepa'}}>
+              Skapa besök
+            </GoldButton>
+          </div>
         </div>
       </div>
     )
