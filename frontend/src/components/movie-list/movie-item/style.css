@@ -18,4 +18,28 @@
 
 .description {
     flex: 1;
+    position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  img {
+    height: 1.2em;
+  }
+  h3 {
+    padding-top: 0.2em;
+  }
+}
+
+.footer{
+  position: absolute;
+  bottom:0px;
+  color:white;
+}
+
+.imdbLogo {
+  padding-right: 1em;
+  display: flex;
+  align-items: center;
 }

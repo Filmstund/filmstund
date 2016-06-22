@@ -10,8 +10,16 @@ const MovieItem = React.createClass({
       <div className={styles.container}>
         <div className={styles.image} style={{backgroundImage: `url(${movie.poster})`}}></div>
         <div className={styles.description}>
-          <h3>{movie.title}</h3>
+          <div className={styles.header}>
+              {movie.imdb_id &&
+                <a href={`http://www.imdb.com/title/${movie.imdb_id}/`} className={styles.imdbLogo}>
+                  <img src='/IMDb_logo.svg' />
+                </a>
+              }
+            <h3> {movie.title} </h3>
+          </div>
           {movie.description}
+          <div className={styles.footer}>wey</div>
         </div>
       </div>
     )
