@@ -46,6 +46,6 @@ class ShowingsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def showing_params
-      params.require(:showing).permit(:imdb_id, :sf_movie_id, :poster_url, :duration, :status)
+      params.require(:showing).permit(:imdb_id, :sf_id, :poster_url, :duration, :status)
     end
 end

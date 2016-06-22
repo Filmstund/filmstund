@@ -12,7 +12,7 @@ class ShowingsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create showing" do
     assert_difference('Showing.count') do
-      post showings_url, params: { showing: { duration: @showing.duration, imdb_id: @showing.imdb_id, poster_url: @showing.poster_url, sf_movie_id: @showing.sf_movie_id, status: @showing.status } }
+      post showings_url, params: { showing: { duration: @showing.duration, imdb_id: @showing.imdb_id, poster_url: @showing.poster_url, sf_id: @showing.sf_id, status: @showing.status } }
     end
 
     assert_response 201
@@ -24,7 +24,7 @@ class ShowingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update showing" do
-    patch showing_url(@showing), params: { showing: { duration: @showing.duration, imdb_id: @showing.imdb_id, poster_url: @showing.poster_url, sf_movie_id: @showing.sf_movie_id, status: @showing.status } }
+    patch showing_url(@showing), params: { showing: { duration: @showing.duration, imdb_id: @showing.imdb_id, poster_url: @showing.poster_url, sf_id: @showing.sf_id, status: @showing.status } }
     assert_response 200
   end
 
