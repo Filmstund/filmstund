@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     collection do
       get 'toplist'
       get 'upcoming'
+      get 'current'
     end
   end
 
