@@ -1,14 +1,6 @@
 class Movie < ApplicationRecord
+  include SFParty
   include ActiveModel::Serialization
-  include HTTParty
-  #debug_output $stdout
-  base_uri 'https://mobilebackend.sfbio.se/services/5'
-  HEADERS = {
-    'User-Agent': 'SF Bio 541 (Android Nexus 6 , N',
-    'X-SF-Android-Version': '541',
-    'Accept': ' application/json',
-    'Authorization': 'Basic U0ZiaW9BUEk6YlNGNVBGSGNSNFoz'
-  }
   self.primary_key = :sf_id
 
   def update_from_imdb_id
@@ -47,7 +39,9 @@ class Movie < ApplicationRecord
           is_vip: tags.include?('vip'),
           is_3d: tags.include?('3d'),
           theatre: s['theatreName'],
-          time: Time.zone.at(s['timeMs']/1000)
+          theatre_account: s['theatreMainAccount'].to_i,
+          time: Time.zone.at(s['timeMs']/1000),
+          sf_slot_id: s['id']
         }
       end
     end.sort{|x,y| x['time'] <=> y['time']}
@@ -88,7 +82,7 @@ class Movie < ApplicationRecord
     end
 
     def sf_movie id
-      download_data "/movies/GB/movieid/#{id}"
+      SFParty::download_data "/movies/GB/movieid/#{id}"
     end
 
     def shows_at_date id, date
@@ -98,22 +92,12 @@ class Movie < ApplicationRecord
     end
 
     def shows_at_date_fresh id, date
-      download_data "/shows/GB/movieid/#{id}/day/#{date.strftime "%Y%m%d"}"
+      SFParty::download_data "/shows/GB/movieid/#{id}/day/#{date.strftime "%Y%m%d"}"
     end
 
 private
     def request url=''
-      parse_collection(download_data url)
-    end
-
-    def download_data url
-      resp = get(url, {headers: HEADERS})
-      if resp.success?
-        resp.parsed_response
-      else
-        # TODO raise some appropriate exception
-        p "Failed to download #{url} | Resp: #{resp.response}"
-      end
+      parse_collection(SFParty::download_data url)
     end
 
     def parse_sf_movie_data data

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160622162605) do
+ActiveRecord::Schema.define(version: 20160622190128) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.integer  "user_id"
@@ -101,6 +101,8 @@ ActiveRecord::Schema.define(version: 20160622162605) do
     t.string   "theatre"
     t.boolean  "is_vip"
     t.boolean  "is_3d"
+    t.integer  "theatre_account"
+    t.string   "sf_slot_id"
     t.index ["showing_id"], name: "index_time_slots_on_showing_id"
   end
 
