@@ -7,6 +7,21 @@ moment.locale('sv')
 import styles from './style.css';
 
 const MovieItem = React.createClass({
+  renderImdbButton(movie) {
+    if (movie.imdb_id) {
+      return (
+        <a href={`http://www.imdb.com/title/${movie.imdb_id}/`} className={styles.imdbLogo}>
+          <img src="/IMDb_logo.svg" />
+        </a>
+      )
+    } else {
+      return (
+        <div className={styles.imdbLogo + ' ' + styles.inactiveLogo}>
+          <img src="/IMDb_logo.svg" />
+        </div>
+      )
+    }
+  },
   render() {
     const { movie } = this.props
 
@@ -16,11 +31,7 @@ const MovieItem = React.createClass({
         <div className={styles.description}>
           <div className={styles.header}>
             <div className={styles.leftSide}>
-              {movie.imdb_id &&
-                <a href={`http://www.imdb.com/title/${movie.imdb_id}/`} className={styles.imdbLogo}>
-                  <img src='/IMDb_logo.svg' />
-                </a>
-              }
+              {this.renderImdbButton(movie)}
               <h3>{movie.title}</h3>
             </div>
             <div>

@@ -51,3 +51,8 @@
   display: flex;
   align-items: center;
 }
+
+.inactiveLogo {
+  filter: grayscale(100%);
+  // opacity: 0.3;
+}

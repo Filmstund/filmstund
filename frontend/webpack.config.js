@@ -17,7 +17,7 @@ module.exports = {
 		extensions: ['', '.js', '.jsx']
 	},
 	postcss() {
-		return [require('precss')]
+		return [require('precss'), require('autoprefixer')]
 	},
 	module: {
 		loaders: loaders
