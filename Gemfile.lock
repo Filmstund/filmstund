@@ -45,6 +45,7 @@ GEM
       tzinfo (~> 1.1)
     arel (7.0.0)
     attr_required (1.0.1)
+    browser (2.2.0)
     builder (3.2.2)
     byebug (9.0.5)
     concurrent-ruby (1.0.2)
@@ -155,6 +156,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers
+  browser
   byebug
   fb_graph2 (~> 0.7.7)
   httparty

@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
 
     @user = User.find_by_email user[:email], nick: user[:name]
 
-    token = @user.tokens.create!
+    token = @user.tokens.create! comment: request.user_agent
     @auth_response = AuthResponse.new @user, token.token
     render json: @auth_response
   end
