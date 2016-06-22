@@ -52,3 +52,14 @@ Bioord.create!([
     "number" => 37
   }
 ])
+
+Showing.create!([
+  {
+    "sf_id" => "77049680",
+    "status" => 1,
+  },
+  {
+    "sf_id" => "49000928",
+    "status" => 1
+  }
+])

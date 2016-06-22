@@ -52,3 +52,7 @@ export const postEndpoint = (url, data) => {
     body
   });
 }
+
+export const fetchMovie = (sf_id) => {
+  return fetchEndpoint(`/movies/${sf_id}`);
+};
