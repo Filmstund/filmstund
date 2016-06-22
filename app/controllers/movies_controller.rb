@@ -1,5 +1,5 @@
 class MoviesController < ApplicationController
-  before_action :set_movie, only: [:show]
+  before_action :set_movie, only: [:show, :update]
 
   # GET /movies
   def index
@@ -24,6 +24,19 @@ class MoviesController < ApplicationController
     render json: @movie
   end
 
+  # PATCH/PUT /movies/1
+  def update
+    if @movie.update(user_params)
+      if movie_params.has_key? :imdb_id
+        @movie.update_from_imdb_id
+      end
+      render json: @movie
+    else
+      render json: @movie.errors, status: :unprocessable_entity
+    end
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_movie
@@ -32,6 +45,6 @@ class MoviesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def movie_params
-      params.fetch(:movie, {})
+      params.require(:movie).permit(:imdb_id)
     end
 end
