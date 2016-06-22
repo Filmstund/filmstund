@@ -24,5 +24,5 @@ const Quotationsbar = React.createClass({
 });
 
 export default loader((props) => ({
-  bioord: 'random_bioord'
+  bioord: '/random_bioord'
 }))(Quotationsbar)

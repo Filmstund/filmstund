@@ -17,5 +17,5 @@ const MovieList = React.createClass({
 })
 
 export default loader((props) => ({
-  movies: 'movies'
+  movies: '/movies'
 }))(MovieList)

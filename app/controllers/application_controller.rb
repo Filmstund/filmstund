@@ -10,7 +10,14 @@ class ApplicationController < ActionController::API
   private
     def authenticate
       authenticate_or_request_with_http_token do |token, options|
-        @current_user = ApiToken.find_by!(token: token).user
+        if token.nil?
+          head :unauthorized
+        end
+        begin
+          @current_user = ApiToken.find_by!(token: token).user
+        rescue
+          head :forbidden
+        end
       end
     end
 end

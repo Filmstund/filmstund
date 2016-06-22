@@ -1,81 +1,40 @@
 import React from 'react';
 
+import { connect } from 'react-redux';
 import FacebookLogin from 'react-facebook-login';
 import GoogleLogin from 'react-google-login';
+
+import { transformFacebookAuthCallback, transformGoogleAuthCallback } from '../../lib/auth'
+import { getUser, getSession } from '../../store/reducer'
+import { signIn, signOut } from '../../store/actions'
 
 import Quotationsbar from './quotationsbar';
 import Navbar from './navbar';
 import styles from './style.css';
 
-const fetchWithToken = (url) => {
-  const token = localStorage.getItem('token')
-
-  return fetch(url, {
-    headers: {
-      'Authorization': `Token token="${token}"`
-    }
-  }).then(d => d.json())
-}
-
 const Header = React.createClass({
   handleGoogleAuthCallback(params) {
-    return this.handleAuthCallback({
-      token: params.hg.id_token,
-      user_id: params.wc.Ka,
-      provider: 'google'
-    })
+    return this.handleAuthCallback(transformGoogleAuthCallback(params))
   },
   handleFacebookAuthCallback(params) {
-    return this.handleAuthCallback({
-      token: params.accessToken,
-      user_id: params.userID,
-      provider: 'facebook'
-    })
+    return this.handleAuthCallback(transformFacebookAuthCallback(params))
   },
   handleAuthCallback(params) {
     if (!params.token || !params.user_id) {
       throw 'Authentication failure - no token received'
+    } else {
+      this.props.dispatch(signIn(params))
     }
-    const postBody = Object.keys(params).reduce((formData, key) => {
-      formData.append(key, params[key])
-      return formData
-    }, new FormData())
-
-    fetch('/api/authenticate', {
-      method: 'post',
-      body: postBody
-    })
-    .then(d => d.json())
-    .then(json => {
-      console.log(json.token);
-      localStorage.setItem('token', json.token)
-      this.forceUpdate()
-
-      fetch('/api/me', {
-        headers: {
-          'Authorization': `Token token="${json.token}"`
-        }
-      })
-    })
   },
   signOut() {
-    fetchWithToken('/api/signout').then(() => {
-      localStorage.removeItem('token')
-      this.forceUpdate()
-    })
-  },
-  fetchMe() {
-    fetchWithToken('/api/me')
+    this.props.dispatch(signOut());
   },
   render() {
-    let signedIn = false;
-    if (localStorage.getItem('token')) {
-      signedIn = true;
-    }
+    const { signedIn, user } = this.props
 
     return (
       <div className={styles.container}>
-        <Navbar/>
+        <Navbar user={user} signedIn={signedIn}/>
         <Quotationsbar />
         {!signedIn &&
         <GoogleLogin
@@ -101,4 +60,7 @@ const Header = React.createClass({
 })
 
 
-export default Header
+export default connect(state => ({
+  user: getUser(state),
+  signedIn: getSession(state).signedIn
+}))(Header)
