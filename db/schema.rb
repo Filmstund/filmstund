@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160621104257) do
+ActiveRecord::Schema.define(version: 20160622135005) do
 
   create_table "attendees", force: :cascade do |t|
     t.integer  "user_id"
@@ -69,16 +69,10 @@ ActiveRecord::Schema.define(version: 20160621104257) do
   end
 
   create_table "showings", force: :cascade do |t|
-    t.string   "imdb_id"
     t.string   "sf_movie_id"
-    t.integer  "ticket_price"
-    t.string   "poster_url"
-    t.integer  "duration"
     t.integer  "status"
-    t.boolean  "is_3d"
-    t.boolean  "is_vip"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "showings_time_slots", id: false, force: :cascade do |t|
