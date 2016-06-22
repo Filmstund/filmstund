@@ -1,14 +1,14 @@
 class SessionsController < ApplicationController
-
+  skip_before_action :authenticate, only: [:create, :destroy]
   PROVIDERS = {
     'facebook' => Auth::Facebook,
     'google' => Auth::Google
   }
 
   def create
-    provider = params[:provider]
-    user_id = params[:user_id]
-    token = params[:token]
+    provider = authenticate_params[:provider]
+    user_id = authenticate_params[:user_id]
+    token = authenticate_params[:token]
 
     begin
       unless user_id.present? && token.present?
@@ -30,5 +30,9 @@ class SessionsController < ApplicationController
     token = token_and_options(request).first
     ApiToken.where(token: token).delete_all
     render json: {}
+  end
+
+  def authenticate_params
+    params.permit(:provider, :user_id, :token)
   end
 end
