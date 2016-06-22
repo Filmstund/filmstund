@@ -1,6 +1,8 @@
 import React from 'react';
 import loader from '../../loader';
 
+import StatusLabel from './status-label';
+
 import styles from './style.css';
 
 const ShowingItem = React.createClass({
@@ -11,7 +13,7 @@ const ShowingItem = React.createClass({
         <div className={styles.image} style={{backgroundImage: `url(${movie.poster})`}}></div>
         <div className={styles.description}>
           <h3>{movie.title}</h3>
-          {movie.description}
+          <StatusLabel className={styles.label} status={showing.status} />
         </div>
       </div>
     )
