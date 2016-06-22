@@ -39,7 +39,7 @@ class TimeSlot < ApplicationRecord
     end
 
     def sf_slots_between from, to, movie
-      movie.current_show_dates.select do |s|
+      movie.current_sf_slots.select do |s|
         time = s[:time]
         time >= from && time <= to
       end

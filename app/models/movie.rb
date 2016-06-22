@@ -27,7 +27,7 @@ class Movie < ApplicationRecord
     #shows = []
     dates = data['showDatesMs'].map{|d| (Time.zone.at d/1000).to_date}
     dates.flat_map do |d|
-      shows_hash = Movie.shows_at_date sf_id, d
+      shows_hash = Movie.sf_slots_at_date sf_id, d
       next if shows_hash.nil?
       shows_hash['shows'].map do |s|
         tags = s['tags'].map{|t| t['tagName'].downcase}
@@ -85,13 +85,13 @@ class Movie < ApplicationRecord
       SFParty::download_data "/movies/GB/movieid/#{id}"
     end
 
-    def shows_at_date id, date
-      Rails.cache.fetch "showsatdate/#{id}/#{date.to_s}", expires_in: 30.minutes do
-        shows_at_date_fresh id, date
+    def sf_slots_at_date id, date
+      Rails.cache.fetch "sfslotsatdate/#{id}/#{date.to_s}", expires_in: 30.minutes do
+        sf_slots_at_date_fresh id, date
       end
     end
 
-    def shows_at_date_fresh id, date
+    def sf_slots_at_date_fresh id, date
       SFParty::download_data "/shows/GB/movieid/#{id}/day/#{date.strftime "%Y%m%d"}"
     end
 
