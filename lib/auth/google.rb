@@ -7,7 +7,7 @@ module Auth
       user_response = get("/tokeninfo?id_token=#{token}")
 
       if not user_response.success?
-        raise "Unable to validate token"
+        raise "Invalid OAuth access token."
       end
 
       user = user_response.parsed_response
