@@ -25,6 +25,7 @@ class Movie < ApplicationRecord
     genres = info['genres']
     self.genres = genres.map{|g| g['name']}.join "," unless genres.nil?
     save!
+    Rails.cache.delete('movies/all_sf')
   end
 
   class << self
@@ -42,9 +43,11 @@ class Movie < ApplicationRecord
     end
 
     def all_sf
-      combined = current + upcoming
-      combined.uniq {|item| item.sf_id}
-      combined.sort! {|x,y| x.premiere_date <=> y.premiere_date}
+      Rails.cache.fetch("movies/all_sf", expires_in: 12.hours) do
+        combined = current + upcoming
+        combined.uniq {|item| item.sf_id}
+        combined.sort! {|x,y| x.premiere_date <=> y.premiere_date}
+      end
     end
 
     def current
