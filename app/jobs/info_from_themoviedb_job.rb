@@ -3,7 +3,7 @@ class InfoFromThemoviedbJob < ApplicationJob
 
   def perform(movie)
     info = get_themoviedb_info movie.title, movie.premiere_date.year
-    movie.update_from_themoviedb info
+    movie.update_from_themoviedb info unless info.nil?
   end
 private
   def get_themoviedb_info title, release_year
