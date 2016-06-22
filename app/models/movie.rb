@@ -1,4 +1,4 @@
-class Movie
+class Movie < ApplicationRecord
   include ActiveModel::Serialization
   include HTTParty
   #debug_output $stdout
@@ -9,63 +9,42 @@ class Movie
     'Accept': ' application/json',
     'Authorization': 'Basic U0ZiaW9BUEk6YlNGNVBGSGNSNFoz'
   }
+  self.primary_key = :sf_id
 
-  attr_accessor :title, :title_id, :description, :runtime, :poster, :premiere_date, :sf_id
-
-  def themoviedb
-    release_year = (Time.at (premiere_date / 1000)).year
-    Rails.cache.fetch("movie/#{title_id}", expires_in: 48.hours) do
-      self.class.get_themoviedb_info title, release_year
-    end || {}
+  def update_from_imdb_id
+    UpdateInfoFromImdbIdJob.perform_later self
   end
 
-  def imdb_id
-    themoviedb['imdb_id']
-  end
+  def update_from_themoviedb info
+    self.title = info['original_title']
+    self.imdb_id = info['imdb_id'] unless info['imdb_id'].nil?
+    self.themoviedb_id = info['id']
+    self.description = info['overview']
+    self.tagline = info['tagline']
 
-  def tagline
-    themoviedb['tagline']
+    genres = info['genres']
+    self.genres = genres.map{|g| g['name']}.join "," unless genres.nil?
+    save!
   end
-
-  def title_orig
-    themoviedb['original_title']
-  end
-
-  def genres
-    gens = themoviedb['genres']
-    if gens.present?
-      gens.map{|g| g['name']}
-    end
-  end
-
-  def overview
-    themoviedb['overview']
-  end
-
-  def alt_poster
-    if themoviedb.present?
-      "http://image.tmdb.org/t/p/w500/#{themoviedb['poster_path']}"
-    end
-  end
-
-  def backdrop
-    if themoviedb.present?
-      "http://image.tmdb.org/t/p/w1000/#{themoviedb['backdrop_path']}"
-    end
-  end
-
 
   class << self
     def find id
-      parse_sf_movie_data(download_data "/movieid/#{id}")
+      begin
+        movie = super id
+      rescue ActiveRecord::RecordNotFound => e
+        movie = parse_sf_movie_data(download_data "/movieid/#{id}")
+        if movie.nil?
+          raise e
+        end
+        movie.save!
+      end
+      movie
     end
 
-    def all
-      Rails.cache.fetch("movies/all", expires_in: 12.hours) {
-        combined = current + upcoming
-        combined.uniq {|item| item.sf_id}
-        combined.sort! {|x,y| x.premiere_date <=> y.premiere_date}
-      }
+    def all_sf
+      combined = current + upcoming
+      combined.uniq {|item| item.sf_id}
+      combined.sort! {|x,y| x.premiere_date <=> y.premiere_date}
     end
 
     def current
@@ -79,6 +58,7 @@ class Movie
     def upcoming
       request '/upcoming'
     end
+
 
 private
     def request url=''
@@ -96,35 +76,27 @@ private
     end
 
     def parse_sf_movie_data data
-      m = Movie.new
-      m.title = data['movieName']
-      m.title_id = data['titleId']
-      m.description = data['shortDescription']
-      m.runtime =  data['length']
-      m.poster =  data['placeHolderPosterURL'].sub('_WIDTH_', '512')
-      m.sf_id = data['id']
-      m.premiere_date = data['premiereDate']
-      m
+      Movie.new do |m|
+        m.sf_id = data['id']
+        m.title = data['movieName']
+        m.description = data['shortDescription'].sub('&nbsp;', '\n')
+        m.runtime = data['length']
+        m.poster = data['placeHolderPosterURL'].sub('_WIDTH_', '512')
+        m.premiere_date = Time.at(data['premiereDate']/1000)
+      end
     end
 
     def parse_collection data
-      data['movies'].collect do |m|
-        parse_sf_movie_data m
+      data['movies'].map do |d|
+        movie = Movie.find_by sf_id: d['id']
+        if movie.nil?
+          movie = parse_sf_movie_data d
+          movie.save!
+          InfoFromThemoviedbJob.perform_later movie
+        end
+        movie
       end
     end
 
-    public
-    def get_themoviedb_info title, release_year
-      search = Tmdb::Search.new
-      search.resource 'movie'
-      # The following may yield a subtle bug around new year.
-      search.year release_year
-      search.query title
-      results = search.fetch
-      if results.count == 1
-        return Tmdb::Movie.detail(results[0]['id'])
-      end
-      nil
-    end
   end
 end

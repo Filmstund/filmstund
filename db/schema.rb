@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160619210241) do
+ActiveRecord::Schema.define(version: 20160621104257) do
 
   create_table "attendees", force: :cascade do |t|
     t.integer  "user_id"
@@ -38,6 +38,19 @@ ActiveRecord::Schema.define(version: 20160619210241) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_id"], name: "index_gift_cards_on_owner_id"
+  end
+
+  create_table "movies", primary_key: "sf_id", id: :string, force: :cascade do |t|
+    t.string   "imdb_id"
+    t.string   "themoviedb_id"
+    t.string   "title"
+    t.text     "description"
+    t.integer  "runtime"
+    t.string   "poster"
+    t.datetime "premiere_date"
+    t.string   "tagline"
+    t.string   "genres"
+    t.index ["sf_id"], name: "sqlite_autoindex_movies_1", unique: true
   end
 
   create_table "orders", force: :cascade do |t|
