@@ -4,12 +4,18 @@ class TimeSlot < ApplicationRecord
   has_and_belongs_to_many :users
 
   def price
-    # This ensures that this TimeSlot is a valid SF time slot
-    # and not a temporary one
-    if sf_slot_id.present? and theatre_account.present?
-      data = SFParty.download_data "/shows/showid/#{sf_slot_id}/theatremainaccount/#{theatre_account}"
-      return data['adultPrice'] unless data.nil?
+    unless read_attribute(:price).present?
+      # This ensures that this TimeSlot is a valid SF time slot
+      # and not a temporary one
+      if sf_slot_id.present? and theatre_account.present?
+        data = SFParty.download_data "/shows/showid/#{sf_slot_id}/theatremainaccount/#{theatre_account}"
+        unless data.nil?
+          write_attribute :price, data['adultPrice']
+          save!
+        end
+      end
     end
+    read_attribute(:price)
   end
 
   def available_seats

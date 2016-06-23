@@ -31,7 +31,6 @@ class Movie < ApplicationRecord
     data = Movie.sf_movie sf_id
     return [] if data.nil?
 
-    #shows = []
     dates = data['showDatesMs'].map{|d| (Time.zone.at d/1000).to_date}
     dates.flat_map do |d|
       shows_hash = Movie.sf_slots_at_date sf_id, d
