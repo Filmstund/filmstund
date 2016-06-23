@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
     token = authenticate_params[:token]
 
     begin
-      unless user_id.present? && token.present?
+      unless user_id.present? && token.present? && provider.present?
         raise "Missing parameters"
       end
       user = PROVIDERS[provider].authenticate! user_id, token
