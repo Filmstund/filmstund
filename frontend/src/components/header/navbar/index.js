@@ -7,7 +7,7 @@ const Navbar = React.createClass({
     const { user, signedIn } = this.props
     return (
         <div className={styles.navbar}>
-          <img src="./logo.svg" alt="ITbio logo"/>
+          <img src="/logo.svg" alt="ITbio logo"/>
           <ul>
             <li><Link to="/showings" activeClassName={styles.activeLink}>Besök</Link></li>
             <li><Link to="/movies" activeClassName={styles.activeLink}>Filmer</Link></li>
