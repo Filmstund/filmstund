@@ -1,16 +1,16 @@
 .goldButton {
   text-decoration: none;
-  background-color: #ffd800;
-  border-color: #ffd800;
-  background: linear-gradient(to bottom, #ffd800 0%,#fcf080 100%);
+  background-color: #E5BB25;
+  border-color: #E5BB25;
+  background: linear-gradient(to bottom, #E5BB25 0%,#F3DF66 100%);
   border-radius: 15px;
   border: 0;
   padding: 0.5em;
-  box-shadow: inset 4px 4px 4px #ffd800;
+  box-shadow: inset 4px 4px 4px #E5BB25;
 
   &:hover {
-    background-color: #998200;
+    background-color: #deba3b;
     background: linear-gradient(to bottom, #ccad00 0%,#f9e31f 100%);
-    box-shadow: inset 4px 4px 4px #998200;
+    box-shadow: inset 4px 4px 4px #deba3b;
   }
 }

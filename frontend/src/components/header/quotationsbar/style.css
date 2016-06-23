@@ -14,7 +14,7 @@ blockquote {
   box-shadow: 2px 2px 6px #000;
 }
 blockquote:before, blockquote:after {
-  color: #cc0;
+  color: #E5BB25;
   display: block;
   font-size: 80px;
   position: absolute;
