@@ -1,0 +1,80 @@
+
+.daysContainer {
+    justify-content: center;
+    user-select: none;
+}
+
+.is_vip, .is_3d {
+    margin-left: 0.3em;
+    font-size: 0.8em;
+    padding: 0 0.3em;
+    min-width: 20px;
+    display: inline-block;
+    background: goldenrod;
+    color: black;
+    border: 1px solid black;
+    border-radius: 5px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.daysRow {
+    border: 10px solid #712;
+    color: white;
+    justify-content: center;
+    background: #712;
+}
+
+.daysContainer, .daysRow, .doodleSlot, .doodleDay {
+    display: flex;
+}
+
+.time {
+    font-weight: bold;
+}
+
+.tags {
+    padding: 0.2em 0;
+}
+
+.doodleSlot {
+    padding: 1em 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 6em;
+    width: 6em;
+    border-bottom: 1px solid white;
+
+    &.selected {
+        background: rgba(204, 153, 0, 1);
+        color: black;
+
+        &:hover {
+            background: rgba(204, 153, 0, 0.5);
+        }
+    }
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+    }
+
+    small {
+        font-weight: 100;
+    }
+}
+
+.doodleDate {
+    border-bottom: 1px solid white;
+    padding: 0 1em;
+}
+
+.doodleDay {
+    flex-direction: column;
+    border-right: 1px solid white;
+
+    &:last-child {
+        border-right: 0;
+    }
+}
