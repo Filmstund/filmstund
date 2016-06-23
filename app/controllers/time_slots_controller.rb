@@ -46,6 +46,6 @@ class TimeSlotsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def time_slot_params
-      params.require(:time_slot).permit(:start_time, :showing_id)
+      params.require(:time_slot).permit(:start_time, :showing_id, :auditorium_name, :auditorium_id, :theatre, :theatre_account, :is_vip, :is_3d, :sf_slot_id)
     end
 end
