@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160622195216) do
+ActiveRecord::Schema.define(version: 20160623131044) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.integer  "user_id"
@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(version: 20160622195216) do
   end
 
   create_table "time_slots", force: :cascade do |t|
-    t.time     "start_time"
+    t.datetime "start_time"
     t.integer  "showing_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
