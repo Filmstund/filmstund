@@ -7,12 +7,13 @@ import styles from './style.css';
 
 const ShowingItem = React.createClass({
   render() {
-    const { showing, movie } = this.props
+    const { showing } = this.props
+    console.log('showing',showing);
     return (
       <div className={styles.container}>
-        <div className={styles.image} style={{backgroundImage: `url(${movie.poster})`}}></div>
+        <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>
         <div className={styles.description}>
-          <h3>{movie.title}</h3>
+          <h3>{showing.movie.title}</h3>
           <StatusLabel className={styles.label} status={showing.status} />
         </div>
       </div>
