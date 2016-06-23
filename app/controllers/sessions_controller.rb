@@ -1,5 +1,6 @@
 class SessionsController < ApplicationController
   skip_before_action :authenticate, only: [:create, :destroy]
+
   PROVIDERS = {
     'facebook' => Auth::Facebook,
     'google' => Auth::Google

@@ -18,7 +18,7 @@ protected
       begin
         @current_user = ApiToken.find_by!(token: token).user
       rescue
-        render json: {error: "Schoo, you're not allowed here!"}, status: :forbidden and return
+        render json: {error: "Schoo, you're not allowed here!"}, status: :forbidden and return true
       end
     end
   end
