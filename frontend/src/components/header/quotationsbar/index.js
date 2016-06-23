@@ -4,19 +4,21 @@ import loader from '../../loader'
 
 const Quotationsbar = React.createClass({
   render() {
-    let { bioord, loading } = this.props;
+    const { bioord, loading } = this.props;
 
-    if (loading && !bioord) {
-      bioord = {
-        p: 'Hittar inget bioord :(',
-        cite: 'Bapedibopi'
+    let ord = bioord.bioord || {}
+
+    if (loading && !ord) {
+      ord = {
+        phrase: 'Hittar inget bioord :(',
+        number: 'Bapedibopi'
       }
     }
     return (
       <blockquote>
-        <p>{bioord.phrase}</p>
+        <p>{ord.phrase}</p>
         <footer>
-          <cite>De bio budorden : {bioord.number}</cite>
+          <cite>De bio budorden : {ord.number}</cite>
         </footer>
       </blockquote>
     );

@@ -10,7 +10,7 @@ const ShowingList = React.createClass({
 
     return (
       <div className={styles.container}>
-        {showings.map(showing => <ShowingItem showing={showing} key={showing.sf_id} />)}
+        {(showings.showings || []).map(showing => <ShowingItem showing={showing} key={showing.sf_id} />)}
       </div>
     )
   }

@@ -17,7 +17,7 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
     const defaults = defaultFunc(this.props)
 
     const emptyFetchResults = Object.keys(urls).reduce((acc, key) => {
-      acc[key] = defaults[key] || []
+      acc[key] = defaults[key] || {}
       return acc
     }, {})
 

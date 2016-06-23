@@ -10,7 +10,7 @@ const MovieList = React.createClass({
 
     return (
       <div className={styles.container}>
-        {movies.map(movie => <MovieItem movie={movie} key={movie.sf_id} />)}
+        {(movies.movies || []).map(movie => <MovieItem movie={movie} key={movie.sf_id} />)}
       </div>
     )
   }
