@@ -1,7 +1,7 @@
 import store from '../store'
 import { getAuthToken } from '../store/reducer'
 
-let authToken = null
+let authToken = getAuthToken(store.getState())
 
 store.subscribe(() => {
   authToken = getAuthToken(store.getState())
