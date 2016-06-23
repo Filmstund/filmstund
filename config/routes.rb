@@ -2,8 +2,9 @@ Rails.application.routes.draw do
   resources :gift_cards
   resources :orders
   get '/random_bioord' => 'bioord#random'
-  resources :time_slots
-  resources :showings
+  resources :showings do
+    resources :time_slots
+  end
   resources :users
   get '/me' => 'users#me'
 

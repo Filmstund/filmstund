@@ -3,7 +3,7 @@ class TimeSlotsController < ApplicationController
 
   # GET /time_slots
   def index
-    @time_slots = TimeSlot.all
+    @time_slots = TimeSlot.where showing_id: params[:showing_id]
 
     render json: @time_slots
   end
@@ -41,7 +41,7 @@ class TimeSlotsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_time_slot
-      @time_slot = TimeSlot.find(params[:id])
+      @time_slot = TimeSlot.find_by!(id: params[:id], showing_id: params[:showing_id])
     end
 
     # Only allow a trusted parameter "white list" through.
