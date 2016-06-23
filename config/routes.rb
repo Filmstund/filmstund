@@ -5,8 +5,11 @@ Rails.application.routes.draw do
   resources :showings do
     resources :time_slots
   end
-  resources :users
+
+  resources :users, only: :show
   get '/me' => 'users#me'
+  put '/me' => 'users#update'
+  delete '/me' => 'users#destroy'
 
   resources :movies, only: [:index, :show, :update] do
     collection do

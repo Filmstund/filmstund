@@ -1,10 +1,8 @@
 import React from 'react';
-import moment from 'moment';
+import moment from '../../../lib/moment'
 import { connect } from 'react-redux';
 import { putEndpoint } from '../../../service/backend';
 import GoldButton from '../../gold-button';
-
-moment.locale('sv')
 
 import styles from './style.css';
 
