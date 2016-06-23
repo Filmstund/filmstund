@@ -3,6 +3,8 @@ class TimeSlot < ApplicationRecord
   belongs_to :showing
   has_and_belongs_to_many :users
 
+  validates :showing_id, :auditorium_id, :theatre_account, :sf_slot_id, presence: true
+
   def price
     unless read_attribute(:price).present?
       # This ensures that this TimeSlot is a valid SF time slot
