@@ -1,7 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import GoldButton from '../gold-button'
+
 import { getUser } from '../../store/reducer'
+import { updateUser } from '../../store/actions'
 import styles from './style.css'
 
 
@@ -22,8 +25,10 @@ const UserProfile = React.createClass({
       console.log(this.state.userForm);
     })
   },
-  handleSubmit() {
-    console.log(this.state.userForm)
+  handleSubmit(e) {
+    e.preventDefault()
+
+    this.props.dispatch(updateUser(this.state.userForm))
   },
   render() {
     const { userForm } = this.state
@@ -55,9 +60,10 @@ const UserProfile = React.createClass({
           </select>
         </div>
         <div className={styles.formRow}>
-          <label htmlFor="pushoverKey">Pushover nyckel</label>
-          <input type="text" value={userForm.pushoverKey} onChange={(e) => this.handleChange('pushoverKey', e)} id="pushoverKey" />
+          <label htmlFor="pushover_key">Pushover nyckel</label>
+          <input type="text" value={userForm.pushover_key} onChange={(e) => this.handleChange('pushover_key', e)} id="pushover_key" />
         </div>
+        <GoldButton>Skicka</GoldButton>
        </form>
       </div>
     )

@@ -15,7 +15,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         signedIn: true,
-        authToken: action.data.token
+        authToken: action.token
       }
     case SIGN_IN_FAILED:
     case SIGN_OUT:
