@@ -125,10 +125,6 @@ private
         movie = parse_sf_movie_data m
         movie.save!
         InfoFromThemoviedbJob.perform_later movie
-        if movie.runtime.nil? and m['length'] != 0
-          movie.runtime = m['length']
-          movie.save!
-        end
         movie
       end
 
