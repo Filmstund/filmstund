@@ -52,7 +52,10 @@ Bioord.create!([
     "number" => 37
   }
 ])
-
+Movie.create!([
+  {sf_id: "77049680", imdb_id: "tt3110958", themoviedb_id: "291805", title: "Now You See Me 2", description: "One year after outwitting the FBI and winning the ...", runtime: 129, poster: "https://mobilebackend.sfbio.se/image/POSTER/512/-/...", premiere_date: "2016-06-14 22:00:00", tagline: "You Haven't Seen Anything Yet", genres: "Action,Comedy,Thriller"},
+  {sf_id: "49000928", imdb_id: "tt1489889", themoviedb_id: "302699", title: "Central Intelligence", description: "After he reunites with an old pal through Facebook...", runtime: 108, poster: "https://mobilebackend.sfbio.se/image/POSTER/512/-/...", premiere_date: "2016-06-16 22:00:00", tagline: "Saving the world takes a little Hart and a big Joh...", genres: "Action,Comedy"}
+  ])
 Showing.create!([
   {
     "sf_id" => "77049680",
