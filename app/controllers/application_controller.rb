@@ -8,18 +8,23 @@ class ApplicationController < ActionController::API
     @current_user
   end
 
-  private
-    def authenticate
-      # TODO: render as json
-      authenticate_or_request_with_http_token do |token, options|
-        if token.nil?
-          head :unauthorized
-        end
-        begin
-          @current_user = ApiToken.find_by!(token: token).user
-        rescue
-          head :forbidden
-        end
+protected
+  def authenticate
+    authenticate_token || render_unauthorized
+  end
+
+  def authenticate_token
+    authenticate_with_http_token do |token, options|
+      begin
+        @current_user = ApiToken.find_by!(token: token).user
+      rescue
+        render json: {error: "Schoo, you're not allowed here!"}, status: :forbidden and return
       end
     end
+  end
+
+  def render_unauthorized(realm = "Application")
+    self.headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
+    render json: {error: 'Come back when you have a token!'}, status: :unauthorized and return
+  end
 end
