@@ -44,6 +44,15 @@ class Movie < ApplicationRecord
     end.sort{|x,y| x['time'] <=> y['time']}
   end
 
+  # Serialization related #
+  def marshal_dump
+    {}.merge(attributes)
+  end
+  def marshal_load stuff
+    send :initialize, stuff, :without_protection => true
+  end
+  ########################
+
   class << self
     def find id
       begin
