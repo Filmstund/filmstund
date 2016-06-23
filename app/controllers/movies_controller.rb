@@ -33,9 +33,6 @@ class MoviesController < ApplicationController
   # PATCH/PUT /movies/1
   def update
     if @movie.update(movie_params)
-      if movie_params.has_key? :imdb_id
-        @movie.update_from_imdb_id
-      end
       render json: @movie
     else
       render json: @movie.errors, status: :unprocessable_entity

@@ -10,8 +10,11 @@ class Movie < ApplicationRecord
     title <=> other.title
   end
 
-  def update_from_imdb_id
-    UpdateInfoFromImdbIdJob.perform_later self
+  def imdb_id= id
+    super id
+    unless id.nil?
+      UpdateInfoFromImdbIdJob.perform_later self
+    end
   end
 
   def update_from_themoviedb info
