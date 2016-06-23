@@ -14,10 +14,16 @@ class TimeSlot < ApplicationRecord
 
   def available_seats
     if showing.present? and sf_slot_id.present?
-      date = start_time.strftime '%Y%m%d'
-      data = SFParty.download_data "/shows/GB/movieid/#{showing.movie.sf_id}/day/#{date}"
-      return nil if data.nil?
-      return data['shows'].detect{|e| e['id'] == sf_slot_id}['numberOfAvailableSeats']
+      info = TimeSlot.get_slot_info(showing.movie.sf_id, sf_slot_id, start_time)
+      return info['numberOfAvailableSeats'] unless info.nil?
+    end
+    nil
+  end
+
+  def gold_required?
+    if showing.present? and sf_slot_id.present?
+      info = TimeSlot.get_slot_info(showing.movie.sf_id, sf_slot_id, start_time)
+      return info['loyaltyOnlyForGoldMembers'] unless info.nil?
     end
     nil
   end
@@ -30,15 +36,16 @@ class TimeSlot < ApplicationRecord
 
   class << self
     def new_from_sf_slot slot
-      TimeSlot.new do |s|
-        s.start_time = slot[:time]
-        s.auditorium_name = slot[:auditorium_name]
-        s.auditorium_id = slot[:auditorium_id]
-        s.theatre = slot[:theatre]
-        s.theatre_account = slot[:theatre_account]
-        s.is_vip = slot[:is_vip]
-        s.is_3d = slot[:is_3d]
-        s.sf_slot_id = slot[:sf_slot_id]
+      TimeSlot.new do |ts|
+        tags = slot['tags'].map{|t| t['tagName'].downcase}
+        ts.start_time      = Time.zone.at(slot['timeMs']/1000)
+        ts.auditorium_name = slot['auditoriumName']
+        ts.auditorium_id   = slot['auditoriumsys99Code'].to_i
+        ts.is_vip          = tags.include?('vip')
+        ts.is_3d           = tags.include?('3d')
+        ts.theatre         = slot['theatreName']
+        ts.theatre_account = slot['theatreMainAccount'].to_i
+        ts.sf_slot_id      = slot['id']
       end
     end
 
@@ -47,6 +54,13 @@ class TimeSlot < ApplicationRecord
         time = s[:time]
         time >= from && time <= to
       end
+    end
+
+    def get_slot_info sf_id, sf_slot_id, start_time
+      date = start_time.strftime '%Y%m%d'
+      data = SFParty.download_data "/shows/GB/movieid/#{sf_id}/day/#{date}"
+      return data['shows'].detect{|e| e['id'] == sf_slot_id} unless data.nil?
+      nil
     end
   end
 end

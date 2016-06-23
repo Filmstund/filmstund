@@ -15,14 +15,14 @@ class Movie < ApplicationRecord
   end
 
   def update_from_themoviedb info
-    self.title = info['original_title']
-    self.imdb_id = info['imdb_id'] unless info['imdb_id'].nil?
+    self.title         = info['original_title']
+    self.imdb_id       = info['imdb_id'] unless info['imdb_id'].nil?
     self.themoviedb_id = info['id']
-    self.description = info['overview']
-    self.tagline = info['tagline']
+    self.description   = info['overview']
+    self.tagline       = info['tagline']
 
-    genres = info['genres']
-    self.genres = genres.map{|g| g['name']}.join "," unless genres.nil?
+    genres             = info['genres']
+    self.genres        = genres.map{|g| g['name']}.join "," unless genres.nil?
     save!
     Rails.cache.delete('movies/all_sf')
   end
@@ -37,19 +37,7 @@ class Movie < ApplicationRecord
       shows_hash = Movie.sf_slots_at_date sf_id, d
       next if shows_hash.nil?
       shows_hash['shows'].map do |s|
-        tags = s['tags'].map{|t| t['tagName'].downcase}
-        {
-          auditorium_name: s['auditoriumName'],
-          auditorium_id: s['auditoriumsys99Code'].to_i,
-          gold_required: s['loyaltyOnlyForGoldMembers'],
-          available_seats: s['numberOfAvailableSeats'],
-          is_vip: tags.include?('vip'),
-          is_3d: tags.include?('3d'),
-          theatre: s['theatreName'],
-          theatre_account: s['theatreMainAccount'].to_i,
-          time: Time.zone.at(s['timeMs']/1000),
-          sf_slot_id: s['id']
-        }
+        TimeSlot.new_from_sf_slot s
       end
     end.sort{|x,y| x['time'] <=> y['time']}
   end
