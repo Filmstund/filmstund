@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 import ShowingList from './components/showing-list';
+import Showing from './components/showing';
 import MovieList from './components/movie-list';
 import UserProfile from './components/user-profile';
 import SlotPicker from './components/slot-picker';
@@ -13,6 +14,7 @@ const routes = (
   <Route path="/" component={Root}>
     <IndexRoute component={MovieList}/>
     <Route path="showings" component={ShowingList}/>
+    <Route path="showings/:id" component={Showing}/>
     <Route path="movies" component={MovieList}/>
     <Route path="user" component={UserProfile}/>
     <Route path="slots" component={SlotPicker}/>

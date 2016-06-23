@@ -48,10 +48,13 @@ const reduceFormData = (data) =>
   }, new FormData())
 
 export const postEndpoint = (url, data) => {
-  const body = reduceFormData(data);
-
+  const body = JSON.stringify(data);
+  console.log('body',body);
   return fetchEndpoint(url, {
     method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body
   });
 }

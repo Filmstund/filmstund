@@ -8,7 +8,6 @@ import styles from './style.css';
 const ShowingItem = React.createClass({
   render() {
     const { showing } = this.props
-    console.log('showing',showing);
     return (
       <div className={styles.container}>
         <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>
@@ -22,6 +21,4 @@ const ShowingItem = React.createClass({
 })
 
 
-export default loader((props) => ({
-  movie: `/movies/${props.showing.sf_id}`
-}))(ShowingItem)
+export default ShowingItem
