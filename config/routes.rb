@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   get '/random_bioord' => 'bioord#random'
   resources :showings do
     resources :time_slots
+    member do
+      get 'between/:from/:to', action: :between
+    end
   end
 
   resources :users, only: :show
