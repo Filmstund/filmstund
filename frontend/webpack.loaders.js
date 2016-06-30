@@ -7,6 +7,7 @@ module.exports = [
 
 	{
 		test: /\.css$/,
+		exclude: /(node_modules|bower_components)/,
 		loader: 'style-loader!css-loader?modules&localIdentName=[path][name]---[local]---[hash:base64:5]!postcss-loader'
 	},
 	{

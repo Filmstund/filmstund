@@ -22,12 +22,12 @@ const SlotPicker = React.createClass({
     }
   },
   renderSlot(slot) {
-    const isSelected = this.state.selectedIds.includes(slot.id)
+    const isSelected = this.state.selectedIds.includes(slot.sf_slot_id)
 
     return (
-      <div key={slot.id}
+      <div key={slot.sf_slot_id}
            className={styles.doodleSlot + ' ' + (isSelected ? styles.selected : '')}
-           onClick={() => this.handleSelectId(slot.id)}>
+           onClick={() => this.handleSelectId(slot.sf_slot_id)}>
         <div className={styles.time}>
           {moment(slot.start_time).format('LT')}
         </div>
@@ -45,14 +45,14 @@ const SlotPicker = React.createClass({
   renderDay(date, slots) {
     return (
       <div key={date} className={styles.doodleDay}>
-        <div className={styles.doodleDate} title={moment(date).format('L')}>{moment(date).format('D MMM')}</div>
+        <div className={styles.doodleDate} title={date}>{moment(date).format('D MMM')}</div>
         <div>{slots.map(this.renderSlot)}</div>
       </div>
     )
   },
   render() {
-    const { time_slots } = this.props;
-    const slotsByDate = _.groupBy(time_slots, s => s.start_time);
+    const { timeSlots } = this.props;
+    const slotsByDate = _.groupBy(timeSlots, s => moment(s.start_time).format('L'));
     const keys = Object.keys(slotsByDate)
 
     return (
