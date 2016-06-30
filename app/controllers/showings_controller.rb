@@ -1,5 +1,5 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:show, :update, :destroy]
+  before_action :set_showing, only: [:show, :update, :destroy, :between]
 
   # GET /showings
   def index
@@ -31,6 +31,14 @@ class ShowingsController < ApplicationController
     else
       render json: @showing.errors, status: :unprocessable_entity
     end
+  end
+
+  # GET /showings/:id/between/:from/:to
+  def between
+    from = params[:from]
+    to = params[:to]
+
+    render json: TimeSlot.sf_slots_between(from, to, @showing)
   end
 
   # DELETE /showings/1

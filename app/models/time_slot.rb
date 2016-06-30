@@ -43,7 +43,7 @@ class TimeSlot < ApplicationRecord
   end
 
   class << self
-    def new_from_sf_slot slot
+    def new_from_sf_slot slot, showing
       TimeSlot.new do |ts|
         tags = slot['tags'].map{|t| t['tagName'].downcase}
         ts.start_time      = Time.zone.at(slot['timeMs']/1000)
@@ -54,12 +54,13 @@ class TimeSlot < ApplicationRecord
         ts.theatre         = slot['theatreName']
         ts.theatre_account = slot['theatreMainAccount'].to_i
         ts.sf_slot_id      = slot['id']
+        ts.showing         = showing
       end
     end
 
-    def sf_slots_between from, to, movie
-      movie.current_sf_slots.select do |s|
-        time = s[:time]
+    def sf_slots_between from, to, showing
+      showing.movie.current_sf_slots(showing).select do |s|
+        time = s[:start_time]
         time >= from && time <= to
       end
     end
