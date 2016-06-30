@@ -7,7 +7,7 @@ module.exports = [
 
 	{
 		test: /\.css$/,
-		loader: 'style-loader!css-loader?modules!postcss-loader'
+		loader: 'style-loader!css-loader?modules&localIdentName=[path][name]---[local]---[hash:base64:5]!postcss-loader'
 	},
 	{
 		test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,

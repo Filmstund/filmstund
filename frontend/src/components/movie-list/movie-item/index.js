@@ -59,24 +59,15 @@ const MovieItem = React.createClass({
 
     return (
       <div className={styles.container}>
-        <div className={styles.image} style={{backgroundImage: `url(${movie.poster})`}}></div>
-        <div className={styles.description}>
-          <div className={styles.header}>
-            <div className={styles.leftSide}>
-              {this.renderImdbButton(movie, isEditing)}
-              <h3>{movie.title}</h3>
-            </div>
-            <div>
-              <time dateTime={moment(movie.premiere_date).toISOString()} title={moment(movie.premiere_date).format('L')}>Premiär {moment(movie.premiere_date).fromNow()}</time>
-            </div>
-          </div>
-          {movie.description}
-          <div className={styles.footer}>
-            <GoldButton onClick={() => {window.location = '/apabepa'}}>
-              Skapa besök
-            </GoldButton>
-          </div>
-        </div>
+        {this.renderImdbButton(movie, isEditing)}
+        <h2>{movie.title}</h2>
+        <time dateTime={moment(movie.premiere_date).toISOString()}
+              title={moment(movie.premiere_date).format('L')}>
+          Premiär {moment(movie.premiere_date).fromNow()}
+        </time>
+        <GoldButton onClick={() => {window.location = '/apabepa'}}>
+          Skapa besök
+        </GoldButton>
       </div>
     )
   }

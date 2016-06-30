@@ -33,8 +33,9 @@ const UserProfile = React.createClass({
   render() {
     const { userForm } = this.state
     return (
-      <div className={styles.userProfile}>
-       <form className={styles.form} onSubmit={this.handleSubmit}>
+      <div className={styles.container}>
+        <h1>Användaruppgifter</h1>
+        <form className={styles.form} onSubmit={this.handleSubmit}>
         <div className={styles.formRow}>
           <label htmlFor="nick">Namn</label>
           <input type="text" value={userForm.nick} onChange={(e) => this.handleChange('nick', e)} id="nick" />
@@ -63,7 +64,7 @@ const UserProfile = React.createClass({
           <label htmlFor="pushover_key">Pushover nyckel</label>
           <input type="text" value={userForm.pushover_key} onChange={(e) => this.handleChange('pushover_key', e)} id="pushover_key" />
         </div>
-        <GoldButton>Skicka</GoldButton>
+        <GoldButton>Spara</GoldButton>
        </form>
       </div>
     )

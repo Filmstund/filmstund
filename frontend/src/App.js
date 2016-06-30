@@ -10,7 +10,10 @@ const Root = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        { this.props.children }
+        <Header/>
+        <div className={styles.rootContainer}>
+          { this.props.children }
+        </div>
       </div>
     );
   }

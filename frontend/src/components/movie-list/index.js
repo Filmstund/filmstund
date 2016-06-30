@@ -10,6 +10,7 @@ const MovieList = React.createClass({
 
     return (
       <div className={styles.container}>
+        <h1>Filmer</h1>
         {(movies.movies || []).map(movie => <MovieItem movie={movie} key={movie.sf_id} />)}
       </div>
     )
