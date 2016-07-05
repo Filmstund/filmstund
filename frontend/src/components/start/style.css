@@ -38,6 +38,7 @@
   height: 6em;
   background-size: 6em;
   border: 0;
+  cursor: pointer;
 }
 
 :global(.fb-login) {
