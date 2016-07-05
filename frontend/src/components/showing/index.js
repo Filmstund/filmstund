@@ -65,6 +65,7 @@ const Showing = React.createClass({
           {!this.state.timeSlots && (
             <div>
               <DateRange
+                minDate={startDate}
                 startDate={startDate}
                 endDate={endDate}
                 linkedCalendars={ true }
