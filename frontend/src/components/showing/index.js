@@ -2,7 +2,6 @@ import React from 'react';
 import loader from '../loader/';
 import moment from 'moment';
 import { DateRange } from 'react-date-range';
-import 'style!css!react-daterange-picker/dist/css/react-calendar.css';
 import { fetchEndpoint } from '../../service/backend';
 
 import StatusLabel from '../status-label';
