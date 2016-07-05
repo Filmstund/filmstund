@@ -8,7 +8,7 @@ import styles from './style.css';
 const ShowingItem = React.createClass({
   render() {
     const { showing } = this.props;
-    console.log(showing);
+
     return (
       <div className={styles.container}>
         <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>

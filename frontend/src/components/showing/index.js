@@ -32,25 +32,39 @@ const Showing = React.createClass({
       timeRange: {
         startDate: moment(),
         endDate: moment().add(3, 'weeks'),
-      }
+      },
+      loading: false
     }
   },
 
   getTimeSlots() {
-    console.log(this.state.timeRange);
     const format = 'YYYY-MM-DD hh:mm:ssZZ';
-    let start = this.state.timeRange.startDate.format(format);
-    let end = this.state.timeRange.endDate.format(format);
-    console.log('timerange:', start, end);
+
+    const start = this.state.timeRange.startDate.format(format);
+    const end = this.state.timeRange.endDate.format(format);
+
+    this.setState({
+      loading: true
+    });
+
     fetchEndpoint(`/showings/${this.props.params.id}/between/${start}/${end}`)
       .then((resp) => {
-        this.setState({timeSlots: resp.time_slots});
-      });
+        this.setState({
+          timeSlots: resp.time_slots,
+          loading: false
+        });
+      }).catch(err => {
+        console.error(err);
+        this.setState({
+          loading: false
+        });
+      })
   },
 
   render() {
+    const { loading, timeSlots } = this.state;
     const { showing } = this.props.showing;
-    //console.log('showingstimeslots', time_slots);
+
     if (!showing) {
       return null;
     }
@@ -62,21 +76,20 @@ const Showing = React.createClass({
         <div className={styles.description}>
           <h3>{showing.movie.title}</h3>
           <StatusLabel className={styles.label} status={showing.status} />
-          {!this.state.timeSlots && (
+          {loading && <img src="/loader.gif" />}
+          {!loading && !timeSlots && (
             <div>
               <DateRange
                 minDate={startDate}
                 startDate={startDate}
                 endDate={endDate}
-                linkedCalendars={ true }
+                linkedCalendars={true}
                 onInit={this.handleChange}
                 onChange={(time) => this.setState({timeRange: time})} />
               <button onClick={this.getTimeSlots}>Hämta tider</button>
             </div>
           )}
-          {this.state.timeSlots &&
-            <SlotPicker timeSlots={this.state.timeSlots}/>
-          }
+          {timeSlots && <SlotPicker timeSlots={timeSlots} />}
         </div>
       </div>
     )

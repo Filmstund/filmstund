@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from '../../../lib/moment'
 import { connect } from 'react-redux';
-import { putEndpoint, postEndpoint } from '../../../service/backend';
+import { putEndpoint } from '../../../service/backend';
 import GoldButton from '../../gold-button';
 
 import styles from './style.css';
@@ -55,7 +55,7 @@ const MovieItem = React.createClass({
   },
   render() {
     const { isEditing } = this.state
-    const { movie } = this.props
+    const { movie, onCreateShowing } = this.props
 
     return (
       <div className={styles.container}>
@@ -65,20 +65,11 @@ const MovieItem = React.createClass({
               title={moment(movie.premiere_date).format('L')}>
           Premiär {moment(movie.premiere_date).fromNow()}
         </time>
-        <GoldButton onClick={() => this.createShowing(movie)}>
+        <GoldButton onClick={onCreateShowing}>
           Skapa besök
         </GoldButton>
       </div>
     )
-  },
-  createShowing(movie) {
-    postEndpoint('/showings', {
-      sf_id: movie.sf_id,
-      status: 1
-    }).then((resp) => {
-      window.location = '/showings';
-      console.log('resp', resp);
-    });
   }
 })
 
