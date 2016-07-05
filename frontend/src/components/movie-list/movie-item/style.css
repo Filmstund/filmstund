@@ -1,6 +1,7 @@
 
 .container {
-  flex-direction: row !important;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   border-top: 1px solid #712;
   text-align: left;

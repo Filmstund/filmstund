@@ -20,7 +20,8 @@
 }
 
 .formRow {
-    flex-direction: row !important;
+    display: flex;
+    flex-direction: row;
     padding: 0.5em;
     label {
       width: 50%;
