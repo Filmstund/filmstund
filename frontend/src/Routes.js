@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 import ShowingList from './components/showing-list';
+import CreateShowing from './components/create-showing';
 import Showing from './components/showing';
 import MovieList from './components/movie-list';
 import UserProfile from './components/user-profile';
@@ -17,6 +18,7 @@ const routes = (
     <Route path="/" component={App}>
       <IndexRoute component={MovieList}/>
       <Route path="showings" component={ShowingList}/>
+      <Route path="showings/create/:sf_id" component={CreateShowing}/>
       <Route path="showings/:id" component={Showing}/>
       <Route path="movies" component={MovieList}/>
       <Route path="user" component={UserProfile}/>

@@ -11,15 +11,15 @@ const SlotPicker = React.createClass({
     }
   },
   handleSelectId(slotId) {
-    if (this.state.selectedIds.includes(slotId)) {
-      this.setState({
-        selectedIds: this.state.selectedIds.filter(id => id !== slotId)
-      })
+    let selectedIds = this.state.selectedIds;
+    if (selectedIds.includes(slotId)) {
+        selectedIds = selectedIds.filter(id => id !== slotId);
     } else {
-      this.setState({
-        selectedIds: [...this.state.selectedIds, slotId]
-      })
+        selectedIds = [...selectedIds, slotId];
     }
+    this.setState({selectedIds}, () => {
+        this.props.onChange && this.props.onChange(this.state.selectedIds);
+    });
   },
   renderSlot(slot) {
     const isSelected = this.state.selectedIds.includes(slot.sf_slot_id)

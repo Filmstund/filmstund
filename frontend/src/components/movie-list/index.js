@@ -18,13 +18,7 @@ const MovieList = React.createClass({
     )
   },
   handleCreateShowing(movie) {
-    postEndpoint('/showings', {
-      sf_id: movie.sf_id,
-      status: 1
-    }).then((resp) => {
-      console.log('resp', resp);
-      this.props.router.push('/showings/' + resp.showing.id);
-    });
+      this.props.router.push('/showings/create/' + movie.sf_id);
   }
 })
 
