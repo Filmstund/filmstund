@@ -20,6 +20,9 @@ Rails.application.routes.draw do
       get 'upcoming'
       get 'current'
     end
+    member do
+      get 'between/:from/:to', action: :between
+    end
   end
 
   post '/authenticate' => 'sessions#create'

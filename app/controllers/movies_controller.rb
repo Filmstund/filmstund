@@ -1,5 +1,5 @@
 class MoviesController < ApplicationController
-  before_action :set_movie, only: [:show, :update]
+  before_action :set_movie, only: [:show, :update, :between]
 
   # GET /movies
   def index
@@ -39,6 +39,13 @@ class MoviesController < ApplicationController
     end
   end
 
+  # GET /movies/:id/between/:from/:to
+  def between
+    from = params[:from]
+    to = params[:to]
+
+    render json: TimeSlot.sf_slots_between(from, to, @movie)
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

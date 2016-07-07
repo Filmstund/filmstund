@@ -54,6 +54,6 @@ class ShowingsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def showing_params
-      params.require(:showing).permit(:sf_id, :status)
+      params.require(:showing).permit(:sf_id, :status, :time_slots)
     end
 end

@@ -30,7 +30,7 @@ class Movie < ApplicationRecord
     Rails.cache.delete('movies/all_sf')
   end
 
-  def current_sf_slots showing
+  def current_sf_slots
     data = Movie.sf_movie sf_id
     return [] if data.nil?
 
@@ -39,7 +39,7 @@ class Movie < ApplicationRecord
       shows_hash = Movie.sf_slots_at_date sf_id, d
       next if shows_hash.nil?
       shows_hash['shows'].map do |s|
-        TimeSlot.new_from_sf_slot s, showing
+        TimeSlot.new_from_sf_slot s
       end
     end.sort{|x,y| x['time'] <=> y['time']}
   end

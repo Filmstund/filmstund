@@ -1,9 +1,9 @@
 class TimeSlot < ApplicationRecord
   include SFParty
-  belongs_to :showing
+  belongs_to :showing, optional: true
   has_and_belongs_to_many :users
 
-  validates :showing_id, :auditorium_id, :theatre_account, :sf_slot_id, presence: true
+  validates :auditorium_id, :theatre_account, :sf_slot_id, presence: true
 
   def price
     unless read_attribute(:price).present?
@@ -43,7 +43,7 @@ class TimeSlot < ApplicationRecord
   end
 
   class << self
-    def new_from_sf_slot slot, showing
+    def new_from_sf_slot slot
       TimeSlot.new do |ts|
         tags = slot['tags'].map{|t| t['tagName'].downcase}
         ts.start_time      = Time.zone.at(slot['timeMs']/1000)
@@ -54,12 +54,11 @@ class TimeSlot < ApplicationRecord
         ts.theatre         = slot['theatreName']
         ts.theatre_account = slot['theatreMainAccount'].to_i
         ts.sf_slot_id      = slot['id']
-        ts.showing         = showing
       end
     end
 
-    def sf_slots_between from, to, showing
-      showing.movie.current_sf_slots(showing).select do |s|
+    def sf_slots_between from, to, movie
+      movie.current_sf_slots.select do |s|
         time = s[:start_time]
         time >= from && time <= to
       end
