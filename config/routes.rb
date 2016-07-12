@@ -3,7 +3,11 @@ Rails.application.routes.draw do
   resources :orders
   get '/random_bioord' => 'bioord#random'
   resources :showings do
-    resources :time_slots
+    resources :time_slots do
+      collection do
+        post 'add_vote'
+      end
+    end
     member do
       get 'between/:from/:to', action: :between
     end
