@@ -24,15 +24,16 @@ const Showing = React.createClass({
   },
 
   submitSlotsPicked() {
+    console.log('slots picked');
   },
 
   render() {
-    const { loading, timeSlots } = this.state;
     const { showing } = this.props.showing;
-
     if (!showing) {
       return null;
     }
+    const { loading, time_slots, status } = showing;
+    console.log(time_slots)
 
     return (
       <div className={styles.container}>
@@ -40,6 +41,13 @@ const Showing = React.createClass({
         <div className={styles.description}>
           <h3>{showing.movie.title}</h3>
           {loading && <img src="/loader.gif" />}
+          <StatusLabel status={status} />
+          { time_slots && (
+              <div>
+                <SlotPicker timeSlots={time_slots} onChange={this.pickedSlotUpdate} />
+                <button onClick={this.submitSlotsPicked}>Submit</button>
+              </div>
+          )}
         </div>
       </div>
     )

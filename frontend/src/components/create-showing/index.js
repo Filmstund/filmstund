@@ -69,10 +69,11 @@ const CreateShowing = React.createClass({
   },
 
   submitSlotsPicked() {
-      let sfSlots = this.state.timeSlots.filter(timeSlot => this.state.selectedIds.includes(timeSlot.sf_slot_id) );
       postEndpoint('/showings', {
-          sf_id: this.props.params.sf_id,
-          time_slots: sfSlots
+          showing: {
+            sf_id: this.props.params.sf_id
+          },
+          sf_slot_ids: this.state.selectedIds
       }).then((resp) => {
           this.props.router.push(`/showings/${resp.showing.id}`);
       });
