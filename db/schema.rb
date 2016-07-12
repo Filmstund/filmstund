@@ -124,11 +124,4 @@ ActiveRecord::Schema.define(version: 20160623132248) do
     t.datetime "updated_at",          null: false
   end
 
-  create_table "users_time_slots", id: false, force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "time_slot_id"
-    t.index ["time_slot_id"], name: "index_users_time_slots_on_time_slot_id"
-    t.index ["user_id"], name: "index_users_time_slots_on_user_id"
-  end
-
 end
