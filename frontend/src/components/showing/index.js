@@ -23,8 +23,8 @@ const Showing = React.createClass({
     }
   },
 
-  submitSlotsPicked() {
-    console.log('slots picked');
+  submitSlotsPicked(selectedIds) {
+    console.log('slots picked', selectedIds);
   },
 
   render() {
@@ -44,8 +44,8 @@ const Showing = React.createClass({
           <StatusLabel status={status} />
           { time_slots && (
               <div>
-                <SlotPicker timeSlots={time_slots} onChange={this.pickedSlotUpdate} />
-                <button onClick={this.submitSlotsPicked}>Submit</button>
+                <SlotPicker timeSlots={time_slots}
+                            onSubmit={this.submitSlotsPicked} />
               </div>
           )}
         </div>

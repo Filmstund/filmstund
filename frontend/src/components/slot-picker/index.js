@@ -1,10 +1,14 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import _ from 'lodash';
 import moment from '../../lib/moment';
 
 import styles from './style.css';
 
 const SlotPicker = React.createClass({
+  propTypes: {
+    onSubmit: PropTypes.func.isRequired,
+    timeSlots: PropTypes.array.isRequired
+  },
   getInitialState() {
     return {
       selectedIds: []
@@ -17,9 +21,7 @@ const SlotPicker = React.createClass({
     } else {
         selectedIds = [...selectedIds, slotId];
     }
-    this.setState({selectedIds}, () => {
-        this.props.onChange && this.props.onChange(this.state.selectedIds);
-    });
+    this.setState({selectedIds});
   },
   renderSlot(slot) {
     const isSelected = this.state.selectedIds.includes(slot.sf_slot_id)
@@ -51,15 +53,18 @@ const SlotPicker = React.createClass({
     )
   },
   render() {
-    const { timeSlots } = this.props;
+    const { timeSlots, onSubmit } = this.props;
     const slotsByDate = _.groupBy(timeSlots, s => moment(s.start_time).format('L'));
     const keys = Object.keys(slotsByDate)
 
     return (
-      <div className={styles.daysContainer}>
-        <div className={styles.daysRow}>
-          {keys.map(key => this.renderDay(key, slotsByDate[key]))}
+      <div>
+        <div className={styles.daysContainer}>
+          <div className={styles.daysRow}>
+            {keys.map(key => this.renderDay(key, slotsByDate[key]))}
+          </div>
         </div>
+        <button onClick={() => onSubmit(this.state.selectedIds)}>Submit</button>
       </div>
     )
   }
