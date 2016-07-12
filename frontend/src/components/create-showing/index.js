@@ -64,15 +64,13 @@ const CreateShowing = React.createClass({
       })
   },
 
-  pickedSlotUpdate(selectedIds) {
-      this.setState({selectedIds});
-  },
-
-  submitSlotsPicked() {
-      let sfSlots = this.state.timeSlots.filter(timeSlot => this.state.selectedIds.includes(timeSlot.sf_slot_id) );
+  submitSlotsPicked(selectedSlotIds) {
+      console.log('slotIds', selectedSlotIds);
       postEndpoint('/showings', {
-          sf_id: this.props.params.sf_id,
-          time_slots: sfSlots
+          showing: {
+            sf_id: this.props.params.sf_id
+          },
+          sf_slot_ids: selectedSlotIds
       }).then((resp) => {
           this.props.router.push(`/showings/${resp.showing.id}`);
       });
@@ -107,8 +105,8 @@ const CreateShowing = React.createClass({
           )}
           { timeSlots && (
               <div>
-                  <SlotPicker timeSlots={timeSlots} onChange={this.pickedSlotUpdate} />
-                  <button onClick={this.submitSlotsPicked}>Submit</button>
+                  <SlotPicker timeSlots={timeSlots}
+                              onSubmit={this.submitSlotsPicked}/>
               </div>
           )}
         </div>

@@ -23,16 +23,21 @@ const Showing = React.createClass({
     }
   },
 
-  submitSlotsPicked() {
+  submitSlotsPicked(selectedIds) {
+    console.log('slots picked', selectedIds);
+    postEndpoint(`/showings/${this.props.params.id}/time_slots/votes`, {
+      sf_slot_ids: selectedIds
+    })
   },
 
   render() {
-    const { loading, timeSlots } = this.state;
     const { showing } = this.props.showing;
-
-    if (!showing) {
+    const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
+    if (!showing || !selectedTimeSlots) {
       return null;
     }
+    const { loading, time_slots, status } = showing;
+    const initiallySelectedTimeSlots = this.props.selectedTimeSlots.time_slots;
 
     return (
       <div className={styles.container}>
@@ -40,6 +45,14 @@ const Showing = React.createClass({
         <div className={styles.description}>
           <h3>{showing.movie.title}</h3>
           {loading && <img src="/loader.gif" />}
+          <StatusLabel status={status} />
+          { time_slots && (
+              <div>
+                <SlotPicker timeSlots={time_slots}
+                            initiallySelectedTimeSlots={selectedTimeSlots}
+                            onSubmit={this.submitSlotsPicked} />
+              </div>
+          )}
         </div>
       </div>
     )
@@ -47,6 +60,7 @@ const Showing = React.createClass({
 })
 
 export default withRouter(loader((props) => ({
-    showing: `/showings/${props.params.id}`
+    showing: `/showings/${props.params.id}`,
+    selectedTimeSlots: `/showings/${props.params.id}/time_slots/votes`
 }
 ))(Showing))
