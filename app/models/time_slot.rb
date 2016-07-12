@@ -22,7 +22,7 @@ class TimeSlot < ApplicationRecord
 
   def available_seats
     if showing.present? and sf_slot_id.present?
-      info = TimeSlot.get_slot_info(showing.movie.sf_id, sf_slot_id, start_time)
+      info = TimeSlot.get_slot_info(showing.movie.sf_id, sf_slot_id)
       return info['numberOfAvailableSeats'] unless info.nil?
     end
     nil
@@ -30,7 +30,7 @@ class TimeSlot < ApplicationRecord
 
   def gold_required?
     if showing.present? and sf_slot_id.present?
-      info = TimeSlot.get_slot_info(showing.movie.sf_id, sf_slot_id, start_time)
+      info = TimeSlot.get_slot_info(showing.movie.sf_id, sf_slot_id)
       return info['loyaltyOnlyForGoldMembers'] unless info.nil?
     end
     nil
@@ -64,11 +64,11 @@ class TimeSlot < ApplicationRecord
       end
     end
 
-    def get_slot_info sf_id, sf_slot_id, start_time
-      date = start_time.strftime '%Y%m%d'
+    def get_slot_info sf_id, sf_slot_id
+      date = sf_slot_id.split('_').first.gsub /\-/, ''
       data = SFParty.download_data "/shows/GB/movieid/#{sf_id}/day/#{date}"
-      return data['shows'].detect{|e| e['id'] == sf_slot_id} unless data.nil?
-      nil
+      return nil if data.nil?
+      data['shows'].detect { |e| e['id'] == sf_slot_id }
     end
   end
 end

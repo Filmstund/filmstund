@@ -17,10 +17,22 @@ class ShowingsController < ApplicationController
   def create
     @showing = Showing.new(showing_params)
 
-    if @showing.save
+
+    unless @showing.save
+      render json: @showing.errors, status: :unprocessable_entity
+    end
+
+    slot_ids = params[:sf_slot_ids]
+    time_slots = slot_ids.map do |slot_id|
+      slot = TimeSlot.new_from_sf_slot TimeSlot.get_slot_info(@showing.sf_id, slot_id)
+      slot.showing = @showing
+      slot
+    end
+
+    if time_slots.map { |slot| slot.save }.all?
       render json: @showing, status: :created, location: @showing
     else
-      render json: @showing.errors, status: :unprocessable_entity
+      render json: (time_slots.map { |slot| slot.errors }), status: :unprocessable_entity
     end
   end
 
@@ -54,6 +66,6 @@ class ShowingsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def showing_params
-      params.require(:showing).permit(:sf_id, :status, :time_slots)
+      params.require(:showing).permit(:sf_id, :status, time_slot_ids: [])
     end
 end
