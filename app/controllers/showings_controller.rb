@@ -16,7 +16,7 @@ class ShowingsController < ApplicationController
   # POST /showings
   def create
     @showing = Showing.new(showing_params)
-
+    @showing.status = 1
 
     unless @showing.save
       render json: @showing.errors, status: :unprocessable_entity
@@ -66,6 +66,6 @@ class ShowingsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def showing_params
-      params.require(:showing).permit(:sf_id, :status, time_slot_ids: [])
+      params.require(:showing).permit(:sf_id, time_slot_ids: [])
     end
 end
