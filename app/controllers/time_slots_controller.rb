@@ -33,6 +33,11 @@ class TimeSlotsController < ApplicationController
     end
   end
 
+  # POST /time_slots/add_vote
+  def add_vote
+
+  end
+
   # DELETE /time_slots/1
   def destroy
     @time_slot.destroy
