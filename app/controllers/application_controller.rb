@@ -2,7 +2,7 @@ class ApplicationController < ActionController::API
   include ActionController::Serialization
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::HttpAuthentication::Token
-  before_action :authenticate, unless: "Rails.env.development?"
+  before_action :authenticate
 
   def current_user
     @current_user
