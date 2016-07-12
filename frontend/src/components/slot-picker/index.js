@@ -11,7 +11,7 @@ const SlotPicker = React.createClass({
   },
   getInitialState() {
     return {
-      selectedIds: []
+      selectedIds: this.props.initiallySelectedTimeSlots.map(slot => slot.sf_slot_id)
     }
   },
   handleSelectId(slotId) {
