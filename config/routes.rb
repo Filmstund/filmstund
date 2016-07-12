@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   resources :showings do
     resources :time_slots do
       collection do
-        post 'add_vote'
+        get 'votes'
+        post 'votes', action: :add_vote
       end
     end
     member do
