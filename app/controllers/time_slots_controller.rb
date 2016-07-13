@@ -43,9 +43,10 @@ class TimeSlotsController < ApplicationController
   # POST /time_slots/votes
   def add_vote
     @current_user = current_user
-    time_slots = TimeSlot.where sf_slot_id: params[:sf_slot_ids]
-    prev_time_slots = @current_user.time_slots.select { |slot| slot.showing_id != params[:showing_id].to_i }
-    @current_user.time_slots = prev_time_slots | time_slots
+    @showing = Showing.find params[:showing_id]
+    new_time_slots = TimeSlot.where sf_slot_id: params[:sf_slot_ids]
+
+    @current_user.set_time_slots_for_showing @showing, new_time_slots
 
     if @current_user.save
       render json: @current_user.time_slots.where(showing_id: params[:showing_id])
