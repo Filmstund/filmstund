@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import FacebookLogin from 'react-facebook-login';
 import GoogleLogin from 'react-google-login';
 
+import { withRouter } from 'react-router';
+
 import { transformFacebookAuthCallback, transformGoogleAuthCallback } from '../../lib/auth'
 import { getUser, getSession } from '../../store/reducer'
 import { signIn } from '../../store/actions'
@@ -22,6 +24,7 @@ const Start = React.createClass({
       throw 'Authentication failure - no token received'
     } else {
       this.props.dispatch(signIn(params))
+      this.props.router.push(`/showings`);
     }
   },
   render() {
@@ -58,7 +61,7 @@ const Start = React.createClass({
 })
 
 
-export default connect(state => ({
+export default withRouter(connect(state => ({
   user: getUser(state),
   signedIn: getSession(state).signedIn
-}))(Start)
+}))(Start))
