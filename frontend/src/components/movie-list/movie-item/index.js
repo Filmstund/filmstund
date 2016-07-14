@@ -6,6 +6,8 @@ import GoldButton from '../../gold-button';
 
 import styles from './style.css';
 
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+
 const MovieItem = React.createClass({
   getInitialState() {
     return {
@@ -55,20 +57,36 @@ const MovieItem = React.createClass({
   },
   render() {
     const { isEditing } = this.state
-    const { movie, onCreateShowing } = this.props
+    const { movie, onCreateShowing, selected, onMovieClick } = this.props
 
     return (
       <div className={styles.container}>
-        {this.renderImdbButton(movie, isEditing)}
-        <h2>{movie.title}</h2>
-        <time dateTime={moment(movie.premiere_date).toISOString()}
-              title={moment(movie.premiere_date).format('L')}>
-          Premiär {moment(movie.premiere_date).fromNow()}
-        </time>
-        <GoldButton onClick={onCreateShowing}>
-          Skapa besök
-        </GoldButton>
+        <div className={styles.header}>
+          {this.renderImdbButton(movie, isEditing)}
+          <h2 onClick={() => onMovieClick(movie.sf_id)}>{movie.title}</h2>
+          <time dateTime={moment(movie.premiere_date).toISOString()}
+                title={moment(movie.premiere_date).format('L')}>
+            Premiär {moment(movie.premiere_date).fromNow()}
+          </time>
+          <GoldButton onClick={onCreateShowing}>
+            Skapa besök
+          </GoldButton>
+        </div>
+        <ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+          {selected &&
+            <div className={styles.extraInfo}>
+              <div className={styles.poster}>
+                <img src={movie.poster} />
+              </div>
+              <div className={styles.desc}>
+                <div>{movie.description}</div>
+                <div className={styles.runtime}><i className="fa fa-film" aria-hidden="true"></i> {movie.runtime} min</div>
+              </div>
+            </div>
+          }
+        </ReactCSSTransitionGroup>
       </div>
+      
     )
   }
 })

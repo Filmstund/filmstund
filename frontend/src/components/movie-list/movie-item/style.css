@@ -1,8 +1,5 @@
 
 .container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   border-top: 1px solid #712;
   text-align: left;
   padding: 0.2em 0;
@@ -15,11 +12,43 @@
 
   time {
     color: #666;
+    margin-right: 1em;
   }
 
   button {
     margin-left: auto;
   }
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  h2 {
+    cursor: pointer;
+  }
+}
+
+.extraInfo {
+  display: flex;
+  flex-direction: row;
+  padding-top: 1em;
+}
+
+.poster {
+  img {
+    max-height: 12em;
+  }
+}
+
+.desc {
+  padding: 0 0 1em 1em;
+  max-width: 30em;
+}
+
+.runtime {
+  margin-top: 1em;
 }
 
 .imdbLogo {
@@ -42,57 +71,20 @@
   height: 1.2em;
 }
 
-
-/*
-.container {
-    color: white;
-    background: #222;
-    flex-direction: row;
-    flex: 1;
-    border-radius: 5px;
-    box-shadow: black 2px 2px 5px;
-    padding: 0 2em 2em 0;
-    margin-bottom: 1em;
+:global(.example-enter) {
+  height: 0;
 }
 
-.image {
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 150px;
-    height: 200px;
-    margin: 2em;
+:global(.example-enter.example-enter-active) {
+  height: 100%;
+  transition: height 500ms ease-in;
 }
 
-.leftSide {
-    flex: 1;
-    display: flex;
+:global(.example-leave) {
+  height: 100%;
 }
 
-.description {
-    flex: 1;
-    flex-direction: row;
-    position: relative;
+:global(.example-leave.example-leave-active) {
+  height: 0;
+  transition: height 300ms ease-in;
 }
-
-.header {
-  display: flex;
-  align-items: center;
-  img {
-    height: 1.2em;
-  }
-  h3 {
-    padding-top: 0.2em;
-  }
-  time {
-    color: gray;
-  }
-}
-
-.footer{
-  position: absolute;
-  bottom:0px;
-  color:white;
-}
-
-*/
