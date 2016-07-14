@@ -39,7 +39,7 @@ export const fetchEndpoint = (url, options = {}) => {
       'Authorization': `Token token="${authToken}"`
     }
   })
-}
+};
 
 const reduceFormData = (data) =>
   Object.keys(data).reduce((formData, key) => {

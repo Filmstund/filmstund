@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import _ from 'lodash';
 import moment from '../../lib/moment';
 
@@ -9,6 +9,13 @@ const SlotPicker = React.createClass({
     onSubmit: PropTypes.func.isRequired,
     timeSlots: PropTypes.array.isRequired
   },
+
+  getDefaultProps() {
+    return {
+      initiallySelectedTimeSlots: []
+    }
+  },
+
   getInitialState() {
     return {
       selectedIds: this.props.initiallySelectedTimeSlots.map(slot => slot.sf_slot_id)
@@ -45,17 +52,18 @@ const SlotPicker = React.createClass({
     )
   },
   renderDay(date, slots) {
+
     return (
       <div key={date} className={styles.doodleDay}>
         <div className={styles.doodleDate} title={date}>{moment(date).format('D MMM')}</div>
-        <div>{slots.map(this.renderSlot)}</div>
+        <div>{_.orderBy(slots, 'start_time').map(this.renderSlot)}</div>
       </div>
     )
   },
   render() {
     const { timeSlots, onSubmit } = this.props;
     const slotsByDate = _.groupBy(timeSlots, s => moment(s.start_time).format('L'));
-    const keys = Object.keys(slotsByDate)
+    const keys = _.orderBy(Object.keys(slotsByDate));
 
     return (
       <div>
