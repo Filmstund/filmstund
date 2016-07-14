@@ -39,6 +39,49 @@ const Showing = React.createClass({
     })
   },
 
+  renderBarchart(time_slots) {
+    const maxValue = _.maxBy(time_slots, 'users.length')
+    return (
+        <div style={{
+                width: 500,
+              }}>
+          <VictoryChart width={600}
+                        domainPadding={{x: 30, y:30}}
+                        padding={{
+                              top: 75,
+                              bottom: 40,
+                              left: 80,
+                              right: 40
+                            }}
+
+          >
+            <VictoryAxis domain={[0,10]}
+                         tickFormat={(x) => parseInt(x,10)} />
+            <VictoryAxis dependentAxis/>
+            <VictoryBar horizontal
+                        height={600}
+                        style={{
+                            data: {
+                              width: 50,
+                              margin: 0,
+                              padding: 0
+                            }
+                          }}
+                        animate={{
+                            duration: 700,
+                            onEnter: {
+                              duration: 1000,
+                              before: () => ({y: 0, fill: 'tomato'}),
+                              after: (data) => ({fill: data.y === maxValue.users.length? 'goldenrod' : 'tomato'}),
+                            },
+                            onEnd: () => {console.log('THE END!')}
+                          }}
+                        data={this.state.votingStats} />
+          </VictoryChart>
+        </div>
+    )
+  },
+
   render() {
     const { showing } = this.props.showing;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
@@ -48,7 +91,7 @@ const Showing = React.createClass({
 
     const { loading, time_slots, status } = showing;
 
-    const maxValue = _.maxBy(time_slots, 'users.length')
+
 
     return (
       <div className={styles.container}>
@@ -65,45 +108,7 @@ const Showing = React.createClass({
               </div>
           )}
 
-          { showing.is_admin && (
-            <div style={{
-              width: 500,
-            }}>
-            <VictoryChart width={600}
-                          domainPadding={{x: 30, y:30}}
-                          padding={{
-                            top: 75,
-                            bottom: 40,
-                            left: 80,
-                            right: 40
-                          }}
-
-            >
-              <VictoryAxis domain={[0,10]}
-                           tickFormat={(x) => parseInt(x,10)} />
-              <VictoryAxis dependentAxis/>
-              <VictoryBar horizontal
-                        height={600}
-                        style={{
-                          data: {
-                            width: 50,
-                            margin: 0,
-                            padding: 0
-                          }
-                        }}
-                        animate={{
-                          duration: 700,
-                          onEnter: {
-                            duration: 1000,
-                            before: () => ({y: 0, fill: 'tomato'}),
-                            after: (data) => ({fill: data.y === maxValue.users.length? 'goldenrod' : 'tomato'}),
-                          },
-                          onEnd: () => {console.log('THE END!')}
-                        }}
-                        data={this.state.votingStats} />
-            </VictoryChart>
-            </div>
-          )}
+          {this.renderBarchart(time_slots)}
 
         </div>
       </div>
