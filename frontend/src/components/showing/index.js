@@ -25,7 +25,7 @@ const Showing = React.createClass({
       this.setState({
         votingStats:
           showing.time_slots.map((ts) => ({
-            x: moment(ts.start_time).format('LLLL'),
+            x: moment(ts.start_time).format('DD/M, HH:mm'),
             y: ts.users.length,
             id: ts.id
         }))
@@ -50,7 +50,7 @@ const Showing = React.createClass({
                         padding={{
                               top: 75,
                               bottom: 40,
-                              left: 80,
+                              left: 100,
                               right: 40
                             }}
 
@@ -62,7 +62,7 @@ const Showing = React.createClass({
                         height={600}
                         style={{
                             data: {
-                              width: 50,
+                              width: 40,
                               margin: 0,
                               padding: 0
                             }
@@ -74,7 +74,6 @@ const Showing = React.createClass({
                               before: () => ({y: 0, fill: 'tomato'}),
                               after: (data) => ({fill: data.y === maxValue.users.length? 'goldenrod' : 'tomato'}),
                             },
-                            onEnd: () => {console.log('THE END!')}
                           }}
                         data={this.state.votingStats} />
           </VictoryChart>
