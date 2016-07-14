@@ -38,10 +38,8 @@ class Movie < ApplicationRecord
     dates.flat_map do |d|
       shows_hash = Movie.sf_slots_at_date sf_id, d
       next if shows_hash.nil?
-      shows_hash['shows'].map do |s|
-        TimeSlot.new_from_sf_slot s
-      end
-    end.sort{|x,y| x['time'] <=> y['time']}
+      shows_hash['shows']
+    end
   end
 
   # Serialization related #
