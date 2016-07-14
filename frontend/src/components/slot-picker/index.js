@@ -21,6 +21,7 @@ const SlotPicker = React.createClass({
       selectedIds: this.props.initiallySelectedTimeSlots.map(slot => slot.sf_slot_id)
     }
   },
+  
   handleSelectId(slotId) {
     let selectedIds = this.state.selectedIds;
     if (selectedIds.includes(slotId)) {
