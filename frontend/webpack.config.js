@@ -32,14 +32,14 @@ module.exports = {
 		},
 		proxy: {
 			'/api/*': {
-				target: 'http://ndushi.chalmers.it:3000',
+				target: 'http://localhost:3000',
 				secure: false,
 				rewrite(req) {
 					req.url = req.url.replace(/^\/api/, '');
 				}
 			},
 			'/auth/*': {
-				target: 'http://ndushi.chalmers.it:3000',
+				target: 'http://localhost:3000',
 				secure: false
 			}
 		},
