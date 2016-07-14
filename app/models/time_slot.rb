@@ -2,22 +2,23 @@ class TimeSlot < ApplicationRecord
   include SFParty
   belongs_to :showing, optional: true
   has_and_belongs_to_many :users
+  before_create :fetch_price
 
   validates :auditorium_id, :theatre_account, :sf_slot_id, presence: true
 
-  def price
-    unless read_attribute(:price).present?
-      # This ensures that this TimeSlot is a valid SF time slot
-      # and not a temporary one
-      if sf_slot_id.present? and theatre_account.present?
-        data = SFParty.download_data "/shows/showid/#{sf_slot_id}/theatremainaccount/#{theatre_account}"
-        unless data.nil?
-          write_attribute :price, data['adultPrice']
-          save!
-        end
+  # This ensures that this TimeSlot is a valid SF time slot
+  # and not a temporary one
+  def official_time_slot?
+    sf_slot_id.present? and theatre_account.present?
+  end
+
+  def fetch_price
+    if official_time_slot?
+      data = SFParty.download_data "/shows/showid/#{sf_slot_id}/theatremainaccount/#{theatre_account}"
+      unless data.nil?
+        self.price = data['adultPrice']
       end
     end
-    read_attribute(:price)
   end
 
   def available_seats
