@@ -4,7 +4,7 @@ import moment from 'moment';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { fetchEndpoint, postEndpoint } from '../../service/backend';
-import { VictoryChart, VictoryBar} from "victory";
+import { VictoryChart, VictoryBar, VictoryAxis} from "victory";
 
 import StatusLabel from '../status-label';
 import SlotPicker from '../slot-picker';
@@ -15,38 +15,20 @@ const Showing = React.createClass({
   getInitialState() {
     return {
       loading: false,
-      votingStats: [{
-        x: '2015-07-15',
-        y: 0
-      }, {
-        x: '2015-07-16',
-        y: 0
-      }, {
-        x: '2015-07-17',
-        y: 0
-      }, {
-        x: '2015-07-21',
-        y: 0
-      }]
+      votingStats: []
   }
   },
 
   componentDidMount() {
     setTimeout(() => {
+      const {showing} = this.props.showing;
       this.setState({
-        votingStats: [{
-          x: '2015-07-15',
-          y: 2
-        }, {
-          x: '2015-07-16',
-          y: 6
-        }, {
-          x: '2015-07-17',
-          y: 8
-        }, {
-          x: '2015-07-21',
-          y: 3
-        }]
+        votingStats:
+          showing.time_slots.map((ts) => ({
+            x: moment(ts.start_time).format('LLLL'),
+            y: ts.users.length,
+            id: ts.id
+        }))
       });
     }, 1000)
   },
@@ -64,13 +46,9 @@ const Showing = React.createClass({
       return null;
     }
 
-/*
-    let votingStats = showing.time_slots.map((ts) => ({
-      x: moment(ts.start_time).format('L'),
-      y: ts.users.length
-    }));
-*/
     const { loading, time_slots, status } = showing;
+
+    const maxValue = _.maxBy(time_slots, 'users.length')
 
     return (
       <div className={styles.container}>
@@ -101,8 +79,10 @@ const Showing = React.createClass({
                           }}
 
             >
-
-            <VictoryBar horizontal
+              <VictoryAxis domain={[0,10]}
+                           tickFormat={(x) => parseInt(x,10)} />
+              <VictoryAxis dependentAxis/>
+              <VictoryBar horizontal
                         height={600}
                         style={{
                           data: {
@@ -111,14 +91,12 @@ const Showing = React.createClass({
                             padding: 0
                           }
                         }}
-                        colorScale="qualitative"
                         animate={{
-                          duration: 5000,
-                          delay: 2000,
+                          duration: 700,
                           onEnter: {
                             duration: 1000,
-                            before: () => ({opacity: 0.0}),
-                            after: () => ({opacity: 1})
+                            before: () => ({y: 0, fill: 'tomato'}),
+                            after: (data) => ({fill: data.y === maxValue.users.length? 'goldenrod' : 'tomato'}),
                           },
                           onEnd: () => {console.log('THE END!')}
                         }}
