@@ -2,22 +2,23 @@ class TimeSlot < ApplicationRecord
   include SFParty
   belongs_to :showing, optional: true
   has_and_belongs_to_many :users
+  before_create :fetch_price
 
   validates :auditorium_id, :theatre_account, :sf_slot_id, presence: true
 
-  def price
-    unless read_attribute(:price).present?
-      # This ensures that this TimeSlot is a valid SF time slot
-      # and not a temporary one
-      if sf_slot_id.present? and theatre_account.present?
-        data = SFParty.download_data "/shows/showid/#{sf_slot_id}/theatremainaccount/#{theatre_account}"
-        unless data.nil?
-          write_attribute :price, data['adultPrice']
-          save!
-        end
+  # This ensures that this TimeSlot is a valid SF time slot
+  # and not a temporary one
+  def official_time_slot?
+    sf_slot_id.present? and theatre_account.present?
+  end
+
+  def fetch_price
+    if official_time_slot?
+      data = SFParty.download_data "/shows/showid/#{sf_slot_id}/theatremainaccount/#{theatre_account}"
+      unless data.nil?
+        self.price = data['adultPrice']
       end
     end
-    read_attribute(:price)
   end
 
   def available_seats
@@ -58,14 +59,22 @@ class TimeSlot < ApplicationRecord
     end
 
     def sf_slots_between from, to, movie
-      movie.current_sf_slots.select do |s|
-        time = s[:start_time]
-        time >= from && time <= to
+      time_slots = movie.current_sf_slots.map { |s| TimeSlot.new_from_sf_slot s }
+
+      time_slots.select! do |s|
+        t = s[:start_time]
+        t >= from && t <= to
       end
+
+      time_slots.sort{|x,y| x['time'] <=> y['time']}
+    end
+
+    def to_datestring sf_slot_id
+      sf_slot_id.split('_').first.gsub /\-/, ''
     end
 
     def get_slot_info sf_id, sf_slot_id
-      date = sf_slot_id.split('_').first.gsub /\-/, ''
+      date = to_datestring sf_slot_id
       data = SFParty.download_data "/shows/GB/movieid/#{sf_id}/day/#{date}"
       return nil if data.nil?
       data['shows'].detect { |e| e['id'] == sf_slot_id }

@@ -33,6 +33,28 @@ class TimeSlotsController < ApplicationController
     end
   end
 
+  # GET /time_slots/votes
+  def votes
+    @time_slots = @current_user.time_slots.where(showing_id: params[:showing_id])
+
+    render json: @time_slots
+  end
+
+  # POST /time_slots/votes
+  def add_vote
+    @current_user = current_user
+    @showing = Showing.find params[:showing_id]
+    new_time_slots = TimeSlot.where sf_slot_id: params[:sf_slot_ids]
+
+    @current_user.set_time_slots_for_showing @showing, new_time_slots
+
+    if @current_user.save
+      render json: @current_user.time_slots.where(showing_id: params[:showing_id])
+    else
+      render json: @current_user.errors, status: :unprocessable_entity
+    end
+  end
+
   # DELETE /time_slots/1
   def destroy
     @time_slot.destroy
