@@ -1,6 +1,8 @@
 .navbar {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   padding: 1em;
   background: #712;
   border-radius: 0.5em;
@@ -28,4 +30,13 @@
   li {
     display: inline;
   }
+}
+
+.left {
+  display: flex;
+  flex-direction: row;
+}
+
+a.signOut {
+  font-weight: normal;
 }
