@@ -59,16 +59,19 @@ const MovieItem = React.createClass({
     const { isEditing } = this.state
     const { movie, onCreateShowing, selected, onMovieClick } = this.props
 
+    const premiereDate = moment(movie.premiere_date);
+    const premiereIsInFuture = premiere_date.isAfter(moment())
+
     return (
       <div className={styles.container}>
         <div className={styles.header}>
           {this.renderImdbButton(movie, isEditing)}
           <h2 onClick={() => onMovieClick(movie.sf_id)}>{movie.title}</h2>
-          {moment(movie.premiere_date).isAfter(moment())
+          {premiereIsInFuture
             &&
-            <time dateTime={moment(movie.premiere_date).toISOString()}
-                title={moment(movie.premiere_date).format('L')}>
-            Premiär {moment(movie.premiere_date).fromNow()}
+            <time dateTime={premiereDate.toISOString()}
+                title={premiereDate.format('L')}>
+            Premiär {premiereDate.fromNow()}
           </time>}
           <GoldButton onClick={onCreateShowing}>
             Skapa besök

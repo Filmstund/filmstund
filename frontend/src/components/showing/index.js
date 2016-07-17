@@ -45,7 +45,6 @@ const Showing = React.createClass({
         <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>
         <div className={styles.description}>
           <h3>{showing.movie.title}</h3>
-          {loading && <LoadingIndicator />}
           <StatusLabel status={status} />
           { time_slots && (
               <div>

@@ -16,10 +16,9 @@ const MovieList = React.createClass({
     if(this.state.selected.includes(sf_id)) {
       selected = this.state.selected.filter(id => id != sf_id);
     } else {
-      selected = this.state.selected;
-      selected.push(sf_id);
+      selected = [sf_id, ...this.state.selected];
     }
-    this.setState({selected: selected});
+    this.setState({selected});
   },
   render() {
     const { movies, loading } = this.props;
@@ -27,7 +26,6 @@ const MovieList = React.createClass({
     return (
       <div className={styles.container}>
         <h1>Filmer</h1>
-        {loading && <LoadingIndicator />}
         {(movies.movies || []).map(movie => <MovieItem onMovieClick={this.onMovieClicked} selected={this.state.selected.includes(movie.sf_id)} movie={movie} key={movie.sf_id} onCreateShowing={() => this.handleCreateShowing(movie)} />)}
       </div>
     )
