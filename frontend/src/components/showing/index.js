@@ -7,6 +7,7 @@ import { fetchEndpoint, postEndpoint } from '../../service/backend';
 
 import StatusLabel from '../status-label';
 import SlotPicker from '../slot-picker';
+import LoadingIndicator from '../loading-indicator';
 
 import styles from './style.css'
 
@@ -44,7 +45,7 @@ const Showing = React.createClass({
         <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>
         <div className={styles.description}>
           <h3>{showing.movie.title}</h3>
-          {loading && <img src="/loader.gif" />}
+          {loading && <LoadingIndicator />}
           <StatusLabel status={status} />
           { time_slots && (
               <div>
