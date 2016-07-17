@@ -11,7 +11,7 @@ const MovieList = React.createClass({
     return {selected: []};
   },
   onMovieClicked(sf_id) {
-    var selected;
+    let selected;
     if(this.state.selected.includes(sf_id)) {
       selected = this.state.selected.filter(id => id != sf_id);
     } else {
