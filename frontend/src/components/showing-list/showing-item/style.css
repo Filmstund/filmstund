@@ -1,21 +1,27 @@
 
 .container {
-    color: white;
-    background: black;
+  background: white;
+  border-radius: 0.5em;
+  padding: 0 2em 2em;
+
+  h2 {
+    font-weight: lighter;
+    margin-bottom: 0.3em;
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+}
+
+.header {
     display: flex;
-    padding: 0 2em 2em 0;
-    margin-bottom: 1em;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.image {
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 150px;
-    height: 200px;
-    margin: 2em;
-}
-
-.description {
-    flex: 1;
+.showingInfo {
+  font-size: smaller;
 }

@@ -1,0 +1,24 @@
+
+.extraInfo {
+  display: flex;
+  flex-direction: row;
+  padding-top: 1em;
+  overflow: hidden;
+}
+
+.poster {
+  min-width: 8.5em;
+
+  img {
+    max-height: 12em;
+  }
+}
+
+.desc {
+  padding: 0 0 1em 1em;
+  max-width: 30em;
+}
+
+.runtime {
+  margin-top: 1em;
+}
