@@ -64,17 +64,19 @@ const MovieItem = React.createClass({
         <div className={styles.header}>
           {this.renderImdbButton(movie, isEditing)}
           <h2 onClick={() => onMovieClick(movie.sf_id)}>{movie.title}</h2>
-          <time dateTime={moment(movie.premiere_date).toISOString()}
+          {moment(movie.premiere_date).isAfter(moment())
+            &&
+            <time dateTime={moment(movie.premiere_date).toISOString()}
                 title={moment(movie.premiere_date).format('L')}>
             Premiär {moment(movie.premiere_date).fromNow()}
-          </time>
+          </time>}
           <GoldButton onClick={onCreateShowing}>
             Skapa besök
           </GoldButton>
         </div>
-        <ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+        <ReactCSSTransitionGroup transitionName="slide" transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
           {selected &&
-            <div className={styles.extraInfo}>
+            <div className={styles.extraInfo} key="extraInfo">
               <div className={styles.poster}>
                 <img src={movie.poster} />
               </div>
@@ -86,7 +88,7 @@ const MovieItem = React.createClass({
           }
         </ReactCSSTransitionGroup>
       </div>
-      
+
     )
   }
 })

@@ -34,9 +34,12 @@
   display: flex;
   flex-direction: row;
   padding-top: 1em;
+  overflow: hidden;
 }
 
 .poster {
+  min-width: 8.5em;
+
   img {
     max-height: 12em;
   }
@@ -71,20 +74,26 @@
   height: 1.2em;
 }
 
-:global(.example-enter) {
-  height: 0;
+:global(.slide-enter) {
+  max-height: 0;
+  padding-top: 0;
 }
 
-:global(.example-enter.example-enter-active) {
-  height: 100%;
-  transition: height 500ms ease-in;
+:global(.slide-enter.slide-enter-active) {
+  padding-top: 1em;
+  max-height: 30em;
+  transition-property: max-height, padding-top;
+  transition-duration: 1000ms;
 }
 
-:global(.example-leave) {
-  height: 100%;
+:global(.slide-leave) {
+  padding-top: 1em;
+  max-height: 30em;
 }
 
-:global(.example-leave.example-leave-active) {
-  height: 0;
-  transition: height 300ms ease-in;
+:global(.slide-leave.slide-leave-active) {
+  padding-top: 0;
+  max-height: 0;
+  transition-property: max-height, padding-top;
+  transition-duration: 1000ms;
 }
