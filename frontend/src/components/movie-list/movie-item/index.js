@@ -60,7 +60,7 @@ const MovieItem = React.createClass({
     const { movie, onCreateShowing, selected, onMovieClick } = this.props
 
     const premiereDate = moment(movie.premiere_date);
-    const premiereIsInFuture = premiere_date.isAfter(moment())
+    const premiereIsInFuture = premiereDate.isAfter(moment())
 
     return (
       <div className={styles.container}>
