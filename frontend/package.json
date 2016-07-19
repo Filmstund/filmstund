@@ -26,11 +26,13 @@
   },
   "homepage": "https://github.com/tejpbit/itbio#readme",
   "dependencies": {
+    "chart.js": "^1.1.1",
     "lodash": "~4.13.1",
     "moment": "~2.13.0",
     "postcss-loader": "~0.9.1",
     "precss": "~1.4.0",
     "react": "^15.1.0",
+    "react-chartjs": "^0.7.3",
     "react-date-range": "^0.2.4",
     "react-dom": "^15.1.0",
     "react-facebook-login": "~3.0.0",

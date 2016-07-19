@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { fetchEndpoint, postEndpoint } from '../../service/backend';
-import HorizontalBarGraph from './HorizontalBarGraph';
+import { Bar } from 'react-chartjs';
+
+import _ from 'lodash';
 
 import StatusLabel from '../status-label';
 import SlotPicker from '../slot-picker';
@@ -58,6 +60,24 @@ const Showing = React.createClass({
     console.log(id);
   },
 
+  renderChartjsfance(barData) {
+    const maxY = _.max(barData.map(d => d.y));
+    const colors = barData.map(d => d.y === maxY ? 'goldenrod' : 'tomato');
+    console.log('corlos',colors);
+
+    let data = {
+      labels: barData.map(d => d.x),
+      datasets: [{
+        fillColor: colors,
+        data: barData.map(d => d.y)
+      }]
+    };
+
+    return (
+      <Bar data={data} />
+    )
+  },
+
   render() {
     const { showing } = this.props.showing;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
@@ -92,8 +112,7 @@ const Showing = React.createClass({
               </div>
           )}
 
-          <HorizontalBarGraph data={barData} onDataClicked={this.onBarClicked} />
-
+          {this.renderChartjsfance(barData)}
         </div>
       </div>
     )
