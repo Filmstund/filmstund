@@ -1,7 +1,7 @@
 import React from 'react';
 import loader from '../../loader';
 
-import StatusLabel from '../../status-label';
+import ShowingHeader from '../../showing-header';
 import MovieInfo from '../../movie-info';
 
 import styles from './style.css';
@@ -12,10 +12,7 @@ const ShowingItem = React.createClass({
 
     return (
       <div className={styles.container}>
-        <div className={styles.header}>
-          <a href={`/showings/${showing.id}`} ><h2>{showing.movie.title}</h2></a>
-          <div className={styles.statusLabel}><StatusLabel className={styles.label} status={showing.status} /></div>
-        </div>
+        <ShowingHeader showing={showing} />
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
         </div>
