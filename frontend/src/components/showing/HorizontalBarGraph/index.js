@@ -32,10 +32,10 @@ const HorizontalBarGraph = React.createClass({
 
   render() {
     const maxValue = _.maxBy(this.props.data, 'y').y;
-    
+
     return (
       <div style={{
-                width: 500,
+                width: 500
               }}>
         <VictoryChart width={600}
                       domainPadding={{x: 30, y:30}}
@@ -67,13 +67,22 @@ const HorizontalBarGraph = React.createClass({
                                 return ({y: 0, fill: 'tomato'});
                               },
                               after: (data) => {
-                                console.log(data);
-                                console.log("wat");
                                 return ({fill: data.y === maxValue? 'goldenrod' : 'tomato'})
                               }
                             }
                           }}
-                      data={this.state.data} />
+                      data={this.state.data}
+                      events={[
+                        {
+                          target: "data",
+                          eventHandlers: {
+                            onClick: (evt, data) => {
+                              evt.stopPropagation();
+                              this.props.onDataClicked(data.datum.id)
+                            }
+                          }
+                        }
+                      ]}/>
         </VictoryChart>
       </div>
     )

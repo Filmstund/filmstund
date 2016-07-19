@@ -1,6 +1,7 @@
 import React from 'react';
 import loader from '../loader/';
 import moment from 'moment';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { fetchEndpoint, postEndpoint } from '../../service/backend';
@@ -10,6 +11,7 @@ import StatusLabel from '../status-label';
 import SlotPicker from '../slot-picker';
 
 import styles from './style.css'
+import {getUser} from "../../store/reducer/index";
 
 const Showing = React.createClass({
   getInitialState() {
@@ -18,10 +20,42 @@ const Showing = React.createClass({
     }
   },
 
+  calculateNewVotesFromPickedSlots(selectedIds) {
+    const allTimeSlotsWithoutUsersVotes = this.props.showing.showing.time_slots.map(ts => ({
+      ...ts,
+      users: ts.users.filter(u => u.id != this.props.currentUser.id)
+    }));
+
+    const newTimeSlots = allTimeSlotsWithoutUsersVotes.map(ts => {
+      if (selectedIds.includes(ts.sf_slot_id)) {
+        ts.users.push(this.props.currentUser)
+      }
+      return ts;
+    });
+
+
+    return newTimeSlots;
+  },
+
   submitSlotsPicked(selectedIds) {
+    this.setState({
+      loading: true,
+      timeSlots: this.calculateNewVotesFromPickedSlots(selectedIds)
+    });
+
     postEndpoint(`/showings/${this.props.params.id}/time_slots/votes`, {
       sf_slot_ids: selectedIds
-    })
+    }).then(data => {
+      this.setState({
+        loading: false,
+        timeSlots: data.time_slots
+      });
+    });
+  },
+
+  onBarClicked(id) {
+    //postEndpoint(`/sh`)
+    console.log(id);
   },
 
   render() {
@@ -31,12 +65,16 @@ const Showing = React.createClass({
       return null;
     }
 
-    const { loading, time_slots, status } = showing;
-    const barData = showing.time_slots.map((ts) => ({
+    const { loading, status } = showing;
+    let { time_slots } = showing;
+    if (this.state.timeSlots) {
+      time_slots = this.state.timeSlots;
+    }
+    const barData = time_slots.map((ts) => ({
       x: moment(ts.start_time).format('DD/M, HH:mm'),
       y: ts.users.length,
       id: ts.id
-    }))
+    }));
 
 
     return (
@@ -54,7 +92,7 @@ const Showing = React.createClass({
               </div>
           )}
 
-          <HorizontalBarGraph data={barData}/>
+          <HorizontalBarGraph data={barData} onDataClicked={this.onBarClicked} />
 
         </div>
       </div>
@@ -66,4 +104,6 @@ export default withRouter(loader((props) => ({
     showing: `/showings/${props.params.id}`,
     selectedTimeSlots: `/showings/${props.params.id}/time_slots/votes`
 }
-))(Showing))
+))(connect(state => ({
+  currentUser: getUser(state)
+}))(Showing)))
