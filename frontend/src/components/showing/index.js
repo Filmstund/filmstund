@@ -5,7 +5,8 @@ import moment from 'moment';
 import { DateRange } from 'react-date-range';
 import { fetchEndpoint, postEndpoint } from '../../service/backend';
 
-import StatusLabel from '../status-label';
+import ShowingHeader from '../showing-header';
+import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
 import LoadingIndicator from '../loading-indicator';
 
@@ -20,7 +21,8 @@ const Showing = React.createClass({
         startDate: minDate,
         endDate: moment().add(3, 'weeks'),
       },
-      loading: false
+      loading: false,
+      slotsSaved: false
     }
   },
 
@@ -28,7 +30,11 @@ const Showing = React.createClass({
     console.log('slots picked', selectedIds);
     postEndpoint(`/showings/${this.props.params.id}/time_slots/votes`, {
       sf_slot_ids: selectedIds
-    })
+    }).then(() => {this.setState({slotsSaved: true})});
+  },
+
+  slotsChanged() {
+    this.setState({slotsSaved: false});
   },
 
   render() {
@@ -42,18 +48,23 @@ const Showing = React.createClass({
 
     return (
       <div className={styles.container}>
-        <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>
-        <div className={styles.description}>
-          <h3>{showing.movie.title}</h3>
-          <StatusLabel status={status} />
+        <ShowingHeader showing={showing} />
+        <div className={styles.showingInfo}>
+          Admin: {showing.owner.nick}
+        </div>
+        <div className={styles.timePicker}>
           { time_slots && (
               <div>
                 <SlotPicker timeSlots={time_slots}
                             initiallySelectedTimeSlots={selectedTimeSlots}
-                            onSubmit={this.submitSlotsPicked} />
+                            onSubmit={this.submitSlotsPicked}
+                            onChange={this.slotsChanged}
+                            saved={this.state.slotsSaved} />
               </div>
           )}
         </div>
+        <h3>Om filmen</h3>
+        <MovieInfo movie={showing.movie} />
       </div>
     )
   }

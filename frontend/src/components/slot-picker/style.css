@@ -1,4 +1,24 @@
 
+.container {
+  display: flex;
+  flex-direction: column;
+
+  button {
+    margin-top: 1em;
+  }
+
+  .saved {
+    text-align: center;
+    margin-top: 1em;
+    font-size: smaller;
+    visibility: hidden;
+  }
+
+  .saved.isSaved {
+    visibility: visible;
+  }
+}
+
 .daysContainer {
     justify-content: center;
     user-select: none;
@@ -6,23 +26,20 @@
 
 .is_vip, .is_3d {
     margin-left: 0.3em;
-    font-size: 0.8em;
+    font-size: smaller;
     padding: 0 0.3em;
     min-width: 20px;
     display: inline-block;
-    background: goldenrod;
-    color: black;
-    border: 1px solid black;
+    background: #712;
+    color: white;
     border-radius: 5px;
-    font-weight: 700;
+    font-weight: 600;
     text-align: center;
 }
 
 .daysRow {
-    border: 10px solid #712;
-    color: white;
     justify-content: center;
-    background: #712;
+    border: 1px solid black;
 }
 
 .daysContainer, .daysRow, .doodleSlot, .doodleDay {
@@ -35,6 +52,7 @@
 
 .tags {
     padding: 0.2em 0;
+    margin-bottom: 0.4em;
 }
 
 .doodleSlot {
@@ -42,37 +60,45 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    height: 6em;
+    height: 8em;
     width: 6em;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid black;
+    background: #fff;
 
     &.selected {
-        background: rgba(204, 153, 0, 1);
+        background: #E5BB25;
         color: black;
 
         &:hover {
-            background: rgba(204, 153, 0, 0.5);
+            background: #f5cc35;
         }
     }
 
     &:hover {
-        background: rgba(0, 0, 0, 0.5);
+        background: #fcc;
         cursor: pointer;
     }
 
     small {
         font-weight: 100;
     }
+
+    .users {
+      font-size: smaller;
+      margin-top: 0.5em;
+    }
 }
 
 .doodleDate {
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid black;
     padding: 0 1em;
 }
 
 .doodleDay {
     flex-direction: column;
-    border-right: 1px solid white;
+    border-right: 1px solid black;
+    background: #eee;
+    padding-bottom: 4em;
 
     &:last-child {
         border-right: 0;

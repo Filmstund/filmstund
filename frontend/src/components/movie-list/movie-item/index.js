@@ -3,6 +3,7 @@ import moment from '../../../lib/moment'
 import { connect } from 'react-redux';
 import { putEndpoint } from '../../../service/backend';
 import GoldButton from '../../gold-button';
+import MovieInfo from '../../movie-info';
 
 import styles from './style.css';
 
@@ -78,17 +79,7 @@ const MovieItem = React.createClass({
           </GoldButton>
         </div>
         <ReactCSSTransitionGroup transitionName="slide" transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
-          {selected &&
-            <div className={styles.extraInfo} key="extraInfo">
-              <div className={styles.poster}>
-                <img src={movie.poster} />
-              </div>
-              <div className={styles.desc}>
-                <div>{movie.description}</div>
-                <div className={styles.runtime}><i className="fa fa-film" aria-hidden="true"></i> {movie.runtime} min</div>
-              </div>
-            </div>
-          }
+          {selected && <MovieInfo movie={movie} />}
         </ReactCSSTransitionGroup>
       </div>
 
