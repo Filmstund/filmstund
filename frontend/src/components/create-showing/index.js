@@ -7,7 +7,8 @@ import { fetchEndpoint, postEndpoint } from '../../service/backend';
 
 import StatusLabel from '../status-label';
 import SlotPicker from '../slot-picker';
-
+import GoldButton from '../gold-button';
+import LoadingIndicator from '../loading-indicator';
 
 import styles from './style.css'
 
@@ -64,6 +65,44 @@ const CreateShowing = React.createClass({
       })
   },
 
+  getTheme() {
+    return {
+      MonthButton    : {
+        background   : '#712'
+      },
+      MonthArrowPrev : {
+        borderRightColor : '#fff',
+      },
+      MonthArrowNext : {
+        borderLeftColor : '#fff',
+      },
+      Weekday        : {
+        background   : '#ddd',
+        color        : '#333'
+      },
+      Day            : {
+        transition   : 'transform .1s ease, box-shadow .1s ease, background .1s ease'
+      },
+      DaySelected    : {
+        background   : '#712'
+      },
+      DayActive    : {
+        background   : '#712',
+        boxShadow    : 'none'
+      },
+      DayInRange     : {
+        background   : '#712',
+        color        : '#fff'
+      },
+      DayHover       : {
+        background   : '#ffffff',
+        color        : '#7f8c8d',
+        transform    : 'scale(1.1) translateY(-10%)',
+        boxShadow    : '0 2px 4px rgba(0, 0, 0, 0.4)'
+      }
+    };
+  },
+
   submitSlotsPicked(selectedSlotIds) {
       console.log('slotIds', selectedSlotIds);
       postEndpoint('/showings', {
@@ -87,29 +126,29 @@ const CreateShowing = React.createClass({
 
     return (
       <div className={styles.container}>
-        <div className={styles.image} style={{backgroundImage: `url(${movie.poster})`}}></div>
-        <div className={styles.description}>
-          <h3>{movie.title}</h3>
-          {loading && <img src="/loader.gif" />}
-          {!loading && !timeSlots && (
-            <div>
-              <DateRange
-                minDate={minDate}
-                startDate={startDate}
-                endDate={endDate}
-                linkedCalendars={true}
-                onInit={this.handleChange}
-                onChange={(time) => this.setState({timeRange: time})} />
-              <button onClick={this.getTimeSlots}>Hämta tider</button>
-            </div>
-          )}
-          { timeSlots && (
-              <div>
-                  <SlotPicker timeSlots={timeSlots}
-                              onSubmit={this.submitSlotsPicked}/>
+        <h3>Skapa besök: {movie.title}</h3>
+        {loading && <LoadingIndicator />}
+        {!loading && !timeSlots && (
+          <div>
+            <DateRange
+              minDate={minDate}
+              startDate={startDate}
+              endDate={endDate}
+              linkedCalendars={true}
+              onInit={this.handleChange}
+              onChange={(time) => this.setState({timeRange: time})}
+              theme={this.getTheme()} />
+              <div className={styles.button}>
+                <GoldButton onClick={this.getTimeSlots}>Hämta tider</GoldButton>
               </div>
-          )}
-        </div>
+          </div>
+        )}
+        { timeSlots && (
+            <div className={styles.slotPicker}>
+                <SlotPicker timeSlots={timeSlots}
+                            onSubmit={this.submitSlotsPicked}/>
+            </div>
+        )}
       </div>
     )
   }
