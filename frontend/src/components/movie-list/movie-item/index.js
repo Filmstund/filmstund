@@ -78,7 +78,7 @@ const MovieItem = React.createClass({
             Skapa besök
           </GoldButton>
         </div>
-        <ReactCSSTransitionGroup transitionName="slide" transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
+        <ReactCSSTransitionGroup transitionName="slide" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
           {selected && <MovieInfo movie={movie} />}
         </ReactCSSTransitionGroup>
       </div>
