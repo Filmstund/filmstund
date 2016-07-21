@@ -9,8 +9,10 @@ import { Bar } from 'react-chartjs';
 
 import _ from 'lodash';
 
-import StatusLabel from '../status-label';
+import ShowingHeader from '../showing-header';
+import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
+import LoadingIndicator from '../loading-indicator';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
@@ -18,7 +20,12 @@ import {getUser} from "../../store/reducer/index";
 const Showing = React.createClass({
   getInitialState() {
     return {
-      votingStats: []
+      timeRange: {
+        startDate: minDate,
+        endDate: moment().add(3, 'weeks'),
+      },
+      loading: false,
+      slotsSaved: false
     }
   },
 
@@ -38,7 +45,7 @@ const Showing = React.createClass({
 
     return newTimeSlots;
   },
-
+  
   submitSlotsPicked(selectedIds) {
     this.setState({
       loading: true,
@@ -99,21 +106,25 @@ const Showing = React.createClass({
 
     return (
       <div className={styles.container}>
-        <div className={styles.image} style={{backgroundImage: `url(${showing.movie.poster})`}}></div>
-        <div className={styles.description}>
-          <h3>{showing.movie.title}</h3>
-          {loading && <img src="/loader.gif" />}
-          <StatusLabel status={status} />
+        <ShowingHeader showing={showing} />
+        <div className={styles.showingInfo}>
+          Admin: {showing.owner.nick}
+        </div>
+        <div className={styles.timePicker}>
           { time_slots && (
               <div>
                 <SlotPicker timeSlots={time_slots}
                             initiallySelectedTimeSlots={selectedTimeSlots}
-                            onSubmit={this.submitSlotsPicked} />
+                            onSubmit={this.submitSlotsPicked}
+                            onChange={this.slotsChanged}
+                            saved={this.state.slotsSaved} />
               </div>
           )}
 
           {this.renderChartjsfance(barData)}
         </div>
+        <h3>Om filmen</h3>
+        <MovieInfo movie={showing.movie} />
       </div>
     )
   }

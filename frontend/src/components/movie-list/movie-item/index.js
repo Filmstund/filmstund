@@ -3,8 +3,11 @@ import moment from '../../../lib/moment'
 import { connect } from 'react-redux';
 import { putEndpoint } from '../../../service/backend';
 import GoldButton from '../../gold-button';
+import MovieInfo from '../../movie-info';
 
 import styles from './style.css';
+
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 const MovieItem = React.createClass({
   getInitialState() {
@@ -55,20 +58,31 @@ const MovieItem = React.createClass({
   },
   render() {
     const { isEditing } = this.state
-    const { movie, onCreateShowing } = this.props
+    const { movie, onCreateShowing, selected, onMovieClick } = this.props
+
+    const premiereDate = moment(movie.premiere_date);
+    const premiereIsInFuture = premiereDate.isAfter(moment())
 
     return (
       <div className={styles.container}>
-        {this.renderImdbButton(movie, isEditing)}
-        <h2>{movie.title}</h2>
-        <time dateTime={moment(movie.premiere_date).toISOString()}
-              title={moment(movie.premiere_date).format('L')}>
-          Premiär {moment(movie.premiere_date).fromNow()}
-        </time>
-        <GoldButton onClick={onCreateShowing}>
-          Skapa besök
-        </GoldButton>
+        <div className={styles.header}>
+          {this.renderImdbButton(movie, isEditing)}
+          <h2 onClick={() => onMovieClick(movie.sf_id)}>{movie.title}</h2>
+          {premiereIsInFuture
+            &&
+            <time dateTime={premiereDate.toISOString()}
+                title={premiereDate.format('L')}>
+            Premiär {premiereDate.fromNow()}
+          </time>}
+          <GoldButton onClick={onCreateShowing}>
+            Skapa besök
+          </GoldButton>
+        </div>
+        <ReactCSSTransitionGroup transitionName="slide" transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
+          {selected && <MovieInfo movie={movie} />}
+        </ReactCSSTransitionGroup>
       </div>
+
     )
   }
 })

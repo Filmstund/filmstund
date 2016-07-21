@@ -1,10 +1,35 @@
 
 .container {
-    color: white;
-    background: black;
+  background: white;
+  border-radius: 0.5em;
+  padding: 0 2em 2em;
+  margin-bottom: 2em;
+
+  h2 {
+    font-weight: lighter;
+    margin-bottom: 0.3em;
+  }
+
+  h3 {
+    font-weight: lighter;
+    margin-bottom: 0.3em;
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+}
+
+.header {
     display: flex;
-    padding: 0 2em 2em 0;
-    margin-bottom: 1em;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.showingInfo {
+  font-size: smaller;
 }
 
 .image {
@@ -16,8 +41,9 @@
     margin: 2em;
 }
 
-.description {
+.timePicker {
     flex: 1;
+    margin-top: 1em;
 }
 
 .fa-calendar {

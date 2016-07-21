@@ -32,6 +32,7 @@
     "postcss-loader": "~0.9.1",
     "precss": "~1.4.0",
     "react": "^15.1.0",
+    "react-addons-css-transition-group": "^15.1.0",
     "react-chartjs": "^0.7.3",
     "react-date-range": "^0.2.4",
     "react-dom": "^15.1.0",
@@ -40,8 +41,7 @@
     "react-redux": "~4.4.5",
     "react-router": "^2.4.1",
     "redux": "~3.5.2",
-    "redux-thunk": "~2.1.0",
-    "victory": "^0.9.0"
+    "redux-thunk": "~2.1.0"
   },
   "devDependencies": {
     "autoprefixer": "~6.3.6",

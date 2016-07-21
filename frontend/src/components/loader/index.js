@@ -2,6 +2,7 @@ import React from 'react';
 import {
   fetchEndpoint
 } from '../../service/backend'
+import LoadingIndicator from '../loading-indicator';
 
 const noopObj = () => ({})
 
@@ -52,6 +53,12 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
   },
   render() {
     const { loading, data } = this.state;
+
+    if(loading) {
+      return (
+        <LoadingIndicator />
+      )
+    }
 
     return (
       <Component {...this.props} {...data} loading={loading} />

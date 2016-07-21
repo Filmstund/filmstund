@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react';
 import _ from 'lodash';
 import moment from '../../lib/moment';
 
+import GoldButton from '../gold-button'
+
 import styles from './style.css';
 
 const SlotPicker = React.createClass({
@@ -11,14 +13,18 @@ const SlotPicker = React.createClass({
   },
 
   getDefaultProps() {
+    let f = () => undefined;
     return {
-      initiallySelectedTimeSlots: []
+      initiallySelectedTimeSlots: [],
+      onChange: f,
+      saved: false
     }
   },
 
   getInitialState() {
     return {
-      selectedIds: this.props.initiallySelectedTimeSlots.map(slot => slot.sf_slot_id)
+      selectedIds: this.props.initiallySelectedTimeSlots.map(slot => slot.sf_slot_id),
+      internalSaved: false
     }
   },
   
@@ -29,10 +35,14 @@ const SlotPicker = React.createClass({
     } else {
         selectedIds = [...selectedIds, slotId];
     }
+    this.props.onChange();
     this.setState({selectedIds});
   },
   renderSlot(slot) {
     const isSelected = this.state.selectedIds.includes(slot.sf_slot_id)
+    const addOne = isSelected && !Boolean(slot.users.find(u => u.nick === 'Juice')) // TODO proper find
+    const subtractOne = !isSelected && Boolean(slot.users.find(u => u.nick === 'Juice')) // TODO proper find
+    const total = slot.users.length + addOne - subtractOne;
 
     return (
       <div key={slot.sf_slot_id}
@@ -49,6 +59,11 @@ const SlotPicker = React.createClass({
         <small title={slot.auditorium_name}>
           {slot.theatre.replace('Fs ', '').substring(0, 4)}…
         </small>
+        {total > 0 &&
+          <div className={styles.users}>
+          <i className="fa fa-users"></i> {total}
+          </div>
+        }
       </div>
     )
   },
@@ -62,18 +77,20 @@ const SlotPicker = React.createClass({
     )
   },
   render() {
-    const { timeSlots, onSubmit } = this.props;
+    const { timeSlots, onSubmit, saved } = this.props;
     const slotsByDate = _.groupBy(timeSlots, s => moment(s.start_time).format('L'));
     const keys = _.orderBy(Object.keys(slotsByDate));
+    console.log(timeSlots);
 
     return (
-      <div>
+      <div className={styles.container}>
         <div className={styles.daysContainer}>
           <div className={styles.daysRow}>
             {keys.map(key => this.renderDay(key, slotsByDate[key]))}
           </div>
         </div>
-        <button onClick={() => onSubmit(this.state.selectedIds)}>Submit</button>
+        <div className={styles.saved + ' ' + (saved ? styles.isSaved : '')}>Sparat!</div>
+        <GoldButton onClick={() => onSubmit(this.state.selectedIds)}>Välj tider</GoldButton>
       </div>
     )
   }

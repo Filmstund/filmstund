@@ -15,7 +15,7 @@ class ShowingsController < ApplicationController
 
   # POST /showings
   def create
-    @showing = Showing.new(showing_params)
+    @showing = current_user.showings.build(showing_params)
     @showing.status = 1
 
     unless @showing.save
