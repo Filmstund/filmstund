@@ -49,7 +49,7 @@ class TimeSlotsController < ApplicationController
     @current_user.set_time_slots_for_showing @showing, new_time_slots
 
     if @current_user.save
-      render json: @current_user.time_slots.where(showing_id: params[:showing_id])
+      render json: TimeSlot.where(showing_id: params[:showing_id])
     else
       render json: @current_user.errors, status: :unprocessable_entity
     end
