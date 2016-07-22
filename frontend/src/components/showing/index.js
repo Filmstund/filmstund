@@ -59,7 +59,9 @@ const Showing = React.createClass({
                             initiallySelectedTimeSlots={selectedTimeSlots}
                             onSubmit={this.submitSlotsPicked}
                             onChange={this.slotsChanged}
-                            saved={this.state.slotsSaved} />
+                            saved={this.state.slotsSaved}
+                            showSaved={true}
+                            showUsers={true} />
               </div>
           )}
         </div>

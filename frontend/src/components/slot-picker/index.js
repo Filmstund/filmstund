@@ -17,7 +17,9 @@ const SlotPicker = React.createClass({
     return {
       initiallySelectedTimeSlots: [],
       onChange: f,
-      saved: false
+      saved: false,
+      showSaved: false,
+      showUsers: false
     }
   },
 
@@ -38,6 +40,7 @@ const SlotPicker = React.createClass({
     this.setState({selectedIds});
   },
   renderSlot(slot) {
+    const { showUsers } = this.props;
     const isSelected = this.state.selectedIds.includes(slot.sf_slot_id)
     const addOne = isSelected && !Boolean(slot.users.find(u => u.nick === 'Juice')) // TODO proper find
     const subtractOne = !isSelected && Boolean(slot.users.find(u => u.nick === 'Juice')) // TODO proper find
@@ -58,7 +61,7 @@ const SlotPicker = React.createClass({
         <small title={slot.auditorium_name}>
           {slot.theatre.replace('Fs ', '').substring(0, 4)}…
         </small>
-        {total > 0 &&
+        {(showUsers && total > 0) &&
           <div className={styles.users}>
           <i className="fa fa-users"></i> {total}
           </div>
@@ -76,7 +79,7 @@ const SlotPicker = React.createClass({
     )
   },
   render() {
-    const { timeSlots, onSubmit, saved } = this.props;
+    const { timeSlots, onSubmit, saved, showSaved } = this.props;
     const slotsByDate = _.groupBy(timeSlots, s => moment(s.start_time).format('L'));
     const keys = _.orderBy(Object.keys(slotsByDate));
     console.log(timeSlots);
@@ -88,8 +91,8 @@ const SlotPicker = React.createClass({
             {keys.map(key => this.renderDay(key, slotsByDate[key]))}
           </div>
         </div>
-        <div className={styles.saved + ' ' + (saved ? styles.isSaved : '')}>Sparat!</div>
         <GoldButton onClick={() => onSubmit(this.state.selectedIds)}>Välj tider</GoldButton>
+        {showSaved && <div className={styles.saved + ' ' + (saved ? styles.isSaved : '')}>Sparat!</div>}
       </div>
     )
   }

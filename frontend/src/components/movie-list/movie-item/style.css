@@ -59,7 +59,7 @@
   padding-top: 1em;
   max-height: 30em;
   transition-property: max-height, padding-top;
-  transition-duration: 1000ms;
+  transition-duration: 500ms;
 }
 
 :global(.slide-leave) {
@@ -71,5 +71,5 @@
   padding-top: 0;
   max-height: 0;
   transition-property: max-height, padding-top;
-  transition-duration: 1000ms;
+  transition-duration: 300ms;
 }
