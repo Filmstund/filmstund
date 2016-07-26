@@ -14,6 +14,7 @@ gem 'themoviedb'
 gem 'fb_graph2', '~> 0.7.7'
 
 gem "browser"
+gem "pushover"
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.0'
