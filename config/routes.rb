@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   resources :orders
   get '/random_bioord' => 'bioord#random'
   resources :showings do
-    collection do
+    member do
       post 'complete'
     end
     resources :time_slots do

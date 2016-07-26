@@ -1,5 +1,5 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:update, :destroy, :between]
+  before_action :set_showing, only: [:update, :destroy, :between, :complete]
 
   # GET /showings
   def index
@@ -49,7 +49,18 @@ class ShowingsController < ApplicationController
 
   # POST /showings/:id/complete
   def complete
-    @showing.confirmed!
+    unless @showing.owner == current_user
+      render nothing: true, status: :forbidden and return
+    end
+    @time_slot = TimeSlot.find_by(sf_slot_id: params[:sf_slot_id])
+    @showing.selected_time_slot = @time_slot
+    @showing.status = "confirmed"
+
+    if @showing.save
+      render json: @showing
+    else
+      render json: @showing.errors, status: :unprocessable_entity
+    end
   end
 
   # GET /showings/:id/between/:from/:to
