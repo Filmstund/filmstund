@@ -10,7 +10,7 @@ class ShowingsController < ApplicationController
 
   # GET /showings/1
   def show
-    render json: @showing
+    render json: @showing.includes(:owner, :movie, time_slots: [:users])
   end
 
   # POST /showings
