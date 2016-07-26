@@ -1,5 +1,5 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:show, :update, :destroy, :between]
+  before_action :set_showing, only: [:update, :destroy, :between]
 
   # GET /showings
   def index
@@ -10,7 +10,9 @@ class ShowingsController < ApplicationController
 
   # GET /showings/1
   def show
-    render json: @showing.includes(:owner, :movie, time_slots: [:users])
+    @showing = Showing.includes(:owner, :movie, time_slots: [:users]).find(params[:id])
+
+    render json: @showing
   end
 
   # POST /showings
