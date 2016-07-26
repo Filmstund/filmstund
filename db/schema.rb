@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160726185908) do
+ActiveRecord::Schema.define(version: 20160726192125) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.integer  "user_id"
@@ -107,6 +107,7 @@ ActiveRecord::Schema.define(version: 20160726185908) do
     t.integer  "theatre_account"
     t.string   "sf_slot_id"
     t.integer  "price"
+    t.index ["sf_slot_id"], name: "index_time_slots_on_sf_slot_id"
     t.index ["showing_id"], name: "index_time_slots_on_showing_id"
   end
 
