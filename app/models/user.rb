@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  scope :with_push_key, -> { where.not(pushover_key: nil) }
   has_and_belongs_to_many :time_slots
   has_many :tokens, class_name: ApiToken
   has_many :showings, foreign_key: :owner_id
