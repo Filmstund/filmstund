@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import loader from '../loader/';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
-import { fetchEndpoint, postEndpoint } from '../../service/backend';
+import { postEndpoint } from '../../service/backend';
 import { Bar } from 'react-chartjs';
 
 import _ from 'lodash';
@@ -12,12 +12,17 @@ import _ from 'lodash';
 import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
-import LoadingIndicator from '../loading-indicator';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
 const Showing = React.createClass({
+  propTypes: {
+    showing: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
+    selectedTimeSlots: PropTypes.object
+  },
+
   getInitialState() {
     return {
       loading: false,
@@ -55,20 +60,18 @@ const Showing = React.createClass({
         loading: false,
         timeSlots: data.time_slots
       });
+    }).catch((err) => {
+      err.json().then((x) => {
+        console.log(x);
+      })
     });
   },
 
-  onBarClicked(id) {
-    //postEndpoint(`/sh`)
-    console.log(id);
-  },
-
-  renderChartjsfance(barData) {
+  renderChart(barData) {
     const maxY = _.max(barData.map(d => d.y));
     const colors = barData.map(d => d.y === maxY ? 'goldenrod' : 'tomato');
-    console.log('corlos',colors);
 
-    let data = {
+    const data = {
       labels: barData.map(d => d.x),
       datasets: [{
         fillColor: colors,
@@ -81,14 +84,33 @@ const Showing = React.createClass({
     )
   },
 
-  render() {
+  renderSubmitTimeSlotButtons() {
     const { showing } = this.props.showing;
+    return (
+      <div>
+        {
+          showing.time_slots.map(ts =>
+            <button key={ts.sf_slot_id}
+                    onClick={() => this.submitTimeSlot(ts.sf_slot_id)}
+                    disabled={showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id}>{ts.sf_slot_id}</button>
+          )
+        }
+      </div>
+    )
+  },
+
+  submitTimeSlot(sf_slot_id) {
+    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { sf_slot_id }))
+  },
+
+  render() {
+    const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
     if (!showing || !selectedTimeSlots) {
       return null;
     }
 
-    const { loading, status } = showing;
+    const { loading } = showing;
     let { time_slots } = showing;
     if (this.state.timeSlots) {
       time_slots = this.state.timeSlots;
@@ -99,15 +121,18 @@ const Showing = React.createClass({
       id: ts.id
     }));
 
-
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
+        {showing.selected_time_slot && (
+          <div>The selected date for this showing is {showing.selected_time_slot.start_time}</div>
+        )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
         </div>
         <div className={styles.timePicker}>
-          { time_slots && (
+          {!showing.selected_time_slot && (
+            time_slots && (
               <div>
                 <SlotPicker timeSlots={time_slots}
                             initiallySelectedTimeSlots={selectedTimeSlots}
@@ -117,9 +142,10 @@ const Showing = React.createClass({
                             showSaved={true}
                             showUsers={true} />
               </div>
+            )
           )}
-
-          {this.renderChartjsfance(barData)}
+          {this.renderChart(barData)}
+          {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />

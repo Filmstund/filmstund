@@ -4,6 +4,7 @@ class TimeSlot < ApplicationRecord
   has_and_belongs_to_many :users
   before_create :fetch_price
 
+  validates_uniqueness_of :sf_slot_id
   validates :auditorium_id, :theatre_account, :sf_slot_id, presence: true
 
   # This ensures that this TimeSlot is a valid SF time slot

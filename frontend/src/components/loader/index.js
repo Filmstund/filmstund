@@ -36,7 +36,7 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
             [key]: json
           }
         })
-      }))
+      }));
 
     Promise.all(promises)
       .then(() => {
@@ -51,6 +51,16 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
         })
       })
   },
+  update(key, promise) {
+    promise.then((resp) => this.setState({
+      data: {
+        ...this.state.data,
+        [key]: resp
+      }
+    })).catch(err => {
+      console.error('Error in loader: ', err);
+    });
+  },
   render() {
     const { loading, data } = this.state;
 
@@ -61,7 +71,7 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
     }
 
     return (
-      <Component {...this.props} {...data} loading={loading} />
+      <Component {...this.props} {...data} loading={loading} update={this.update} />
     )
   }
 })

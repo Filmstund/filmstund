@@ -1,5 +1,5 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:show, :update, :destroy, :between]
+  before_action :set_showing, only: [:update, :destroy, :between, :complete]
 
   # GET /showings
   def index
@@ -10,13 +10,15 @@ class ShowingsController < ApplicationController
 
   # GET /showings/1
   def show
-    render json: @showing.includes(:owner, :movie, time_slots: [:users])
+    @showing = Showing.includes(:owner, :movie, time_slots: [:users]).find(params[:id])
+
+    render json: @showing
   end
 
   # POST /showings
   def create
     @showing = current_user.showings.build(showing_params)
-    @showing.status = 1
+    @showing.status = 'open'
 
     unless @showing.save
       render json: @showing.errors, status: :unprocessable_entity
@@ -39,6 +41,22 @@ class ShowingsController < ApplicationController
   # PATCH/PUT /showings/1
   def update
     if @showing.update(showing_params)
+      render json: @showing
+    else
+      render json: @showing.errors, status: :unprocessable_entity
+    end
+  end
+
+  # POST /showings/:id/complete
+  def complete
+    unless @showing.owner == current_user
+      render nothing: true, status: :forbidden and return
+    end
+    @time_slot = TimeSlot.find_by(sf_slot_id: params[:sf_slot_id])
+    @showing.selected_time_slot = @time_slot
+    @showing.status = "confirmed"
+
+    if @showing.save
       render json: @showing
     else
       render json: @showing.errors, status: :unprocessable_entity

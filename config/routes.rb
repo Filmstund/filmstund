@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   resources :orders
   get '/random_bioord' => 'bioord#random'
   resources :showings do
+    member do
+      post 'complete'
+    end
     resources :time_slots do
       collection do
         get 'votes'

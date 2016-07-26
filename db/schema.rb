@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160714190610) do
+ActiveRecord::Schema.define(version: 20160726192125) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.integer  "user_id"
@@ -80,10 +79,12 @@ ActiveRecord::Schema.define(version: 20160714190610) do
   create_table "showings", force: :cascade do |t|
     t.string   "sf_id"
     t.integer  "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
     t.integer  "owner_id"
+    t.integer  "selected_time_slot_id"
     t.index ["owner_id"], name: "index_showings_on_owner_id"
+    t.index ["selected_time_slot_id"], name: "index_showings_on_selected_time_slot_id"
   end
 
   create_table "showings_time_slots", id: false, force: :cascade do |t|
@@ -106,6 +107,7 @@ ActiveRecord::Schema.define(version: 20160714190610) do
     t.integer  "theatre_account"
     t.string   "sf_slot_id"
     t.integer  "price"
+    t.index ["sf_slot_id"], name: "index_time_slots_on_sf_slot_id"
     t.index ["showing_id"], name: "index_time_slots_on_showing_id"
   end
 
