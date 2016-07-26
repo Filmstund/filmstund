@@ -95,7 +95,7 @@ const Showing = React.createClass({
   },
 
   render() {
-    const { showing } = this.props.showing;
+    const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
     if (!showing || !selectedTimeSlots) {
       return null;
@@ -111,7 +111,6 @@ const Showing = React.createClass({
       y: ts.users.length,
       id: ts.id
     }));
-
 
     return (
       <div className={styles.container}>
@@ -136,7 +135,7 @@ const Showing = React.createClass({
           )}
 
           {this.renderChart(barData)}
-          {this.renderSubmitTimeSlotButtons()}
+          {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
