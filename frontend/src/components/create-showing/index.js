@@ -104,7 +104,6 @@ const CreateShowing = React.createClass({
   },
 
   submitSlotsPicked(selectedSlotIds) {
-      console.log('slotIds', selectedSlotIds);
       postEndpoint('/showings', {
           showing: {
             sf_id: this.props.params.sf_id

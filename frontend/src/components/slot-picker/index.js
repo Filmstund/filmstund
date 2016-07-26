@@ -29,6 +29,7 @@ const SlotPicker = React.createClass({
       internalSaved: false
     }
   },
+  
   handleSelectId(slotId) {
     let selectedIds = this.state.selectedIds;
     if (selectedIds.includes(slotId)) {
