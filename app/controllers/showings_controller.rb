@@ -47,6 +47,11 @@ class ShowingsController < ApplicationController
     end
   end
 
+  # POST /showings/:id/complete
+  def complete
+    @showing.confirmed!
+  end
+
   # GET /showings/:id/between/:from/:to
   def between
     from = params[:from]
