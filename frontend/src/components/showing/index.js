@@ -55,6 +55,10 @@ const Showing = React.createClass({
         loading: false,
         timeSlots: data.time_slots
       });
+    }).catch((err) => {
+      err.json().then((x) => {
+        console.log(x);
+      })
     });
   },
 
