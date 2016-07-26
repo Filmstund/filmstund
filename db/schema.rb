@@ -126,6 +126,7 @@ ActiveRecord::Schema.define(version: 20160726192125) do
     t.string   "phone_number"
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
+    t.string   "pushover_key"
   end
 
 end
