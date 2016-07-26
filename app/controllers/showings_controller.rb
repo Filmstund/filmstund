@@ -32,6 +32,7 @@ class ShowingsController < ApplicationController
     end
 
     if time_slots.map { |slot| slot.save }.all?
+      Push.showing_created(@showing)
       render json: @showing, status: :created, location: @showing
     else
       render json: (time_slots.map { |slot| slot.errors }), status: :unprocessable_entity
@@ -57,6 +58,7 @@ class ShowingsController < ApplicationController
     @showing.status = "confirmed"
 
     if @showing.save
+      Push.showing_confirmed(@showing)
       render json: @showing
     else
       render json: @showing.errors, status: :unprocessable_entity
