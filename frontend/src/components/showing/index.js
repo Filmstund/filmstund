@@ -20,10 +20,6 @@ import {getUser} from "../../store/reducer/index";
 const Showing = React.createClass({
   getInitialState() {
     return {
-      timeRange: {
-        startDate: minDate,
-        endDate: moment().add(3, 'weeks'),
-      },
       loading: false,
       slotsSaved: false
     }
