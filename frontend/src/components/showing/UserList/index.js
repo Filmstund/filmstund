@@ -10,7 +10,7 @@ const UserList = React.createClass({
 
   renderUserItem(user) {
     return (
-      <div className={style.item}>
+      <div key={user.id} className={style.item}>
         {user.nick}
       </div>
     )
