@@ -12,6 +12,7 @@ import _ from 'lodash';
 import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
+import UserList from './UserList';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
@@ -103,9 +104,19 @@ const Showing = React.createClass({
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { sf_slot_id }))
   },
 
+  renderUserList() {
+    return (
+      <div></div>
+    )
+  },
+  
   render() {
     const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
+    const userIsShowingAdmin = showing.owner.id === currentUser.id;
+    const votingUsers = _(showing.time_slots).flatMap('users').uniqBy('id').value();
+    console.log('votingusers', votingUsers);
+
     if (!showing || !selectedTimeSlots) {
       return null;
     }
@@ -145,7 +156,8 @@ const Showing = React.createClass({
             )
           )}
           {this.renderChart(barData)}
-          {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
+          {userIsShowingAdmin && (this.renderSubmitTimeSlotButtons())}
+          {<UserList users={votingUsers} />}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
