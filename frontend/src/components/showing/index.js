@@ -20,7 +20,7 @@ const Showing = React.createClass({
   propTypes: {
     showing: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
-    selectedTimeSlots: PropTypes.array
+    selectedTimeSlots: PropTypes.object
   },
 
   getInitialState() {
