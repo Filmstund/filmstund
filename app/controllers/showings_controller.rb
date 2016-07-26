@@ -18,7 +18,7 @@ class ShowingsController < ApplicationController
   # POST /showings
   def create
     @showing = current_user.showings.build(showing_params)
-    @showing.status = 1
+    @showing.status = 'open'
 
     unless @showing.save
       render json: @showing.errors, status: :unprocessable_entity
