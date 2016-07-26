@@ -44,6 +44,10 @@ class TimeSlotsController < ApplicationController
   def add_vote
     @current_user = current_user
     @showing = Showing.find params[:showing_id]
+    unless @showing.open?
+      render json: { error: "Showing is not accepting votes at this time (showing status is not open)" }, status: :precondition_failed and return
+    end
+
     new_time_slots = TimeSlot.where sf_slot_id: params[:sf_slot_ids]
 
     @current_user.set_time_slots_for_showing @showing, new_time_slots
