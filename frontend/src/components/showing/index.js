@@ -122,7 +122,8 @@ const Showing = React.createClass({
           Admin: {showing.owner.nick}
         </div>
         <div className={styles.timePicker}>
-          { time_slots && (
+          {!showing.selected_time_slot && (
+            time_slots && (
               <div>
                 <SlotPicker timeSlots={time_slots}
                             initiallySelectedTimeSlots={selectedTimeSlots}
@@ -132,8 +133,8 @@ const Showing = React.createClass({
                             showSaved={true}
                             showUsers={true} />
               </div>
+            )
           )}
-
           {this.renderChart(barData)}
           {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
         </div>
