@@ -3,7 +3,7 @@ class ShowingsController < ApplicationController
 
   # GET /showings
   def index
-    @showings = Showing.all
+    @showings = Showing.includes(:owner, :movie, time_slots: [:users]).all
 
     render json: @showings
   end
