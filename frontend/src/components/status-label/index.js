@@ -10,10 +10,10 @@ const colors = {
 }
 
 const text = {
-  '0': 'cancelled',
-  '1': 'pending',
-  '2': 'confirmed',
-  '3': 'done'
+  'cancelled': 'cancelled',
+  'open': 'open',
+  'confirmed': 'confirmed',
+  'done': 'done'
 }
 
 const StatusLable = React.createClass({

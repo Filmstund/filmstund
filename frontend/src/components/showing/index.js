@@ -58,17 +58,11 @@ const Showing = React.createClass({
     });
   },
 
-  onBarClicked(id) {
-    //postEndpoint(`/sh`)
-    console.log(id);
-  },
-
-  renderChartjsfance(barData) {
+  renderChart(barData) {
     const maxY = _.max(barData.map(d => d.y));
     const colors = barData.map(d => d.y === maxY ? 'goldenrod' : 'tomato');
-    console.log('corlos',colors);
 
-    let data = {
+    const data = {
       labels: barData.map(d => d.x),
       datasets: [{
         fillColor: colors,
@@ -81,6 +75,25 @@ const Showing = React.createClass({
     )
   },
 
+  renderSubmitTimeSlotButtons() {
+    const { showing } = this.props.showing;
+    return (
+      <div>
+        {
+          showing.time_slots.map(ts =>
+            <button key={ts.sf_slot_id}
+                    onClick={() => this.submitTimeSlot(ts.sf_slot_id)}
+                    disabled={showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id}>{ts.sf_slot_id}</button>
+          )
+        }
+      </div>
+    )
+  },
+
+  submitTimeSlot(sf_slot_id) {
+    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { sf_slot_id }))
+  },
+
   render() {
     const { showing } = this.props.showing;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
@@ -88,7 +101,7 @@ const Showing = React.createClass({
       return null;
     }
 
-    const { loading, status } = showing;
+    const { loading } = showing;
     let { time_slots } = showing;
     if (this.state.timeSlots) {
       time_slots = this.state.timeSlots;
@@ -103,6 +116,9 @@ const Showing = React.createClass({
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
+        {showing.selected_time_slot && (
+          <div>The selected date for this showing is {showing.selected_time_slot.start_time}</div>
+        )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
         </div>
@@ -119,7 +135,8 @@ const Showing = React.createClass({
               </div>
           )}
 
-          {this.renderChartjsfance(barData)}
+          {this.renderChart(barData)}
+          {this.renderSubmitTimeSlotButtons()}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
