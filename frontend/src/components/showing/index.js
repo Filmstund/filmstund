@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import loader from '../loader/';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
-import { fetchEndpoint, postEndpoint } from '../../service/backend';
+import { postEndpoint } from '../../service/backend';
 import { Bar } from 'react-chartjs';
 
 import _ from 'lodash';
@@ -12,12 +12,17 @@ import _ from 'lodash';
 import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
-import LoadingIndicator from '../loading-indicator';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
 const Showing = React.createClass({
+  propTypes: {
+    showing: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
+    selectedTimeSlots: PropTypes.array
+  },
+
   getInitialState() {
     return {
       loading: false,
