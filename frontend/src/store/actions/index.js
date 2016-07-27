@@ -1,3 +1,5 @@
+import { browserHistory } from 'react-router'
+
 export const WAITING_SIGN_OUT = 'WAITING_SIGN_OUT'
 export const SIGN_OUT = 'SIGN_OUT'
 
@@ -22,6 +24,7 @@ export const signIn = (authData) => (dispatch) => {
 }
 
 export const signOut = () => (dispatch) => {
+  browserHistory.push('/')
   dispatch({ type: WAITING_SIGN_OUT })
 
   fetchEndpoint('/signout').catch(err => {
