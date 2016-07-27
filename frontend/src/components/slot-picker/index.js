@@ -37,23 +37,24 @@ const SlotPicker = React.createClass({
   },
   renderSlot(slot) {
     const { showUsers, userId, getId } = this.props;
-    const isSelected = this.state.selectedIds.includes(getId(slot));
+    const slotId = getId(slot);
+    const isSelected = this.state.selectedIds.includes(slotId);
     const slotPickedByCurrentUser = Boolean(slot.users.find(u => u.id === userId));
     const addOne = isSelected && !slotPickedByCurrentUser;
     const subtractOne = !isSelected && slotPickedByCurrentUser;
     const total = slot.users.length + addOne - subtractOne;
 
     return (
-      <div key={getId(slot)}
+      <div key={slotId}
            className={styles.doodleSlot + ' ' + (isSelected ? styles.selected : '')}
-           onClick={() => this.handleSelectId(getId(slot))}>
+           onClick={() => this.handleSelectId(slotId)}>
         <div className={styles.time}>
           {moment(slot.start_time).format('LT')}
         </div>
         <div className={styles.tags}>
           {slot.is_vip && <span className={styles.is_vip}>VIP</span>}
           {slot.is_3d && <span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>}
-          {!getId(slot) && <span className={styles.is_3d} title="Approximativ tid (kan komma att ändras)">≈</span>}
+          {!slotId && <span className={styles.is_3d} title="Approximativ tid (kan komma att ändras)">≈</span>}
         </div>
         <small title={slot.auditorium_name}>
           {slot.theatre.replace('Fs ', '').substring(0, 4)}…
