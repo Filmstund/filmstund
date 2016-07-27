@@ -46,7 +46,7 @@ const Showing = React.createClass({
 
     return newTimeSlots;
   },
-  
+
   submitSlotsPicked(selectedIds) {
     this.setState({
       loading: true,
@@ -54,7 +54,7 @@ const Showing = React.createClass({
     });
 
     postEndpoint(`/showings/${this.props.params.id}/time_slots/votes`, {
-      sf_slot_ids: selectedIds
+      ids: selectedIds
     }).then(data => {
       this.setState({
         loading: false,
@@ -136,10 +136,9 @@ const Showing = React.createClass({
               <div>
                 <SlotPicker timeSlots={time_slots}
                             initiallySelectedTimeSlots={selectedTimeSlots}
-                            onSubmit={this.submitSlotsPicked}
-                            onChange={this.slotsChanged}
-                            saved={this.state.slotsSaved}
-                            showSaved={true}
+                            onChange={this.submitSlotsPicked}
+                            getId={(slot) => slot.id}
+                            userId={currentUser.id}
                             showUsers={true} />
               </div>
             )
