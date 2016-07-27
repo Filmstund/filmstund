@@ -61,7 +61,7 @@ const SlotPicker = React.createClass({
         </small>
         {(showUsers && total > 0) &&
           <div className={styles.users}>
-          <i className="fa fa-users"></i> {total}
+            <i className="fa fa-users"/> {total}
           </div>
         }
       </div>

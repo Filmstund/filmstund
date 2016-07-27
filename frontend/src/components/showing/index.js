@@ -80,19 +80,20 @@ const Showing = React.createClass({
     };
 
     return (
-      <Bar data={data} />
+      <Bar data={data} width="900" />
     )
   },
 
   renderSubmitTimeSlotButtons() {
     const { showing } = this.props.showing;
+    const f = (date) => moment(date).format("DD/MM HH:mm");
     return (
-      <div>
+      <div className={styles.slotButtonContainer}>
         {
           showing.time_slots.map(ts =>
-            <button key={ts.sf_slot_id}
+            <div className={styles.timeSlotButton} key={ts.sf_slot_id}
                     onClick={() => this.submitTimeSlot(ts.sf_slot_id)}
-                    disabled={showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id}>{ts.sf_slot_id}</button>
+                    disabled={showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id}>{f(ts.start_time)}</div>
           )
         }
       </div>
