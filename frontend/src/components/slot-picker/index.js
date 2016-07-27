@@ -2,34 +2,30 @@ import React, { PropTypes } from 'react';
 import _ from 'lodash';
 import moment from '../../lib/moment';
 
-import GoldButton from '../gold-button'
-
 import styles from './style.css';
 
 const SlotPicker = React.createClass({
   propTypes: {
-    onSubmit: PropTypes.func.isRequired,
-    timeSlots: PropTypes.array.isRequired
+    onChange: PropTypes.func.isRequired,
+    getId: PropTypes.func.isRequired,
+    timeSlots: PropTypes.array.isRequired,
+    userId: PropTypes.number
   },
 
   getDefaultProps() {
-    let f = () => undefined;
     return {
       initiallySelectedTimeSlots: [],
-      onChange: f,
-      saved: false,
-      showSaved: false,
-      showUsers: false
+      showUsers: false,
+      userId: -1
     }
   },
 
   getInitialState() {
     return {
-      selectedIds: this.props.initiallySelectedTimeSlots.map(slot => slot.sf_slot_id),
-      internalSaved: false
+      selectedIds: this.props.initiallySelectedTimeSlots.map(slot => this.props.getId(slot))
     }
   },
-  
+
   handleSelectId(slotId) {
     let selectedIds = this.state.selectedIds;
     if (selectedIds.includes(slotId)) {
@@ -37,27 +33,28 @@ const SlotPicker = React.createClass({
     } else {
         selectedIds = [...selectedIds, slotId];
     }
-    this.props.onChange();
-    this.setState({selectedIds});
+    this.setState({selectedIds}, () => this.props.onChange(selectedIds));
   },
   renderSlot(slot) {
-    const { showUsers } = this.props;
-    const isSelected = this.state.selectedIds.includes(slot.sf_slot_id)
-    const addOne = isSelected && !Boolean(slot.users.find(u => u.nick === 'Juice')) // TODO proper find
-    const subtractOne = !isSelected && Boolean(slot.users.find(u => u.nick === 'Juice')) // TODO proper find
+    const { showUsers, userId, getId } = this.props;
+    const slotId = getId(slot);
+    const isSelected = this.state.selectedIds.includes(slotId);
+    const slotPickedByCurrentUser = Boolean(slot.users.find(u => u.id === userId));
+    const addOne = isSelected && !slotPickedByCurrentUser;
+    const subtractOne = !isSelected && slotPickedByCurrentUser;
     const total = slot.users.length + addOne - subtractOne;
 
     return (
-      <div key={slot.sf_slot_id}
+      <div key={slotId}
            className={styles.doodleSlot + ' ' + (isSelected ? styles.selected : '')}
-           onClick={() => this.handleSelectId(slot.sf_slot_id)}>
+           onClick={() => this.handleSelectId(slotId)}>
         <div className={styles.time}>
           {moment(slot.start_time).format('LT')}
         </div>
         <div className={styles.tags}>
           {slot.is_vip && <span className={styles.is_vip}>VIP</span>}
           {slot.is_3d && <span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>}
-          {!slot.sf_slot_id && <span className={styles.is_3d} title="Approximativ tid (kan komma att ändras)">≈</span>}
+          {!slotId && <span className={styles.is_3d} title="Approximativ tid (kan komma att ändras)">≈</span>}
         </div>
         <small title={slot.auditorium_name}>
           {slot.theatre.replace('Fs ', '').substring(0, 4)}…
@@ -80,20 +77,15 @@ const SlotPicker = React.createClass({
     )
   },
   render() {
-    const { timeSlots, onSubmit, saved, showSaved } = this.props;
+    const { timeSlots } = this.props;
     const slotsByDate = _.groupBy(timeSlots, s => moment(s.start_time).format('L'));
     const keys = _.orderBy(Object.keys(slotsByDate));
-    console.log(timeSlots);
 
     return (
-      <div className={styles.container}>
-        <div className={styles.daysContainer}>
-          <div className={styles.daysRow}>
-            {keys.map(key => this.renderDay(key, slotsByDate[key]))}
-          </div>
+      <div className={styles.daysContainer}>
+        <div className={styles.daysRow}>
+          {keys.map(key => this.renderDay(key, slotsByDate[key]))}
         </div>
-        <GoldButton onClick={() => onSubmit(this.state.selectedIds)}>Välj tider</GoldButton>
-        {showSaved && <div className={styles.saved + ' ' + (saved ? styles.isSaved : '')}>Sparat!</div>}
       </div>
     )
   }
