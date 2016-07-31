@@ -8,7 +8,7 @@ class Push
       User.with_push_key.each do |user|
         Pushover.notification(message: @showing.movie.title,
                               user: user.pushover_key,
-                              title: "#{@showing.owner.nick} created showing!",
+                              title: "#{@showing.owner.nick} created showing",
                               url: showing_url(@showing),
                               url_title: "Link to showing")
       end
