@@ -87,14 +87,18 @@ const Showing = React.createClass({
   renderSubmitTimeSlotButtons() {
     const { showing } = this.props.showing;
     const f = (date) => moment(date).format("DD/MM HH:mm");
+
     return (
       <div className={styles.slotButtonContainer}>
         {
-          showing.time_slots.map(ts =>
-            <div className={styles.timeSlotButton} key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.sf_slot_id)}
-                    disabled={showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id}>{f(ts.start_time)}</div>
-          )
+          showing.time_slots.map(ts => {
+            const buttonClasses = [styles.timeSlotButton];
+            if (showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id) {
+              buttonClasses.push(styles.selected)
+            }
+            return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
+                    onClick={() => this.submitTimeSlot(ts.sf_slot_id)}>{f(ts.start_time)}</div>
+          })
         }
       </div>
     )

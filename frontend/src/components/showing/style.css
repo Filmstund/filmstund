@@ -59,5 +59,14 @@
     margin: 0.3em;
     background: rgba(119, 17, 34, 0.61);
     padding: 0.5em;
+    cursor: pointer;
+}
 
+.timeSlotButton:hover {
+    background: rgba(154, 16, 47, 0.61);
+}
+
+.selected {
+    background: rgba(154, 16, 47, 0.61);
+    cursor: default;
 }
