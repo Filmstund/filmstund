@@ -16,6 +16,8 @@ import SlotPicker from '../slot-picker';
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
+const f = (date) => moment(date).format("DD/M HH:mm");
+
 const Showing = React.createClass({
   propTypes: {
     showing: PropTypes.object.isRequired,
@@ -86,7 +88,7 @@ const Showing = React.createClass({
 
   renderSubmitTimeSlotButtons() {
     const { showing } = this.props.showing;
-    const f = (date) => moment(date).format("DD/MM HH:mm");
+
 
     return (
       <div className={styles.slotButtonContainer}>
@@ -121,7 +123,7 @@ const Showing = React.createClass({
       time_slots = this.state.timeSlots;
     }
     const barData = time_slots.map((ts) => ({
-      x: moment(ts.start_time).format('DD/M, HH:mm'),
+      x: f(ts.start_time),
       y: ts.users.length,
       id: ts.id
     }));
@@ -130,7 +132,7 @@ const Showing = React.createClass({
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && (
-          <div>The selected date for this showing is {showing.selected_time_slot.start_time}</div>
+          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time)}</div>
         )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
