@@ -99,15 +99,15 @@ const Showing = React.createClass({
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.sf_slot_id)}>{f(ts.start_time)}</div>
+                    onClick={() => this.submitTimeSlot(ts.id)}>{f(ts.start_time)}</div>
           })
         }
       </div>
     )
   },
 
-  submitTimeSlot(sf_slot_id) {
-    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { sf_slot_id }))
+  submitTimeSlot(slot_id) {
+    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
   render() {
