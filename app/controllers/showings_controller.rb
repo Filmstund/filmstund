@@ -53,7 +53,7 @@ class ShowingsController < ApplicationController
     unless @showing.owner == current_user
       render nothing: true, status: :forbidden and return
     end
-    @time_slot = TimeSlot.find(params[:id])
+    @time_slot = TimeSlot.find(params[:slot_id])
     @showing.selected_time_slot = @time_slot
     @showing.status = "confirmed"
 
