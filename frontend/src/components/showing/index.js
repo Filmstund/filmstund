@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { postEndpoint } from '../../service/backend';
-import { Bar } from 'react-chartjs';
+import { HorizontalBar } from 'react-chartjs-2';
 
 import _ from 'lodash';
 
@@ -69,20 +69,24 @@ const Showing = React.createClass({
     });
   },
 
+  onBarClicked() {
+    console.log(arguments);
+  },
+
   renderChart(barData) {
-    const maxY = _.max(barData.map(d => d.y));
-    const colors = barData.map(d => d.y === maxY ? 'goldenrod' : 'tomato');
 
     const data = {
       labels: barData.map(d => d.x),
       datasets: [{
-        fillColor: colors,
+        label: 'Votes',
+        backgroundColor: 'goldenrod',
+        hoverBackgroundColor: '#f1bc20',
         data: barData.map(d => d.y)
       }]
     };
 
     return (
-      <Bar data={data} width="900" />
+      <HorizontalBar data={data} onElementsClick={this.onBarClicked} width={800} height={55 + barData.length*18.4} />
     )
   },
 
@@ -99,7 +103,7 @@ const Showing = React.createClass({
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.id)}>{f(ts.start_time)}</div>
+                    onClick={() => this.submitTimeSlot(ts.id)}></div>
           })
         }
       </div>
@@ -150,8 +154,10 @@ const Showing = React.createClass({
               </div>
             )
           )}
-          {this.renderChart(barData)}
-          {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
+          <div className={styles.buttonAndGraphContainer}>
+            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
+            {this.renderChart(barData)}
+          </div>
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
