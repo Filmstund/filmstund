@@ -1,5 +1,6 @@
 import store from '../store'
 import { getAuthToken } from '../store/reducer'
+import { signOut } from "../store/actions";
 
 let authToken = getAuthToken(store.getState())
 
@@ -12,12 +13,14 @@ const fetchJson = (url, options = {}) =>
   fetch(url, options)
     .then(resp => {
       if (resp.ok) {
-        return resp
+        return resp;
+      } else if (resp.status === 403) {
+        store.dispatch(signOut());
       } else {
-        throw resp
+        throw resp;
       }
     })
-    .then(d => d.json())
+    .then(d => d.json());
 
 export const fetchWithoutToken = (endpoint, options) => fetchJson(`/api${endpoint}`, options)
 
