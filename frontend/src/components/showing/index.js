@@ -96,14 +96,14 @@ const Showing = React.createClass({
     )
   },
 
-  renderSubmitTimeSlotButtons(showing) {
+  renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
 
     return (
       <div className={styles.slotButtonContainer}>
         {
-          showing.time_slots.map(ts => {
+          time_slots.map(ts => {
             const buttonClasses = [styles.timeSlotButton];
-            if (showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id) {
+            if (selected_time_slot && ts.sf_slot_id === selected_time_slot.sf_slot_id) {
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
@@ -170,7 +170,7 @@ const Showing = React.createClass({
             )
           )}
           <div className={styles.buttonAndGraphContainer}>
-            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(showing))}
+            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
             {this.renderChart(barData)}
           </div>
           <div>
