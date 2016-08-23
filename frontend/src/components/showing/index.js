@@ -119,10 +119,6 @@ const Showing = React.createClass({
       return null;
     }
 
-    showing.time_slots = _.orderBy(showing.time_slots, (ts1, ts2) => {
-      return moment(ts1).isBefore(moment(ts2)) ? 1 : -1;
-    });
-
     let { time_slots } = showing;
     if (this.state.timeSlots) {
       time_slots = this.state.timeSlots;
