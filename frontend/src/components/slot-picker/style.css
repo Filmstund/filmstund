@@ -1,24 +1,4 @@
 
-.container {
-  display: flex;
-  flex-direction: column;
-
-  button {
-    margin-top: 1em;
-  }
-
-  .saved {
-    text-align: center;
-    margin-top: 1em;
-    font-size: smaller;
-    visibility: hidden;
-  }
-
-  .saved.isSaved {
-    visibility: visible;
-  }
-}
-
 .daysContainer {
     justify-content: center;
     user-select: none;

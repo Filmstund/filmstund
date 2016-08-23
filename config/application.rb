@@ -28,5 +28,9 @@ module Itbio
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     config.time_zone = "Europe/Stockholm"
+
+    config.after_initialize do
+      Rails.application.routes.default_url_options = config.action_mailer.default_url_options
+    end
   end
 end

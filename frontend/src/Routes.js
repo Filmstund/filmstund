@@ -14,9 +14,8 @@ import App from './App';
 
 const routes = (
   <Route path="/" component={Root}>
-    <Route path="start" component={Start}/>
+    <IndexRoute component={Start}/>
     <Route path="/" component={App}>
-      <IndexRoute component={MovieList}/>
       <Route path="showings" component={ShowingList}/>
       <Route path="showings/create/:sf_id" component={CreateShowing}/>
       <Route path="showings/:id" component={Showing}/>

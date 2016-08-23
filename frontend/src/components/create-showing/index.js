@@ -37,7 +37,8 @@ const CreateShowing = React.createClass({
         startDate: minDate,
         endDate: moment().add(3, 'weeks'),
       },
-      loading: false
+      loading: false,
+      slotsPicked: []
     }
   },
 
@@ -103,15 +104,23 @@ const CreateShowing = React.createClass({
     };
   },
 
-  submitSlotsPicked(selectedSlotIds) {
-      postEndpoint('/showings', {
-          showing: {
-            sf_id: this.props.params.sf_id
-          },
-          sf_slot_ids: selectedSlotIds
-      }).then((resp) => {
-          this.props.router.push(`/showings/${resp.showing.id}`);
-      });
+  updateSlotsPicked(selectedSlotIds) {
+    this.setState({slotsPicked: selectedSlotIds});
+  },
+
+  submitSlotsPicked() {
+    this.setState({loading: true});
+    postEndpoint('/showings', {
+      showing: {
+        sf_id: this.props.params.sf_id
+      },
+      sf_slot_ids: this.state.slotsPicked
+    })
+    .then((resp) => {
+      this.props.router.push(`/showings/${resp.showing.id}`);
+    })
+    .catch((resp) => console.error('Failed to create showing'))
+    .then(() => this.setState({loading: false}));
   },
 
   render() {
@@ -143,10 +152,16 @@ const CreateShowing = React.createClass({
           </div>
         )}
         { timeSlots && (
+          <div>
             <div className={styles.slotPicker}>
                 <SlotPicker timeSlots={timeSlots}
-                            onSubmit={this.submitSlotsPicked}/>
+                            getId={(slot) => slot.sf_slot_id}
+                            onChange={this.updateSlotsPicked}/>
             </div>
+            <div className={styles.button}>
+              <GoldButton onClick={this.submitSlotsPicked}>Skapa besök</GoldButton>
+            </div>
+          </div>
         )}
       </div>
     )

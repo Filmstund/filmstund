@@ -32,6 +32,7 @@ class ShowingsController < ApplicationController
     end
 
     if time_slots.map { |slot| slot.save }.all?
+      Push.showing_created(@showing)
       render json: @showing, status: :created, location: @showing
     else
       render json: (time_slots.map { |slot| slot.errors }), status: :unprocessable_entity
@@ -52,11 +53,12 @@ class ShowingsController < ApplicationController
     unless @showing.owner == current_user
       render nothing: true, status: :forbidden and return
     end
-    @time_slot = TimeSlot.find_by(sf_slot_id: params[:sf_slot_id])
+    @time_slot = TimeSlot.find(params[:slot_id])
     @showing.selected_time_slot = @time_slot
     @showing.status = "confirmed"
 
     if @showing.save
+      Push.showing_confirmed(@showing)
       render json: @showing
     else
       render json: @showing.errors, status: :unprocessable_entity

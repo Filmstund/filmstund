@@ -2,7 +2,7 @@ class UsersController < ApplicationController
 
   # GET /me
   def me
-    render json: current_user
+    render json: current_user, serializer: MeSerializer
   end
 
   # GET /users/1
@@ -16,7 +16,7 @@ class UsersController < ApplicationController
     @user = current_user
 
     if @user.update(user_params)
-      render json: @user
+      render json: @user, serializer: MeSerializer
     else
       render json: @user.errors, status: :unprocessable_entity
     end

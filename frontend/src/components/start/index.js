@@ -9,6 +9,9 @@ import { withRouter } from 'react-router';
 import { transformFacebookAuthCallback, transformGoogleAuthCallback } from '../../lib/auth'
 import { getUser, getSession } from '../../store/reducer'
 import { signIn } from '../../store/actions'
+import { browserHistory } from 'react-router';
+import App from '../../App';
+import ShowingList from '../showing-list';
 
 import styles from './style.css'
 
@@ -23,12 +26,16 @@ const Start = React.createClass({
     if (!params.token || !params.user_id) {
       throw 'Authentication failure - no token received'
     } else {
-      this.props.dispatch(signIn(params))
+      this.props.dispatch(signIn(params));
       this.props.router.push(`/showings`);
     }
   },
   render() {
-    const { signedIn, user } = this.props
+    const { signedIn, user } = this.props;
+
+    if (this.props.signedIn) {
+      return <App><ShowingList /></App>
+    }
 
     return (
       <div className={styles.container}>

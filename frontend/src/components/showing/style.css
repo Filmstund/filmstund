@@ -49,3 +49,34 @@
 .fa-calendar {
     color: white;
 }
+
+.buttonAndGraphContainer {
+    display: flex;
+}
+
+.slotButtonContainer {
+    display: flex;
+    flex-direction: column;
+    padding-top: 32px;
+    padding-bottom: 27px;
+    justify-content: space-around;
+}
+
+.timeSlotButton {
+    box-sizing: border-box;
+    height: 17px;
+    width: 17px;
+    margin: 1px 0;
+    background: rgba(119, 17, 34, 0.61);
+    cursor: pointer;
+}
+
+.timeSlotButton:hover {
+    background: rgba(154, 16, 47, 0.61);
+}
+
+.selected {
+    background: rgba(154, 16, 47, 0.61);
+    border: 3px solid goldenrod;
+    cursor: default;
+}
