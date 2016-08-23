@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { postEndpoint } from '../../service/backend';
-import { Bar } from 'react-chartjs';
+import { HorizontalBar } from 'react-chartjs-2';
 
 import _ from 'lodash';
 
@@ -15,6 +15,8 @@ import SlotPicker from '../slot-picker';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
+
+const f = (date) => moment(date).format("DD/M HH:mm");
 
 const Showing = React.createClass({
   propTypes: {
@@ -67,40 +69,49 @@ const Showing = React.createClass({
     });
   },
 
+  onBarClicked() {
+    console.log(arguments);
+  },
+
   renderChart(barData) {
-    const maxY = _.max(barData.map(d => d.y));
-    const colors = barData.map(d => d.y === maxY ? 'goldenrod' : 'tomato');
 
     const data = {
       labels: barData.map(d => d.x),
       datasets: [{
-        fillColor: colors,
+        label: 'Votes',
+        backgroundColor: 'goldenrod',
+        hoverBackgroundColor: '#f1bc20',
         data: barData.map(d => d.y)
       }]
     };
 
     return (
-      <Bar data={data} />
+      <HorizontalBar data={data} onElementsClick={this.onBarClicked} width={800} height={55 + barData.length*18.4} />
     )
   },
 
   renderSubmitTimeSlotButtons() {
     const { showing } = this.props.showing;
+
+
     return (
-      <div>
+      <div className={styles.slotButtonContainer}>
         {
-          showing.time_slots.map(ts =>
-            <button key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.sf_slot_id)}
-                    disabled={showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id}>{ts.sf_slot_id}</button>
-          )
+          showing.time_slots.map(ts => {
+            const buttonClasses = [styles.timeSlotButton];
+            if (showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id) {
+              buttonClasses.push(styles.selected)
+            }
+            return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
+                    onClick={() => this.submitTimeSlot(ts.id)}></div>
+          })
         }
       </div>
     )
   },
 
-  submitTimeSlot(sf_slot_id) {
-    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { sf_slot_id }))
+  submitTimeSlot(slot_id) {
+    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
   render() {
@@ -116,7 +127,7 @@ const Showing = React.createClass({
       time_slots = this.state.timeSlots;
     }
     const barData = time_slots.map((ts) => ({
-      x: moment(ts.start_time).format('DD/M, HH:mm'),
+      x: f(ts.start_time),
       y: ts.users.length,
       id: ts.id
     }));
@@ -125,7 +136,7 @@ const Showing = React.createClass({
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && (
-          <div>The selected date for this showing is {showing.selected_time_slot.start_time}</div>
+          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time)}</div>
         )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
@@ -143,8 +154,10 @@ const Showing = React.createClass({
               </div>
             )
           )}
-          {this.renderChart(barData)}
-          {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
+          <div className={styles.buttonAndGraphContainer}>
+            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
+            {this.renderChart(barData)}
+          </div>
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
