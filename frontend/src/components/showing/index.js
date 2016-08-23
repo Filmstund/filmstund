@@ -118,9 +118,11 @@ const Showing = React.createClass({
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
-  renderUserList() {
+  renderUserList(votingUsers) {
     return (
-      <div></div>
+      <div>
+        {<UserList users={votingUsers} />}
+      </div>
     )
   },
   
@@ -128,7 +130,6 @@ const Showing = React.createClass({
     const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
     const votingUsers = _(showing.time_slots).flatMap('users').uniqBy('id').value();
-    console.log('votingusers', votingUsers);
 
     if (!showing || !selectedTimeSlots) {
       return null;
@@ -173,9 +174,7 @@ const Showing = React.createClass({
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
             {this.renderChart(barData)}
           </div>
-          <div>
-            {<UserList users={votingUsers} />}
-          </div>
+          {this.renderUserList(votingUsers)}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
