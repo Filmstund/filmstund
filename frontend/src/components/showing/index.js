@@ -90,9 +90,7 @@ const Showing = React.createClass({
     )
   },
 
-  renderSubmitTimeSlotButtons() {
-    const { showing } = this.props.showing;
-
+  renderSubmitTimeSlotButtons(showing) {
 
     return (
       <div className={styles.slotButtonContainer}>
@@ -121,11 +119,17 @@ const Showing = React.createClass({
       return null;
     }
 
-    const { loading } = showing;
+    showing.time_slots = _.orderBy(showing.time_slots, (ts1, ts2) => {
+      return moment(ts1).isBefore(moment(ts2)) ? 1 : -1;
+    });
+
     let { time_slots } = showing;
     if (this.state.timeSlots) {
       time_slots = this.state.timeSlots;
     }
+
+    time_slots = _.orderBy(time_slots, "start_time");
+
     const barData = time_slots.map((ts) => ({
       x: f(ts.start_time),
       y: ts.users.length,
@@ -155,7 +159,7 @@ const Showing = React.createClass({
             )
           )}
           <div className={styles.buttonAndGraphContainer}>
-            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons())}
+            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(showing))}
             {this.renderChart(barData)}
           </div>
         </div>
