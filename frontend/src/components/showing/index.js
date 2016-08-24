@@ -12,11 +12,17 @@ import _ from 'lodash';
 import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
+import UserList from './UserList';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
-const f = (date) => moment(date).format("DD/M HH:mm");
+const f = (date, is3D, isVip) => {
+  let formattedDate = moment(date).format("DD/M HH:mm")
+  if (is3D) formattedDate = "3D " + formattedDate;
+  if (isVip) formattedDate = "VIP " + formattedDate;
+  return formattedDate
+};
 
 const Showing = React.createClass({
   propTypes: {
@@ -90,14 +96,14 @@ const Showing = React.createClass({
     )
   },
 
-  renderSubmitTimeSlotButtons(showing) {
+  renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
 
     return (
       <div className={styles.slotButtonContainer}>
         {
-          showing.time_slots.map(ts => {
+          time_slots.map(ts => {
             const buttonClasses = [styles.timeSlotButton];
-            if (showing.selected_time_slot && ts.sf_slot_id === showing.selected_time_slot.sf_slot_id) {
+            if (selected_time_slot && ts.sf_slot_id === selected_time_slot.sf_slot_id) {
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
@@ -112,9 +118,19 @@ const Showing = React.createClass({
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
+  renderUserList(votingUsers) {
+    return (
+      <div>
+        {<UserList users={votingUsers} />}
+      </div>
+    )
+  },
+  
   render() {
     const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
+    const votingUsers = _(showing.time_slots).flatMap('users').uniqBy('id').value();
+
     if (!showing || !selectedTimeSlots) {
       return null;
     }
@@ -127,7 +143,7 @@ const Showing = React.createClass({
     time_slots = _.orderBy(time_slots, "start_time");
 
     const barData = time_slots.map((ts) => ({
-      x: f(ts.start_time),
+      x: f(ts.start_time, ts.is_3d, ts.is_vip),
       y: ts.users.length,
       id: ts.id
     }));
@@ -136,7 +152,7 @@ const Showing = React.createClass({
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && (
-          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time)}</div>
+          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
         )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
@@ -155,9 +171,10 @@ const Showing = React.createClass({
             )
           )}
           <div className={styles.buttonAndGraphContainer}>
-            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(showing))}
+            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
             {this.renderChart(barData)}
           </div>
+          {this.renderUserList(votingUsers)}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
