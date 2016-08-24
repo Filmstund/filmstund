@@ -34,7 +34,8 @@ const Showing = React.createClass({
   getInitialState() {
     return {
       loading: false,
-      slotsSaved: false
+      slotsSaved: false,
+      attendees: []
     }
   },
 
@@ -132,15 +133,62 @@ const Showing = React.createClass({
     )
   },
 
+  renderAttendButton() {
+    const {attendees, loadingAttend} = this.state;
+    const isAttending = attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
+
+
+    return (
+      <div>
+        {isAttending ?
+          <div>
+            You are currently attending <br />
+            <button onClick={this.unAttendShowing} disabled={loadingAttend}>
+              I will NOT attend
+            </button>
+          </div>
+        :
+          <div>
+            You are currently not attending <br />
+            <button onClick={this.doAttendShowing} disabled={loadingAttend}>
+              I will attend
+            </button>
+          </div>
+        }
+      </div>
+    )
+  },
+
+  doAttendShowing() {
+    this.setState({
+      loadingAttend: true,
+      attendees: [...this.state.attendees, {user_id: this.props.currentUser.id}]
+    });
+    postEndpoint(`/showings/${this.props.params.id}/attend`)
+      .then(this.updateAttendees);
+
+  },
+
+  unAttendShowing() {
+    this.setState({
+      loadingAttend: true,
+      attendees: this.state.attendees.filter(attendee => attendee.user_id !== this.props.currentUser.id)
+    });
+    postEndpoint(`/showings/${this.props.params.id}/unattend`)
+      .then(this.updateAttendees);
+  },
+
+  updateAttendees({attendees}) {
+    this.setState({ attendees, loadingAttend: false })
+  },
+
   submitTimeSlot(slot_id) {
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
   renderUserList(votingUsers) {
     return (
-      <div>
-        {<UserList users={votingUsers} />}
-      </div>
+      <UserList users={votingUsers} />
     )
   },
   
@@ -196,6 +244,8 @@ const Showing = React.createClass({
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
+        { this.renderAttendButton() }
+
       </div>
     )
   }
