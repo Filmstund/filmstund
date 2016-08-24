@@ -79,13 +79,15 @@ const Showing = React.createClass({
     console.log(arguments);
   },
 
-  renderChart(barData) {
+  renderChart(barData, selectedId) {
 
     const data = {
       labels: barData.map(d => d.x),
       datasets: [{
         label: 'Votes',
-        backgroundColor: 'goldenrod',
+        backgroundColor: barData.map(d => d.id === selectedId ?  'tomato' : 'goldenrod'),
+        borderColor: 'goldenrod',
+        borderWidth: barData.map(d => d.id === selectedId ? 3 : 0),
         hoverBackgroundColor: '#f1bc20',
         data: barData.map(d => d.y)
       }]
@@ -188,7 +190,7 @@ const Showing = React.createClass({
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-            {this.renderChart(barData)}
+            {this.renderChart(barData, showing.selected_time_slot.id)}
           </div>
           {this.renderUserList(votingUsers)}
         </div>
