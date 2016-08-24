@@ -91,8 +91,24 @@ const Showing = React.createClass({
       }]
     };
 
+    const options = {
+      scales: {
+        xAxes: [{
+          ticks: {
+            beginAtZero: true,
+            stepSize: 1,
+            suggestedMax: 10
+          }
+        }]
+      }
+    };
+
     return (
-      <HorizontalBar data={data} onElementsClick={this.onBarClicked} width={800} height={55 + barData.length*18.4} />
+      <HorizontalBar data={data}
+                     onElementsClick={this.onBarClicked}
+                     width={800}
+                     height={55 + barData.length*18.4}
+                     options={options} />
     )
   },
 
