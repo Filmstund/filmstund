@@ -5,7 +5,7 @@ export const transformFacebookAuthCallback = (params) => ({
 })
 
 export const transformGoogleAuthCallback = (params) => ({
-  token: params.hg.id_token,
-  user_id: params.wc.Ka,
+  token: params.Zi.id_token,
+  user_id: params.w3.Eea,
   provider: 'google'
 })
