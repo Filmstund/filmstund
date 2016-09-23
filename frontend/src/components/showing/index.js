@@ -238,7 +238,7 @@ const Showing = React.createClass({
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-            {this.renderChart(barData, showing.selected_time_slot.id)}
+	    {this.renderChart(barData, showing.selected_time_slot && showing.selected_time_slot.id)}
           </div>
           {this.renderUserList(votingUsers)}
         </div>
