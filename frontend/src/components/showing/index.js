@@ -152,12 +152,6 @@ const Showing = React.createClass({
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
-  renderUserList(votingUsers) {
-    return (
-      <UserList users={votingUsers} />
-    )
-  },
-
   render() {
     const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
@@ -208,7 +202,8 @@ const Showing = React.createClass({
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
             <VotingChart barData={barData} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
-          {this.renderUserList(votingUsers)}
+
+          <UserList users={votingUsers} />
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
