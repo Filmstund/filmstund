@@ -12,8 +12,8 @@ import _ from 'lodash';
 import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
-import UserList from './UserList';
-import VotingChart from './VotingChart';
+import UserList from './user-list';
+import VotingChart from './voting-chart';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
