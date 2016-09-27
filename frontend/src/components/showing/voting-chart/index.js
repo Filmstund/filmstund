@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { DateRange } from 'react-date-range';
 import { HorizontalBar } from 'react-chartjs-2';
 
-import f from '../formatter';
+import format from '../formatter';
 
 const VotingChart = React.createClass({
     propTypes: {
@@ -15,7 +15,7 @@ const VotingChart = React.createClass({
         const { timeSlots, selectedId } = this.props;
 
         const barData = timeSlots.filter(ts => ts.users.length > 0).map((ts) => ({
-            x: f(ts.start_time, ts.is_3d, ts.is_vip),
+            x: format(ts.start_time, ts.is_3d, ts.is_vip),
             y: ts.users.length,
             id: ts.id
         }));

@@ -1,4 +1,6 @@
-const f = (date, is3D, isVip) => {
+import moment from 'moment';
+
+const format = (date, is3D, isVip) => {
     let formattedDate = moment(date).format("DD/M HH:mm");
     if (is3D) {
         formattedDate = "3D " + formattedDate;
@@ -9,4 +11,4 @@ const f = (date, is3D, isVip) => {
     return formattedDate
 };
 
-export default f;
+export default format;

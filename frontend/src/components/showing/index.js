@@ -17,7 +17,7 @@ import VotingChart from './voting-chart';
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
-import f from './formatter';
+import format from './formatter';
 
 const Showing = React.createClass({
   propTypes: {
@@ -166,7 +166,7 @@ const Showing = React.createClass({
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && (
-          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
+          <div>The selected date for this showing is {format(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
         )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
