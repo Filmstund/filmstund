@@ -13,6 +13,7 @@ import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
 import UserList from './UserList';
+import VotingChart from './VotingChart';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
@@ -78,44 +79,6 @@ const Showing = React.createClass({
 
   onBarClicked() {
     console.log(arguments);
-  },
-
-  renderChart(barData, selectedId) {
-
-    const data = {
-      labels: barData.map(d => d.x),
-      datasets: [{
-        label: 'Votes',
-        backgroundColor: barData.map(d => d.id === selectedId ?  'tomato' : 'goldenrod'),
-        borderColor: 'goldenrod',
-        borderWidth: barData.map(d => d.id === selectedId ? 3 : 0),
-        hoverBackgroundColor: '#f1bc20',
-        data: barData.map(d => d.y)
-      }]
-    };
-
-    const options = {
-      scales: {
-        xAxes: [{
-          ticks: {
-            beginAtZero: true,
-            stepSize: 1,
-            suggestedMax: 10
-          }
-        }]
-      },
-      legend: {
-        display: false
-      }
-    };
-
-    return (
-      <HorizontalBar data={data}
-                     onElementsClick={this.onBarClicked}
-                     width={800}
-                     height={55 + barData.length*18.4}
-                     options={options} />
-    )
   },
 
   renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
@@ -243,7 +206,7 @@ const Showing = React.createClass({
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-	    {this.renderChart(barData, showing.selected_time_slot && showing.selected_time_slot.id)}
+            <VotingChart barData={barData} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
           {this.renderUserList(votingUsers)}
         </div>
