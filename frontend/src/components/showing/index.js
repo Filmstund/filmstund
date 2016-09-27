@@ -211,7 +211,9 @@ const Showing = React.createClass({
 
     time_slots = _.orderBy(time_slots, "start_time");
 
-    const barData = time_slots.map((ts) => ({
+    const timeslotHasUsers = ts => ts.users.length > 0;
+
+    const barData = time_slots.filter(timeslotHasUsers).map((ts) => ({
       x: f(ts.start_time, ts.is_3d, ts.is_vip),
       y: ts.users.length,
       id: ts.id
