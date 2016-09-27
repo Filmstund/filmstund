@@ -1,5 +1,5 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:update, :destroy, :between, :complete]
+  before_action :set_showing, only: [:update, :destroy, :between, :complete, :attend, :unattend]
 
   # GET /showings
   def index
@@ -63,6 +63,30 @@ class ShowingsController < ApplicationController
     else
       render json: @showing.errors, status: :unprocessable_entity
     end
+  end
+
+  # POST /showings/:id/attend
+  def attend
+    unless @showing.status == "confirmed"
+      render nothing: true, status: :unprocessable_entity and return
+    end
+    @attendee = Attendee.find_or_create_by(user: current_user, showing: @showing)
+    if @attendee.save
+      render json: @showing.attendees
+    else
+      render json: @attendee.errors, status: :unprocessable_entity
+    end
+  end
+
+  # POST /showings/:id/unattend
+  def unattend
+    unless @showing.status == "confirmed"
+      render nothing: true, status: :unprocessable_entity and return
+    end
+    @attendee = Attendee.where(user: current_user, showing: @showing)
+    @attendee.delete_all
+
+    render json: @showing.attendees
   end
 
   # GET /showings/:id/between/:from/:to
