@@ -3,6 +3,7 @@ class ShowingSerializer < ActiveModel::Serializer
   belongs_to :movie
   belongs_to :owner
   has_many :time_slots
+  has_many :attendees
   has_one :selected_time_slot
 
   def is_admin

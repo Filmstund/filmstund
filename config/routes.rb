@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   resources :showings do
     member do
       post 'complete'
+      post 'attend'
+      post 'unattend'
     end
     resources :time_slots do
       collection do

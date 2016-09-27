@@ -15,7 +15,7 @@ module SFParty
       resp.parsed_response
     else
       # TODO raise some appropriate exception
-      p "Failed to download #{url} | Resp: #{resp.response}"
+      puts "Failed to download #{url} | Resp: #{resp.response}"
     end
   end
 
