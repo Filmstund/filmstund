@@ -16,6 +16,7 @@ const fetchJson = (url, options = {}) =>
         return resp;
       } else if (resp.status === 403) {
         store.dispatch(signOut());
+	throw 'Unauthorized';
       } else {
         throw resp;
       }

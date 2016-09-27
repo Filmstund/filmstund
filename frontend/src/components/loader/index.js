@@ -45,7 +45,7 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
         })
       })
       .catch(err => {
-        console.error(err);
+	throw err;
         this.setState({
           loading: false
         })

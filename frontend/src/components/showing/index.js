@@ -34,7 +34,8 @@ const Showing = React.createClass({
   getInitialState() {
     return {
       loading: false,
-      slotsSaved: false
+      slotsSaved: false,
+      attendees: []
     }
   },
 
@@ -79,20 +80,38 @@ const Showing = React.createClass({
     console.log(arguments);
   },
 
-  renderChart(barData) {
+  renderChart(barData, selectedId) {
 
     const data = {
       labels: barData.map(d => d.x),
       datasets: [{
         label: 'Votes',
-        backgroundColor: 'goldenrod',
+        backgroundColor: barData.map(d => d.id === selectedId ?  'tomato' : 'goldenrod'),
+        borderColor: 'goldenrod',
+        borderWidth: barData.map(d => d.id === selectedId ? 3 : 0),
         hoverBackgroundColor: '#f1bc20',
         data: barData.map(d => d.y)
       }]
     };
 
+    const options = {
+      scales: {
+        xAxes: [{
+          ticks: {
+            beginAtZero: true,
+            stepSize: 1,
+            suggestedMax: 10
+          }
+        }]
+      }
+    };
+
     return (
-      <HorizontalBar data={data} onElementsClick={this.onBarClicked} width={800} height={55 + barData.length*18.4} />
+      <HorizontalBar data={data}
+                     onElementsClick={this.onBarClicked}
+                     width={800}
+                     height={55 + barData.length*18.4}
+                     options={options} />
     )
   },
 
@@ -114,15 +133,62 @@ const Showing = React.createClass({
     )
   },
 
+  renderAttendButton() {
+    const {attendees, loadingAttend} = this.state;
+    const isAttending = attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
+
+
+    return (
+      <div>
+        {isAttending ?
+          <div>
+            You are currently attending <br />
+            <button onClick={this.unAttendShowing} disabled={loadingAttend}>
+              I will NOT attend
+            </button>
+          </div>
+        :
+          <div>
+            You are currently not attending <br />
+            <button onClick={this.doAttendShowing} disabled={loadingAttend}>
+              I will attend
+            </button>
+          </div>
+        }
+      </div>
+    )
+  },
+
+  doAttendShowing() {
+    this.setState({
+      loadingAttend: true,
+      attendees: [...this.state.attendees, {user_id: this.props.currentUser.id}]
+    });
+    postEndpoint(`/showings/${this.props.params.id}/attend`)
+      .then(this.updateAttendees);
+
+  },
+
+  unAttendShowing() {
+    this.setState({
+      loadingAttend: true,
+      attendees: this.state.attendees.filter(attendee => attendee.user_id !== this.props.currentUser.id)
+    });
+    postEndpoint(`/showings/${this.props.params.id}/unattend`)
+      .then(this.updateAttendees);
+  },
+
+  updateAttendees({attendees}) {
+    this.setState({ attendees, loadingAttend: false })
+  },
+
   submitTimeSlot(slot_id) {
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
   renderUserList(votingUsers) {
     return (
-      <div>
-        {<UserList users={votingUsers} />}
-      </div>
+      <UserList users={votingUsers} />
     )
   },
   
@@ -172,12 +238,14 @@ const Showing = React.createClass({
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-            {this.renderChart(barData)}
+	    {this.renderChart(barData, showing.selected_time_slot && showing.selected_time_slot.id)}
           </div>
           {this.renderUserList(votingUsers)}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
+        { this.renderAttendButton() }
+
       </div>
     )
   }
