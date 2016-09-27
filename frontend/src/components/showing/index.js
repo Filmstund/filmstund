@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import loader from '../loader/';
-import moment from 'moment';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
@@ -12,17 +11,13 @@ import _ from 'lodash';
 import ShowingHeader from '../showing-header';
 import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
-import UserList from './UserList';
+import UserList from './user-list';
+import VotingChart from './voting-chart';
 
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
-const f = (date, is3D, isVip) => {
-  let formattedDate = moment(date).format("DD/M HH:mm")
-  if (is3D) formattedDate = "3D " + formattedDate;
-  if (isVip) formattedDate = "VIP " + formattedDate;
-  return formattedDate
-};
+import format from './formatter';
 
 const Showing = React.createClass({
   propTypes: {
@@ -78,44 +73,6 @@ const Showing = React.createClass({
 
   onBarClicked() {
     console.log(arguments);
-  },
-
-  renderChart(barData, selectedId) {
-
-    const data = {
-      labels: barData.map(d => d.x),
-      datasets: [{
-        label: 'Votes',
-        backgroundColor: barData.map(d => d.id === selectedId ?  'tomato' : 'goldenrod'),
-        borderColor: 'goldenrod',
-        borderWidth: barData.map(d => d.id === selectedId ? 3 : 0),
-        hoverBackgroundColor: '#f1bc20',
-        data: barData.map(d => d.y)
-      }]
-    };
-
-    const options = {
-      scales: {
-        xAxes: [{
-          ticks: {
-            beginAtZero: true,
-            stepSize: 1,
-            suggestedMax: 10
-          }
-        }]
-      },
-      legend: {
-        display: false
-      }
-    };
-
-    return (
-      <HorizontalBar data={data}
-                     onElementsClick={this.onBarClicked}
-                     width={800}
-                     height={55 + barData.length*18.4}
-                     options={options} />
-    )
   },
 
   renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
@@ -189,12 +146,6 @@ const Showing = React.createClass({
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
-  renderUserList(votingUsers) {
-    return (
-      <UserList users={votingUsers} />
-    )
-  },
-
   render() {
     const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
@@ -211,19 +162,11 @@ const Showing = React.createClass({
 
     time_slots = _.orderBy(time_slots, "start_time");
 
-    const timeslotHasUsers = ts => ts.users.length > 0;
-
-    const barData = time_slots.filter(timeslotHasUsers).map((ts) => ({
-      x: f(ts.start_time, ts.is_3d, ts.is_vip),
-      y: ts.users.length,
-      id: ts.id
-    }));
-
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && (
-          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
+          <div>The selected date for this showing is {format(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
         )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
@@ -243,9 +186,10 @@ const Showing = React.createClass({
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-	    {this.renderChart(barData, showing.selected_time_slot && showing.selected_time_slot.id)}
+            <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
-          {this.renderUserList(votingUsers)}
+
+          <UserList users={votingUsers} />
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
