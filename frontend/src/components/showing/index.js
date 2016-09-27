@@ -168,14 +168,6 @@ const Showing = React.createClass({
 
     time_slots = _.orderBy(time_slots, "start_time");
 
-    const timeslotHasUsers = ts => ts.users.length > 0;
-
-    const barData = time_slots.filter(timeslotHasUsers).map((ts) => ({
-      x: f(ts.start_time, ts.is_3d, ts.is_vip),
-      y: ts.users.length,
-      id: ts.id
-    }));
-
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
@@ -200,7 +192,7 @@ const Showing = React.createClass({
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-            <VotingChart barData={barData} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
+            <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
 
           <UserList users={votingUsers} />

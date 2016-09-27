@@ -2,15 +2,30 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { DateRange } from 'react-date-range';
 import { HorizontalBar } from 'react-chartjs-2';
+import moment from 'moment';
+
+const f = (date, is3D, isVip) => {
+    let formattedDate = moment(date).format("DD/M HH:mm")
+    if (is3D) formattedDate = "3D " + formattedDate;
+    if (isVip) formattedDate = "VIP " + formattedDate;
+    return formattedDate
+};
 
 const VotingChart = React.createClass({
     propTypes: {
-        barData: PropTypes.array.isRequired,
+        timeSlots: PropTypes.array.isRequired,
         selectedId: PropTypes.number
     },
 
     render() {
-        const { barData, selectedId } = this.props;
+        const { timeSlots, selectedId } = this.props;
+
+        const barData = timeSlots.filter(ts => ts.users.length > 0).map((ts) => ({
+            x: f(ts.start_time, ts.is_3d, ts.is_vip),
+            y: ts.users.length,
+            id: ts.id
+        }));
+
 
         const data = {
             labels: barData.map(d => d.x),
