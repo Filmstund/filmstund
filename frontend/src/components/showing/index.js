@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import loader from '../loader/';
-import moment from 'moment';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
@@ -18,12 +17,7 @@ import VotingChart from './voting-chart';
 import styles from './style.css'
 import {getUser} from "../../store/reducer/index";
 
-const f = (date, is3D, isVip) => {
-  let formattedDate = moment(date).format("DD/M HH:mm")
-  if (is3D) formattedDate = "3D " + formattedDate;
-  if (isVip) formattedDate = "VIP " + formattedDate;
-  return formattedDate
-};
+import f from './formatter';
 
 const Showing = React.createClass({
   propTypes: {

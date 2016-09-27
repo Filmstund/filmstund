@@ -2,14 +2,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { DateRange } from 'react-date-range';
 import { HorizontalBar } from 'react-chartjs-2';
-import moment from 'moment';
 
-const f = (date, is3D, isVip) => {
-    let formattedDate = moment(date).format("DD/M HH:mm")
-    if (is3D) formattedDate = "3D " + formattedDate;
-    if (isVip) formattedDate = "VIP " + formattedDate;
-    return formattedDate
-};
+import f from '../formatter';
 
 const VotingChart = React.createClass({
     propTypes: {
