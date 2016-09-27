@@ -2,27 +2,37 @@ import React from 'react';
 
 import styles from './style.css';
 
-const colors = {
-  '0':  '#712',
-  '1':  '#ffd800',
-  '2':  'green',
-  '3':  'gray'
-}
-
-const text = {
-  'cancelled': 'cancelled',
-  'open': 'open',
-  'confirmed': 'confirmed',
-  'done': 'done'
+const labels = {
+  cancelled: {
+    text: 'cancelled',
+    color: '#712',
+    textColor: 'black'
+  },
+  open: {
+    text: 'open',
+    color: '#ffd800',
+    textColor: 'black'
+  },
+  confirmed: {
+    text: 'confirmed',
+    color: 'green',
+    textColor: 'white'
+  },
+  done: {
+    text: 'done',
+    color: 'gray',
+    textColor: 'black'
+  }
 }
 
 const StatusLable = React.createClass({
   render() {
     const { status } = this.props;
+    const labelData = labels[status];
 
     return (
-      <div className={styles.label} style={{backgroundColor: colors[status]}}>
-        {text[status]}
+      <div className={styles.label} style={{backgroundColor: labelData.color, color: labelData.textColor}}>
+        {labelData.text}
       </div>
     )
   }
