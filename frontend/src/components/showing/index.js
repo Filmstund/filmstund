@@ -103,6 +103,9 @@ const Showing = React.createClass({
             suggestedMax: 10
           }
         }]
+      },
+      legend: {
+        display: false
       }
     };
 
@@ -191,7 +194,7 @@ const Showing = React.createClass({
       <UserList users={votingUsers} />
     )
   },
-  
+
   render() {
     const { showing: { showing }, currentUser } = this.props;
     const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
