@@ -24,11 +24,9 @@ const VotingChart = React.createClass({
         const data = {
             labels: barData.map(d => d.x),
             datasets: [{
-                label: 'Votes',
-                backgroundColor: barData.map(d => d.id === selectedId ?  'tomato' : 'goldenrod'),
-                borderColor: 'goldenrod',
-                borderWidth: barData.map(d => d.id === selectedId ? 3 : 0),
-                hoverBackgroundColor: '#f1bc20',
+                label: 'Röster',
+                backgroundColor: barData.map(d => d.id === selectedId ? 'goldenrod' : '#712'),
+                hoverBackgroundColor: barData.map(d => d.id === selectedId ? '#f0d000' : '#934'),
                 data: barData.map(d => d.y)
             }]
         };

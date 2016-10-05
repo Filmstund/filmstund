@@ -25,7 +25,7 @@ html { box-sizing: border-box;}
 
 .rootContainer {
   color: black;
-  padding-bottom: 4em;
+  padding-bottom: 2em;
   display: flex;
   flex-direction: column;
   justify-content: center;
