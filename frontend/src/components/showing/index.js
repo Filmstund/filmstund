@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import loader from '../loader/';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
@@ -15,7 +14,8 @@ import UserList from './user-list';
 import VotingChart from './voting-chart';
 
 import styles from './style.css'
-import {getUser} from "../../store/reducer/index";
+import { getUser } from "../../store/reducer";
+import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange } from "../../store/actions";
 
 import format from './formatter';
 
@@ -31,6 +31,15 @@ const Showing = React.createClass({
       loading: false,
       slotsSaved: false
     }
+  },
+
+  componentWillMount() {
+    this.props.dispatch(
+      fetchShowing(this.props.params.id)
+    )
+    this.props.dispatch(
+      fetchTimeSlotsForShowing(this.props.params.id)
+    )
   },
 
   calculateNewVotesFromPickedSlots(selectedIds) {
@@ -93,38 +102,26 @@ const Showing = React.createClass({
   },
 
   renderAttendButton() {
-    const { loadingAttend } = this.state;
-    const { showing: { showing } } = this.props;
+    const { showing } = this.props;
     const isAttending = showing.attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
 
     return (
       <label>
-        <input type="checkbox" onClick={isAttending ? this.unAttendShowing : this.doAttendShowing} checked={Boolean(isAttending)} disabled={loadingAttend} /> Jag kommer
+        <input type="checkbox" onClick={isAttending ? this.unAttendShowing : this.doAttendShowing} checked={Boolean(isAttending)} /> Jag kommer
       </label>
     )
   },
 
   doAttendShowing() {
-    this.setState({ loadingAttend: true });
-    postEndpoint(`/showings/${this.props.params.id}/attend`)
-      .then(this.updateAttendees);
-
+    this.props.dispatch(
+      postAttendStatusChange(this.props.params.id, 'attend')
+    )
   },
 
   unAttendShowing() {
-    this.setState({ loadingAttend: true });
-    postEndpoint(`/showings/${this.props.params.id}/unattend`)
-      .then(this.updateAttendees);
-  },
-
-  updateAttendees({attendees}) {
-    this.props.update('showing', Promise.resolve(() => ({
-      showing: {
-        ...this.props.showing.showing,
-        attendees
-      }
-    })))
-    this.setState({ loadingAttend: false })
+    this.props.dispatch(
+      postAttendStatusChange(this.props.params.id, 'unattend')
+    )
   },
 
   submitTimeSlot(slot_id) {
@@ -132,18 +129,14 @@ const Showing = React.createClass({
   },
 
   render() {
-    const { showing: { showing }, currentUser } = this.props;
-    const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
-    const votingUsers = _(showing.time_slots).flatMap('users').uniqBy('id').value();
+    const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
+    const votingUsers = _(showing.attendees).uniqBy('id').value();
 
     if (!showing || !selectedTimeSlots) {
       return null;
     }
 
     let { time_slots } = showing;
-    if (this.state.timeSlots) {
-      time_slots = this.state.timeSlots;
-    }
 
     time_slots = _.orderBy(time_slots, "start_time");
 
@@ -187,10 +180,8 @@ const Showing = React.createClass({
   }
 });
 
-export default withRouter(loader((props) => ({
-    showing: `/showings/${props.params.id}`,
-    selectedTimeSlots: `/showings/${props.params.id}/time_slots/votes`
-}
-))(connect(state => ({
-  currentUser: getUser(state)
-}))(Showing)))
+export default withRouter(connect((state, props) => ({
+    currentUser: getUser(state),
+    showing: state.showings.showings[props.params.id],
+    time_slots: state.showings.time_slots[props.params.id]
+}))(Showing))

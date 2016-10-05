@@ -1,20 +1,26 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import ShowingItem from './showing-item';
-import loader from '../loader';
+import { fetchShowings } from '../../store/actions'
 
 import styles from './style.css';
 
 const ShowingList = React.createClass({
+  componentWillMount() {
+    this.props.dispatch(fetchShowings());
+  },
   render() {
     const { showings, loading } = this.props;
+    const showingIds = Object.keys(showings)
+
     return (
       <div className={styles.container}>
-        {(showings.showings || []).map(showing => <ShowingItem showing={showing} key={showing.id} />)}
+        {showingIds.map(showingId => <ShowingItem showingId={showingId} key={showingId} />)}
       </div>
     )
   }
 })
 
-export default loader((props) => ({
-  showings: '/showings'
+export default connect((state) => ({
+  showings: state.showings.showings
 }))(ShowingList)
