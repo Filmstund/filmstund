@@ -34,8 +34,7 @@ const Showing = React.createClass({
   getInitialState() {
     return {
       loading: false,
-      slotsSaved: false,
-      attendees: []
+      slotsSaved: false
     }
   },
 
@@ -85,11 +84,9 @@ const Showing = React.createClass({
     const data = {
       labels: barData.map(d => d.x),
       datasets: [{
-        label: 'Votes',
-        backgroundColor: barData.map(d => d.id === selectedId ?  'tomato' : 'goldenrod'),
-        borderColor: 'goldenrod',
-        borderWidth: barData.map(d => d.id === selectedId ? 3 : 0),
-        hoverBackgroundColor: '#f1bc20',
+        label: 'Röster',
+        backgroundColor: barData.map(d => d.id === selectedId ? 'goldenrod' : '#712'),
+        hoverBackgroundColor: barData.map(d => d.id === selectedId ? '#f0d000' : '#934'),
         data: barData.map(d => d.y)
       }]
     };
@@ -137,52 +134,38 @@ const Showing = React.createClass({
   },
 
   renderAttendButton() {
-    const {attendees, loadingAttend} = this.state;
-    const isAttending = attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
-
+    const { loadingAttend } = this.state;
+    const { showing: { showing } } = this.props;
+    const isAttending = showing.attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
 
     return (
-      <div>
-        {isAttending ?
-          <div>
-            You are currently attending <br />
-            <button onClick={this.unAttendShowing} disabled={loadingAttend}>
-              I will NOT attend
-            </button>
-          </div>
-        :
-          <div>
-            You are currently not attending <br />
-            <button onClick={this.doAttendShowing} disabled={loadingAttend}>
-              I will attend
-            </button>
-          </div>
-        }
-      </div>
+      <label>
+        <input type="checkbox" onClick={isAttending ? this.unAttendShowing : this.doAttendShowing} checked={Boolean(isAttending)} disabled={loadingAttend} /> Jag kommer
+      </label>
     )
   },
 
   doAttendShowing() {
-    this.setState({
-      loadingAttend: true,
-      attendees: [...this.state.attendees, {user_id: this.props.currentUser.id}]
-    });
+    this.setState({ loadingAttend: true });
     postEndpoint(`/showings/${this.props.params.id}/attend`)
       .then(this.updateAttendees);
 
   },
 
   unAttendShowing() {
-    this.setState({
-      loadingAttend: true,
-      attendees: this.state.attendees.filter(attendee => attendee.user_id !== this.props.currentUser.id)
-    });
+    this.setState({ loadingAttend: true });
     postEndpoint(`/showings/${this.props.params.id}/unattend`)
       .then(this.updateAttendees);
   },
 
   updateAttendees({attendees}) {
-    this.setState({ attendees, loadingAttend: false })
+    this.props.update('showing', Promise.resolve(() => ({
+      showing: {
+        ...this.props.showing.showing,
+        attendees
+      }
+    })))
+    this.setState({ loadingAttend: false })
   },
 
   submitTimeSlot(slot_id) {
@@ -222,12 +205,12 @@ const Showing = React.createClass({
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
-        {showing.selected_time_slot && (
-          <div>The selected date for this showing is {f(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
-        )}
         <div className={styles.showingInfo}>
           Admin: {showing.owner.nick}
         </div>
+        {showing.selected_time_slot && (
+          <div>Bestämt besöksdatum är {f(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
+        )}
         <div className={styles.timePicker}>
           {!showing.selected_time_slot && (
             time_slots && (
@@ -241,16 +224,19 @@ const Showing = React.createClass({
               </div>
             )
           )}
+          {!showing.selected_time_slot && (
+            <div>Pick a date! Any date!</div>
+          )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
 	    {this.renderChart(barData, showing.selected_time_slot && showing.selected_time_slot.id)}
           </div>
+          <h3>Deltagare</h3>
+          {this.renderAttendButton()}
           {this.renderUserList(votingUsers)}
         </div>
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
-        { this.renderAttendButton() }
-
       </div>
     )
   }
