@@ -6,7 +6,7 @@ import style from './style.css';
 const UserList = React.createClass({
   propTypes: {
     currentUser: PropTypes.object.isRequired,
-    attendees: PropTypes.object.isRequired,
+    attendees: PropTypes.array.isRequired,
     doAttendShowing: PropTypes.func.isRequired,
     unAttendShowing: PropTypes.func.isRequired
   },
