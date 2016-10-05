@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import loader from '../loader/';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
@@ -15,7 +14,8 @@ import UserList from './user-list';
 import VotingChart from './voting-chart';
 
 import styles from './style.css'
-import {getUser} from "../../store/reducer/index";
+import { getUser } from "../../store/reducer";
+import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange } from "../../store/actions";
 
 import format from './formatter';
 
@@ -32,6 +32,15 @@ const Showing = React.createClass({
       slotsSaved: false,
       attendees: []
     }
+  },
+
+  componentWillMount() {
+    this.props.dispatch(
+      fetchShowing(this.props.params.id)
+    )
+    this.props.dispatch(
+      fetchTimeSlotsForShowing(this.props.params.id)
+    )
   },
 
   calculateNewVotesFromPickedSlots(selectedIds) {
@@ -94,8 +103,8 @@ const Showing = React.createClass({
   },
 
   renderAttendButton() {
-    const {attendees, loadingAttend} = this.state;
-    const isAttending = attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
+    const { showing } = this.props;
+    const isAttending = showing.attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
 
 
     return (
@@ -103,14 +112,14 @@ const Showing = React.createClass({
         {isAttending ?
           <div>
             You are currently attending <br />
-            <button onClick={this.unAttendShowing} disabled={loadingAttend}>
+            <button onClick={this.unAttendShowing}>
               I will NOT attend
             </button>
           </div>
         :
           <div>
             You are currently not attending <br />
-            <button onClick={this.doAttendShowing} disabled={loadingAttend}>
+            <button onClick={this.doAttendShowing}>
               I will attend
             </button>
           </div>
@@ -120,26 +129,15 @@ const Showing = React.createClass({
   },
 
   doAttendShowing() {
-    this.setState({
-      loadingAttend: true,
-      attendees: [...this.state.attendees, {user_id: this.props.currentUser.id}]
-    });
-    postEndpoint(`/showings/${this.props.params.id}/attend`)
-      .then(this.updateAttendees);
-
+    this.props.dispatch(
+      postAttendStatusChange(this.props.params.id, 'attend')
+    )
   },
 
   unAttendShowing() {
-    this.setState({
-      loadingAttend: true,
-      attendees: this.state.attendees.filter(attendee => attendee.user_id !== this.props.currentUser.id)
-    });
-    postEndpoint(`/showings/${this.props.params.id}/unattend`)
-      .then(this.updateAttendees);
-  },
-
-  updateAttendees({attendees}) {
-    this.setState({ attendees, loadingAttend: false })
+    this.props.dispatch(
+      postAttendStatusChange(this.props.params.id, 'unattend')
+    )
   },
 
   submitTimeSlot(slot_id) {
@@ -147,18 +145,14 @@ const Showing = React.createClass({
   },
 
   render() {
-    const { showing: { showing }, currentUser } = this.props;
-    const { time_slots:selectedTimeSlots } = this.props.selectedTimeSlots;
-    const votingUsers = _(showing.time_slots).flatMap('users').uniqBy('id').value();
+    const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
+    const votingUsers = _(showing.attendees).uniqBy('id').value();
 
     if (!showing || !selectedTimeSlots) {
       return null;
     }
 
     let { time_slots } = showing;
-    if (this.state.timeSlots) {
-      time_slots = this.state.timeSlots;
-    }
 
     time_slots = _.orderBy(time_slots, "start_time");
 
@@ -200,10 +194,8 @@ const Showing = React.createClass({
   }
 });
 
-export default withRouter(loader((props) => ({
-    showing: `/showings/${props.params.id}`,
-    selectedTimeSlots: `/showings/${props.params.id}/time_slots/votes`
-}
-))(connect(state => ({
-  currentUser: getUser(state)
-}))(Showing)))
+export default withRouter(connect((state, props) => ({
+    currentUser: getUser(state),
+    showing: state.showings.showings[props.params.id],
+    time_slots: state.showings.time_slots[props.params.id]
+}))(Showing))
