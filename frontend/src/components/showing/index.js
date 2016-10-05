@@ -163,7 +163,7 @@ const Showing = React.createClass({
             )
           )}
           {!showing.selected_time_slot && (
-            <div>Pick a date! Any date!</div>
+            <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
