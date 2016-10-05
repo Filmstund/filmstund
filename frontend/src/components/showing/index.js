@@ -103,31 +103,20 @@ const Showing = React.createClass({
     )
   },
 
-  renderAttendButton() {
-    const { showing } = this.props;
-    const isAttending = showing.attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
-
-    return (
-      <label>
-        <input type="checkbox" onClick={isAttending ? this.unAttendShowing : this.doAttendShowing} checked={Boolean(isAttending)} /> Jag kommer
-      </label>
-    )
+  submitTimeSlot(slot_id) {
+    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
   doAttendShowing() {
     this.props.dispatch(
-      postAttendStatusChange(this.props.params.id, 'attend')
+        postAttendStatusChange(this.props.params.id, 'attend')
     )
   },
 
   unAttendShowing() {
     this.props.dispatch(
-      postAttendStatusChange(this.props.params.id, 'unattend')
+        postAttendStatusChange(this.props.params.id, 'unattend')
     )
-  },
-
-  submitTimeSlot(slot_id) {
-    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
 
   render() {
@@ -171,10 +160,11 @@ const Showing = React.createClass({
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
             <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
-          <h3>Deltagare</h3>
-          {this.renderAttendButton()}
-          <UserList users={votingUsers} />
         </div>
+        <UserList attendees={showing.attendees}
+                  currentUser={currentUser}
+                  doAttendShowing={this.doAttendShowing}
+                  unAttendShowing={this.unAttendShowing} />
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
       </div>
