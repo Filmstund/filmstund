@@ -10,6 +10,9 @@ export const SIGN_IN = 'SIGN_IN'
 export const WAITING_UPDATE_ME = 'WAITING_UPDATE_ME'
 export const UPDATE_ME = 'UPDATE_ME'
 
+export const FETCH_SHOWINGS = 'FETCH_SHOWINGS'
+export const FETCH_SHOWING = 'FETCH_SHOWING'
+
 import { fetchEndpoint, postEndpoint, putEndpoint } from '../../service/backend'
 
 export const signIn = (authData) => (dispatch) => {
@@ -47,5 +50,22 @@ export const updateUser = (user) => (dispatch) => {
     })
   }).catch(err => {
     console.error("Error during user update", err);
+  })
+}
+
+export const fetchShowings = () => (dispatch) => {
+  fetchEndpoint('/showings').then(({ showings }) => {
+
+    let showingsObj = showings.reduce((acc, showing) => {
+      acc[showing.id] = showing
+      return acc
+    }, {})
+
+    dispatch({
+      type: FETCH_SHOWINGS,
+      showings: showingsObj
+    })
+  }).catch(err => {
+    console.error("Error during showings fetch", err);
   })
 }

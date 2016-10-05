@@ -1,5 +1,5 @@
 import React from 'react';
-import loader from '../../loader';
+import { connect } from 'react-redux';
 
 import ShowingHeader from '../../showing-header';
 import MovieInfo from '../../movie-info';
@@ -23,4 +23,6 @@ const ShowingItem = React.createClass({
 })
 
 
-export default ShowingItem
+export default connect((state, props) => ({
+  showing: state.showings.showings[props.showingId]
+}))(ShowingItem);
