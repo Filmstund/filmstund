@@ -85,6 +85,8 @@ const Showing = React.createClass({
 
   renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
 
+    time_slots = time_slots.filter(ts => ts.users.length > 0);
+
     return (
       <div className={styles.slotButtonContainer}>
         {
