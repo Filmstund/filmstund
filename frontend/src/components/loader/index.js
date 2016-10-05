@@ -58,7 +58,7 @@ const loader = (urlFunc, defaultFunc = noopObj) => (Component) => React.createCl
         [key]: resp
       }
     })).catch(err => {
-      console.error('Error in loader: ', err);
+      throw err;
     });
   },
   render() {
