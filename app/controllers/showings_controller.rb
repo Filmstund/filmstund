@@ -68,7 +68,7 @@ class ShowingsController < ApplicationController
   # POST /showings/:id/attend
   def attend
     unless @showing.status == "confirmed"
-      render nothing: true, status: :unprocessable_entity and return
+      render json: { error: "Showing is not confirmed yet" }, status: :unprocessable_entity and return
     end
     @attendee = Attendee.find_or_create_by(user: current_user, showing: @showing)
     if @attendee.save
@@ -81,7 +81,7 @@ class ShowingsController < ApplicationController
   # POST /showings/:id/unattend
   def unattend
     unless @showing.status == "confirmed"
-      render nothing: true, status: :unprocessable_entity and return
+      render json: { error: "Showing is not confirmed yet" }, status: :unprocessable_entity and return
     end
     @attendee = Attendee.where(user: current_user, showing: @showing)
     @attendee.delete_all
