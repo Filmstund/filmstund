@@ -18,6 +18,11 @@ const labels = {
     color: 'green',
     textColor: 'white'
   },
+  ordered: {
+    text: 'ordered',
+    color: 'goldenrod',
+    textColor: 'black'
+  },
   done: {
     text: 'done',
     color: 'gray',
