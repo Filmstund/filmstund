@@ -15,7 +15,7 @@ class GiftCardsController < ApplicationController
 
   # POST /gift_cards
   def create
-    @gift_card = GiftCard.new(gift_card_params)
+    @gift_card = current_user.gift_cards.build(gift_card_params)
 
     if @gift_card.save
       render json: @gift_card, status: :created, location: @gift_card
