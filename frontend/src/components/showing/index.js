@@ -4,7 +4,6 @@ import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { postEndpoint } from '../../service/backend';
 import { HorizontalBar } from 'react-chartjs-2';
-import UserAvatar from '../avatar';
 
 import _ from 'lodash';
 
@@ -13,7 +12,6 @@ import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
 import UserList from './user-list';
 import VotingChart from './voting-chart';
-import GoldButton from '../gold-button'
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
@@ -124,7 +122,7 @@ const Showing = React.createClass({
 
   render() {
     const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
-    const votingUsers = _(showing.attendees).uniqBy('id').value()
+    const votingUsers = _(showing.attendees).uniqBy('id').value();
 
     if (!showing || !selectedTimeSlots) {
       return null;

@@ -2,32 +2,21 @@
 
 import React, {PropTypes} from 'react';
 import Avatar from 'react-avatar';
-import style from './style.css';
+import styles from './style.css';
 
-const UserList = React.createClass({
-  propTypes: {
-    users: PropTypes.array.isRequired
-  },
-
-  renderUserItem(user) {
-    return (
-      <div key={user.id}>
-        <div className={style.item} title={user.nick}>
-          <Avatar name={user.nick} size="40" />
-        </div>
-      </div>
-    )
-  },
+const UserAvatar = React.createClass({
 
   render() {
-    const { users } = this.props;
+    const { user, size } = this.props;
 
     return (
-      <div className={style.container}>
-        {users.map(this.renderUserItem)}
+      <div key={user.id}>
+        <div className={styles.item} title={user.nick}>
+          <Avatar name={user.nick} size={size} />
+        </div>
       </div>
     )
   }
 });
 
-export default UserList
+export default UserAvatar

@@ -112,15 +112,3 @@
 .attendees {
   padding: 1em 0 0.5em;
 }
-
-.admin {
-  position: relative;
-}
-
-.adminIcon {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  color: white;
-  font-size: small;
-}

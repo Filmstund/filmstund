@@ -1,7 +1,7 @@
 //@flow
 
 import React, {PropTypes} from 'react';
-import UserAvatar from '../../avatar';
+import UserAvatar from '../../user-avatar';
 import GoldButton from '../../gold-button';
 import style from './style.css';
 
