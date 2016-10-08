@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import { DateRange } from 'react-date-range';
 import { postEndpoint } from '../../service/backend';
 import { HorizontalBar } from 'react-chartjs-2';
+import UserAvatar from '../avatar';
 
 import _ from 'lodash';
 
@@ -12,12 +13,14 @@ import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
 import UserList from './user-list';
 import VotingChart from './voting-chart';
+import GoldButton from '../gold-button'
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
 import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange } from "../../store/actions";
 
 import format from './formatter';
+import moment from '../../lib/moment';
 
 const Showing = React.createClass({
   propTypes: {
@@ -103,18 +106,6 @@ const Showing = React.createClass({
     )
   },
 
-  renderAttendButton() {
-    const { loadingAttend } = this.state;
-    const { showing: { showing } } = this.props;
-    const isAttending = showing.attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
-
-    return (
-      <label>
-        <input type="checkbox" onClick={isAttending ? this.unAttendShowing : this.doAttendShowing} checked={Boolean(isAttending)} disabled={loadingAttend} /> Jag kommer
-      </label>
-    )
-  },
-
   submitTimeSlot(slot_id) {
     this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
   },
@@ -133,7 +124,7 @@ const Showing = React.createClass({
 
   render() {
     const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
-    const votingUsers = _(showing.attendees).uniqBy('id').value();
+    const votingUsers = _(showing.attendees).uniqBy('id').value()
 
     if (!showing || !selectedTimeSlots) {
       return null;
@@ -146,14 +137,23 @@ const Showing = React.createClass({
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
-        <div className={styles.showingInfo}>
-          Admin: {showing.owner.nick}
-        </div>
         {showing.selected_time_slot && (
-          <div>Bestämt besöksdatum är {format(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
+          <div>
+            {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
+            {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
+            {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
+          </div>
         )}
+        {showing.status === "confirmed" &&
+          <div className={styles.attendees}>
+            <UserList attendees={showing.attendees}
+                      currentUser={currentUser}
+                      doAttendShowing={this.doAttendShowing}
+                      unAttendShowing={this.unAttendShowing} />
+          </div>
+        }
         <div className={styles.timePicker}>
-          {!showing.selected_time_slot && (
+          {showing.status !== "confirmed" && (
             time_slots && (
               <div>
                 <SlotPicker timeSlots={time_slots}
@@ -165,21 +165,15 @@ const Showing = React.createClass({
               </div>
             )
           )}
-          {!showing.selected_time_slot && (
+          <h3>Resultat</h3>
+          {showing.status !== "confirmed" && (
             <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
           )}
           <div className={styles.buttonAndGraphContainer}>
             {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
             <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
-          <h3>Deltagare</h3>
-          {this.renderAttendButton()}
-          <UserList users={votingUsers} />
         </div>
-        <UserList attendees={showing.attendees}
-                  currentUser={currentUser}
-                  doAttendShowing={this.doAttendShowing}
-                  unAttendShowing={this.unAttendShowing} />
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
       </div>

@@ -1,7 +1,10 @@
 .container {
-    padding: 1em;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.5em;
+  min-height: 40px;
 }
 
 .item {
-    padding: 0.5em;
+    cursor: default;
 }

@@ -1,6 +1,8 @@
 //@flow
 
 import React, {PropTypes} from 'react';
+import UserAvatar from '../../avatar';
+import GoldButton from '../../gold-button';
 import style from './style.css';
 
 const UserList = React.createClass({
@@ -16,16 +18,16 @@ const UserList = React.createClass({
     const isAttending = attendees.find(attendee => attendee.user_id == this.props.currentUser.id);
 
     return (
-        <label>
-          <input type="checkbox" onClick={isAttending ? unAttendShowing : doAttendShowing} checked={Boolean(isAttending)} /> Jag kommer
-        </label>
+      <GoldButton onClick={isAttending ? unAttendShowing : doAttendShowing}>
+        {isAttending ? "Jag kommer inte" : "Jag kommer"}
+      </GoldButton>
     )
   },
 
   renderUserItem(user) {
     return (
-      <div key={user.id} className={style.item}>
-        {user.nick}
+      <div key={user.id}>
+        <UserAvatar user={user} size={40} />
       </div>
     )
   },
@@ -34,11 +36,10 @@ const UserList = React.createClass({
     const { attendees } = this.props;
     return (
       <div>
-        <h3>Deltagare</h3>
-        {this.renderAttendButton()}
         <div className={style.container}>
           {attendees.map(this.renderUserItem)}
         </div>
+        {this.renderAttendButton()}
       </div>
     )
   }
