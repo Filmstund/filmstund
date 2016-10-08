@@ -49,13 +49,13 @@ export default (state = initialState, action) => {
         }
       }
     case SHOWING_STATUS_CHANGE:
-      const { showingId: apabepa, status } = action;
+      const { showingId: id, status } = action;
       return {
           ...state,
           showings: {
               ...state.showings,
-            [apabepa]: {
-                ...state.showings[apabepa],
+            [id]: {
+                ...state.showings[id],
               status
             }
           }

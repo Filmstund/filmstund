@@ -29,17 +29,12 @@ class Push
 
     def showing_ordered(showing)
       @showing = showing
-      # Should send the cost of the showing.
-      # also use the payment information, företagsbiljett etc...
-
 
       cost = @showing.selected_time_slot.price
       nick = @showing.owner.nick
       phone = @showing.owner.phone_number
       message = "#{@showing.movie.title}, Pay #{cost} to #{nick} (#{phone})"
-      p message
       User.with_push_key.each do |user|
-        p user.nick
         Pushover.notification(message: message,
                               user: user.pushover_key,
                               title: "Showing has been ordered!",
