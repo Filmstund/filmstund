@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       post 'attend'
       post 'unattend'
       post 'order'
+      post 'done'
     end
     resources :time_slots do
       collection do

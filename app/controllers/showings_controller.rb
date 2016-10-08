@@ -1,9 +1,9 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:update, :destroy, :between, :complete, :attend, :unattend, :order]
+  before_action :set_showing, only: [:update, :destroy, :between, :complete, :attend, :unattend, :order, :done]
 
   # GET /showings
   def index
-    @showings = Showing.includes(:owner, :movie, time_slots: [:users]).all
+    @showings = Showing.includes(:owner, :movie, time_slots: [:users]).active
 
     render json: @showings
   end
@@ -65,7 +65,7 @@ class ShowingsController < ApplicationController
     end
   end
 
-  # Post /showing/:id:/order
+  # Post /showing/:id/order
   def order
     unless @showing.status == "confirmed"
       render nothing: true, status: :unprocessable_entity and return
@@ -76,6 +76,24 @@ class ShowingsController < ApplicationController
 
     @showing.status = "ordered"
     Push.showing_ordered(@showing)
+    if @showing.save
+      render json: @showing
+    else
+      render json: @showing.errors, status: :unprocessable_entity
+    end
+
+  end
+
+  # Post /showing/:id/done
+  def done
+    unless @showing.status == "ordered"
+      render nothing: true, status: :unprocessable_entity and return
+    end
+    unless @showing.owner == current_user
+      render nothing: true, status: :forbidden and return
+    end
+
+    @showing.status = "done"
     if @showing.save
       render json: @showing
     else
