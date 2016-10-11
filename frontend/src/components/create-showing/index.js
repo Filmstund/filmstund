@@ -119,7 +119,7 @@ const CreateShowing = React.createClass({
     .then((resp) => {
       this.props.router.push(`/showings/${resp.showing.id}`);
     })
-    .catch((resp) => console.error('Failed to create showing'))
+    .catch(n => console.error('Failed to create showing ', n))
     .then(() => this.setState({loading: false}));
   },
 

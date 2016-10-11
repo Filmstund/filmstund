@@ -9,7 +9,7 @@ import styles from './style.css';
 const ShowingItem = React.createClass({
   render() {
     const { showing } = this.props;
-
+    console.log(showing);
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
@@ -24,5 +24,5 @@ const ShowingItem = React.createClass({
 
 
 export default connect((state, props) => ({
-  showing: state.showings.showings[props.showingId]
+  showing: state.showings.showingMap[props.showingId]
 }))(ShowingItem);

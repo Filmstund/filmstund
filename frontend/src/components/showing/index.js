@@ -15,23 +15,23 @@ import VotingChart from './voting-chart';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
-import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange, postShowingOrdered, postShowingDone } from "../../store/actions";
+import {
+    fetchShowing,
+    fetchTimeSlotsForShowing,
+    postAttendStatusChange,
+    postShowingOrdered,
+    postShowingDone,
+    submitSlotsPickedForShowing
+} from "../../store/actions";
 
 import format from './formatter';
 import moment from '../../lib/moment';
 
 const Showing = React.createClass({
   propTypes: {
-    showing: PropTypes.object.isRequired,
+    showing: PropTypes.object,
     currentUser: PropTypes.object.isRequired,
     selectedTimeSlots: PropTypes.object
-  },
-
-  getInitialState() {
-    return {
-      loading: false,
-      slotsSaved: false
-    }
   },
 
   componentWillMount() {
@@ -44,7 +44,7 @@ const Showing = React.createClass({
   },
 
   calculateNewVotesFromPickedSlots(selectedIds) {
-    const allTimeSlotsWithoutUsersVotes = this.props.showing.showing.time_slots.map(ts => ({
+    const allTimeSlotsWithoutUsersVotes = this.props.showing.time_slots.map(ts => ({
       ...ts,
       users: ts.users.filter(u => u.id != this.props.currentUser.id)
     }));
@@ -61,23 +61,9 @@ const Showing = React.createClass({
   },
 
   submitSlotsPicked(selectedIds) {
-    this.setState({
-      loading: true,
-      timeSlots: this.calculateNewVotesFromPickedSlots(selectedIds)
-    });
-
-    postEndpoint(`/showings/${this.props.params.id}/time_slots/votes`, {
-      ids: selectedIds
-    }).then(data => {
-      this.setState({
-        loading: false,
-        timeSlots: data.time_slots
-      });
-    }).catch((err) => {
-      err.json().then((x) => {
-        console.log(x);
-      })
-    });
+    this.props.dispatch(
+        submitSlotsPickedForShowing(this.props.params.id, selectedIds)
+    )
   },
 
   onBarClicked() {
@@ -132,67 +118,83 @@ const Showing = React.createClass({
     )
   },
 
-  render() {
-    const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
-    const votingUsers = _(showing.attendees).uniqBy('id').value();
+  renderSummary(showing) {
+    return <div>
+      {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
+      {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
+      {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
+    </div>
+  },
 
-    if (!showing || !selectedTimeSlots) {
+  renderAttendeeList(showing, currentUser) {
+    return <div className={styles.attendees}>
+      <UserList attendees={showing.attendees}
+                currentUser={currentUser}
+                doAttendShowing={this.doAttendShowing}
+                unAttendShowing={this.unAttendShowing} />
+    </div>
+  },
+
+  renderSlotPicker(time_slots, currentUser) {
+    return <SlotPicker timeSlots={time_slots}
+                onChange={this.submitSlotsPicked}
+                getId={(slot) => slot.id}
+                userId={currentUser.id}
+                showUsers={true} />
+  },
+
+  renderResult(showing, time_slots, currentUser) {
+    return <div>
+      <h3>Resultat</h3>
+      {showing.status !== "confirmed" && (
+          <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
+      )}
+      <div className={styles.buttonAndGraphContainer}>
+        {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
+        <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
+      </div>
+    </div>
+  },
+
+  renderActionButton(showing) {
+    if (showing.status === "confirmed") {
+      return <button onClick={this.doOrder}>Jag har beställt</button>
+    } else if (showing.status === "ordered") {
+      return <button onClick={this.doDone}>Slutför och arkivera besöket</button>
+    } else {
+      return <div></div>
+    }
+  },
+
+  render() {
+    const { showing, currentUser } = this.props;
+
+    if (!showing) {
       return null;
     }
-
-    let { time_slots } = showing;
-
-    time_slots = _.orderBy(time_slots, "start_time");
+    console.log('showings', showing);
+    const sortedTimeSlots = _.orderBy(showing.time_slots, "start_time");
 
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
-        {showing.selected_time_slot && (
-          <div>
-            {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
-            {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
-            {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
-          </div>
-        )}
-        {showing.status === "confirmed" &&
-          <div className={styles.attendees}>
-            <UserList attendees={showing.attendees}
-                      currentUser={currentUser}
-                      doAttendShowing={this.doAttendShowing}
-                      unAttendShowing={this.unAttendShowing} />
-          </div>
-        }
+        {showing.selected_time_slot && this.renderSummary(showing)}
+        {showing.status === "confirmed" && this.renderAttendeeList(showing, currentUser) }
+
         <div className={styles.timePicker}>
-          {showing.status !== "confirmed" && (
-            time_slots && (
-              <div>
-                <SlotPicker timeSlots={time_slots}
-                            initiallySelectedTimeSlots={selectedTimeSlots}
-                            onChange={this.submitSlotsPicked}
-                            getId={(slot) => slot.id}
-                            userId={currentUser.id}
-                            showUsers={true} />
-              </div>
-            )
-          )}
-          <h3>Resultat</h3>
-          {showing.status !== "confirmed" && (
-            <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
-          )}
-          <div className={styles.buttonAndGraphContainer}>
-            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-            <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
-          </div>
+          {showing.status !== "confirmed" && sortedTimeSlots &&
+                this.renderSlotPicker(sortedTimeSlots, currentUser)
+          }
+
+          { this.renderResult(showing, sortedTimeSlots, currentUser) }
         </div>
+
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
-        { showing.status === "confirmed" &&
-          showing.owner.id === currentUser.id &&
-          <button onClick={this.doOrder}>Jag har beställt</button>}
 
-        { showing.status === "ordered" &&
-        showing.owner.id === currentUser.id &&
-        <button onClick={this.doDone}>Slutför och arkivera besöket</button>}
+        { showing.owner.id === currentUser.id &&
+          this.renderActionButton(showing)
+        }
       </div>
     )
   }
@@ -200,6 +202,5 @@ const Showing = React.createClass({
 
 export default withRouter(connect((state, props) => ({
     currentUser: getUser(state),
-    showing: state.showings.showings[props.params.id],
-    time_slots: state.showings.time_slots[props.params.id]
+    showing: state.showings.showingMap[props.params.id]
 }))(Showing))

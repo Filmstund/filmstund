@@ -3,12 +3,13 @@ import {
   FETCH_SHOWING,
   FETCH_TIME_SLOTS,
   SHOWING_ATTENDEES_CHANGE,
-  SHOWING_STATUS_CHANGE
+  SHOWING_STATUS_CHANGE,
+  WAITING_SUBMIT_SLOTS_PICKED,
+  SUBMIT_SLOTS_PICKED
 } from '../actions'
 
 const initialState = {
-  showings: {},
-  time_slots: {}
+  showingMap: {}
 }
 
 export default (state = initialState, action) => {
@@ -16,34 +17,37 @@ export default (state = initialState, action) => {
     case FETCH_SHOWINGS:
       return {
         ...state,
-        showings: action.showings
-      }
+        showingMap: action.showings
+      };
     case FETCH_SHOWING:
       const { showing } = action
 
       return {
         ...state,
-        showings: {
-          ...state.showings,
+        showingMap: {
+          ...state.showingMap,
           [showing.id]: showing
         }
       }
     case FETCH_TIME_SLOTS:
       return {
         ...state,
-        time_slots: {
-          ...state.time_slots,
-          [action.showingId]: action.time_slots
+        showingMap: {
+          ...state.showingMap,
+          [action.showingId]: {
+            ...state.showingMap[action.showingId],
+            time_slots: action.time_slots
+          }
         }
       }
     case SHOWING_ATTENDEES_CHANGE:
       const { showingId, attendees } = action
       return {
         ...state,
-        showings: {
-          ...state.showings,
+        showingMap: {
+          ...state.showingMap,
           [showingId]: {
-            ...state.showings[showingId],
+            ...state.showingMap[showingId],
             attendees
           }
         }
@@ -52,10 +56,10 @@ export default (state = initialState, action) => {
       const { showingId: id, status } = action;
       return {
           ...state,
-          showings: {
-              ...state.showings,
+          showingMap: {
+              ...state.showingMap,
             [id]: {
-                ...state.showings[id],
+                ...state.showingMap[id],
               status
             }
           }
