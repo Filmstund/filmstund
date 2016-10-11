@@ -86,3 +86,29 @@
 .selected:hover {
     background: #712;
 }
+
+.is_vip, .is_3d {
+    margin-left: 0.3em;
+    font-size: smaller;
+    padding: 0 0.3em;
+    min-width: 20px;
+    display: inline-block;
+    background: goldenrod;
+    color: white;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.is_3d {
+    background: #f00;
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+
+.attendees {
+  padding: 1em 0 0.5em;
+}

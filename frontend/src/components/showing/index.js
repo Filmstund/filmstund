@@ -18,6 +18,7 @@ import { getUser } from "../../store/reducer";
 import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange, postShowingOrdered, postShowingDone } from "../../store/actions";
 
 import format from './formatter';
+import moment from '../../lib/moment';
 
 const Showing = React.createClass({
   propTypes: {
@@ -146,14 +147,23 @@ const Showing = React.createClass({
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
-        <div className={styles.showingInfo}>
-          Admin: {showing.owner.nick}
-        </div>
         {showing.selected_time_slot && (
-          <div>Bestämt besöksdatum är {format(showing.selected_time_slot.start_time, showing.selected_time_slot.is_3d, showing.selected_time_slot.is_vip)}</div>
+          <div>
+            {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
+            {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
+            {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
+          </div>
         )}
+        {showing.status === "confirmed" &&
+          <div className={styles.attendees}>
+            <UserList attendees={showing.attendees}
+                      currentUser={currentUser}
+                      doAttendShowing={this.doAttendShowing}
+                      unAttendShowing={this.unAttendShowing} />
+          </div>
+        }
         <div className={styles.timePicker}>
-          {!showing.selected_time_slot && (
+          {showing.status !== "confirmed" && (
             time_slots && (
               <div>
                 <SlotPicker timeSlots={time_slots}
@@ -165,7 +175,8 @@ const Showing = React.createClass({
               </div>
             )
           )}
-          {!showing.selected_time_slot && (
+          <h3>Resultat</h3>
+          {showing.status !== "confirmed" && (
             <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
           )}
           <div className={styles.buttonAndGraphContainer}>
@@ -173,10 +184,6 @@ const Showing = React.createClass({
             <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
           </div>
         </div>
-        <UserList attendees={showing.attendees}
-                  currentUser={currentUser}
-                  doAttendShowing={this.doAttendShowing}
-                  unAttendShowing={this.unAttendShowing} />
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
         { showing.status === "confirmed" &&

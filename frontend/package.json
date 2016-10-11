@@ -33,6 +33,7 @@
     "precss": "~1.4.0",
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.3.2",
+    "react-avatar": "^2.2.1",
     "react-chartjs-2": "^1.2.3",
     "react-date-range": "^0.2.4",
     "react-dom": "^15.3.2",
