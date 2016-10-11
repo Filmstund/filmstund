@@ -2,6 +2,7 @@ import {
   FETCH_SHOWINGS,
   FETCH_SHOWING,
   FETCH_TIME_SLOTS,
+  SHOWING_ATTENDEES_CHANGE,
   SHOWING_STATUS_CHANGE
 } from '../actions'
 
@@ -35,7 +36,7 @@ export default (state = initialState, action) => {
           [action.showingId]: action.time_slots
         }
       }
-    case SHOWING_STATUS_CHANGE:
+    case SHOWING_ATTENDEES_CHANGE:
       const { showingId, attendees } = action
       return {
         ...state,
@@ -46,6 +47,18 @@ export default (state = initialState, action) => {
             attendees
           }
         }
+      }
+    case SHOWING_STATUS_CHANGE:
+      const { showingId: id, status } = action;
+      return {
+          ...state,
+          showings: {
+              ...state.showings,
+            [id]: {
+                ...state.showings[id],
+              status
+            }
+          }
       }
     default:
       return state

@@ -15,7 +15,7 @@ import VotingChart from './voting-chart';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
-import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange } from "../../store/actions";
+import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange, postShowingOrdered } from "../../store/actions";
 
 import format from './formatter';
 
@@ -119,6 +119,12 @@ const Showing = React.createClass({
     )
   },
 
+  doOrder () {
+    this.props.dispatch(
+        postShowingOrdered(this.props.params.id)
+    )
+  },
+
   render() {
     const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
     const votingUsers = _(showing.attendees).uniqBy('id').value();
@@ -167,6 +173,9 @@ const Showing = React.createClass({
                   unAttendShowing={this.unAttendShowing} />
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
+        { showing.status === "confirmed" &&
+          showing.owner.id === currentUser.id &&
+          <button onClick={this.doOrder}>Jag har beställt</button>}
       </div>
     )
   }

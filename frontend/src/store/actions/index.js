@@ -13,6 +13,7 @@ export const UPDATE_ME = 'UPDATE_ME'
 export const FETCH_SHOWINGS = 'FETCH_SHOWINGS'
 export const FETCH_SHOWING = 'FETCH_SHOWING'
 export const FETCH_TIME_SLOTS = 'FETCH_TIME_SLOTS'
+export const SHOWING_ATTENDEES_CHANGE = 'SHOWING_ATTENDEES_CHANGE'
 export const SHOWING_STATUS_CHANGE = 'SHOWING_STATUS_CHANGE'
 
 import { fetchEndpoint, postEndpoint, putEndpoint } from '../../service/backend'
@@ -88,7 +89,7 @@ export const postAttendStatusChange = (id, status) => (dispatch) => {
   postEndpoint(`/showings/${id}/${status}`).then(({ attendees }) => {
 
     dispatch({
-      type: SHOWING_STATUS_CHANGE,
+      type: SHOWING_ATTENDEES_CHANGE,
       showingId: id,
       attendees
     })
@@ -110,4 +111,15 @@ export const fetchTimeSlotsForShowing = (id) => (dispatch) => {
   })
 }
 
+export const postShowingOrdered = (id) => (dispatch) => {
+  postEndpoint(`/showings/${id}/order`).then(() => {
 
+    dispatch({
+      type: SHOWING_STATUS_CHANGE,
+      showingId: id,
+      status: "ordered"
+    })
+  }).catch(err => {
+    console.error(`Error during post status change(${id}, ${status})`, err);
+  })
+};
