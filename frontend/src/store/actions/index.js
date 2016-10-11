@@ -123,3 +123,16 @@ export const postShowingOrdered = (id) => (dispatch) => {
     console.error(`Error during post status change(${id}, ${status})`, err);
   })
 };
+
+export const postShowingDone = (id) => (dispatch) => {
+  postEndpoint(`/showings/${id}/done`).then(() => {
+
+    dispatch({
+      type: SHOWING_STATUS_CHANGE,
+      showingId: id,
+      status: "done"
+    })
+  }).catch(err => {
+    console.error(`Error during post status change(${id}, ${status})`, err);
+  })
+};

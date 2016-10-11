@@ -15,7 +15,7 @@ import VotingChart from './voting-chart';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
-import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange, postShowingOrdered } from "../../store/actions";
+import { fetchShowing, fetchTimeSlotsForShowing, postAttendStatusChange, postShowingOrdered, postShowingDone } from "../../store/actions";
 
 import format from './formatter';
 
@@ -125,6 +125,12 @@ const Showing = React.createClass({
     )
   },
 
+  doDone () {
+    this.props.dispatch(
+        postShowingDone(this.props.params.id)
+    )
+  },
+
   render() {
     const { showing, currentUser, time_slots: selectedTimeSlots } = this.props;
     const votingUsers = _(showing.attendees).uniqBy('id').value();
@@ -176,6 +182,10 @@ const Showing = React.createClass({
         { showing.status === "confirmed" &&
           showing.owner.id === currentUser.id &&
           <button onClick={this.doOrder}>Jag har beställt</button>}
+
+        { showing.status === "ordered" &&
+        showing.owner.id === currentUser.id &&
+        <button onClick={this.doDone}>Slutför och arkivera besöket</button>}
       </div>
     )
   }
