@@ -135,12 +135,13 @@ const Showing = React.createClass({
     </div>
   },
 
-  renderSlotPicker(time_slots, currentUser) {
+  renderSlotPicker(time_slots, user) {
+    const selectedTimeSlotIds = time_slots.filter(ts => ts.users.map(u => u.id).includes(user.id)).map(ts => ts.id);
     return <SlotPicker timeSlots={time_slots}
-                onChange={this.submitSlotsPicked}
-                getId={(slot) => slot.id}
-                userId={currentUser.id}
-                showUsers={true} />
+                       onChange={this.submitSlotsPicked}
+                       getId={(slot) => slot.id}
+                       selectedTimeSlotIds={selectedTimeSlotIds}
+                       showUsers={true} />
   },
 
   renderResult(showing, time_slots, currentUser) {

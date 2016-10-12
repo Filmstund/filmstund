@@ -9,14 +9,12 @@ const SlotPicker = React.createClass({
     onChange: PropTypes.func.isRequired,
     getId: PropTypes.func.isRequired,
     timeSlots: PropTypes.array.isRequired,
-    selectedTimeSlotIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-    userId: PropTypes.number
+    selectedTimeSlotIds: PropTypes.arrayOf(PropTypes.string).isRequired
   },
 
   getDefaultProps() {
     return {
-      showUsers: false,
-      userId: -1
+      showUsers: false
     }
   },
 
