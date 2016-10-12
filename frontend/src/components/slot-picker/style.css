@@ -19,7 +19,6 @@
 
 .daysRow {
     justify-content: center;
-    border: 1px solid black;
 }
 
 .daysContainer, .daysRow, .doodleSlot, .doodleDay {
@@ -42,8 +41,8 @@
     align-items: center;
     height: 8em;
     width: 6em;
-    border-bottom: 1px solid black;
-    background: #fff;
+    border-bottom: 1px solid white;
+    background: #eee;
 
     &.selected {
         background: #E5BB25;
@@ -55,7 +54,7 @@
     }
 
     &:hover {
-        background: #fcc;
+        background: #f5f5f5;
         cursor: pointer;
     }
 
@@ -70,15 +69,15 @@
 }
 
 .doodleDate {
-    border-bottom: 1px solid black;
-    padding: 0 1em;
+    border-bottom: 1px solid white;
+    text-align: center;
+    background: black;
+    color: white;
 }
 
 .doodleDay {
     flex-direction: column;
-    border-right: 1px solid black;
-    background: #eee;
-    padding-bottom: 4em;
+    border-right: 1px solid white;
 
     &:last-child {
         border-right: 0;

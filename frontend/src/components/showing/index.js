@@ -12,6 +12,8 @@ import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
 import UserList from './user-list';
 import VotingChart from './voting-chart';
+import GoldButton from '../gold-button';
+import TimeSlotLabel from '../time-slot-label';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
@@ -97,7 +99,7 @@ const Showing = React.createClass({
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.id)}></div>
+                    onClick={() => this.submitTimeSlot(ts.id)} title="Välj"></div>
           })
         }
       </div>
@@ -150,49 +152,61 @@ const Showing = React.createClass({
         {showing.selected_time_slot && (
           <div>
             {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
-            {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
-            {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
+            {showing.selected_time_slot.is_3d && (<TimeSlotLabel type="3d" />)}
+            {showing.selected_time_slot.is_vip && (<TimeSlotLabel type="vip" />)}
           </div>
         )}
         {showing.status === "confirmed" &&
-          <div className={styles.attendees}>
-            <UserList attendees={showing.attendees}
-                      currentUser={currentUser}
-                      doAttendShowing={this.doAttendShowing}
-                      unAttendShowing={this.unAttendShowing} />
+          <div>
+            <div className={styles.attendees}>
+              <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
+              <UserList attendees={showing.attendees}
+                        currentUser={currentUser}
+                        doAttendShowing={this.doAttendShowing}
+                        unAttendShowing={this.unAttendShowing} />
+            </div>
           </div>
         }
-        <div className={styles.timePicker}>
-          {showing.status !== "confirmed" && (
-            time_slots && (
-              <div>
+        {showing.status === "open" && (
+          time_slots && (
+            <div>
+              Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
+              <div className={styles.timePicker}>
                 <SlotPicker timeSlots={time_slots}
                             initiallySelectedTimeSlots={selectedTimeSlots}
                             onChange={this.submitSlotsPicked}
                             getId={(slot) => slot.id}
                             userId={currentUser.id}
                             showUsers={true} />
+                </div>
+            </div>
+          )
+        )}
+        {showing.owner.id === currentUser.id && (
+          <div>
+            <h3>Admin</h3>
+            {showing.status === "open" && (
+              <div title="(29 maj)">Röstat klart? Välj ett datum, vilket som helst!</div>
+            )}
+            {showing.status === "confirmed" && (
+              <div title="(29 maj)">Välj ett datum, vilket som helst! OBS: Om du ändrar dig nu nollställer du deltagarlistan.</div>
+            )}
+            {(showing.status === "open" || showing.status === "confirmed") && (
+              <div className={styles.buttonAndGraphContainer}>
+                {(this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
+                <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
               </div>
-            )
-          )}
-          <h3>Resultat</h3>
-          {showing.status !== "confirmed" && (
-            <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
-          )}
-          <div className={styles.buttonAndGraphContainer}>
-            {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-            <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
+            )}
+            {showing.status === "confirmed" && (
+              <GoldButton onClick={this.doOrder}>Jag har beställt</GoldButton>
+            )}
+            {showing.status === "ordered" && (
+              <GoldButton onClick={this.doDone}>Slutför och arkivera besöket</GoldButton>
+            )}
           </div>
-        </div>
+        )}
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
-        { showing.status === "confirmed" &&
-          showing.owner.id === currentUser.id &&
-          <button onClick={this.doOrder}>Jag har beställt</button>}
-
-        { showing.status === "ordered" &&
-        showing.owner.id === currentUser.id &&
-        <button onClick={this.doDone}>Slutför och arkivera besöket</button>}
       </div>
     )
   }

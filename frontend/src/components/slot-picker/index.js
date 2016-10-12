@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react';
 import _ from 'lodash';
 import moment from '../../lib/moment';
 
+import TimeSlotLabel from '../time-slot-label';
+
 import styles from './style.css';
 
 const SlotPicker = React.createClass({
@@ -52,9 +54,9 @@ const SlotPicker = React.createClass({
           {moment(slot.start_time).format('LT')}
         </div>
         <div className={styles.tags}>
-          {slot.is_vip && <span className={styles.is_vip}>VIP</span>}
-          {slot.is_3d && <span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>}
-          {!slotId && <span className={styles.is_3d} title="Approximativ tid (kan komma att ändras)">≈</span>}
+          {slot.is_vip && <TimeSlotLabel type="vip" />}
+          {slot.is_3d && <TimeSlotLabel type="3d" />}
+          {!slotId && <TimeSlotLabel type="maybe" />}
         </div>
         <small title={slot.auditorium_name}>
           {slot.theatre.replace('Fs ', '').substring(0, 4)}…
