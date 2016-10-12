@@ -9,7 +9,6 @@ import styles from './style.css';
 const ShowingItem = React.createClass({
   render() {
     const { showing } = this.props;
-    console.log(showing);
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />

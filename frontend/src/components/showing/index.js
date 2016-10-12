@@ -173,7 +173,6 @@ const Showing = React.createClass({
     if (!showing) {
       return null;
     }
-    console.log('showings', showing);
     const sortedTimeSlots = _.orderBy(showing.time_slots, "start_time");
 
     return (
