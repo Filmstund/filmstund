@@ -124,7 +124,7 @@ const CreateShowing = React.createClass({
   },
 
   render() {
-    const { loading, timeSlots } = this.state;
+    const { loading, timeSlots, slotsPicked } = this.state;
     const { movie } = this.props.movie;
 
     if (!movie) {
@@ -156,7 +156,8 @@ const CreateShowing = React.createClass({
             <div className={styles.slotPicker}>
                 <SlotPicker timeSlots={timeSlots}
                             getId={(slot) => slot.sf_slot_id}
-                            onChange={this.updateSlotsPicked}/>
+                            onChange={this.updateSlotsPicked}
+                            selectedTimeSlotIds={slotsPicked}/>
             </div>
             <div className={styles.button}>
               <GoldButton onClick={this.submitSlotsPicked}>Skapa besök</GoldButton>
