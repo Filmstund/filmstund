@@ -1,4 +1,5 @@
 import {
+  SIGN_OUT,
   FETCH_SHOWINGS,
   FETCH_SHOWING,
   FETCH_TIME_SLOTS,
@@ -14,6 +15,8 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SIGN_OUT:
+      return initialState;
     case FETCH_SHOWINGS:
       return {
         ...state,
