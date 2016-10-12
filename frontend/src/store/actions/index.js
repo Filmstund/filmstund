@@ -161,4 +161,4 @@ export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
       console.log(x);
     })
   });
-}
+};
