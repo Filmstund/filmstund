@@ -21,7 +21,7 @@ class ShowingsController < ApplicationController
     @showing.status = 'open'
 
     unless @showing.save
-      render json: @showing.errors, status: :unprocessable_entity
+      render json: @showing.errors, status: :unprocessable_entity and return
     end
 
     slot_ids = params[:sf_slot_ids]
