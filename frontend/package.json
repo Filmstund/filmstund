@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/tejpbit/itbio#readme",
   "dependencies": {
-    "chart.js": "^1.1.1",
     "lodash": "~4.13.1",
     "moment": "~2.13.0",
     "postcss-loader": "~0.9.1",
@@ -34,7 +33,7 @@
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.3.2",
     "react-avatar": "^2.2.1",
-    "react-chartjs-2": "^1.2.3",
+    "react-chartjs-2": "^1.4.0",
     "react-date-range": "^0.2.4",
     "react-dom": "^15.3.2",
     "react-facebook-login": "~3.0.0",

@@ -11,40 +11,32 @@ const SlotPicker = React.createClass({
     onChange: PropTypes.func.isRequired,
     getId: PropTypes.func.isRequired,
     timeSlots: PropTypes.array.isRequired,
-    userId: PropTypes.number
+    selectedTimeSlotIds: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string])).isRequired
   },
 
   getDefaultProps() {
     return {
-      initiallySelectedTimeSlots: [],
-      showUsers: false,
-      userId: -1
-    }
-  },
-
-  getInitialState() {
-    return {
-      selectedIds: this.props.initiallySelectedTimeSlots.map(slot => this.props.getId(slot))
+      showUsers: false
     }
   },
 
   handleSelectId(slotId) {
-    let selectedIds = this.state.selectedIds;
-    if (selectedIds.includes(slotId)) {
-        selectedIds = selectedIds.filter(id => id !== slotId);
+    const { onChange, selectedTimeSlotIds } = this.props;
+
+    let updatedSlotIds = [];
+    if (selectedTimeSlotIds.includes(slotId)) {
+      updatedSlotIds = selectedTimeSlotIds.filter(id => id !== slotId)
     } else {
-        selectedIds = [...selectedIds, slotId];
+      updatedSlotIds = [...selectedTimeSlotIds, slotId]
     }
-    this.setState({selectedIds}, () => this.props.onChange(selectedIds));
+
+    onChange && onChange(updatedSlotIds);
   },
   renderSlot(slot) {
-    const { showUsers, userId, getId } = this.props;
+    const { showUsers, getId, selectedTimeSlotIds } = this.props;
     const slotId = getId(slot);
-    const isSelected = this.state.selectedIds.includes(slotId);
-    const slotPickedByCurrentUser = Boolean(slot.users.find(u => u.id === userId));
-    const addOne = isSelected && !slotPickedByCurrentUser;
-    const subtractOne = !isSelected && slotPickedByCurrentUser;
-    const total = slot.users.length + addOne - subtractOne;
+    const isSelected = selectedTimeSlotIds.includes(slotId);
+    const total = slot.users.length;
 
     return (
       <div key={slotId}

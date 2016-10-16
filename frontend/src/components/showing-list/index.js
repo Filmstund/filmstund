@@ -22,5 +22,5 @@ const ShowingList = React.createClass({
 })
 
 export default connect((state) => ({
-  showings: state.showings.showings
+  showings: state.showings.showingMap
 }))(ShowingList)
