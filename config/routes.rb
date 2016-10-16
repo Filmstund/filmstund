@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :gift_cards
+  resources :gift_cards do
+    collection do
+      get 'me'
+    end
+  end
   resources :orders
   get '/random_bioord' => 'bioord#random'
   resources :showings do

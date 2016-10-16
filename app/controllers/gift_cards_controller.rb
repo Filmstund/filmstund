@@ -8,6 +8,13 @@ class GiftCardsController < ApplicationController
     render json: @gift_cards
   end
 
+  # GET /gift_cards/me
+  def me
+    @gift_card = current_user.gift_cards
+    GiftCard.find_by owner: current_user
+    render json: @gift_card
+  end
+
   # GET /gift_cards/1
   def show
     render json: @gift_card
