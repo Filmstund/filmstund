@@ -14,6 +14,7 @@ import UserList from './user-list';
 import VotingChart from './voting-chart';
 import GoldButton from '../gold-button';
 import TimeSlotLabel from '../time-slot-label';
+import PaymentSelector from './payment-selector';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
@@ -187,12 +188,13 @@ const Showing = React.createClass({
     }
     const sortedTimeSlots = _.orderBy(showing.time_slots, "start_time");
 
+
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && this.renderSummary(showing)}
         {showing.status === "confirmed" && this.renderAttendeeList(showing, currentUser) }
-
+        <PaymentSelector />
         <div className={styles.timePicker}>
           {showing.status !== "confirmed" && sortedTimeSlots &&
                 this.renderSlotPicker(sortedTimeSlots, currentUser)

@@ -5,6 +5,7 @@ import {
   UPDATE_ME,
   UPDATE_CARD_FOR_USER,
   REMOVE_CARD_FROM_USER,
+  FETCH_GIFT_CARDS
 } from '../actions'
 
 const initialState = { cards: [] }
@@ -31,6 +32,12 @@ export default (state = initialState, action) => {
     case SIGN_IN_FAILED:
     case SIGN_OUT:
       return initialState
+    case FETCH_GIFT_CARDS:
+      const { giftCards } = action;
+      return {
+          ...state,
+          giftCards
+      };
     default:
       return state
   }

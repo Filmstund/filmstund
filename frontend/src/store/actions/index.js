@@ -20,6 +20,7 @@ export const SUBMIT_SLOTS_PICKED = 'SUBMIT_SLOTS_PICKED'
 export const WAITING_SUBMIT_SLOTS_PICKED = 'WAITING_SUBMIT_SLOTS_PICKED'
 
 export const WAITING_SLOT_PICKED = 'WAITING_SLOT_PICKED'
+export const FETCH_GIFT_CARDS = 'FETCH_GIFT_CARDS'
 
 export const SUBMIT_GIFT_CARD = 'SUBMIT_GIFT_CARD'
 export const WAITING_SUBMIT_GIFT_CARD = 'WAITING_SUBMIT_GIFT_CARD'
@@ -186,8 +187,22 @@ export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {
     console.error('Error, could not submit time slot for showing');
     throw err;
   });
-} ;
+};
 
+export const fetchGiftCards = () => (dispatch) => {
+  fetchEndpoint(`/gift_cards/me`)
+      .then(({ gift_cards }) => {
+        dispatch({
+          type: FETCH_GIFT_CARDS,
+          giftCards: gift_cards
+        })
+      })
+      .catch(err => {
+        console.error('Error, cannot fetch /gift_cards/me');
+        throw err
+      });
+
+};
 export const submitGiftCard = (card) => (dispatch) => {
     dispatch({
       type: WAITING_SUBMIT_GIFT_CARD
