@@ -4,17 +4,9 @@ import { connect } from 'react-redux';
 import { submitGiftCard } from '../../../store/actions';
 import GoldButton from '../../gold-button'
 
+import {TYPES, TYPE_NAME} from '../../gift-cards/consants';
+
 import styles from './style.css';
-
-const TYPES = [
-    'foretagsbiljett', 'rabattkort', 'presentkort'
-];
-
-const TYPE_NAME = {
-    'foretagsbiljett': 'Företagsbiljett',
-    'rabattkort': 'Rabattkort',
-    'presentkort': 'Presentkort'
-};
 
 const GiftCardForm = React.createClass({
 

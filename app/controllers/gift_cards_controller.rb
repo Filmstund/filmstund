@@ -46,6 +46,6 @@ class GiftCardsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def gift_card_params
-      params.require(:gift_card).permit(:number, :type)
+      params.require(:gift_card).permit(:number, :card_type)
     end
 end

@@ -4,6 +4,7 @@ import React, {PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { removeCard } from '../../store/actions'
 
+import {TYPE_NAME} from '../gift-cards/consants';
 
 import styles from './style.css';
 
@@ -27,7 +28,7 @@ const GiftCardList = React.createClass({
                 {cards.length == 0 && <div>Inga kort</div>}
                 {cards.map(c => {
                     return <div key={c.id}>
-                        <span>{c.card_type}</span> <span>{c.number}</span> <button onClick={(e) => this.removeCard(e, c.id)}>Ta bort</button>
+                        <span>{TYPE_NAME[c.card_type]}</span> <span>{c.number}</span> <button onClick={(e) => this.removeCard(e, c.id)}>Ta bort</button>
                     </div>
                 })
                 }
