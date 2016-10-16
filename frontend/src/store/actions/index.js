@@ -19,6 +19,8 @@ export const SHOWING_STATUS_CHANGE = 'SHOWING_STATUS_CHANGE'
 export const SUBMIT_SLOTS_PICKED = 'SUBMIT_SLOTS_PICKED'
 export const WAITING_SUBMIT_SLOTS_PICKED = 'WAITING_SUBMIT_SLOTS_PICKED'
 
+export const WAITING_SLOT_PICKED = 'WAITING_SLOT_PICKED'
+
 import { fetchEndpoint, postEndpoint, putEndpoint } from '../../service/backend'
 
 export const signIn = (authData) => (dispatch) => {
@@ -162,3 +164,21 @@ export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
     })
   });
 };
+
+export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {
+  dispatch({
+    type: WAITING_SLOT_PICKED
+  });
+
+  postEndpoint(`/showings/${showing_id}/complete`, {
+    slot_id
+  }).then(({showing}) => {
+    dispatch({
+      type: FETCH_SHOWING,
+      showing
+    })
+  }).catch(err => {
+    console.error('Error, could not submit time slot for showing');
+    throw err;
+  });
+} ;

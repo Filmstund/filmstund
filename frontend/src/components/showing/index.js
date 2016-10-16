@@ -12,6 +12,8 @@ import MovieInfo from '../movie-info';
 import SlotPicker from '../slot-picker';
 import UserList from './user-list';
 import VotingChart from './voting-chart';
+import GoldButton from '../gold-button';
+import TimeSlotLabel from '../time-slot-label';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
@@ -21,7 +23,8 @@ import {
     postAttendStatusChange,
     postShowingOrdered,
     postShowingDone,
-    submitSlotsPickedForShowing
+    submitSlotsPickedForShowing,
+    submitTimeSlotForShowing
 } from "../../store/actions";
 
 import format from './formatter';
@@ -83,7 +86,7 @@ const Showing = React.createClass({
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.id)}></div>
+                    onClick={() => this.submitTimeSlot(ts.id)} title="Välj"></div>
           })
         }
       </div>
@@ -91,7 +94,9 @@ const Showing = React.createClass({
   },
 
   submitTimeSlot(slot_id) {
-    this.props.update('showing', postEndpoint(`/showings/${this.props.params.id}/complete`, { slot_id }))
+    this.props.dispatch(
+        submitTimeSlotForShowing(this.props.params.id, slot_id)
+    )
   },
 
   doAttendShowing() {
@@ -121,13 +126,14 @@ const Showing = React.createClass({
   renderSummary(showing) {
     return <div>
       {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
-      {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
-      {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
+      {showing.selected_time_slot.is_3d && (<TimeSlotLabel type="3d" />)}
+      {showing.selected_time_slot.is_vip && (<TimeSlotLabel type="vip" />)}
     </div>
   },
 
   renderAttendeeList(showing, currentUser) {
     return <div className={styles.attendees}>
+      <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
       <UserList attendees={showing.attendees}
                 currentUser={currentUser}
                 doAttendShowing={this.doAttendShowing}
@@ -137,11 +143,17 @@ const Showing = React.createClass({
 
   renderSlotPicker(time_slots, user) {
     const selectedTimeSlotIds = time_slots.filter(ts => ts.users.map(u => u.id).includes(user.id)).map(ts => ts.id);
-    return <SlotPicker timeSlots={time_slots}
-                       onChange={this.submitSlotsPicked}
-                       getId={(slot) => slot.id}
-                       selectedTimeSlotIds={selectedTimeSlotIds}
-                       showUsers={true} />
+
+    return <div>
+      Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
+      <div className={styles.timePicker}>
+        <SlotPicker timeSlots={time_slots}
+                    onChange={this.submitSlotsPicked}
+                    getId={(slot) => slot.id}
+                    selectedTimeSlotIds={selectedTimeSlotIds}
+                    showUsers={true} />
+      </div>
+    </div>
   },
 
   renderResult(showing, time_slots, currentUser) {
@@ -159,9 +171,9 @@ const Showing = React.createClass({
 
   renderActionButton(showing) {
     if (showing.status === "confirmed") {
-      return <button onClick={this.doOrder}>Jag har beställt</button>
+      return <GoldButton onClick={this.doOrder}>Jag har beställt</GoldButton>
     } else if (showing.status === "ordered") {
-      return <button onClick={this.doDone}>Slutför och arkivera besöket</button>
+      return <GoldButton onClick={this.doDone}>Slutför och arkivera besöket</GoldButton>
     } else {
       return <div></div>
     }
