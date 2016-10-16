@@ -13,7 +13,7 @@
 
 .is_3d {
     background: #f00;
-    animation: blinker 1s linear infinite;
+    animation: blinker 2s linear infinite;
 }
 
 .is_maybe {
