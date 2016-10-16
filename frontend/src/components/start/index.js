@@ -27,7 +27,6 @@ const Start = React.createClass({
       throw 'Authentication failure - no token received'
     } else {
       this.props.dispatch(signIn(params));
-      this.props.router.push(`/showings`);
     }
   },
   render() {

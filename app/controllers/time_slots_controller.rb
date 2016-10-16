@@ -1,9 +1,10 @@
 class TimeSlotsController < ApplicationController
   before_action :set_time_slot, only: [:show, :update, :destroy]
+  before_action :set_showing, only: [:index, :votes, :add_vote]
 
   # GET /time_slots
   def index
-    @time_slots = TimeSlot.where showing_id: params[:showing_id]
+    @time_slots = @showing.time_slots
 
     render json: @time_slots
   end
@@ -35,7 +36,7 @@ class TimeSlotsController < ApplicationController
 
   # GET /time_slots/votes
   def votes
-    @time_slots = @current_user.time_slots.where(showing_id: params[:showing_id])
+    @time_slots = @showing.time_slots
 
     render json: @time_slots
   end
@@ -53,7 +54,7 @@ class TimeSlotsController < ApplicationController
     @current_user.set_time_slots_for_showing @showing, new_time_slots
 
     if @current_user.save
-      render json: TimeSlot.where(showing_id: params[:showing_id])
+      render json: @showing.time_slots
     else
       render json: @current_user.errors, status: :unprocessable_entity
     end
@@ -68,6 +69,10 @@ class TimeSlotsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_time_slot
       @time_slot = TimeSlot.find_by!(id: params[:id], showing_id: params[:showing_id])
+    end
+
+    def set_showing
+      @showing = Showing.find(params[:showing_id])
     end
 
     # Only allow a trusted parameter "white list" through.

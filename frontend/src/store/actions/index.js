@@ -16,6 +16,9 @@ export const FETCH_TIME_SLOTS = 'FETCH_TIME_SLOTS'
 export const SHOWING_ATTENDEES_CHANGE = 'SHOWING_ATTENDEES_CHANGE'
 export const SHOWING_STATUS_CHANGE = 'SHOWING_STATUS_CHANGE'
 
+export const SUBMIT_SLOTS_PICKED = 'SUBMIT_SLOTS_PICKED'
+export const WAITING_SUBMIT_SLOTS_PICKED = 'WAITING_SUBMIT_SLOTS_PICKED'
+
 import { fetchEndpoint, postEndpoint, putEndpoint } from '../../service/backend'
 
 export const signIn = (authData) => (dispatch) => {
@@ -23,6 +26,7 @@ export const signIn = (authData) => (dispatch) => {
 
   postEndpoint('/authenticate', authData).then(data => {
     dispatch({ type: SIGN_IN, ...data })
+    browserHistory.push(`/showings`);
   }).catch(err => {
     console.error("Error during sign in", err);
     dispatch({ type: SIGN_IN_FAILED })
@@ -107,7 +111,8 @@ export const fetchTimeSlotsForShowing = (id) => (dispatch) => {
       time_slots
     })
   }).catch(err => {
-    console.error(`Error during time_slots(${id}) fetch`, err);
+    console.log(`Error during time_slots(${id}) fetch` );
+    throw err;
   })
 }
 
@@ -135,4 +140,25 @@ export const postShowingDone = (id) => (dispatch) => {
   }).catch(err => {
     console.error(`Error during post status change(${id}, ${status})`, err);
   })
+};
+
+export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
+  dispatch({
+    type: WAITING_SUBMIT_SLOTS_PICKED
+  });
+
+  postEndpoint(`/showings/${id}/time_slots/votes`, {
+    ids: slotIds
+  }).then(data => {
+
+    dispatch({
+      type: FETCH_TIME_SLOTS,
+      showingId: id,
+      time_slots: data.time_slots
+    })
+  }).catch(err => {
+    err.json().then((x) => {
+      console.log(x);
+    })
+  });
 };

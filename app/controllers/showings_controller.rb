@@ -19,12 +19,16 @@ class ShowingsController < ApplicationController
   def create
     @showing = current_user.showings.build(showing_params)
     @showing.status = 'open'
+    slot_ids = params[:sf_slot_ids]
 
-    unless @showing.save
-      render json: @showing.errors, status: :unprocessable_entity
+    if slot_ids.empty?
+      render json: { errors: ["slot_ids cannot be empty"] }, status: :unprocessable_entity and return
     end
 
-    slot_ids = params[:sf_slot_ids]
+    unless @showing.save
+      render json: @showing.errors, status: :unprocessable_entity and return
+    end
+
     time_slots = slot_ids.map do |slot_id|
       slot = TimeSlot.new_from_sf_slot TimeSlot.get_slot_info(@showing.sf_id, slot_id)
       slot.showing = @showing
