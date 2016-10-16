@@ -21,7 +21,12 @@ export const WAITING_SUBMIT_SLOTS_PICKED = 'WAITING_SUBMIT_SLOTS_PICKED'
 
 export const WAITING_SLOT_PICKED = 'WAITING_SLOT_PICKED'
 
-import { fetchEndpoint, postEndpoint, putEndpoint } from '../../service/backend'
+export const SUBMIT_GIFT_CARD = 'SUBMIT_GIFT_CARD'
+export const WAITING_SUBMIT_GIFT_CARD = 'WAITING_SUBMIT_GIFT_CARD'
+export const UPDATE_CARD_FOR_USER = 'UPDATE_CARD_FOR_USER'
+export const REMOVE_CARD_FROM_USER = 'REMOVE_CARD_FROM_USER'
+
+import { fetchEndpoint, postEndpoint, putEndpoint, deleteEndpoint } from '../../service/backend'
 
 export const signIn = (authData) => (dispatch) => {
   dispatch({ type: WAITING_SIGN_IN })
@@ -182,3 +187,29 @@ export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {
     throw err;
   });
 } ;
+
+export const submitGiftCard = (card) => (dispatch) => {
+    dispatch({
+      type: WAITING_SUBMIT_GIFT_CARD
+    });
+  postEndpoint('/gift_cards', { gift_card: card }).then((card) => {
+    dispatch({
+      type: UPDATE_CARD_FOR_USER,
+      card
+  })
+  }).catch(err => {
+    console.error("Error during user update", err);
+  });
+};
+
+export const removeCard = (cardId) => (dispatch) => {
+  deleteEndpoint(`/gift_cards/${cardId}`).then(resp => {
+    dispatch({
+      type: REMOVE_CARD_FROM_USER,
+      cardId
+    })
+  }).catch(err => {
+    console.error("Error during removal of card", err);
+  })
+};
+
