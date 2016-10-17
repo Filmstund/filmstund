@@ -70,10 +70,6 @@ const Showing = React.createClass({
     )
   },
 
-  onBarClicked() {
-    console.log(arguments);
-  },
-
   renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
 
     time_slots = time_slots.filter(ts => ts.users.length > 0);
