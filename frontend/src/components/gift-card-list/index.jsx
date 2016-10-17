@@ -15,13 +15,11 @@ const GiftCardList = React.createClass({
     },
 
     removeCard(e, cardId) {
-        console.log('removeCard', cardId);
         this.props.dispatch(removeCard(cardId));
     },
 
     render() {
         const { cards } = this.props;
-        console.log('cards', cards);
         return (
             <div className={styles.container}>
                 <h2>Kort du har</h2>

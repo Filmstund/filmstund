@@ -121,7 +121,7 @@ export const fetchTimeSlotsForShowing = (id) => (dispatch) => {
       time_slots
     })
   }).catch(err => {
-    console.log(`Error during time_slots(${id}) fetch` );
+    console.error(`Error during time_slots(${id}) fetch` );
     throw err;
   })
 }
@@ -167,9 +167,8 @@ export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
       time_slots: data.time_slots
     })
   }).catch(err => {
-    err.json().then((x) => {
-      console.log(x);
-    })
+      console.error('Error during fetch time slots');
+      throw err;
   });
 };
 
@@ -233,12 +232,10 @@ export const removeCard = (cardId) => (dispatch) => {
 };
 
 export const selectPayment = (showingId, cardId) => (dispatch) => {
-  console.log("hello");
 
   postEndpoint(`/showings/${showingId}/payment_method`, {
     cardId
   }).then(({attendee}) => {
-    console.log(attendee);
     dispatch({
       type: FETCH_PAYMENT_METHOD,
       attendee,

@@ -21,7 +21,6 @@ const PaymentSelector = React.createClass({
     handleChange(showingId, e) {
 
         const cardId = e.target.value == EXTERN ? null : e.target.value;
-        console.log(showingId, e.target.value);
         this.props.dispatch(
             selectPayment(showingId, cardId)
         );

@@ -20,7 +20,6 @@ const GiftCardForm = React.createClass({
     },
 
     handleSubmitNewPaymentCard(e) {
-        console.log('submit');
         e.preventDefault();
         this.props.dispatch(submitGiftCard(this.state.cardForm))
     },
