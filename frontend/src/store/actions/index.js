@@ -27,6 +27,8 @@ export const WAITING_SUBMIT_GIFT_CARD = 'WAITING_SUBMIT_GIFT_CARD'
 export const UPDATE_CARD_FOR_USER = 'UPDATE_CARD_FOR_USER'
 export const REMOVE_CARD_FROM_USER = 'REMOVE_CARD_FROM_USER'
 
+export const FETCH_PAYMENT_METHOD = 'FETCH_PAYMENT_METHOD'
+
 import { fetchEndpoint, postEndpoint, putEndpoint, deleteEndpoint } from '../../service/backend'
 
 export const signIn = (authData) => (dispatch) => {
@@ -191,7 +193,7 @@ export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {
 
 export const fetchGiftCards = () => (dispatch) => {
   fetchEndpoint(`/gift_cards/me`)
-      .then(({ gift_cards }) => {
+      .then(gift_cards => {
         dispatch({
           type: FETCH_GIFT_CARDS,
           giftCards: gift_cards
@@ -214,6 +216,7 @@ export const submitGiftCard = (card) => (dispatch) => {
   })
   }).catch(err => {
     console.error("Error during user update", err);
+    throw err;
   });
 };
 
@@ -225,6 +228,25 @@ export const removeCard = (cardId) => (dispatch) => {
     })
   }).catch(err => {
     console.error("Error during removal of card", err);
+    throw err
+  })
+};
+
+export const selectPayment = (showingId, cardId) => (dispatch) => {
+  console.log("hello");
+
+  postEndpoint(`/showings/${showingId}/payment_method`, {
+    cardId
+  }).then(({attendee}) => {
+    console.log(attendee);
+    dispatch({
+      type: FETCH_PAYMENT_METHOD,
+      attendee,
+      showingId
+    })
+  }).catch(err => {
+    console.error('Error during payment method selection');
+    throw err
   })
 };
 

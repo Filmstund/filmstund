@@ -1,5 +1,5 @@
 class ShowingsController < ApplicationController
-  before_action :set_showing, only: [:update, :destroy, :between, :complete, :attend, :unattend, :order, :done]
+  before_action :set_showing, only: [:update, :destroy, :between, :complete, :attend, :unattend, :order, :done, :payment_method]
 
   # GET /showings
   def index
@@ -128,6 +128,19 @@ class ShowingsController < ApplicationController
     @attendee.delete_all
 
     render json: @showing.attendees
+  end
+
+  # POST /showings/:id/payment_method
+  def payment_method
+    @attendee = Attendee.where(user: current_user, showing: @showing).first
+    unless params[:cardId].nil?
+      @card = GiftCard.find(params[:cardId])
+    end
+
+    @attendee.gift_card = @card
+    @attendee.save
+
+    render json: @attendee, serializer: AttendeeWithGiftCardSerializer
   end
 
   # GET /showings/:id/between/:from/:to

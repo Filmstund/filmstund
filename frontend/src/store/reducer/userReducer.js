@@ -33,10 +33,9 @@ export default (state = initialState, action) => {
     case SIGN_OUT:
       return initialState
     case FETCH_GIFT_CARDS:
-      const { giftCards } = action;
       return {
           ...state,
-          giftCards
+          cards: action.giftCards
       };
     default:
       return state

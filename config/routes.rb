@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       post 'complete'
       post 'attend'
       post 'unattend'
+      post 'payment_method'
       post 'order'
       post 'done'
     end

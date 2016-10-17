@@ -180,21 +180,27 @@ const Showing = React.createClass({
     }
   },
 
+
+
   render() {
-    const { showing, currentUser } = this.props;
+    const { showing, currentUser, giftCards } = this.props;
 
     if (!showing) {
       return null;
     }
     const sortedTimeSlots = _.orderBy(showing.time_slots, "start_time");
-
+    const attendee = showing.attendees.find(a => a.user_id === currentUser.id);
+    let paymentMethod;
+    if (attendee && attendee.gift_card) {
+      paymentMethod = attendee.gift_card.id;
+    }
 
     return (
       <div className={styles.container}>
         <ShowingHeader showing={showing} />
         {showing.selected_time_slot && this.renderSummary(showing)}
         {showing.status === "confirmed" && this.renderAttendeeList(showing, currentUser) }
-        <PaymentSelector />
+        <PaymentSelector giftCards={giftCards} showingId={this.props.params.id} currentPaymentMethod={paymentMethod} />
         <div className={styles.timePicker}>
           {showing.status !== "confirmed" && sortedTimeSlots &&
                 this.renderSlotPicker(sortedTimeSlots, currentUser)
@@ -216,5 +222,6 @@ const Showing = React.createClass({
 
 export default withRouter(connect((state, props) => ({
     currentUser: getUser(state),
-    showing: state.showings.showingMap[props.params.id]
+    showing: state.showings.showingMap[props.params.id],
+    giftCards: state.user.cards
 }))(Showing))

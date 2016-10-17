@@ -3,6 +3,7 @@ import {
   FETCH_SHOWINGS,
   FETCH_SHOWING,
   FETCH_TIME_SLOTS,
+  FETCH_PAYMENT_METHOD,
   SHOWING_ATTENDEES_CHANGE,
   SHOWING_STATUS_CHANGE,
   WAITING_SUBMIT_SLOTS_PICKED,
@@ -67,6 +68,19 @@ export default (state = initialState, action) => {
             }
           }
       }
+    case FETCH_PAYMENT_METHOD:
+      const { showingId: showId, attendee} = action;
+          return {
+              ...state,
+              showingMap: {
+                  ...state.showingMap,
+                  [showId]: {
+                      ...state.showingMap[showId],
+                    attendees: state.showingMap[showId].attendees.map(a => a.id === attendee.id ? attendee : a)
+                  }
+              }
+
+          }
     default:
       return state
   }
