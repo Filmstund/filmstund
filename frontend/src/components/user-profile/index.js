@@ -24,8 +24,6 @@ const UserProfile = React.createClass({
         ...this.state.userForm,
         [attr]: newValue
       }
-    }, () => {
-      console.log(this.state.userForm);
     })
   },
 
@@ -37,7 +35,6 @@ const UserProfile = React.createClass({
 
   render() {
     const { userForm } = this.state;
-    console.log('user', this.props.user);
     return (
         <div>
           <div className={styles.container}>

@@ -31,8 +31,6 @@ const GiftCardForm = React.createClass({
                 ...this.state.cardForm,
                 [attr]: newValue
             }
-        }, () => {
-            console.log(this.state.cardForm);
         })
     },
 
