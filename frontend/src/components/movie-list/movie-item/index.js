@@ -38,20 +38,20 @@ const MovieItem = React.createClass({
     if (isEditing) {
       return (
         <form onSubmit={this.handleSubmitImdbId} className={styles.imdbLogo}>
-          <input type="text" ref={(el) => this.imdbIdInput = el} />
-          <button>Submit</button>
+          <input type="text" placeholder="tt1234567" ref={(el) => this.imdbIdInput = el} />
+          <button>Spara</button>
         </form>
       )
     } else if (movie.imdb_id) {
       return (
-        <a href={`http://www.imdb.com/title/${movie.imdb_id}/`} className={styles.imdbLogo}>
-          <img src="/IMDb_logo.svg" />
+        <a href={`http://www.imdb.com/title/${movie.imdb_id}/`} target="blank" className={styles.imdbLogo}>
+          <i className="fa fa-imdb"></i>
         </a>
       )
     } else {
       return (
         <div className={styles.imdbLogo + ' ' + styles.inactiveLogo} onClick={this.setEdit}>
-          <img src="/IMDb_logo.svg" />
+          <i className="fa fa-imdb"></i>
         </div>
       )
     }

@@ -34,20 +34,20 @@
   padding-right: 1em;
   display: flex;
   align-items: center;
+  color: goldenrod;
+  text-decoration: none;
 }
 
 .inactiveLogo {
-  padding-right: 1em;
-  filter: grayscale(100%);
-  // opacity: 0.3;
+  color: gray;
   &:hover {
-    filter: none;
+    color: #aaa;
     cursor: pointer;
   }
 }
 
-.imdbLogo > img, .inactiveLogo > img {
-  height: 1.2em;
+.imdbLogo > i {
+  font-size: 1.5em;
 }
 
 :global(.slide-enter) {
