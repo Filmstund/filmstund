@@ -181,4 +181,4 @@ export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {
     console.error('Error, could not submit time slot for showing');
     throw err;
   });
-};
+} ;

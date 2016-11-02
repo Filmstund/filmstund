@@ -126,13 +126,14 @@ const Showing = React.createClass({
   renderSummary(showing) {
     return <div>
       {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
-      {showing.selected_time_slot.is_3d && (<span className={styles.is_3d} title="Filmen visas i 3D :(">3D</span>)}
-      {showing.selected_time_slot.is_vip && (<span className={styles.is_vip}>VIP</span>)}
+      {showing.selected_time_slot.is_3d && (<TimeSlotLabel type="3d" />)}
+      {showing.selected_time_slot.is_vip && (<TimeSlotLabel type="vip" />)}
     </div>
   },
 
   renderAttendeeList(showing, currentUser) {
     return <div className={styles.attendees}>
+      <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
       <UserList attendees={showing.attendees}
                 currentUser={currentUser}
                 doAttendShowing={this.doAttendShowing}
@@ -142,6 +143,7 @@ const Showing = React.createClass({
 
   renderSlotPicker(time_slots, user) {
     const selectedTimeSlotIds = time_slots.filter(ts => ts.users.map(u => u.id).includes(user.id)).map(ts => ts.id);
+
     return <div>
       Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
       <div className={styles.timePicker}>
