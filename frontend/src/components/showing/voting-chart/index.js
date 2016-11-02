@@ -32,6 +32,8 @@ const VotingChart = React.createClass({
         };
 
         const options = {
+            maintainAspectRatio: false,
+            responsive: false,
             scales: {
                 xAxes: [{
                     ticks: {
@@ -46,11 +48,14 @@ const VotingChart = React.createClass({
             }
         };
 
+        const height = 55 + timeSlots.length*18.4;
+
         return (
             <HorizontalBar data={data}
+                           redraw={true}
                            onElementsClick={this.onBarClicked}
                            width={800}
-                           height={55 + barData.length*18.4}
+                           height={height}
                            options={options} />
         )
     }

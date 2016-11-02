@@ -61,7 +61,7 @@ const UserProfile = React.createClass({
           </select>
         </div>
         <div className={styles.formRow}>
-          <label htmlFor="pushover_key">Pushover nyckel</label>
+          <label htmlFor="pushover_key">Pushover-nyckel</label>
           <input type="text" value={userForm.pushover_key} onChange={(e) => this.handleChange('pushover_key', e)} id="pushover_key" />
         </div>
         <GoldButton>Spara</GoldButton>
