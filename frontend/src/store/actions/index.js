@@ -20,8 +20,16 @@ export const SUBMIT_SLOTS_PICKED = 'SUBMIT_SLOTS_PICKED'
 export const WAITING_SUBMIT_SLOTS_PICKED = 'WAITING_SUBMIT_SLOTS_PICKED'
 
 export const WAITING_SLOT_PICKED = 'WAITING_SLOT_PICKED'
+export const FETCH_GIFT_CARDS = 'FETCH_GIFT_CARDS'
 
-import { fetchEndpoint, postEndpoint, putEndpoint } from '../../service/backend'
+export const SUBMIT_GIFT_CARD = 'SUBMIT_GIFT_CARD'
+export const WAITING_SUBMIT_GIFT_CARD = 'WAITING_SUBMIT_GIFT_CARD'
+export const UPDATE_CARD_FOR_USER = 'UPDATE_CARD_FOR_USER'
+export const REMOVE_CARD_FROM_USER = 'REMOVE_CARD_FROM_USER'
+
+export const FETCH_PAYMENT_METHOD = 'FETCH_PAYMENT_METHOD'
+
+import { fetchEndpoint, postEndpoint, putEndpoint, deleteEndpoint } from '../../service/backend'
 
 export const signIn = (authData) => (dispatch) => {
   dispatch({ type: WAITING_SIGN_IN })
@@ -113,7 +121,7 @@ export const fetchTimeSlotsForShowing = (id) => (dispatch) => {
       time_slots
     })
   }).catch(err => {
-    console.log(`Error during time_slots(${id}) fetch` );
+    console.error(`Error during time_slots(${id}) fetch` );
     throw err;
   })
 }
@@ -159,9 +167,8 @@ export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
       time_slots: data.time_slots
     })
   }).catch(err => {
-    err.json().then((x) => {
-      console.log(x);
-    })
+      console.error('Error during fetch time slots');
+      throw err;
   });
 };
 
@@ -181,4 +188,62 @@ export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {
     console.error('Error, could not submit time slot for showing');
     throw err;
   });
-} ;
+};
+
+export const fetchGiftCards = () => (dispatch) => {
+  fetchEndpoint(`/gift_cards/me`)
+      .then(gift_cards => {
+        dispatch({
+          type: FETCH_GIFT_CARDS,
+          giftCards: gift_cards
+        })
+      })
+      .catch(err => {
+        console.error('Error, cannot fetch /gift_cards/me');
+        throw err
+      });
+
+};
+export const submitGiftCard = (card) => (dispatch) => {
+    dispatch({
+      type: WAITING_SUBMIT_GIFT_CARD
+    });
+  postEndpoint('/gift_cards', { gift_card: card }).then((card) => {
+    dispatch({
+      type: UPDATE_CARD_FOR_USER,
+      card
+  })
+  }).catch(err => {
+    console.error("Error during user update", err);
+    throw err;
+  });
+};
+
+export const removeCard = (cardId) => (dispatch) => {
+  deleteEndpoint(`/gift_cards/${cardId}`).then(resp => {
+    dispatch({
+      type: REMOVE_CARD_FROM_USER,
+      cardId
+    })
+  }).catch(err => {
+    console.error("Error during removal of card", err);
+    throw err
+  })
+};
+
+export const selectPayment = (showingId, cardId) => (dispatch) => {
+
+  postEndpoint(`/showings/${showingId}/payment_method`, {
+    cardId
+  }).then(({attendee}) => {
+    dispatch({
+      type: FETCH_PAYMENT_METHOD,
+      attendee,
+      showingId
+    })
+  }).catch(err => {
+    console.error('Error during payment method selection');
+    throw err
+  })
+};
+

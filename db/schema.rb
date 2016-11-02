@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160726211548) do
+ActiveRecord::Schema.define(version: 20161017205455) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.integer  "user_id"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(version: 20160726211548) do
     t.string   "payment_method"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.integer  "gift_card_id"
+    t.index ["gift_card_id"], name: "index_attendees_on_gift_card_id"
     t.index ["showing_id"], name: "index_attendees_on_showing_id"
     t.index ["user_id"], name: "index_attendees_on_user_id"
   end
@@ -42,7 +44,7 @@ ActiveRecord::Schema.define(version: 20160726211548) do
   create_table "gift_cards", force: :cascade do |t|
     t.integer  "owner_id"
     t.string   "number"
-    t.string   "type"
+    t.integer  "card_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_id"], name: "index_gift_cards_on_owner_id"

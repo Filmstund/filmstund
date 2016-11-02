@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :tokens, class_name: ApiToken
   has_many :showings, foreign_key: :owner_id
   has_many :gift_cards, foreign_key: :owner_id
+  has_many :attendees, foreign_key: :owner_id
   before_save :default_values
   before_validation :strip_numbers
 

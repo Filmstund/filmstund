@@ -53,7 +53,6 @@ const VotingChart = React.createClass({
         return (
             <HorizontalBar data={data}
                            redraw={true}
-                           onElementsClick={this.onBarClicked}
                            width={800}
                            height={height}
                            options={options} />

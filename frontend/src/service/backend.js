@@ -9,7 +9,7 @@ store.subscribe(() => {
 })
 
 
-const fetchJson = (url, options = {}) =>
+const fetchAndValidate = (url, options = {}) =>
   fetch(url, options)
     .then(resp => {
       if (resp.ok) {
@@ -20,10 +20,15 @@ const fetchJson = (url, options = {}) =>
       } else {
         throw resp;
       }
-    })
-    .then(d => d.json());
+    });
 
-export const fetchWithoutToken = (endpoint, options) => fetchJson(`/api${endpoint}`, options)
+export const fetchWithoutToken = (endpoint, options = {}) => {
+    if (options.responseType === 'plain') {
+        return fetchAndValidate(`/api${endpoint}`, options);
+    } else {
+        return fetchAndValidate(`/api${endpoint}`, options).then(d => d.json());
+    }
+}
 
 export const extendArrayFromEndpoint = (array, endpoint) => {
     return fetchEndpoint(endpoint)
@@ -63,7 +68,7 @@ export const postEndpoint = (url, data) => {
 }
 
 export const putEndpoint = (url, data) => {
-  const body = JSON.stringify(data)
+  const body = JSON.stringify(data || {})
 
   return fetchEndpoint(url, {
     method: 'put',
@@ -73,3 +78,16 @@ export const putEndpoint = (url, data) => {
     body
   });
 }
+
+export const deleteEndpoint = (url, data) => {
+    const body = JSON.stringify(data);
+
+    return fetchEndpoint(url, {
+        method: 'delete',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        responseType: 'plain',
+        body
+    });
+};
