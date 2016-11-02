@@ -132,15 +132,18 @@ class ShowingsController < ApplicationController
 
   # POST /showings/:id/payment_method
   def payment_method
-    @attendee = Attendee.where(user: current_user, showing: @showing).first
-    unless params[:cardId].nil?
-      @card = GiftCard.find(params[:cardId])
+    @attendee = Attendee.find_or_create_by(user: current_user, showing: @showing)
+    if params[:cardId].nil?
+      render json: { error: "Missing cardId" }, status: :unprocessable_entity and return
     end
 
-    @attendee.gift_card = @card
-    @attendee.save
+    @attendee.gift_card = GiftCard.find(params[:cardId])
 
-    render json: @attendee, serializer: AttendeeWithGiftCardSerializer
+    if @attendee.save
+      render json: @attendee, serializer: AttendeeWithGiftCardSerializer
+    else
+      render json: @attendee.errors, status: :unprocessable_entity
+    end
   end
 
   # GET /showings/:id/between/:from/:to
