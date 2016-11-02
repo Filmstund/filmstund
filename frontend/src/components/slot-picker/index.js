@@ -8,7 +8,8 @@ import styles from './style.css';
 
 const SlotPicker = React.createClass({
   propTypes: {
-    onChange: PropTypes.func.isRequired,
+    onAddSlot: PropTypes.func.isRequired,
+    onRemoveSlot: PropTypes.func.isRequired,
     getId: PropTypes.func.isRequired,
     timeSlots: PropTypes.array.isRequired,
     selectedTimeSlotIds: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string])).isRequired
@@ -21,16 +22,16 @@ const SlotPicker = React.createClass({
   },
 
   handleSelectId(slotId) {
-    const { onChange, selectedTimeSlotIds } = this.props;
+    const { onAddSlot, onRemoveSlot, selectedTimeSlotIds } = this.props;
 
     let updatedSlotIds = [];
     if (selectedTimeSlotIds.includes(slotId)) {
       updatedSlotIds = selectedTimeSlotIds.filter(id => id !== slotId)
+      onRemoveSlot && onRemoveSlot(slotId)
     } else {
       updatedSlotIds = [...selectedTimeSlotIds, slotId]
+      onAddSlot && onAddSlot(slotId)
     }
-
-    onChange && onChange(updatedSlotIds);
   },
   renderSlot(slot) {
     const { showUsers, getId, selectedTimeSlotIds } = this.props;

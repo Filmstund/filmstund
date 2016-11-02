@@ -152,15 +152,12 @@ export const postShowingDone = (id) => (dispatch) => {
   })
 };
 
-export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
+const submitTimeSlots = (id, data) => (dispatch) => {
   dispatch({
     type: WAITING_SUBMIT_SLOTS_PICKED
   });
 
-  postEndpoint(`/showings/${id}/time_slots/votes`, {
-    ids: slotIds
-  }).then(data => {
-
+  postEndpoint(`/showings/${id}/time_slots/votes`, data).then(data => {
     dispatch({
       type: FETCH_TIME_SLOTS,
       showingId: id,
@@ -170,6 +167,14 @@ export const submitSlotsPickedForShowing = (id, slotIds) => (dispatch) => {
       console.error('Error during fetch time slots');
       throw err;
   });
+}
+
+export const submitAddSlotPickedForShowing = (id, id_to_add) => (dispatch) => {
+  return submitTimeSlots(id, {add_ids: [id_to_add]})(dispatch)
+};
+
+export const submitRemoveSlotPickedForShowing = (id, id_to_remove) => (dispatch) => {
+  return submitTimeSlots(id, {remove_ids: [id_to_remove]})(dispatch)
 };
 
 export const submitTimeSlotForShowing = (showing_id, slot_id) => (dispatch) => {

@@ -21,11 +21,6 @@ class User < ApplicationRecord
     end
   end
 
-  def set_time_slots_for_showing showing, time_slots_for_showing
-    time_slots_for_other_showings = self.time_slots.select { |slot| slot.showing != showing }
-    self.time_slots = time_slots_for_other_showings | time_slots_for_showing
-  end
-
   private
     def default_values
       self.bioklubbsnummer = bioklubbsnummer.presence || ''

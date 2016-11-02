@@ -44,17 +44,20 @@ class TimeSlotsController < ApplicationController
   # POST /time_slots/votes
   def add_vote
     @current_user = current_user
-    @showing = Showing.find params[:showing_id]
     unless @showing.open?
       render json: { error: "Showing is not accepting votes at this time (showing status is not open)" }, status: :precondition_failed and return
     end
 
-    new_time_slots = TimeSlot.find params[:ids]
+    if params[:add_ids].present?
+      @current_user.time_slots += TimeSlot.find params[:add_ids]
+    end
 
-    @current_user.set_time_slots_for_showing @showing, new_time_slots
+    if params[:remove_ids].present?
+      @current_user.time_slots -= TimeSlot.find params[:remove_ids]
+    end
 
     if @current_user.save
-      render json: @showing.time_slots
+      render json: @showing.time_slots.includes(:users)
     else
       render json: @current_user.errors, status: :unprocessable_entity
     end

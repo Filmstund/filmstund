@@ -24,7 +24,8 @@ import {
     postAttendStatusChange,
     postShowingOrdered,
     postShowingDone,
-    submitSlotsPickedForShowing,
+    submitAddSlotPickedForShowing,
+    submitRemoveSlotPickedForShowing,
     submitTimeSlotForShowing
 } from "../../store/actions";
 
@@ -39,35 +40,8 @@ const Showing = React.createClass({
   },
 
   componentWillMount() {
-    this.props.dispatch(
-      fetchShowing(this.props.params.id)
-    )
-    this.props.dispatch(
-      fetchTimeSlotsForShowing(this.props.params.id)
-    )
-  },
-
-  calculateNewVotesFromPickedSlots(selectedIds) {
-    const allTimeSlotsWithoutUsersVotes = this.props.showing.time_slots.map(ts => ({
-      ...ts,
-      users: ts.users.filter(u => u.id != this.props.currentUser.id)
-    }));
-
-    const newTimeSlots = allTimeSlotsWithoutUsersVotes.map(ts => {
-      if (selectedIds.includes(ts.sf_slot_id)) {
-        ts.users.push(this.props.currentUser)
-      }
-      return ts;
-    });
-
-
-    return newTimeSlots;
-  },
-
-  submitSlotsPicked(selectedIds) {
-    this.props.dispatch(
-        submitSlotsPickedForShowing(this.props.params.id, selectedIds)
-    )
+    this.props.fetchShowing()
+    this.props.fetchTimeSlotsForShowing()
   },
 
   renderSubmitTimeSlotButtons(time_slots, selected_time_slot) {
@@ -115,7 +89,8 @@ const Showing = React.createClass({
       Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
       <div className={styles.timePicker}>
         <SlotPicker timeSlots={time_slots}
-                    onChange={this.submitSlotsPicked}
+                    onAddSlot={this.props.submitAddSlotPickedForShowing}
+                    onRemoveSlot={this.props.submitRemoveSlotPickedForShowing}
                     getId={(slot) => slot.id}
                     selectedTimeSlotIds={selectedTimeSlotIds}
                     showUsers={true} />
@@ -145,8 +120,6 @@ const Showing = React.createClass({
       return <div></div>
     }
   },
-
-
 
   render() {
     const { showing, currentUser, giftCards } = this.props;
@@ -186,14 +159,24 @@ const Showing = React.createClass({
   }
 });
 
-export default withRouter(connect((state, props) => ({
-    currentUser: getUser(state),
-    showing: state.showings.showingMap[props.params.id],
-    giftCards: state.user.cards
-}, (dispatch, props) => ({
-    submitTimeSlot: (slot_id) => dispatch(submitTimeSlotForShowing(props.params.id, slot_id)),
-    doAttendShowing: () => dispatch(postAttendStatusChange(props.params.id, 'attend')),
-    unAttendShowing: () => dispatch(postAttendStatusChange(props.params.id, 'unattend')),
-    doOrder: () => dispatch(postShowingOrdered(props.params.id)),
-    doDone: () => dispatch(postShowingDone(props.params.id)),
-}))(Showing))
+const mapStateToProps = (state, props) => ({
+  currentUser: getUser(state),
+  showing: state.showings.showingMap[props.params.id],
+  giftCards: state.user.cards
+})
+
+const mapDispatchToProps = (dispatch, props) => ({
+  submitTimeSlot: (slot_id) => dispatch(submitTimeSlotForShowing(props.params.id, slot_id)),
+  doAttendShowing: () => dispatch(postAttendStatusChange(props.params.id, 'attend')),
+  unAttendShowing: () => dispatch(postAttendStatusChange(props.params.id, 'unattend')),
+  doOrder: () => dispatch(postShowingOrdered(props.params.id)),
+  doDone: () => dispatch(postShowingDone(props.params.id)),
+  submitAddSlotPickedForShowing: (add_id) => dispatch(submitAddSlotPickedForShowing(props.params.id, add_id)),
+  submitRemoveSlotPickedForShowing: (remove_id) => dispatch(submitRemoveSlotPickedForShowing(props.params.id, remove_id)),
+  fetchShowing: () => dispatch(fetchShowing(props.params.id)),
+  fetchTimeSlotsForShowing: () => dispatch(fetchTimeSlotsForShowing(props.params.id)),
+})
+
+const connectedShowing = connect(mapStateToProps, mapDispatchToProps)(Showing)
+
+export default withRouter(connectedShowing)
