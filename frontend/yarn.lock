@@ -876,10 +876,6 @@ charenc@~0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/charenc/-/charenc-0.0.1.tgz#004cff9feaf102382ed12db58dd6f962796d6e88"
 
-chart.js@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-1.1.1.tgz#a9b17054220bd45cbdb176fd6bcb8783ef871a7d"
-
 chart.js@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-2.3.0.tgz#40460e48e2c417c05fc3325cd84f7b000dc7d7d6"
@@ -2873,9 +2869,9 @@ react-avatar@^2.2.1:
     react ">=0.14.0"
     react-addons-shallow-compare ">=0.14.0"
 
-react-chartjs-2@^1.2.3:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/react-chartjs-2/-/react-chartjs-2-1.4.0.tgz#ba6cbd2d977096693fad45596ac9309d986dd6f4"
+react-chartjs-2@^1.4.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-chartjs-2/-/react-chartjs-2-1.5.0.tgz#5d373cc1483cab78b8b22d6d5897614c6e13b6df"
   dependencies:
     chart.js "^2.3.0"
 
