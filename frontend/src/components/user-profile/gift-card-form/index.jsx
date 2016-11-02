@@ -39,7 +39,7 @@ const GiftCardForm = React.createClass({
         const { cardForm } = this.state;
 
         return <div className={styles.container}>
-            <h2>Lägg till rabbatkort/företagsbiljett</h2>
+            <h2>Lägg till rabattkort/företagsbiljett</h2>
             <form className={styles.form} onSubmit={this.handleSubmitNewPaymentCard}>
                 <div className={styles.formRow}>
                     <label htmlFor="number">Nummer</label>
