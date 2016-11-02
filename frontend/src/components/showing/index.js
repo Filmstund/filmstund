@@ -83,40 +83,10 @@ const Showing = React.createClass({
               buttonClasses.push(styles.selected)
             }
             return <div className={buttonClasses.join(' ')} key={ts.sf_slot_id}
-                    onClick={() => this.submitTimeSlot(ts.id)} title="Välj"></div>
+                    onClick={() => this.props.submitTimeSlot(ts.id)} title="Välj"></div>
           })
         }
       </div>
-    )
-  },
-
-  submitTimeSlot(slot_id) {
-    this.props.dispatch(
-        submitTimeSlotForShowing(this.props.params.id, slot_id)
-    )
-  },
-
-  doAttendShowing() {
-    this.props.dispatch(
-        postAttendStatusChange(this.props.params.id, 'attend')
-    )
-  },
-
-  unAttendShowing() {
-    this.props.dispatch(
-        postAttendStatusChange(this.props.params.id, 'unattend')
-    )
-  },
-
-  doOrder () {
-    this.props.dispatch(
-        postShowingOrdered(this.props.params.id)
-    )
-  },
-
-  doDone () {
-    this.props.dispatch(
-        postShowingDone(this.props.params.id)
     )
   },
 
@@ -133,8 +103,8 @@ const Showing = React.createClass({
       <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
       <UserList attendees={showing.attendees}
                 currentUser={currentUser}
-                doAttendShowing={this.doAttendShowing}
-                unAttendShowing={this.unAttendShowing} />
+                doAttendShowing={this.props.doAttendShowing}
+                unAttendShowing={this.props.unAttendShowing} />
     </div>
   },
 
@@ -168,9 +138,9 @@ const Showing = React.createClass({
 
   renderActionButton(showing) {
     if (showing.status === "confirmed") {
-      return <GoldButton onClick={this.doOrder}>Jag har beställt</GoldButton>
+      return <GoldButton onClick={this.props.doOrder}>Jag har beställt</GoldButton>
     } else if (showing.status === "ordered") {
-      return <GoldButton onClick={this.doDone}>Slutför och arkivera besöket</GoldButton>
+      return <GoldButton onClick={this.props.doDone}>Slutför och arkivera besöket</GoldButton>
     } else {
       return <div></div>
     }
@@ -220,4 +190,10 @@ export default withRouter(connect((state, props) => ({
     currentUser: getUser(state),
     showing: state.showings.showingMap[props.params.id],
     giftCards: state.user.cards
+}, (dispatch, props) => ({
+    submitTimeSlot: (slot_id) => dispatch(submitTimeSlotForShowing(props.params.id, slot_id)),
+    doAttendShowing: () => dispatch(postAttendStatusChange(props.params.id, 'attend')),
+    unAttendShowing: () => dispatch(postAttendStatusChange(props.params.id, 'unattend')),
+    doOrder: () => dispatch(postShowingOrdered(props.params.id)),
+    doDone: () => dispatch(postShowingDone(props.params.id)),
 }))(Showing))
