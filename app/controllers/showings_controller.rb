@@ -134,7 +134,11 @@ class ShowingsController < ApplicationController
   def payment_method
     @attendee = Attendee.find_or_create_by(user: current_user, showing: @showing)
 
-    @card = GiftCard.find(params[:cardId]) if params[:cardId].present?
+    @card = if params[:cardId].present?
+      GiftCard.find(params[:cardId])
+    else
+      nil
+    end
 
     @attendee.gift_card = @card
 
