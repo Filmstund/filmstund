@@ -104,8 +104,15 @@ const CreateShowing = React.createClass({
     };
   },
 
-  updateSlotsPicked(selectedSlotIds) {
-    this.setState({slotsPicked: selectedSlotIds});
+  addSlotsPicked(selectedSlotId) {
+    this.setState({
+      slotsPicked: [...this.state.slotsPicked, selectedSlotId]
+    });
+  },
+  removeSlotsPicked(selectedSlotId) {
+    this.setState({
+      slotsPicked: this.state.slotsPicked.filter(s => s !== selectedSlotId)
+    });
   },
 
   submitSlotsPicked() {
@@ -156,7 +163,8 @@ const CreateShowing = React.createClass({
             <div className={styles.slotPicker}>
                 <SlotPicker timeSlots={timeSlots}
                             getId={(slot) => slot.sf_slot_id}
-                            onChange={this.updateSlotsPicked}
+                            onAddSlot={this.addSlotsPicked}
+                            onRemoveSlot={this.removeSlotsPicked}
                             selectedTimeSlotIds={slotsPicked}/>
             </div>
             <div className={styles.button}>
