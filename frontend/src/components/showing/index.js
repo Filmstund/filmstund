@@ -128,7 +128,7 @@ const Showing = React.createClass({
       return null;
     }
     const sortedTimeSlots = _.orderBy(showing.time_slots, "start_time");
-    const attendee = showing.attendees.find(a => a.user_id === currentUser.id);
+    const attendee = (showing.attendees || []).find(a => a.user_id === currentUser.id);
     let paymentMethod;
     if (attendee && attendee.gift_card) {
       paymentMethod = attendee.gift_card.id;
@@ -151,7 +151,7 @@ const Showing = React.createClass({
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
 
-        { showing.owner.id === currentUser.id &&
+        { showing.owner && showing.owner.id === currentUser.id &&
           this.renderActionButton(showing)
         }
       </div>
