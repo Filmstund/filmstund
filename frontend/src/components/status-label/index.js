@@ -4,28 +4,28 @@ import styles from './style.css';
 
 const labels = {
   cancelled: {
-    text: 'cancelled',
-    color: '#712',
+    text: 'Inställd',
+    color: '#bbb',
     textColor: 'black'
   },
   open: {
-    text: 'open',
+    text: 'Doodlas',
     color: '#ffd800',
     textColor: 'black'
   },
   confirmed: {
-    text: 'confirmed',
-    color: 'green',
+    text: 'Spikad',
+    color: '#712',
     textColor: 'white'
   },
   ordered: {
-    text: 'ordered',
-    color: 'goldenrod',
+    text: 'Stängd',
+    color: '#bbb',
     textColor: 'black'
   },
   done: {
-    text: 'done',
-    color: 'gray',
+    text: 'Arkiverad',
+    color: '#bbb',
     textColor: 'black'
   }
 }
