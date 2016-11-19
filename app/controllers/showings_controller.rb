@@ -143,7 +143,7 @@ class ShowingsController < ApplicationController
     @attendee.gift_card = @card
 
     if @attendee.save
-      render json: @attendee, serializer: AttendeeWithGiftCardSerializer
+      render json: @attendee
     else
       render json: @attendee.errors, status: :unprocessable_entity
     end

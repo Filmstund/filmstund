@@ -15,6 +15,7 @@ import VotingChart from './voting-chart';
 import GoldButton from '../gold-button';
 import TimeSlotLabel from '../time-slot-label';
 import PaymentSelector from './payment-selector';
+import AttendeSummary from './attendee-summary';
 
 import styles from './style.css'
 import { getUser } from "../../store/reducer";
@@ -65,59 +66,77 @@ const Showing = React.createClass({
   },
 
   renderSummary(showing) {
-    return <div>
-      {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
-      {showing.selected_time_slot.is_3d && (<TimeSlotLabel type="3d" />)}
-      {showing.selected_time_slot.is_vip && (<TimeSlotLabel type="vip" />)}
-    </div>
+    return (
+      <div>
+        {moment(showing.selected_time_slot.start_time).format("ddd D/M HH:mm")} på {showing.selected_time_slot.theatre}
+        {showing.selected_time_slot.is_3d && (<TimeSlotLabel type="3d" />)}
+        {showing.selected_time_slot.is_vip && (<TimeSlotLabel type="vip" />)}
+      </div>
+    )
   },
 
   renderAttendeeList(showing, currentUser) {
-    return <div className={styles.attendees}>
-      <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
-      <UserList attendees={showing.attendees}
-                currentUser={currentUser}
-                doAttendShowing={this.props.doAttendShowing}
-                unAttendShowing={this.props.unAttendShowing} />
-    </div>
+    return (
+      <div className={styles.attendees}>
+        <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
+        <UserList attendees={showing.attendees}
+                  currentUser={currentUser}
+                  doAttendShowing={this.props.doAttendShowing}
+                  unAttendShowing={this.props.unAttendShowing} />
+      </div>
+    )
   },
 
   renderSlotPicker(time_slots, user) {
     const selectedTimeSlotIds = time_slots.filter(ts => ts.users.map(u => u.id).includes(user.id)).map(ts => ts.id);
 
-    return <div>
-      Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
+    return (
       <div className={styles.timePicker}>
-        <SlotPicker timeSlots={time_slots}
-                    onAddSlot={this.props.submitAddSlotPickedForShowing}
-                    onRemoveSlot={this.props.submitRemoveSlotPickedForShowing}
-                    getId={(slot) => slot.id}
-                    selectedTimeSlotIds={selectedTimeSlotIds}
-                    showUsers={true} />
+        Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
+        <div className={styles.timePicker}>
+          <SlotPicker timeSlots={time_slots}
+                      onAddSlot={this.props.submitAddSlotPickedForShowing}
+                      onRemoveSlot={this.props.submitRemoveSlotPickedForShowing}
+                      getId={(slot) => slot.id}
+                      selectedTimeSlotIds={selectedTimeSlotIds}
+                      showUsers={true} />
+        </div>
       </div>
-    </div>
+    )
   },
 
-  renderResult(showing, time_slots, currentUser) {
-    return <div>
-      <h3>Resultat</h3>
-      {showing.status !== "confirmed" && (
-          <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
-      )}
-      <div className={styles.buttonAndGraphContainer}>
-        {showing.owner.id === currentUser.id && (this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot))}
-        <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
+  renderAdmin(showing, time_slots, currentUser) {
+    return (
+      <div className={styles.adminContainer}>
+        <h3>Admin</h3>
+        {showing.status === "open" && (
+            <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
+        )}
+        {showing.status === "confirmed" && (
+            <div title="(29 maj)">Välj ett datum, vilket som helst! (OBS: om du byter datum nollställs deltagarlistan.)</div>
+        )}
+        <div className={styles.buttonAndGraphContainer}>
+          {this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot)}
+          <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
+        </div>
+
+        <div className={styles.attendeeSummary}>
+          <AttendeSummary attendees={showing.attendees} />
+        </div>
+
+        {this.renderActionButton(showing)}
       </div>
-    </div>
+    )
   },
 
   renderActionButton(showing) {
-    if (showing.status === "confirmed") {
-      return <GoldButton onClick={this.props.doOrder}>Jag har beställt</GoldButton>
-    } else if (showing.status === "ordered") {
-      return <GoldButton onClick={this.props.doDone}>Slutför och arkivera besöket</GoldButton>
-    } else {
-      return <div></div>
+    switch (showing.status) {
+      case "confirmed":
+        return <GoldButton onClick={this.doOrder}>Stäng anmälan</GoldButton>
+      case "ordered":
+        return <GoldButton onClick={this.props.doDone}>Arkivera</GoldButton>
+      default:
+        return <div></div>
     }
   },
 
@@ -140,20 +159,14 @@ const Showing = React.createClass({
         {showing.selected_time_slot && this.renderSummary(showing)}
         {showing.status === "confirmed" && this.renderAttendeeList(showing, currentUser) }
         <PaymentSelector giftCards={giftCards} showingId={this.props.params.id} currentPaymentMethod={paymentMethod} />
-        <div className={styles.timePicker}>
-          {showing.status !== "confirmed" && sortedTimeSlots &&
-                this.renderSlotPicker(sortedTimeSlots, currentUser)
-          }
 
-          { this.renderResult(showing, sortedTimeSlots, currentUser) }
-        </div>
+        {showing.status === "open" && sortedTimeSlots && this.renderSlotPicker(sortedTimeSlots, currentUser)}
+
+        {showing.owner.id === currentUser.id && this.renderAdmin(showing, sortedTimeSlots, currentUser)}
 
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />
 
-        { showing.owner && showing.owner.id === currentUser.id &&
-          this.renderActionButton(showing)
-        }
       </div>
     )
   }
