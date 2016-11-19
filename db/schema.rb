@@ -65,10 +65,8 @@ ActiveRecord::Schema.define(version: 20161017205455) do
 
   create_table "orders", force: :cascade do |t|
     t.string   "price"
-    t.integer  "payer_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["payer_id"], name: "index_orders_on_payer_id"
   end
 
   create_table "orders_users", id: false, force: :cascade do |t|
