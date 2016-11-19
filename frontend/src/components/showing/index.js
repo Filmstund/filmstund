@@ -76,7 +76,6 @@ const Showing = React.createClass({
   },
 
   renderAttendeeList(showing, currentUser) {
-    console.log(this.doAttendShowing)
     return (
       <div className={styles.attendees}>
         <div className={styles.numberOfAttendees}>{showing.attendees.length} deltagare</div>
@@ -92,7 +91,7 @@ const Showing = React.createClass({
     const selectedTimeSlotIds = time_slots.filter(ts => ts.users.map(u => u.id).includes(user.id)).map(ts => ts.id);
 
     return (
-      <div>
+      <div className={styles.timePicker}>
         Markera de tider du kan. Du blir automagiskt anmäld om en av dina tider vinner omröstningen.
         <div className={styles.timePicker}>
           <SlotPicker timeSlots={time_slots}
@@ -108,7 +107,7 @@ const Showing = React.createClass({
 
   renderAdmin(showing, time_slots, currentUser) {
     return (
-      <div>
+      <div className={styles.adminContainer}>
         <h3>Admin</h3>
         {showing.status === "open" && (
             <div title="(29 maj)">Välj ett datum, vilket som helst!</div>
@@ -120,18 +119,24 @@ const Showing = React.createClass({
           {this.renderSubmitTimeSlotButtons(time_slots, showing.selected_time_slot)}
           <VotingChart timeSlots={time_slots} selectedId={showing.selected_time_slot && showing.selected_time_slot.id}/>
         </div>
-        {showing.status === "confirmed" && this.renderActionButton(showing)}
+
+        <div className={styles.attendeeSummary}>
+          <AttendeSummary attendees={showing.attendees} />
+        </div>
+
+        {this.renderActionButton(showing)}
       </div>
     )
   },
 
   renderActionButton(showing) {
-    if (showing.status === "confirmed") {
-      return <GoldButton onClick={this.doOrder}>Jag har bokat biljetter</GoldButton>
-    } else if (showing.status === "ordered") {
-      return <GoldButton onClick={this.props.doDone}>Slutför och arkivera besöket</GoldButton>
-    } else {
-      return <div></div>
+    switch (showing.status) {
+      case "confirmed":
+        return <GoldButton onClick={this.doOrder}>Stäng anmälan</GoldButton>
+        case "confirmed":
+          return <GoldButton onClick={this.props.doDone}>Arkivera</GoldButton>
+      default:
+        return <div></div>
     }
   },
 
@@ -154,15 +159,10 @@ const Showing = React.createClass({
         {showing.selected_time_slot && this.renderSummary(showing)}
         {showing.status === "confirmed" && this.renderAttendeeList(showing, currentUser) }
         <PaymentSelector giftCards={giftCards} showingId={this.props.params.id} currentPaymentMethod={paymentMethod} />
-        <div className={styles.timePicker}>
-          {showing.status !== "confirmed" && sortedTimeSlots &&
-                this.renderSlotPicker(sortedTimeSlots, currentUser)
-          }
 
-          {showing.owner.id === currentUser.id && this.renderAdmin(showing, sortedTimeSlots, currentUser) }
-        </div>
+        {showing.status === "open" && sortedTimeSlots && this.renderSlotPicker(sortedTimeSlots, currentUser)}
 
-        <AttendeSummary attendees={showing.attendees} />
+        {showing.owner.id === currentUser.id && this.renderAdmin(showing, sortedTimeSlots, currentUser)}
 
         <h3>Om filmen</h3>
         <MovieInfo movie={showing.movie} />

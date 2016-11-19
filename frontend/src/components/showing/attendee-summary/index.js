@@ -1,31 +1,54 @@
-
 import React, {PropTypes} from 'react';
+import UserAvatar from '../../user-avatar';
+import styles from './style.css'
 
 const AttendeSummary = React.createClass({
   propTypes: {
     attendees: PropTypes.array.isRequired,
   },
 
-  renderPaymentMethod(gift_card) {
-    if(gift_card) {
-      return <span> <span>{gift_card.card_type}</span> <span>{gift_card.number} </span> </span>
-    } else {
-      return <span> External payment method, swish etc </span>
-    }
-  },
-
   renderAttende(attendee) {
-    return (<div key={attendee.id}>
-      <span>{attendee.nick}</span>
-      {this.renderPaymentMethod(attendee.gift_card)}
+    return (
+      <div key={attendee.id} className={styles.tableRow}>
+        <div className={styles.tableCell}>
+          <div className={styles.flexRow}>
+            <UserAvatar user={attendee} size={40} />
+            <div className={styles.name}>{attendee.nick}</div>
+          </div>
+        </div>
+        <div className={styles.tableCell}>
+          insert klubbnummer
+        </div>
+        <div className={styles.tableCell}>
+          {attendee.gift_card && attendee.gift_card.card_type}
+        </div>
+        <div className={styles.tableCell}>
+          {attendee.gift_card && attendee.gift_card.number}
+        </div>
       </div>)
   },
 
   render() {
-    console.log(this.props.attendees)
-    return (<div>
-      <h3>Summary</h3>
-      {this.props.attendees.map(this.renderAttende)}
+    return (
+      <div>
+        <h3>Anmälda</h3>
+        <div className={styles.table}>
+          <div className={styles.tableRow}>
+            <div className={styles.tableCell}>
+              Namn
+            </div>
+            <div className={styles.tableCell}>
+              Bioklubbsnummer
+            </div>
+            <div className={styles.tableCell}>
+              Specialbetalning
+            </div>
+            <div className={styles.tableCell}>
+              Nummer
+            </div>
+          </div>
+          {this.props.attendees.map(this.renderAttende)}
+        </div>
       </div>)
   }
 
