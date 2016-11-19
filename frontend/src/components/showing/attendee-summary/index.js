@@ -17,7 +17,7 @@ const AttendeSummary = React.createClass({
           </div>
         </div>
         <div className={styles.tableCell}>
-          insert klubbnummer
+          {attendee.bioklubbsnummer}
         </div>
         <div className={styles.tableCell}>
           {attendee.gift_card && attendee.gift_card.card_type}

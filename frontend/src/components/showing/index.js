@@ -133,8 +133,8 @@ const Showing = React.createClass({
     switch (showing.status) {
       case "confirmed":
         return <GoldButton onClick={this.doOrder}>Stäng anmälan</GoldButton>
-        case "confirmed":
-          return <GoldButton onClick={this.props.doDone}>Arkivera</GoldButton>
+      case "ordered":
+        return <GoldButton onClick={this.props.doDone}>Arkivera</GoldButton>
       default:
         return <div></div>
     }
