@@ -84,6 +84,7 @@ GEM
     minitest (5.9.0)
     multi_json (1.12.1)
     multi_xml (0.5.5)
+    mysql2 (0.4.5)
     nio4r (1.2.1)
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
@@ -168,6 +169,7 @@ DEPENDENCIES
   fb_graph2 (~> 0.7.7)
   httparty
   listen (~> 3.0.5)
+  mysql2
   puma (~> 3.0)
   pushover
   rails (>= 5.0.0.racecar1, < 5.1)
@@ -178,4 +180,4 @@ DEPENDENCIES
   tzinfo-data
 
 BUNDLED WITH
-   1.12.5
+   1.13.2

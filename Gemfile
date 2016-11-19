@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gem 'rails', '>= 5.0.0.racecar1', '< 5.1'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
+gem 'mysql2'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
 gem 'httparty'
