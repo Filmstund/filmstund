@@ -133,6 +133,10 @@ const Showing = React.createClass({
     if (attendee && attendee.gift_card) {
       paymentMethod = attendee.gift_card.id;
     }
+    console.log('whathahta');
+    console.log('attendee:', attendee);
+    console.log('showing.attendees', showing.attendees);
+    console.log('paymentmethod', paymentMethod);
 
     return (
       <div className={styles.container}>
