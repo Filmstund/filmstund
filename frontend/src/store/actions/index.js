@@ -60,7 +60,7 @@ export const updateUser = (user) => (dispatch) => {
   dispatch({
     type: WAITING_UPDATE_ME
   })
-  putEndpoint('/me', { user }).then((user) => {
+  putEndpoint('/me', { user }).then(({ user }) => {
     dispatch({
       type: UPDATE_ME,
       user
