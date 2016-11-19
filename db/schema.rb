@@ -12,16 +12,16 @@
 
 ActiveRecord::Schema.define(version: 20161017205455) do
 
-  create_table "api_tokens", force: :cascade do |t|
+  create_table "api_tokens", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id"
     t.string   "token"
     t.string   "comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_api_tokens_on_user_id"
+    t.index ["user_id"], name: "index_api_tokens_on_user_id", using: :btree
   end
 
-  create_table "attendees", force: :cascade do |t|
+  create_table "attendees", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id"
     t.integer  "showing_id"
     t.boolean  "notify"
@@ -29,72 +29,71 @@ ActiveRecord::Schema.define(version: 20161017205455) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.integer  "gift_card_id"
-    t.index ["gift_card_id"], name: "index_attendees_on_gift_card_id"
-    t.index ["showing_id"], name: "index_attendees_on_showing_id"
-    t.index ["user_id"], name: "index_attendees_on_user_id"
+    t.index ["gift_card_id"], name: "index_attendees_on_gift_card_id", using: :btree
+    t.index ["showing_id"], name: "index_attendees_on_showing_id", using: :btree
+    t.index ["user_id"], name: "index_attendees_on_user_id", using: :btree
   end
 
-  create_table "bioord", force: :cascade do |t|
+  create_table "bioord", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "number"
     t.string   "phrase"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "gift_cards", force: :cascade do |t|
+  create_table "gift_cards", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "owner_id"
     t.string   "number"
     t.integer  "card_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["owner_id"], name: "index_gift_cards_on_owner_id"
+    t.index ["owner_id"], name: "index_gift_cards_on_owner_id", using: :btree
   end
 
-  create_table "movies", primary_key: "sf_id", id: :string, force: :cascade do |t|
+  create_table "movies", primary_key: "sf_id", id: :string, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "imdb_id"
     t.string   "themoviedb_id"
     t.string   "title"
-    t.text     "description"
+    t.text     "description",   limit: 65535
     t.integer  "runtime"
     t.string   "poster"
     t.datetime "premiere_date"
     t.string   "tagline"
     t.string   "genres"
-    t.index ["sf_id"], name: "sqlite_autoindex_movies_1", unique: true
   end
 
-  create_table "orders", force: :cascade do |t|
+  create_table "orders", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "orders_users", id: false, force: :cascade do |t|
+  create_table "orders_users", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "order_id"
     t.integer "user_id"
-    t.index ["order_id"], name: "index_orders_users_on_order_id"
-    t.index ["user_id"], name: "index_orders_users_on_user_id"
+    t.index ["order_id"], name: "index_orders_users_on_order_id", using: :btree
+    t.index ["user_id"], name: "index_orders_users_on_user_id", using: :btree
   end
 
-  create_table "showings", force: :cascade do |t|
+  create_table "showings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "sf_id"
     t.integer  "status"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.integer  "owner_id"
     t.integer  "selected_time_slot_id"
-    t.index ["owner_id"], name: "index_showings_on_owner_id"
-    t.index ["selected_time_slot_id"], name: "index_showings_on_selected_time_slot_id"
+    t.index ["owner_id"], name: "index_showings_on_owner_id", using: :btree
+    t.index ["selected_time_slot_id"], name: "index_showings_on_selected_time_slot_id", using: :btree
   end
 
-  create_table "showings_time_slots", id: false, force: :cascade do |t|
+  create_table "showings_time_slots", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "showing_id"
     t.integer "time_slot_id"
-    t.index ["showing_id"], name: "index_showings_time_slots_on_showing_id"
-    t.index ["time_slot_id"], name: "index_showings_time_slots_on_time_slot_id"
+    t.index ["showing_id"], name: "index_showings_time_slots_on_showing_id", using: :btree
+    t.index ["time_slot_id"], name: "index_showings_time_slots_on_time_slot_id", using: :btree
   end
 
-  create_table "time_slots", force: :cascade do |t|
+  create_table "time_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "start_time"
     t.integer  "showing_id"
     t.datetime "created_at",      null: false
@@ -107,18 +106,18 @@ ActiveRecord::Schema.define(version: 20161017205455) do
     t.integer  "theatre_account"
     t.string   "sf_slot_id"
     t.integer  "price"
-    t.index ["sf_slot_id"], name: "index_time_slots_on_sf_slot_id"
-    t.index ["showing_id"], name: "index_time_slots_on_showing_id"
+    t.index ["sf_slot_id"], name: "index_time_slots_on_sf_slot_id", using: :btree
+    t.index ["showing_id"], name: "index_time_slots_on_showing_id", using: :btree
   end
 
-  create_table "time_slots_users", id: false, force: :cascade do |t|
+  create_table "time_slots_users", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "time_slot_id"
     t.integer "user_id"
-    t.index ["time_slot_id"], name: "index_time_slots_users_on_time_slot_id"
-    t.index ["user_id"], name: "index_time_slots_users_on_user_id"
+    t.index ["time_slot_id"], name: "index_time_slots_users_on_time_slot_id", using: :btree
+    t.index ["user_id"], name: "index_time_slots_users_on_user_id", using: :btree
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "nick"
     t.string   "email"
     t.string   "bioklubbsnummer"
@@ -129,4 +128,11 @@ ActiveRecord::Schema.define(version: 20161017205455) do
     t.string   "pushover_key"
   end
 
+  add_foreign_key "api_tokens", "users"
+  add_foreign_key "attendees", "showings"
+  add_foreign_key "attendees", "users"
+  add_foreign_key "gift_cards", "users", column: "owner_id"
+  add_foreign_key "showings", "time_slots", column: "selected_time_slot_id"
+  add_foreign_key "showings", "users", column: "owner_id"
+  add_foreign_key "time_slots", "showings"
 end
