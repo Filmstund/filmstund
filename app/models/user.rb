@@ -27,12 +27,13 @@ class User < ApplicationRecord
       self.bioklubbsnummer = bioklubbsnummer.presence || ''
       self.sf_membership_level = sf_membership_level.presence || 'BRONZE'
       self.phone_number = phone_number.presence || ''
-      self.pushover_key = pushover_key.strip.presence || nil
+      self.pushover_key = pushover_key.presence || nil
     end
 
     def strip_numbers
       self.phone_number = (self.phone_number || '').gsub /[^0-9]/, ''
       self.bioklubbsnummer = (self.bioklubbsnummer || '').gsub /[^0-9]/, ''
+      self.pushover_key = self.pushover_key.strip if self.pushover_key
     end
 
     def upcase_membership_level
