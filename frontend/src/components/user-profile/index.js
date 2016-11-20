@@ -14,7 +14,15 @@ import GiftCardList from '../gift-card-list';
 const UserProfile = React.createClass({
   getInitialState() {
     return {
-      userForm: this.props.user,
+      userForm: {
+        nick: '',
+        email: '',
+        phone_number: '',
+        bioklubbsnummer: '',
+        sf_membership_level: '',
+        pushover_key: '',
+        ...this.props.user
+      }
     }
   },
   handleChange(attr, event) {
