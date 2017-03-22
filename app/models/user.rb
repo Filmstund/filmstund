@@ -5,8 +5,7 @@ class User < ApplicationRecord
   has_many :showings, foreign_key: :owner_id
   has_many :gift_cards, foreign_key: :owner_id
   has_many :attendees, foreign_key: :owner_id
-  before_save :default_values
-  before_validation :strip_numbers, :upcase_membership_level
+  before_validation :strip_numbers, :default_values, :upcase_membership_level
 
   validates_format_of :phone_number, with: /\A\d{10}\z/, allow_blank: true
   validates_format_of :bioklubbsnummer, with: /\A\d{8}\d{3}?\z/, allow_blank: true
