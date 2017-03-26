@@ -15,4 +15,4 @@ data class Movie(
         val id: UUID = UUID.randomUUID(),
         val name: String,
         val runtime: Duration,
-        val imdbTitle: Imdb? = null)
+        val imdb: Imdb? = null)

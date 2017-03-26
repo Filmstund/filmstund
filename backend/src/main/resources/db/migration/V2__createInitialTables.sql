@@ -11,7 +11,7 @@ CREATE TABLE MOVIE (
   ID UUID PRIMARY KEY,
   NAME VARCHAR(255) NOT NULL,
   RUNTIME BIGINT NOT NULL, -- In nanoseconds
-  IMDB_TITLE VARCHAR(9) NULL UNIQUE
+  IMDB VARCHAR(9) NULL UNIQUE
 );
 
 CREATE TABLE LOCATION (
@@ -34,6 +34,6 @@ INSERT INTO LOCATION (ID, name, latitude, longitude) VALUES (uuid_generate_v4(),
 
 INSERT INTO USERS (ID, NAME, NICK, EMAIL, BIOKLUBBNUMMER, PHONE) VALUES (uuid_generate_v4(), 'Test admin user', 'AddyAdmin', 'apa@example.org', '11111111111', '070-000 00 00');
 
-INSERT INTO MOVIE (ID, NAME, RUNTIME, IMDB_TITLE) VALUES (uuid_generate_v4(), 'John Wick: Chapter 2', 7320000000000, 'tt4425200');
+INSERT INTO MOVIE (ID, NAME, RUNTIME, IMDB) VALUES (uuid_generate_v4(), 'John Wick: Chapter 2', 7320000000000, 'tt4425200');
 
 INSERT INTO SHOWING (id, start_time, movie_id, location_id, admin_id) VALUES (uuid_generate_v4(), '2017-03-26 19:08:59.042000', (SELECT id FROM MOVIE WHERE NAME='John Wick: Chapter 2'), (SELECT id FROM LOCATION WHERE name='Filmstaden Bergakungen'), (SELECT id FROM USERS WHERE NICK='AddyAdmin'));
