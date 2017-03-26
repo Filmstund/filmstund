@@ -4,7 +4,8 @@ import { injectGlobal } from "styled-components";
 
 import App from "./App";
 
-const globalStyles = injectGlobal`
+// eslint-disable-next-line
+injectGlobal`
   body {
     margin: 0;
     padding: 0;
