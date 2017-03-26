@@ -23,7 +23,6 @@ const TopBar = React.createClass({
     return (
       <TopBarContainer>
         <Link to="/">Hem</Link>
-        <Link to="/showings">Visningar</Link>
         <Link to="/user">Användare</Link>
       </TopBarContainer>
     );
