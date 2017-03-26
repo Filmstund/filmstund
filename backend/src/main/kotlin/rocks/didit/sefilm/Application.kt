@@ -5,13 +5,10 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
-import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.repositories.LocationRepository
 import rocks.didit.sefilm.repositories.MovieRepository
 import rocks.didit.sefilm.repositories.ShowingRepository
 import rocks.didit.sefilm.repositories.UserRepository
-import java.time.Instant
-import java.util.*
 
 @SpringBootApplication
 class Application {

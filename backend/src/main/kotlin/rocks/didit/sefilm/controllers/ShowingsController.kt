@@ -1,4 +1,4 @@
-package rocks.didit.sefilm
+package rocks.didit.sefilm.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
@@ -8,7 +8,7 @@ import rocks.didit.sefilm.repositories.ShowingRepository
 import java.util.*
 
 @RestController
-class ShowingController(@Autowired
+class ShowingsController(@Autowired
                         val showingRepository: ShowingRepository) {
 
     @GetMapping("/showings")
