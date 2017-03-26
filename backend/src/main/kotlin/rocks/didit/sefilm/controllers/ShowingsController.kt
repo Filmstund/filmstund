@@ -14,6 +14,6 @@ class ShowingsController(@Autowired
     @GetMapping("/showings")
     fun allShowings() = showingRepository.findAll()
 
-    @GetMapping("/showing/{id}")
+    @GetMapping("/showings/{id}")
     fun getShowingById(@PathVariable(value = "id") id: UUID) = showingRepository.findOne(id)
 }

@@ -8,12 +8,12 @@ import rocks.didit.sefilm.repositories.MovieRepository
 import java.util.*
 
 @RestController
-class MoviesControllerController(@Autowired
+class MoviesController(@Autowired
                         val movieRepository: MovieRepository) {
 
     @GetMapping("/movies")
     fun allShowings() = movieRepository.findAll()
 
-    @GetMapping("/movie/{id}")
+    @GetMapping("/movies/{id}")
     fun getMovieById(@PathVariable(value = "id") id: UUID) = movieRepository.findOne(id)
 }
