@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.database.entities
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import java.util.*
 import javax.persistence.*
@@ -14,5 +15,9 @@ data class User(
         val nick: String?,
         val email: String,
         val bioklubbnummer: Bioklubbnummer,
-        val phone: String
+        val phone: String,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @Transient
+        @ManyToMany(mappedBy = "participants")
+        val showings: Collection<Showing>
 )

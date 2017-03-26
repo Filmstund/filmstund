@@ -14,5 +14,10 @@ data class Showing(@Id
                    @ManyToOne
                    val location: Location,
                    @ManyToOne
-                   val admin: User
+                   val admin: User,
+                   @ManyToMany()
+                   @JoinTable(name = "showing_participants",
+                           joinColumns = arrayOf(JoinColumn(name = "showing_id", referencedColumnName = "id")),
+                           inverseJoinColumns = arrayOf(JoinColumn(name="user_id", referencedColumnName = "id")))
+                   val participants: Collection<User>
 )
