@@ -10,12 +10,13 @@
 ### Get up and running
 
 ```sh
-# create user:
-createuser sefilm --interactive 
+# Vreate development database user:
+$ createuser sefilm --interactive 
 # answer y to make superuser
 
-# create database:
-createdb sefilm -O sefilm
+# Create database:
+$ createdb sefilm -O sefilm
 
-gradle flywayMigrate
+$ gradle flywayMigrate
+$ gradle bootRun
 ```
