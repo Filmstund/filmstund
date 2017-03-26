@@ -1,18 +1,18 @@
 package rocks.didit.sefilm.database.converters
 
-import rocks.didit.sefilm.domain.ImdbTitle
+import rocks.didit.sefilm.domain.Imdb
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
 @Converter(autoApply = true)
-class ImdbTitleConverter : AttributeConverter<ImdbTitle?, String?> {
-    override fun convertToDatabaseColumn(attribute: ImdbTitle?): String? {
+class ImdbTitleConverter : AttributeConverter<Imdb?, String?> {
+    override fun convertToDatabaseColumn(attribute: Imdb?): String? {
         return attribute?.id
     }
 
-    override fun convertToEntityAttribute(dbData: String?): ImdbTitle? {
+    override fun convertToEntityAttribute(dbData: String?): Imdb? {
         if (dbData != null ) {
-            return ImdbTitle(dbData)
+            return Imdb(dbData)
         }
         return null
     }

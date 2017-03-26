@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.database.entities
 
-import rocks.didit.sefilm.domain.ImdbTitle
+import rocks.didit.sefilm.domain.Imdb
 import java.time.Duration
 import java.util.*
 import javax.persistence.Entity
@@ -15,4 +15,4 @@ data class Movie(
         val id: UUID = UUID.randomUUID(),
         val name: String,
         val runtime: Duration,
-        val imdbTitle: ImdbTitle? = null)
+        val imdbTitle: Imdb? = null)
