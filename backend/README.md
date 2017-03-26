@@ -1,4 +1,4 @@
-# itbio backend
+# ITBio backend
 
 ### Requirements
 
@@ -9,7 +9,7 @@
 ### Get up and running
 
 ```sh
-# Vreate development database user:
+# Create development database user:
 $ createuser sefilm --interactive 
 # answer y to make superuser
 
