@@ -5,17 +5,19 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
-import rocks.didit.sefilm.entities.Showing
+import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.repositories.LocationRepository
+import rocks.didit.sefilm.repositories.MovieRepository
+import rocks.didit.sefilm.repositories.ShowingRepository
+import rocks.didit.sefilm.repositories.UserRepository
+import java.time.Instant
+import java.util.*
 
 @SpringBootApplication
 class Application {
     private val log = LoggerFactory.getLogger(Application::class.java)
     @Bean
-    fun init(repository: ShowingRepository) = CommandLineRunner {
-        log.info("Showings:")
-        val allShowings = repository.findAll()
-        allShowings.forEach({s -> log.info(s.toString())})
-        log.info("end showings")
+    fun init(showings: ShowingRepository, movies: MovieRepository, locations: LocationRepository, users: UserRepository) = CommandLineRunner {
     }
 }
 
