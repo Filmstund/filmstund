@@ -2,9 +2,8 @@
 
 ### Requirements
 
-- `kotlin 1.1.1`
-- `postgresql`
 - `gradle`
+- `postgresql`
 
 
 ### Get up and running
