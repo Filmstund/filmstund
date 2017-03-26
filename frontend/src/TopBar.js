@@ -1,4 +1,5 @@
 import React from "react";
+import { Link as RouterLink } from "react-router-dom";
 import styled from "styled-components";
 
 const TopBarContainer = styled.div`
@@ -6,8 +7,10 @@ const TopBarContainer = styled.div`
   padding: 1em 0;
 `;
 
-const Link = styled.a`
+const Link = styled(RouterLink)`
   padding: 1em;
+  color: white;
+  text-decoration: none;
   cursor: pointer;
   &:hover {
     color: lightgray;
@@ -19,9 +22,9 @@ const TopBar = React.createClass({
   render() {
     return (
       <TopBarContainer>
-        <Link>Hem</Link>
-        <Link>Visningar</Link>
-        <Link>Användare</Link>
+        <Link to="/">Hem</Link>
+        <Link to="/showings">Visningar</Link>
+        <Link to="/user">Användare</Link>
       </TopBarContainer>
     );
   }
