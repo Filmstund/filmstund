@@ -1,6 +1,0 @@
-class GiftCard < ApplicationRecord
-  belongs_to :owner, class_name: User
-  has_one :attendee
-  enum card_type: [ :bioklubbskort, :foretagsbiljett, :rabattkort, :presentkort ]
-  validates :number, format: {with: /\A(\d{8}|\d{11})\z/, message: 'Invalid number id'}
-end
