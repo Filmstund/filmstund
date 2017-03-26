@@ -3,29 +3,28 @@ import styled from "styled-components";
 
 const TopBarContainer = styled.div`
   background: maroon;
-  padding: 1em;
+  padding: 1em 0;
 `;
 
 const Link = styled.a`
-  padding: 0 1em 0 1em;
+  padding: 1em;
   cursor: pointer;
   &:hover {
     color: lightgray;
+    background: darkred;
   }
-`
+`;
 
 const TopBar = React.createClass({
   render() {
     return (
       <TopBarContainer>
-        <Link>This is link</Link>
-        <Link>This is link2</Link>
-        <Link>This is link3</Link>
+        <Link>Hem</Link>
+        <Link>Visningar</Link>
+        <Link>Användare</Link>
       </TopBarContainer>
     );
   }
 });
-
-
 
 export default TopBar;
