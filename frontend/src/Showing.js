@@ -23,19 +23,23 @@ const VerticalPaddingContainer = styled.div`
 `;
 
 
-const Showing = ({ className, poster, title, date, location, owner }) => (
+const Showing = ({ className, poster, showing: { startTime, admin, movie, location } }) => (
     <div className={className}>
         <Poster src={poster}/>
         <PaddingContainer>
-            <Header>{title}</Header>
+            <Header>{movie.name}</Header>
             <VerticalPaddingContainer>
-                {moment(date).format("D MMM HH:mm")}<br/>
-                {location}<br/>
+                {moment(startTime * 1000).format("D MMM HH:mm")}<br/>
+                {location.name}<br/>
             </VerticalPaddingContainer>
-            Bokat av {owner}
+            Bokat av {admin.nick}
         </PaddingContainer>
     </div>
 );
+
+Showing.defaultProps = {
+    poster: "https://images-na.ssl-images-amazon.com/images/M/MV5BMjI1MjkzMjczMV5BMl5BanBnXkFtZTgwNDk4NjYyMTI@._V1_SY1000_CR0"
+};
 
 
 export default styled(Showing)`
