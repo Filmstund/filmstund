@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 fun ServerResponse.BodyBuilder.json() = contentType(MediaType.APPLICATION_JSON_UTF8)
+        .header("Access-Control-Allow-Origin", "/")
 
 fun ServerRequest.uuidMonoPathVariable(name: String): Mono<UUID> {
     try {

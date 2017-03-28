@@ -5,6 +5,7 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.web.reactive.config.CorsRegistry
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
@@ -64,15 +65,6 @@ class Application {
                 .doOnComplete { log.info("Completed save of seed showings") }
                 .subscribe()
     }
-
-    //@Bean
-    //fun corsConfigurer(): WebMvcConfigurer {
-    //    return object : WebMvcConfigurerAdapter() {
-    //        override fun addCorsMappings(registry: CorsRegistry?) {
-    //            registry!!.addMapping("/**").allowedOrigins("*")
-    //        }
-    //    }
-    //}
 }
 
 fun main(args: Array<String>) {
