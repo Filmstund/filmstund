@@ -11,6 +11,6 @@ import java.util.*
 @Component
 class UserHandler(val userRepository: UserRepository) {
     fun findAll(req: ServerRequest) = ok().json().body(userRepository.findAll())
-    fun findOne(req: ServerRequest) = ok().json().body(userRepository.findOne(UUID.fromString(req.pathVariable("id"))))
+    fun findOne(req: ServerRequest) = ok().json().body(userRepository.findOne(req.pathVariable("id")))
 }
 
