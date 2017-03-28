@@ -1,17 +1,14 @@
 package rocks.didit.sefilm.database.entities
 
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
 
-@Entity
+@Document
 data class Location(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
         val id: UUID = UUID.randomUUID(),
-        val name: String,
-        val latitude: BigDecimal,
-        val longitude: BigDecimal)
+        val name: String? = null,
+        val latitude: BigDecimal? = null,
+        val longitude: BigDecimal? = null)

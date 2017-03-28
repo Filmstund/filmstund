@@ -3,19 +3,12 @@
 ### Requirements
 
 - `gradle`
-- `postgresql`
-
+- `mongodb`
+- `mongodb-tools`
 
 ### Get up and running
 
 ```sh
-# Create development database user:
-$ createuser sefilm --interactive 
-# answer y to make superuser
-
-# Create database:
-$ createdb sefilm -O sefilm
-
-$ gradle flywayMigrate
+$ mongorestore -d sefilm ./backend/src/test/resources/db/seeds/sefilm
 $ gradle bootRun
 ```
