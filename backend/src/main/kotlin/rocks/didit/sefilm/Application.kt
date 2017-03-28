@@ -5,10 +5,20 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.domain.Bioklubbnummer
+import rocks.didit.sefilm.domain.Imdb
+import java.math.BigDecimal
+import java.time.Duration
+import java.time.Instant
+import java.util.*
 
 @SpringBootApplication
 class Application {

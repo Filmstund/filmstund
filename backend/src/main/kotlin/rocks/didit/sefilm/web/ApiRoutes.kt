@@ -4,12 +4,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.router
+import rocks.didit.sefilm.web.handlers.LocationHandler
 import rocks.didit.sefilm.web.handlers.MovieHandler
 import rocks.didit.sefilm.web.handlers.ShowingHandler
 import rocks.didit.sefilm.web.handlers.UserHandler
 
 @Component
-class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandler, val userHandler: UserHandler) {
+class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandler, val userHandler: UserHandler,
+                val locationHandler: LocationHandler) {
     @Bean
     fun apiRouter() = router {
         (accept(MediaType.APPLICATION_JSON) and "/api").nest {
@@ -26,6 +28,11 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
             "/users".nest {
                 GET("/", userHandler::findAll)
                 GET("/{id}", userHandler::findOne)
+            }
+
+            "/locations".nest {
+                GET("/", locationHandler::findAll)
+                GET("/{name}", locationHandler::findOne)
             }
         }
     }
