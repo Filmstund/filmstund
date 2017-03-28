@@ -21,10 +21,13 @@ class ShowingHandler(val repo: ShowingRepository) {
             .otherwiseIfEmpty(notFound().build())
             .otherwise(IllegalArgumentException::class.java, { badRequest().build() })
 
-    fun findBioklubbnummerForShowing(req: ServerRequest) = repo.findOne(UUID.fromString(req.pathVariable("id")))
-            .then { s ->
-                ok().json().body(BodyInserters.fromObject(shuffledBioklubbnummer(s.participants)))
-            }
+    fun findBioklubbnummerForShowing(req: ServerRequest) =
+            repo.findOne(req.uuidMonoPathVariable("id"))
+                    .then { s ->
+                        ok().json().body(BodyInserters.fromObject(shuffledBioklubbnummer(s.participants)))
+                    }
+                    .otherwiseIfEmpty(notFound().build())
+                    .otherwise(IllegalArgumentException::class.java, { badRequest().build() })
 
     private fun shuffledBioklubbnummer(participants: Collection<User>): List<Bioklubbnummer> {
         val numbers = participants.map(User::bioklubbnummer).filterNotNull()
