@@ -23,6 +23,7 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
             "/showings".nest {
                 GET("/", showingHandler::findAll)
                 GET("/{id}", showingHandler::findOne)
+                GET("/{id}/bioklubbnummer", showingHandler::findBioklubbnummerForShowing)
             }
 
             "/users".nest {
