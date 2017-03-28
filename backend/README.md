@@ -4,11 +4,10 @@
 
 - `gradle`
 - `mongodb`
-- `mongodb-tools`
 
 ### Get up and running
 
 ```sh
-$ mongorestore -d sefilm ./backend/src/test/resources/db/seeds/sefilm
+# Currently, development seed data is created on every run.
 $ gradle bootRun
 ```
