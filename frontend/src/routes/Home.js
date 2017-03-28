@@ -26,9 +26,10 @@ const Home = React.createClass({
                     <MainButton>Skapa nytt besök</MainButton>
                 </Jumbotron>
                 <Header>Besök jag har skapat</Header>
-                <Showing
+                {/*<Showing
                     poster="https://images-na.ssl-images-amazon.com/images/M/MV5BMTUwNjUxMTM4NV5BMl5BanBnXkFtZTgwODExMDQzMTI@._V1_SY1000_CR0,0,674,1000_AL_.jpg"
                     showing={{startTime: 1410548139.042, movie: {name: "Beauty and the Beast"}, location: {name: "Bergakungen, sal 2"}, admin: {nick: "Horv"}}}/>
+                    */}
                 <Header>Mina kommande besök</Header>
                 {showings.map(showing => (
                     <Showing key={showing.id} showing={showing}/>

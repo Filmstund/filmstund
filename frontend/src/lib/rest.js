@@ -1,6 +1,6 @@
 import "whatwg-fetch";
 
-const backendUrl = "http://localhost:8080";
+const backendUrl = "http://localhost:8080/api";
 
 const checkStatusAndParseJson = (response) => {
     if (response.status >= 200 && response.status < 300) {
