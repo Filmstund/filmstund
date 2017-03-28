@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import moment from "moment";
+import {formatShowingDate} from "./lib/dateTools";
 
 const Poster = styled.div`
     background-image: url(${props => props.src});
@@ -23,13 +23,13 @@ const VerticalPaddingContainer = styled.div`
 `;
 
 
-const Showing = ({ className, poster, showing: { startTime, admin, movie, location } }) => (
+const Showing = ({ className, poster, showing: { date, time, admin, movie, location } }) => (
     <div className={className}>
         <Poster src={poster}/>
         <PaddingContainer>
             <Header>{movie.name}</Header>
             <VerticalPaddingContainer>
-                {moment(startTime * 1000).format("D MMM HH:mm")}<br/>
+                {formatShowingDate(date, time)}<br/>
                 {location.name}<br/>
             </VerticalPaddingContainer>
             Bokat av {admin.nick}
@@ -47,4 +47,6 @@ export default styled(Showing)`
     display: flex;
     height: 150px;
     width: 100%;
+    
+    &:not(:last-child) { margin-bottom: 1em; }
 `;
