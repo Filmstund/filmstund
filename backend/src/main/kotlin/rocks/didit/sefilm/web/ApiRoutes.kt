@@ -17,6 +17,7 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
         (accept(MediaType.APPLICATION_JSON) and "/api").nest {
             "/movies".nest {
                 GET("/", movieHandler::findAll)
+                GET("/sf", movieHandler::populateFromSf)
                 GET("/{id}", movieHandler::findOne)
             }
 

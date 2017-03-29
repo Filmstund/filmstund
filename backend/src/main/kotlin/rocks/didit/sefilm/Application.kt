@@ -5,7 +5,6 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.web.reactive.config.CorsRegistry
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
@@ -27,10 +26,10 @@ class Application {
     @Bean
     fun initData(showings: ShowingRepository, movies: MovieRepository,
                  locations: LocationRepository, users: UserRepository) = ApplicationRunner {
-        showings.deleteAll()
-        movies.deleteAll()
-        locations.deleteAll()
-        users.deleteAll()
+        showings.deleteAll().subscribe()
+        movies.deleteAll().subscribe()
+        locations.deleteAll().subscribe()
+        users.deleteAll().subscribe()
         seedTestData(showings, movies, locations, users)
     }
 
@@ -43,9 +42,9 @@ class Application {
                 .doOnComplete { log.info("Completed save of seed locations") }
                 .subscribe()
 
-        val seedMovies = listOf(Movie("tt4425200", "John Wick: Chapter 2", Duration.ofHours(2).plusMinutes(2)),
-                Movie("tt1219827", "Ghost in the Shell", Duration.ofHours(1).plusMinutes(46)),
-                Movie("tt0110912", "Pulp Fiction", Duration.ofHours(2).plusMinutes(34)))
+        val seedMovies = listOf(Movie(imdbId = "tt4425200", title = "John Wick: Chapter 2", runtime = Duration.ofHours(2).plusMinutes(2)),
+                Movie(imdbId = "tt1219827", title = "Ghost in the Shell", runtime = Duration.ofHours(1).plusMinutes(46)),
+                Movie(imdbId = "tt0110912", title = "Pulp Fiction", runtime = Duration.ofHours(2).plusMinutes(34)))
         movies.save(seedMovies)
                 .doOnComplete { log.info("Completed save of seed movies") }
                 .subscribe()
