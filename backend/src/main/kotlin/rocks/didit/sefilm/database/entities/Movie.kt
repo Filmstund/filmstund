@@ -13,13 +13,21 @@ data class Movie(
         val imdbId: String? = null,
         val sfId: String? = null,
         val title: String = "",
+        val synopsis: String? = null,
         val originalTitle: String? = null,
         val releaseDate: LocalDate = LocalDate.now(),
+        val productionYear: Int? = null,
         val runtime: Duration? = null,
-        val poster: String? = null) {
+        val poster: String? = null,
+        val genres: Collection<String> = emptyList()) {
     init {
         if (imdbId != null && !imdbId.matches(Regex("^tt[0-9]{7}"))) {
             throw IllegalArgumentException("Illegal IMDb ID format: $imdbId")
         }
+    }
+
+    /** Should we do an extended query to find more information about this movie? */
+    fun needsMoreInfo(): Boolean {
+        return synopsis == null || originalTitle == null || runtime == null || poster == null;
     }
 }

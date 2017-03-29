@@ -57,9 +57,9 @@ class Application {
                 .doOnComplete { log.info("Completed save of seed users") }
                 .subscribe()
 
-        val seedShowings = listOf(Showing(UUID.randomUUID(), LocalDate.now(), LocalTime.now(), seedMovies.first(), seedLocations.first(), seedUsers.first(), seedUsers),
-                Showing(UUID.randomUUID(), LocalDate.now().plusDays(1), LocalTime.now(), seedMovies[1], seedLocations.first(), seedUsers.first(), seedUsers),
-                Showing(UUID.randomUUID(), LocalDate.now().plusDays(2), LocalTime.now(), seedMovies[2], seedLocations[1], seedUsers[1], seedUsers))
+        val seedShowings = listOf(Showing(UUID.randomUUID(), LocalDate.now(), LocalTime.now(), seedMovies.first(), seedLocations.first(), admin = seedUsers.first(), participants = seedUsers),
+                Showing(UUID.randomUUID(), LocalDate.now().plusDays(1), LocalTime.now(), seedMovies[1], seedLocations.first(), admin = seedUsers.first(), participants = seedUsers),
+                Showing(UUID.randomUUID(), LocalDate.now().plusDays(2), LocalTime.now(), seedMovies[2], seedLocations[1], admin = seedUsers[1], participants = seedUsers))
         showings.save(seedShowings)
                 .doOnComplete { log.info("Completed save of seed showings") }
                 .subscribe()

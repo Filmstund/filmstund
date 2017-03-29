@@ -13,6 +13,7 @@ data class Showing(@Id
                    val time: LocalTime? = null,
                    val movie: Movie? = null,
                    val location: Location? = null,
+                   val private: Boolean = false,
                    val admin: User? = null,
                    val participants: Collection<User> = listOf()
 )
