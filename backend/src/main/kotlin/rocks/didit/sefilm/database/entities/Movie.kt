@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.database.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Duration
@@ -29,5 +30,10 @@ data class Movie(
     /** Should we do an extended query to find more information about this movie? */
     fun needsMoreInfo(): Boolean {
         return synopsis == null || originalTitle == null || runtime == null || poster == null;
+    }
+
+    @JsonIgnore
+    fun isMissingImdbId(): Boolean {
+        return imdbId.isNullOrBlank()
     }
 }
