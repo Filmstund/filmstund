@@ -11,7 +11,7 @@ data class Showing(@Id
                    val id: UUID = UUID.randomUUID(),
                    val date: LocalDate? = null,
                    val time: LocalTime? = null,
-                   val movie: Movie? = null,
+                   val movieId: UUID? = null,
                    val location: Location? = null,
                    val private: Boolean = false,
                    val admin: User? = null,
