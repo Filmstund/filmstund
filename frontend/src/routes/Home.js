@@ -1,29 +1,27 @@
 import React from "react";
+import { connect } from "react-redux";
+
 import MainButton from "../MainButton";
 import Showing from "../Showing";
 import Header from "../Header";
 import Jumbotron from "../jumbotron/jumbotron";
-import {getJson} from "../lib/rest";
+
+import rest from "../store/reducers/rest"
 
 const Home = React.createClass({
-    getInitialState() {
-        return {
-            showings: []
-        }
-    },
     componentWillMount() {
-        getJson("/showings").then(showings => {
-            this.setState({ showings });
-        });
+        this.props.dispatch(rest.actions.showings.sync())
+    },
+    componentWillUnmount() {
+        this.props.dispatch(rest.actions.showings.reset())
     },
     render() {
-        const { showings } = this.state;
-        const { className } = this.props;
+        const { className, showings = [] } = this.props;
         return (
             <div className={className}>
                 <Jumbotron>
                     <Header>Nytt besök?</Header>
-                    <MainButton>Skapa nytt besök</MainButton>
+                    <MainButton onClick={() => console.log("button")}>Skapa nytt besök</MainButton>
                 </Jumbotron>
                 <Header>Besök jag har skapat</Header>
                 {/*<Showing
@@ -39,5 +37,9 @@ const Home = React.createClass({
     }
 });
 
+const mapStateToProps = (state) => ({
+    showings: state.showings.data
+})
 
-export default Home;
+
+export default connect(mapStateToProps)(Home);

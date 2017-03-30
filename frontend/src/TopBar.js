@@ -24,6 +24,7 @@ const TopBar = React.createClass({
       <TopBarContainer>
         <Link to="/">Hem</Link>
         <Link to="/user">Användare</Link>
+        <Link to="/movies">Movies</Link>
       </TopBarContainer>
     );
   }
