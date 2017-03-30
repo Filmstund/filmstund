@@ -54,6 +54,7 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
                 .uri("/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=GB&")
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
+                .retry(1)
                 .doOnError { e -> log.error("Unable to fetch movies from SF. Exception: $e") }
                 .flatMap { r -> r.bodyToFlux(SfMovieDTO::class.java) }
                 .map { (ncgId, title, releaseDate, _, posterUrl) ->
@@ -68,7 +69,7 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
     }
 
     private fun fetchExtendedInfoForMovie(movie: Movie) {
-        log.info("Fetching extended info movie info for ${movie.id}")
+        log.info("Fetching extended movie info for ${movie.id}")
         when {
             movie.sfId != null -> fetchFromSf(movie)
             movie.imdbId != null -> fetchFromImdbById(movie)
@@ -82,6 +83,7 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
                 .uri("/v1/movies/{sfId}", mapOf("sfId" to movie.sfId))
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
+                .retry(1)
                 .doOnError { e -> log.error("Unable to fetch movie info from SF for ${movie.sfId}: $e") }
                 .flatMap { r -> r.bodyToMono(SfExtendedMovieDTO::class) }
                 .flatMap { m ->
@@ -93,7 +95,6 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
                             poster = m.posterUrl,
                             genres = m.genres.map { g -> g.name }).toMono()
                 }
-                // TODO: .retryWhen()
 
 
         repo.save(updatedMovie)
@@ -115,17 +116,23 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
     }
 
     private fun fetchImdbIdBasedOnTitleAndYear(movie: Movie) {
-        log.info("Fetching IMDb id for '${movie.title}'")
+        val title = movie.originalTitle ?: movie.title
+
+        log.info("Fetching IMDb id for '$title'")
         val updatedInfo = omdbApiWebClient.get()
-                .uri("/?t={title}&y={year}", mapOf("title" to movie.title, "year" to movie.productionYear))
+                .uri("/?t={title}&y={year}", mapOf("title" to title, "year" to movie.productionYear))
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
-                .doOnError { e -> log.error("Unable to fetch info from OMDbApi[title='${movie.title}', year=${movie.productionYear}: $e") }
+                .doOnError { e -> log.error("Unable to fetch info from OMDbApi[title='$title', year=${movie.productionYear}: $e") }
                 .flatMap { b -> b.bodyToMono(OmdbApiMovieDTO::class) }
                 .flatMap { m ->
-                    log.info("Found: $m")
+                    if (!m.Response.toBoolean()) {
+                        log.info("Omdb didn't find anything for '${title}'")
+                        return@flatMap movie.toMono()
+                    }
+                    log.info("Updating Imdb id to ${m.imdbID} for movie[id=${movie.id}]")
                     movie.copy(imdbId = m.imdbID).toMono()
-                } // TODO: update more values if needed?
+                }
 
         repo.save(updatedInfo)
                 .doOnError { e -> log.error("Unable to update movie[id=${movie.id}] with new IMDb id: $e") }

@@ -26,4 +26,4 @@ data class OmdbApiMovieDTO(val Title: String?,
                            val BoxOffice: String?,
                            val Production: String?,
                            val Website: String?,
-                           val Response: String?)
+                           val Response: String)
