@@ -29,7 +29,7 @@ data class Movie(
 
     /** Should we do an extended query to find more information about this movie? */
     fun needsMoreInfo(): Boolean {
-        return synopsis == null || originalTitle == null || runtime == null || poster == null;
+        return synopsis == null || poster == null;
     }
 
     @JsonIgnore

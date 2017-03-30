@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.body
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import rocks.didit.sefilm.Properties
@@ -104,30 +105,40 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
     }
 
     private fun fetchFromImdbById(movie: Movie) {
-        if (!properties.tmdb.apiKeyExists()) return
         log.info("Fetching extended movie info from IMDb by ID for ${movie.imdbId}")
-        // TODO
+        val updatedInfo = fetchOmdbExtendedInfo(movie, "/?i={id}", mapOf("id" to movie.imdbId))
+                .flatMap { m ->
+                    if (!m.Response.toBoolean()) return@flatMap movie.toMono()
+
+                    val genres: List<String>
+                    if (m.Genre != null) {
+                        genres = m.Genre.split(", ")
+                    } else {
+                        genres = listOf()
+                    }
+
+                    movie.copy(synopsis = m.Plot, productionYear = m.Year?.toInt(), poster = m.Poster, genres = genres).toMono()
+                }
+
+        repo.save(updatedInfo)
+                .doOnError { e -> log.error("Unable to update movie[id=${movie.id}] with new extended info: $e") }
+                .doOnComplete { log.info("Successfully updated movie with extended information") }
+                .subscribe()
     }
 
     private fun fetchFromImdbByTitle(movie: Movie) {
-        if (!properties.tmdb.apiKeyExists()) return
-        log.info("Fetching extended movie info from IMDb by title for ${movie.title}")
-        // TODO
+        log.info("Fetching extended movie info from IMDb by title for ${movie.title} - NOT SUPPORTED YET")
     }
 
     private fun fetchImdbIdBasedOnTitleAndYear(movie: Movie) {
         val title = movie.originalTitle ?: movie.title
 
         log.info("Fetching IMDb id for '$title'")
-        val updatedInfo = omdbApiWebClient.get()
-                .uri("/?t={title}&y={year}", mapOf("title" to title, "year" to movie.productionYear))
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .exchange()
-                .doOnError { e -> log.error("Unable to fetch info from OMDbApi[title='$title', year=${movie.productionYear}: $e") }
-                .flatMap { b -> b.bodyToMono(OmdbApiMovieDTO::class) }
+        val updatedInfo = fetchOmdbExtendedInfo(movie, "/?t={title}&y={year}",
+                mapOf("title" to title, "year" to movie.productionYear))
                 .flatMap { m ->
                     if (!m.Response.toBoolean()) {
-                        log.info("Omdb didn't find anything for '${title}'")
+                        log.info("Omdb didn't find anything for '$title'")
                         return@flatMap movie.toMono()
                     }
                     log.info("Updating Imdb id to ${m.imdbID} for movie[id=${movie.id}]")
@@ -138,5 +149,14 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
                 .doOnError { e -> log.error("Unable to update movie[id=${movie.id}] with new IMDb id: $e") }
                 .doOnComplete { log.info("Successfully updated movie with new IMDb id") }
                 .subscribe()
+    }
+
+    private fun fetchOmdbExtendedInfo(movie: Movie, uri: String, params: Map<String, Any?>): Flux<OmdbApiMovieDTO> {
+        return omdbApiWebClient.get()
+                .uri(uri, params)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .doOnError { e -> log.error("Unable to fetch info from OMDbApi[title='${movie.title}', year=${movie.productionYear}: $e") }
+                .flatMap { b -> b.bodyToMono(OmdbApiMovieDTO::class) }
     }
 }
