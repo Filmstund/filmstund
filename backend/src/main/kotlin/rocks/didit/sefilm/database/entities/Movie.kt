@@ -2,8 +2,10 @@ package rocks.didit.sefilm.database.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 
@@ -20,7 +22,9 @@ data class Movie(
         val productionYear: Int? = null,
         val runtime: Duration? = null,
         val poster: String? = null,
-        val genres: Collection<String> = emptyList()) {
+        val genres: Collection<String> = emptyList(),
+        @LastModifiedDate
+        val lastModifiedDate: Instant = Instant.EPOCH) {
     init {
         if (imdbId != null && !imdbId.matches(Regex("^tt[0-9]{7}"))) {
             throw IllegalArgumentException("Illegal IMDb ID format: $imdbId")

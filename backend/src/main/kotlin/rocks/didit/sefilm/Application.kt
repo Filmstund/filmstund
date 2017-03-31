@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
+import org.springframework.data.mongodb.config.EnableMongoAuditing
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
@@ -22,6 +23,7 @@ import java.time.LocalTime
 import java.util.*
 
 @SpringBootApplication
+@EnableMongoAuditing
 @EnableConfigurationProperties(Properties::class)
 class Application {
     private val log = LoggerFactory.getLogger(Application::class.java)

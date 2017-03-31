@@ -32,13 +32,12 @@ class MovieHandler(private val repo: MovieRepository, private val properties: Pr
     fun findAll(req: ServerRequest) = ok().json().body(repo.findAll())
     fun findOne(req: ServerRequest): Mono<ServerResponse> {
         val movie = repo.findOne(req.uuidMonoPathVariable("id"))
-
-        movie.doOnSuccess { movie ->
-            when {
-                movie.needsMoreInfo() -> fetchExtendedInfoForMovie(movie)
-                movie.isMissingImdbId() -> fetchImdbIdBasedOnTitleAndYear(movie)
-            }
-        }.subscribe()
+                .doOnSuccess { movie ->
+                    when {
+                        movie.needsMoreInfo() -> fetchExtendedInfoForMovie(movie)
+                        movie.isMissingImdbId() -> fetchImdbIdBasedOnTitleAndYear(movie)
+                    }
+                }.subscribe()
 
         return movie.then { m -> ok().json().body(Mono.just(m)) }
                 .otherwiseIfEmpty(notFound().build())
