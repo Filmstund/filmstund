@@ -34,9 +34,19 @@ const eTagFetch = (url = null, options = { headers: {} }) => {
     }
     // all other requests go straight to fetch
     // can't use apply(undefined, arguments) as babel uses _arguments which is different..
-    console.log("hello", url, options)
     return fetch.call(undefined, url, options)
 };
 
+const myFetch = (url, opts) => {
+    return eTagFetch(url, opts).then(resp => resp.json()
+        .then((data)=> {
+            if (resp.status >= 200 && resp.status < 300) {
+                return data;
+            } else {
+                return Promise.reject(data);
+            }
+        }));
+};
 
-export default eTagFetch;
+
+export default myFetch;

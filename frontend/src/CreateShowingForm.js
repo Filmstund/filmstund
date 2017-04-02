@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment";
 import 'react-datepicker/dist/react-datepicker.css';
 
-import rest from "./store/reducers/rest";
+import { showings } from "./store/reducers";
 
 import Header from "./Header";
 import Showing from "./Showing";
@@ -43,9 +43,9 @@ const NewShowing = React.createClass({
             date: this.state.showing.date.format("YYYY-MM-DD")
         };
 
-        console.log(submitObject, rest.actions);
+        console.log(submitObject, showings.actions);
 
-        this.props.dispatch(rest.actions.createShowing({}, {body: JSON.stringify(submitObject)}));
+        this.props.dispatch(showings.actions.requestCreate(submitObject));
     },
     render() {
         const { showing } = this.state;
@@ -81,7 +81,7 @@ const NewShowing = React.createClass({
 });
 
 const mapStateToProps = (state, { movieId }) => ({
-    movie: state.movies.data.find(m => movieId === m.id)
+    movie: state.movies.data[movieId]
 });
 
 

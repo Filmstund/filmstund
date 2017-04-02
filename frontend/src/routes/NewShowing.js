@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 
-import rest from "../store/reducers/rest";
+import { movies } from "../store/reducers";
 
 import Header from "../Header";
 import Movie from "../Movie";
@@ -14,10 +14,7 @@ const NewShowing = React.createClass({
         return { movieId }
     },
     componentWillMount() {
-        this.props.dispatch(rest.actions.movies.sync())
-    },
-    componentWillUnmount() {
-        this.props.dispatch(rest.actions.movies.reset("sync"))
+        this.props.dispatch(movies.actions.requestIndex());
     },
     renderSelectMovie(movies) {
         return (
@@ -44,7 +41,7 @@ const NewShowing = React.createClass({
 });
 
 const mapStateToProps = (state) => ({
-    movies: state.movies.data
+    movies: Object.values(state.movies.data)
 });
 
 

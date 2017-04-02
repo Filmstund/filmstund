@@ -29,7 +29,7 @@ const StyledShowing = styled(Showing)`
 `;
 
 const mapStateToProps = (state, { showing }) => ({
-    movie: state.movies.data.find(m => m.id === showing.movieId)
+    movie: state.movies.data[showing.movieId]
 });
 
 export default connect(mapStateToProps)(StyledShowing)

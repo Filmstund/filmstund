@@ -1,51 +1,159 @@
-import reduxApi, {transformers} from "redux-api";
-import adapterFetch from "redux-api/lib/adapters/fetch";
+import _ from "lodash";
 import fetch from "../../lib/fetch";
-import {showingDateToString} from "../../lib/dateTools";
 
-const showingTransformer = (showing) => {
-    const date = showingDateToString(showing.date, showing.time);
-    const newMovie = {
-        ...showing,
-        date
+
+const reduceToObject = (array) => array.reduce(
+    (acc, elem) => ({ ...acc, [elem.id]: elem}),
+    {}
+);
+
+const crudReducer = (name, path) => {
+    const actions = {
+        requestIndex: Symbol(`${name}_REQUEST_INDEX`),
+        successIndex: Symbol(`${name}_RESPONSE_INDEX`),
+        errorIndex: Symbol(`${name}_ERROR_INDEX`),
+
+        requestSingle: Symbol(`${name}_REQUEST_SINGLE`),
+        successSingle: Symbol(`${name}_RESPONSE_SINGLE`),
+        errorSingle: Symbol(`${name}_ERROR_SINGLE`),
+
+        requestCreate: Symbol(`${name}_REQUEST_CREATE`),
+        successCreate: Symbol(`${name}_RESPONSE_CREATE`),
+        errorCreate: Symbol(`${name}_ERROR_CREATE`),
+
+        requestUpdate: Symbol(`${name}_REQUEST_UPDATE`),
+        successUpdate: Symbol(`${name}_RESPONSE_UPDATE`),
+        errorUpdate: Symbol(`${name}_ERROR_UPDATE`),
+
+        requestDelete: Symbol(`${name}_REQUEST_DELETE`),
+        successDelete: Symbol(`${name}_RESPONSE_DELETE`),
+        errorDelete: Symbol(`${name}_ERROR_DELETE`),
     };
-    delete newMovie.time;
-    return newMovie;
-};
 
-const movieTransformer = (movie) => {
-    const releaseDate = showingDateToString(movie.releaseDate);
-    const newMovie = {
-        ...movie,
-        releaseDate
+    const initialState = {
+        loading: false,
+        data: {},
+        error: null
     };
-    return newMovie;
-};
 
-const api = reduxApi({
-    showings: {
-        url: "/showings",
-        reducerName: "showings",
-        transformer: (d) => transformers.array(d).map(showingTransformer)
-    },
-    createShowing: {
-        url: "/showings",
-        reducerName: "showings",
-        options: {
-            method: "post",
-            headers: {
-                'Content-Type': 'application/json'
-            }
+    const reducer = (state = initialState, action) => {
+        switch (action.type) {
+            case actions.requestIndex:
+            case actions.requestSingle:
+            case actions.requestCreate:
+            case actions.requestUpdate:
+            case actions.requestDelete:
+                return {
+                    ...state,
+                    error: null,
+                    loading: true
+                };
+            case actions.successIndex:
+                return {
+                    ...state,
+                    loading: false,
+                    error: null,
+                    data: action.data
+                };
+            case actions.successSingle:
+            case actions.successUpdate:
+                return {
+                    ...state,
+                    loading: false,
+                    error: null,
+                    data: {
+                        ...state.data,
+                        [action.data.id]: action.data
+                    }
+                };
+            case actions.successCreate:
+                return {
+                    ...state,
+                    loading: false,
+                    error: null,
+                    data: {
+                        ...state.data,
+                        [action.data.id]: action.data
+                    }
+                };
+            case actions.successDelete:
+                return {
+                    ...state,
+                    loading: false,
+                    error: null,
+                    data: _.omit(state.data, action.id)
+                };
+            case actions.errorIndex:
+            case actions.errorSingle:
+            case actions.errorCreate:
+            case actions.errorUpdate:
+            case actions.errorDelete:
+                return {
+                    ...state,
+                    loading: false,
+                    error: action.error
+                };
+
+            default:
+                return state;
         }
-    },
-    movies: {
-        url: "/movies",
-        transformer: (d) => transformers.array(d).map(movieTransformer)
-    }
-});
+    };
 
-api.use("rootUrl", "http://localhost:8080/api");
-api.use("fetch", adapterFetch(fetch));
+    const jsonRequest = (path, data, method = "POST") =>
+        fetch(path, {
+            method,
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
-export default api
+    const actionCreators = {
+        requestIndex: () => (dispatch) => {
+            dispatch({ type: actions.requestIndex });
 
+            fetch(path)
+                .then(data => dispatch({ type: actions.successIndex, data: reduceToObject(data) }))
+                .catch(error => dispatch({ type: actions.errorIndex, error }))
+        },
+
+        requestSingle: (id) => (dispatch) => {
+            dispatch({ type: actions.requestSingle });
+
+            fetch(path + "/" + id)
+                .then(data => dispatch({ type: actions.successSingle, data }))
+                .catch(error => dispatch({ type: actions.errorSingle, error }))
+        },
+
+        requestCreate: (data) => (dispatch) => {
+            dispatch({ type: actions.requestCreate });
+
+            jsonRequest(path, data)
+                .then(data => dispatch({ type: actions.successCreate, data }))
+                .catch(error => dispatch({ type: actions.errorCreate, error }))
+        },
+
+        requestUpdate: (data) => (dispatch) => {
+            dispatch({ type: actions.requestUpdate });
+
+            jsonRequest(path + "/" + data.id, data, "PUT")
+                .then(data => dispatch({ type: actions.successUpdate, data }))
+                .catch(error => dispatch({ type: actions.errorUpdate, error }))
+        },
+
+        requestDelete: (id) => (dispatch) => {
+            dispatch({type: actions.requestDelete, id});
+
+            jsonRequest(path + "/" + id, {}, "DELETE")
+                .then(id => dispatch({ type: actions.successDelete, id }))
+                .catch(error => dispatch({ type: actions.errorDelete, error }))
+        }
+    };
+
+    return {
+        reducer,
+        actions: actionCreators
+    };
+};
+
+export default crudReducer;

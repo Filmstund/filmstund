@@ -1,22 +1,22 @@
-import { applyMiddleware, combineReducers, createStore, compose } from "redux";
+import { applyMiddleware, createStore, compose } from "redux";
 import thunk from "redux-thunk";
 import logger from "redux-logger";
 import throttle from 'lodash/throttle';
 
 import { loadState, saveState } from "./localStorage";
-import rest from "./reducers/rest";
+
+import reducers from "./reducers";
 
 const persistedState = loadState();
 
+const middlewares = applyMiddleware(thunk, logger);
 
-const createStoreWithMiddleware = compose(
-    applyMiddleware(
-        thunk,
-        logger
-    ), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-)(createStore);
-const reducer = combineReducers(rest.reducers);
-const store = createStoreWithMiddleware(reducer, persistedState);
+const enhancers = compose(
+    middlewares,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
+
+const store = createStore(reducers, persistedState, enhancers);
 
 store.subscribe(throttle(() => {
     saveState(store.getState());

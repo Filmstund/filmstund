@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import Header from "../Header";
 
-import rest from "../store/reducers/rest";
+import { movies } from "../store/reducers";
 import Movie from "../Movie";
 
 import _ from "lodash";
@@ -11,10 +11,7 @@ import _ from "lodash";
 
 const Movies = React.createClass({
     componentWillMount() {
-        this.props.dispatch(rest.actions.movies.sync())
-    },
-    componentWillUnmount() {
-        this.props.dispatch(rest.actions.movies.reset("sync"))
+        this.props.dispatch(movies.actions.requestIndex());
     },
     render() {
         const { className, movies = [], history } = this.props;

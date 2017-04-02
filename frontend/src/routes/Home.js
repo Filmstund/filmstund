@@ -6,14 +6,11 @@ import Showing from "../Showing";
 import Header from "../Header";
 import Jumbotron from "../jumbotron/jumbotron";
 
-import rest from "../store/reducers/rest"
+import { showings } from "../store/reducers/index"
 
 const Home = React.createClass({
     componentWillMount() {
-        this.props.dispatch(rest.actions.showings.sync())
-    },
-    componentWillUnmount() {
-        this.props.dispatch(rest.actions.showings.reset("sync"))
+        this.props.dispatch(showings.actions.requestIndex());
     },
     render() {
         const { className, showings = [] } = this.props;
@@ -38,7 +35,7 @@ const Home = React.createClass({
 });
 
 const mapStateToProps = (state) => ({
-    showings: state.showings.data
+    showings: Object.values(state.showings.data)
 })
 
 
