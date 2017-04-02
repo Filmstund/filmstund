@@ -1,6 +1,11 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { Link as RouterLink } from "react-router-dom";
 
-const MainButton = styled.button`
+const MainButtonStyles = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: gold;
   color: black;
   border: 0;
@@ -12,4 +17,6 @@ const MainButton = styled.button`
   font-family: "Roboto", sans-serif;
 `;
 
-export default MainButton
+export const Link = styled(RouterLink)(MainButtonStyles);
+
+export default styled.button(MainButtonStyles);

@@ -20,8 +20,8 @@ export const showingDateToString = (date, time = [0, 0, 0]) => {
     return dateString + " " + timeString;
 };
 
-export const formatShowingDateTime = (date, time) =>
-    moment(showingDateToString(date, time)).format(DATE_MONTH_TIME);
+export const formatShowingDateTime = (date) =>
+    moment(date).format(DATE_MONTH_TIME);
 
 export const formatShowingDate = (date) =>
     moment(showingDateToString(date)).format(DATE_MONTH);

@@ -18,12 +18,12 @@ const Movies = React.createClass({
         this.props.dispatch(rest.actions.movies.reset("sync"))
     },
     render() {
-        const { className, movies = [] } = this.props;
+        const { className, movies = [], history } = this.props;
         return (
             <div className={className}>
                 <Header>Filmer hos SF</Header>
                 {_.sortBy(movies, m => showingDateToString(m.releaseDate)).map(movie => (
-                    <Movie key={movie.id} movie={movie}/>
+                    <Movie key={movie.id} movie={movie} onClick={() => history.push(`/showings/new/${movie.id}`)} />
                 ))}
             </div>
         )

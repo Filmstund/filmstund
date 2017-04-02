@@ -1,5 +1,7 @@
 import React, { PropTypes } from "react";
 import styled from "styled-components";
+import alfons from "./assets/alfons.jpg";
+
 
 const PaddingContainer = styled.div`
   flex: 1;
@@ -22,7 +24,7 @@ const Header = styled.h3`
 
 const PosterBox = ({ className, poster, headerText, children }) => (
     <div className={className}>
-        <Poster src={poster}/>
+        <Poster src={poster || alfons}/>
         <PaddingContainer>
             <Header>{headerText}</Header>
             {children}
@@ -31,10 +33,9 @@ const PosterBox = ({ className, poster, headerText, children }) => (
 );
 
 PosterBox.propTypes = {
-    poster: PropTypes.string.isRequired,
+    poster: PropTypes.string,
     headerText: PropTypes.string.isRequired
 };
-
 
 export default styled(PosterBox)`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);

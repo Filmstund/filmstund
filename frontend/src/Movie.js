@@ -23,8 +23,8 @@ const renderPremiereDate = (releaseDate) => {
 
 
 
-const Movie = ({ className, movie: { poster, title, releaseDate } }) => (
-    <div className={className}>
+const Movie = ({ movie: { poster, title, releaseDate }, ...props }) => (
+    <div {...props}>
         <PosterBox headerText={title} poster={poster}>
             <VerticalPaddingContainer>
                 {renderPremiereDate(releaseDate)}

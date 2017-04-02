@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import MainButton from "../MainButton";
+import { Link } from "../MainButton";
 import Showing from "../Showing";
 import Header from "../Header";
 import Jumbotron from "../jumbotron/jumbotron";
@@ -21,7 +21,7 @@ const Home = React.createClass({
             <div className={className}>
                 <Jumbotron>
                     <Header>Nytt besök?</Header>
-                    <MainButton onClick={() => console.log("button")}>Skapa nytt besök</MainButton>
+                    <Link to="/showings/new">Skapa nytt besök</Link>
                 </Jumbotron>
                 <Header>Besök jag har skapat</Header>
                 {/*<Showing
@@ -30,7 +30,7 @@ const Home = React.createClass({
                     */}
                 <Header>Mina kommande besök</Header>
                 {showings.map(showing => (
-                    <Showing key={showing.id} showing={showing}/>
+                    <Showing key={showing.id} movie={showing.movie} showing={showing}/>
                 ))}
             </div>
         )

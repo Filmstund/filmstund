@@ -10,6 +10,7 @@ import Footer from "./footer/Footer";
 import Home from "./routes/Home";
 import User from "./routes/User";
 import Movies from "./routes/Movies";
+import NewShowing from "./routes/NewShowing";
 
 const PaddingContainer = styled.div`
   padding: 1em;
@@ -42,6 +43,7 @@ const App = React.createClass({
                 <Route exact path="/" component={Home} />
                 <Route path="/user" component={User} />
                 <Route path="/movies" component={Movies} />
+                <Route path="/showings/new/:movieId?" component={NewShowing} />
               </PaddingContainer>
               <Footer/>
             </ScrollContainer>
