@@ -29,8 +29,8 @@ const PosterBox = ({ className, poster, headerText, children }) => (
 );
 
 PosterBox.propTypes = {
-    poster: PropTypes.string,
-    headerText: PropTypes.string
+    poster: PropTypes.string.isRequired,
+    headerText: PropTypes.string.isRequired
 };
 
 

@@ -10,7 +10,7 @@ const VerticalPaddingContainer = styled.div`
 
 const Showing = ({ className, poster, showing: { date, time, admin, movie, location } }) => (
     <div className={className}>
-        <PosterBox headerText={movie.name} poster={poster}>
+        <PosterBox headerText={movie.title} poster={poster}>
             <VerticalPaddingContainer>
                 {formatShowingDateTime(date, time)}<br/>
                 {location.name}<br/>
