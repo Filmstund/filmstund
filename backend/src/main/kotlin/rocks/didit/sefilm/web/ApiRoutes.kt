@@ -17,7 +17,7 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
         (accept(MediaType.APPLICATION_JSON) and "/api").nest {
             "/movies".nest {
                 GET("/", movieHandler::findAll)
-                PUT("/", movieHandler::saveMovie)
+                POST("/", movieHandler::saveMovie)
                 GET("/sf", movieHandler::populateFromSf)
                 GET("/{id}", movieHandler::findOne)
                 //POST("/{id}", movieHandler::updateMovie)
@@ -25,6 +25,7 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
 
             "/showings".nest {
                 GET("/", showingHandler::findAll)
+                POST("/", showingHandler::saveShowing)
                 GET("/{id}", showingHandler::findOne)
                 GET("/{id}/bioklubbnummer", showingHandler::findBioklubbnummerForShowing)
             }

@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.OmdbApiMovieDTO
@@ -57,7 +58,7 @@ class MovieHandler(private val repo: MovieRepository) {
         return repo.save(fetchedMovie)
                 .doOnComplete { log.info("Saved incoming movie") }
                 .doOnError { e -> log.error("Unable to save incoming movie", e) }
-                .flatMap { m -> created(m.toLocationUri()).build() }
+                .flatMap { m -> created(m.toLocationUri()).body(m.toMono()) }
                 .next()
     }
 
@@ -150,7 +151,6 @@ class MovieHandler(private val repo: MovieRepository) {
         repo.save(updatedInfo)
                 .doOnError { e -> log.error("Unable to update movie[id=${movie.id}] with new IMDb id", e) }
                 .doOnComplete { log.info("Successfully updated movie with new IMDb id") }
-                .subscribe()
     }
 
     private fun fetchOmdbExtendedInfo(uri: String, params: Map<String, Any?>) =
