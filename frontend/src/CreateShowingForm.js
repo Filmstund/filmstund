@@ -48,13 +48,13 @@ const NewShowing = React.createClass({
     },
     render() {
         const { showing } = this.state;
-        const { movie } = this.props;
+        const { movie, clearSelectedMovie } = this.props;
 
         return (
             <div>
                 <Header>Skapa besök</Header>
                 <form onSubmit={this.handleSubmit}>
-                    <Showing showing={showing} movie={movie}/>
+                    <Showing showing={showing} movie={movie} onClick={clearSelectedMovie} />
                     <Field text="Datum:">
                         <DatePicker selected={showing.date} onChange={v => this.setShowingValue("date", v)} />
                     </Field>

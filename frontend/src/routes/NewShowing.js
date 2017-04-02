@@ -26,13 +26,16 @@ const NewShowing = React.createClass({
             </div>
         )
     },
+    clearSelectedMovie() {
+        this.setState({ movieId: null })
+    },
     render() {
         const { movieId } = this.state;
         const { movies = [] } = this.props;
 
         if (movieId) {
             return (
-                <CreateShowingForm movieId={movieId}/>
+                <CreateShowingForm movieId={movieId} clearSelectedMovie={this.clearSelectedMovie}/>
             )
         } else {
             return this.renderSelectMovie(movies);
