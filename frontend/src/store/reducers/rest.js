@@ -1,24 +1,42 @@
 import reduxApi, {transformers} from "redux-api";
 import adapterFetch from "redux-api/lib/adapters/fetch";
-import fetch from "../../lib/rest";
+import fetch from "../../lib/fetch";
 import {showingDateToString} from "../../lib/dateTools";
 
-const dateTransformer = (date, time) => showingDateToString(date, time);
-
-const movieTransformer = (movie) => {
-    const date = dateTransformer(movie.date, movie.time);
+const showingTransformer = (showing) => {
+    const date = showingDateToString(showing.date, showing.time);
     const newMovie = {
-        ...movie,
+        ...showing,
         date
     };
     delete newMovie.time;
     return newMovie;
 };
 
+const movieTransformer = (movie) => {
+    const releaseDate = showingDateToString(movie.releaseDate);
+    const newMovie = {
+        ...movie,
+        releaseDate
+    };
+    return newMovie;
+};
+
 const api = reduxApi({
     showings: {
         url: "/showings",
-        transformer: (d) => transformers.array(d).map(showing => ({...showing, movie: movieTransformer(showing.movie)}))
+        reducerName: "showings",
+        transformer: (d) => transformers.array(d).map(showingTransformer)
+    },
+    createShowing: {
+        url: "/showings",
+        reducerName: "showings",
+        options: {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
     },
     movies: {
         url: "/movies",

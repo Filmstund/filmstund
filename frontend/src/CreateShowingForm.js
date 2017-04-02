@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment";
 import 'react-datepicker/dist/react-datepicker.css';
 
+import rest from "./store/reducers/rest";
 
 import Header from "./Header";
 import Showing from "./Showing";
@@ -42,7 +43,9 @@ const NewShowing = React.createClass({
             date: this.state.showing.date.format("YYYY-MM-DD")
         };
 
-        console.log(submitObject)
+        console.log(submitObject, rest.actions);
+
+        this.props.dispatch(rest.actions.createShowing({}, {body: JSON.stringify(submitObject)}));
     },
     render() {
         const { showing } = this.state;

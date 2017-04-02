@@ -24,4 +24,4 @@ export const formatShowingDateTime = (date) =>
     moment(date).format(DATE_MONTH_TIME);
 
 export const formatShowingDate = (date) =>
-    moment(showingDateToString(date)).format(DATE_MONTH);
+    moment(date).format(DATE_MONTH);

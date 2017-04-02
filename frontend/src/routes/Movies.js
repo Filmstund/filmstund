@@ -8,7 +8,6 @@ import Movie from "../Movie";
 
 import _ from "lodash";
 
-import {showingDateToString} from "../lib/dateTools";
 
 const Movies = React.createClass({
     componentWillMount() {
@@ -22,7 +21,7 @@ const Movies = React.createClass({
         return (
             <div className={className}>
                 <Header>Filmer hos SF</Header>
-                {_.sortBy(movies, m => showingDateToString(m.releaseDate)).map(movie => (
+                {_.sortBy(movies, 'releaseDate').map(movie => (
                     <Movie key={movie.id} movie={movie} onClick={() => history.push(`/showings/new/${movie.id}`)} />
                 ))}
             </div>

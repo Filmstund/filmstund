@@ -34,6 +34,7 @@ const eTagFetch = (url = null, options = { headers: {} }) => {
     }
     // all other requests go straight to fetch
     // can't use apply(undefined, arguments) as babel uses _arguments which is different..
+    console.log("hello", url, options)
     return fetch.call(undefined, url, options)
 };
 

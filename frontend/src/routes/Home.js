@@ -30,7 +30,7 @@ const Home = React.createClass({
                     */}
                 <Header>Mina kommande besök</Header>
                 {showings.map(showing => (
-                    <Showing key={showing.id} movie={showing.movie} showing={showing}/>
+                    <Showing key={showing.id} showing={showing}/>
                 ))}
             </div>
         )

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import {formatShowingDate, getTodaysDate, showingDateToString} from "./lib/dateTools";
+import {formatShowingDate, getTodaysDate} from "./lib/dateTools";
 import PosterBox from "./PosterBox";
 
 const VerticalPaddingContainer = styled.div`
@@ -11,10 +11,9 @@ const now = getTodaysDate();
 
 const renderPremiereDate = (releaseDate) => {
 
-    const showingDate = showingDateToString(releaseDate);
     const formattedDate = formatShowingDate(releaseDate);
 
-    if (showingDate > now) {
+    if (releaseDate > now) {
         return "Premiär " + formattedDate;
     } else {
         return null;
