@@ -1,24 +1,41 @@
 import "whatwg-fetch";
 
-const backendUrl = "http://localhost:8080/api";
+const data = {};
+const etags = {};
 
-const checkStatusAndParseJson = (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response.json();
-    } else {
-        const error = new Error(response.statusText);
-        error.response = response;
-        throw error;
+const eTagFetch = (url = null, options = { headers: {} }) => {
+    /* eslint no-param-reassign:0 */
+    url = url ? url : options.url
+    if (options.method === 'GET' || !options.method) {
+        const etag = etags[url]
+        const cachedResponse = data[`${url}${etag}`] // ensure etag is for url
+        if (etag) {
+            options.headers['If-None-Match'] = etag
+        }
+
+        return fetch(url, options)
+            .then((response) => {
+                if (response.status === 304) {
+                    return cachedResponse.clone()
+                }
+
+                if (response.status === 200) {
+                    const responseEtag = response.headers.get('Etag')
+
+                    if (responseEtag) {
+                        data[`${url}${responseEtag}`] = response.clone()
+                        etags[url] = responseEtag
+                    }
+                }
+
+                return response
+            })
+
     }
+    // all other requests go straight to fetch
+    // can't use apply(undefined, arguments) as babel uses _arguments which is different..
+    return fetch.call(undefined, url, options)
 };
 
-export const getJson = (path) =>
-    fetch(backendUrl + path)
-    .then(checkStatusAndParseJson);
 
-export const postJson = (path, data) =>
-    fetch(backendUrl + path, {
-        method: 'POST',
-        body: JSON.stringify(data)
-    })
-    .then(checkStatusAndParseJson);
+export default eTagFetch;
