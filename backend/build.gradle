@@ -44,7 +44,7 @@ repositories {
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-webflux")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-    // compile("org.springframework.boot:spring-boot-devtools") // not working correctly
+    // compile("org.springframework.boot:spring-boot-devtools") // bug: https://github.com/spring-projects/spring-boot/issues/8771
     compileOnly("org.springframework:spring-context-indexer")
     compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
