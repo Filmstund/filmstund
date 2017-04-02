@@ -49,7 +49,8 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
     object Cors {
         fun corsSupport(req: ServerRequest) =
                 ok().header("Access-Control-Allow-Origin", "*")
-                        .header("Access-Control-Allow-Methods", "POST, GET, PUT").build()
+                        .header("Access-Control-Allow-Methods", "POST, GET, PUT")
+                        .header("Access-Control-Request-Headers", "*").build()
 
     }
 }
