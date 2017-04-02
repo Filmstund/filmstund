@@ -17,7 +17,7 @@ const Showing = ({ movie = {}, showing: { date, admin, location }, dispatch, ...
                 {location.name}<br/>
             </VerticalPaddingContainer>
             {admin &&
-                <span>Bokat av {admin.nick}</span>
+                <span>Skapad av {admin.nick}</span>
             }
         </PosterBox>
     </div>
