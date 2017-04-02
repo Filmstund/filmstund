@@ -31,7 +31,7 @@ class ShowingHandler(val repo: ShowingRepository, val locationRepo: LocationRepo
     fun findOne(req: ServerRequest) = repo.findOne(req.uuidMonoPathVariable("id"))
             .then { s -> ok().json().body(Mono.just(s)) }
             .otherwiseIfEmpty(notFound().build())
-            .otherwise(IllegalArgumentException::class.java, { badRequest().build() })
+            .otherwise(IllegalArgumentException::class.java, { badRequest().json().build() })
 
     fun findBioklubbnummerForShowing(req: ServerRequest) =
             repo.findOne(req.uuidMonoPathVariable("id"))
@@ -39,7 +39,7 @@ class ShowingHandler(val repo: ShowingRepository, val locationRepo: LocationRepo
                         ok().json().body(BodyInserters.fromObject(shuffledBioklubbnummer(s.participants)))
                     }
                     .otherwiseIfEmpty(notFound().build())
-                    .otherwise(IllegalArgumentException::class.java, { badRequest().build() })
+                    .otherwise(IllegalArgumentException::class.java, { badRequest().json().build() })
 
     fun saveShowing(req: ServerRequest): Mono<ServerResponse> {
         val showing = req.bodyToMono(ShowingDTO::class.java)
@@ -48,7 +48,7 @@ class ShowingHandler(val repo: ShowingRepository, val locationRepo: LocationRepo
         return repo.save(showing)
                 .doOnComplete { log.info("Saved new showing") }
                 .doOnError { e -> log.error("Unable to save new showing", e) }
-                .flatMap { s -> created(URI.create("/api/showings/${s.id}")).body(s.toMono()) }
+                .flatMap { s -> created(URI.create("/api/showings/${s.id}")).json().body(s.toMono()) }
                 .next()
     }
 

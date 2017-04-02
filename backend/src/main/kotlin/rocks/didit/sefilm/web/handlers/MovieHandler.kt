@@ -43,7 +43,7 @@ class MovieHandler(private val repo: MovieRepository) {
                 }
                 .then { m -> ok().json().body(Mono.just(m)) }
                 .otherwiseIfEmpty(notFound().build())
-                .otherwise(IllegalArgumentException::class.java, { badRequest().build() })
+                .otherwise(IllegalArgumentException::class.java, { badRequest().json().build() })
                 .subscribe()
     }
 
@@ -58,7 +58,7 @@ class MovieHandler(private val repo: MovieRepository) {
         return repo.save(fetchedMovie)
                 .doOnComplete { log.info("Saved incoming movie") }
                 .doOnError { e -> log.error("Unable to save incoming movie", e) }
-                .flatMap { m -> created(m.toLocationUri()).body(m.toMono()) }
+                .flatMap { m -> created(m.toLocationUri()).json().body(m.toMono()) }
                 .next()
     }
 
@@ -83,7 +83,7 @@ class MovieHandler(private val repo: MovieRepository) {
                 .doOnComplete { log.info("Saved ${movies.count().block()} movies from SF") }
                 .subscribe()
 
-        return temporaryRedirect(URI.create("/api/movies")).build()
+        return temporaryRedirect(URI.create("/api/movies")).json().build()
     }
 
     private fun fetchExtendedInfoForMovie(movie: Movie) {
