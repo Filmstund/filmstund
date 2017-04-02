@@ -4,14 +4,17 @@ import _ from "lodash";
 moment.locale('sv');
 
 const DATE_MONTH_TIME = "D MMM HH:mm";
-const DATE_MONTH = "D MMMM";
+const DATE_MONTH = "D MMMM YYYY";
 
 const padWithZero = (s) => _.padStart(s, 2, '0');
 
 const padAndJoinWith = (elems, joiner) =>
     elems.map(padWithZero).join(joiner);
 
-const showingDateToString = (date, time = [0, 0, 0]) => {
+
+export const getTodaysDate = () => moment().format();
+
+export const showingDateToString = (date, time = [0, 0, 0]) => {
     const dateString = padAndJoinWith(date, '-');
     const timeString = padAndJoinWith(_.take(time, 3), ':');
     return dateString + " " + timeString;
