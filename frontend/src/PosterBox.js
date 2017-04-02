@@ -2,6 +2,7 @@ import React, { PropTypes } from "react";
 import styled from "styled-components";
 
 const PaddingContainer = styled.div`
+  flex: 1;
   padding: 1em;
 `;
 
@@ -16,6 +17,7 @@ const Header = styled.h3`
     font-weight: 300;
     padding: 0;
     margin: 0;
+    overflow: hidden;
 `;
 
 const PosterBox = ({ className, poster, headerText, children }) => (

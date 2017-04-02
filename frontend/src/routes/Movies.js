@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import Header from "../Header";
 
-import rest from "../store/reducers/rest"
+import rest from "../store/reducers/rest";
 import Movie from "../Movie";
 
 import _ from "lodash";
