@@ -47,9 +47,9 @@ class MovieHandler(private val repo: MovieRepository) {
 
     fun saveMovie(req: ServerRequest): Mono<ServerResponse> {
         val fetchedMovie = req.bodyToMono(ExternalMovieIdDTO::class.java)
-                .then { ids ->
-                    fetchInfoFromSf(ids.sf)
-                            .otherwise { fetchOmdbExtendedInfo("/?i={id}", mapOf("id" to ids.imdb)) }
+                .then { (imdb, sf) ->
+                    fetchInfoFromSf(sf)
+                            .otherwise { fetchOmdbExtendedInfo("/?i={id}", mapOf("id" to imdb)) }
                 }
 
         // FIXME: check for existence first
@@ -86,12 +86,14 @@ class MovieHandler(private val repo: MovieRepository) {
 
     fun findSfDates(req: ServerRequest): Mono<ServerResponse> {
         return repo.findOne(req.uuidMonoPathVariable("id"))
-                .then { m ->
-                    if (m.sfId == null) return@then Mono.error<SfDatesAndLocationsDTO>(IllegalArgumentException("Movie [id=${m.id}] does not have a SF id"))
-                    getDatesAndLocationsFromSf(m.sfId)
+                .then { (id, _, sfId) ->
+                    when (sfId) {
+                        null -> Mono.error(IllegalArgumentException("Movie [id=$id] does not have a SF id"))
+                        else -> getDatesAndLocationsFromSf(sfId)
+                    }
                 }
-                .then { sfDatesAndLocs ->
-                    ok().json().body(sfDatesAndLocs.dates.toMono())
+                .then { (_, dates) ->
+                    ok().json().body(dates.toMono())
                 }
                 .otherwiseIfEmpty(notFound().build())
                 .otherwise { e ->
@@ -126,7 +128,7 @@ class MovieHandler(private val repo: MovieRepository) {
                             productionYear = it.productionYear,
                             runtime = Duration.ofMinutes(it.length),
                             poster = it.posterUrl,
-                            genres = it.genres.map { g -> g.name })
+                            genres = it.genres.map { (name) -> name })
                 }
 
         repo.save(updatedMovie)
@@ -138,8 +140,8 @@ class MovieHandler(private val repo: MovieRepository) {
     private fun fetchFromImdbById(movie: Movie) {
         log.info("Fetching extended movie info from IMDb by ID for ${movie.imdbId}")
         val updatedInfo = fetchOmdbExtendedInfo("/?i={id}", mapOf("id" to movie.imdbId))
-                .map { m ->
-                    movie.copy(synopsis = m.synopsis, productionYear = m.productionYear, poster = m.poster, genres = m.genres)
+                .map { (_, _, _, _, synopsis, _, _, productionYear, _, poster, genres) ->
+                    movie.copy(synopsis = synopsis, productionYear = productionYear, poster = poster, genres = genres)
                 }
 
         repo.save(updatedInfo)
@@ -158,9 +160,9 @@ class MovieHandler(private val repo: MovieRepository) {
         log.info("Fetching IMDb id for '$title'")
         val updatedInfo = fetchOmdbExtendedInfo("/?t={title}&y={year}",
                 mapOf("title" to title, "year" to movie.productionYear))
-                .map { m ->
-                    log.info("Updating Imdb id to ${m.imdbId} for movie[id=${movie.id}]")
-                    movie.copy(imdbId = m.imdbId)
+                .map { (_, imdbId) ->
+                    log.info("Updating Imdb id to $imdbId for movie[id=${movie.id}]")
+                    movie.copy(imdbId = imdbId)
                 }
 
         repo.save(updatedInfo)
@@ -233,7 +235,7 @@ class MovieHandler(private val repo: MovieRepository) {
                     poster = this.posterUrl,
                     releaseDate = this.releaseDate,
                     originalTitle = this.originalTitle,
-                    genres = this.genres.map { g -> g.name },
+                    genres = this.genres.map { (name) -> name },
                     runtime = Duration.ofMinutes(this.length),
                     productionYear = this.productionYear,
                     synopsis = this.shortDescription)
