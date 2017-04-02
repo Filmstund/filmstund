@@ -13,9 +13,7 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.domain.OmdbApiMovieDTO
-import rocks.didit.sefilm.domain.SfExtendedMovieDTO
-import rocks.didit.sefilm.domain.SfMovieDTO
+import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.json
 import rocks.didit.sefilm.uuidMonoPathVariable
 import java.net.URI
@@ -27,7 +25,7 @@ import java.util.*
 @Component
 class MovieHandler(private val repo: MovieRepository) {
     private val log = LoggerFactory.getLogger(MovieHandler::class.java)
-    private val sfWebClient = WebClient.create("https://beta.sfbio.se/api")
+    private val sfWebClient = WebClient.create(SF_API_URL)
     private val omdbApiWebClient = WebClient.create("http://www.omdbapi.com/")
 
     fun findAll(req: ServerRequest) = ok().json().body(repo.findAll())
@@ -85,6 +83,23 @@ class MovieHandler(private val repo: MovieRepository) {
 
         return temporaryRedirect(URI.create("/api/movies")).json().build()
     }
+
+    fun findSfDates(req: ServerRequest): Mono<ServerResponse> {
+        return repo.findOne(req.uuidMonoPathVariable("id"))
+                .then { m ->
+                    if (m.sfId == null) return@then Mono.error<SfDatesAndLocationsDTO>(IllegalArgumentException("Movie [id=${m.id}] does not have a SF id"))
+                    getDatesAndLocationsFromSf(m.sfId)
+                }
+                .then { sfDatesAndLocs ->
+                    ok().json().body(sfDatesAndLocs.dates.toMono())
+                }
+                .otherwiseIfEmpty(notFound().build())
+                .otherwise { e ->
+                    unprocessableEntity().body(Mono.just(e.localizedMessage))
+                }
+    }
+
+    fun findSfTimes(req: ServerRequest) = ok().json().body(Mono.just("Not implemented yet"))
 
     private fun fetchExtendedInfoForMovie(movie: Movie) {
         log.info("Fetching extended movie info for ${movie.id}")

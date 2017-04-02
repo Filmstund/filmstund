@@ -1,7 +1,9 @@
 package rocks.didit.sefilm.domain
 
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
+const val SF_API_URL = "https://beta.sfbio.se/api"
 
 data class SfRatingDTO(val age: Int,
                        val ageAccompanied: Int,
@@ -45,3 +47,20 @@ data class SfExtendedMovieDTO(val ncgId: String,
                               val length: Long,
                               val posterUrl: String,
                               val slug: String)
+
+data class SfNameValueDTO(val name: String, val value: String)
+
+data class SfDatesAndLocationsDTO(val cinemas: Collection<SfNameValueDTO>,
+                                  val dates: Collection<LocalDate>,
+                                  val movies: Collection<SfNameValueDTO>)
+
+fun getDatesAndLocationsFromSf(sfId: String) =
+        WebClient.create(SF_API_URL)
+                .get()
+                .uri("/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp")
+                .exchange()
+                .then { r ->
+                    r.bodyToMono(SfDatesAndLocationsDTO::class.java)
+                }
+
+

@@ -23,7 +23,8 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
                 OPTIONS("/", Cors::corsSupport)
                 GET("/sf", movieHandler::populateFromSf)
                 GET("/{id}", movieHandler::findOne)
-                //POST("/{id}", movieHandler::updateMovie)
+                GET("/{id}/sfdates", movieHandler::findSfDates)
+                GET("/{id}/sfdates/{date}", movieHandler::findSfTimes)
             }
 
             "/showings".nest {
