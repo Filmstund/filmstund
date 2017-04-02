@@ -3,6 +3,8 @@ package rocks.didit.sefilm.web
 import org.springframework.context.annotation.Bean
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.router
 import rocks.didit.sefilm.web.handlers.LocationHandler
 import rocks.didit.sefilm.web.handlers.MovieHandler
@@ -18,6 +20,7 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
             "/movies".nest {
                 GET("/", movieHandler::findAll)
                 POST("/", movieHandler::saveMovie)
+                OPTIONS("/", Cors::corsSupport)
                 GET("/sf", movieHandler::populateFromSf)
                 GET("/{id}", movieHandler::findOne)
                 //POST("/{id}", movieHandler::updateMovie)
@@ -26,6 +29,7 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
             "/showings".nest {
                 GET("/", showingHandler::findAll)
                 POST("/", showingHandler::saveShowing)
+                OPTIONS("/", Cors::corsSupport)
                 GET("/{id}", showingHandler::findOne)
                 GET("/{id}/bioklubbnummer", showingHandler::findBioklubbnummerForShowing)
             }
@@ -40,5 +44,12 @@ class ApiRoutes(val movieHandler: MovieHandler, val showingHandler: ShowingHandl
                 GET("/{name}", locationHandler::findOne)
             }
         }
+    }
+
+    object Cors {
+        fun corsSupport(req: ServerRequest) =
+                ok().header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Methods", "POST, GET, PUT").build()
+
     }
 }
