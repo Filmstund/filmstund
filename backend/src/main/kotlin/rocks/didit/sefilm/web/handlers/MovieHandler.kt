@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.web.handlers
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -40,8 +41,10 @@ class MovieHandler(private val repo: MovieRepository) {
                     }
                 }
                 .then { m -> ok().json().body(Mono.just(m)) }
-                .otherwiseIfEmpty(notFound().build())
-                .otherwise(IllegalArgumentException::class.java, { badRequest().json().build() })
+                .otherwiseIfEmpty(whatNotFound("Movie"))
+                .otherwise(IllegalArgumentException::class.java, { e ->
+                    e.localizedMessage.toErrorResponse(HttpStatus.BAD_REQUEST)
+                })
                 .subscribe()
     }
 
@@ -95,13 +98,13 @@ class MovieHandler(private val repo: MovieRepository) {
                 .then { (_, dates) ->
                     ok().json().body(dates.toMono())
                 }
-                .otherwiseIfEmpty(notFound().build())
+                .otherwiseIfEmpty(whatNotFound("Movie"))
                 .otherwise { e ->
-                    unprocessableEntity().body(Mono.just(e.localizedMessage))
+                    e.localizedMessage.toErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY)
                 }
     }
 
-    fun findSfTimes(req: ServerRequest) = ok().json().body(Mono.just("Not implemented yet"))
+    fun findSfTimes(req: ServerRequest) = "Not implemented yet".toErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY)
 
     private fun fetchExtendedInfoForMovie(movie: Movie) {
         log.info("Fetching extended movie info for ${movie.id}")

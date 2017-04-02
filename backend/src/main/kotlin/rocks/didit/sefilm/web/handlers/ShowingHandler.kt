@@ -1,11 +1,13 @@
 package rocks.didit.sefilm.web.handlers
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.*
+import org.springframework.web.reactive.function.server.ServerResponse.created
+import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
@@ -15,6 +17,8 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
+import rocks.didit.sefilm.domain.toErrorResponse
+import rocks.didit.sefilm.domain.whatNotFound
 import rocks.didit.sefilm.json
 import rocks.didit.sefilm.uuidMonoPathVariable
 import java.net.URI
@@ -30,16 +34,20 @@ class ShowingHandler(val repo: ShowingRepository, val locationRepo: LocationRepo
 
     fun findOne(req: ServerRequest) = repo.findOne(req.uuidMonoPathVariable("id"))
             .then { s -> ok().json().body(Mono.just(s)) }
-            .otherwiseIfEmpty(notFound().build())
-            .otherwise(IllegalArgumentException::class.java, { badRequest().json().build() })
+            .otherwiseIfEmpty(whatNotFound("Showing"))
+            .otherwise(IllegalArgumentException::class.java, { e ->
+                e.localizedMessage.toErrorResponse(HttpStatus.BAD_REQUEST)
+            })
 
     fun findBioklubbnummerForShowing(req: ServerRequest) =
             repo.findOne(req.uuidMonoPathVariable("id"))
                     .then { s ->
                         ok().json().body(BodyInserters.fromObject(shuffledBioklubbnummer(s.participants)))
                     }
-                    .otherwiseIfEmpty(notFound().build())
-                    .otherwise(IllegalArgumentException::class.java, { badRequest().json().build() })
+                    .otherwiseIfEmpty(whatNotFound("Showing"))
+                    .otherwise(IllegalArgumentException::class.java, { e ->
+                        e.localizedMessage.toErrorResponse(HttpStatus.BAD_REQUEST)
+                    })
 
     fun saveShowing(req: ServerRequest): Mono<ServerResponse> {
         val showing = req.bodyToMono(ShowingDTO::class.java)
