@@ -1,6 +1,6 @@
 import reduxApi, {transformers} from "redux-api";
 import adapterFetch from "redux-api/lib/adapters/fetch";
-import "whatwg-fetch";
+import fetch from "../../lib/rest";
 
 const api = reduxApi({
     showings: {
@@ -12,7 +12,6 @@ const api = reduxApi({
         transformer: transformers.array
     }
 });
-
 
 api.use("rootUrl", "http://localhost:8080/api");
 api.use("fetch", adapterFetch(fetch));
