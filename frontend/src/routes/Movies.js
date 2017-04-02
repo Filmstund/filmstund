@@ -15,7 +15,7 @@ const Movies = React.createClass({
         this.props.dispatch(rest.actions.movies.sync())
     },
     componentWillUnmount() {
-        this.props.dispatch(rest.actions.movies.reset())
+        this.props.dispatch(rest.actions.movies.reset("sync"))
     },
     render() {
         const { className, movies = [] } = this.props;

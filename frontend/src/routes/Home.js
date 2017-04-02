@@ -13,7 +13,7 @@ const Home = React.createClass({
         this.props.dispatch(rest.actions.showings.sync())
     },
     componentWillUnmount() {
-        this.props.dispatch(rest.actions.showings.reset())
+        this.props.dispatch(rest.actions.showings.reset("sync"))
     },
     render() {
         const { className, showings = [] } = this.props;
