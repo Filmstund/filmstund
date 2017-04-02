@@ -42,6 +42,6 @@ data class SfExtendedMovieDTO(val ncgId: String,
                               val actors: Collection<SfPersonDTO>,
                               val directors: Collection<SfPersonDTO>,
                               val rating: SfRatingDTO,
-                              val length: Int,
+                              val length: Long,
                               val posterUrl: String,
                               val slug: String)
