@@ -2,6 +2,7 @@ import _ from "lodash";
 import fetch from "../../lib/fetch";
 
 const idTransform = f => f;
+const appendId = (...pathComponents) => pathComponents.join('/');
 
 const reduceToObject = (array, transform) => array.reduce(
     (acc, elem) => ({ ...acc, [elem.id]: transform(elem) }),
@@ -121,7 +122,7 @@ const crudReducer = (name, path, transform = idTransform) => {
         requestSingle: (id) => (dispatch) => {
             dispatch({ type: actions.requestSingle, id });
 
-            fetch(path + "/" + id)
+            fetch(appendId(path, id))
                 .then(data => dispatch({ type: actions.successSingle, data: transform(data) }))
                 .catch(error => dispatch({ type: actions.errorSingle, error }))
         },
@@ -137,7 +138,7 @@ const crudReducer = (name, path, transform = idTransform) => {
         requestUpdate: (data) => (dispatch) => {
             dispatch({ type: actions.requestUpdate, data });
 
-            jsonRequest(path + "/" + data.id, data, "PUT")
+            jsonRequest(appendId(path, data.id), data, "PUT")
                 .then(data => dispatch({ type: actions.successUpdate, data: transform(data) }))
                 .catch(error => dispatch({ type: actions.errorUpdate, error }))
         },
@@ -145,7 +146,7 @@ const crudReducer = (name, path, transform = idTransform) => {
         requestDelete: (id) => (dispatch) => {
             dispatch({ type: actions.requestDelete, id });
 
-            jsonRequest(path + "/" + id, {}, "DELETE")
+            jsonRequest(appendId(path, id), {}, "DELETE")
                 .then(id => dispatch({ type: actions.successDelete, id }))
                 .catch(error => dispatch({ type: actions.errorDelete, error }))
         }
