@@ -21,6 +21,7 @@ const NewShowing = React.createClass({
                 date: now,
                 time: now.format("HH:mm"),
                 location: "",
+                price: "",
                 movieId: this.props.movieId
             }
         }
@@ -69,7 +70,7 @@ const NewShowing = React.createClass({
                         <Input type="text" value={showing.location} onChange={v => this.setShowingValueFromEvent("location", v)} />
                     </Field>
                     <Field text="Pris:">
-                        <Input type="text" defaultValue=""/>
+                        <Input type="text" value={showing.price} onChange={v => this.setShowingValueFromEvent("price", v)} />
                     </Field>
                     <MainButton>Skapa visning</MainButton>
                 </form>
