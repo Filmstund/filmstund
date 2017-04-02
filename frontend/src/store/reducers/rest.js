@@ -1,13 +1,14 @@
 import _ from "lodash";
 import fetch from "../../lib/fetch";
 
+const idTransform = f => f;
 
-const reduceToObject = (array) => array.reduce(
-    (acc, elem) => ({ ...acc, [elem.id]: elem}),
+const reduceToObject = (array, transform) => array.reduce(
+    (acc, elem) => ({ ...acc, [elem.id]: transform(elem) }),
     {}
 );
 
-const crudReducer = (name, path) => {
+const crudReducer = (name, path, transform = idTransform) => {
     const actions = {
         requestIndex: Symbol(`${name}_REQUEST_INDEX`),
         successIndex: Symbol(`${name}_RESPONSE_INDEX`),
@@ -113,36 +114,36 @@ const crudReducer = (name, path) => {
             dispatch({ type: actions.requestIndex });
 
             fetch(path)
-                .then(data => dispatch({ type: actions.successIndex, data: reduceToObject(data) }))
+                .then(data => dispatch({ type: actions.successIndex, data: reduceToObject(data, transform) }))
                 .catch(error => dispatch({ type: actions.errorIndex, error }))
         },
 
         requestSingle: (id) => (dispatch) => {
-            dispatch({ type: actions.requestSingle });
+            dispatch({ type: actions.requestSingle, id });
 
             fetch(path + "/" + id)
-                .then(data => dispatch({ type: actions.successSingle, data }))
+                .then(data => dispatch({ type: actions.successSingle, data: transform(data) }))
                 .catch(error => dispatch({ type: actions.errorSingle, error }))
         },
 
         requestCreate: (data) => (dispatch) => {
-            dispatch({ type: actions.requestCreate });
+            dispatch({ type: actions.requestCreate, data });
 
             jsonRequest(path, data)
-                .then(data => dispatch({ type: actions.successCreate, data }))
+                .then(data => dispatch({ type: actions.successCreate, data: transform(data) }))
                 .catch(error => dispatch({ type: actions.errorCreate, error }))
         },
 
         requestUpdate: (data) => (dispatch) => {
-            dispatch({ type: actions.requestUpdate });
+            dispatch({ type: actions.requestUpdate, data });
 
             jsonRequest(path + "/" + data.id, data, "PUT")
-                .then(data => dispatch({ type: actions.successUpdate, data }))
+                .then(data => dispatch({ type: actions.successUpdate, data: transform(data) }))
                 .catch(error => dispatch({ type: actions.errorUpdate, error }))
         },
 
         requestDelete: (id) => (dispatch) => {
-            dispatch({type: actions.requestDelete, id});
+            dispatch({ type: actions.requestDelete, id });
 
             jsonRequest(path + "/" + id, {}, "DELETE")
                 .then(id => dispatch({ type: actions.successDelete, id }))

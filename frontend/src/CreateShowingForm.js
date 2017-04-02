@@ -43,8 +43,6 @@ const NewShowing = React.createClass({
             date: this.state.showing.date.format("YYYY-MM-DD")
         };
 
-        console.log(submitObject, showings.actions);
-
         this.props.dispatch(showings.actions.requestCreate(submitObject));
     },
     render() {
