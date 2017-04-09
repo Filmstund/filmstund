@@ -2,6 +2,7 @@ package rocks.didit.sefilm.domain
 
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
+import java.time.LocalTime
 
 const val SF_API_URL = "https://beta.sfbio.se/api"
 
@@ -53,6 +54,17 @@ data class SfNameValueDTO(val name: String, val value: String)
 data class SfDatesAndLocationsDTO(val cinemas: Collection<SfNameValueDTO>,
                                   val dates: Collection<LocalDate>,
                                   val movies: Collection<SfNameValueDTO>)
+
+enum class SfTag {
+    Normal,
+    `3D`,
+    VIP,
+    Barnvagn
+}
+
+data class SfTime(val localTime: LocalTime,
+                  val saloon: String,
+                  val tags: List<SfTag>)
 
 fun getDatesAndLocationsFromSf(sfId: String) =
         WebClient.create(SF_API_URL)

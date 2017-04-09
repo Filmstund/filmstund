@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
@@ -20,6 +21,7 @@ import rocks.didit.sefilm.uuidMonoPathVariable
 import java.net.URI
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -104,7 +106,18 @@ class MovieHandler(private val repo: MovieRepository) {
                 }
     }
 
-    fun findSfTimes(req: ServerRequest) = "Not implemented yet".toErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY)
+    fun findSfTimes(req: ServerRequest): Mono<ServerResponse> {
+        val vip3d = listOf(SfTag.`3D`, SfTag.VIP)
+        val normal3d = listOf(SfTag.`3D`, SfTag.Normal)
+        val normal = listOf(SfTag.Normal)
+        val times = listOf(
+                SfTime(LocalTime.of(18, 0), "Salong 1", vip3d),
+                SfTime(LocalTime.of(21, 0), "Salong 2", normal3d),
+                SfTime(LocalTime.of(20, 30), "Salong 2", normal),
+                SfTime(LocalTime.of(15, 30), "Salong 8", normal)
+        )
+        return ok().body(times.toFlux())
+    }
 
     private fun fetchExtendedInfoForMovie(movie: Movie) {
         log.info("Fetching extended movie info for ${movie.id}")
