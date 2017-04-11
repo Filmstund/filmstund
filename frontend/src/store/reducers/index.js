@@ -3,9 +3,7 @@ import _ from "lodash";
 
 import createCrudReducer from "./rest";
 import {showingDateToString} from "../../lib/dateTools";
-
-const BASE_URL = "http://localhost:8080/api";
-const withBaseURL = (path) => BASE_URL + path;
+import {withBaseURL} from "../../lib/fetch";
 
 const showingTransformer = (showing) => ({
     ..._.omit(showing, 'time'),

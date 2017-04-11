@@ -48,5 +48,11 @@ const myFetch = (url, opts) => {
         }));
 };
 
+export const BASE_URL = "http://localhost:8080/api";
+export const withBaseURL = (path) => BASE_URL + path;
+
+
+export const getJson = (url) => myFetch(withBaseURL(url))
+
 
 export default myFetch;

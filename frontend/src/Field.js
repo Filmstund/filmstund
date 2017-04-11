@@ -20,7 +20,7 @@ const Field = ({ children, text, ...props }) => (
 export default styled(Field)`
   margin-bottom: 1em;
   
-  div { width: 100%; }
+  >  div { width: 100%; }
   input {
       border-radius: 4px;
       border: 1px solid gray;

@@ -5,6 +5,7 @@ moment.locale('sv');
 
 const DATE_MONTH_TIME = "D MMM HH:mm";
 const DATE_MONTH = "D MMMM YYYY";
+const YMD = "YYYY-MM-DD";
 
 const padWithZero = (s) => _.padStart(s, 2, '0');
 
@@ -14,7 +15,7 @@ const padAndJoinWith = (elems, joiner) =>
 
 export const getTodaysDate = () => moment().format();
 
-export const showingDateToString = (date, time = [0, 0, 0]) => {
+export const showingDateToString = (date, time = ['0', '0', '0']) => {
     const dateString = padAndJoinWith(date, '-');
     const timeString = padAndJoinWith(_.take(time, 3), ':');
     return dateString + " " + timeString;
@@ -25,3 +26,6 @@ export const formatShowingDateTime = (date) =>
 
 export const formatShowingDate = (date) =>
     moment(date).format(DATE_MONTH);
+
+export const formatYMD = (date) =>
+    moment(date).format(YMD);

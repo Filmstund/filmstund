@@ -1,5 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
+import _ from "lodash";
 
 import { movies } from "../store/reducers";
 
@@ -20,7 +21,7 @@ const NewShowing = React.createClass({
         return (
             <div>
                 <Header>Skapa besök</Header>
-                {movies.map(m => (
+                {_.sortBy(movies, 'releaseDate').map(m => (
                     <Movie key={m.id} movie={m} onClick={() => this.setState({ movieId: m.id })} />
                 ))}
             </div>

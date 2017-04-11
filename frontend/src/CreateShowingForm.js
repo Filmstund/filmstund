@@ -1,16 +1,20 @@
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import 'react-datepicker/dist/react-datepicker.css';
+import _ from "lodash";
+import "react-datepicker/dist/react-datepicker.css";
 
-import { showings } from "./store/reducers";
+import {showings} from "./store/reducers";
 
 import Header from "./Header";
 import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
 import MainButton from "./MainButton";
+import {getJson} from "./lib/fetch";
+import {formatYMD, showingDateToString} from "./lib/dateTools";
+import SelectBox from "./SelectBox";
 
 const NewShowing = React.createClass({
     getInitialState() {
@@ -23,31 +27,107 @@ const NewShowing = React.createClass({
                 location: "",
                 price: "",
                 movieId: this.props.movieId
-            }
+            },
+            sfTimes: [],
+            datesForMovieId: []
         }
+    },
+    componentWillMount() {
+        this.requestDatesForMovie(this.props.movieId);
+    },
+    setShowingDate(value) {
+        this.setShowingValue("date", value, this.requestSFTimes)
+    },
+    setShowingCity({ target: { value }}) {
+        console.log(value)
+        this.requestSFTimes();
+        // this.setShowingValue("city", value, )
+    },
+    requestDatesForMovie(movieId) {
+        const url = `/movies/${movieId}/sfdates`;
+
+        getJson(url).then(data => {
+            const dates = data.map(d => showingDateToString(d)).map(formatYMD);
+
+            this.setState({
+                datesForMovieId: dates
+            }, this.requestSFTimes);
+        });
+    },
+    requestSFTimes() {
+        const { datesForMovieId, showing: { movieId, date } } = this.state;
+
+        if (!datesForMovieId.includes(formatYMD(date))) {
+            this.setState({
+                sfTimes: []
+            });
+
+            return;
+        }
+
+
+        const url = `/movies/${movieId}/sfdates/${formatYMD(date)}`;
+
+        getJson(url).then(data => {
+            const sfTimes = data.map(d => {
+                const localTime = d.localTime.map(s => _.padStart(s, 2, '0')).join(':');
+
+                return {
+                    ...d,
+                    localTime
+                }
+            });
+            this.setState({ sfTimes })
+        })
+    },
+    setShowingTime(sfTime) {
+        console.log(sfTime)
     },
     setShowingValueFromEvent(key, { target: { value } }) {
         return this.setShowingValue(key, value);
     },
-    setShowingValue(key, value) {
+    setShowingValue(key, value, callback = f => f) {
         this.setState({
             showing: {
                 ...this.state.showing,
                 [key]: value
             }
-        });
+        }, callback);
     },
     handleSubmit(event) {
         event.preventDefault();
         const submitObject = {
             ...this.state.showing,
-            date: this.state.showing.date.format("YYYY-MM-DD")
+            date: formatYMD(this.state.showing.date)
         };
 
         this.props.dispatch(showings.actions.requestCreate(submitObject));
     },
+    renderSelectSfTime(sfTimes, showing) {
+
+        if (sfTimes.length === 0) {
+            return (
+                <div>
+                    Inga tider från SF för {formatYMD(showing.date)}
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <Header>Välj tid från SF</Header>
+                    <Field text="SF-stad (används för att hämta rätt tider):">
+                        <Input type="text" value="Göteborg" disabled={true} onChange={v => this.setShowingCity(v)} />
+                    </Field>
+                    <Field text="Tid:">
+                        <SelectBox options={sfTimes} onChange={v => this.setShowingTime(v)}/>
+                    </Field>
+                </div>
+            )
+        }
+
+    },
     render() {
-        const { showing } = this.state;
+        const { showing, sfTimes } = this.state;
         const { movie, clearSelectedMovie } = this.props;
 
         return (
@@ -56,13 +136,10 @@ const NewShowing = React.createClass({
                 <form onSubmit={this.handleSubmit}>
                     <Showing showing={showing} movie={movie} onClick={clearSelectedMovie} />
                     <Field text="Datum:">
-                        <DatePicker selected={showing.date} onChange={v => this.setShowingValue("date", v)} />
+                        <DatePicker selected={showing.date} onChange={v => this.setShowingDate(v)} />
                     </Field>
-                    <Header>Alt. 1: Välj tid från SF</Header>
-                    <Field text="Stad:">
-                        <Input type="text" value="Göteborg" disabled={true} />
-                    </Field>
-                    <Header>Alt. 2: Skapa egen tid</Header>
+                    {this.renderSelectSfTime(sfTimes, showing)}
+                    <Header>...eller skapa egen tid</Header>
                     <Field text="Tid:">
                         <Input type="time" value={showing.time} onChange={v => this.setShowingValueFromEvent("time", v)}/>
                     </Field>
