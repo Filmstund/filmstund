@@ -43,9 +43,9 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-webflux")
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-    // compile("org.springframework.boot:spring-boot-devtools") // bug: https://github.com/spring-projects/spring-boot/issues/8771
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+    compile("org.springframework.boot:spring-boot-devtools")
     compileOnly("org.springframework:spring-context-indexer")
     compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
@@ -53,7 +53,4 @@ dependencies {
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testCompile("org.springframework.boot:spring-boot-starter-test")
-
-    compile("io.projectreactor:reactor-kotlin-extensions:1.0.0.BUILD-SNAPSHOT")
-    testCompile("io.projectreactor.addons:reactor-test")
 }

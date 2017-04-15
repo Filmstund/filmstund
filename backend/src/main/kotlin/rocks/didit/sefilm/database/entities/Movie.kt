@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.database.entities
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
@@ -18,6 +19,7 @@ data class Movie(
         val title: String = "",
         val synopsis: String? = null,
         val originalTitle: String? = null,
+        @JsonFormat(pattern = "yyyy-MM-dd")
         val releaseDate: LocalDate = LocalDate.now(),
         val productionYear: Int? = null,
         val runtime: Duration? = null,

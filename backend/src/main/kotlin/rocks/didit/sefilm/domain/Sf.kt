@@ -1,10 +1,14 @@
 package rocks.didit.sefilm.domain
 
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
+import org.springframework.stereotype.Component
+import org.springframework.web.client.RestTemplate
 import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 const val SF_API_URL = "https://beta.sfbio.se/api"
+
 
 data class SfRatingDTO(val age: Int,
                        val ageAccompanied: Int,
@@ -55,24 +59,44 @@ data class SfDatesAndLocationsDTO(val cinemas: Collection<SfNameValueDTO>,
                                   val dates: Collection<LocalDate>,
                                   val movies: Collection<SfNameValueDTO>)
 
+data class SfAttributeDTO(val alias: String, val displayName: String)
+
+data class SfScreenDTO(val ncgId: String, val screenName: String)
+
+data class SfShowDTO(val attributes: List<SfAttributeDTO>,
+                     val cinemaId: String,
+                     val cinemaName: String,
+                     val cityAlias: String,
+                     val cityName: String,
+                     val movieId: String,
+                     val movieTitle: String,
+                     val posterUrl: String,
+                     val remoteEntityId: String,
+                     val remoteSystemAlias: String,
+                     val screen: SfScreenDTO,
+                     val time: LocalDateTime)
+
+data class SfShowListingDTO(val id: String, val name: String, val shows: List<SfShowDTO>)
+
+data class SfShowListingEntitiesDTO(val entities: List<SfShowListingDTO>, val totalNumberOfMatchingItems: Int)
+
 enum class SfTag {
-    Normal,
     `3D`,
     VIP,
-    Barnvagn
+    TXT,
+    EN
 }
 
-data class SfTime(val localTime: LocalTime,
-                  val saloon: String,
-                  val tags: List<SfTag>)
+@Component
+class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
+    fun getDatesAndLocations(sfId: String) =
+            restTemplate.exchange(SF_API_URL + "/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfDatesAndLocationsDTO::class.java)
+                    .body
 
-fun getDatesAndLocationsFromSf(sfId: String) =
-        WebClient.create(SF_API_URL)
-                .get()
-                .uri("/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp")
-                .exchange()
-                .then { r ->
-                    r.bodyToMono(SfDatesAndLocationsDTO::class.java)
-                }
-
+    /** Date must be in ISO8601 format, i.e 2017-04-11 */
+    fun getScreensForDateAndMovie(sfId: String, date: String) =
+            restTemplate
+                    .exchange(SF_API_URL + "/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
+                    .body
+}
 

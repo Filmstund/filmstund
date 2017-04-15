@@ -9,7 +9,7 @@ import rocks.didit.sefilm.domain.Bioklubbnummer
 data class User(
         val name: String? = null,
         val nick: String? = null,
-        @Id
+        @Id // FIXME: use another field as @Id
         val email: String = "",
         @JsonIgnore
         val bioklubbnummer: Bioklubbnummer? = null,
