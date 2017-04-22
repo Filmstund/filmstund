@@ -1,5 +1,5 @@
 import _ from "lodash";
-import fetch from "../../lib/fetch";
+import fetch, { jsonRequest } from "../../lib/fetch";
 
 const idTransform = f => f;
 const appendId = (...pathComponents) => pathComponents.join('/');
@@ -101,15 +101,6 @@ const crudReducer = (name, path, transform = idTransform) => {
         }
     };
 
-    const jsonRequest = (path, data, method = "POST") =>
-        fetch(path, {
-            method,
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-
     const actionCreators = {
         requestIndex: () => (dispatch) => {
             dispatch({ type: actions.requestIndex });
@@ -149,6 +140,78 @@ const crudReducer = (name, path, transform = idTransform) => {
             jsonRequest(appendId(path, id), {}, "DELETE")
                 .then(id => dispatch({ type: actions.successDelete, id }))
                 .catch(error => dispatch({ type: actions.errorDelete, error }))
+        }
+    };
+
+    return {
+        reducer,
+        actions: actionCreators
+    };
+};
+
+export const crudSingleReducer = (name, path, transform = idTransform) => {
+    const actions = {
+        requestSingle: `${name}_REQUEST_SINGLE`,
+        successSingle: `${name}_RESPONSE_SINGLE`,
+        errorSingle: `${name}_ERROR_SINGLE`,
+
+        requestUpdate: `${name}_REQUEST_UPDATE`,
+        successUpdate: `${name}_RESPONSE_UPDATE`,
+        errorUpdate: `${name}_ERROR_UPDATE`,
+    };
+
+    const initialState = {
+        loading: false,
+        data: {},
+        error: null
+    };
+
+    const reducer = (state = initialState, action) => {
+        switch (action.type) {
+            case actions.requestSingle:
+            case actions.requestUpdate:
+                return {
+                    ...state,
+                    error: null,
+                    loading: true
+                };
+            case actions.successSingle:
+            case actions.successUpdate:
+                return {
+                    ...state,
+                    loading: false,
+                    error: null,
+                    data: action.data
+                };
+            case actions.errorSingle:
+            case actions.errorUpdate:
+                return {
+                    ...state,
+                    loading: false,
+                    error: action.error
+                };
+
+            default:
+                return state;
+        }
+    };
+
+    const actionCreators = {
+
+        requestSingle: () => (dispatch) => {
+            dispatch({ type: actions.requestSingle });
+
+            fetch(path)
+                .then(data => dispatch({ type: actions.successSingle, data }))
+                .catch(error => dispatch({ type: actions.errorSingle, error }))
+        },
+
+        requestUpdate: (data) => (dispatch) => {
+            dispatch({ type: actions.requestUpdate, data });
+
+            jsonRequest(path, data, "PUT")
+                .then(data => dispatch({ type: actions.successUpdate, data }))
+                .catch(error => dispatch({ type: actions.errorUpdate, error }))
         }
     };
 

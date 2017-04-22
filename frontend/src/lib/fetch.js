@@ -38,6 +38,10 @@ const eTagFetch = (url = null, options = { headers: {} }) => {
 };
 
 const myFetch = (url, opts) => {
+    opts = {
+        credentials: 'include',
+        ...opts
+    }
     return eTagFetch(url, opts).then(resp => resp.json()
         .then((data)=> {
             if (resp.status >= 200 && resp.status < 300) {
@@ -48,11 +52,21 @@ const myFetch = (url, opts) => {
         }));
 };
 
-export const BASE_URL = "http://localhost:8080/api";
-export const withBaseURL = (path) => BASE_URL + path;
+export const BASE_URL = "http://localhost:8080";
+export const BASE_API_URL = `${BASE_URL}/api`;
+export const withBaseURL = (path) => BASE_API_URL + path;
 
 
 export const getJson = (url) => myFetch(withBaseURL(url))
+
+export const jsonRequest = (path, data, method = "POST") =>
+        myFetch(path, {
+            method,
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
 
 export default myFetch;
