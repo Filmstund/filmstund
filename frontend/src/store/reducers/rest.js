@@ -158,6 +158,8 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
         requestUpdate: `${name}_REQUEST_UPDATE`,
         successUpdate: `${name}_RESPONSE_UPDATE`,
         errorUpdate: `${name}_ERROR_UPDATE`,
+
+        clearSingle: `${name}_CLEAR_SINGLE`,
     };
 
     const initialState = {
@@ -191,6 +193,8 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
                     error: action.error
                 };
 
+            case actions.clearSingle:
+                return initialState;
             default:
                 return state;
         }
@@ -212,7 +216,9 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
             jsonRequest(path, data, "PUT")
                 .then(data => dispatch({ type: actions.successUpdate, data }))
                 .catch(error => dispatch({ type: actions.errorUpdate, error }))
-        }
+        },
+
+        clearSingle: () => ({ type: actions.clearSingle })
     };
 
     return {
