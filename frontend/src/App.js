@@ -39,7 +39,18 @@ class App extends Component {
   }
   render() {
     const { status } = this.props;
-    const signedIn = !status.error;
+    const signedIn = status.data.id !== undefined;
+
+    if (!signedIn) {
+      return (
+        <Container>
+          <PaddingContainer>
+            <Login/>
+          </PaddingContainer>
+          <Footer/>
+        </Container>
+      )
+    }
 
     return (
       <Router>
@@ -47,8 +58,8 @@ class App extends Component {
           <TopBar/>
           <ScrollContainer>
             <PaddingContainer>
-              <Route exact path="/" render={() => (signedIn ? <Home/> : <Redirect to="/login" /> )} />
-              <Route path="/login" component={Login} />
+              <Route exact path="/" component={Home} />
+              <Route path="/login" render={() => (signedIn ? <Redirect to="/" /> : <Login /> )} />
               <Route path="/user" component={User} />
               <Route path="/movies" component={Movies} />
               <Route path="/showings/new/:movieId?" component={NewShowing} />
@@ -62,7 +73,6 @@ class App extends Component {
 }
 
 const ConnectedApp = connect(state => ({
-  me: state.me.data,
   status: state.me
 }))(App);
 
