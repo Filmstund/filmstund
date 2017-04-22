@@ -206,6 +206,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .logoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
                 // TODO: .and().requiresChannel().anyRequest().requiresSecure()
                 .and()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                 .anyRequest().authenticated()
