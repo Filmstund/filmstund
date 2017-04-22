@@ -207,7 +207,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .cors().and()
                 .addFilterAfter(OAuth2ClientContextFilter(), AbstractPreAuthenticatedProcessingFilter::class.java)
                 .addFilterAfter(myFilter(), OAuth2ClientContextFilter::class.java)
-                .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+                .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.ACCEPTED)))
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
