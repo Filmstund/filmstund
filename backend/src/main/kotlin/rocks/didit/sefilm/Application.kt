@@ -7,10 +7,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -34,6 +36,7 @@ import java.util.*
 @SpringBootApplication
 @EnableMongoAuditing
 @EnableCaching
+@EnableWebSecurity
 @EnableConfigurationProperties(Properties::class)
 class Application {
     private val log = LoggerFactory.getLogger(Application::class.java)
@@ -43,6 +46,7 @@ class Application {
     }
 
     @Bean
+    @Primary
     fun getRestClient(): RestTemplate {
         val restClient = RestTemplate()
         restClient.errorHandler = ExternalProviderErrorHandler()
@@ -91,9 +95,9 @@ class Application {
         log.info("Completed save of seed movies")
 
         val seedUsers = listOf(
-                User("Addy admin", "Addy", "adminw@example.org", Bioklubbnummer("11111111111"), "070-0000000"),
-                User("Normal User 1", "Normy1", "normy1@example.org", Bioklubbnummer("11111111112"), "070-0000001"),
-                User("Normal User 2", "Normy2", "normy2@example.org", null, "070-0000002"))
+                User("1", "Addy admin", "Addy", "adminw@example.org", Bioklubbnummer("11111111111"), "070-0000000"),
+                User("2", "Normal User 1", "Normy1", "normy1@example.org", Bioklubbnummer("11111111112"), "070-0000001"),
+                User("3", "Normal User 2", "Normy2", "normy2@example.org", null, "070-0000002"))
         users.save(seedUsers)
         log.info("Completed save of seed users")
 

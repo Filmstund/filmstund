@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-class CustomErrorController : ErrorController {
+class ErrorController : ErrorController {
     companion object {
         private const val PATH = "/error"
     }
