@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -32,6 +33,7 @@ import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import rocks.didit.sefilm.database.entities.User
@@ -204,7 +206,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         http
                 .addFilterAfter(OAuth2ClientContextFilter(), AbstractPreAuthenticatedProcessingFilter::class.java)
                 .addFilterAfter(myFilter(), OAuth2ClientContextFilter::class.java)
-                .logout().logoutSuccessUrl("/").clearAuthentication(true)
+                .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))).clearAuthentication(true)
                 .logoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
                 // TODO: .and().requiresChannel().anyRequest().requiresSecure()
                 .and()
