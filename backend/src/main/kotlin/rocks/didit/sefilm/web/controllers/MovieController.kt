@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.web.controllers
 
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -85,6 +86,7 @@ class MovieController(private val repo: MovieRepository,
     }
 
     @GetMapping(PATH_WITH_ID + "/sfdates")
+    @Cacheable(cacheNames = arrayOf("sfdates"))
     fun findSfDates(@PathVariable id: UUID): Collection<LocalDate> {
         val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id") }
         if (movie.sfId == null) throw MissingSfIdException()
@@ -93,6 +95,7 @@ class MovieController(private val repo: MovieRepository,
     }
 
     @GetMapping(PATH_WITH_ID + "/sfdates/{date}")
+    @Cacheable(cacheNames = arrayOf("sfdates/date"))
     fun findSfTimes(@PathVariable id: UUID, @PathVariable date: String): Collection<ScreenDTO> {
         if (!date.matches(Regex("^\\d{4}-\\d{2}-\\d{2}$"))) throw BadRequestException("Wrong date format, requires yyyy-mm-dd")
         val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id'") }

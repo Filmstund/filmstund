@@ -5,6 +5,7 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.http.HttpEntity
@@ -13,7 +14,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
@@ -33,6 +33,7 @@ import java.util.*
 
 @SpringBootApplication
 @EnableMongoAuditing
+@EnableCaching
 @EnableConfigurationProperties(Properties::class)
 class Application {
     private val log = LoggerFactory.getLogger(Application::class.java)
@@ -45,7 +46,7 @@ class Application {
     fun getRestClient(): RestTemplate {
         val restClient = RestTemplate()
         restClient.errorHandler = ExternalProviderErrorHandler()
-        return restClient;
+        return restClient
     }
 
     @Bean
@@ -58,7 +59,7 @@ class Application {
 
     @Bean
     fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurerAdapter() {
+        return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**").allowedOrigins("*")
             }
