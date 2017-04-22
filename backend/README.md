@@ -8,6 +8,6 @@
 ### Get up and running
 
 ```sh
-# Currently, development seed data is created on every run.
+$ app.secret=<OAUTH2 APP SECRET GOES HERE>
 $ gradle bootRun
 ```
