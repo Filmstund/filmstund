@@ -12,8 +12,8 @@ import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
 import MainButton from "./MainButton";
-import {getJson} from "./lib/fetch";
-import {formatYMD, showingDateToString} from "./lib/dateTools";
+import { getJson } from "./lib/fetch";
+import { formatYMD } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
 
 const NewShowing = React.createClass({
@@ -47,7 +47,7 @@ const NewShowing = React.createClass({
         const url = `/movies/${movieId}/sfdates`;
 
         getJson(url).then(data => {
-            const dates = data.map(d => showingDateToString(d)).map(formatYMD);
+            const dates = data.map(formatYMD);
 
             this.setState({
                 datesForMovieId: dates
@@ -81,7 +81,13 @@ const NewShowing = React.createClass({
         })
     },
     setShowingTime(sfTime) {
-        console.log(sfTime)
+        this.setState({
+            showing: {
+                ...this.state.showing,
+                time: sfTime.localTime,
+                location: sfTime.saloon
+            }
+        }, this.handleSubmit)
     },
     setShowingValueFromEvent(key, { target: { value } }) {
         return this.setShowingValue(key, value);
@@ -94,8 +100,7 @@ const NewShowing = React.createClass({
             }
         }, callback);
     },
-    handleSubmit(event) {
-        event.preventDefault();
+    handleSubmit() {
         const submitObject = {
             ...this.state.showing,
             date: formatYMD(this.state.showing.date)
@@ -133,7 +138,7 @@ const NewShowing = React.createClass({
         return (
             <div>
                 <Header>Skapa besök</Header>
-                <form onSubmit={this.handleSubmit}>
+                <div>
                     <Showing showing={showing} movie={movie} onClick={clearSelectedMovie} />
                     <Field text="Datum:">
                         <DatePicker selected={showing.date} onChange={v => this.setShowingDate(v)} />
@@ -149,8 +154,8 @@ const NewShowing = React.createClass({
                     <Field text="Pris:">
                         <Input type="text" value={showing.price} onChange={v => this.setShowingValueFromEvent("price", v)} />
                     </Field>
-                    <MainButton>Skapa visning</MainButton>
-                </form>
+                    <MainButton onClick={this.handleSubmit}>Skapa visning</MainButton>
+                </div>
             </div>
         )
     }

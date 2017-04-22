@@ -11,25 +11,25 @@ const reduceToObject = (array, transform) => array.reduce(
 
 const crudReducer = (name, path, transform = idTransform) => {
     const actions = {
-        requestIndex: Symbol(`${name}_REQUEST_INDEX`),
-        successIndex: Symbol(`${name}_RESPONSE_INDEX`),
-        errorIndex: Symbol(`${name}_ERROR_INDEX`),
+        requestIndex: `${name}_REQUEST_INDEX`,
+        successIndex: `${name}_RESPONSE_INDEX`,
+        errorIndex: `${name}_ERROR_INDEX`,
 
-        requestSingle: Symbol(`${name}_REQUEST_SINGLE`),
-        successSingle: Symbol(`${name}_RESPONSE_SINGLE`),
-        errorSingle: Symbol(`${name}_ERROR_SINGLE`),
+        requestSingle: `${name}_REQUEST_SINGLE`,
+        successSingle: `${name}_RESPONSE_SINGLE`,
+        errorSingle: `${name}_ERROR_SINGLE`,
 
-        requestCreate: Symbol(`${name}_REQUEST_CREATE`),
-        successCreate: Symbol(`${name}_RESPONSE_CREATE`),
-        errorCreate: Symbol(`${name}_ERROR_CREATE`),
+        requestCreate: `${name}_REQUEST_CREATE`,
+        successCreate: `${name}_RESPONSE_CREATE`,
+        errorCreate: `${name}_ERROR_CREATE`,
 
-        requestUpdate: Symbol(`${name}_REQUEST_UPDATE`),
-        successUpdate: Symbol(`${name}_RESPONSE_UPDATE`),
-        errorUpdate: Symbol(`${name}_ERROR_UPDATE`),
+        requestUpdate: `${name}_REQUEST_UPDATE`,
+        successUpdate: `${name}_RESPONSE_UPDATE`,
+        errorUpdate: `${name}_ERROR_UPDATE`,
 
-        requestDelete: Symbol(`${name}_REQUEST_DELETE`),
-        successDelete: Symbol(`${name}_RESPONSE_DELETE`),
-        errorDelete: Symbol(`${name}_ERROR_DELETE`),
+        requestDelete: `${name}_REQUEST_DELETE`,
+        successDelete: `${name}_RESPONSE_DELETE`,
+        errorDelete: `${name}_ERROR_DELETE`,
     };
 
     const initialState = {
