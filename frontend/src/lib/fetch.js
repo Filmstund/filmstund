@@ -42,14 +42,15 @@ const myFetch = (url, opts) => {
         credentials: 'include',
         ...opts
     }
-    return eTagFetch(url, opts).then(resp => resp.json()
-        .then((data)=> {
-            if (resp.status >= 200 && resp.status < 300) {
-                return data;
+    return eTagFetch(url, opts).then(resp => {
+            if (resp.status === 202) {
+                return resp.text();
+            } else if (resp.status >= 200 && resp.status < 300) {
+                return resp.json();
             } else {
-                return Promise.reject(data);
+                return Promise.reject(resp);
             }
-        }));
+        });
 };
 
 export const BASE_URL = "http://localhost:8080";
