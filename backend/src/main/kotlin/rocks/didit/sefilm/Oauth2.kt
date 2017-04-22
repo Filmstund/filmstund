@@ -204,9 +204,13 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
+                .cors().and()
                 .addFilterAfter(OAuth2ClientContextFilter(), AbstractPreAuthenticatedProcessingFilter::class.java)
                 .addFilterAfter(myFilter(), OAuth2ClientContextFilter::class.java)
-                .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))).clearAuthentication(true)
+                .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
                 .logoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
                 // TODO: .and().requiresChannel().anyRequest().requiresSecure()
                 .and()
