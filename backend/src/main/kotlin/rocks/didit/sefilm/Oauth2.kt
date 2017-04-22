@@ -33,6 +33,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import java.io.IOException
@@ -200,6 +201,10 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         http
                 .addFilterAfter(OAuth2ClientContextFilter(), AbstractPreAuthenticatedProcessingFilter::class.java)
                 .addFilterAfter(myFilter(), OAuth2ClientContextFilter::class.java)
+                .logout().logoutSuccessUrl("/").clearAuthentication(true)
+                .logoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
+                // TODO: .and().requiresChannel().anyRequest().requiresSecure()
+                .and()
                 .authorizeRequests()
                 .anyRequest().authenticated()
     }
