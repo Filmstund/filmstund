@@ -10,6 +10,8 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.domain.LimitedUserInfo
+import rocks.didit.sefilm.domain.toLimitedUserInfo
 
 @RestController
 class UserController(val userRepository: UserRepository) {
@@ -20,13 +22,16 @@ class UserController(val userRepository: UserRepository) {
     @GetMapping(BASE_PATH + "/me", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun currentUser(): User {
         val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
-        return findOne(principal.userId)
+        return userRepository.findOne(principal.userId).orElseThrow { NotFoundException("user '${principal.userId}'") }
     }
 
     @GetMapping(BASE_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun findAll() = userRepository.findAll()
+    fun findAll(): Iterable<LimitedUserInfo> = userRepository.findAll().map(User::toLimitedUserInfo)
 
     @GetMapping(BASE_PATH + "/{id}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun findOne(@PathVariable id: String) = userRepository.findOne(id).orElseThrow { NotFoundException("user '$id'") }
+    fun findOne(@PathVariable id: String): LimitedUserInfo =
+            userRepository.findOne(id)
+                    .map(User::toLimitedUserInfo)
+                    .orElseThrow { NotFoundException("user '$id'") }
 }
 
