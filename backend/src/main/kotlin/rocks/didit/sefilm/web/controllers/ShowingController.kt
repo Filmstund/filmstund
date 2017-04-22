@@ -9,19 +9,24 @@ import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.MissingParametersException
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
 
 @RestController
-class ShowingController(val repo: ShowingRepository, val locationRepo: LocationRepository, val movieRepo: MovieRepository) {
+class ShowingController(private val repo: ShowingRepository,
+                        private val locationRepo: LocationRepository,
+                        private val movieRepo: MovieRepository,
+                        private val userRepo: UserRepository) {
     companion object {
         private const val PATH = Application.API_BASE_PATH + "/showings"
         private const val PATH_WITH_ID = PATH + "/{id}"
@@ -51,7 +56,11 @@ class ShowingController(val repo: ShowingRepository, val locationRepo: LocationR
             throw NotFoundException("movie '${body.movieId}'. Can't create showing for movie that does not exist")
         }
 
-        val savedShowing = repo.save(body.toShowing())
+        val adminUser = userRepo
+                .findOne(currentLoggedInUserId())
+                .orElseThrow { NotFoundException("Current logged in user not found in db") }
+
+        val savedShowing = repo.save(body.toShowing(adminUser))
         val newLocation = b.path(PATH_WITH_ID).buildAndExpand(savedShowing.id).toUri()
         return ResponseEntity.created(newLocation).build()
     }
@@ -68,13 +77,14 @@ class ShowingController(val repo: ShowingRepository, val locationRepo: LocationR
                           val location: String?)
 
     /* Fetch location from db or create it if it does not exist before converting the showing */
-    private fun ShowingDTO.toShowing(): Showing {
+    private fun ShowingDTO.toShowing(admin: User): Showing {
         val location = locationRepo
                 .findOne(this.location)
                 .orElseGet { locationRepo.save(Location(name = this.location)) }
         return Showing(date = this.date,
                 time = this.time,
                 movieId = this.movieId,
-                location = location)
+                location = location,
+                admin = admin)
     }
 }
