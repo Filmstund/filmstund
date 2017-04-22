@@ -31,6 +31,7 @@ import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -114,6 +115,8 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String, private val userRep
     }
 
     private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository) : AuthenticationSuccessHandler {
+        private val defaultHandler: AuthenticationSuccessHandler = SavedRequestAwareAuthenticationSuccessHandler()
+
         override fun onAuthenticationSuccess(request: HttpServletRequest?, response: HttpServletResponse?, authentication: Authentication?) {
             val principal = authentication?.principal as OpenIdConnectUserDetails?
                     ?: throw BadCredentialsException("Successful authentication without a given principal")
@@ -121,7 +124,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String, private val userRep
             val newUser = User(id = principal.userId, name = "${principal.firstName} ${principal.lastName}",
                     email = principal.username ?: "", avatar = principal.avatarUrl)
             userRepository.save(newUser)
-            response?.sendRedirect("/api/users/me")
+            defaultHandler.onAuthenticationSuccess(request, response, authentication)
         }
     }
 
