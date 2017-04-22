@@ -86,7 +86,7 @@ class MovieController(private val repo: MovieRepository,
     }
 
     @GetMapping(PATH_WITH_ID + "/sfdates")
-    @Cacheable(cacheNames = arrayOf("sfdates"))
+    @Cacheable("sfdates")
     fun findSfDates(@PathVariable id: UUID): Collection<LocalDate> {
         val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id") }
         if (movie.sfId == null) throw MissingSfIdException()
@@ -95,7 +95,7 @@ class MovieController(private val repo: MovieRepository,
     }
 
     @GetMapping(PATH_WITH_ID + "/sfdates/{date}")
-    @Cacheable(cacheNames = arrayOf("sfdates/date"))
+    @Cacheable("sfdate")
     fun findSfTimes(@PathVariable id: UUID, @PathVariable date: String): Collection<ScreenDTO> {
         if (!date.matches(Regex("^\\d{4}-\\d{2}-\\d{2}$"))) throw BadRequestException("Wrong date format, requires yyyy-mm-dd")
         val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id'") }
