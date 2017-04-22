@@ -6,6 +6,4 @@ import rocks.didit.sefilm.database.entities.Showing
 import java.util.*
 
 @Repository
-interface ShowingRepository : CrudRepository<Showing, UUID> {
-    //fun findBioklubbnummerForShowing(@Param("showingId") showingId: UUID): Collection<Bioklubbnummer>
-}
+interface ShowingRepository : CrudRepository<Showing, UUID>

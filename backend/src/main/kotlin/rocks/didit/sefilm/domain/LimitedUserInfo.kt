@@ -4,6 +4,7 @@ import rocks.didit.sefilm.database.entities.User
 
 
 data class LimitedUserInfo(
+        val id: String? = null,
         val name: String? = null,
         val nick: String? = null,
         val phone: String? = null,
@@ -11,5 +12,5 @@ data class LimitedUserInfo(
 )
 
 fun User.toLimitedUserInfo(): LimitedUserInfo {
-    return LimitedUserInfo(this.name, this.nick, this.phone, this.avatar)
+    return LimitedUserInfo(this.id, this.name, this.nick, this.phone, this.avatar)
 }

@@ -18,6 +18,8 @@ import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
+import rocks.didit.sefilm.domain.LimitedUserInfo
+import rocks.didit.sefilm.domain.toLimitedUserInfo
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -58,6 +60,7 @@ class ShowingController(private val repo: ShowingRepository,
 
         val adminUser = userRepo
                 .findOne(currentLoggedInUserId())
+                .map(User::toLimitedUserInfo)
                 .orElseThrow { NotFoundException("Current logged in user not found in db") }
 
         val savedShowing = repo.save(body.toShowing(adminUser))
@@ -65,10 +68,11 @@ class ShowingController(private val repo: ShowingRepository,
         return ResponseEntity.created(newLocation).build()
     }
 
-    private fun shuffledBioklubbnummer(participants: Collection<User>): List<Bioklubbnummer> {
-        val numbers = participants.map(User::bioklubbnummer).filterNotNull()
-        Collections.shuffle(numbers)
-        return numbers
+    private fun shuffledBioklubbnummer(participants: Collection<LimitedUserInfo>): Collection<Bioklubbnummer> {
+        val ids = participants.map(LimitedUserInfo::id).filterNotNull()
+        val bioklubbnummer = userRepo.findByIdIn(ids)
+        Collections.shuffle(bioklubbnummer)
+        return bioklubbnummer
     }
 
     data class ShowingDTO(val date: LocalDate?,
@@ -77,7 +81,7 @@ class ShowingController(private val repo: ShowingRepository,
                           val location: String?)
 
     /* Fetch location from db or create it if it does not exist before converting the showing */
-    private fun ShowingDTO.toShowing(admin: User): Showing {
+    private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {
         val location = locationRepo
                 .findOne(this.location)
                 .orElseGet { locationRepo.save(Location(name = this.location)) }
