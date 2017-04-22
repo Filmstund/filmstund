@@ -8,6 +8,6 @@
 ### Get up and running
 
 ```sh
-$ app.secret=<OAUTH2 APP SECRET GOES HERE>
+$ app_secret=<OAUTH2 APP SECRET GOES HERE>
 $ gradle bootRun
 ```
