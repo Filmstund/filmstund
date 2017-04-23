@@ -2,6 +2,7 @@ package rocks.didit.sefilm
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -22,7 +23,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.jwt.JwtHelper
 import org.springframework.security.oauth2.client.OAuth2ClientContext
-import org.springframework.security.oauth2.client.OAuth2RestOperations
 import org.springframework.security.oauth2.client.OAuth2RestTemplate
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails
@@ -32,7 +32,7 @@ import org.springframework.security.oauth2.common.exceptions.InvalidTokenExcepti
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
@@ -81,12 +81,13 @@ class GoogleOpenIdConnectConfig {
     }
 }
 
-class OpenIdConnectFilter(defaultFilterProcessesUrl: String, private val userRepository: UserRepository) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
-    lateinit var restTemplate: OAuth2RestOperations
-
+class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
+                          userRepository: UserRepository,
+                          val restTemplate: OAuth2RestTemplate,
+                          loginRedirectUri: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
     init {
         authenticationManager = NoopAuthenticationManager()
-        setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository))
+        setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository, loginRedirectUri))
     }
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
@@ -105,7 +106,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String, private val userRep
 
             val authInfo: Map<String, String> = ObjectMapper().readValue(tokenDecoded.claims)
 
-            val user = OpenIdConnectUserDetails(authInfo, accessToken)
+            val user = OpenIdConnectUserDetails(authInfo)
             return UsernamePasswordAuthenticationToken(user, null, user.authorities)
         } catch (e: InvalidTokenException) {
             throw BadCredentialsException("Could not obtain user details from token", e)
@@ -113,24 +114,23 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String, private val userRep
 
     }
 
-    fun setRestTemplate(restTemplate2: OAuth2RestTemplate) {
-        restTemplate = restTemplate2
-    }
+    private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository,
+                                                    private val loginRedirectUri: String) : SimpleUrlAuthenticationSuccessHandler() {
+        private val log = LoggerFactory.getLogger(CreateUserOnSuccessfulAuthHandler::class.java)
 
-    private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository) : AuthenticationSuccessHandler {
         override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
             val principal = authentication?.principal as OpenIdConnectUserDetails?
                     ?: throw BadCredentialsException("Successful authentication without a given principal")
 
-            val newUser = User(id = principal.userId, name = "${principal.firstName} ${principal.lastName}",
-                    email = principal.username ?: "", avatar = principal.avatarUrl)
-            userRepository.save(newUser)
-
-            val targetUrl = request.getHeader("Referer");
-            when {
-                targetUrl != null -> response.sendRedirect(targetUrl)
-                else -> response.sendRedirect("/api/users/me")
+            if (!userRepository.exists(principal.userId)) {
+                val newUser = User(id = principal.userId, name = "${principal.firstName} ${principal.lastName}",
+                        email = principal.username ?: "", avatar = principal.avatarUrl)
+                userRepository.save(newUser)
+                log.info("Created user ${newUser.id}")
             }
+
+            defaultTargetUrl = loginRedirectUri
+            super.onAuthenticationSuccess(request, response, authentication)
         }
     }
 
@@ -142,7 +142,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String, private val userRep
     }
 }
 
-class OpenIdConnectUserDetails(userInfo: Map<String, String>, val token: OAuth2AccessToken?) : UserDetails {
+class OpenIdConnectUserDetails(userInfo: Map<String, String>) : UserDetails {
 
     val userId: String = userInfo.getValue("sub")
     private val username: String? = userInfo["email"]
@@ -189,17 +189,20 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Autowired
     private val userRepository: UserRepository? = null
 
+    @Value("\${login.redirectUri}")
+    private lateinit var loginRedirectUri: String
+
     @Throws(Exception::class)
     override fun configure(web: WebSecurity) {
         web.ignoring().antMatchers("/resources/**")
     }
 
     @Bean
-    fun myFilter(): OpenIdConnectFilter {
-        val filter = OpenIdConnectFilter("/login/google", userRepository!!)
-        filter.setRestTemplate(restTemplate!!)
-        return filter
-    }
+    fun myFilter() =
+            OpenIdConnectFilter("/login/google",
+                    userRepository!!,
+                    restTemplate!!,
+                    loginRedirectUri)
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
