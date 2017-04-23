@@ -6,7 +6,6 @@ const Option = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1em;
-  font-style: italic;
   color: #8E1B1B;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 `;
@@ -18,7 +17,8 @@ const Box = styled.div`
 
 const Lable = styled.div`
   display: inline-block;
-  width: 30vw;
+  font-style: italic;
+  font-size: 0.9em;
 `
 
 const Tag = styled.div`
@@ -26,23 +26,28 @@ const Tag = styled.div`
   border-radius: 1.4em;
   background-color: #9B9B9B;
   color: white;
-  font-size: 0.8em;
-  padding: 0.4em 0.7em;
+  font-size: 0.7em;
+  padding: 0.4em;
   margin: 0 0.2em;
 `;
+
+const RightArrow = styled.div`
+  display: inline-block;
+  margin-left: 0.4em;
+`
 
 
 const SelectBox = ({ options, onChange, ...props }) => (
     <Box>
         {options.map(option => (
             <Option key={option.localTime} onClick={() => onChange(option)}>
+                <Lable>{option.localTime} {option.screen}, {option.cinema}</Lable>
                 <div>
-                    <Lable>{option.localTime} {option.saloon}</Lable>
                     {option.tags.map(tag => (
                         <Tag key={tag}>{tag}</Tag>
                     ))}
+                  <RightArrow>&gt;</RightArrow>
                 </div>
-                <span>&gt;</span>
             </Option>
         ))}
     </Box>
