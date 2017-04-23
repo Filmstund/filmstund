@@ -52,7 +52,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     @ResponseStatus(HttpStatus.CREATED)
-    fun saveShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Void> {
+    fun saveShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
         if (body.date == null || body.location == null || body.movieId == null || body.time == null) throw MissingParametersException()
         if (!movieRepo.exists(body.movieId)) {
             throw NotFoundException("movie '${body.movieId}'. Can't create showing for movie that does not exist")
@@ -65,7 +65,7 @@ class ShowingController(private val repo: ShowingRepository,
 
         val savedShowing = repo.save(body.toShowing(adminUser))
         val newLocation = b.path(PATH_WITH_ID).buildAndExpand(savedShowing.id).toUri()
-        return ResponseEntity.created(newLocation).build()
+        return ResponseEntity.created(newLocation).body(savedShowing)
     }
 
     private fun shuffledBioklubbnummer(participants: Collection<LimitedUserInfo>): Collection<Bioklubbnummer> {

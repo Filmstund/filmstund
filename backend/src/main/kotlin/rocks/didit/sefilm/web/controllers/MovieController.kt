@@ -49,7 +49,7 @@ class MovieController(private val repo: MovieRepository,
     }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Void> {
+    fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
         val movieInfo = when {
             body.sf != null -> fetchInfoFromSf(body.sf)
             body.imdb != null -> fetchOmdbExtendedInfo(OMDBAPI_URL + "/?i={id}", mapOf("id" to body.imdb))
@@ -64,7 +64,7 @@ class MovieController(private val repo: MovieRepository,
         // FIXME: check if a movie with the supplied sf or imdb id already exists
         val movie = repo.save(movieInfo)
         val createdUri = b.path(PATH_WITH_ID).buildAndExpand(movie.id).toUri()
-        return ResponseEntity.created(createdUri).build()
+        return ResponseEntity.created(createdUri).body(movie)
     }
 
     @GetMapping(PATH + "/sf/populate")
