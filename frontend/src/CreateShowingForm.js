@@ -70,11 +70,11 @@ const NewShowing = React.createClass({
 
         getJson(url).then(data => {
             const sfTimes = data.map(d => {
-                const localTime = d.localTime.map(s => _.padStart(s, 2, '0')).join(':');
 
                 return {
                     ...d,
-                    localTime
+                    cinema: d.cinema.replace(/ ?Filmstaden ?/, ''),
+                    localTime: moment(formatYMD(date) + " " + d.localTime).format("HH:mm")
                 }
             });
             this.setState({ sfTimes })
