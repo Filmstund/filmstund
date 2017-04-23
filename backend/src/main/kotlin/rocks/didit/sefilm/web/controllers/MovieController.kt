@@ -105,13 +105,25 @@ class MovieController(private val repo: MovieRepository,
         return screens.entities
                 .flatMap { e -> e.shows }
                 .map { show ->
-                    val tags = show.attributes.map { a -> SfTag.valueOf(a.displayName) }.toMutableList()
+                    val tags = convertTags(show.attributes)
                     if (show.screen.screenName.endsWith("VIP")) {
                         tags.add(SfTag.VIP)
                     }
 
                     ScreenDTO(show.time.toLocalTime(), show.screen.screenName, show.cinemaName, tags)
                 }
+    }
+
+    private fun convertTags(attributes: List<SfAttributeDTO>): MutableList<SfTag> {
+        return attributes.map { a ->
+            try {
+                SfTag.valueOf(a.displayName)
+            } catch(e: IllegalArgumentException) {
+                log.warn("SfTag with name $a does not exist")
+                return@map null
+            }
+        }.filterNotNull().toMutableList()
+
     }
 
     private fun fetchExtendedInfoForMovie(movie: Movie) {

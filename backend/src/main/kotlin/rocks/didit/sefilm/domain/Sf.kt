@@ -84,7 +84,9 @@ enum class SfTag {
     `3D`,
     VIP,
     TXT,
-    EN
+    EN,
+    JA,
+    Unknown
 }
 
 @Component
