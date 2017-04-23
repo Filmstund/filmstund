@@ -9,8 +9,8 @@ const VerticalPaddingContainer = styled.div`
 `;
 
 
-const Showing = ({ movie = {}, movieId, date, admin, location, dispatch, ...props }) => (
-    <div {...props}>
+const Showing = ({ movie = {}, movieId, date, admin, location, disabled, onClick, dispatch, ...props }) => (
+    <div onClick={disabled ? () => {} : onClick} {...props}>
         <PosterBox headerText={movie.title} poster={movie.poster}>
             <VerticalPaddingContainer>
                 {formatShowingDateTime(date)}<br/>
@@ -26,6 +26,7 @@ const Showing = ({ movie = {}, movieId, date, admin, location, dispatch, ...prop
 
 const StyledShowing = styled(Showing)`
    &:not(:last-child) { margin-bottom: 1em; }
+   opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
 const mapStateToProps = (state, { movie, movieId }) => ({
