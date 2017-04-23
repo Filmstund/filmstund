@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import { Link } from "../MainButton";
@@ -8,10 +8,24 @@ import Jumbotron from "../jumbotron/jumbotron";
 
 import { showings } from "../store/reducers/index"
 
-const Home = React.createClass({
+class Home extends Component {
     componentWillMount() {
         this.props.dispatch(showings.actions.requestIndex());
-    },
+    }
+
+    renderShowings = (showings) => {
+        return showings.map(showing =>
+            <Showing movieId={showing.movieId} key={showing.id} date={showing.date} admin={showing.admin} location={showing.location.name} />
+        )
+    }
+
+    renderCreatedByMe = (showings) => {
+        const { me } = this.props;
+        const myShowings = showings.filter(s => s.admin.id === me.id);
+
+        return this.renderShowings(myShowings)
+    }
+
     render() {
         const { className, showings = [] } = this.props;
         return (
@@ -20,22 +34,18 @@ const Home = React.createClass({
                     <Header>Nytt besök?</Header>
                     <Link to="/showings/new">Skapa nytt besök</Link>
                 </Jumbotron>
-                <Header>Besök jag har skapat</Header>
-                {/*<Showing
-                    poster="https://images-na.ssl-images-amazon.com/images/M/MV5BMTUwNjUxMTM4NV5BMl5BanBnXkFtZTgwODExMDQzMTI@._V1_SY1000_CR0,0,674,1000_AL_.jpg"
-                    showing={{startTime: 1410548139.042, movie: {name: "Beauty and the Beast"}, location: {name: "Bergakungen, sal 2"}, admin: {nick: "Horv"}}}/>
-                    */}
                 <Header>Mina kommande besök</Header>
-                {showings.map(showing => (
-                    <Showing movieId={showing.movieId} key={showing.id} date={showing.date} admin={showing.admin} location={showing.location.name} />
-                ))}
+                {this.renderShowings(showings)}
+                <Header>Besök jag har skapat</Header>
+                {this.renderCreatedByMe(showings)}
             </div>
         )
     }
-});
+}
 
 const mapStateToProps = (state) => ({
-    showings: Object.values(state.showings.data)
+    showings: Object.values(state.showings.data),
+    me: state.me.data
 })
 
 
