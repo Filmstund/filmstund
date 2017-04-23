@@ -73,7 +73,6 @@ const NewShowing = React.createClass({
 
                 return {
                     ...d,
-                    cinema: d.cinema.replace(/ ?Filmstaden ?/, ''),
                     localTime: moment(formatYMD(date) + " " + d.localTime).format("HH:mm")
                 }
             });
@@ -85,7 +84,7 @@ const NewShowing = React.createClass({
             showing: {
                 ...this.state.showing,
                 time: sfTime.localTime,
-                location: sfTime.saloon
+                location: sfTime.cinema
             }
         }, this.handleSubmit)
     },
@@ -139,7 +138,7 @@ const NewShowing = React.createClass({
             <div>
                 <Header>Skapa besök</Header>
                 <div>
-                    <Showing showing={showing} movie={movie} onClick={clearSelectedMovie} />
+                    <Showing date={showing.date} location={showing.location} movie={movie} onClick={clearSelectedMovie} />
                     <Field text="Datum:">
                         <DatePicker selected={showing.date} onChange={v => this.setShowingDate(v)} />
                     </Field>

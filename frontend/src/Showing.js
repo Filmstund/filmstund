@@ -9,7 +9,7 @@ const VerticalPaddingContainer = styled.div`
 `;
 
 
-const Showing = ({ movie = {}, showing: { date, admin, location }, dispatch, ...props }) => (
+const Showing = ({ movie = {}, movieId, date, admin, location, dispatch, ...props }) => (
     <div {...props}>
         <PosterBox headerText={movie.title} poster={movie.poster}>
             <VerticalPaddingContainer>
@@ -17,7 +17,7 @@ const Showing = ({ movie = {}, showing: { date, admin, location }, dispatch, ...
                 {location.name}<br/>
             </VerticalPaddingContainer>
             {admin &&
-                <span>Skapad av {admin.nick}</span>
+                <span>Skapad av {admin.nick || admin.name}</span>
             }
         </PosterBox>
     </div>
@@ -28,8 +28,8 @@ const StyledShowing = styled(Showing)`
    &:not(:last-child) { margin-bottom: 1em; }
 `;
 
-const mapStateToProps = (state, { showing }) => ({
-    movie: state.movies.data[showing.movieId]
+const mapStateToProps = (state, { movie, movieId }) => ({
+    movie: movie || state.movies.data[movieId]
 });
 
 export default connect(mapStateToProps)(StyledShowing)

@@ -41,7 +41,7 @@ const SelectBox = ({ options, onChange, ...props }) => (
     <Box>
         {options.map(option => (
             <Option key={option.localTime} onClick={() => onChange(option)}>
-                <Lable>{option.localTime} {option.screen}, {option.cinema}</Lable>
+                <Lable>{option.localTime} {option.screen}, {option.cinema.replace(/ ?Filmstaden ?/, '')}</Lable>
                 <div>
                     {option.tags.map(tag => (
                         <Tag key={tag}>{tag}</Tag>
