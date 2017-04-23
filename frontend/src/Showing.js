@@ -14,7 +14,7 @@ const Showing = ({ movie = {}, movieId, date, admin, location, dispatch, ...prop
         <PosterBox headerText={movie.title} poster={movie.poster}>
             <VerticalPaddingContainer>
                 {formatShowingDateTime(date)}<br/>
-                {location.name}<br/>
+                {location}<br/>
             </VerticalPaddingContainer>
             {admin &&
                 <span>Skapad av {admin.nick || admin.name}</span>
