@@ -1,7 +1,7 @@
 import React from "react";
 import styled  from "styled-components";
 import GitHubLogo from "./GithubLogo"
-import QuoteBox from "./QuoteBox";
+import Bioord from "./Bioord";
 
 const BottomContainer = styled.div`
   background: maroon;
@@ -23,7 +23,7 @@ const TopBar = React.createClass({
     render() {
         return (
             <BottomContainer>
-               <QuoteBox number={4}>Du skall icke späda din cola</QuoteBox>
+               <Bioord/>
                <FlexBox>
                    <FlexGrow>
                        <small>Courtesy of didIT (& Tuna)</small>

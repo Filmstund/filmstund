@@ -12,9 +12,11 @@ const showingTransformer = (showing) => ({
 export const showings = createCrudReducer("SHOWINGS", withBaseURL("/showings"), showingTransformer);
 export const movies = createCrudReducer("MOVIES", withBaseURL("/movies"));
 export const me = crudSingleReducer("ME", withBaseURL("/users/me"));
+export const bioord = crudSingleReducer("BIOORD", withBaseURL("/budord/random"));
 
 export default combineReducers({
     me: me.reducer,
     showings: showings.reducer,
-    movies: movies.reducer
+    movies: movies.reducer,
+    bioord: bioord.reducer
 });
