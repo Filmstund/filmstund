@@ -38,6 +38,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.web.controllers.BudordController
 import java.io.IOException
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
@@ -220,6 +221,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.GET, BudordController.PATH).permitAll()
+                .antMatchers(HttpMethod.GET, BudordController.PATH + "/random").permitAll()
                 .anyRequest().authenticated()
     }
 }

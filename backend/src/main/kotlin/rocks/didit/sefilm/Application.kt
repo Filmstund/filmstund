@@ -1,5 +1,7 @@
 package rocks.didit.sefilm
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
@@ -8,21 +10,21 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
+import org.springframework.core.io.ClassPathResource
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
-import java.math.BigDecimal
 
 
 @SpringBootApplication
@@ -63,18 +65,19 @@ class Application {
     }
 
     @Bean
-    fun initData(locations: LocationRepository) = ApplicationRunner {
-        //locations.deleteAll()
-        //seedTestData(locations)
-    }
+    fun seedInitialData(locationsRepo: LocationRepository,
+                        budordRepo: BudordRepository) = ApplicationRunner {
+        val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
 
-    private fun seedTestData(showings: ShowingRepository, movies: MovieRepository,
-                             locations: LocationRepository, users: UserRepository) {
-        val seedLocations = listOf(Location("Filmstaden Bergakungen", BigDecimal("57.7022927"), BigDecimal("11.9841099")),
-                Location("Biopalatset", BigDecimal("57.7034996"), BigDecimal("11.9647064")),
-                Location("Göta", BigDecimal("57.6973703"), BigDecimal("11.9763771")))
-        locations.save(seedLocations)
-        log.info("Completed save of seed locations")
+        val budordResource = ClassPathResource("seeds/budord.json")
+        val budords: List<BioBudord> = objectMapper.readValue(budordResource.inputStream)
+        budordRepo.save(budords)
+        log.info("Seeded budord with ${budords.size} values")
+
+        val locationsResource = ClassPathResource("seeds/locations.json")
+        val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
+        locationsRepo.save(locations)
+        log.info("Seeded locations with ${locations.size} values")
     }
 }
 
