@@ -43,8 +43,8 @@ class TopBar extends Component {
     return (
       <TopBarContainer>
         <Link to="/">Hem</Link>
-        <Link to="/user">Användare</Link>
-        <Link to="/movies">Filmer</Link>
+        <Link to="/showings">Aktuella Besök</Link>
+        <Link to="/user">Profil</Link>
         {signedIn && <ExternalLink onClick={this.handleLogout}>Logga ut</ExternalLink>}
       </TopBarContainer>
     );
