@@ -17,6 +17,7 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.LimitedUserInfo
+import rocks.didit.sefilm.domain.SuccessfulDTO
 import rocks.didit.sefilm.domain.toLimitedUserInfo
 import java.time.LocalDate
 import java.time.LocalTime
@@ -39,6 +40,14 @@ class ShowingController(private val repo: ShowingRepository,
 
     @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: UUID) = repo.findOne(id).orElseThrow { NotFoundException("showing '$id") }
+
+    @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    fun deleteShowing(@PathVariable id: UUID): SuccessfulDTO {
+        val showing = findOne(id)
+        if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can delete a showing")
+        repo.delete(showing)
+        return SuccessfulDTO(true, "Showing with id ${showing.id} were removed successfully")
+    }
 
     @GetMapping(PATH_WITH_ID + "/bioklubbnummer")
     fun findBioklubbnummerForShowing(@PathVariable id: UUID): Collection<Bioklubbnummer> {
@@ -94,3 +103,4 @@ class ShowingController(private val repo: ShowingRepository,
                 admin = admin)
     }
 }
+
