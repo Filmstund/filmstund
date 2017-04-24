@@ -4,12 +4,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import rocks.didit.sefilm.Application
-import rocks.didit.sefilm.MissingParametersException
-import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.currentLoggedInUserId
+import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
@@ -43,12 +41,14 @@ class ShowingController(private val repo: ShowingRepository,
     fun findOne(@PathVariable id: UUID) = repo.findOne(id).orElseThrow { NotFoundException("showing '$id") }
 
     @GetMapping(PATH_WITH_ID + "/bioklubbnummer")
-    fun findBioklubbnummerForShowing(@PathVariable id: UUID) =
-            repo.findOne(id)
-                    .map { showing ->
-                        shuffledBioklubbnummer(showing.participants)
-                    }
-                    .orElseThrow { NotFoundException("showing '$id") }
+    fun findBioklubbnummerForShowing(@PathVariable id: UUID): Collection<Bioklubbnummer> {
+        return repo.findOne(id)
+                .map { showing ->
+                    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can view the bioklubbnummer")
+                    shuffledBioklubbnummer(showing)
+                }
+                .orElseThrow { NotFoundException("showing '$id") }
+    }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     @ResponseStatus(HttpStatus.CREATED)
@@ -68,9 +68,11 @@ class ShowingController(private val repo: ShowingRepository,
         return ResponseEntity.created(newLocation).body(savedShowing)
     }
 
-    private fun shuffledBioklubbnummer(participants: Collection<LimitedUserInfo>): Collection<Bioklubbnummer> {
-        val ids = participants.map(LimitedUserInfo::id).filterNotNull()
-        val bioklubbnummer = userRepo.findByIdIn(ids)
+    private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
+        val ids = showing.participants.map(LimitedUserInfo::id).filterNotNull().toMutableList()
+        if (showing.admin?.id != null) ids.add(showing.admin.id)
+
+        val bioklubbnummer = userRepo.findAll(ids).map(User::bioklubbnummer).filterNotNull()
         Collections.shuffle(bioklubbnummer)
         return bioklubbnummer
     }
