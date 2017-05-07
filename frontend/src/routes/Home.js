@@ -14,9 +14,19 @@ class Home extends Component {
         this.props.dispatch(movies.actions.requestIndex());
     }
 
+    navigateToShowing = (showing) => {
+        this.props.history.push(`/showings/${showing.id}`)
+    }
+
     renderShowings = (showings) => {
         return showings.map(showing =>
-            <Showing movieId={showing.movieId} key={showing.id} date={showing.date} adminId={showing.admin} location={showing.location.name} />
+            <Showing
+                onClick={() => this.navigateToShowing(showing)}
+                movieId={showing.movieId}
+                key={showing.id}
+                date={showing.date}
+                adminId={showing.admin}
+                location={showing.location.name} />
         )
     }
 

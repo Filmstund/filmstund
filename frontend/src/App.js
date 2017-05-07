@@ -12,6 +12,7 @@ import Home from "./routes/Home";
 import Login from "./routes/Login";
 import User from "./routes/User";
 import Showings from "./routes/Showings";
+import SingleShowing from "./routes/SingleShowing";
 import NewShowing from "./routes/NewShowing";
 
 const PaddingContainer = styled.div`
@@ -62,6 +63,7 @@ class App extends Component {
               <Route path="/login" render={() => (signedIn ? <Redirect to="/" /> : <Login /> )} />
               <Route path="/user" component={User} />
               <Route exact path="/showings" component={Showings} />
+              <Route path="/showings/:showingId" component={SingleShowing} />
               <Route path="/showings/new/:movieId?" component={NewShowing} />
             </PaddingContainer>
             <Footer/>

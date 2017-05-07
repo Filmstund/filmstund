@@ -22,11 +22,11 @@ const Header = styled.h3`
     overflow: hidden;
 `;
 
-const PosterBox = ({ className, poster, headerText, children }) => (
+const PosterBox = ({ className, poster, onClick, headerText, children }) => (
     <div className={className}>
-        <Poster src={poster || alfons}/>
+        <Poster src={poster || alfons} onClick={onClick}/>
         <PaddingContainer>
-            <Header>{headerText}</Header>
+            <Header onClick={onClick}>{headerText}</Header>
             {children}
         </PaddingContainer>
     </div>
