@@ -47,6 +47,15 @@ const myFetch = (url, opts) => {
                 return resp.text();
             } else if (resp.status >= 200 && resp.status < 300) {
                 return resp.json();
+            } else if (resp.status === 400) {
+                return new Promise((resolve, reject) => {
+                    return resp.json().then(json => {
+                        reject({
+                            ...resp,
+                            reason: json.reason || json
+                        })
+                    })
+                })
             } else {
                 return Promise.reject(resp);
             }
