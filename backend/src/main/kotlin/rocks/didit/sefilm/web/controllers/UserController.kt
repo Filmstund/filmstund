@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.currentLoggedInUserId
+import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.LimitedUserInfo
@@ -20,9 +20,9 @@ class UserController(val userRepository: UserRepository) {
 
     @GetMapping(BASE_PATH + "/me", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun currentUser(): User {
-        val currentLoggedInUserId = currentLoggedInUserId()
+        val currentLoggedInUserId = currentLoggedInUser().id
         return userRepository
-                .findOne(currentLoggedInUserId)
+                .findById(currentLoggedInUserId)
                 .orElseThrow { NotFoundException("user '$currentLoggedInUserId'") }
     }
 
@@ -31,7 +31,7 @@ class UserController(val userRepository: UserRepository) {
 
     @GetMapping(BASE_PATH + "/{id}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: String): LimitedUserInfo =
-            userRepository.findOne(id)
+            userRepository.findById(id)
                     .map(User::toLimitedUserInfo)
                     .orElseThrow { NotFoundException("user '$id'") }
 }

@@ -20,7 +20,7 @@ class LocationController(private val repo: LocationRepository) {
 
     @GetMapping(BASE_PATH + "/{id}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: String): Location {
-        return repo.findOne(id)
+        return repo.findById(id)
                 .orElseThrow { NotFoundException("location '$id'") }
     }
 }

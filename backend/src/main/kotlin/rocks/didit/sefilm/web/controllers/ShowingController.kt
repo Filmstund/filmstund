@@ -15,10 +15,7 @@ import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.Bioklubbnummer
-import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.SuccessfulDTO
-import rocks.didit.sefilm.domain.toLimitedUserInfo
+import rocks.didit.sefilm.domain.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -39,7 +36,7 @@ class ShowingController(private val repo: ShowingRepository,
     fun findAll() = repo.findAll()
 
     @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun findOne(@PathVariable id: UUID) = repo.findOne(id).orElseThrow { NotFoundException("showing '$id") }
+    fun findOne(@PathVariable id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id") }
 
     @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun deleteShowing(@PathVariable id: UUID): SuccessfulDTO {
@@ -51,7 +48,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     @GetMapping(PATH_WITH_ID + "/bioklubbnummer")
     fun findBioklubbnummerForShowing(@PathVariable id: UUID): Collection<Bioklubbnummer> {
-        return repo.findOne(id)
+        return repo.findById(id)
                 .map { showing ->
                     if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can view the bioklubbnummer")
                     shuffledBioklubbnummer(showing)
@@ -63,12 +60,12 @@ class ShowingController(private val repo: ShowingRepository,
     @ResponseStatus(HttpStatus.CREATED)
     fun saveShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
         if (body.date == null || body.location == null || body.movieId == null || body.time == null) throw MissingParametersException()
-        if (!movieRepo.exists(body.movieId)) {
+        if (!movieRepo.existsById(body.movieId)) {
             throw NotFoundException("movie '${body.movieId}'. Can't create showing for movie that does not exist")
         }
 
         val adminUser = userRepo
-                .findOne(currentLoggedInUserId())
+                .findById(currentLoggedInUser().id)
                 .map(User::toLimitedUserInfo)
                 .orElseThrow { NotFoundException("Current logged in user not found in db") }
 
@@ -77,11 +74,31 @@ class ShowingController(private val repo: ShowingRepository,
         return ResponseEntity.created(newLocation).body(savedShowing)
     }
 
-    private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
-        val ids = showing.participants.map(LimitedUserInfo::id).filterNotNull().toMutableList()
-        if (showing.admin?.id != null) ids.add(showing.admin.id)
+    @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    fun attend(@PathVariable id: UUID): AttendDTO {
+        val showing = findOne(id)
+        val participantsPlusLoggedInUser = showing.participants.toMutableSet()
+        participantsPlusLoggedInUser.add(currentLoggedInUser())
 
-        val bioklubbnummer = userRepo.findAll(ids).map(User::bioklubbnummer).filterNotNull()
+        repo.save(showing.copy(participants = participantsPlusLoggedInUser))
+        return AttendDTO(true, id, currentLoggedInUser())
+    }
+
+    @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    fun unattend(@PathVariable id: UUID): AttendDTO {
+        val showing = findOne(id)
+        val participantsWithoutLoggedInUser = showing.participants.toMutableSet()
+        participantsWithoutLoggedInUser.remove(currentLoggedInUser())
+
+        repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
+        return AttendDTO(false, id, currentLoggedInUser())
+    }
+
+    private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
+        val ids = showing.participants.map { it.id }.toMutableSet()
+        ids.add(showing.admin.id)
+
+        val bioklubbnummer = userRepo.findAllById(ids).map(User::bioklubbnummer).filterNotNull()
         Collections.shuffle(bioklubbnummer)
         return bioklubbnummer
     }
@@ -94,13 +111,13 @@ class ShowingController(private val repo: ShowingRepository,
     /* Fetch location from db or create it if it does not exist before converting the showing */
     private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {
         val location = locationRepo
-                .findOne(this.location)
+                .findById(this.location)
                 .orElseGet { locationRepo.save(Location(name = this.location)) }
         return Showing(date = this.date,
                 time = this.time,
                 movieId = this.movieId,
                 location = location,
-                admin = admin)
+                admin = admin.id)
     }
 }
 

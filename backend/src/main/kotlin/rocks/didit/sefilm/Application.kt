@@ -71,12 +71,12 @@ class Application {
 
         val budordResource = ClassPathResource("seeds/budord.json")
         val budords: List<BioBudord> = objectMapper.readValue(budordResource.inputStream)
-        budordRepo.save(budords)
+        budordRepo.saveAll(budords)
         log.info("Seeded budord with ${budords.size} values")
 
         val locationsResource = ClassPathResource("seeds/locations.json")
         val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
-        locationsRepo.save(locations)
+        locationsRepo.saveAll(locations)
         log.info("Seeded locations with ${locations.size} values")
     }
 }

@@ -38,6 +38,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.BudordController
 import java.io.IOException
 import javax.servlet.ServletException
@@ -123,8 +124,8 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
             val principal = authentication?.principal as OpenIdConnectUserDetails?
                     ?: throw BadCredentialsException("Successful authentication without a given principal")
 
-            if (!userRepository.exists(principal.userId)) {
-                val newUser = User(id = principal.userId, name = "${principal.firstName} ${principal.lastName}",
+            if (!userRepository.existsById(principal.userId)) {
+                val newUser = User(id = UserID(principal.userId), name = "${principal.firstName} ${principal.lastName}",
                         email = principal.username ?: "", avatar = principal.avatarUrl)
                 userRepository.save(newUser)
                 log.info("Created user ${newUser.id}")

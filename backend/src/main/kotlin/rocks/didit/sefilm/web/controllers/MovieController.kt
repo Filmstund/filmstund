@@ -39,7 +39,7 @@ class MovieController(private val repo: MovieRepository,
 
     @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: UUID): Movie {
-        val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id'") }
+        val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
         when {
         // FIXME: move this to /scrape or something
             movie.needsMoreInfo() -> fetchExtendedInfoForMovie(movie)
@@ -81,14 +81,14 @@ class MovieController(private val repo: MovieRepository,
                     Movie(title = title, sfId = ncgId, releaseDate = releaseDate, poster = posterUrl)
                 }
 
-        val savedEntities = repo.save(newMoviesWeHaventPreviouslySeen)
+        val savedEntities = repo.saveAll(newMoviesWeHaventPreviouslySeen)
         return SavedEntitiesDTO(savedEntities.count(), "Fetched and saved new movies from SF")
     }
 
     @GetMapping(PATH_WITH_ID + "/sfdates")
     @Cacheable("sfdates")
     fun findSfDates(@PathVariable id: UUID): Collection<LocalDate> {
-        val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id") }
+        val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id") }
         if (movie.sfId == null) throw MissingSfIdException()
 
         return sfClient.getDatesAndLocations(movie.sfId).dates
@@ -98,7 +98,7 @@ class MovieController(private val repo: MovieRepository,
     @Cacheable("sfdate")
     fun findSfTimes(@PathVariable id: UUID, @PathVariable date: String): Collection<ScreenDTO> {
         if (!date.matches(Regex("^\\d{4}-\\d{2}-\\d{2}$"))) throw BadRequestException("Wrong date format, requires yyyy-mm-dd")
-        val movie = repo.findOne(id).orElseThrow { NotFoundException("movie '$id'") }
+        val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
         if (movie.sfId == null) throw MissingSfIdException()
 
         val screens = sfClient.getScreensForDateAndMovie(movie.sfId, date)

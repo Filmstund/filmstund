@@ -4,7 +4,7 @@ import rocks.didit.sefilm.database.entities.User
 
 
 data class LimitedUserInfo(
-        val id: String = "N/A",
+        val id: UserID = UserID("N/A"),
         val name: String? = null,
         val nick: String? = null,
         val phone: String? = null,
