@@ -6,4 +6,6 @@ import rocks.didit.sefilm.database.entities.Showing
 import java.util.*
 
 @Repository
-interface ShowingRepository : CrudRepository<Showing, UUID>
+interface ShowingRepository : CrudRepository<Showing, UUID> {
+    fun findByPrivate(isPrivate: Boolean): List<Showing>
+}

@@ -34,7 +34,7 @@ class ShowingController(private val repo: ShowingRepository,
     private val log = LoggerFactory.getLogger(ShowingController::class.java)
 
     @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun findAll() = repo.findAll()
+    fun findAll() = repo.findByPrivate(false)
 
     @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id") }
