@@ -19,8 +19,8 @@ const withLoader = (mapOfActionsAndIds) => {
         }
 
         checkAndUpdateProps = (oldProps, props) =>  {
-            const maxTries = Object.keys(mapOfActionsAndIds).length
-            if (this.state.error || this.state.nbrTries > maxTries) {
+            const maxTries = Object.keys(mapOfActionsAndIds).length + 10
+            if (this.state.error) {
                 return;
             }
 
@@ -44,7 +44,7 @@ const withLoader = (mapOfActionsAndIds) => {
                     props.dispatch(action(modelId))
                 }
 
-                if (this.state.nbrTries >= maxTries && this.state.nbrTries > 0) {
+                if (this.state.loading && this.state.nbrTries >= maxTries && this.state.nbrTries > 0) {
                     console.warn(propId + " never getting set");
                     this.setState({
                         error: true
