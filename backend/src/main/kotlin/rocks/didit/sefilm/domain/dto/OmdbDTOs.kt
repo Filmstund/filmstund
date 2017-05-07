@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.domain.dto
 
 data class OmdbApiRatingDTO(val Source: String, val Value: String)
 

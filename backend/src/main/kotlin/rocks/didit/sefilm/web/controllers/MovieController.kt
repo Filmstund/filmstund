@@ -2,18 +2,17 @@ package rocks.didit.sefilm.web.controllers
 
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
+import rocks.didit.sefilm.clients.OmdbClient
+import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.dto.SfAttributeDTO
+import rocks.didit.sefilm.domain.dto.SfTag
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -21,13 +20,12 @@ import java.util.*
 
 @RestController
 class MovieController(private val repo: MovieRepository,
-                      private val restTemplate: RestTemplate,
                       private val sfClient: SfClient,
-                      private val httpEntity: HttpEntity<Void>) {
+                      private val omdbClient: OmdbClient) {
+
     companion object {
         private const val PATH = Application.API_BASE_PATH + "/movies"
         private const val PATH_WITH_ID = PATH + "/{id}"
-        private const val OMDBAPI_URL = "http://www.omdbapi.com/"
     }
 
     private val log = LoggerFactory.getLogger(MovieController::class.java)
@@ -49,8 +47,8 @@ class MovieController(private val repo: MovieRepository,
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
         val movieInfo = when {
-            body.sf != null -> fetchInfoFromSf(body.sf)
-            body.imdb != null -> fetchOmdbExtendedInfo(OMDBAPI_URL + "/?i={id}", mapOf("id" to body.imdb))
+            body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
+            body.imdb != null -> omdbClient.fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?i={id}", mapOf("id" to body.imdb))?.toMovie()
             else -> throw MissingParametersException()
         }
 
@@ -67,10 +65,7 @@ class MovieController(private val repo: MovieRepository,
 
     @GetMapping(PATH + "/sf/populate")
     fun populateFromSf(): SavedEntitiesDTO {
-        val sfMovies = restTemplate
-                .exchange(SF_API_URL + "/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=GB&", HttpMethod.GET,
-                        httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
-                .body
+        val sfMovies = sfClient.allMovies()
 
         val ourMovies = repo.findAll()
         val newMoviesWeHaventPreviouslySeen = sfMovies
@@ -135,8 +130,7 @@ class MovieController(private val repo: MovieRepository,
 
     private fun updateFromSf(movie: Movie): Movie {
         log.info("Fetching extended movie info from SF for ${movie.sfId}")
-        val updatedMovie = restTemplate.exchange(SF_API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java,
-                movie.sfId).body
+        val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
 
         val copy = movie.copy(synopsis = updatedMovie.shortDescription,
                 originalTitle = updatedMovie.originalTitle,
@@ -153,7 +147,7 @@ class MovieController(private val repo: MovieRepository,
 
     private fun updateFromImdbById(movie: Movie) {
         log.info("Fetching extended movie info from IMDb by ID for ${movie.imdbId}")
-        val updatedInfo = fetchOmdbExtendedInfo(OMDBAPI_URL + "/?i={id}", mapOf("id" to movie.imdbId))
+        val updatedInfo = omdbClient.fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?i={id}", mapOf("id" to movie.imdbId))?.toMovie()
         if (updatedInfo == null) {
             log.warn("Unable to find movie on OMDb with for imdb id ${movie.imdbId}")
             throw ExternalProviderException()
@@ -174,8 +168,8 @@ class MovieController(private val repo: MovieRepository,
         val title = movie.originalTitle ?: movie.title
 
         log.info("Fetching IMDb id for '$title'")
-        val updatedInfo = fetchOmdbExtendedInfo(OMDBAPI_URL + "/?t={title}&y={year}",
-                mapOf("title" to title, "year" to movie.productionYear))
+        val updatedInfo = omdbClient.fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?t={title}&y={year}",
+                mapOf("title" to title, "year" to movie.productionYear))?.toMovie()
 
         if (updatedInfo == null) {
             log.info("Movie with title '$title' not found on OMDb")
@@ -187,14 +181,5 @@ class MovieController(private val repo: MovieRepository,
 
         repo.save(copy)
         log.info("Successfully updated movie with new IMDb id")
-    }
-
-    private fun fetchOmdbExtendedInfo(uri: String, params: Map<String, Any?>): Movie? =
-            restTemplate.getForEntity(uri, OmdbApiMovieDTO::class.java, params).body.toMovie()
-
-    private fun fetchInfoFromSf(sfId: String): Movie {
-        val responseEntity = restTemplate
-                .exchange(SF_API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId)
-        return responseEntity.body.toMovie()
     }
 }

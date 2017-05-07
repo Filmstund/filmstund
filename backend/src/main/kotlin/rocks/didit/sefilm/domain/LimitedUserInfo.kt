@@ -1,7 +1,5 @@
 package rocks.didit.sefilm.domain
 
-import rocks.didit.sefilm.database.entities.User
-
 
 data class LimitedUserInfo(
         val id: UserID = UserID("N/A"),
@@ -11,6 +9,3 @@ data class LimitedUserInfo(
         val avatar: String? = null
 )
 
-fun User.toLimitedUserInfo(): LimitedUserInfo {
-    return LimitedUserInfo(this.id, this.name, this.nick, this.phone, this.avatar)
-}

@@ -10,7 +10,7 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.toLimitedUserInfo
+import rocks.didit.sefilm.toLimitedUserInfo
 
 @RestController
 class UserController(val userRepository: UserRepository) {

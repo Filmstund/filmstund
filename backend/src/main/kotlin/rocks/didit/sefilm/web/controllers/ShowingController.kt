@@ -15,11 +15,10 @@ import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.Bioklubbnummer
+import rocks.didit.sefilm.domain.LimitedUserInfo
 import rocks.didit.sefilm.domain.dto.AttendDTO
 import rocks.didit.sefilm.domain.dto.SuccessfulDTO
-import java.time.LocalDate
-import java.time.LocalTime
 import java.util.*
 
 @RestController
@@ -104,11 +103,6 @@ class ShowingController(private val repo: ShowingRepository,
         Collections.shuffle(bioklubbnummer)
         return bioklubbnummer
     }
-
-    data class ShowingDTO(val date: LocalDate?,
-                          val time: LocalTime?,
-                          val movieId: UUID?,
-                          val location: String?)
 
     /* Fetch location from db or create it if it does not exist before converting the showing */
     private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {

@@ -3,9 +3,11 @@ package rocks.didit.sefilm
 import org.springframework.security.core.context.SecurityContextHolder
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.domain.OmdbApiMovieDTO
-import rocks.didit.sefilm.domain.SfExtendedMovieDTO
+import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.domain.LimitedUserInfo
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.OmdbApiMovieDTO
+import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -58,4 +60,8 @@ internal fun OmdbApiMovieDTO.toMovie(): Movie? {
             runtime = runtime,
             genres = genres,
             releaseDate = releaseDate)
+}
+
+internal fun User.toLimitedUserInfo(): LimitedUserInfo {
+    return LimitedUserInfo(this.id, this.name, this.nick, this.phone, this.avatar)
 }

@@ -1,14 +1,7 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.domain.dto
 
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-
-const val SF_API_URL = "https://beta.sfbio.se/api"
-
 
 data class SfRatingDTO(val age: Int,
                        val ageAccompanied: Int,
@@ -89,16 +82,4 @@ enum class SfTag {
     Unknown
 }
 
-@Component
-class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
-    fun getDatesAndLocations(sfId: String) =
-            restTemplate.exchange(SF_API_URL + "/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfDatesAndLocationsDTO::class.java)
-                    .body
-
-    /** Date must be in ISO8601 format, i.e 2017-04-11 */
-    fun getScreensForDateAndMovie(sfId: String, date: String) =
-            restTemplate
-                    .exchange(SF_API_URL + "/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
-                    .body
-}
 
