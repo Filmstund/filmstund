@@ -17,7 +17,7 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.dto.AttendDTO
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SuccessfulDTO
 import java.util.*
 
@@ -76,23 +76,23 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun attend(@PathVariable id: UUID): AttendDTO {
+    fun attend(@PathVariable id: UUID): Set<UserID> {
         val showing = findOne(id)
         val participantsPlusLoggedInUser = showing.participants.toMutableSet()
         participantsPlusLoggedInUser.add(currentLoggedInUser())
 
-        repo.save(showing.copy(participants = participantsPlusLoggedInUser))
-        return AttendDTO(true, id, currentLoggedInUser())
+        val savedShowing = repo.save(showing.copy(participants = participantsPlusLoggedInUser))
+        return savedShowing.participants
     }
 
     @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    fun unattend(@PathVariable id: UUID): AttendDTO {
+    fun unattend(@PathVariable id: UUID): Set<UserID> {
         val showing = findOne(id)
         val participantsWithoutLoggedInUser = showing.participants.toMutableSet()
         participantsWithoutLoggedInUser.remove(currentLoggedInUser())
 
-        repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
-        return AttendDTO(false, id, currentLoggedInUser())
+        val savedShowing = repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
+        return savedShowing.participants
     }
 
     private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
