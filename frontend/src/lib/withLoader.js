@@ -44,7 +44,7 @@ const withLoader = (mapOfActionsAndIds) => {
                     props.dispatch(action(modelId))
                 }
 
-                if (this.state.nbrTries >= maxTries) {
+                if (this.state.nbrTries >= maxTries && this.state.nbrTries > 0) {
                     console.warn(propId + " never getting set");
                     this.setState({
                         error: true

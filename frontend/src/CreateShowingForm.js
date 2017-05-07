@@ -26,7 +26,8 @@ const NewShowing = React.createClass({
                 time: now.format("HH:mm"),
                 location: "",
                 price: "",
-                movieId: this.props.movieId
+                movieId: this.props.movieId,
+                admin: this.props.me.id
             },
             sfTimes: [],
             datesForMovieId: []
@@ -39,7 +40,6 @@ const NewShowing = React.createClass({
         this.setShowingValue("date", value, this.requestSFTimes)
     },
     setShowingCity({ target: { value }}) {
-        console.log(value)
         this.requestSFTimes();
         // this.setShowingValue("city", value, )
     },
@@ -132,13 +132,13 @@ const NewShowing = React.createClass({
     },
     render() {
         const { showing, sfTimes } = this.state;
-        const { movie, clearSelectedMovie } = this.props;
+        const { movieId, clearSelectedMovie } = this.props;
 
         return (
             <div>
                 <Header>Skapa besök</Header>
                 <div>
-                    <Showing date={showing.date} location={showing.location} movie={movie} onClick={clearSelectedMovie} />
+                    <Showing date={showing.date} adminId={showing.admin} location={showing.location} movieId={movieId} onClick={clearSelectedMovie} />
                     <Field text="Datum:">
                         <DatePicker selected={showing.date} onChange={v => this.setShowingDate(v)} />
                     </Field>
@@ -160,9 +160,7 @@ const NewShowing = React.createClass({
     }
 });
 
-const mapStateToProps = (state, { movieId }) => ({
-    movie: state.movies.data[movieId]
-});
 
-
-export default connect(mapStateToProps)(NewShowing);
+export default connect(state => ({
+    me: state.me.data
+}))(NewShowing);

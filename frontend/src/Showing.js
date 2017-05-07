@@ -32,11 +32,10 @@ const StyledShowing = styled(Showing)`
    opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
-const mapStateToProps = (state, { movie, movieId, adminId }) => {
-    console.log(movie, movieId, adminId);
-    return {movie: { ...state.movies, data: state.movies.data[movieId] },
-        admin: { ...state.users, data: state.users.data[adminId] }}
-};
+const mapStateToProps = (state, { movieId, adminId }) => ({
+    movie: { ...state.movies, data: state.movies.data[movieId] },
+    admin: { ...state.users, data: state.users.data[adminId] }
+});
 
 
 export default connect(mapStateToProps)(withLoader({
