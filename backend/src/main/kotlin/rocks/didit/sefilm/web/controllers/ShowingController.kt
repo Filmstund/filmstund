@@ -113,7 +113,8 @@ class ShowingController(private val repo: ShowingRepository,
                 time = this.time,
                 movieId = this.movieId,
                 location = location,
-                admin = admin.id)
+                admin = admin.id,
+                participants = setOf(admin.id))
     }
 }
 
