@@ -1,7 +1,7 @@
 import _ from "lodash";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import {withBaseURL} from "../../lib/fetch";
-import {USER_SIGNOUT_ACTION} from "./user";
+import {USER_SIGNOUT_ACTION, signoutUser} from "./user";
 
 const path = withBaseURL("/users/me")
 
@@ -66,7 +66,12 @@ const actionCreators = {
               dispatch({ type: actions.successSingle, data })
               dispatch({ type: 'USERS_RESPONSE_SINGLE', data })
             })
-            .catch(error => dispatch({ type: actions.errorSingle, error }))
+            .catch(error => {
+                dispatch({ type: actions.errorSingle, error })
+                if (error.status === 403) {
+                    dispatch(signoutUser())
+                }
+            })
     },
 
     requestUpdate: (data) => (dispatch) => {
