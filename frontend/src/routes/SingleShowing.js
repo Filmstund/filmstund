@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import _ from "lodash";
-import { showings as showingActions } from "../store/reducers";
+import { showings as showingActions, users as userActions } from "../store/reducers";
+import withLoader from "../lib/withLoader";
 
 import Showing from "../Showing";
 
@@ -37,18 +38,15 @@ class Showings extends Component {
         this.props.dispatch(showingActions.actions.requestUnattend(this.props.showingId));
     }
 
-    componentWillMount() {
-        this.props.dispatch(showingActions.actions.requestSingle(this.props.showingId));
-    }
     render() {
-        const { className, showing, movie, me } = this.props;
+        const { className, showing, me } = this.props;
 
         const isParticipating = showing.participants.includes(me.id)
 
         return (
             <div className={className}>
                 <Showing
-                    movie={movie}
+                    movieId={showing.movieId}
                     date={showing.date}
                     adminId={showing.admin}
                     location={showing.location.name} />
@@ -63,15 +61,20 @@ class Showings extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-    const showing = state.showings.data[props.match.params.showingId];
+    const { showingId } = props.match.params
+    const showing = state.showings.data[showingId]
+    const adminId = showing && showing.admin
 
     return {
-        showingId: props.match.params.showingId,
-        me: state.me.data,
-        showing,
-        movie: state.movies.data[showing.movieId]
+        showingId,
+        adminId,
+        showing: { ...state.showings, data: showing},
+        admin: { ...state.users, data: state.users.data[adminId] },
+        me: state.me.data
     }
 }
 
-
-export default connect(mapStateToProps)(Showings);
+export default connect(mapStateToProps)(withLoader({
+    showing: ['showingId', showingActions.actions.requestSingle],
+    admin: ['adminId', userActions.actions.requestSingle]
+})(Showings));

@@ -4,7 +4,7 @@ import _ from "lodash";
 import moment from "moment";
 
 import { getTodaysDate } from "../lib/dateTools";
-import { showings as showingActions } from "../store/reducers";
+import { showings as showingActions, movies as movieActions } from "../store/reducers";
 
 import Header from "../Header";
 import Showing from "../Showing";
@@ -14,6 +14,7 @@ const today = getTodaysDate();
 class Showings extends Component {
     componentWillMount() {
         this.props.dispatch(showingActions.actions.requestIndex());
+        this.props.dispatch(movieActions.actions.requestIndex());
     }
     render() {
         const { className, showings = [] } = this.props;
@@ -24,11 +25,11 @@ class Showings extends Component {
             <div className={className}>
                 <Header>Aktuella Besök</Header>
                 {_.sortBy(upcoming, 'date').map(showing => (
-                    <Showing key={showing.id} movieId={showing.movieId} date={showing.date} admin={showing.admin} location={showing.location.name} />
+                    <Showing key={showing.id} movieId={showing.movieId} date={showing.date} adminId={showing.admin} location={showing.location.name} />
                 ))}
                 <Header>Tidigare Besök</Header>
                 {_.sortBy(previous, 'date').map(showing => (
-                    <Showing key={showing.id} disabled={true} movieId={showing.movieId} date={showing.date} admin={showing.admin} location={showing.location.name} />
+                    <Showing key={showing.id} disabled={true} movieId={showing.movieId} date={showing.date} adminId={showing.admin} location={showing.location.name} />
                 ))}
             </div>
         )

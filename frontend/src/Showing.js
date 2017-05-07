@@ -1,7 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
+import _ from "lodash";
+import { movies as movieActions, users as userActions } from "./store/reducers"
 import {formatShowingDateTime} from "./lib/dateTools";
+import withLoader from "./lib/withLoader"
 import PosterBox from "./PosterBox";
 
 const VerticalPaddingContainer = styled.div`
@@ -29,9 +32,14 @@ const StyledShowing = styled(Showing)`
    opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
-const mapStateToProps = (state, { movie, movieId, adminId }) => ({
-    movie: movie || state.movies.data[movieId],
-    admin: state.users.data[adminId]
-});
+const mapStateToProps = (state, { movie, movieId, adminId }) => {
+    console.log(movie, movieId, adminId);
+    return {movie: { ...state.movies, data: state.movies.data[movieId] },
+        admin: { ...state.users, data: state.users.data[adminId] }}
+};
 
-export default connect(mapStateToProps)(StyledShowing)
+
+export default connect(mapStateToProps)(withLoader({
+    movie: ['movieId', movieActions.actions.requestSingle],
+    admin: ['adminId', userActions.actions.requestSingle]
+})(StyledShowing))
