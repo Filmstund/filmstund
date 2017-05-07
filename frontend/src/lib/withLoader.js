@@ -23,8 +23,6 @@ const withLoader = (mapOfActionsAndIds) => {
             if (this.state.error || this.state.nbrTries > maxTries) {
                 return;
             }
-            // console.log(oldProps, props, oldProps === props);
-            // debugger;
 
             const allDone = _.every(mapOfActionsAndIds, ([propId, action], prop) => {
                 const model = props[prop]
@@ -34,8 +32,6 @@ const withLoader = (mapOfActionsAndIds) => {
                     this.setState({ error: true })
                     return false;
                 }
-
-                console.log("model", model);
 
                 if (model.data) {
                     return true;
@@ -57,8 +53,6 @@ const withLoader = (mapOfActionsAndIds) => {
 
                 return false
             })
-
-            console.log('allDone', allDone);
 
             if (allDone) {
                 const objectList = _.map(mapOfActionsAndIds, ([propId, ], prop) => ({ [prop]: props[prop].data }))
@@ -82,7 +76,6 @@ const withLoader = (mapOfActionsAndIds) => {
         }
 
         render() {
-            console.log(this.state.loading);
             if (this.state.error) {
                 return <div>Misslyckades att ladda</div>
             } else if (this.state.loading) {
