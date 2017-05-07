@@ -16,6 +16,8 @@ import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.dto.AttendDTO
+import rocks.didit.sefilm.domain.dto.SuccessfulDTO
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*

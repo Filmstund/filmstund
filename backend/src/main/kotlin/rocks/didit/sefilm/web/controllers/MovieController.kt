@@ -16,8 +16,6 @@ import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.*
 import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -199,56 +197,4 @@ class MovieController(private val repo: MovieRepository,
                 .exchange(SF_API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId)
         return responseEntity.body.toMovie()
     }
-
-    data class ExternalMovieIdDTO(val imdb: String? = null,
-                                  val sf: String? = null)
-
-    private fun OmdbApiMovieDTO.toMovie(): Movie? {
-        if (!this.Response.toBoolean()) return null
-
-        val parsedRuntime = this.Runtime?.substringBefore(" ")?.toLong()
-        val runtime = when (parsedRuntime) {
-            null -> Duration.ZERO
-            else -> Duration.ofMinutes(parsedRuntime)
-        }
-
-        val genres = when (this.Genre) {
-            null -> listOf()
-            else -> this.Genre.split(", ")
-        }
-
-        val releaseDate = when (this.Released) {
-            null -> LocalDate.now()
-            else -> LocalDate.parse(this.Released, DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US))
-        }
-
-        return Movie(imdbId = this.imdbID,
-                title = this.Title ?: "",
-                synopsis = this.Plot,
-                productionYear = this.Year?.toInt(),
-                poster = this.Poster,
-                runtime = runtime,
-                genres = genres,
-                releaseDate = releaseDate)
-    }
-
-    private fun SfExtendedMovieDTO.toMovie() =
-            Movie(sfId = this.ncgId,
-                    title = this.title,
-                    poster = this.posterUrl,
-                    releaseDate = this.releaseDate,
-                    originalTitle = this.originalTitle,
-                    genres = this.genres.map { (name) -> name },
-                    runtime = Duration.ofMinutes(this.length),
-                    productionYear = this.productionYear,
-                    synopsis = this.shortDescription)
-
-    data class ScreenDTO(val localTime: LocalTime,
-                         val screen: String,
-                         val cinema: String,
-                         val tags: List<SfTag>)
-
-    data class SavedEntitiesDTO(val count: Int,
-                                val message: String)
-
 }
