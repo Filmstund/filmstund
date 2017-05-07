@@ -11,6 +11,12 @@ class OmdbClient(private val restTemplate: RestTemplate) {
         const val API_URL = "http://www.omdbapi.com/"
     }
 
-    fun fetchOmdbExtendedInfo(uri: String, params: Map<String, Any?>): OmdbApiMovieDTO? =
+    fun fetchByImdbId(imdbId: String): OmdbApiMovieDTO? =
+            fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?i={id}", mapOf("id" to imdbId))
+
+    fun fetchByTitleAndYear(title: String, year: Int): OmdbApiMovieDTO? =
+            fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?t={title}&y={year}", mapOf("title" to title, "year" to year))
+
+    private fun fetchOmdbExtendedInfo(uri: String, params: Map<String, Any?>): OmdbApiMovieDTO? =
             restTemplate.getForEntity(uri, OmdbApiMovieDTO::class.java, params).body
 }

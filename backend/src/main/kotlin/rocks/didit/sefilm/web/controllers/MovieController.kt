@@ -48,7 +48,7 @@ class MovieController(private val repo: MovieRepository,
     fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
         val movieInfo = when {
             body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
-            body.imdb != null -> omdbClient.fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?i={id}", mapOf("id" to body.imdb))?.toMovie()
+            body.imdb != null -> omdbClient.fetchByImdbId(body.imdb)?.toMovie()
             else -> throw MissingParametersException()
         }
 
@@ -147,7 +147,7 @@ class MovieController(private val repo: MovieRepository,
 
     private fun updateFromImdbById(movie: Movie) {
         log.info("Fetching extended movie info from IMDb by ID for ${movie.imdbId}")
-        val updatedInfo = omdbClient.fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?i={id}", mapOf("id" to movie.imdbId))?.toMovie()
+        val updatedInfo = omdbClient.fetchByImdbId(movie.imdbId!!)?.toMovie()
         if (updatedInfo == null) {
             log.warn("Unable to find movie on OMDb with for imdb id ${movie.imdbId}")
             throw ExternalProviderException()
@@ -168,8 +168,7 @@ class MovieController(private val repo: MovieRepository,
         val title = movie.originalTitle ?: movie.title
 
         log.info("Fetching IMDb id for '$title'")
-        val updatedInfo = omdbClient.fetchOmdbExtendedInfo(OmdbClient.API_URL + "/?t={title}&y={year}",
-                mapOf("title" to title, "year" to movie.productionYear))?.toMovie()
+        val updatedInfo = omdbClient.fetchByTitleAndYear(title, movie.productionYear!!)?.toMovie()
 
         if (updatedInfo == null) {
             log.info("Movie with title '$title' not found on OMDb")
