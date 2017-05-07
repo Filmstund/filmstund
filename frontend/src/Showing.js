@@ -9,7 +9,7 @@ const VerticalPaddingContainer = styled.div`
 `;
 
 
-const Showing = ({ movie = {}, movieId, date, admin, location, disabled, onClick, dispatch, ...props }) => (
+const Showing = ({ movie = {}, movieId, date, admin, adminId, location, disabled, onClick, dispatch, ...props }) => (
     <div onClick={disabled ? () => {} : onClick} {...props}>
         <PosterBox headerText={movie.title} poster={movie.poster}>
             <VerticalPaddingContainer>
@@ -29,8 +29,9 @@ const StyledShowing = styled(Showing)`
    opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
-const mapStateToProps = (state, { movie, movieId }) => ({
-    movie: movie || state.movies.data[movieId]
+const mapStateToProps = (state, { movie, movieId, adminId }) => ({
+    movie: movie || state.movies.data[movieId],
+    admin: state.users.data[adminId]
 });
 
 export default connect(mapStateToProps)(StyledShowing)
