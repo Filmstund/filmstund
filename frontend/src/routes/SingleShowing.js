@@ -1,25 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import styled from "styled-components";
 import _ from "lodash";
 import { showings as showingActions, users as userActions } from "../store/reducers";
 import withLoader from "../lib/withLoader";
 
 import Showing from "../Showing";
-
-const Option = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1em;
-  color: #8E1B1B;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-`;
-
-const Box = styled.div`
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  width: 100%;
-`;
+import UserItem from "../UserItem";
+import MainButton from "../MainButton";
 
 class Showings extends Component {
     handleAttend = () => {
@@ -50,10 +37,11 @@ class Showings extends Component {
                     date={showing.date}
                     adminId={showing.admin}
                     location={showing.location.name} />
-                <Box>
-                    {!isParticipating && <Option onClick={this.handleAttend}>Attend</Option>}
-                    {isParticipating && <Option onClick={this.handleUnattend}>Unattend</Option>}
-                </Box>
+                {!isParticipating && <MainButton onClick={this.handleAttend}>Attend</MainButton>}
+                {isParticipating && <MainButton onClick={this.handleUnattend}>Unattend</MainButton>}
+                <div>
+                    {showing.participants.map(userId => <UserItem key={userId} userId={userId}/>)}
+                </div>
                 {showing.admin === me.id && <button onClick={this.handleDelete}>Delete</button>}
             </div>
         )
