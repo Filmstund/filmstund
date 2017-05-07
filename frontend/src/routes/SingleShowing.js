@@ -25,6 +25,14 @@ class Showings extends Component {
         this.props.dispatch(showingActions.actions.requestAttend(this.props.showingId));
     }
 
+    handleDelete = () => {
+        const proceed = confirm("Är du säker? Går ej att ångra!");
+
+        if (proceed) {
+            this.props.dispatch(showingActions.actions.requestDelete(this.props.showingId));
+        }
+    }
+
     handleUnattend = () => {
         this.props.dispatch(showingActions.actions.requestUnattend(this.props.showingId));
     }
@@ -48,6 +56,7 @@ class Showings extends Component {
                     {!isParticipating && <Option onClick={this.handleAttend}>Attend</Option>}
                     {isParticipating && <Option onClick={this.handleUnattend}>Unattend</Option>}
                 </Box>
+                {showing.admin === me.id && <button onClick={this.handleDelete}>Delete</button>}
             </div>
         )
     }
