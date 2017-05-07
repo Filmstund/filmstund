@@ -124,7 +124,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
             val principal = authentication?.principal as OpenIdConnectUserDetails?
                     ?: throw BadCredentialsException("Successful authentication without a given principal")
 
-            if (!userRepository.existsById(principal.userId)) {
+            if (!userRepository.existsById(UserID(principal.userId))) {
                 val newUser = User(id = UserID(principal.userId), name = "${principal.firstName} ${principal.lastName}",
                         email = principal.username ?: "", avatar = principal.avatarUrl)
                 userRepository.save(newUser)

@@ -66,7 +66,7 @@ class ShowingController(private val repo: ShowingRepository,
         }
 
         val adminUser = userRepo
-                .findById(currentLoggedInUser().id)
+                .findById(currentLoggedInUser())
                 .map(User::toLimitedUserInfo)
                 .orElseThrow { NotFoundException("Current logged in user not found in db") }
 
@@ -96,8 +96,8 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
-        val ids = showing.participants.map { it.id }.toMutableSet()
-        ids.add(showing.admin.id)
+        val ids = showing.participants.toMutableSet()
+        ids.add(showing.admin)
 
         val bioklubbnummer = userRepo.findAllById(ids).map(User::bioklubbnummer).filterNotNull()
         Collections.shuffle(bioklubbnummer)
