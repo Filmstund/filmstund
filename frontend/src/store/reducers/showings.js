@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { push } from 'react-router-redux'
 import fetch, { jsonRequest } from "../../lib/fetch";
 import {withBaseURL} from "../../lib/fetch";
 import {USER_SIGNOUT_ACTION} from "./user";
@@ -188,7 +189,10 @@ const actionCreators = {
         dispatch({ type: actions.requestDelete, id });
 
         jsonRequest(appendId(path, id), {}, "DELETE")
-            .then(id => dispatch({ type: actions.successDelete, id }))
+            .then(id => {
+                dispatch({ type: actions.successDelete, id })
+                dispatch(push('/'))
+            })
             .catch(error => dispatch({ type: actions.errorDelete, error }))
     }
 };

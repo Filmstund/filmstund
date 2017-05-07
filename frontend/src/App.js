@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { Route, Redirect, Switch } from "react-router-dom";
+import { ConnectedRouter } from "react-router-redux";
 import { Provider, connect } from "react-redux";
 import { me } from "./store/reducers";
 import styled from "styled-components";
 
-import store from "./store/reducer";
+import store, { history } from "./store/reducer";
 
 import TopBar from "./TopBar";
 import Footer from "./footer/Footer";
@@ -54,22 +55,24 @@ class App extends Component {
     }
 
     return (
-      <Router>
+      <ConnectedRouter history={history}>
         <Container>
           <TopBar/>
           <ScrollContainer>
             <PaddingContainer>
-              <Route exact path="/" component={Home} />
-              <Route path="/login" render={() => (signedIn ? <Redirect to="/" /> : <Login /> )} />
-              <Route path="/user" component={User} />
-              <Route exact path="/showings" component={Showings} />
-              <Route path="/showings/:showingId" component={SingleShowing} />
-              <Route path="/showings/new/:movieId?" component={NewShowing} />
+              <Switch>
+                <Route exact path="/" component={Home} />
+                <Route path="/login" render={() => (signedIn ? <Redirect to="/" /> : <Login /> )} />
+                <Route path="/user" component={User} />
+                <Route exact path="/showings" component={Showings} />
+                <Route path="/showings/new/:movieId?" component={NewShowing} />
+                <Route path="/showings/:showingId" component={SingleShowing} />
+              </Switch>
             </PaddingContainer>
             <Footer/>
           </ScrollContainer>
         </Container>
-      </Router>
+      </ConnectedRouter>
     );
   }
 }

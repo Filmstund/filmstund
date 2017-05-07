@@ -1,5 +1,6 @@
 import { combineReducers } from "redux";
 import _ from "lodash";
+import { routerReducer } from 'react-router-redux'
 
 import createCrudReducer, {crudSingleReducer} from "./rest";
 import {withBaseURL} from "../../lib/fetch";
@@ -17,5 +18,6 @@ export default combineReducers({
     showings: showings.reducer,
     users: users.reducer,
     movies: movies.reducer,
-    bioord: bioord.reducer
+    bioord: bioord.reducer,
+    router: routerReducer
 });

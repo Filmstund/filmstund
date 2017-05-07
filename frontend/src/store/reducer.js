@@ -3,13 +3,18 @@ import thunk from "redux-thunk";
 import logger from "redux-logger";
 import throttle from 'lodash/throttle';
 
+import createHistory from 'history/createBrowserHistory'
+import { routerMiddleware } from 'react-router-redux'
+
 import { loadState, saveState } from "./localStorage";
 
-import reducers from "./reducers";
+import reducers from "./reducers/index";
+
+export const history = createHistory();
 
 const persistedState = loadState();
 
-const middlewares = applyMiddleware(thunk, logger);
+const middlewares = applyMiddleware(thunk, logger, routerMiddleware(history));
 
 const enhancers = compose(
     middlewares,
