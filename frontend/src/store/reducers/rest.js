@@ -1,5 +1,6 @@
 import _ from "lodash";
 import fetch, { jsonRequest } from "../../lib/fetch";
+import { USER_SIGNOUT_ACTION } from "./user"
 
 const idTransform = f => f;
 const appendId = (...pathComponents) => pathComponents.join('/');
@@ -95,6 +96,8 @@ const crudReducer = (name, path, transform = idTransform) => {
                     loading: false,
                     error: action.error
                 };
+            case USER_SIGNOUT_ACTION:
+                return initialState;
 
             default:
                 return state;
@@ -193,6 +196,7 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
                     error: action.error
                 };
 
+            case USER_SIGNOUT_ACTION:
             case actions.clearSingle:
                 return initialState;
             default:

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { NavLink as RouterLink, withRouter } from "react-router-dom";
 import styled from "styled-components";
 import { me } from "./store/reducers";
+import { signoutUser } from "./store/reducers/user";
 import fetch, { BASE_URL } from "./lib/fetch";
 
 const TopBarContainer = styled.div`
@@ -35,6 +36,7 @@ const Link = styled(RouterLink)`
 class TopBar extends Component {
   handleLogout = () => {
     this.props.dispatch(me.actions.clearSingle());
+    this.props.dispatch(signoutUser());
     fetch(BASE_URL + "/logout");
   }
   render() {
