@@ -27,6 +27,13 @@ class Home extends Component {
         return this.renderShowings(myShowings)
     }
 
+    renderParticipatedByMe = (showings) => {
+        const { me } = this.props;
+        const myShowings = showings.filter(s => s.participants.includes(me.id));
+
+        return this.renderShowings(myShowings)
+    }
+
     render() {
         const { className, showings = [] } = this.props;
         return (
@@ -36,7 +43,7 @@ class Home extends Component {
                     <Link to="/showings/new">Skapa nytt besök</Link>
                 </Jumbotron>
                 <Header>Mina kommande besök</Header>
-                {this.renderShowings(showings)}
+                {this.renderParticipatedByMe(showings)}
                 <Header>Besök jag har skapat</Header>
                 {this.renderCreatedByMe(showings)}
             </div>
