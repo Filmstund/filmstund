@@ -157,7 +157,10 @@ const actionCreators = {
         dispatch({ type: actions.requestCreate, data });
 
         jsonRequest(path, data)
-            .then(data => dispatch({ type: actions.successCreate, data: transform(data) }))
+            .then(data => {
+                dispatch({ type: actions.successCreate, data: transform(data) })
+                dispatch(push('/showings/' + data.id))
+            })
             .catch(error => dispatch({ type: actions.errorCreate, error }))
     },
 
