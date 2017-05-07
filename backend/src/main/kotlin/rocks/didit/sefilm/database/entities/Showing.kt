@@ -18,7 +18,7 @@ data class Showing(@Id
                    val movieId: UUID? = null,
                    val location: Location? = null,
                    val private: Boolean = false,
-                   val price: SEK? = SEK(140000),
+                   val price: SEK? = null,
                    val admin: UserID = UserID(),
                    val participants: Set<UserID> = setOf(),
                    @LastModifiedDate

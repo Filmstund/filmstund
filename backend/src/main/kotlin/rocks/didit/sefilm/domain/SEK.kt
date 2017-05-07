@@ -11,8 +11,9 @@ data class SEK(val ören: Long) {
         }
     }
 
-    fun toKronor(): Double = ören / 100.0
-
+    /** Rounds to nearest integer */
     @JsonValue
+    fun toKronor(): String = "${ören / 100}kr"
+
     fun toÖren(): Long = ören
 }
