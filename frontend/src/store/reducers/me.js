@@ -14,12 +14,14 @@ const actions = {
     successUpdate: `ME_RESPONSE_UPDATE`,
     errorUpdate: `ME_ERROR_UPDATE`,
 
+    clearStatus: `ME_CLEAR_STATUS`,
     clearSingle: `ME_CLEAR_SINGLE`,
 };
 
 const initialState = {
     loading: false,
     data: {},
+    success: null,
     error: null
 };
 
@@ -30,13 +32,22 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: null,
+                success: null,
                 loading: true
             };
         case actions.successSingle:
+            return {
+                ...state,
+                loading: false,
+                success: null,
+                error: null,
+                data: action.data
+            };
         case actions.successUpdate:
             return {
                 ...state,
                 loading: false,
+                success: true,
                 error: null,
                 data: action.data
             };
@@ -45,7 +56,14 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: false,
+                success: false,
                 error: action.error
+            };
+        case actions.clearStatus:
+            return {
+                ...state,
+                success: null,
+                error: null
             };
 
         case USER_SIGNOUT_ACTION:
@@ -78,9 +96,15 @@ const actionCreators = {
         dispatch({ type: actions.requestUpdate, data });
 
         jsonRequest(path, data, "PUT")
-            .then(data => dispatch({ type: actions.successUpdate, data }))
+            .then(data => {
+              dispatch({ type: actions.successUpdate, data })
+              dispatch({ type: 'USERS_UPDATE_SINGLE', data })
+              setTimeout(() => dispatch(actionCreators.clearStatus()), 10000)
+            })
             .catch(error => dispatch({ type: actions.errorUpdate, error }))
     },
+
+    clearStatus: () => ({ type: actions.clearStatus }),
 
     clearSingle: () => ({ type: actions.clearSingle })
 };
