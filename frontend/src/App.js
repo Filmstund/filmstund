@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
 import { ConnectedRouter } from "react-router-redux";
 import { Provider, connect } from "react-redux";
-import { me } from "./store/reducers";
+import { me, meta } from "./store/reducers";
 import styled from "styled-components";
 
 import store, { history } from "./store/reducer";
@@ -38,6 +38,7 @@ const Container = styled.div`
 class App extends Component {
   componentWillMount() {
     this.props.dispatch(me.actions.requestSingle())
+    this.props.dispatch(meta.actions.requestSingle())
   }
   render() {
     const { status } = this.props;
