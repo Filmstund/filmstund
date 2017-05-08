@@ -19,4 +19,18 @@ const MainButtonStyles = css`
 
 export const Link = styled(RouterLink)(MainButtonStyles);
 
-export default styled.button(MainButtonStyles);
+const MainButton = styled.button(MainButtonStyles);
+
+export const GrayButton = styled(MainButton)`
+  background-color: #bdbdbd;
+  color: rgba(0, 0, 0, 0.87);
+`
+export const GreenButton = styled(MainButton)`
+  background-color: #66bb6a;
+  color: rgba(0, 0, 0, 0.87);
+`
+export const RedButton = styled(MainButton)`
+  background-color: #ef5350;
+  color: rgba(255, 255, 255, 0.87);
+`
+export default MainButton
