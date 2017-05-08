@@ -10,16 +10,20 @@ import rocks.didit.sefilm.*
 import rocks.didit.sefilm.clients.OmdbClient
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.repositories.SfMetaRepository
 import rocks.didit.sefilm.domain.dto.SfAttributeDTO
 import rocks.didit.sefilm.domain.dto.SfTag
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 
 
 @RestController
 class MovieController(private val repo: MovieRepository,
+                      private val metaRepo: SfMetaRepository,
                       private val sfClient: SfClient,
                       private val omdbClient: OmdbClient) {
 
@@ -63,6 +67,12 @@ class MovieController(private val repo: MovieRepository,
         return ResponseEntity.created(createdUri).body(movie)
     }
 
+    @GetMapping(PATH + "/sf/meta")
+    fun sfMetaData(): SfMeta =
+            metaRepo
+                    .findById("sfpopulate")
+                    .orElseGet { SfMeta(description = "Never fetched any movies from SF") }
+
     @GetMapping(PATH + "/sf/populate")
     fun populateFromSf(): SavedEntitiesDTO {
         val sfMovies = sfClient.allMovies()
@@ -75,6 +85,8 @@ class MovieController(private val repo: MovieRepository,
                 }
 
         val savedEntities = repo.saveAll(newMoviesWeHaventPreviouslySeen)
+        metaRepo.save(SfMeta("sfpopulate", Instant.now(), "Previously saved ${savedEntities.count()} new movies from SF", savedEntities.count()))
+
         return SavedEntitiesDTO(savedEntities.count(), "Fetched and saved new movies from SF")
     }
 
