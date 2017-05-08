@@ -34,7 +34,7 @@ class Showings extends Component {
         // TODO
     }
 
-    renderAdmin = () => {
+    renderAdminAction = () => {
         const { className, showing, me } = this.props;
 
         if (showing.admin !== me.id) {
@@ -64,7 +64,7 @@ class Showings extends Component {
                 <div>
                     {showing.participants.map(userId => <UserItem key={userId} userId={userId}/>)}
                 </div>
-                {this.renderAdmin()}
+                {this.renderAdminAction()}
             </div>
         )
     }
