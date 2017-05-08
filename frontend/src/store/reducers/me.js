@@ -99,7 +99,7 @@ const actionCreators = {
             .then(data => {
               dispatch({ type: actions.successUpdate, data })
               dispatch({ type: 'USERS_UPDATE_SINGLE', data })
-              setTimeout(() => dispatch(actionCreators.clearStatus()), 10000)
+              setTimeout(() => dispatch(actionCreators.clearStatus()), 5500)
             })
             .catch(error => dispatch({ type: actions.errorUpdate, error }))
     },
