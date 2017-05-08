@@ -24,6 +24,7 @@ internal fun Showing.isLoggedInUserAdmin(): Boolean {
 
 internal fun SfExtendedMovieDTO.toMovie() =
         Movie(sfId = this.ncgId,
+                sfSlug = this.slug,
                 title = this.title,
                 poster = this.posterUrl,
                 releaseDate = this.releaseDate,

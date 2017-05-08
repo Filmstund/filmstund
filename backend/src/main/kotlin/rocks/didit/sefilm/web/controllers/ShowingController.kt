@@ -18,6 +18,7 @@ import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.LimitedUserInfo
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.BuyDTO
 import rocks.didit.sefilm.domain.dto.SuccessfulDTO
 import java.util.*
 
@@ -47,14 +48,22 @@ class ShowingController(private val repo: ShowingRepository,
         return SuccessfulDTO(true, "Showing with id ${showing.id} were removed successfully")
     }
 
-    @GetMapping(PATH_WITH_ID + "/bioklubbnummer")
-    fun findBioklubbnummerForShowing(@PathVariable id: UUID): Collection<Bioklubbnummer> {
-        return repo.findById(id)
+    @GetMapping(PATH_WITH_ID + "/buy")
+    fun findBioklubbnummerForShowing(@PathVariable id: UUID): BuyDTO {
+        val showing = repo.findById(id)
                 .map { showing ->
-                    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can view the bioklubbnummer")
-                    shuffledBioklubbnummer(showing)
+                    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can view buy page")
+                    showing
                 }
                 .orElseThrow { NotFoundException("showing '$id") }
+        val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '${showing.movieId}") }
+
+        val sfLink = when {
+            movie.sfId != null && movie.sfSlug != null -> "https://beta.sfbio.se/film/${movie.sfId}/${movie.sfSlug}"
+            else -> null
+        }
+
+        return BuyDTO(shuffledBioklubbnummer(showing), sfLink)
     }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))

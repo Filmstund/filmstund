@@ -145,6 +145,7 @@ class MovieController(private val repo: MovieRepository,
         val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
 
         val copy = movie.copy(synopsis = updatedMovie.shortDescription,
+                sfSlug = updatedMovie.slug,
                 originalTitle = updatedMovie.originalTitle,
                 releaseDate = updatedMovie.releaseDate,
                 productionYear = updatedMovie.productionYear,

@@ -15,6 +15,7 @@ data class Movie(
         val id: UUID = UUID.randomUUID(),
         val imdbId: String? = null,
         val sfId: String? = null,
+        val sfSlug: String? = null,
         val title: String = "",
         val synopsis: String? = null,
         val originalTitle: String? = null,
