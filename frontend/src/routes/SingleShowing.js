@@ -6,9 +6,14 @@ import withLoader from "../lib/withLoader";
 
 import Showing from "../Showing";
 import UserItem from "../UserItem";
-import MainButton from "../MainButton";
+import MainButton, { GreenButton, RedButton, GrayButton } from "../MainButton";
 
 class Showings extends Component {
+    constructor(props) {
+        super(props);
+
+    }
+
     handleAttend = () => {
         this.props.dispatch(showingActions.actions.requestAttend(this.props.showingId));
     }
@@ -25,6 +30,23 @@ class Showings extends Component {
         this.props.dispatch(showingActions.actions.requestUnattend(this.props.showingId));
     }
 
+    handleStartBooking = () => {
+        // TODO
+    }
+
+    renderAdmin = () => {
+        const { className, showing, me } = this.props;
+
+        if (showing.admin !== me.id) {
+            return null;
+        } else {
+            return <div>
+                <MainButton onClick={this.handleStartBooking}>Alla är med, nu bokar vi!</MainButton>
+                <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
+            </div>
+        }
+    }
+
     render() {
         const { className, showing, me } = this.props;
 
@@ -37,12 +59,12 @@ class Showings extends Component {
                     date={showing.date}
                     adminId={showing.admin}
                     location={showing.location.name} />
-                {!isParticipating && <MainButton onClick={this.handleAttend}>Jag hänger på!</MainButton>}
-                {isParticipating && <MainButton onClick={this.handleUnattend}>Avanmäl</MainButton>}
+                {!isParticipating && <GreenButton onClick={this.handleAttend}>Jag hänger på!</GreenButton>}
+                {isParticipating && <RedButton onClick={this.handleUnattend}>Avanmäl</RedButton>}
                 <div>
                     {showing.participants.map(userId => <UserItem key={userId} userId={userId}/>)}
                 </div>
-                {showing.admin === me.id && <button onClick={this.handleDelete}>Ta bort</button>}
+                {this.renderAdmin()}
             </div>
         )
     }
