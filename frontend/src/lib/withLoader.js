@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import _ from "lodash";
+import Loader from "../Loader";
 
 const withLoader = (mapOfActionsAndIds) => {
 
@@ -79,7 +80,7 @@ const withLoader = (mapOfActionsAndIds) => {
             if (this.state.error) {
                 return <div>Misslyckades att ladda</div>
             } else if (this.state.loading) {
-                return <div>Hämtar data...</div>
+                return <Loader size={70} color="maroon" />
             } else {
                 return <DecoratedComponent {...this.props} {...this.state.props} />
             }
