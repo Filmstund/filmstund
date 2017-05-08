@@ -6,6 +6,6 @@ data class ParticipantInfoDTO(
         val id: UUID = UUID.randomUUID(),
         val userId: String? = null,
         val showingId: UUID? = null,
-        val hasPayed: Boolean = false,
+        val hasPaid: Boolean = false,
         val amountOwed: Long = 0)
 

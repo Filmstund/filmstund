@@ -37,7 +37,7 @@ class ParticipantInfoController(private val participantInfoRepo: ParticipantInfo
             throw AccessDeniedException("Oh no you didn't!")
         }
 
-        val newInfo = participantInfo.copy(hasPayed = body.hasPayed, amountOwed = SEK(body.amountOwed))
+        val newInfo = participantInfo.copy(hasPaid = body.hasPaid, amountOwed = SEK(body.amountOwed))
         return participantInfoRepo.save(newInfo)
     }
 

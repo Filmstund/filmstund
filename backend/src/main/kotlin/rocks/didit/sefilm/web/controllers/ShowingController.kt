@@ -148,7 +148,7 @@ class ShowingController(private val repo: ShowingRepository,
         val participants = showing.participants.map {
             ParticipantInfo(userId = it,
                     showingId = showing.id,
-                    hasPayed = false,
+                    hasPaid = false,
                     amountOwed = showing.price ?: SEK(0))
         }
 
