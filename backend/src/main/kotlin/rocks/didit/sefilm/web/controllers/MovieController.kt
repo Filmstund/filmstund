@@ -41,7 +41,7 @@ class MovieController(private val repo: MovieRepository,
     fun findOne(@PathVariable id: UUID): Movie {
         val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
         when {
-        // FIXME: move this to /scrape or something
+        // FIXME: do this in the background on /sf/populate
             movie.needsMoreInfo() -> fetchExtendedInfoForMovie(movie)
             movie.isMissingImdbId() -> updateImdbIdBasedOnTitleAndYear(movie)
         }
@@ -61,7 +61,6 @@ class MovieController(private val repo: MovieRepository,
             throw ExternalProviderException()
         }
 
-        // FIXME: check if a movie with the supplied sf or imdb id already exists
         val movie = repo.save(movieInfo)
         val createdUri = b.path(PATH_WITH_ID).buildAndExpand(movie.id).toUri()
         return ResponseEntity.created(createdUri).body(movie)

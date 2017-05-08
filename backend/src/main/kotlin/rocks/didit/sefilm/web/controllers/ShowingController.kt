@@ -41,6 +41,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun deleteShowing(@PathVariable id: UUID): SuccessfulDTO {
+        // TODO: remove participantsinfo as well
         val showing = findOne(id)
         if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can delete a showing")
         repo.delete(showing)
