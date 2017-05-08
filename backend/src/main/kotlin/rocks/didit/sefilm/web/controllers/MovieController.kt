@@ -73,7 +73,7 @@ class MovieController(private val repo: MovieRepository,
                     .findById("sfpopulate")
                     .orElseGet { SfMeta(description = "Never fetched any movies from SF") }
 
-    @GetMapping(PATH + "/sf/populate")
+    @PostMapping(PATH + "/sf/populate")
     fun populateFromSf(): SavedEntitiesDTO {
         val sfMovies = sfClient.allMovies()
 
