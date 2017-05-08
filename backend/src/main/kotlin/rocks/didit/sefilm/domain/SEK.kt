@@ -12,8 +12,8 @@ data class SEK(val ören: Long) {
     }
 
     /** Rounds to nearest integer */
-    @JsonValue
     fun toKronor(): String = "${ören / 100}kr"
 
+    @JsonValue
     fun toÖren(): Long = ören
 }

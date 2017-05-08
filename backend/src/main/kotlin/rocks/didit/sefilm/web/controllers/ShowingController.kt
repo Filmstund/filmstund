@@ -149,7 +149,7 @@ class ShowingController(private val repo: ShowingRepository,
             ParticipantInfo(userId = it,
                     showingId = showing.id,
                     hasPayed = false,
-                    amountOwed = showing.price)
+                    amountOwed = showing.price ?: SEK(0))
         }
 
         return participantRepo.saveAll(participants).toList()
