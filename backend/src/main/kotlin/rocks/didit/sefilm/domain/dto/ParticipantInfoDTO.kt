@@ -7,5 +7,5 @@ data class ParticipantInfoDTO(
         val userId: String? = null,
         val showingId: UUID? = null,
         val hasPayed: Boolean = false,
-        val amountOwed: Long? = null)
+        val amountOwed: Long = 0)
 

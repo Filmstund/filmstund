@@ -13,5 +13,5 @@ data class ParticipantInfo(
         val userId: UserID = UserID(),
         val showingId: UUID = UUID.randomUUID(),
         val hasPayed: Boolean = false,
-        val amountOwed: SEK? = null)
+        val amountOwed: SEK = SEK(0))
 
