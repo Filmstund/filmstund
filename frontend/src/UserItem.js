@@ -5,7 +5,7 @@ import { users as userActions } from "./store/reducers";
 import withLoader from "./lib/withLoader";
 
 const UserItem = ({ user }) => (
-  <div>{user.name}</div>
+  <div>{user.nick || user.name}</div>
 )
 
 const mapStateToProps = (state, { userId }) => ({
