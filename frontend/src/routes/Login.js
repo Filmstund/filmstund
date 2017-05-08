@@ -18,8 +18,8 @@ class Login extends Component {
     const { className } = this.props;
     return (
       <div className={className}>
-        <div>You are not signed in.</div>
-        <GoogleButton onClick={this.handleGoogleRedirect}>Sign in with Google</GoogleButton>
+        <div>Logga in för att boka biobesök!</div>
+        <GoogleButton onClick={this.handleGoogleRedirect}>Logga in via Google</GoogleButton>
       </div>
     )
   }
