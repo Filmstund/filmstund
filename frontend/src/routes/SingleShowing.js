@@ -37,12 +37,12 @@ class Showings extends Component {
                     date={showing.date}
                     adminId={showing.admin}
                     location={showing.location.name} />
-                {!isParticipating && <MainButton onClick={this.handleAttend}>Attend</MainButton>}
-                {isParticipating && <MainButton onClick={this.handleUnattend}>Unattend</MainButton>}
+                {!isParticipating && <MainButton onClick={this.handleAttend}>Jag hänger på!</MainButton>}
+                {isParticipating && <MainButton onClick={this.handleUnattend}>Avanmäl</MainButton>}
                 <div>
                     {showing.participants.map(userId => <UserItem key={userId} userId={userId}/>)}
                 </div>
-                {showing.admin === me.id && <button onClick={this.handleDelete}>Delete</button>}
+                {showing.admin === me.id && <button onClick={this.handleDelete}>Ta bort</button>}
             </div>
         )
     }
