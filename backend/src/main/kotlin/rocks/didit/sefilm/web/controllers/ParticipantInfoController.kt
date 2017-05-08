@@ -33,6 +33,9 @@ class ParticipantInfoController(private val participantInfoRepo: ParticipantInfo
                 .findById(body.id)
                 .orElseThrow { NotFoundException("participant info '${body.id}'") }
 
+        if (participantInfo.showingId != body.showingId) {
+            throw AccessDeniedException("Oh no you didn't!")
+        }
 
         val amountOwed = when {
             body.amountOwed == null -> null
