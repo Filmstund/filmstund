@@ -19,6 +19,7 @@ data class Showing(@Id
                    val location: Location? = null,
                    val private: Boolean = false,
                    val price: SEK? = null,
+                   val ticketsBought: Boolean = false,
                    val admin: UserID = UserID(),
                    val participants: Set<UserID> = setOf(),
                    @LastModifiedDate

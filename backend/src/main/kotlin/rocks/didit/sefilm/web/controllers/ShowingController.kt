@@ -9,12 +9,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.entities.ParticipantInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.LocationRepository
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.LimitedUserInfo
 import rocks.didit.sefilm.domain.UserID
@@ -26,7 +24,8 @@ import java.util.*
 class ShowingController(private val repo: ShowingRepository,
                         private val locationRepo: LocationRepository,
                         private val movieRepo: MovieRepository,
-                        private val userRepo: UserRepository) {
+                        private val userRepo: UserRepository,
+                        private val participantRepo: ParticipantInfoRepository) {
     companion object {
         private const val PATH = Application.API_BASE_PATH + "/showings"
         private const val PATH_WITH_ID = PATH + "/{id}"
@@ -63,7 +62,12 @@ class ShowingController(private val repo: ShowingRepository,
             else -> null
         }
 
-        return BuyDTO(shuffledBioklubbnummer(showing), sfLink)
+        var participantsInfo = participantRepo.findByUserIdIn(showing.participants)
+        if (participantsInfo.size != showing.participants.size) {
+            participantsInfo = createInitialParticipantsInfo(showing)
+        }
+
+        return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo)
     }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -125,5 +129,17 @@ class ShowingController(private val repo: ShowingRepository,
                 admin = admin.id,
                 participants = setOf(admin.id))
     }
+
+    private fun createInitialParticipantsInfo(showing: Showing): Collection<ParticipantInfo> {
+        val participants = showing.participants.map {
+            ParticipantInfo(userId = it,
+                    showingId = showing.id,
+                    hasPayed = false,
+                    amountOwed = showing.price)
+        }
+
+        return participantRepo.saveAll(participants).toList()
+    }
+
 }
 
