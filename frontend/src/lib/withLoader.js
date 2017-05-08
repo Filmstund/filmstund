@@ -80,7 +80,7 @@ const withLoader = (mapOfActionsAndIds) => {
             if (this.state.error) {
                 return <div>Misslyckades att ladda</div>
             } else if (this.state.loading) {
-                return <Loader size={70} color="maroon" />
+                return <div><Loader size={70} color="maroon" /></div>
             } else {
                 return <DecoratedComponent {...this.props} {...this.state.props} />
             }
