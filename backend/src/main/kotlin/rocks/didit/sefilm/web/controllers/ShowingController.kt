@@ -15,9 +15,11 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.LimitedUserInfo
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.BuyDTO
 import rocks.didit.sefilm.domain.dto.SuccessfulDTO
+import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import java.util.*
 
 @RestController
@@ -38,6 +40,17 @@ class ShowingController(private val repo: ShowingRepository,
 
     @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id") }
+
+    @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
+        val showing = findOne(id)
+        val updateShowing = showing.copy(
+                price = SEK(body.price),
+                private = body.private,
+                ticketsBought = body.ticketsBought)
+
+        return repo.save(updateShowing)
+    }
 
     @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun deleteShowing(@PathVariable id: UUID): SuccessfulDTO {
@@ -141,6 +154,5 @@ class ShowingController(private val repo: ShowingRepository,
 
         return participantRepo.saveAll(participants).toList()
     }
-
 }
 
