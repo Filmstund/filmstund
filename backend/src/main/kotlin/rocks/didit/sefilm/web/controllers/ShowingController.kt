@@ -51,6 +51,7 @@ class ShowingController(private val repo: ShowingRepository,
                 price = SEK(body.price),
                 private = body.private,
                 ticketsBought = body.ticketsBought,
+                expectedBuyDate = body.expectedBuyDate,
                 payToUser = newPayToUser)
 
         val updatedShowing = repo.save(updateShowing)
@@ -183,6 +184,7 @@ class ShowingController(private val repo: ShowingRepository,
                 location = location,
                 admin = admin.id,
                 payToUser = admin.id,
+                expectedBuyDate = this.expectedBuyDate,
                 participants = setOf(admin.id))
     }
 
