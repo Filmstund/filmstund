@@ -18,15 +18,18 @@ import Modal from "../Modal";
 import buildUserComponent from "../UserComponentBuilder";
 import MainButton, { GreenButton, RedButton, GrayButton } from "../MainButton";
 
+const UserActiveStatus = styled.div`
+    color: ${props => props.active ? '#000' : '#ccc'}
+`
 
 const UserItem = buildUserComponent(({ user }) => (
   <div>{user.nick || user.name}</div>
 ))
 
-const UserWithPriceItem = buildUserComponent(({ user, price, onPaidChange, hasPaid }) => (
-  <div>
+const UserWithPriceItem = buildUserComponent(({ user, active, price, onPaidChange, hasPaid }) => (
+  <UserActiveStatus active={active}>
     {user.nick || user.name} <label>har betalat: <input type="checkbox" checked={hasPaid} onChange={onPaidChange}/></label>
-  </div>
+  </UserActiveStatus>
 ))
 
 const Padding = styled.div`
@@ -83,7 +86,7 @@ class Showings extends Component {
 
     renderAdminAction = (ticketsBought) => {
         return <div>
-            <MainButton onClick={this.handleStartBooking}>{ticketsBought ? "Öppna betalningsinfo" : "Alla är med, nu bokar vi!"}</MainButton>
+            <MainButton onClick={this.handleStartBooking}>{ticketsBought ? "Visa betalningsstatus" : "Alla är med, nu bokar vi!"}</MainButton>
             <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
         </div>
     }
@@ -115,9 +118,10 @@ class Showings extends Component {
         return (
             <div>
                 <Header>Deltagare</Header>
-                {hasNotPaid.map(info => <UserWithPriceItem key={info.id} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+                {hasNotPaid.length === 0 && ("Alla har betalat!")}
+                {hasNotPaid.map(info => <UserWithPriceItem key={info.id} active={true} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
                 <hr/>
-                {hasPaid.map(info => <UserWithPriceItem key={info.id} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+                {hasPaid.map(info => <UserWithPriceItem key={info.id} active={false} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
             </div>
         )
     }
