@@ -1,6 +1,7 @@
 buildscript {
-    ext.kotlin_version = '1.1.2-3'
-    ext.springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+    ext.kotlin_version = '1.1.2-2'
+    ext.springBootSnapshot = '2.0.0.BUILD-SNAPSHOT'
+    ext.springBootRelease = '1.5.3.RELEASE'
 
     repositories {
         mavenCentral()
@@ -11,13 +12,11 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-noarg:$kotlin_version")
         classpath("org.jetbrains.kotlin:kotlin-allopen:$kotlin_version")
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootSnapshot"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-group 'didit.rocks'
-version '1.0-SNAPSHOT'
 
 apply {
     plugin("kotlin")
@@ -42,19 +41,22 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
-    compile("org.springframework.boot:spring-boot-devtools")
-    compile("org.springframework.boot:spring-boot-starter-cache")
-    compile("org.springframework.boot:spring-boot-starter-security")
-    compile("org.springframework.security:spring-security-jwt")
+    compile("org.springframework.boot:spring-boot-starter-web-services:$springBootSnapshot")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootSnapshot")
+    compile("org.springframework.boot:spring-boot-devtools:$springBootRelease")
+    compile("org.springframework.boot:spring-boot-starter-cache:$springBootRelease")
+    compile("org.springframework.boot:spring-boot-starter-security:$springBootRelease")
+    compile("org.springframework.security:spring-security-config:4.2.2.RELEASE")
+    compile("org.springframework.security:spring-security-web:4.2.2.RELEASE")
+    compile("org.springframework.security:spring-security-core:4.2.2.RELEASE")
+    compile("org.springframework.security:spring-security-jwt:")
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("com.github.ben-manes.caffeine:caffeine")
-    compileOnly("org.springframework:spring-context-indexer")
+    //compileOnly("org.springframework:spring-context-indexer")
     compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.boot:spring-boot-starter-test:$springBootRelease")
 }
