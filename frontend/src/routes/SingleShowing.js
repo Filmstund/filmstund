@@ -11,7 +11,9 @@ import Showing from "../Showing";
 import CopyValue from "../CopyValue";
 import Loader from "../Loader";
 import Center from "../Center";
-import Header from "../Header";
+import Field from "../Field";
+import Input from "../Input";
+import Header, { SmallHeader } from "../Header";
 import Modal from "../Modal";
 import buildUserComponent from "../UserComponentBuilder";
 import MainButton, { GreenButton, RedButton, GrayButton } from "../MainButton";
@@ -31,10 +33,19 @@ const Padding = styled.div`
     padding: 1em;
 `
 
+const oreToKr = (price) => {
+    if (price === null) {
+        return 0
+    } else {
+        return price / 100
+    }
+}
+
 class Showings extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            ticketPrice: oreToKr(props.showing.price),
             buyData: null,
             showModal: false
         }
@@ -98,15 +109,49 @@ class Showings extends Component {
         })
     }
 
+    renderParticipants = (participants) => {
+        const { hasPaid = [], hasNotPaid = [] } = _.groupBy(participants, info => info.hasPaid ? 'hasPaid' : 'hasNotPaid')
+
+        return (
+            <div>
+                <Header>Deltagare</Header>
+                {hasNotPaid.map(info => <UserWithPriceItem key={info.id} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+                <hr/>
+                {hasPaid.map(info => <UserWithPriceItem key={info.id} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+            </div>
+        )
+    }
+
+    setPrice = (price) => {
+        const int = parseInt(price, 10)
+
+        this.setState({
+            ticketPrice: isNaN(int) ? 0 : int
+        })
+    }
+
+    handleMarkBought = (event) => {
+        event.preventDefault()
+
+        this.props.dispatch(showingActions.actions.requestUpdate({
+            ...this.props.showing,
+            price: this.state.ticketPrice * 100,
+            ticketsBought: true
+        }))
+        setTimeout(() => {
+            this.handleStartBooking()
+        }, 2000)
+    }
+
     renderBuyModal = (buyData) => {
 
-        if (!buyData) {
+        if (!buyData || this.props.loading) {
             return <Modal><Center><Loader /></Center></Modal>
         }
 
         const { participantInfo, bioklubbnummer, sfBuyLink } = buyData
-
-        const { hasPaid = [], hasNotPaid = [] } = _.groupBy(participantInfo, info => info.hasPaid ? 'hasPaid' : 'hasNotPaid')
+        const { ticketsBought } = this.props.showing
+        const { ticketPrice } = this.state
 
         return <Modal>
             <Padding>
@@ -161,6 +206,7 @@ const mapStateToProps = (state, props) => {
     return {
         showingId,
         adminId,
+        loading: state.showings.loading,
         showing: { ...state.showings, data: showing},
         admin: { ...state.users, data: state.users.data[adminId] },
         me: state.me.data
