@@ -23,7 +23,7 @@ const UserActiveStatus = styled.div`
 `
 
 const UserItem = buildUserComponent(({ user }) => (
-  <div>{user.nick || user.name}</div>
+  <span>{user.nick || user.name}</span>
 ))
 
 const UserWithPriceItem = buildUserComponent(({ user, active, price, onPaidChange, hasPaid }) => (
@@ -50,7 +50,14 @@ class Showings extends Component {
         this.state = {
             ticketPrice: oreToKr(props.showing.price),
             buyData: null,
+            payData: null,
             showModal: false
+        }
+    }
+
+    componentWillMount() {
+        if (this.props.showing.ticketsBought) {
+            this.requestPaymentInfo()
         }
     }
 
@@ -80,6 +87,16 @@ class Showings extends Component {
             this.setState({
                 showModal: true,
                 buyData
+            })
+        })
+    }
+
+    requestPaymentInfo = () => {
+        const { showing } = this.props;
+
+        getJson(`/showings/${showing.id}/pay`).then(payData => {
+            this.setState({
+                payData
             })
         })
     }
@@ -192,7 +209,19 @@ class Showings extends Component {
     }
 
     renderBoughtShowing = (showing) => {
+        const { payData } = this.state
+        if (!payData) {
+            return <Loader />
+        }
+        const { amountOwed, swishLink, hasPaid, payTo } = payData
 
+        return <div>
+            {hasPaid && "Du har betalat!"}
+            {!hasPaid && <div>
+                Betala {amountOwed / 100} till <UserItem userId={payTo} />
+                <GreenButton onClick={() => window.open(swishLink)}>Öppna Swish!</GreenButton>
+            </div>}
+        </div>
     }
 
     render() {
