@@ -112,7 +112,8 @@ class Showings extends Component {
             <Padding>
                 <button onClick={() => this.setState({showModal: false, buyData: null})}>Stäng</button>
                 <Padding>
-                    <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">Öppna SF länk i nytt fönster</a>
+                    {!sfBuyLink && "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
+                    {sfBuyLink && <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">Öppna SF länk i nytt fönster</a>}
                     <Header>Bioklubbnummer</Header>
                     {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr}/>)}
                     <hr/>
