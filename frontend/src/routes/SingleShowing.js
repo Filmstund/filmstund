@@ -81,9 +81,9 @@ class Showings extends Component {
         })
     }
 
-    renderAdminAction = () => {
+    renderAdminAction = (ticketsBought) => {
         return <div>
-            <MainButton onClick={this.handleStartBooking}>Alla är med, nu bokar vi!</MainButton>
+            <MainButton onClick={this.handleStartBooking}>{ticketsBought ? "Öppna betalningsinfo" : "Alla är med, nu bokar vi!"}</MainButton>
             <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
         </div>
     }
@@ -157,19 +157,38 @@ class Showings extends Component {
             <Padding>
                 <button onClick={() => this.setState({showModal: false, buyData: null})}>Stäng</button>
                 <Padding>
-                    {!sfBuyLink && "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
-                    {sfBuyLink && <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">Öppna SF länk i nytt fönster</a>}
-                    <Header>Bioklubbnummer</Header>
-                    {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr}/>)}
-                    <hr/>
-                    = {bioklubbnummer.map(nbr => parseInt(nbr, 10)).reduce((acc, nbr) => acc + nbr, 0)}
-                    <Header>Deltagare</Header>
-                    {hasNotPaid.map(info => <UserWithPriceItem key={info.userId} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
-                    <hr/>
-                    {hasPaid.map(info => <UserWithPriceItem key={info.userId} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+                    {ticketsBought && this.renderParticipants(participantInfo)}
+                    {!ticketsBought && <form onSubmit={this.handleMarkBought}>
+                        <Header>Boka</Header>
+                        {!sfBuyLink && "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
+                        {sfBuyLink && <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">Öppna SF länk i nytt fönster</a>}
+                        <SmallHeader>Bioklubbnummer</SmallHeader>
+                        {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr}/>)}
+                        <hr/>
+                        = {bioklubbnummer.map(nbr => parseInt(nbr, 10)).reduce((acc, nbr) => acc + nbr, 0)}
+                        <Field text="Biljettpris:">
+                            <Input type="number" value={ticketPrice} min={0} onChange={event => this.setPrice(event.target.value)} />
+                        </Field>
+                        <MainButton>Markera som bokad</MainButton>
+                    </form>}
                 </Padding>
             </Padding>
         </Modal>
+    }
+
+    renderPendingShowing = (showing, isParticipating) => {
+
+        return <div>
+            {!isParticipating && <GreenButton onClick={this.handleAttend}>Jag hänger på!</GreenButton>}
+            {isParticipating && <RedButton onClick={this.handleUnattend}>Avanmäl</RedButton>}
+            <div>
+                {showing.participants.map(userId => <UserItem key={userId} userId={userId}/>)}
+            </div>
+        </div>
+    }
+
+    renderBoughtShowing = (showing) => {
+
     }
 
     render() {
@@ -187,12 +206,9 @@ class Showings extends Component {
                     date={showing.date}
                     adminId={showing.admin}
                     location={showing.location.name} />
-                {!isParticipating && <GreenButton onClick={this.handleAttend}>Jag hänger på!</GreenButton>}
-                {isParticipating && <RedButton onClick={this.handleUnattend}>Avanmäl</RedButton>}
-                <div>
-                    {showing.participants.map(userId => <UserItem key={userId} userId={userId}/>)}
-                </div>
-                {isAdmin && this.renderAdminAction()}
+                {!showing.ticketsBought && this.renderPendingShowing(showing, isParticipating)}
+                {showing.ticketsBought && this.renderBoughtShowing(showing)}
+                {isAdmin && this.renderAdminAction(showing.ticketsBought)}
             </div>
         )
     }
