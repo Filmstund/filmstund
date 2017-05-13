@@ -47,12 +47,22 @@ class ShowingController(private val repo: ShowingRepository,
             body.payToUser != null -> UserID(body.payToUser)
             else -> showing.payToUser
         }
+        val newLocation = when {
+            body.newLocation != null -> {
+                locationRepo.findById(body.newLocation)
+                        .orElseGet { locationRepo.save(Location(body.newLocation)) }
+            }
+            else -> showing.location
+        }
+
         val updateShowing = showing.copy(
                 price = SEK(body.price),
                 private = body.private,
                 ticketsBought = body.ticketsBought,
                 expectedBuyDate = body.expectedBuyDate,
-                payToUser = newPayToUser)
+                payToUser = newPayToUser,
+                time = body.newTime ?: showing.time,
+                location = newLocation)
 
         val updatedShowing = repo.save(updateShowing)
         if (body.ticketsBought) {
