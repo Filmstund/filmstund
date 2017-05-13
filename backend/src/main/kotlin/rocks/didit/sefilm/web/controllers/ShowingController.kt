@@ -13,10 +13,7 @@ import rocks.didit.sefilm.database.entities.ParticipantInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.*
-import rocks.didit.sefilm.domain.Bioklubbnummer
-import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.BuyDTO
 import rocks.didit.sefilm.domain.dto.PaymentDTO
 import rocks.didit.sefilm.domain.dto.SuccessfulDTO
@@ -87,19 +84,34 @@ class ShowingController(private val repo: ShowingRepository,
 
     @GetMapping(PATH_WITH_ID + "/pay")
     fun paymentInfo(@PathVariable id: UUID): PaymentDTO {
-        val adminPhone = findOne(id)
-                .let {
-                    userRepo.findById(it.admin)
-                            .map { it.phone }
-                            .orElseThrow { NotFoundException("admin for showing " + id) }
-                }
+        val showing = findOne(id)
+        val adminPhone = userRepo.findById(showing.admin)
+                .map { it.phone }
+                .orElseThrow { NotFoundException("admin for showing " + id) }
 
         val currentUser = currentLoggedInUser()
         val participantInfo = participantRepo
                 .findByShowingIdAndUserId(id, currentUser)
                 .orElseThrow { PaymentInfoMissing(id) }
 
-        return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, adminPhone, currentUser)
+        val swishTo = when {
+            !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 && adminPhone != null -> {
+                val movieTitle = movieRepo
+                        .findById(showing.movieId)
+                        .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
+                        .title
+
+                SwishDataDTO(
+                        payee = StringValue(adminPhone),
+                        amount = IntValue(participantInfo.amountOwed.toKronor()),
+                        message = StringValue("$movieTitle @ ${showing.location?.name ?: "någonstans"} ${showing.date} ${showing.time}"))
+                        .generateUri()
+                        .toASCIIString()
+            }
+            else -> null
+        }
+
+        return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, swishTo, currentUser)
     }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
