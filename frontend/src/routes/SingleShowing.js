@@ -115,6 +115,8 @@ class Showings extends Component {
                     <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">Öppna SF länk i nytt fönster</a>
                     <Header>Bioklubbnummer</Header>
                     {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr}/>)}
+                    <hr/>
+                    = {bioklubbnummer.map(nbr => parseInt(nbr, 10)).reduce((acc, nbr) => acc + nbr, 0)}
                     <Header>Deltagare</Header>
                     {hasNotPaid.map(info => <UserWithPriceItem key={info.userId} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
                     <hr/>
