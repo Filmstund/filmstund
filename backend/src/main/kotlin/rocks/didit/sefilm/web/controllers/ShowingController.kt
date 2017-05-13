@@ -14,10 +14,7 @@ import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
-import rocks.didit.sefilm.domain.dto.BuyDTO
-import rocks.didit.sefilm.domain.dto.PaymentDTO
-import rocks.didit.sefilm.domain.dto.SuccessfulDTO
-import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.*
 import java.util.*
 
 @RestController

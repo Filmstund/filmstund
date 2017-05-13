@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.web.controllers
+package rocks.didit.sefilm.domain.dto
 
 import java.time.LocalDate
 import java.time.LocalTime

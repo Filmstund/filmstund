@@ -1,6 +1,5 @@
-package rocks.didit.sefilm.web.controllers
+package rocks.didit.sefilm.domain.dto
 
-import rocks.didit.sefilm.domain.dto.SfTag
 import java.time.LocalTime
 
 data class ScreenDTO(val localTime: LocalTime,

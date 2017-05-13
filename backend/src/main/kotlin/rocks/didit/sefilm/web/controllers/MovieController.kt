@@ -13,8 +13,7 @@ import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.SfMetaRepository
-import rocks.didit.sefilm.domain.dto.SfAttributeDTO
-import rocks.didit.sefilm.domain.dto.SfTag
+import rocks.didit.sefilm.domain.dto.*
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
