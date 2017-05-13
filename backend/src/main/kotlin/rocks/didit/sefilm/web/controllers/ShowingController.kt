@@ -50,7 +50,11 @@ class ShowingController(private val repo: ShowingRepository,
                 ticketsBought = body.ticketsBought,
                 payToUser = newPayToUser)
 
-        return repo.save(updateShowing)
+        val updatedShowing = repo.save(updateShowing)
+        if (body.ticketsBought) {
+            createInitialParticipantsInfo(updateShowing)
+        }
+        return updatedShowing
     }
 
     @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -77,11 +81,7 @@ class ShowingController(private val repo: ShowingRepository,
             else -> null
         }
 
-        var participantsInfo = participantRepo.findByUserIdIn(showing.participants)
-        if (participantsInfo.size != showing.participants.size) {
-            participantsInfo = createInitialParticipantsInfo(showing)
-        }
-
+        val participantsInfo = participantRepo.findByUserIdIn(showing.participants)
         return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo)
     }
 
@@ -178,14 +178,13 @@ class ShowingController(private val repo: ShowingRepository,
                 participants = setOf(admin.id))
     }
 
-    private fun createInitialParticipantsInfo(showing: Showing): Collection<ParticipantInfo> {
+    private fun createInitialParticipantsInfo(showing: Showing) {
         val participants = showing.participants.map {
             ParticipantInfo(userId = it,
                     showingId = showing.id,
                     hasPaid = false,
                     amountOwed = showing.price ?: SEK(0))
         }
-
-        return participantRepo.saveAll(participants).toList()
+        participantRepo.saveAll(participants)
     }
 }
