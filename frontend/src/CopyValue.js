@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import copy from "./lib/copy";
 
-const Hover = styled.div`
+const Hover = styled.span`
   &:hover {
     cursor: pointer;
     color: gray;
