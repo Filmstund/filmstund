@@ -106,6 +106,8 @@ class Showings extends Component {
 
         const { participantInfo, bioklubbnummer, sfBuyLink } = buyData
 
+        const { hasPaid = [], hasNotPaid = [] } = _.groupBy(participantInfo, info => info.hasPaid ? 'hasPaid' : 'hasNotPaid')
+
         return <Modal>
             <Padding>
                 <button onClick={() => this.setState({showModal: false, buyData: null})}>Stäng</button>
@@ -114,7 +116,9 @@ class Showings extends Component {
                     <Header>Bioklubbnummer</Header>
                     {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr}/>)}
                     <Header>Deltagare</Header>
-                    {participantInfo.map(info => <UserWithPriceItem key={info.userId} userId={info.userId} onPaidChange={(value) => this.handlePaidChange(info, value)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+                    {hasNotPaid.map(info => <UserWithPriceItem key={info.userId} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
+                    <hr/>
+                    {hasPaid.map(info => <UserWithPriceItem key={info.userId} userId={info.userId} onPaidChange={() => this.handlePaidChange(info)} price={info.amountOwed} hasPaid={info.hasPaid} />)}
                 </Padding>
             </Padding>
         </Modal>
