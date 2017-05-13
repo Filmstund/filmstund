@@ -8,4 +8,6 @@ import java.util.*
 
 interface ParticipantInfoRepository : CrudRepository<ParticipantInfo, UUID> {
     fun findByUserIdIn(userIds: Collection<UserID>): Collection<ParticipantInfo>
+
+    fun deleteByShowingIdAndUserId(showingId: UUID, userId: UserID)
 }
