@@ -8,6 +8,7 @@ import withLoader from "../lib/withLoader";
 import { getJson, jsonRequest, withBaseURL } from "../lib/fetch";
 
 import Showing from "../Showing";
+import QRCode from "../QRCode";
 import CopyValue from "../CopyValue";
 import Loader from "../Loader";
 import Center from "../Center";
@@ -23,7 +24,7 @@ const UserActiveStatus = styled.div`
 `
 
 const UserItem = buildUserComponent(({ user }) => (
-  <span>{user.nick || user.name}</span>
+  <span>{user.nick || user.name} ({user.phone})</span>
 ))
 
 const UserWithPriceItem = buildUserComponent(({ user, active, price, onPaidChange, hasPaid }) => (
@@ -164,6 +165,23 @@ class Showings extends Component {
         }, 2000)
     }
 
+    renderSwishModal = () => {
+        const { payData } = this.state
+        if (!payData) {
+            return <Loader />
+        }
+        const { amountOwed, swishLink, hasPaid, payTo } = payData
+
+        if (swishLink) {
+            return (
+                <Modal>
+                    <button onClick={() => this.setState({swish: false})}>Stäng</button>
+                    <QRCode value={swishLink} width={200} height={200} />
+                </Modal>
+            )
+        }
+    }
+
     renderBuyModal = (buyData) => {
 
         if (!buyData || this.props.loading) {
@@ -208,6 +226,11 @@ class Showings extends Component {
         </div>
     }
 
+    openSwish = (swishLink) => {
+        this.setState({ swish: true })
+        window.location = swishLink
+    }
+
     renderBoughtShowing = (showing) => {
         const { payData } = this.state
         if (!payData) {
@@ -219,20 +242,21 @@ class Showings extends Component {
             {hasPaid && "Du har betalat!"}
             {!hasPaid && <div>
                 Betala {amountOwed / 100} till <UserItem userId={payTo} />
-                <GreenButton onClick={() => window.open(swishLink)}>Öppna Swish!</GreenButton>
+                <GreenButton onClick={() => this.openSwish(swishLink)}>Betala</GreenButton>
             </div>}
         </div>
     }
 
     render() {
         const { className, showing, me } = this.props;
-        const { showModal, buyData } = this.state;
+        const { swish, showModal, buyData } = this.state;
 
         const isParticipating = showing.participants.includes(me.id)
         const isAdmin = showing.admin === me.id
 
         return (
             <div className={className}>
+                {swish && this.renderSwishModal()}
                 {showModal && this.renderBuyModal(buyData)}
                 <Showing
                     movieId={showing.movieId}
