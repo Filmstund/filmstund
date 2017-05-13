@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import moment from "moment";
 
 import { Link } from "../MainButton";
 import Showing from "../Showing";
 import Header from "../Header";
 import Jumbotron from "../jumbotron/jumbotron";
 
+import { getTodaysDate } from "../lib/dateTools";
+
 import { showings, movies } from "../store/reducers/index"
+
+const today = getTodaysDate()
 
 class Home extends Component {
     componentWillMount() {
@@ -39,7 +44,7 @@ class Home extends Component {
 
     renderParticipatedByMe = (showings) => {
         const { me } = this.props;
-        const myShowings = showings.filter(s => s.participants.includes(me.id));
+        const myShowings = showings.filter(s => s.participants.includes(me.id) && moment(s.date).isAfter(today));
 
         return this.renderShowings(myShowings)
     }
