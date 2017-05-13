@@ -1,6 +1,6 @@
 import React from "react";
 
-const Loader = ({ color = '#000', size = 150 }) => (
+const Loader = ({ color = 'maroon', size = 150 }) => (
   <svg width={size + 'px'} height={size + 'px'} viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke={color}><rect fill="#ffffff" width="100%" height="100%" strokeWidth="0"></rect>
     <g fill="none" fillRule="evenodd" strokeWidth="2">
         <circle cx="22" cy="22" r="1">
