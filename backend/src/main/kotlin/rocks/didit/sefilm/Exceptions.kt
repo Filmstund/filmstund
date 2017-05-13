@@ -19,5 +19,8 @@ class MissingSfIdException() : RuntimeException("Movie does not have a valid SF 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class PaymentInfoMissing(showingId: UUID) : RuntimeException("Payment info for $showingId is missing")
 
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+class TicketsAlreadyBoughtException(showingId: UUID) : RuntimeException("The action is not allowd since the tickets for showing $showingId is already bought")
+
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(msg: String) : RuntimeException(msg)

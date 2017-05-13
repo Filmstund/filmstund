@@ -141,6 +141,8 @@ class ShowingController(private val repo: ShowingRepository,
     @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun attend(@PathVariable id: UUID): Set<UserID> {
         val showing = findOne(id)
+        verfiyTicketsNotBought(showing)
+
         val participantsPlusLoggedInUser = showing.participants.toMutableSet()
         participantsPlusLoggedInUser.add(currentLoggedInUser())
 
@@ -151,6 +153,8 @@ class ShowingController(private val repo: ShowingRepository,
     @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun unattend(@PathVariable id: UUID): Set<UserID> {
         val showing = findOne(id)
+        verfiyTicketsNotBought(showing)
+
         val participantsWithoutLoggedInUser = showing.participants.toMutableSet()
         participantsWithoutLoggedInUser.remove(currentLoggedInUser())
 
@@ -202,5 +206,11 @@ class ShowingController(private val repo: ShowingRepository,
                     }
         }
         participantRepo.saveAll(participants)
+    }
+
+    private fun verfiyTicketsNotBought(showing: Showing) {
+        if (showing.ticketsBought) {
+            throw TicketsAlreadyBoughtException(showing.id)
+        }
     }
 }
