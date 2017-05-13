@@ -16,6 +16,17 @@ class Showings extends Component {
         this.props.dispatch(showingActions.actions.requestIndex());
         this.props.dispatch(movieActions.actions.requestIndex());
     }
+
+    navigateToShowing = (showing) => {
+        this.props.history.push(`/showings/${showing.id}`)
+    }
+
+    renderShowings = (showings, disabled) => {
+        return _.orderBy(showings, ['date'], ['desc']).map(showing =>
+            <Showing key={showing.id} onClick={() => this.navigateToShowing(showing)} movieId={showing.movieId} disabled={disabled} date={showing.date} adminId={showing.admin} location={showing.location.name} />
+        )
+    }
+
     render() {
         const { className, showings = [] } = this.props;
 
@@ -24,13 +35,9 @@ class Showings extends Component {
         return (
             <div className={className}>
                 <Header>Aktuella Besök</Header>
-                {_.sortBy(upcoming, 'date').map(showing => (
-                    <Showing key={showing.id} movieId={showing.movieId} date={showing.date} adminId={showing.admin} location={showing.location.name} />
-                ))}
+                {this.renderShowings(upcoming, false)}
                 <Header>Tidigare Besök</Header>
-                {_.sortBy(previous, 'date').map(showing => (
-                    <Showing key={showing.id} disabled={true} movieId={showing.movieId} date={showing.date} adminId={showing.admin} location={showing.location.name} />
-                ))}
+                {this.renderShowings(previous, true)}
             </div>
         )
     }
