@@ -23,8 +23,8 @@ const UserItem = buildUserComponent(({ user }) => (
 
 const UserWithPriceItem = buildUserComponent(({ user, price, onPaidChange, hasPaid }) => (
   <div>
-    {user.nick || user.name} {(price && (price / 100))} <label>har betalat: <input type="checkbox" checked={hasPaid} onChange={(event) => onPaidChange(!event.target.checked)}/></label>
-</div>
+    {user.nick || user.name} <label>har betalat: <input type="checkbox" checked={hasPaid} onChange={onPaidChange}/></label>
+  </div>
 ))
 
 const Padding = styled.div`
@@ -77,17 +77,17 @@ class Showings extends Component {
         </div>
     }
 
-    handlePaidChange = (info, hasPaid) => {
+    handlePaidChange = (info) => {
         const data = {
             ...info,
-            hasPaid
+            hasPaid: !info.hasPaid
         }
         jsonRequest(withBaseURL('/participantinfo'), data, 'PUT').then(newInfo => {
             this.setState({
                 buyData: {
                     ...this.state.buyData,
                     participantInfo: this.state.buyData.participantInfo.map(info => {
-                        if (info.id === newInfo) {
+                        if (info.id === newInfo.id) {
                             return newInfo
                         } else {
                             return info
