@@ -64,5 +64,5 @@ internal fun OmdbApiMovieDTO.toMovie(): Movie? {
 }
 
 internal fun User.toLimitedUserInfo(): LimitedUserInfo {
-    return LimitedUserInfo(this.id, this.name, this.nick, this.phone, this.avatar)
+    return LimitedUserInfo(this.id, this.name, this.nick, this.phone?.number, this.avatar)
 }

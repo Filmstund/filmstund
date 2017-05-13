@@ -39,10 +39,16 @@ class ShowingController(private val repo: ShowingRepository,
     @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
         val showing = findOne(id)
+
+        val newPayToUser = when {
+            body.payToUser != null -> UserID(body.payToUser)
+            else -> showing.payToUser
+        }
         val updateShowing = showing.copy(
                 price = SEK(body.price),
                 private = body.private,
-                ticketsBought = body.ticketsBought)
+                ticketsBought = body.ticketsBought,
+                payToUser = newPayToUser)
 
         return repo.save(updateShowing)
     }
@@ -82,9 +88,9 @@ class ShowingController(private val repo: ShowingRepository,
     @GetMapping(PATH_WITH_ID + "/pay")
     fun paymentInfo(@PathVariable id: UUID): PaymentDTO {
         val showing = findOne(id)
-        val adminPhone = userRepo.findById(showing.admin)
+        val payeePhone = userRepo.findById(showing.payToUser)
                 .map { it.phone }
-                .orElseThrow { NotFoundException("admin for showing " + id) }
+                .orElseThrow { NotFoundException("payee for showing " + id) }
 
         val currentUser = currentLoggedInUser()
         val participantInfo = participantRepo
@@ -92,14 +98,14 @@ class ShowingController(private val repo: ShowingRepository,
                 .orElseThrow { PaymentInfoMissing(id) }
 
         val swishTo = when {
-            !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 && adminPhone != null -> {
+            !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 && payeePhone != null -> {
                 val movieTitle = movieRepo
                         .findById(showing.movieId)
                         .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
                         .title
 
                 SwishDataDTO(
-                        payee = StringValue(adminPhone),
+                        payee = StringValue(payeePhone.number),
                         amount = IntValue(participantInfo.amountOwed.toKronor()),
                         message = StringValue("$movieTitle @ ${showing.location?.name ?: "någonstans"} ${showing.date} ${showing.time}"))
                         .generateUri()
@@ -168,6 +174,7 @@ class ShowingController(private val repo: ShowingRepository,
                 movieId = this.movieId,
                 location = location,
                 admin = admin.id,
+                payToUser = admin.id,
                 participants = setOf(admin.id))
     }
 

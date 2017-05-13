@@ -21,6 +21,7 @@ data class Showing(@Id
                    val price: SEK? = null,
                    val ticketsBought: Boolean = false,
                    val admin: UserID = UserID(),
+                   val payToUser: UserID = admin,
                    val participants: Set<UserID> = setOf(),
                    @LastModifiedDate
                    val lastModifiedDate: Instant = Instant.EPOCH)

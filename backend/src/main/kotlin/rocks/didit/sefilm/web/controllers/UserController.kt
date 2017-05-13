@@ -9,6 +9,7 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.LimitedUserInfo
+import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.toLimitedUserInfo
@@ -45,7 +46,7 @@ class UserController(val userRepository: UserRepository) {
         }
 
         val updatedUser = currentUser().copy(
-                phone = newDetails.phone,
+                phone = PhoneNumber(newDetails.phone ?: ""),
                 nick = newDetails.nick,
                 bioklubbnummer = newBioklubbnummer)
 
