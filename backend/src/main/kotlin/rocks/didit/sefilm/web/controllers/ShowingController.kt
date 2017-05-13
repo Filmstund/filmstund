@@ -111,7 +111,7 @@ class ShowingController(private val repo: ShowingRepository,
                 SwishDataDTO(
                         payee = StringValue(payeePhone.number),
                         amount = IntValue(participantInfo.amountOwed.toKronor()),
-                        message = StringValue("$movieTitle @ ${showing.location?.name ?: "någonstans"} ${showing.date} ${showing.time}"))
+                        message = generateSwishMessage(movieTitle, showing))
                         .generateUri()
                         .toASCIIString()
             }
@@ -213,5 +213,12 @@ class ShowingController(private val repo: ShowingRepository,
         if (showing.ticketsBought) {
             throw TicketsAlreadyBoughtException(showing.id)
         }
+    }
+
+    private fun generateSwishMessage(movieTitle: String, showing: Showing): StringValue {
+        val timeAndDate = " @ ${showing.date} ${showing.time}"
+        val truncatedMovieTitle = movieTitle.substring(0, 50 - timeAndDate.length)
+
+        return StringValue("$truncatedMovieTitle$timeAndDate")
     }
 }
