@@ -118,7 +118,7 @@ class ShowingController(private val repo: ShowingRepository,
             else -> null
         }
 
-        return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, swishTo, currentUser)
+        return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, showing.payToUser, swishTo, currentUser)
     }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
