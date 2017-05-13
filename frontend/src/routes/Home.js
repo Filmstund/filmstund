@@ -27,6 +27,7 @@ class Home extends Component {
         return showings.map(showing =>
             <Showing
                 onClick={() => this.navigateToShowing(showing)}
+                disabled={moment(showing.date).isBefore(today)}
                 movieId={showing.movieId}
                 key={showing.id}
                 date={showing.date}

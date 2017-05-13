@@ -14,7 +14,7 @@ const VerticalPaddingContainer = styled.div`
 
 const Showing = ({ movie = {}, movieId, date, admin, adminId, location, disabled, onClick, dispatch, ...props }) => (
     <div {...props}>
-        <PosterBox headerText={movie.title} poster={movie.poster} onClick={disabled ? () => {} : onClick}>
+        <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
             <VerticalPaddingContainer>
                 {formatShowingDateTime(date)}<br/>
                 {location}<br/>

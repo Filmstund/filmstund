@@ -2,6 +2,9 @@ import React, { PropTypes } from "react";
 import styled from "styled-components";
 import alfons from "./assets/alfons.jpg";
 
+const pointerHover = `
+  &:hover { cursor: pointer }
+`
 
 const PaddingContainer = styled.div`
   flex: 1;
@@ -13,6 +16,7 @@ const Poster = styled.div`
     background-size: cover;
     height: 100%;
     width: 100px;
+    ${ props => props.onClick && pointerHover }
 `;
 
 const Header = styled.h3`
@@ -20,6 +24,7 @@ const Header = styled.h3`
     padding: 0;
     margin: 0;
     overflow: hidden;
+    ${ props => props.onClick && pointerHover }
 `;
 
 const PosterBox = ({ className, poster, onClick, headerText, children }) => (

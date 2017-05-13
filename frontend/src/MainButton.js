@@ -15,6 +15,7 @@ const MainButtonStyles = css`
   font-weight: 400;
   width: 100%;
   font-family: "Roboto", sans-serif;
+  &:hover { cursor: pointer }
 `;
 
 export const Link = styled(RouterLink)(MainButtonStyles);
