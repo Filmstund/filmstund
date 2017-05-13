@@ -179,11 +179,24 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     private fun createInitialParticipantsInfo(showing: Showing) {
-        val participants = showing.participants.map {
-            ParticipantInfo(userId = it,
-                    showingId = showing.id,
-                    hasPaid = false,
-                    amountOwed = showing.price ?: SEK(0))
+        val participants = showing.participants.map { participant ->
+            participantRepo.findByShowingIdAndUserId(showing.id, participant)
+                    .map { p ->
+                        // Use existing info
+                        ParticipantInfo(
+                                id = p.id,
+                                userId = participant,
+                                showingId = showing.id,
+                                hasPaid = p.hasPaid,
+                                amountOwed = p.amountOwed)
+                    }
+                    .orElseGet {
+                        // Create new info
+                        ParticipantInfo(userId = participant,
+                                showingId = showing.id,
+                                hasPaid = false,
+                                amountOwed = showing.price ?: SEK(0))
+                    }
         }
         participantRepo.saveAll(participants)
     }
