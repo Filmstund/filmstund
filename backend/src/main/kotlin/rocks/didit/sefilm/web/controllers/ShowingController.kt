@@ -18,6 +18,7 @@ import rocks.didit.sefilm.domain.LimitedUserInfo
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.BuyDTO
+import rocks.didit.sefilm.domain.dto.PaymentDTO
 import rocks.didit.sefilm.domain.dto.SuccessfulDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import java.util.*
@@ -82,6 +83,23 @@ class ShowingController(private val repo: ShowingRepository,
         }
 
         return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo)
+    }
+
+    @GetMapping(PATH_WITH_ID + "/pay")
+    fun paymentInfo(@PathVariable id: UUID): PaymentDTO {
+        val adminPhone = findOne(id)
+                .let {
+                    userRepo.findById(it.admin)
+                            .map { it.phone }
+                            .orElseThrow { NotFoundException("admin for showing " + id) }
+                }
+
+        val currentUser = currentLoggedInUser()
+        val participantInfo = participantRepo
+                .findByShowingIdAndUserId(id, currentUser)
+                .orElseThrow { PaymentInfoMissing(id) }
+
+        return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, adminPhone, currentUser)
     }
 
     @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -155,4 +173,3 @@ class ShowingController(private val repo: ShowingRepository,
         return participantRepo.saveAll(participants).toList()
     }
 }
-

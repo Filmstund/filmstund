@@ -2,6 +2,7 @@ package rocks.didit.sefilm
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.util.*
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 class NotFoundException(what: String) : RuntimeException("Could not find $what")
@@ -14,6 +15,9 @@ class ExternalProviderException() : RuntimeException("Unable to fetch informatio
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class MissingSfIdException() : RuntimeException("Movie does not have a valid SF id associated with it")
+
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+class PaymentInfoMissing(showingId: UUID) : RuntimeException("Payment info for $showingId is missing")
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(msg: String) : RuntimeException(msg)
