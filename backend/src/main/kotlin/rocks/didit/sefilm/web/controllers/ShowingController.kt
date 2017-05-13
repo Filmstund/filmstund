@@ -39,6 +39,9 @@ class ShowingController(private val repo: ShowingRepository,
     @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
         val showing = findOne(id)
+        if (currentLoggedInUser() != showing.admin) {
+            throw AccessDeniedException("Only the admin can update a showing")
+        }
 
         val newPayToUser = when {
             body.payToUser != null -> UserID(body.payToUser)
