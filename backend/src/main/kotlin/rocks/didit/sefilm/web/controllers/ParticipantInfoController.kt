@@ -27,7 +27,7 @@ class ParticipantInfoController(private val participantInfoRepo: ParticipantInfo
         if (body.showingId == null || body.userId == null) {
             throw IllegalArgumentException("Missing showing id and/or user id")
         }
-        checkAccess(body.showingId)
+        onlyAllowAdminToContinue(body.showingId)
 
         val participantInfo = participantInfoRepo
                 .findById(body.id)
@@ -41,7 +41,7 @@ class ParticipantInfoController(private val participantInfoRepo: ParticipantInfo
         return participantInfoRepo.save(newInfo)
     }
 
-    private fun checkAccess(showingId: UUID) {
+    private fun onlyAllowAdminToContinue(showingId: UUID) {
         val showing = showingRepo
                 .findById(showingId)
                 .orElseThrow { NotFoundException("showing '${showingId}") }

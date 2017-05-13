@@ -7,7 +7,7 @@ import java.util.*
 
 
 interface ParticipantInfoRepository : CrudRepository<ParticipantInfo, UUID> {
-    fun findByUserIdIn(userIds: Collection<UserID>): Collection<ParticipantInfo>
+    fun findByShowingId(showingId: UUID): Collection<ParticipantInfo>
     fun findByShowingIdAndUserId(showingId: UUID, userId: UserID): Optional<ParticipantInfo>
     fun deleteByShowingIdAndUserId(showingId: UUID, userId: UserID)
 }

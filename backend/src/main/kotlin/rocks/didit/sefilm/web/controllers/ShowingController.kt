@@ -84,16 +84,17 @@ class ShowingController(private val repo: ShowingRepository,
             else -> null
         }
 
-        val participantsInfo = participantRepo.findByUserIdIn(showing.participants)
+        val participantsInfo = participantRepo.findByShowingId(showing.id)
         return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo)
     }
 
     @GetMapping(PATH_WITH_ID + "/pay")
     fun paymentInfo(@PathVariable id: UUID): PaymentDTO {
         val showing = findOne(id)
+
         val payeePhone = userRepo.findById(showing.payToUser)
                 .map { it.phone }
-                .orElseThrow { NotFoundException("payee for showing " + id) }
+                .orElseThrow { NotFoundException("payment info for showing " + id) }
 
         val currentUser = currentLoggedInUser()
         val participantInfo = participantRepo
