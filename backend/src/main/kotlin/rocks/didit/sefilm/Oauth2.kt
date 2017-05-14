@@ -127,9 +127,10 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
             val maybeUser = userRepository.findById(UserID(principal.userId))
             if (!maybeUser.isPresent) {
                 val newUser = User(id = UserID(principal.userId),
-                        name = "${principal.firstName} ${principal.lastName}",
+                        name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
                         firstName = principal.firstName,
                         lastName = principal.lastName,
+                        nick = principal.lastName ?: "Houdini",
                         email = principal.username ?: "",
                         avatar = principal.avatarUrl)
                 userRepository.save(newUser)
