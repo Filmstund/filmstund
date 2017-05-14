@@ -16,6 +16,8 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
@@ -31,6 +33,8 @@ import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 @EnableMongoAuditing
 @EnableCaching
 @EnableWebSecurity
+@EnableAsync
+@EnableScheduling
 @EnableConfigurationProperties(Properties::class)
 class Application {
     private val log = LoggerFactory.getLogger(Application::class.java)
