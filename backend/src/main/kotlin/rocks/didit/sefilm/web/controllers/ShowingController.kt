@@ -214,7 +214,7 @@ class ShowingController(private val repo: ShowingRepository,
                         // Create new info
                         ParticipantInfo(userId = participant,
                                 showingId = showing.id,
-                                hasPaid = false,
+                                hasPaid = participant == showing.payToUser,
                                 amountOwed = showing.price ?: SEK(0))
                     }
         }
