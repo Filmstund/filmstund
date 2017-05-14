@@ -229,7 +229,8 @@ class ShowingController(private val repo: ShowingRepository,
 
     private fun generateSwishMessage(movieTitle: String, showing: Showing): StringValue {
         val timeAndDate = " @ ${showing.date} ${showing.time}"
-        val truncatedMovieTitle = movieTitle.substring(0, 50 - timeAndDate.length)
+        val maxSize = Math.min(movieTitle.length, 50 - timeAndDate.length)
+        val truncatedMovieTitle = movieTitle.substring(0, maxSize)
 
         return StringValue("$truncatedMovieTitle$timeAndDate")
     }
