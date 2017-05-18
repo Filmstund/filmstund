@@ -22,7 +22,7 @@ class Showings extends Component {
     }
 
     renderShowings = (showings, disabled) => {
-        return _.orderBy(showings, ['date'], ['desc']).map(showing =>
+        return _.orderBy(showings, ['date'], ['asc']).map(showing =>
             <Showing key={showing.id} onClick={() => this.navigateToShowing(showing)} movieId={showing.movieId} disabled={disabled} date={showing.date} adminId={showing.admin} location={showing.location.name} />
         )
     }
