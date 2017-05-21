@@ -14,7 +14,6 @@ import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.SfMetaRepository
 import rocks.didit.sefilm.domain.dto.*
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -24,7 +23,8 @@ import java.util.*
 class MovieController(private val repo: MovieRepository,
                       private val metaRepo: SfMetaRepository,
                       private val sfClient: SfClient,
-                      private val omdbClient: OmdbClient) {
+                      private val omdbClient: OmdbClient,
+                      private val asyncMovieUpdater: AsyncMovieUpdater) {
 
     companion object {
         private const val PATH = Application.API_BASE_PATH + "/movies"
@@ -39,11 +39,6 @@ class MovieController(private val repo: MovieRepository,
     @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
     fun findOne(@PathVariable id: UUID): Movie {
         val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
-        when {
-        // FIXME: do this in the background on /sf/populate
-            movie.needsMoreInfo() -> fetchExtendedInfoForMovie(movie)
-            movie.isMissingImdbId() -> updateImdbIdBasedOnTitleAndYear(movie)
-        }
         return movie
     }
 
@@ -77,7 +72,7 @@ class MovieController(private val repo: MovieRepository,
 
         val ourMovies = repo.findAll()
         val newMoviesWeHaventPreviouslySeen = sfMovies
-                .filter { sf -> ourMovies.firstOrNull { our -> our.sfId == sf.ncgId } == null }
+                .filter { (ncgId) -> ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
                 .map { (ncgId, title, releaseDate, _, posterUrl) ->
                     Movie(title = title, sfId = ncgId, releaseDate = releaseDate, poster = posterUrl)
                 }
@@ -85,6 +80,7 @@ class MovieController(private val repo: MovieRepository,
         val savedEntities = repo.saveAll(newMoviesWeHaventPreviouslySeen)
         metaRepo.save(SfMeta("sfpopulate", Instant.now(), "Previously saved ${savedEntities.count()} new movies from SF", savedEntities.count()))
 
+        asyncMovieUpdater.extendMovieInfo(savedEntities)
         return SavedEntitiesDTO(savedEntities.count(), "Fetched and saved new movies from SF")
     }
 
@@ -126,70 +122,5 @@ class MovieController(private val repo: MovieRepository,
                 return@map null
             }
         }.filterNotNull().toMutableList()
-
-    }
-
-    private fun fetchExtendedInfoForMovie(movie: Movie) {
-        log.info("Fetching extended movie info for ${movie.id}")
-        when {
-            movie.sfId != null -> updateFromSf(movie)
-            movie.imdbId != null -> updateFromImdbById(movie)
-            else -> updateFromImdbByTitle(movie)
-        }
-    }
-
-    private fun updateFromSf(movie: Movie): Movie {
-        log.info("Fetching extended movie info from SF for ${movie.sfId}")
-        val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
-
-        val copy = movie.copy(synopsis = updatedMovie.shortDescription,
-                sfSlug = updatedMovie.slug,
-                originalTitle = updatedMovie.originalTitle,
-                releaseDate = updatedMovie.releaseDate,
-                productionYear = updatedMovie.productionYear,
-                runtime = Duration.ofMinutes(updatedMovie.length),
-                poster = updatedMovie.posterUrl,
-                genres = updatedMovie.genres.map { (name) -> name })
-
-        val saved = repo.save(copy)
-        log.info("Successfully updated and saved movie[${movie.id}] with SF data")
-        return saved
-    }
-
-    private fun updateFromImdbById(movie: Movie) {
-        log.info("Fetching extended movie info from IMDb by ID for ${movie.imdbId}")
-        val updatedInfo = omdbClient.fetchByImdbId(movie.imdbId!!)?.toMovie()
-        if (updatedInfo == null) {
-            log.warn("Unable to find movie on OMDb with for imdb id ${movie.imdbId}")
-            throw ExternalProviderException()
-        }
-
-        val copy = movie.copy(synopsis = updatedInfo.synopsis, productionYear = updatedInfo.productionYear,
-                poster = updatedInfo.poster, genres = updatedInfo.genres)
-
-        repo.save(copy)
-        log.info("Successfully updated movie with extended information")
-    }
-
-    private fun updateFromImdbByTitle(movie: Movie) {
-        log.warn("Fetching extended movie info from IMDb by title for ${movie.title} - NOT SUPPORTED YET")
-    }
-
-    private fun updateImdbIdBasedOnTitleAndYear(movie: Movie) {
-        val title = movie.originalTitle ?: movie.title
-
-        log.info("Fetching IMDb id for '$title'")
-        val updatedInfo = omdbClient.fetchByTitleAndYear(title, movie.productionYear!!)?.toMovie()
-
-        if (updatedInfo == null) {
-            log.info("Movie with title '$title' not found on OMDb")
-            return
-        }
-
-        log.info("Updating Imdb id to ${updatedInfo.imdbId} for movie[id=${movie.id}]")
-        val copy = movie.copy(imdbId = updatedInfo.imdbId)
-
-        repo.save(copy)
-        log.info("Successfully updated movie with new IMDb id")
     }
 }

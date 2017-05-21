@@ -27,14 +27,14 @@ data class Movie(
         @LastModifiedDate
         val lastModifiedDate: Instant = Instant.EPOCH) {
     init {
-        if (imdbId != null && !imdbId.matches(Regex("^tt[0-9]{7}"))) {
+        if (imdbId != null && imdbId != "N/A" && !imdbId.matches(Regex("^tt[0-9]{7}"))) {
             throw IllegalArgumentException("Illegal IMDb ID format: $imdbId")
         }
     }
 
     /** Should we do an extended query to find more information about this movie? */
     fun needsMoreInfo(): Boolean {
-        return synopsis == null || poster == null;
+        return synopsis == null || poster == null || runtime == null
     }
 
     @JsonIgnore

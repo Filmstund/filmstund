@@ -124,11 +124,28 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
             val principal = authentication?.principal as OpenIdConnectUserDetails?
                     ?: throw BadCredentialsException("Successful authentication without a given principal")
 
-            if (!userRepository.existsById(UserID(principal.userId))) {
-                val newUser = User(id = UserID(principal.userId), name = "${principal.firstName} ${principal.lastName}",
-                        email = principal.username ?: "", avatar = principal.avatarUrl)
+            val maybeUser = userRepository.findById(UserID(principal.userId))
+            if (!maybeUser.isPresent) {
+                val newUser = User(id = UserID(principal.userId),
+                        name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
+                        firstName = principal.firstName,
+                        lastName = principal.lastName,
+                        nick = principal.lastName ?: "Houdini",
+                        email = principal.username ?: "",
+                        avatar = principal.avatarUrl)
                 userRepository.save(newUser)
-                log.info("Created user ${newUser.id}")
+                log.info("Created new user ${newUser.id}")
+            } else {
+                val updatedUser = maybeUser.map {
+                    it.copy(name = "${principal.firstName} ${principal.lastName}",
+                            firstName = principal.firstName,
+                            lastName = principal.lastName,
+                            avatar = principal.avatarUrl)
+                }.get()
+                val savedUser = userRepository.save(updatedUser)
+                if (savedUser != updatedUser) {
+                    log.info("Updated user ${savedUser.id}")
+                }
             }
 
             defaultTargetUrl = loginRedirectUri

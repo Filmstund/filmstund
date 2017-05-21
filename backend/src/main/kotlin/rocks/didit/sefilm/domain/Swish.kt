@@ -23,7 +23,7 @@ data class SwishDataDTO(
 
     fun generateUri(): URI {
         val asString = jacksonObjectMapper().writeValueAsString(this)
-        val encodedData = URLEncoder.encode(asString, StandardCharsets.UTF_8.displayName())
+        val encodedData = URLEncoder.encode(asString, StandardCharsets.UTF_8.displayName()).replace("+", "%20")
         return URI.create("swish://payment?data=$encodedData")
     }
 }

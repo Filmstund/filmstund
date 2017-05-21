@@ -47,11 +47,22 @@ class ShowingController(private val repo: ShowingRepository,
             body.payToUser != null -> UserID(body.payToUser)
             else -> showing.payToUser
         }
+        val newLocation = when {
+            body.newLocation != null -> {
+                locationRepo.findById(body.newLocation)
+                        .orElseGet { locationRepo.save(Location(body.newLocation)) }
+            }
+            else -> showing.location
+        }
+
         val updateShowing = showing.copy(
                 price = SEK(body.price),
                 private = body.private,
                 ticketsBought = body.ticketsBought,
-                payToUser = newPayToUser)
+                expectedBuyDate = body.expectedBuyDate,
+                payToUser = newPayToUser,
+                time = body.newTime ?: showing.time,
+                location = newLocation)
 
         val updatedShowing = repo.save(updateShowing)
         if (body.ticketsBought) {
@@ -111,7 +122,7 @@ class ShowingController(private val repo: ShowingRepository,
                 SwishDataDTO(
                         payee = StringValue(payeePhone.number),
                         amount = IntValue(participantInfo.amountOwed.toKronor()),
-                        message = StringValue("$movieTitle @ ${showing.location?.name ?: "någonstans"} ${showing.date} ${showing.time}"))
+                        message = generateSwishMessage(movieTitle, showing))
                         .generateUri()
                         .toASCIIString()
             }
@@ -183,6 +194,7 @@ class ShowingController(private val repo: ShowingRepository,
                 location = location,
                 admin = admin.id,
                 payToUser = admin.id,
+                expectedBuyDate = this.expectedBuyDate,
                 participants = setOf(admin.id))
     }
 
@@ -202,7 +214,7 @@ class ShowingController(private val repo: ShowingRepository,
                         // Create new info
                         ParticipantInfo(userId = participant,
                                 showingId = showing.id,
-                                hasPaid = false,
+                                hasPaid = participant == showing.payToUser,
                                 amountOwed = showing.price ?: SEK(0))
                     }
         }
@@ -213,5 +225,13 @@ class ShowingController(private val repo: ShowingRepository,
         if (showing.ticketsBought) {
             throw TicketsAlreadyBoughtException(showing.id)
         }
+    }
+
+    private fun generateSwishMessage(movieTitle: String, showing: Showing): StringValue {
+        val timeAndDate = " @ ${showing.date} ${showing.time}"
+        val maxSize = Math.min(movieTitle.length, 50 - timeAndDate.length)
+        val truncatedMovieTitle = movieTitle.substring(0, maxSize)
+
+        return StringValue("$truncatedMovieTitle$timeAndDate")
     }
 }

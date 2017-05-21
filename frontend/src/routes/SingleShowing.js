@@ -24,7 +24,7 @@ const UserActiveStatus = styled.div`
 `
 
 const UserItem = buildUserComponent(({ user }) => (
-  <span>{user.nick || user.name} ({user.phone})</span>
+  <div>{user.nick || user.name} ({user.phone})</div>
 ))
 
 const UserWithPriceItem = buildUserComponent(({ user, active, price, onPaidChange, hasPaid }) => (

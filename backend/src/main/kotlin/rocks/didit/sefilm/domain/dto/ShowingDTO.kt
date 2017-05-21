@@ -7,4 +7,5 @@ import java.util.*
 data class ShowingDTO(val date: LocalDate?,
                       val time: LocalTime?,
                       val movieId: UUID?,
-                      val location: String?)
+                      val location: String?,
+                      val expectedBuyDate: LocalDate?)
