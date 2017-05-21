@@ -91,7 +91,7 @@ class ShowingController(private val repo: ShowingRepository,
         val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '${showing.movieId}") }
 
         val sfLink = when {
-            movie.sfId != null && movie.sfSlug != null -> "https://beta.sfbio.se/film/${movie.sfId}/${movie.sfSlug}"
+            movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
             else -> null
         }
 

@@ -14,7 +14,7 @@ import rocks.didit.sefilm.domain.dto.SfShowListingEntitiesDTO
 @Component
 class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
     companion object {
-        const val API_URL = "https://beta.sfbio.se/api"
+        const val API_URL = "https://www.sf.se/api"
     }
 
     fun getDatesAndLocations(sfId: String) =
