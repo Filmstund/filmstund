@@ -1,9 +1,8 @@
 package rocks.didit.sefilm.domain
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.google.common.net.UrlEscapers
 import java.net.URI
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 data class StringValue(
         val value: String,
@@ -23,7 +22,7 @@ data class SwishDataDTO(
 
     fun generateUri(): URI {
         val asString = jacksonObjectMapper().writeValueAsString(this)
-        val encodedData = URLEncoder.encode(asString, StandardCharsets.UTF_8.displayName()).replace("+", "%20")
+        val encodedData = UrlEscapers.urlFragmentEscaper().escape(asString)
         return URI.create("swish://payment?data=$encodedData")
     }
 }

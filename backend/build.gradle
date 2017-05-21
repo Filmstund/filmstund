@@ -58,5 +58,6 @@ dependencies {
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     compile("com.googlecode.libphonenumber:libphonenumber:8.4.2")
+    compile("com.google.guava:guava:21.0")
     testCompile("org.springframework.boot:spring-boot-starter-test:$springBootRelease")
 }
