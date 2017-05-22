@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
  * QR Code generator library (JavaScript)
  *
