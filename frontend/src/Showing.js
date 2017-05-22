@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import _ from "lodash";
 import { movies as movieActions, users as userActions } from "./store/reducers"
 import {formatShowingDateTime} from "./lib/dateTools";
 import withLoader from "./lib/withLoader"

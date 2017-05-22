@@ -1,5 +1,4 @@
 import { combineReducers } from "redux";
-import _ from "lodash";
 import { routerReducer } from 'react-router-redux'
 
 import createCrudReducer, {crudSingleReducer} from "./rest";

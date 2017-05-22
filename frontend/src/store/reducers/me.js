@@ -1,4 +1,3 @@
-import _ from "lodash";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import {withBaseURL} from "../../lib/fetch";
 import {USER_SIGNOUT_ACTION, signoutUser} from "./user";

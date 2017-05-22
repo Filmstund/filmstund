@@ -2,7 +2,6 @@ import React from "react";
 import {connect} from "react-redux";
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import _ from "lodash";
 import "react-datepicker/dist/react-datepicker.css";
 
 import {showings} from "./store/reducers";

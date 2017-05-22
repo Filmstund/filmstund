@@ -1,4 +1,4 @@
-import React, { PropTypes } from "react";
+import React from "react";
 import styled from "styled-components";
 import alfons from "./assets/alfons.jpg";
 
@@ -36,11 +36,6 @@ const PosterBox = ({ className, poster, onClick, headerText, children }) => (
         </PaddingContainer>
     </div>
 );
-
-PosterBox.propTypes = {
-    poster: PropTypes.string,
-    headerText: PropTypes.string.isRequired
-};
 
 export default styled(PosterBox)`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);

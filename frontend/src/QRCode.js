@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from "react-dom";
 
 import qrcodegen from "./lib/qrcode";
 const QRC = qrcodegen.QrCode;
