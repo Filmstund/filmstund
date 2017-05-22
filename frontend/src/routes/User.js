@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import _ from "lodash";
+import { mapValues } from "lodash";
 import Field from "../Field";
 import MainButton from "../MainButton";
 import Input from "../Input";
@@ -70,7 +70,7 @@ class User extends Component {
   }
 
   handleSubmit = () => {
-    const trimmedValues = _.mapValues(this.state.editedUser, s => s.trim())
+    const trimmedValues = mapValues(this.state.editedUser, s => s.trim())
     this.props.dispatch(meActions.actions.requestUpdate({
       id: this.props.me.id,
       ...trimmedValues

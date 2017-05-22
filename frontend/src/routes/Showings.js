@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import _ from "lodash";
+import { orderBy, groupBy } from "lodash";
 import moment from "moment";
 
 import { getTodaysDate } from "../lib/dateTools";
@@ -22,7 +22,7 @@ class Showings extends Component {
     }
 
     renderShowings = (showings, disabled) => {
-        return _.orderBy(showings, ['date'], ['asc']).map(showing =>
+        return orderBy(showings, ['date'], ['asc']).map(showing =>
             <Showing key={showing.id} onClick={() => this.navigateToShowing(showing)} movieId={showing.movieId} disabled={disabled} date={showing.date} adminId={showing.admin} location={showing.location.name} />
         )
     }
@@ -30,7 +30,7 @@ class Showings extends Component {
     render() {
         const { className, showings = [] } = this.props;
 
-        const { previous, upcoming } = _.groupBy(showings, s => moment(s.date).isBefore(today) ? 'previous' : 'upcoming')
+        const { previous, upcoming } = groupBy(showings, s => moment(s.date).isBefore(today) ? 'previous' : 'upcoming')
 
         return (
             <div className={className}>

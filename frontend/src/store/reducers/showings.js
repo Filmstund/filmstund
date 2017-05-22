@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { omit } from "lodash";
 import { push } from 'react-router-redux'
 import fetch, { jsonRequest } from "../../lib/fetch";
 import {withBaseURL} from "../../lib/fetch";
@@ -9,7 +9,7 @@ const path = withBaseURL("/showings")
 const appendId = (...pathComponents) => pathComponents.join('/');
 
 const transform = (showing) => ({
-    ..._.omit(showing, 'time'),
+    ...omit(showing, 'time'),
     date: `${showing.date} ${showing.time}`
 });
 
@@ -114,7 +114,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 loading: false,
                 error: null,
-                data: _.omit(state.data, action.id)
+                data: omit(state.data, action.id)
             };
         case actions.errorIndex:
         case actions.errorSingle:

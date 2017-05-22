@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import moment from "moment";
-import _ from "lodash";
+import { orderBy } from "lodash";
 
 import { Link } from "../MainButton";
 import Showing from "../Showing";
@@ -25,7 +25,7 @@ class Home extends Component {
     }
 
     renderShowings = (showings) => {
-        return _.orderBy(showings, ['date'], ['desc']).map(showing =>
+        return orderBy(showings, ['date'], ['desc']).map(showing =>
             <Showing
                 onClick={() => this.navigateToShowing(showing)}
                 disabled={moment(showing.date).isBefore(today)}

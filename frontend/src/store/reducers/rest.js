@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { omit } from "lodash";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { USER_SIGNOUT_ACTION } from "./user"
 
@@ -84,7 +84,7 @@ const crudReducer = (name, path, transform = idTransform) => {
                     ...state,
                     loading: false,
                     error: null,
-                    data: _.omit(state.data, action.id)
+                    data: omit(state.data, action.id)
                 };
             case actions.errorIndex:
             case actions.errorSingle:

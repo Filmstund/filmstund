@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import _ from "lodash";
+import { groupBy } from "lodash";
 import { showings as showingActions, users as userActions } from "../store/reducers";
 import styled from "styled-components";
 
@@ -67,7 +67,7 @@ class Showings extends Component {
     }
 
     handleDelete = () => {
-        const proceed = confirm("Är du säker? Går ej att ångra!");
+        const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
         if (proceed) {
             this.props.dispatch(showingActions.actions.requestDelete(this.props.showingId));
@@ -131,7 +131,7 @@ class Showings extends Component {
     }
 
     renderParticipants = (participants) => {
-        const { hasPaid = [], hasNotPaid = [] } = _.groupBy(participants, info => info.hasPaid ? 'hasPaid' : 'hasNotPaid')
+        const { hasPaid = [], hasNotPaid = [] } = groupBy(participants, info => info.hasPaid ? 'hasPaid' : 'hasNotPaid')
 
         return (
             <div>
@@ -170,7 +170,8 @@ class Showings extends Component {
         if (!payData) {
             return <Loader />
         }
-        const { amountOwed, swishLink, hasPaid, payTo } = payData
+        // const { amountOwed, swishLink, hasPaid, payTo } = payData
+        const { swishLink } = payData
 
         if (swishLink) {
             return (

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import _ from "lodash";
+import { every, map, extend } from "lodash";
 import Loader from "../Loader";
 
 const withLoader = (mapOfActionsAndIds) => {
@@ -25,7 +25,7 @@ const withLoader = (mapOfActionsAndIds) => {
                 return;
             }
 
-            const allDone = _.every(mapOfActionsAndIds, ([propId, action], prop) => {
+            const allDone = every(mapOfActionsAndIds, ([propId, action], prop) => {
                 const model = props[prop]
                 const modelId = props[propId]
 
@@ -56,9 +56,9 @@ const withLoader = (mapOfActionsAndIds) => {
             })
 
             if (allDone) {
-                const objectList = _.map(mapOfActionsAndIds, ([propId, ], prop) => ({ [prop]: props[prop].data }))
+                const objectList = map(mapOfActionsAndIds, ([propId, ], prop) => ({ [prop]: props[prop].data }))
 
-                const mappedProps = _.extend({}, ...objectList)
+                const mappedProps = extend({}, ...objectList)
 
                 this.setState({
                     props: mappedProps,
