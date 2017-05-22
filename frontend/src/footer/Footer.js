@@ -19,22 +19,20 @@ const FlexGrow = styled.div`
   flex: 1;
 `;
 
-const TopBar = React.createClass({
-    render() {
-        return (
-            <BottomContainer>
-               <Bioord/>
-               <FlexBox>
-                   <FlexGrow>
-                       <small>Courtesy of didIT (& Tuna)</small>
-                   </FlexGrow>
-                   <a href="http://github.com/cthdidit/itbio">
-                       <GitHubLogo/>
-                   </a>
-               </FlexBox>
-            </BottomContainer>
-        );
-    }
-});
+const TopBar = () => {
+    return (
+        <BottomContainer>
+            <Bioord/>
+            <FlexBox>
+                <FlexGrow>
+                    <small>Courtesy of didIT (& Tuna)</small>
+                </FlexGrow>
+                <a href="http://github.com/cthdidit/itbio">
+                    <GitHubLogo/>
+                </a>
+            </FlexBox>
+        </BottomContainer>
+    )
+}
 
 export default TopBar;

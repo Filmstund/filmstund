@@ -15,11 +15,12 @@ import { getJson } from "./lib/fetch";
 import { formatYMD } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
 
-const NewShowing = React.createClass({
-    getInitialState() {
+class NewShowing extends React.Component {
+    constructor(props) {
+        super(props);
         const now = moment();
 
-        return {
+        this.state = {
             showing: {
                 date: now,
                 time: now.format("HH:mm"),
@@ -31,18 +32,22 @@ const NewShowing = React.createClass({
             sfTimes: [],
             datesForMovieId: []
         }
-    },
+    }
+
     componentWillMount() {
         this.requestDatesForMovie(this.props.movieId);
-    },
-    setShowingDate(value) {
+    }
+
+    setShowingDate = (value) => {
         this.setShowingValue("date", value, this.requestSFTimes)
-    },
-    setShowingCity({ target: { value }}) {
+    }
+
+    setShowingCity = ({ target: { value }}) => {
         this.requestSFTimes();
         // this.setShowingValue("city", value, )
-    },
-    requestDatesForMovie(movieId) {
+    }
+
+    requestDatesForMovie = (movieId) => {
         const url = `/movies/${movieId}/sfdates`;
 
         getJson(url).then(data => {
@@ -52,8 +57,9 @@ const NewShowing = React.createClass({
                 datesForMovieId: dates
             }, this.requestSFTimes);
         });
-    },
-    requestSFTimes() {
+    }
+
+    requestSFTimes = () => {
         const { datesForMovieId, showing: { movieId, date } } = this.state;
 
         if (!datesForMovieId.includes(formatYMD(date))) {
@@ -77,8 +83,9 @@ const NewShowing = React.createClass({
             });
             this.setState({ sfTimes })
         })
-    },
-    setShowingTime(sfTime) {
+    }
+
+    setShowingTime = (sfTime) => {
         this.setState({
             showing: {
                 ...this.state.showing,
@@ -86,27 +93,31 @@ const NewShowing = React.createClass({
                 location: sfTime.cinema
             }
         }, this.handleSubmit)
-    },
-    setShowingValueFromEvent(key, { target: { value } }) {
+    }
+
+    setShowingValueFromEvent = (key, { target: { value } }) => {
         return this.setShowingValue(key, value);
-    },
-    setShowingValue(key, value, callback = f => f) {
+    }
+
+    setShowingValue = (key, value, callback = f => f) => {
         this.setState({
             showing: {
                 ...this.state.showing,
                 [key]: value
             }
         }, callback);
-    },
-    handleSubmit() {
+    }
+
+    handleSubmit = () => {
         const submitObject = {
             ...this.state.showing,
             date: formatYMD(this.state.showing.date)
         };
 
         this.props.dispatch(showings.actions.requestCreate(submitObject));
-    },
-    renderSelectSfTime(sfTimes, showing) {
+    }
+
+    renderSelectSfTime = (sfTimes, showing) => {
 
         if (sfTimes.length === 0) {
             return (
@@ -128,7 +139,8 @@ const NewShowing = React.createClass({
             )
         }
 
-    },
+    }
+
     render() {
         const { showing, sfTimes } = this.state;
         const { movieId, clearSelectedMovie } = this.props;
@@ -157,7 +169,7 @@ const NewShowing = React.createClass({
             </div>
         )
     }
-});
+}
 
 
 export default connect(state => ({
