@@ -9,12 +9,7 @@ import store, { history } from "./store/reducer";
 
 import TopBar from "./TopBar";
 import Footer from "./footer/Footer";
-import Home from "./routes/Home";
 import Login from "./routes/Login";
-import User from "./routes/User";
-import Showings from "./routes/Showings";
-import SingleShowing from "./routes/SingleShowing";
-import NewShowing from "./routes/NewShowing";
 
 const PaddingContainer = styled.div`
   padding: 1em;
@@ -34,6 +29,8 @@ const Container = styled.div`
   background: white;
   height: 100vh;
 `;
+
+const loadRoute = (cb) => module => cb(null, module.default);
 
 class App extends Component {
   componentWillMount() {
@@ -62,12 +59,12 @@ class App extends Component {
           <ScrollContainer>
             <PaddingContainer>
               <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" getComponent={(cb) => import("./routes/Home").then(loadRoute(cb))} />
                 <Route path="/login" render={() => (signedIn ? <Redirect to="/" /> : <Login /> )} />
-                <Route path="/user" component={User} />
-                <Route exact path="/showings" component={Showings} />
-                <Route path="/showings/new/:movieId?" component={NewShowing} />
-                <Route path="/showings/:showingId" component={SingleShowing} />
+                <Route path="/user" getComponent={(cb) => import("./routes/User").then(loadRoute(cb))} />
+                <Route exact path="/showings" getComponent={(cb) => import("./routes/Showings").then(loadRoute(cb))} />
+                <Route path="/showings/new/:movieId?" getComponent={(cb) => import("./routes/NewShowing").then(loadRoute(cb))} />
+                <Route path="/showings/:showingId" getComponent={(cb) => import("./routes/SingleShowing").then(loadRoute(cb))} />
               </Switch>
             </PaddingContainer>
             <Footer/>
