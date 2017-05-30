@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "^1.0.5"
+    "react-scripts": "^1.0.7"
   },
   "dependencies": {
     "history": "^4.6.1",
@@ -18,7 +18,7 @@
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "styled-components": "^1.4.6",
+    "styled-components": "^2.0.0",
     "whatwg-fetch": "^2.0.3"
   },
   "scripts": {
