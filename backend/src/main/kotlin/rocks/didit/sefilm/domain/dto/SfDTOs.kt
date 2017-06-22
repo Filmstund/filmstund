@@ -23,7 +23,7 @@ data class SfOriginalLanguageDTO(val alias: String,
                                  val nativeName: String,
                                  val displayName: String)
 
-data class SfPersonDTO(val displayName: String, val firstName: String, val lastName: String)
+data class SfPersonDTO(val displayName: String?, val firstName: String?, val lastName: String?)
 
 data class SfGenreDTO(val name: String)
 
@@ -74,12 +74,12 @@ data class SfShowListingDTO(val id: String, val name: String, val shows: List<Sf
 data class SfShowListingEntitiesDTO(val entities: List<SfShowListingDTO>, val totalNumberOfMatchingItems: Int)
 
 enum class SfTag {
-    `3D`,
-    VIP,
-    TXT,
-    EN,
-    JA,
-    Unknown
+  `3D`,
+  VIP,
+  TXT,
+  EN,
+  JA,
+  Unknown
 }
 
 
