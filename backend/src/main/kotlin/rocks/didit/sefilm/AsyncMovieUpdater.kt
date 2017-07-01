@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.clients.OmdbClient
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
@@ -13,8 +12,7 @@ import java.util.*
 
 @Component
 class AsyncMovieUpdater(private val movieRepository: MovieRepository,
-                        private val sfClient: SfClient,
-                        private val omdbClient: OmdbClient) {
+                        private val sfClient: SfClient) {
 
     companion object {
         private const val INITIAL_UPDATE_DELAY = 5 * 60 * 1000L
@@ -45,7 +43,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
             try {
                 updateInfo(it)
             } catch(e: Exception) {
-                log.warn("An error occurred when updating ${it.title} [${it.id}]", e)
+                log.warn("An error occurred when updating ${it.title} [${it.id}][${it.sfId}", e)
             }
             randomBackoff()
         }
@@ -99,41 +97,17 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     }
 
     private fun updateFromImdbById(movie: Movie) {
-        log.debug("Fetching extended movie.debug from IMDb by ID for ${movie.imdbId}")
-        val updatedInfo = omdbClient.fetchByImdbId(movie.imdbId!!)?.toMovie()
-        if (updatedInfo == null) {
-            log.warn("Unable to find movie on OMDb with for imdb id ${movie.imdbId}")
-            throw ExternalProviderException()
-        }
-
-        val copy = movie.copy(synopsis = updatedInfo.synopsis, productionYear = updatedInfo.productionYear,
-                poster = updatedInfo.poster, genres = updatedInfo.genres)
-
-        movieRepository.save(copy)
-        log.debug("Successfully updated movie with extended.debugrmation")
+        log.debug("Fetching extended info from IMDb by ID for ${movie.imdbId} -- NOT IMPLEMENTED")
+        TODO("IMDb scraper not implemented")
     }
 
     private fun updateFromImdbByTitle(movie: Movie) {
-        log.warn("Fetching extended movie.debug from IMDb by title for ${movie.title} - NOT SUPPORTED YET")
+        log.warn("Fetching extended info from IMDb by title for ${movie.title} - NOT SUPPORTED YET")
+        TODO("IMDb scraper not implemented")
     }
 
     private fun updateImdbIdBasedOnTitleAndYear(movie: Movie) {
-        val title = movie.originalTitle ?: movie.title
-        val productionYear = movie.productionYear ?: return
-
-        log.debug("Fetching IMDb id for '$title'")
-        val updatedInfo = omdbClient.fetchByTitleAndYear(title, productionYear)?.toMovie()
-
-        if (updatedInfo == null) {
-            log.info("Movie with title '$title' not found on OMDb, Setting IMDbId=N/A")
-            movieRepository.save(movie.copy(imdbId = "N/A"))
-            return
-        }
-
-        log.debug("Updating Imdb id to ${updatedInfo.imdbId} for movie[id=${movie.id}]")
-        val copy = movie.copy(imdbId = updatedInfo.imdbId)
-
-        movieRepository.save(copy)
-        log.debug("Successfully updated movie with new IMDb id")
+        log.warn("Fetching extended info from IMDb by title for ${movie.title} and year - NOT SUPPORTED YET")
+        TODO("IMDb scraper not implemented")
     }
 }
