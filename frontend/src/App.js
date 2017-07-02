@@ -64,8 +64,8 @@ class App extends Component {
     } else {
       if(status.location) {
         const target = status.location;
-        history.push(target);
         this.props.dispatch(me.actions.clearLocation());
+        history.push(target);
       }
     }
 
