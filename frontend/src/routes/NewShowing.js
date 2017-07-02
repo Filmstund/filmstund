@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import { sortBy } from "lodash";
+import { values, sortBy } from "lodash";
 import moment from "moment";
 
 import { jsonRequest, withBaseURL } from "../lib/fetch";
@@ -76,7 +76,7 @@ class NewShowing extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    movies: Object.values(state.movies.data),
+    movies: values(state.movies.data),
     meta: state.meta.data
 });
 

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import moment from "moment";
-import { orderBy } from "lodash";
+import { values, orderBy } from "lodash";
 
 import { Link } from "../MainButton";
 import Showing from "../Showing";
@@ -69,7 +69,7 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    showings: Object.values(state.showings.data),
+    showings: values(state.showings.data),
     me: state.me.data
 })
 

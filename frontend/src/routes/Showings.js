@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { orderBy, groupBy } from "lodash";
+import { values, orderBy, groupBy } from "lodash";
 import moment from "moment";
 
 import { getTodaysDate } from "../lib/dateTools";
@@ -44,7 +44,7 @@ class Showings extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    showings: Object.values(state.showings.data)
+    showings: values(state.showings.data)
 })
 
 
