@@ -8,14 +8,11 @@ const Label = styled.label`
   padding: 0.5em 0;
 `;
 
-const Field = ({ children, text, ...props }) => (
-    <div {...props}>
-        <Label>{text}</Label><br/>
-        {children}
-    </div>
-);
-
-
+const Field = ({ children, text, ...props }) =>
+  <div {...props}>
+    <Label>{text}</Label><br />
+    {children}
+  </div>;
 
 export default styled(Field)`
   margin-bottom: 1em;
@@ -29,4 +26,4 @@ export default styled(Field)`
       width: 100%;
   }
   
-`
+`;

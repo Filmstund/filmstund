@@ -30,12 +30,12 @@ const Container = styled.div`
   height: 100vh;
 `;
 
-const loadRoute = (cb) => module => cb(null, module.default);
+const loadRoute = cb => module => cb(null, module.default);
 
 class App extends Component {
   componentWillMount() {
-    this.props.dispatch(me.actions.requestSingle())
-    this.props.dispatch(meta.actions.requestSingle())
+    this.props.dispatch(me.actions.requestSingle());
+    this.props.dispatch(meta.actions.requestSingle());
   }
   render() {
     const { status } = this.props;
@@ -45,29 +45,54 @@ class App extends Component {
       return (
         <Container>
           <PaddingContainer>
-            <Login/>
+            <Login />
           </PaddingContainer>
-          <Footer/>
+          <Footer />
         </Container>
-      )
+      );
     }
 
     return (
       <ConnectedRouter history={history}>
         <Container>
-          <TopBar/>
+          <TopBar />
           <ScrollContainer>
             <PaddingContainer>
               <Switch>
-                <Route exact path="/" getComponent={(cb) => import("./routes/Home").then(loadRoute(cb))} />
-                <Route path="/login" render={() => (signedIn ? <Redirect to="/" /> : <Login /> )} />
-                <Route path="/user" getComponent={(cb) => import("./routes/User").then(loadRoute(cb))} />
-                <Route exact path="/showings" getComponent={(cb) => import("./routes/Showings").then(loadRoute(cb))} />
-                <Route path="/showings/new/:movieId?" getComponent={(cb) => import("./routes/NewShowing").then(loadRoute(cb))} />
-                <Route path="/showings/:showingId" getComponent={(cb) => import("./routes/SingleShowing").then(loadRoute(cb))} />
+                <Route
+                  exact
+                  path="/"
+                  getComponent={cb =>
+                    import("./routes/Home").then(loadRoute(cb))}
+                />
+                <Route
+                  path="/login"
+                  render={() => (signedIn ? <Redirect to="/" /> : <Login />)}
+                />
+                <Route
+                  path="/user"
+                  getComponent={cb =>
+                    import("./routes/User").then(loadRoute(cb))}
+                />
+                <Route
+                  exact
+                  path="/showings"
+                  getComponent={cb =>
+                    import("./routes/Showings").then(loadRoute(cb))}
+                />
+                <Route
+                  path="/showings/new/:movieId?"
+                  getComponent={cb =>
+                    import("./routes/NewShowing").then(loadRoute(cb))}
+                />
+                <Route
+                  path="/showings/:showingId"
+                  getComponent={cb =>
+                    import("./routes/SingleShowing").then(loadRoute(cb))}
+                />
               </Switch>
             </PaddingContainer>
-            <Footer/>
+            <Footer />
           </ScrollContainer>
         </Container>
       </ConnectedRouter>
@@ -79,10 +104,9 @@ const ConnectedApp = connect(state => ({
   status: state.me
 }))(App);
 
-const ProviderApp = () => (
+const ProviderApp = () =>
   <Provider store={store}>
     <ConnectedApp />
-  </Provider>
-)
+  </Provider>;
 
-export default ProviderApp
+export default ProviderApp;

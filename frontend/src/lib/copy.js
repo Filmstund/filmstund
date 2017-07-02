@@ -1,11 +1,10 @@
-const copy = (string) => {
-  var aux = document.createElement("input")
-  aux.value = string
-  document.body.appendChild(aux)
-  aux.select()
-  document.execCommand("copy")
-  document.body.removeChild(aux)
-}
+const copy = string => {
+  var aux = document.createElement("input");
+  aux.value = string;
+  document.body.appendChild(aux);
+  aux.select();
+  document.execCommand("copy");
+  document.body.removeChild(aux);
+};
 
-
-export default copy
+export default copy;

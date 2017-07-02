@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import styled from "styled-components"
+import styled from "styled-components";
 import { BASE_URL } from "../lib/fetch";
 
 const GoogleButton = styled.button`
@@ -7,23 +7,24 @@ const GoogleButton = styled.button`
   font-family: Roboto;
   background-color: #fff;
   color: #757575;
-`
+`;
 
 class Login extends Component {
   handleGoogleRedirect = () => {
     window.location = BASE_URL + "/login/google";
-  }
+  };
 
   render() {
     const { className } = this.props;
     return (
       <div className={className}>
         <div>Logga in för att boka biobesök!</div>
-        <GoogleButton onClick={this.handleGoogleRedirect}>Logga in via Google</GoogleButton>
+        <GoogleButton onClick={this.handleGoogleRedirect}>
+          Logga in via Google
+        </GoogleButton>
       </div>
-    )
+    );
   }
 }
 
-
-export default Login
+export default Login;

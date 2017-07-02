@@ -1,5 +1,5 @@
 import React from "react";
-import styled  from "styled-components";
+import styled from "styled-components";
 
 const QuoteBox = styled.div`
   padding: 1em 0;
@@ -16,14 +16,12 @@ const QuoteBox = styled.div`
   }
 `;
 
-
-const TopBar = ({ children, number }) => (
-    <QuoteBox>
-        <blockquote>
-            "<span>{children}</span>"
-        </blockquote>
-        <small>- de bio budorden {number}</small>
-    </QuoteBox>
-);
+const TopBar = ({ children, number }) =>
+  <QuoteBox>
+    <blockquote>
+      "<span>{children}</span>"
+    </blockquote>
+    <small>- de bio budorden {number}</small>
+  </QuoteBox>;
 
 export default TopBar;

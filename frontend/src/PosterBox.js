@@ -4,7 +4,7 @@ import alfons from "./assets/alfons.jpg";
 
 const pointerHover = `
   &:hover { cursor: pointer }
-`
+`;
 
 const PaddingContainer = styled.div`
   flex: 1;
@@ -16,7 +16,7 @@ const Poster = styled.div`
     background-size: cover;
     height: 100%;
     width: 100px;
-    ${ props => props.onClick && pointerHover }
+    ${props => props.onClick && pointerHover}
 `;
 
 const Header = styled.h3`
@@ -24,18 +24,17 @@ const Header = styled.h3`
     padding: 0;
     margin: 0;
     overflow: hidden;
-    ${ props => props.onClick && pointerHover }
+    ${props => props.onClick && pointerHover}
 `;
 
-const PosterBox = ({ className, poster, onClick, headerText, children }) => (
-    <div className={className}>
-        <Poster src={poster || alfons} onClick={onClick}/>
-        <PaddingContainer>
-            <Header onClick={onClick}>{headerText}</Header>
-            {children}
-        </PaddingContainer>
-    </div>
-);
+const PosterBox = ({ className, poster, onClick, headerText, children }) =>
+  <div className={className}>
+    <Poster src={poster || alfons} onClick={onClick} />
+    <PaddingContainer>
+      <Header onClick={onClick}>{headerText}</Header>
+      {children}
+    </PaddingContainer>
+  </div>;
 
 export default styled(PosterBox)`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);

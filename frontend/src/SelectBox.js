@@ -19,7 +19,7 @@ const Lable = styled.div`
   display: inline-block;
   font-style: italic;
   font-size: 0.9em;
-`
+`;
 
 const Tag = styled.div`
   display: inline-block;
@@ -34,24 +34,22 @@ const Tag = styled.div`
 const RightArrow = styled.div`
   display: inline-block;
   margin-left: 0.4em;
-`
+`;
 
-
-const SelectBox = ({ options, onChange, ...props }) => (
-    <Box>
-        {options.map(option => (
-            <Option key={option.localTime} onClick={() => onChange(option)}>
-                <Lable>{option.localTime} {option.screen}, {option.cinema.replace(/ ?Filmstaden ?/, '')}</Lable>
-                <div>
-                    {option.tags.map(tag => (
-                        <Tag key={tag}>{tag}</Tag>
-                    ))}
-                  <RightArrow>&gt;</RightArrow>
-                </div>
-            </Option>
-        ))}
-    </Box>
-);
-
+const SelectBox = ({ options, onChange, ...props }) =>
+  <Box>
+    {options.map(option =>
+      <Option key={option.localTime} onClick={() => onChange(option)}>
+        <Lable>
+          {option.localTime} {option.screen},{" "}
+          {option.cinema.replace(/ ?Filmstaden ?/, "")}
+        </Lable>
+        <div>
+          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          <RightArrow>&gt;</RightArrow>
+        </div>
+      </Option>
+    )}
+  </Box>;
 
 export default SelectBox;
