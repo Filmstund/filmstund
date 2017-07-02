@@ -7,6 +7,7 @@ import styled from "styled-components";
 
 import store, { history } from "./store/reducer";
 
+import asyncComponent from "./AsyncComponent";
 import TopBar from "./TopBar";
 import Footer from "./footer/Footer";
 import Login from "./routes/Login";
@@ -30,7 +31,13 @@ const Container = styled.div`
   height: 100vh;
 `;
 
-const loadRoute = cb => module => cb(null, module.default);
+const AsyncHome = asyncComponent(() => import("./routes/Home"));
+const AsyncUser = asyncComponent(() => import("./routes/User"));
+const AsyncShowings = asyncComponent(() => import("./routes/Showings"));
+const AsyncNewShowing = asyncComponent(() => import("./routes/NewShowing"));
+const AsyncSingleShowing = asyncComponent(() =>
+  import("./routes/SingleShowing")
+);
 
 class App extends Component {
   componentWillMount() {
@@ -59,36 +66,20 @@ class App extends Component {
           <ScrollContainer>
             <PaddingContainer>
               <Switch>
-                <Route
-                  exact
-                  path="/"
-                  getComponent={cb =>
-                    import("./routes/Home").then(loadRoute(cb))}
-                />
+                <Route exact path="/" component={AsyncHome} />
                 <Route
                   path="/login"
                   render={() => (signedIn ? <Redirect to="/" /> : <Login />)}
                 />
-                <Route
-                  path="/user"
-                  getComponent={cb =>
-                    import("./routes/User").then(loadRoute(cb))}
-                />
-                <Route
-                  exact
-                  path="/showings"
-                  getComponent={cb =>
-                    import("./routes/Showings").then(loadRoute(cb))}
-                />
+                <Route path="/user" component={AsyncUser} />
+                <Route exact path="/showings" component={AsyncShowings} />
                 <Route
                   path="/showings/new/:movieId?"
-                  getComponent={cb =>
-                    import("./routes/NewShowing").then(loadRoute(cb))}
+                  component={AsyncNewShowing}
                 />
                 <Route
                   path="/showings/:showingId"
-                  getComponent={cb =>
-                    import("./routes/SingleShowing").then(loadRoute(cb))}
+                  component={AsyncSingleShowing}
                 />
               </Switch>
             </PaddingContainer>
