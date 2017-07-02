@@ -27,7 +27,7 @@ const UserActiveStatus = styled.div`
 `;
 
 const UserItem = buildUserComponent(({ user }) =>
-  <div>{user.nick || user.name} ({user.phone})</div>
+  <div>{user.nick || user.name} ({user.phone}) {JSON.stringify(user)}</div>
 );
 
 const UserWithPriceItem = buildUserComponent(
@@ -106,6 +106,15 @@ class Showings extends Component {
     });
   };
 
+  handleCreateGoogleEvent = () => {
+    const { showing } = this.props;
+
+    jsonRequest(withBaseURL(`/showings/${showing.id}/invite/googlecalendar`),  showing.participants)
+      .then(resp => {
+        console.log("GOOGLE INVITE", resp)
+      }).catch(err => console.log("GOOGLE INVITE ERROR", err))
+  }
+
   requestPaymentInfo = () => {
     const { showing } = this.props;
 
@@ -124,6 +133,9 @@ class Showings extends Component {
             ? "Visa betalningsstatus"
             : "Alla är med, nu bokar vi!"}
         </MainButton>
+        {ticketsBought && <MainButton onClick={this.handleCreateGoogleEvent}>
+          Skapa google kalender event
+        </MainButton>}
         <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
       </div>
     );

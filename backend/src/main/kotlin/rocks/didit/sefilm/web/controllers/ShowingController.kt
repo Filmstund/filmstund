@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
+import rocks.didit.sefilm.clients.GoogleCalenderClient
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.ParticipantInfo
 import rocks.didit.sefilm.database.entities.Showing
@@ -15,14 +16,17 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
+import java.time.LocalDateTime
 import java.util.*
+import java.util.stream.Collectors
 
 @RestController
 class ShowingController(private val repo: ShowingRepository,
                         private val locationRepo: LocationRepository,
                         private val movieRepo: MovieRepository,
                         private val userRepo: UserRepository,
-                        private val participantRepo: ParticipantInfoRepository) {
+                        private val participantRepo: ParticipantInfoRepository,
+                        private val googleCalenderClient: GoogleCalenderClient) {
     companion object {
         private const val PATH = Application.API_BASE_PATH + "/showings"
         private const val PATH_WITH_ID = PATH + "/{id}"
@@ -78,6 +82,36 @@ class ShowingController(private val repo: ShowingRepository,
         participantRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
         repo.delete(showing)
         return SuccessfulDTO(true, "Showing with id ${showing.id} were removed successfully")
+    }
+
+    @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    fun createGoogleCalendarEvent(@PathVariable id: UUID, @RequestBody body: List<String>) {
+        val showing = repo.findById(id)
+                .map { showing ->
+                    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can view buy page")
+                    showing
+                }
+                .orElseThrow { NotFoundException("showing '$id") }
+
+        val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
+        val event = CalendarEventDTO(
+                movie.title,
+                showing.location,
+                showing.participants
+                        .stream()
+                        .map { userID ->
+                            userRepo.findById(userID)
+                                    .map { u -> u.email }
+                                    .orElseThrow { NotFoundException("user '$userID") }
+
+                        }
+                        .collect(Collectors.toList()),
+                LocalDateTime.of(showing.date, showing.time),
+                LocalDateTime.of(showing.date, showing.time)) // TODO Add runtime or default to 2h
+
+        googleCalenderClient.createEvent(event)
+
+
     }
 
     @GetMapping(PATH_WITH_ID + "/buy")

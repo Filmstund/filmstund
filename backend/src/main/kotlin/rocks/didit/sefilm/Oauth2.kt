@@ -71,7 +71,7 @@ class GoogleOpenIdConnectConfig {
         details.clientSecret = clientSecret
         details.accessTokenUri = accessTokenUri
         details.userAuthorizationUri = userAuthorizationUri
-        details.scope = listOf("openid", "email", "profile")
+        details.scope = listOf("openid", "email", "profile", "https://www.googleapis.com/auth/calendar")
         details.preEstablishedRedirectUri = redirectUri
         details.isUseCurrentUri = false
         return details
