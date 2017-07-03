@@ -89,7 +89,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                           private val defaultRedirectPath: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
   init {
     authenticationManager = NoopAuthenticationManager()
-    setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository, loginRedirectUri, defaultRedirectPath))
+    setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository))
   }
 
   private fun setRedirectPathInSession(request: HttpServletRequest) {
@@ -137,9 +137,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
 
   }
 
-  private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository,
-                                                  private val loginRedirectUri: String,
-                                                  private val defaultRedirectPath: String) : SimpleUrlAuthenticationSuccessHandler() {
+  private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository) : SimpleUrlAuthenticationSuccessHandler() {
     private val log = LoggerFactory.getLogger(CreateUserOnSuccessfulAuthHandler::class.java)
 
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
