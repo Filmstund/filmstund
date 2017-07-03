@@ -16,7 +16,7 @@ class Login extends Component {
     window.location =
       BASE_URL +
       "/login/google?redirect=" +
-      encodeURIComponent(window.location);
+      encodeURIComponent(window.location.pathname);
   };
 
   render() {
