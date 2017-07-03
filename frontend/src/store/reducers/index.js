@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { routerReducer } from "react-router-redux";
 
 import createCrudReducer, { crudSingleReducer } from "./rest";
-import { withBaseURL } from "../../lib/fetch";
+import { withBaseURL } from "../../lib/withBaseURL";
 import meReducer from "./me";
 import showingsReducer from "./showings";
 

@@ -1,4 +1,5 @@
 import "whatwg-fetch";
+import { withBaseURL } from "./withBaseURL";
 
 const data = {};
 const etags = {};
@@ -59,10 +60,6 @@ const myFetch = (url, opts) => {
     }
   });
 };
-
-export const BASE_URL = "http://localhost:8080";
-export const BASE_API_URL = `${BASE_URL}/api`;
-export const withBaseURL = path => BASE_API_URL + path;
 
 export const getJson = url => myFetch(withBaseURL(url));
 

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import background from "./body_background.jpg";
+import background from "../assets/body_background.jpg";
 
 const Jumbotron = styled.div`
     color: white;

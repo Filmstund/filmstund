@@ -8,12 +8,14 @@ import {
 import styled from "styled-components";
 
 import withLoader from "../lib/withLoader";
-import { getJson, jsonRequest, withBaseURL } from "../lib/fetch";
+import { getJson, jsonRequest } from "../lib/fetch";
+import { withBaseURL } from "../lib/withBaseURL";
 
 import Showing from "../Showing";
 import QRCode from "../QRCode";
 import CopyValue from "../CopyValue";
-import Loader from "../Loader";
+//import Loader from "../Loader";
+import Loader from "../ProjectorLoader";
 import Center from "../Center";
 import Field from "../Field";
 import Input from "../Input";
@@ -354,6 +356,7 @@ class Showings extends Component {
 
     return (
       <div className={className}>
+
         {swish && this.renderSwishModal()}
         {showModal && this.renderBuyModal(buyData)}
         <Showing
@@ -363,7 +366,7 @@ class Showings extends Component {
           location={showing.location.name}
         />
         {!showing.ticketsBought &&
-          this.renderPendingShowing(showing, isParticipating)}
+        this.renderPendingShowing(showing, isParticipating)}
         {showing.ticketsBought && this.renderBoughtShowing(showing)}
         {isAdmin && this.renderAdminAction(showing.ticketsBought)}
       </div>

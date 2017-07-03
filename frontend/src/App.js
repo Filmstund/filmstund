@@ -49,24 +49,11 @@ class App extends Component {
     const signedIn = status.data.id !== undefined;
 
     if (!signedIn) {
-      if(!status.location) {
-        this.props.dispatch(me.actions.saveLocation(window.location.pathname));
-      }
-
       return (
         <Container>
-          <PaddingContainer>
-            <Login />
-          </PaddingContainer>
-          <Footer />
+          <Login />
         </Container>
       );
-    } else {
-      if(status.location) {
-        const target = status.location;
-        this.props.dispatch(me.actions.clearLocation());
-        history.push(target);
-      }
     }
 
     return (

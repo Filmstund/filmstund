@@ -3,12 +3,13 @@ import { connect } from "react-redux";
 import { values, sortBy } from "lodash";
 import moment from "moment";
 
-import { jsonRequest, withBaseURL } from "../lib/fetch";
+import { jsonRequest } from "../lib/fetch";
+import { withBaseURL } from "../lib/withBaseURL";
 
 import { movies, meta } from "../store/reducers";
 
 import Header from "../Header";
-import Loader from "../Loader";
+import Loader from "../ProjectorLoader";
 import Movie from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
 

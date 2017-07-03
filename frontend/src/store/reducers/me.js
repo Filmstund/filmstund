@@ -1,13 +1,10 @@
 import fetch, { jsonRequest } from "../../lib/fetch";
-import { withBaseURL } from "../../lib/fetch";
+import { withBaseURL } from "../../lib/withBaseURL";
 import { USER_SIGNOUT_ACTION, signoutUser } from "./user";
 
 const path = withBaseURL("/users/me");
 
 const actions = {
-  saveLocation: `SAVE_LOCATION`,
-  clearLocation: `CLEAR_LOCATION`,
-
   requestSingle: `ME_REQUEST_SINGLE`,
   successSingle: `ME_RESPONSE_SINGLE`,
   errorSingle: `ME_ERROR_SINGLE`,
@@ -68,18 +65,6 @@ const reducer = (state = initialState, action) => {
         error: null
       };
 
-    case actions.saveLocation:
-      return {
-        ...state,
-        location: action.location
-      };
-
-    case actions.clearLocation:
-      return {
-        ...state,
-        location: null
-      };
-
     case USER_SIGNOUT_ACTION:
     case actions.clearSingle:
       return initialState;
@@ -89,10 +74,6 @@ const reducer = (state = initialState, action) => {
 };
 
 const actionCreators = {
-  saveLocation: (location) => ({ type: actions.saveLocation, location }),
-
-  clearLocation: () => ({ type: actions.clearLocation }),
-
   requestSingle: () => dispatch => {
     dispatch({ type: actions.requestSingle });
 
