@@ -98,7 +98,7 @@ class ShowingController(private val repo: ShowingRepository,
 
         val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
         val runtime = movie?.runtime?: Duration.ofHours(2).plusMinutes(30)
-        val event = CalendarEventDTO(
+        val event = CalendarEventDTO.of(
                 movie.title,
                 showing.location,
                 showing.participants

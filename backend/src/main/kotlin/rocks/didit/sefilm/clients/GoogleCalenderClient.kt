@@ -29,12 +29,6 @@ class GoogleCalenderClient(private val restTemplate: RestTemplate, private val h
     private val clientSecret: String? = null
 
     fun createEvent(event: CalendarEventDTO, accessToken: OAuth2AccessToken) {
-        val postObject = mapOf(
-                "attendees" to event.emails.map { mail -> mapOf("email" to mail) },
-                "start" to mapOf("dateTime" to event.start.toLocalDateTime().toString(), "timeZone" to event.start.zone),
-                "end" to mapOf("dateTime" to event.end.toLocalDateTime().toString(), "timeZone" to event.end.zone),
-                "summary" to event.summary
-        )
 
         val headers = HttpHeaders()
         headers.contentType = APPLICATION_JSON_UTF8
@@ -42,7 +36,7 @@ class GoogleCalenderClient(private val restTemplate: RestTemplate, private val h
         // TODO Handle case when token needs to be refreshed
         headers.set("authorization",  accessToken.tokenType + " " + accessToken.value)
 
-        val http = HttpEntity(postObject, headers)
+        val http = HttpEntity(event, headers)
         restTemplate.postForLocation(API_URL, http, mapOf("sendNotifications" to "true", "key" to clientSecret))
 
     }
