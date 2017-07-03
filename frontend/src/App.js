@@ -51,10 +51,7 @@ class App extends Component {
     if (!signedIn) {
       return (
         <Container>
-          <PaddingContainer>
-            <Login />
-          </PaddingContainer>
-          <Footer />
+          <Login />
         </Container>
       );
     }
