@@ -110,3 +110,6 @@ fabric.properties
 
 # db
 sefilm.*.db
+
+# OSX
+.DS_Store
