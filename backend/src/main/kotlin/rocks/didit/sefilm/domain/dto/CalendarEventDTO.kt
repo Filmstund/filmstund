@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.time.ZonedDateTime
 
 data class CalendarEventDTO(val summary: String,
-                            val location: Location? = null,
+                            val location: String? = null,
                             val attendees: List<Map<String, String>>,
                             val start: Map<String, Serializable>,
                             val end: Map<String, Serializable>) {
@@ -16,7 +16,7 @@ data class CalendarEventDTO(val summary: String,
 
             return CalendarEventDTO(
                     summary,
-                    location,
+                    (location?.name),
                     emails.map { mail -> mapOf("email" to mail) },
                     mapOf("dateTime" to start.toLocalDateTime().toString(), "timeZone" to start.zone),
                     mapOf("dateTime" to end.toLocalDateTime().toString(), "timeZone" to end.zone)
