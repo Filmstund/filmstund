@@ -46,7 +46,7 @@ class NewShowing extends React.Component {
     }
   };
 
-  setSearchTerm(term) {
+  setSearchTerm = (term) => {
     this.setState({
       searchTerm: term.target.value
     })
@@ -81,7 +81,7 @@ class NewShowing extends React.Component {
         <Field text="Namn:">
           <Input
             type="text"
-            onChange={v => this.setSearchTerm(v)}
+            onChange={this.setSearchTerm}
             value={searchTerm}
           />
         </Field>
