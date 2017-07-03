@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import { BASE_URL } from "../lib/fetch";
-import { me } from "../store/reducers";
+import { BASE_URL } from "../lib/withBaseURL";
 
 const GoogleButton = styled.button`
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);

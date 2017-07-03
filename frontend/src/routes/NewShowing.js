@@ -3,7 +3,8 @@ import { connect } from "react-redux";
 import { values, sortBy } from "lodash";
 import moment from "moment";
 
-import { jsonRequest, withBaseURL } from "../lib/fetch";
+import { jsonRequest } from "../lib/fetch";
+import { withBaseURL } from "../lib/withBaseURL";
 
 import { movies, meta } from "../store/reducers";
 
