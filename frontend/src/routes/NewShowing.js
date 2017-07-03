@@ -47,12 +47,8 @@ class NewShowing extends React.Component {
   };
 
   setSearchTerm(term) {
-    let value = term.target.value
-    if(value) {
-      value = value.toLowerCase()
-    }
     this.setState({
-      searchTerm: value
+      searchTerm: term.target.value
     })
   }
 
@@ -60,8 +56,10 @@ class NewShowing extends React.Component {
 
     const { searchTerm } = this.state;
 
+    const lowerCaseTerm = searchTerm.toLowerCase()
+
     if(searchTerm && searchTerm.length > 0) {
-      if(m.title.toLowerCase().search(searchTerm) > -1) {
+      if(m.title.toLowerCase().search(lowerCaseTerm) > -1) {
         return true
       }
 
@@ -74,6 +72,7 @@ class NewShowing extends React.Component {
 
   renderSelectMovie = movies => {
     const { meta } = this.props;
+    const { searchTerm } = this.state
 
 
     return (
@@ -83,6 +82,7 @@ class NewShowing extends React.Component {
           <Input
             type="text"
             onChange={v => this.setSearchTerm(v)}
+            value={searchTerm}
           />
         </Field>
         Senaste uppdatering från SF:{" "}
