@@ -84,15 +84,37 @@ class GoogleOpenIdConnectConfig {
 
 class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                           userRepository: UserRepository,
-                          val restTemplate: OAuth2RestTemplate,
-                          loginRedirectUri: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
+                          private val restTemplate: OAuth2RestTemplate,
+                          private val loginRedirectUri: String,
+                          private val defaultRedirectPath: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
   init {
     authenticationManager = NoopAuthenticationManager()
-    setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository, loginRedirectUri))
+    setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository, loginRedirectUri, defaultRedirectPath))
+  }
+
+  private fun setRedirectPathInSession(request: HttpServletRequest) {
+    val redirectPath = request.getParameter("redirect") ?: defaultRedirectPath
+
+    val session = request.session
+    val previousRedirectPath = session.getAttribute("redirectPath")
+    if (previousRedirectPath == null)
+      session.setAttribute("redirectPath", "$loginRedirectUri/${cleanupRedirectPath(redirectPath)}")
+  }
+
+  private fun cleanupRedirectPath(path: String): String {
+    var newPath = path
+    if (newPath.startsWith("/")) {
+      newPath = newPath.substring(1, newPath.length)
+    }
+    if (newPath.startsWith("http")) {
+      newPath = defaultRedirectPath
+    }
+    return newPath
   }
 
   @Throws(AuthenticationException::class, IOException::class, ServletException::class)
   override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
+    setRedirectPathInSession(request)
 
     val accessToken: OAuth2AccessToken
     try {
@@ -116,7 +138,8 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
   }
 
   private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository,
-                                                  private val loginRedirectUri: String) : SimpleUrlAuthenticationSuccessHandler() {
+                                                  private val loginRedirectUri: String,
+                                                  private val defaultRedirectPath: String) : SimpleUrlAuthenticationSuccessHandler() {
     private val log = LoggerFactory.getLogger(CreateUserOnSuccessfulAuthHandler::class.java)
 
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
@@ -147,7 +170,9 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
         }
       }
 
-      defaultTargetUrl = loginRedirectUri
+      val redirectPath = request.session.getAttribute("redirectPath").toString()
+      request.session.setAttribute("redirectPath", null)
+      defaultTargetUrl = redirectPath
       super.onAuthenticationSuccess(request, response, authentication)
     }
   }
@@ -207,8 +232,11 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
   @Autowired
   private val userRepository: UserRepository? = null
 
-  @Value("\${login.redirectUri}")
+  @Value("\${login.baseRedirectUri}")
   private lateinit var loginRedirectUri: String
+
+  @Value("\${login.defaultRedirectPath}")
+  private lateinit var defaultRedirectPath: String
 
   @Throws(Exception::class)
   override fun configure(web: WebSecurity) {
@@ -220,7 +248,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     OpenIdConnectFilter("/login/google",
       userRepository!!,
       restTemplate!!,
-      loginRedirectUri)
+      loginRedirectUri,
+      defaultRedirectPath)
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
@@ -233,7 +262,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
       .invalidateHttpSession(true)
       .clearAuthentication(true)
       .logoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
-      // TODO: .and().requiresChannel().anyRequest().requiresSecure()
       .and()
       .csrf().disable()
       .authorizeRequests()
