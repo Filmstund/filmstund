@@ -14,100 +14,100 @@ import java.util.*
 class AsyncMovieUpdater(private val movieRepository: MovieRepository,
                         private val sfClient: SfClient) {
 
-    companion object {
-        private const val INITIAL_UPDATE_DELAY = 5 * 60 * 1000L
-        private const val UPDATE_INTERVAL = 120 * 60 * 1000L
+  companion object {
+    private const val INITIAL_UPDATE_DELAY = 5 * 60 * 1000L
+    private const val UPDATE_INTERVAL = 120 * 60 * 1000L
+  }
+
+  private val log = LoggerFactory.getLogger(AsyncMovieUpdater::class.java)
+
+  @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
+  fun scheduledMovieUpdates() {
+    val moviesThatRequiresUpdate = movieRepository
+      .findAll()
+      .filter(this::isUpdateRequired)
+    if (moviesThatRequiresUpdate.isNotEmpty()) {
+      log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
+      synchronousExtendMovieInfo(moviesThatRequiresUpdate)
     }
+  }
 
-    private val log = LoggerFactory.getLogger(AsyncMovieUpdater::class.java)
+  @Async
+  fun extendMovieInfo(movies: Iterable<Movie>) {
+    synchronousExtendMovieInfo(movies)
+  }
 
-    @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
-    fun scheduledMovieUpdates() {
-        val moviesThatRequiresUpdate = movieRepository
-                .findAll()
-                .filter(this::isUpdateRequired)
-        if (moviesThatRequiresUpdate.isNotEmpty()) {
-            log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
-            synchronousExtendMovieInfo(moviesThatRequiresUpdate)
-        }
+  fun synchronousExtendMovieInfo(movies: Iterable<Movie>) {
+    movies.forEach {
+      log.info("Fetching extended info for ${it.title} [${it.id}]")
+      try {
+        updateInfo(it)
+      } catch(e: Exception) {
+        log.warn("An error occurred when updating ${it.title} [${it.id}][${it.sfId}", e)
+      }
+      randomBackoff()
     }
+  }
 
-    @Async
-    fun extendMovieInfo(movies: Iterable<Movie>) {
-        synchronousExtendMovieInfo(movies)
+  private fun randomBackoff() {
+    val waitTime = 3000L + Random().nextInt(7000)
+    try {
+      Thread.sleep(waitTime)
+    } catch(e: InterruptedException) {
+      log.info("randomBackoff were interrupted")
     }
+  }
 
-    fun synchronousExtendMovieInfo(movies: Iterable<Movie>) {
-        movies.forEach {
-            log.info("Fetching extended info for ${it.title} [${it.id}]")
-            try {
-                updateInfo(it)
-            } catch(e: Exception) {
-                log.warn("An error occurred when updating ${it.title} [${it.id}][${it.sfId}", e)
-            }
-            randomBackoff()
-        }
+  private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || movie.isMissingImdbId()
+
+  private fun updateInfo(movie: Movie) {
+    if (movie.needsMoreInfo()) {
+      fetchExtendedInfoForMovie(movie)
     }
-
-    private fun randomBackoff() {
-        val waitTime = 3000L + Random().nextInt(7000)
-        try {
-            Thread.sleep(waitTime)
-        } catch(e: InterruptedException) {
-            log.info("randomBackoff were interrupted")
-        }
+    if (movie.isMissingImdbId()) {
+      updateImdbIdBasedOnTitleAndYear(movie)
     }
+  }
 
-    private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || movie.isMissingImdbId()
-
-    private fun updateInfo(movie: Movie) {
-        if (movie.needsMoreInfo()) {
-            fetchExtendedInfoForMovie(movie)
-        }
-        if (movie.isMissingImdbId()) {
-            updateImdbIdBasedOnTitleAndYear(movie)
-        }
+  private fun fetchExtendedInfoForMovie(movie: Movie) {
+    log.debug("Fetching extended movie.debug for ${movie.id}")
+    when {
+      movie.sfId != null -> updateFromSf(movie)
+      movie.imdbId != null -> updateFromImdbById(movie)
+      else -> updateFromImdbByTitle(movie)
     }
+  }
 
-    private fun fetchExtendedInfoForMovie(movie: Movie) {
-        log.debug("Fetching extended movie.debug for ${movie.id}")
-        when {
-            movie.sfId != null -> updateFromSf(movie)
-            movie.imdbId != null -> updateFromImdbById(movie)
-            else -> updateFromImdbByTitle(movie)
-        }
-    }
+  private fun updateFromSf(movie: Movie): Movie {
+    log.debug("Fetching extended movie.debug from SF for ${movie.sfId}")
+    val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
 
-    private fun updateFromSf(movie: Movie): Movie {
-        log.debug("Fetching extended movie.debug from SF for ${movie.sfId}")
-        val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
+    val copy = movie.copy(synopsis = updatedMovie.shortDescription,
+      sfSlug = updatedMovie.slug,
+      originalTitle = updatedMovie.originalTitle,
+      releaseDate = updatedMovie.releaseDate,
+      productionYear = updatedMovie.productionYear,
+      runtime = Duration.ofMinutes(updatedMovie.length),
+      poster = updatedMovie.posterUrl,
+      genres = updatedMovie.genres.map { (name) -> name })
 
-        val copy = movie.copy(synopsis = updatedMovie.shortDescription,
-                sfSlug = updatedMovie.slug,
-                originalTitle = updatedMovie.originalTitle,
-                releaseDate = updatedMovie.releaseDate,
-                productionYear = updatedMovie.productionYear,
-                runtime = Duration.ofMinutes(updatedMovie.length),
-                poster = updatedMovie.posterUrl,
-                genres = updatedMovie.genres.map { (name) -> name })
+    val saved = movieRepository.save(copy)
+    log.debug("Successfully updated and saved movie[${movie.id}] with SF data")
+    return saved
+  }
 
-        val saved = movieRepository.save(copy)
-        log.debug("Successfully updated and saved movie[${movie.id}] with SF data")
-        return saved
-    }
+  private fun updateFromImdbById(movie: Movie) {
+    log.debug("Fetching extended info from IMDb by ID for ${movie.imdbId} -- NOT IMPLEMENTED")
+    TODO("IMDb scraper not implemented")
+  }
 
-    private fun updateFromImdbById(movie: Movie) {
-        log.debug("Fetching extended info from IMDb by ID for ${movie.imdbId} -- NOT IMPLEMENTED")
-        TODO("IMDb scraper not implemented")
-    }
+  private fun updateFromImdbByTitle(movie: Movie) {
+    log.warn("Fetching extended info from IMDb by title for ${movie.title} - NOT SUPPORTED YET")
+    TODO("IMDb scraper not implemented")
+  }
 
-    private fun updateFromImdbByTitle(movie: Movie) {
-        log.warn("Fetching extended info from IMDb by title for ${movie.title} - NOT SUPPORTED YET")
-        TODO("IMDb scraper not implemented")
-    }
-
-    private fun updateImdbIdBasedOnTitleAndYear(movie: Movie) {
-        log.warn("Fetching extended info from IMDb by title for ${movie.title} and year - NOT SUPPORTED YET")
-        TODO("IMDb scraper not implemented")
-    }
+  private fun updateImdbIdBasedOnTitleAndYear(movie: Movie) {
+    log.warn("Fetching extended info from IMDb by title for ${movie.title} and year - NOT SUPPORTED YET")
+    TODO("IMDb scraper not implemented")
+  }
 }

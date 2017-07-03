@@ -14,13 +14,13 @@ data class ErrorDTO(val error: Boolean = true,
                     val reason: String? = null)
 
 internal class ExternalProviderErrorHandler : ResponseErrorHandler {
-    private val log = LoggerFactory.getLogger(ExternalProviderErrorHandler::class.java)
-    override fun hasError(response: ClientHttpResponse): Boolean {
-        return response.statusCode != HttpStatus.OK
-    }
+  private val log = LoggerFactory.getLogger(ExternalProviderErrorHandler::class.java)
+  override fun hasError(response: ClientHttpResponse): Boolean {
+    return response.statusCode != HttpStatus.OK
+  }
 
-    override fun handleError(response: ClientHttpResponse) {
-        log.error("Error when fetching movie info from external provider: ${response.statusCode}: ${response.statusText}")
-        throw ExternalProviderException()
-    }
+  override fun handleError(response: ClientHttpResponse) {
+    log.error("Error when fetching movie info from external provider: ${response.statusCode}: ${response.statusText}")
+    throw ExternalProviderException()
+  }
 }

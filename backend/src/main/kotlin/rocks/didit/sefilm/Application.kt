@@ -28,7 +28,6 @@ import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 
-
 @SpringBootApplication
 @EnableMongoAuditing
 @EnableCaching
@@ -37,54 +36,54 @@ import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 @EnableScheduling
 @EnableConfigurationProperties(Properties::class)
 class Application {
-    private val log = LoggerFactory.getLogger(Application::class.java)
+  private val log = LoggerFactory.getLogger(Application::class.java)
 
-    companion object {
-        const val API_BASE_PATH = "/api"
+  companion object {
+    const val API_BASE_PATH = "/api"
+  }
+
+  @Bean
+  @Primary
+  fun getRestClient(): RestTemplate {
+    val restClient = RestTemplate()
+    restClient.errorHandler = ExternalProviderErrorHandler()
+    return restClient
+  }
+
+  @Bean
+  fun getHttpEntityWithJsonAcceptHeader(): HttpEntity<Void> {
+    val httpHeaders = HttpHeaders()
+    httpHeaders.accept = listOf(MediaType.APPLICATION_JSON_UTF8)
+    httpHeaders.put("User-Agent", listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"))
+    return HttpEntity(httpHeaders)
+  }
+
+  @Bean
+  fun corsConfigurer(): WebMvcConfigurer {
+    return object : WebMvcConfigurer {
+      override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+      }
     }
+  }
 
-    @Bean
-    @Primary
-    fun getRestClient(): RestTemplate {
-        val restClient = RestTemplate()
-        restClient.errorHandler = ExternalProviderErrorHandler()
-        return restClient
-    }
+  @Bean
+  fun seedInitialData(locationsRepo: LocationRepository,
+                      budordRepo: BudordRepository) = ApplicationRunner {
+    val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
 
-    @Bean
-    fun getHttpEntityWithJsonAcceptHeader(): HttpEntity<Void> {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.accept = listOf(MediaType.APPLICATION_JSON_UTF8)
-        httpHeaders.put("User-Agent", listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"))
-        return HttpEntity(httpHeaders)
-    }
+    val budordResource = ClassPathResource("seeds/budord.json")
+    val budords: List<BioBudord> = objectMapper.readValue(budordResource.inputStream)
+    budordRepo.saveAll(budords)
+    log.info("Seeded budord with ${budords.size} values")
 
-    @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            }
-        }
-    }
-
-    @Bean
-    fun seedInitialData(locationsRepo: LocationRepository,
-                        budordRepo: BudordRepository) = ApplicationRunner {
-        val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
-
-        val budordResource = ClassPathResource("seeds/budord.json")
-        val budords: List<BioBudord> = objectMapper.readValue(budordResource.inputStream)
-        budordRepo.saveAll(budords)
-        log.info("Seeded budord with ${budords.size} values")
-
-        val locationsResource = ClassPathResource("seeds/locations.json")
-        val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
-        locationsRepo.saveAll(locations)
-        log.info("Seeded locations with ${locations.size} values")
-    }
+    val locationsResource = ClassPathResource("seeds/locations.json")
+    val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
+    locationsRepo.saveAll(locations)
+    log.info("Seeded locations with ${locations.size} values")
+  }
 }
 
 fun main(args: Array<String>) {
-    SpringApplication.run(Application::class.java, *args)
+  SpringApplication.run(Application::class.java, *args)
 }
