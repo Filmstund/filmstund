@@ -29,7 +29,7 @@ const UserActiveStatus = styled.div`
 `;
 
 const UserItem = buildUserComponent(({ user }) =>
-  <div>{user.nick || user.name} ({user.phone})</div>
+  <div>{user.nick || user.name} ({user.phone}) </div>
 );
 
 const UserWithPriceItem = buildUserComponent(
@@ -51,7 +51,7 @@ const oreToKr = price => {
   if (price === null) {
     return 0;
   } else {
-    return price / 100;
+    return Math.ceil(price / 100);
   }
 };
 
@@ -108,6 +108,27 @@ class Showings extends Component {
     });
   };
 
+  handleCreateGoogleEvent = () => {
+    const { showing } = this.props;
+
+    this.setState({
+      isCreatingEvent: true
+    })
+
+    jsonRequest(withBaseURL(`/showings/${showing.id}/invite/googlecalendar`),  showing.participants)
+      .then(resp => {
+        this.setState({
+          isCreatingEvent: false,
+          adminMessage: "Kalenderevent skapat"
+        })
+      }).catch(err => {
+      this.setState({
+        isCreatingEvent: false,
+        adminMessage: "Misslyckades med att skapa kalenderevent"
+      })
+    })
+  }
+
   requestPaymentInfo = () => {
     const { showing } = this.props;
 
@@ -119,13 +140,18 @@ class Showings extends Component {
   };
 
   renderAdminAction = ticketsBought => {
+    const { isCreatingEvent, adminMessage } = this.state
     return (
       <div>
+        {adminMessage && <div>{adminMessage} </div> }
         <MainButton onClick={this.handleStartBooking}>
           {ticketsBought
             ? "Visa betalningsstatus"
             : "Alla är med, nu bokar vi!"}
         </MainButton>
+        {ticketsBought && <MainButton disabled={isCreatingEvent} onClick={this.handleCreateGoogleEvent}>
+          Skapa google kalender event
+        </MainButton>}
         <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
       </div>
     );
@@ -356,6 +382,8 @@ const mapStateToProps = (state, props) => {
   return {
     showingId,
     adminId,
+    isCreatingEvent: false,
+    adminMessage: null,
     loading: state.showings.loading,
     showing: { ...state.showings, data: showing },
     admin: { ...state.users, data: state.users.data[adminId] },

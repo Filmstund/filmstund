@@ -1,6 +1,7 @@
 package rocks.didit.sefilm
 
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.common.OAuth2AccessToken
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
@@ -16,6 +17,11 @@ import java.util.*
 internal fun currentLoggedInUser(): UserID {
   val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
   return UserID(principal.userId)
+}
+
+internal fun oauthAccessToken(): OAuth2AccessToken {
+    val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
+    return principal.accessToken
 }
 
 internal fun Showing.isLoggedInUserAdmin(): Boolean {

@@ -8,25 +8,31 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
+import rocks.didit.sefilm.clients.GoogleCalenderClient
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.ParticipantInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
-import rocks.didit.sefilm.domain.dto.*
+import java.time.Duration
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
+import java.util.stream.Collectors
+import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.*
+import rocks.didit.sefilm.domain.dto.*
 
 @RestController
 class ShowingController(private val repo: ShowingRepository,
                         private val locationRepo: LocationRepository,
                         private val movieRepo: MovieRepository,
                         private val userRepo: UserRepository,
-                        private val participantRepo: ParticipantInfoRepository) {
-  companion object {
-    private const val PATH = Application.API_BASE_PATH + "/showings"
-    private const val PATH_WITH_ID = PATH + "/{id}"
-  }
+                        private val participantRepo: ParticipantInfoRepository,
+    private val googleCalenderClient: GoogleCalenderClient) {companion object {
+        private const val PATH = Application.API_BASE_PATH + "/showings"
+        private const val PATH_WITH_ID = PATH + "/{id}"
+    }
 
   private val log = LoggerFactory.getLogger(ShowingController::class.java)
 
@@ -72,13 +78,47 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun deleteShowing(@PathVariable id: UUID): SuccessfulDTO {
+  fun deleteShowing(@PathVariable id: UUID): SuccessfulStatusDTO {
     val showing = findOne(id)
     if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can delete a showing")
     participantRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
-    return SuccessfulDTO(true, "Showing with id ${showing.id} were removed successfully")
+    return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
   }
+
+    @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    fun createGoogleCalendarEvent(@PathVariable id: UUID, @RequestBody body: List<String>) : ResponseStatusDTO {
+        val showing = repo.findById(id)
+                .map { showing ->
+                    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can create gcal events")
+                    showing
+                }
+                .orElseThrow { NotFoundException("showing '$id") }
+
+        val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
+        val runtime = movie?.runtime?: Duration.ofHours(2).plusMinutes(30)
+        val event = CalendarEventDTO.of(
+                movie.title,
+                showing.location,
+                showing.participants
+                        .stream()
+                        .map { userID ->
+                            userRepo.findById(userID)
+                                    .map { u -> u.email }
+                                    .orElseThrow { NotFoundException("user '$userID") }
+
+                        }
+                        .collect(Collectors.toList()),
+                // Addition of 1 second to prevent too short string format
+                ZonedDateTime.of(showing.date, showing.time, ZoneId.systemDefault()).plusSeconds(1),
+                ZonedDateTime.of(showing.date, showing.time, ZoneId.systemDefault()).plus(runtime).plusSeconds(1))
+
+        googleCalenderClient.createEvent(event, oauthAccessToken())
+
+        return SuccessfulStatusDTO("Event created")
+
+
+    }
 
   @GetMapping(PATH_WITH_ID + "/buy")
   fun findBioklubbnummerForShowing(@PathVariable id: UUID): BuyDTO {
