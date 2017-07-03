@@ -36,11 +36,15 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import rocks.didit.sefilm.clients.GoogleCalenderClient
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.CalendarEventDTO
 import rocks.didit.sefilm.web.controllers.BudordController
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -86,6 +90,7 @@ class GoogleOpenIdConnectConfig {
 class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                           userRepository: UserRepository,
                           val restTemplate: OAuth2RestTemplate,
+                          val googleClient: GoogleCalenderClient,
                           loginRedirectUri: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
     init {
         authenticationManager = NoopAuthenticationManager()
@@ -104,11 +109,10 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
 
         try {
             val idToken = accessToken.additionalInformation["id_token"].toString()
+
             val tokenDecoded = JwtHelper.decode(idToken)
-
             val authInfo: Map<String, String> = ObjectMapper().readValue(tokenDecoded.claims)
-
-            val user = OpenIdConnectUserDetails(authInfo)
+            val user = OpenIdConnectUserDetails(authInfo, accessToken)
             return UsernamePasswordAuthenticationToken(user, null, user.authorities)
         } catch (e: InvalidTokenException) {
             throw BadCredentialsException("Could not obtain user details from token", e)
@@ -135,6 +139,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                         avatar = principal.avatarUrl)
                 userRepository.save(newUser)
                 log.info("Created new user ${newUser.id}")
+
             } else {
                 val updatedUser = maybeUser.map {
                     it.copy(name = "${principal.firstName} ${principal.lastName}",
@@ -161,7 +166,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
     }
 }
 
-class OpenIdConnectUserDetails(userInfo: Map<String, String>) : UserDetails {
+class OpenIdConnectUserDetails(userInfo: Map<String, String>, accessToken: OAuth2AccessToken) : UserDetails {
 
     val userId: String = userInfo.getValue("sub")
     private val username: String? = userInfo["email"]
@@ -169,6 +174,7 @@ class OpenIdConnectUserDetails(userInfo: Map<String, String>) : UserDetails {
     val lastName: String? = userInfo["family_name"]
     val avatarUrl: String? = userInfo["picture"]
     val verifiedMail: Boolean = userInfo["email_verified"]?.toBoolean() ?: false
+    val accessToken: OAuth2AccessToken = accessToken
 
     override fun getUsername(): String? {
         return username
@@ -208,6 +214,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Autowired
     private val userRepository: UserRepository? = null
 
+    @Autowired
+    private val googleClient: GoogleCalenderClient? = null
+
     @Value("\${login.redirectUri}")
     private lateinit var loginRedirectUri: String
 
@@ -221,6 +230,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             OpenIdConnectFilter("/login/google",
                     userRepository!!,
                     restTemplate!!,
+                    googleClient!!,
                     loginRedirectUri)
 
     @Throws(Exception::class)

@@ -21,6 +21,7 @@ internal class ExternalProviderErrorHandler : ResponseErrorHandler {
 
     override fun handleError(response: ClientHttpResponse) {
         log.error("Error when fetching movie info from external provider: ${response.statusCode}: ${response.statusText}")
+        log.error(response.body.toString())
         throw ExternalProviderException()
     }
 }
