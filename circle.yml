@@ -3,5 +3,3 @@ general:
 machine:
   node:
     version: 8.1.2
-  yarn:
-    version: 0.21.3
