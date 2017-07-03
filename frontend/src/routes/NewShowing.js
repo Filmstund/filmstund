@@ -13,12 +13,17 @@ import Loader from "../ProjectorLoader";
 import Movie from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
 
+import Field from "../Field";
+import Input from "../Input";
+
 class NewShowing extends React.Component {
   constructor(props) {
     super(props);
     const { match: { params: { movieId } } } = props;
 
-    this.state = { movieId };
+    this.state = { movieId,
+      searchTerm: ""
+    };
   }
 
   componentWillMount() {
@@ -42,17 +47,50 @@ class NewShowing extends React.Component {
     }
   };
 
+  setSearchTerm = (term) => {
+    this.setState({
+      searchTerm: term.target.value
+    })
+  }
+
+  searchFilter(m) {
+
+    const { searchTerm } = this.state;
+
+    const lowerCaseTerm = searchTerm.toLowerCase()
+
+    if(searchTerm && searchTerm.length > 0) {
+      if(m.title.toLowerCase().search(lowerCaseTerm) > -1) {
+        return true
+      }
+
+      return false
+    }
+
+    return true
+
+  }
+
   renderSelectMovie = movies => {
     const { meta } = this.props;
+    const { searchTerm } = this.state
+
 
     return (
       <div>
         <Header>Skapa besök</Header>
+        <Field text="Namn:">
+          <Input
+            type="text"
+            onChange={this.setSearchTerm}
+            value={searchTerm}
+          />
+        </Field>
         Senaste uppdatering från SF:{" "}
         {(!meta.timestamp && "aldrig") ||
           moment(meta.timestamp).format("YYYY-MM-DD HH:mm")}
         {this.renderRequestButton()}
-        {sortBy(movies, "releaseDate").map(m =>
+        {sortBy(movies, "releaseDate").filter((m) => this.searchFilter(m)).map(m =>
           <Movie
             key={m.id}
             movie={m}
