@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
+import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.SfMeta
@@ -22,6 +23,7 @@ import java.util.*
 class MovieController(private val repo: MovieRepository,
                       private val metaRepo: SfMetaRepository,
                       private val sfClient: SfClient,
+                      private val imdbClient: ImdbClient,
                       private val asyncMovieUpdater: AsyncMovieUpdater) {
 
     companion object {
@@ -44,13 +46,8 @@ class MovieController(private val repo: MovieRepository,
     fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
         val movieInfo = when {
             body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
-            body.imdb != null -> TODO("IMDb scraper not implemented")
+            body.imdb != null -> imdbClient.movieDetails(body.imdb).toMovie(body.imdb)
             else -> throw MissingParametersException()
-        }
-
-        if (movieInfo == null) {
-            log.info("Movie info not found for $body")
-            throw ExternalProviderException()
         }
 
         val movie = repo.save(movieInfo)

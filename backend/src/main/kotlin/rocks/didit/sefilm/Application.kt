@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.BudordRepository
@@ -70,7 +71,12 @@ class Application {
 
     @Bean
     fun seedInitialData(locationsRepo: LocationRepository,
-                        budordRepo: BudordRepository) = ApplicationRunner {
+                        budordRepo: BudordRepository,
+                        properties: Properties) = ApplicationRunner {
+        if (!properties.tmdb.apiKeyExists()) {
+            log.warn("TMDB api key not set. Some features will not work properly!")
+        }
+
         val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
 
         val budordResource = ClassPathResource("seeds/budord.json")
@@ -82,6 +88,11 @@ class Application {
         val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
         locationsRepo.saveAll(locations)
         log.info("Seeded locations with ${locations.size} values")
+
+        val client = ImdbClient(getRestClient(), getHttpEntityWithJsonAcceptHeader(), properties)
+        val search = client.search("så som i himmelen")
+        val details = client.movieDetails(search[0].id)
+        log.info("Found on IMDb: $details")
     }
 }
 
