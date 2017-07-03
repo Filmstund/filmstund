@@ -43,7 +43,6 @@ class App extends Component {
   componentWillMount() {
     this.props.dispatch(me.actions.requestSingle());
     this.props.dispatch(meta.actions.requestSingle());
-    this.props.dispatch(me.actions.saveLocation(window.location.pathname));
   }
   render() {
     const { status } = this.props;
