@@ -43,16 +43,13 @@ class App extends Component {
   componentWillMount() {
     this.props.dispatch(me.actions.requestSingle());
     this.props.dispatch(meta.actions.requestSingle());
+    this.props.dispatch(me.actions.saveLocation(window.location.pathname));
   }
   render() {
     const { status } = this.props;
     const signedIn = status.data.id !== undefined;
 
     if (!signedIn) {
-      if(!status.location) {
-        this.props.dispatch(me.actions.saveLocation(window.location.pathname));
-      }
-
       return (
         <Container>
           <PaddingContainer>
@@ -61,12 +58,6 @@ class App extends Component {
           <Footer />
         </Container>
       );
-    } else {
-      if(status.location) {
-        const target = status.location;
-        this.props.dispatch(me.actions.clearLocation());
-        history.push(target);
-      }
     }
 
     return (

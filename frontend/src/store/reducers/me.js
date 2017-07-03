@@ -82,7 +82,10 @@ const reducer = (state = initialState, action) => {
 
     case USER_SIGNOUT_ACTION:
     case actions.clearSingle:
-      return initialState;
+      return {
+        ...initialState,
+        location: state.location
+      };
     default:
       return state;
   }
