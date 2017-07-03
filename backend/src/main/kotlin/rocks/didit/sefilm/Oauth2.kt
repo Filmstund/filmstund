@@ -36,15 +36,11 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import rocks.didit.sefilm.clients.GoogleCalenderClient
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.domain.dto.CalendarEventDTO
 import rocks.didit.sefilm.web.controllers.BudordController
 import java.io.IOException
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -90,7 +86,6 @@ class GoogleOpenIdConnectConfig {
 class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                           userRepository: UserRepository,
                           val restTemplate: OAuth2RestTemplate,
-                          val googleClient: GoogleCalenderClient,
                           loginRedirectUri: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
     init {
         authenticationManager = NoopAuthenticationManager()
@@ -214,8 +209,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Autowired
     private val userRepository: UserRepository? = null
 
-    @Autowired
-    private val googleClient: GoogleCalenderClient? = null
 
     @Value("\${login.redirectUri}")
     private lateinit var loginRedirectUri: String
@@ -230,7 +223,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             OpenIdConnectFilter("/login/google",
                     userRepository!!,
                     restTemplate!!,
-                    googleClient!!,
                     loginRedirectUri)
 
     @Throws(Exception::class)
