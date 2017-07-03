@@ -6,6 +6,6 @@ const Center = styled.div`
     justify-content: center;
     align-items: center;
     height: 100%;
-`
+`;
 
-export default Center
+export default Center;

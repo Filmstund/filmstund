@@ -4,12 +4,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("sefilm")
 class Properties {
-    var tmdb = Tmdb()
+  var tmdb = Tmdb()
 
-    class Tmdb {
-        var apikey: String? = null
-        fun apiKeyExists(): Boolean {
-            return !apikey.isNullOrBlank()
-        }
+  class Tmdb {
+    var apikey: String? = null
+    fun apiKeyExists(): Boolean {
+      return !apikey.isNullOrBlank()
     }
+  }
 }

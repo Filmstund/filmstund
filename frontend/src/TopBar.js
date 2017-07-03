@@ -20,7 +20,7 @@ const ExternalLink = styled.a`
     color: lightgray;
     background: darkred;
   }
-`
+`;
 
 const Link = styled(RouterLink)`
   padding: 1em;
@@ -38,7 +38,7 @@ class TopBar extends Component {
     this.props.dispatch(me.actions.clearSingle());
     this.props.dispatch(signoutUser());
     fetch(BASE_URL + "/logout");
-  }
+  };
   render() {
     const { signedIn } = this.props;
 
@@ -47,10 +47,13 @@ class TopBar extends Component {
         <Link to="/">Hem</Link>
         <Link to="/showings">Aktuella Besök</Link>
         <Link to="/user">Profil</Link>
-        {signedIn && <ExternalLink onClick={this.handleLogout}>Logga ut</ExternalLink>}
+        {signedIn &&
+          <ExternalLink onClick={this.handleLogout}>Logga ut</ExternalLink>}
       </TopBarContainer>
     );
   }
 }
 
-export default withRouter(connect(state => ({ signedIn: !!state.me.data.id }))(TopBar));
+export default withRouter(
+  connect(state => ({ signedIn: !!state.me.data.id }))(TopBar)
+);

@@ -8,20 +8,17 @@ const Padding = styled.div`
     width: 100vw;
     height: 100vh;
     padding: 1em;
-`
+`;
 
 const Background = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     background-color: white;
     height: 100%;
-`
+`;
 
-
-const Modal = ({children, ...props}) => (
+const Modal = ({ children, ...props }) =>
   <Padding>
     <Background {...props}>{children}</Background>
-  </Padding>
-)
+  </Padding>;
 
-
-export default Modal
+export default Modal;

@@ -14,16 +14,16 @@ const Hover = styled.span`
       font-size: 0.8em;
     }
   }
-`
+`;
 
 class CopyValue extends Component {
   onClick = () => {
-    copy(this.props.text)
-  }
+    copy(this.props.text);
+  };
 
   render() {
-      return <div><Hover onClick={this.onClick}>{this.props.text}</Hover></div>
+    return <div><Hover onClick={this.onClick}>{this.props.text}</Hover></div>;
   }
 }
 
-export default CopyValue
+export default CopyValue;

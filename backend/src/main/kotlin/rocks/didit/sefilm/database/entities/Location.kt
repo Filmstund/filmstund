@@ -6,7 +6,7 @@ import java.math.BigDecimal
 
 @Document
 data class Location(
-        @Id
-        val name: String? = null,
-        val latitude: BigDecimal? = null,
-        val longitude: BigDecimal? = null)
+  @Id
+  val name: String? = null,
+  val latitude: BigDecimal? = null,
+  val longitude: BigDecimal? = null)

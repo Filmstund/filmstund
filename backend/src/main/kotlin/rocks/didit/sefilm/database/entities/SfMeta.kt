@@ -5,12 +5,11 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
-
 @Document
 class SfMeta(
-        @Id
-        @JsonIgnore
-        val key: String = "sfpopulate",
-        val timestamp: Instant? = null,
-        val description: String = "N/A",
-        val value: Any? = null)
+  @Id
+  @JsonIgnore
+  val key: String = "sfpopulate",
+  val timestamp: Instant? = null,
+  val description: String = "N/A",
+  val value: Any? = null)

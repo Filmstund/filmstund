@@ -8,10 +8,10 @@ import java.util.*
 
 @Document
 data class ParticipantInfo(
-        @Id
-        val id: UUID = UUID.randomUUID(),
-        val userId: UserID = UserID(),
-        val showingId: UUID = UUID.randomUUID(),
-        val hasPaid: Boolean = false,
-        val amountOwed: SEK = SEK(0))
+  @Id
+  val id: UUID = UUID.randomUUID(),
+  val userId: UserID = UserID(),
+  val showingId: UUID = UUID.randomUUID(),
+  val hasPaid: Boolean = false,
+  val amountOwed: SEK = SEK(0))
 

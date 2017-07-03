@@ -12,4 +12,4 @@ export const SmallHeader = styled.h3`
     margin: 0;
 `;
 
-export default Header
+export default Header;
