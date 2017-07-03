@@ -8,6 +8,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ### Get up and running
 ```sh
-$ yarn install
+$ yarn
 $ yarn start
 ```
