@@ -8,7 +8,7 @@ import { jsonRequest, withBaseURL } from "../lib/fetch";
 import { movies, meta } from "../store/reducers";
 
 import Header from "../Header";
-import Loader from "../Loader";
+import Loader from "../ProjectorLoader";
 import Movie from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
 
