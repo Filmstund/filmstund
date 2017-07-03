@@ -1,5 +1,5 @@
 import fetch, { jsonRequest } from "../../lib/fetch";
-import { withBaseURL } from "../../lib/fetch";
+import { withBaseURL } from "../../lib/withBaseURL";
 import { USER_SIGNOUT_ACTION, signoutUser } from "./user";
 
 const path = withBaseURL("/users/me");

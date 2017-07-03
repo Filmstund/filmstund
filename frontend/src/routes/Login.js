@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { BASE_URL } from "../lib/fetch";
+import { BASE_URL } from "../lib/withBaseURL";
 import background from "../assets/body_background.jpg";
 
 const LoginContainer = styled.div`

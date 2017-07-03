@@ -4,7 +4,8 @@ import { NavLink as RouterLink, withRouter } from "react-router-dom";
 import styled from "styled-components";
 import { me } from "./store/reducers";
 import { signoutUser } from "./store/reducers/user";
-import fetch, { BASE_URL } from "./lib/fetch";
+import fetch from "./lib/fetch";
+import { BASE_URL } from "./lib/withBaseURL";
 
 const TopBarContainer = styled.div`
   background: maroon;

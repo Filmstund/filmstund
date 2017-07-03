@@ -8,7 +8,8 @@ import {
 import styled from "styled-components";
 
 import withLoader from "../lib/withLoader";
-import { getJson, jsonRequest, withBaseURL } from "../lib/fetch";
+import { getJson, jsonRequest } from "../lib/fetch";
+import { withBaseURL } from "../lib/withBaseURL";
 
 import Showing from "../Showing";
 import QRCode from "../QRCode";
