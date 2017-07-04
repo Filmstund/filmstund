@@ -1,5 +1,19 @@
-general:
-  build_dir: frontend
-machine:
-  node:
-    version: 8.1.2
+version: 2
+jobs:
+  build-backend:
+    working_directory: ~/itbio/backend
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - run: gradle clean build
+  build-frontend:
+    working_directory: ~/itbio/frontend
+    steps:
+      - run: yarn
+      - run: yarn run build
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-backend
+      - build-frontend
