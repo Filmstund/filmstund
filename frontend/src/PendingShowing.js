@@ -1,4 +1,7 @@
 import React from "react";
+import { connect } from "react-redux";
+
+import { showings as showingActions } from "./store/reducers";
 
 import { GreenButton, RedButton } from "./MainButton";
 import buildUserComponent from "./UserComponentBuilder";
@@ -26,4 +29,9 @@ const PendingShowing = ({
     </div>
   </div>;
 
-export default PendingShowing;
+const mapDispatchToProps = (dispatch, props) => ({
+  handleAttend: () => showingActions.actions.requestAttend(props.showing.id),
+  handleUnattend: () => showingActions.actions.requestUnattend(props.showing.id)
+});
+
+export default connect(null, mapDispatchToProps)(PendingShowing);
