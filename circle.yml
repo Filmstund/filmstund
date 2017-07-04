@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout:
           path: ~/itbio
-      - run: ./gradlew clean build
+      - run: gradle clean build
   build-frontend:
     working_directory: ~/itbio/frontend
     docker:
