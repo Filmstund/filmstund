@@ -68,12 +68,6 @@ class Showings extends Component {
     }
   }
 
-  handleAttend = () => {
-    this.props.dispatch(
-      showingActions.actions.requestAttend(this.props.showingId)
-    );
-  };
-
   handleDelete = () => {
     const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
@@ -82,12 +76,6 @@ class Showings extends Component {
         showingActions.actions.requestDelete(this.props.showingId)
       );
     }
-  };
-
-  handleUnattend = () => {
-    this.props.dispatch(
-      showingActions.actions.requestUnattend(this.props.showingId)
-    );
   };
 
   handleStartBooking = () => {
@@ -349,8 +337,6 @@ class Showings extends Component {
         {!showing.ticketsBought &&
           <PendingShowing
             showing={showing}
-            handleAttend={this.handleAttend}
-            handleUnattend={this.handleUnattend}
             isParticipating={this.isParticipating()}
           />}
         {showing.ticketsBought &&
