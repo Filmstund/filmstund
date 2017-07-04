@@ -18,6 +18,7 @@ jobs:
       - checkout:
           path: ~/itbio
       - run: npm install
+      - run: rm -rf build/*
       - run: npm run build
       - run: npm run test
       - run: tar -czvf build.tar.gz build/*
