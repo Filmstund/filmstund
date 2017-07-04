@@ -10,13 +10,11 @@ import { getJson, jsonRequest } from "../lib/fetch";
 import { withBaseURL } from "../lib/withBaseURL";
 
 import Showing from "../Showing";
-import QRCode from "../QRCode";
-import Loader from "../ProjectorLoader";
 import BoughtShowing from "../BoughtShowing";
 import PendingShowing from "../PendingShowing";
 import AdminAction from "../AdminAction";
 import BuyModal from "../BuyModal";
-import Modal from "../Modal";
+import SwishModal from "../SwishModal";
 
 const oreToKr = price => {
   if (price === null) {
@@ -148,24 +146,6 @@ class Showings extends Component {
     }, 2000);
   };
 
-  renderSwishModal = () => {
-    const { payData } = this.state;
-    if (!payData) {
-      return <Loader />;
-    }
-    // const { amountOwed, swishLink, hasPaid, payTo } = payData
-    const { swishLink } = payData;
-
-    if (swishLink) {
-      return (
-        <Modal>
-          <button onClick={() => this.setState({ swish: false })}>Stäng</button>
-          <QRCode value={swishLink} width={200} height={200} />
-        </Modal>
-      );
-    }
-  };
-
   openSwish = swishLink => {
     this.setState({ swish: true });
     window.location = swishLink;
@@ -183,6 +163,7 @@ class Showings extends Component {
       swish,
       showModal,
       buyData,
+      payData,
       isCreatingEvent,
       adminMessage
     } = this.state;
@@ -191,7 +172,11 @@ class Showings extends Component {
 
     return (
       <div className={className}>
-        {swish && this.renderSwishModal()}
+        {swish &&
+          <SwishModal
+            payData={payData}
+            closeSwish={() => this.setState({ swish: false })}
+          />}
         {showModal &&
           <BuyModal
             setPrice={this.setPrice}
