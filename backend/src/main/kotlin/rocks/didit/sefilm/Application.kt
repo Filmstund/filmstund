@@ -69,7 +69,12 @@ class Application {
 
   @Bean
   fun seedInitialData(locationsRepo: LocationRepository,
-                      budordRepo: BudordRepository) = ApplicationRunner {
+                      budordRepo: BudordRepository,
+                      properties: Properties) = ApplicationRunner {
+    if (!properties.tmdb.apiKeyExists()) {
+      log.warn("TMDB api key not set. Some features will not work properly!")
+    }
+
     val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
 
     val budordResource = ClassPathResource("seeds/budord.json")
