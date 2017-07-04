@@ -7,7 +7,7 @@ package rocks.didit.sefilm.domain.dto
  */
 data class ImdbSearchResults(val v: Int,
                              val q: String,
-                             val d: List<ImdbResult>)
+                             val d: List<ImdbResult>?)
 
 /**
  * @param l title

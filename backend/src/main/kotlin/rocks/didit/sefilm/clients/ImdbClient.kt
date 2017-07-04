@@ -12,7 +12,6 @@ import org.springframework.web.client.exchange
 import org.springframework.web.util.UriUtils
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.MissingAPIKeyException
-import rocks.didit.sefilm.MovieNotFoundException
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.ImdbSearchResults
@@ -38,6 +37,8 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
         .replace("å", "a")
         .replace("ä", "a")
         .replace("ö", "o")
+        .replace("!", "")
+        .replace("?", "")
 
     fun String.isValidImdbId() = Regex("tt[0-9]{7}").matches(this)
   }
@@ -59,12 +60,12 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     val resultWithCallback = restTemplate.exchange<String>(url, HttpMethod.GET, httpEntity, String::javaClass).body
     val resultWithoutCallback = removeCallback(resultWithCallback)
     return jsonToSearchResult(resultWithoutCallback).d
-      .filter { it.q == "feature" }
+      ?.filter { it.q == "feature" } ?: listOf()
   }
 
   /**
    * @throws MissingAPIKeyException if the TMDB api hasn't been supplied
-   * @throws MovieNotFoundException if the movie was not found or if the ID didn't uniquely identify the movie
+   * @throws ExternalProviderException if the movie was not found or if the ID didn't uniquely identify the movie
    */
   fun movieDetails(imdbId: String): TmdbMovieDetails {
     validateImdbId(imdbId)
@@ -88,6 +89,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     }
   }
 
+  /** IMDb returns jsonp with a callback we need to remove */
   private fun removeCallback(result: String): String {
     if (result.isNullOrBlank()) throw IllegalArgumentException("Result with callback mustn't be empty")
     val firstParenthesis = result.indexOf("(") + 1

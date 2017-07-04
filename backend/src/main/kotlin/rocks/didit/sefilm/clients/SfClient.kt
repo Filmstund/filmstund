@@ -16,14 +16,14 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     const val API_URL = "https://www.sf.se/api"
   }
 
-  fun getDatesAndLocations(sfId: String) =
-    restTemplate.exchange(API_URL + "/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfDatesAndLocationsDTO::class.java)
+  fun getDatesAndLocations(sfId: String): SfDatesAndLocationsDTO =
+    restTemplate.exchange("$API_URL/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfDatesAndLocationsDTO::class.java)
       .body
 
   /** Date must be in ISO8601 format, i.e 2017-04-11 */
-  fun getScreensForDateAndMovie(sfId: String, date: String) =
+  fun getScreensForDateAndMovie(sfId: String, date: String):SfShowListingEntitiesDTO =
     restTemplate
-      .exchange(API_URL + "/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
+      .exchange("$API_URL/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
       .body
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO {
@@ -34,7 +34,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
 
   fun allMovies(cityAlias: String = "GB"): List<SfMovieDTO> {
     return restTemplate
-      .exchange(API_URL + "/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
+      .exchange("$API_URL/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
         httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
       .body
   }

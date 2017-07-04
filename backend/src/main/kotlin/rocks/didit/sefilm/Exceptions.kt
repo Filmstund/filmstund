@@ -19,9 +19,6 @@ class MissingSfIdException() : RuntimeException("Movie does not have a valid SF 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 class MissingAPIKeyException(service: String) : RuntimeException("The service $service is missing an API key")
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class MovieNotFoundException(id: String) : RuntimeException("Movie with id $id was not uniquely identified")
-
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class PaymentInfoMissing(showingId: UUID) : RuntimeException("Payment info for $showingId is missing")
 

@@ -31,16 +31,18 @@ internal fun SfExtendedMovieDTO.toMovie() =
     productionYear = this.productionYear,
     synopsis = this.shortDescription)
 
-internal fun TmdbMovieDetails.toMovie(imdbId: String) = Movie(imdbId = imdbId,
-  title = this.title,
-  poster = this.poster_path,
-  releaseDate = this.release_date,
-  originalTitle = this.original_title,
-  genres = this.genres.map { it.toString() }, // TODO: fetch genre names
-  productionYear = this.release_date.year,
-  synopsis = this.overview,
-  runtime = Duration.ofMinutes(this.runtime.toLong())
-)
+internal fun TmdbMovieDetails.toMovie() =
+  Movie(
+    imdbId = this.imdb_id,
+    title = this.title,
+    poster = this.fullPosterPath(),
+    releaseDate = this.release_date,
+    originalTitle = this.original_title,
+    genres = this.genres.map { it.name },
+    productionYear = this.release_date.year,
+    synopsis = this.overview,
+    runtime = Duration.ofMinutes(this.runtime.toLong())
+  )
 
 internal fun User.toLimitedUserInfo(): LimitedUserInfo {
   return LimitedUserInfo(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)

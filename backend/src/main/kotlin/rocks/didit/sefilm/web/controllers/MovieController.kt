@@ -45,16 +45,14 @@ class MovieController(private val repo: MovieRepository,
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
       body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
-      body.imdb != null -> imdbClient.movieDetails(body.imdb).toMovie(body.imdb)
+      body.imdb != null -> imdbClient.movieDetails(body.imdb).toMovie()
       else -> throw MissingParametersException()
     }
 
-
-
-        val movie = repo.save(movieInfo)
-        val createdUri = b.path(PATH_WITH_ID).buildAndExpand(movie.id).toUri()
-        return ResponseEntity.created(createdUri).body(movie)
-    }
+    val movie = repo.save(movieInfo)
+    val createdUri = b.path(PATH_WITH_ID).buildAndExpand(movie.id).toUri()
+    return ResponseEntity.created(createdUri).body(movie)
+  }
 
   @GetMapping(PATH + "/sf/meta")
   fun sfMetaData(): SfMeta =
