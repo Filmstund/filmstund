@@ -1,7 +1,6 @@
 version: 2
 jobs:
   checkout:
-    working_directory: ~/itbio
     docker:
       - image: circleci/node:8.1.2
     steps:
