@@ -16,6 +16,7 @@ import QRCode from "../QRCode";
 import CopyValue from "../CopyValue";
 //import Loader from "../Loader";
 import Loader from "../ProjectorLoader";
+import PendingShowing from "../PendingShowing";
 import Center from "../Center";
 import Field from "../Field";
 import Input from "../Input";
@@ -324,22 +325,6 @@ class Showings extends Component {
     );
   };
 
-  renderPendingShowing = (showing, isParticipating) => {
-    return (
-      <div>
-        {!isParticipating &&
-          <GreenButton onClick={this.handleAttend}>Jag hänger på!</GreenButton>}
-        {isParticipating &&
-          <RedButton onClick={this.handleUnattend}>Avanmäl</RedButton>}
-        <div>
-          {showing.participants.map(userId =>
-            <UserItem key={userId} userId={userId} />
-          )}
-        </div>
-      </div>
-    );
-  };
-
   openSwish = swishLink => {
     this.setState({ swish: true });
     window.location = swishLink;
@@ -388,7 +373,12 @@ class Showings extends Component {
           location={showing.location.name}
         />
         {!showing.ticketsBought &&
-          this.renderPendingShowing(showing, this.isParticipating())}
+          <PendingShowing
+            showing={showing}
+            handleAttend={this.handleAttend}
+            handleUnattend={this.handleUnattend}
+            isParticipating={this.isParticipating()}
+          />}
         {showing.ticketsBought && this.renderBoughtShowing(showing)}
         {isAdmin && this.renderAdminAction(showing.ticketsBought)}
       </div>
