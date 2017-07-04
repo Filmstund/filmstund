@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { groupBy } from "lodash";
 import {
   showings as showingActions,
   users as userActions
 } from "../store/reducers";
-import styled from "styled-components";
 
 import withLoader from "../lib/withLoader";
 import { getJson, jsonRequest } from "../lib/fetch";
@@ -13,35 +11,12 @@ import { withBaseURL } from "../lib/withBaseURL";
 
 import Showing from "../Showing";
 import QRCode from "../QRCode";
-import CopyValue from "../CopyValue";
-//import Loader from "../Loader";
 import Loader from "../ProjectorLoader";
 import BoughtShowing from "../BoughtShowing";
 import PendingShowing from "../PendingShowing";
-import Center from "../Center";
-import Field from "../Field";
-import Input from "../Input";
-import Header, { SmallHeader } from "../Header";
+import BuyModal from "../BuyModal";
 import Modal from "../Modal";
-import buildUserComponent from "../UserComponentBuilder";
 import MainButton, { GrayButton } from "../MainButton";
-
-const UserActiveStatus = styled.div`
-  color: ${props => (props.active ? "#000" : "#ccc")};
-`;
-
-const UserWithPriceItem = buildUserComponent(
-  ({ user, active, price, onPaidChange, hasPaid }) =>
-    <UserActiveStatus active={active}>
-      {user.nick || user.name}{" "}
-      <label>
-        har betalat:{" "}
-        <input type="checkbox" checked={hasPaid} onChange={onPaidChange} />
-      </label>
-    </UserActiveStatus>
-);
-
-const Padding = styled.div`padding: 1em;`;
 
 const oreToKr = price => {
   if (price === null) {
@@ -175,41 +150,6 @@ class Showings extends Component {
     });
   };
 
-  renderParticipants = participants => {
-    const { hasPaid = [], hasNotPaid = [] } = groupBy(
-      participants,
-      info => (info.hasPaid ? "hasPaid" : "hasNotPaid")
-    );
-
-    return (
-      <div>
-        <Header>Deltagare</Header>
-        {hasNotPaid.length === 0 && "Alla har betalat!"}
-        {hasNotPaid.map(info =>
-          <UserWithPriceItem
-            key={info.id}
-            active={true}
-            userId={info.userId}
-            onPaidChange={() => this.handlePaidChange(info)}
-            price={info.amountOwed}
-            hasPaid={info.hasPaid}
-          />
-        )}
-        <hr />
-        {hasPaid.map(info =>
-          <UserWithPriceItem
-            key={info.id}
-            active={false}
-            userId={info.userId}
-            onPaidChange={() => this.handlePaidChange(info)}
-            price={info.amountOwed}
-            hasPaid={info.hasPaid}
-          />
-        )}
-      </div>
-    );
-  };
-
   setPrice = price => {
     const int = parseInt(price, 10);
 
@@ -251,63 +191,6 @@ class Showings extends Component {
     }
   };
 
-  renderBuyModal = buyData => {
-    if (!buyData || this.props.loading) {
-      return (
-        <Modal>
-          <Center>
-            <Loader />
-          </Center>
-        </Modal>
-      );
-    }
-
-    const { participantInfo, bioklubbnummer, sfBuyLink } = buyData;
-    const { ticketsBought } = this.props.showing;
-    const { ticketPrice } = this.state;
-
-    return (
-      <Modal>
-        <Padding>
-          <button
-            onClick={() => this.setState({ showModal: false, buyData: null })}
-          >
-            Stäng
-          </button>
-          <Padding>
-            {ticketsBought && this.renderParticipants(participantInfo)}
-            {!ticketsBought &&
-              <form onSubmit={this.handleMarkBought}>
-                <Header>Boka</Header>
-                {!sfBuyLink &&
-                  "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
-                {sfBuyLink &&
-                  <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
-                    Öppna SF länk i nytt fönster
-                  </a>}
-                <SmallHeader>Bioklubbnummer</SmallHeader>
-                {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
-                <hr />
-                ={" "}
-                {bioklubbnummer
-                  .map(nbr => parseInt(nbr, 10))
-                  .reduce((acc, nbr) => acc + nbr, 0)}
-                <Field text="Biljettpris:">
-                  <Input
-                    type="number"
-                    value={ticketPrice}
-                    min={0}
-                    onChange={event => this.setPrice(event.target.value)}
-                  />
-                </Field>
-                <MainButton>Markera som bokad</MainButton>
-              </form>}
-          </Padding>
-        </Padding>
-      </Modal>
-    );
-  };
-
   openSwish = swishLink => {
     this.setState({ swish: true });
     window.location = swishLink;
@@ -319,15 +202,26 @@ class Showings extends Component {
   };
 
   render() {
-    const { className, showing, me } = this.props;
-    const { swish, showModal, buyData } = this.state;
+    const { className, showing, me, loading } = this.props;
+    const { ticketPrice, swish, showModal, buyData } = this.state;
 
     const isAdmin = showing.admin === me.id;
 
     return (
       <div className={className}>
         {swish && this.renderSwishModal()}
-        {showModal && this.renderBuyModal(buyData)}
+        {showModal &&
+          <BuyModal
+            setPrice={this.setPrice}
+            loading={loading}
+            showing={showing}
+            handleMarkBought={this.handleMarkBought}
+            handlePaidChange={this.handlePaidChange}
+            ticketPrice={ticketPrice}
+            buyData={buyData}
+            closeModal={() =>
+              this.setState({ showModal: false, buyData: null })}
+          />}
         <Showing
           movieId={showing.movieId}
           date={showing.date}
