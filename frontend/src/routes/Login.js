@@ -57,7 +57,7 @@ class Login extends Component {
     return (
       <LoginContainer className={className}>
         <LoginDialog className={className}>
-          <img src={require('../assets/logo.png')} />
+          <img src={require('../assets/logo.png')} alt="IT-bio logga" />
           <h3>Logga in för att boka biobesök!</h3>
           <GoogleButton onClick={this.handleGoogleRedirect}>
             <GoogleLogo src={require('../assets/google-logo.svg')} />
