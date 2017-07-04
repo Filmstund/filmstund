@@ -8,6 +8,8 @@ jobs:
       - run: gradle clean build
   build-frontend:
     working_directory: ~/itbio/frontend
+    docker:
+      - image: circleci/node:8.1.2
     steps:
       - run: npm install
       - run: npm run build
