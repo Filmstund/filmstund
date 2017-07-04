@@ -16,6 +16,7 @@ import QRCode from "../QRCode";
 import CopyValue from "../CopyValue";
 //import Loader from "../Loader";
 import Loader from "../ProjectorLoader";
+import BoughtShowing from "../BoughtShowing";
 import PendingShowing from "../PendingShowing";
 import Center from "../Center";
 import Field from "../Field";
@@ -23,17 +24,11 @@ import Input from "../Input";
 import Header, { SmallHeader } from "../Header";
 import Modal from "../Modal";
 import buildUserComponent from "../UserComponentBuilder";
-import MainButton, { GreenButton, RedButton, GrayButton } from "../MainButton";
+import MainButton, { GrayButton } from "../MainButton";
 
 const UserActiveStatus = styled.div`
   color: ${props => (props.active ? "#000" : "#ccc")};
 `;
-
-const UserItem = buildUserComponent(({ user }) =>
-  <div>
-    {user.nick || user.name} ({user.phone}){" "}
-  </div>
-);
 
 const UserWithPriceItem = buildUserComponent(
   ({ user, active, price, onPaidChange, hasPaid }) =>
@@ -330,27 +325,6 @@ class Showings extends Component {
     window.location = swishLink;
   };
 
-  renderBoughtShowing = showing => {
-    const { payData } = this.state;
-    if (!payData) {
-      return <Loader />;
-    }
-    const { amountOwed, swishLink, hasPaid, payTo } = payData;
-
-    return (
-      <div>
-        {hasPaid && "Du har betalat!"}
-        {!hasPaid &&
-          <div>
-            Betala {amountOwed / 100} till <UserItem userId={payTo} />
-            <GreenButton onClick={() => this.openSwish(swishLink)}>
-              Betala
-            </GreenButton>
-          </div>}
-      </div>
-    );
-  };
-
   isParticipating = () => {
     const { showing, me } = this.props;
     return showing.participants.includes(me.id);
@@ -379,7 +353,8 @@ class Showings extends Component {
             handleUnattend={this.handleUnattend}
             isParticipating={this.isParticipating()}
           />}
-        {showing.ticketsBought && this.renderBoughtShowing(showing)}
+        {showing.ticketsBought &&
+          <BoughtShowing showing={showing} openSwish={this.openSwish} />}
         {isAdmin && this.renderAdminAction(showing.ticketsBought)}
       </div>
     );
