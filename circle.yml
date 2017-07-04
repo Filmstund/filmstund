@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
-      - run: gradle clean build
+      - run: ./gradlew clean build
   build-frontend:
     working_directory: ~/itbio/frontend
     docker:
