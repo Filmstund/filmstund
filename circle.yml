@@ -1,29 +1,25 @@
 version: 2
 jobs:
-  checkout:
-    docker:
-      - image: circleci/node:8.1.2
-    steps:
-      - checkout
   build-backend:
-    working_directory: ~/itbio/backend
+    working_directory: ~/itbio
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
+      - checkout
+      - run: cd backend
       - run: ./gradlew clean build
   build-frontend:
-    working_directory: ~/itbio/frontend
+    working_directory: ~/itbio
     docker:
       - image: circleci/node:8.1.2
     steps:
+      - checkout 
+      - run: cd frontend
       - run: npm install
       - run: npm run build
 workflows:
   version: 2
   build:
     jobs:
-      - checkout
       - build-backend:
-          requires: checkout
       - build-frontend:
-          requires: checkout
