@@ -130,6 +130,8 @@ class Showings extends Component {
   }
 
   requestPaymentInfo = () => {
+    if (!this.isParticipating()) return;
+
     const { showing } = this.props;
 
     getJson(`/showings/${showing.id}/pay`).then(payData => {
@@ -347,16 +349,19 @@ class Showings extends Component {
     );
   };
 
+  isParticipating = () => {
+    const { showing, me } = this.props;
+    return showing.participants.includes(me.id);
+  };
+
   render() {
     const { className, showing, me } = this.props;
     const { swish, showModal, buyData } = this.state;
 
-    const isParticipating = showing.participants.includes(me.id);
     const isAdmin = showing.admin === me.id;
 
     return (
       <div className={className}>
-
         {swish && this.renderSwishModal()}
         {showModal && this.renderBuyModal(buyData)}
         <Showing
@@ -366,7 +371,7 @@ class Showings extends Component {
           location={showing.location.name}
         />
         {!showing.ticketsBought &&
-        this.renderPendingShowing(showing, isParticipating)}
+          this.renderPendingShowing(showing, this.isParticipating())}
         {showing.ticketsBought && this.renderBoughtShowing(showing)}
         {isAdmin && this.renderAdminAction(showing.ticketsBought)}
       </div>
