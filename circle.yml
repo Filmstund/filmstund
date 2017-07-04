@@ -24,5 +24,7 @@ workflows:
   build:
     jobs:
       - checkout
-      - build-backend
-      - build-frontend
+      - build-backend:
+          requires: checkout
+      - build-frontend:
+          requires: checkout
