@@ -14,9 +14,9 @@ import QRCode from "../QRCode";
 import Loader from "../ProjectorLoader";
 import BoughtShowing from "../BoughtShowing";
 import PendingShowing from "../PendingShowing";
+import AdminAction from "../AdminAction";
 import BuyModal from "../BuyModal";
 import Modal from "../Modal";
-import MainButton, { GrayButton } from "../MainButton";
 
 const oreToKr = price => {
   if (price === null) {
@@ -104,31 +104,6 @@ class Showings extends Component {
     });
   };
 
-  renderAdminAction = ticketsBought => {
-    const { isCreatingEvent, adminMessage } = this.state;
-    return (
-      <div>
-        {adminMessage &&
-          <div>
-            {adminMessage}{" "}
-          </div>}
-        <MainButton onClick={this.handleStartBooking}>
-          {ticketsBought
-            ? "Visa betalningsstatus"
-            : "Alla är med, nu bokar vi!"}
-        </MainButton>
-        {ticketsBought &&
-          <MainButton
-            disabled={isCreatingEvent}
-            onClick={this.handleCreateGoogleEvent}
-          >
-            Skapa google kalender event
-          </MainButton>}
-        <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
-      </div>
-    );
-  };
-
   handlePaidChange = info => {
     const data = {
       ...info,
@@ -203,7 +178,14 @@ class Showings extends Component {
 
   render() {
     const { className, showing, me, loading } = this.props;
-    const { ticketPrice, swish, showModal, buyData } = this.state;
+    const {
+      ticketPrice,
+      swish,
+      showModal,
+      buyData,
+      isCreatingEvent,
+      adminMessage
+    } = this.state;
 
     const isAdmin = showing.admin === me.id;
 
@@ -235,7 +217,15 @@ class Showings extends Component {
           />}
         {showing.ticketsBought &&
           <BoughtShowing showing={showing} openSwish={this.openSwish} />}
-        {isAdmin && this.renderAdminAction(showing.ticketsBought)}
+        {isAdmin &&
+          <AdminAction
+            isCreatingEvent={isCreatingEvent}
+            adminMessage={adminMessage}
+            handleDelete={this.handleDelete}
+            handleStartBooking={this.handleStartBooking}
+            handleCreateGoogleEvent={this.handleCreateGoogleEvent}
+            ticketsBought={showing.ticketsBought}
+          />}
       </div>
     );
   }
