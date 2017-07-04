@@ -25,11 +25,13 @@ import buildUserComponent from "../UserComponentBuilder";
 import MainButton, { GreenButton, RedButton, GrayButton } from "../MainButton";
 
 const UserActiveStatus = styled.div`
-    color: ${props => (props.active ? "#000" : "#ccc")}
+  color: ${props => (props.active ? "#000" : "#ccc")};
 `;
 
 const UserItem = buildUserComponent(({ user }) =>
-  <div>{user.nick || user.name} ({user.phone}) </div>
+  <div>
+    {user.nick || user.name} ({user.phone}){" "}
+  </div>
 );
 
 const UserWithPriceItem = buildUserComponent(
@@ -43,9 +45,7 @@ const UserWithPriceItem = buildUserComponent(
     </UserActiveStatus>
 );
 
-const Padding = styled.div`
-    padding: 1em;
-`;
+const Padding = styled.div`padding: 1em;`;
 
 const oreToKr = price => {
   if (price === null) {
@@ -113,21 +113,25 @@ class Showings extends Component {
 
     this.setState({
       isCreatingEvent: true
-    })
+    });
 
-    jsonRequest(withBaseURL(`/showings/${showing.id}/invite/googlecalendar`),  showing.participants)
+    jsonRequest(
+      withBaseURL(`/showings/${showing.id}/invite/googlecalendar`),
+      showing.participants
+    )
       .then(resp => {
         this.setState({
           isCreatingEvent: false,
           adminMessage: "Kalenderevent skapat"
-        })
-      }).catch(err => {
-      this.setState({
-        isCreatingEvent: false,
-        adminMessage: "Misslyckades med att skapa kalenderevent"
+        });
       })
-    })
-  }
+      .catch(err => {
+        this.setState({
+          isCreatingEvent: false,
+          adminMessage: "Misslyckades med att skapa kalenderevent"
+        });
+      });
+  };
 
   requestPaymentInfo = () => {
     if (!this.isParticipating()) return;
@@ -142,18 +146,25 @@ class Showings extends Component {
   };
 
   renderAdminAction = ticketsBought => {
-    const { isCreatingEvent, adminMessage } = this.state
+    const { isCreatingEvent, adminMessage } = this.state;
     return (
       <div>
-        {adminMessage && <div>{adminMessage} </div> }
+        {adminMessage &&
+          <div>
+            {adminMessage}{" "}
+          </div>}
         <MainButton onClick={this.handleStartBooking}>
           {ticketsBought
             ? "Visa betalningsstatus"
             : "Alla är med, nu bokar vi!"}
         </MainButton>
-        {ticketsBought && <MainButton disabled={isCreatingEvent} onClick={this.handleCreateGoogleEvent}>
-          Skapa google kalender event
-        </MainButton>}
+        {ticketsBought &&
+          <MainButton
+            disabled={isCreatingEvent}
+            onClick={this.handleCreateGoogleEvent}
+          >
+            Skapa google kalender event
+          </MainButton>}
         <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
       </div>
     );
@@ -258,7 +269,13 @@ class Showings extends Component {
 
   renderBuyModal = buyData => {
     if (!buyData || this.props.loading) {
-      return <Modal><Center><Loader /></Center></Modal>;
+      return (
+        <Modal>
+          <Center>
+            <Loader />
+          </Center>
+        </Modal>
+      );
     }
 
     const { participantInfo, bioklubbnummer, sfBuyLink } = buyData;
