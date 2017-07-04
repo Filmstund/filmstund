@@ -39,13 +39,20 @@ const RightArrow = styled.div`
 const SelectBox = ({ options, onChange, ...props }) =>
   <Box>
     {options.map(option =>
-      <Option key={option.localTime} onClick={() => onChange(option)}>
+      <Option
+        key={option.cinema + option.screen + option.localTime}
+        onClick={() => onChange(option)}
+      >
         <Lable>
           {option.localTime} {option.screen},{" "}
           {option.cinema.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          {option.tags.map(tag =>
+            <Tag key={tag}>
+              {tag}
+            </Tag>
+          )}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>
