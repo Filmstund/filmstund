@@ -20,7 +20,7 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run test
-      - run: tar -cvf build.tar.gz build/*
+      - run: tar -czvf build.tar.gz build/*
       - store_artifacts:
           path: build.tar.gz
 workflows:
