@@ -8,6 +8,8 @@ jobs:
       - checkout:
           path: ~/itbio
       - run: gradle clean build
+      - store_artifacts:
+          path: build/libs/sefilm.jar
   build-frontend:
     working_directory: ~/itbio/frontend
     docker:
