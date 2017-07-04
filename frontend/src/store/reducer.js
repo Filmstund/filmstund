@@ -14,10 +14,14 @@ export const history = createHistory();
 
 const persistedState = loadState();
 
-const middlewares = applyMiddleware(thunk, logger, routerMiddleware(history));
+let middlewares = [thunk, routerMiddleware(history)];
+
+if (process.env.NODE_ENV !== "test") {
+  middlewares = [...middlewares, logger];
+}
 
 const enhancers = compose(
-  middlewares,
+  applyMiddleware(...middlewares),
   window.__REDUX_DEVTOOLS_EXTENSION__
     ? window.__REDUX_DEVTOOLS_EXTENSION__()
     : f => f
