@@ -15,9 +15,7 @@ const FlexBox = styled.div`
   align-items: center;
 `;
 
-const FlexGrow = styled.div`
-  flex: 1;
-`;
+const FlexGrow = styled.div`flex: 1;`;
 
 const TopBar = () => {
   return (
@@ -27,7 +25,7 @@ const TopBar = () => {
         <FlexGrow>
           <small>Courtesy of didIT (& Tuna)</small>
         </FlexGrow>
-        <a href="http://github.com/cthdidit/itbio">
+        <a href="https://github.com/cthdidit/itbio">
           <GitHubLogo />
         </a>
       </FlexBox>
