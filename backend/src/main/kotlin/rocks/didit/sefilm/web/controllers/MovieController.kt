@@ -99,10 +99,6 @@ class MovieController(private val repo: MovieRepository,
       .flatMap { e -> e.shows }
       .map { show ->
         val tags = convertTags(show.attributes)
-        if (show.screen.screenName.endsWith("VIP")) {
-          tags.add(SfTag.VIP)
-        }
-
         ScreenDTO(show.time.toLocalTime(), show.screen.screenName, show.cinemaName, tags)
       }
   }
