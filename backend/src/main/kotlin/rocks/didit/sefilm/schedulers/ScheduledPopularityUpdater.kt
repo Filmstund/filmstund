@@ -1,4 +1,4 @@
-package rocks.didit.sefilm
+package rocks.didit.sefilm.schedulers
 
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -56,7 +56,7 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
   private fun updatePopularity(movie: Movie) {
     val popularityAndId = when {
       movie.tmdbId != null -> fetchPopularityByTmdbId(movie)
-      movie.imdbId != null -> fetchPopularityByImdbId(movie)
+      !movie.isMissingImdbId() -> fetchPopularityByImdbId(movie)
       else -> fetchPopularityByTitle(movie)
     }
 

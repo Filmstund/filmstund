@@ -1,4 +1,4 @@
-package rocks.didit.sefilm
+package rocks.didit.sefilm.schedulers
 
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
@@ -78,7 +78,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     log.debug("Fetching extended info for movie id=${movie.id}")
     when {
       movie.tmdbId != null -> updateFromTmdbById(movie)
-      movie.imdbId != null -> updateFromTmdbByImdbId(movie)
+      !movie.isMissingImdbId() -> updateFromTmdbByImdbId(movie)
       movie.sfId != null -> updateFromSf(movie)
       else -> updateFromImdbByTitle(movie)
     }
