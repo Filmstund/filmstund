@@ -29,9 +29,14 @@ const PendingShowing = ({
     </div>
   </div>;
 
-const mapDispatchToProps = (dispatch, props) => ({
-  handleAttend: () => showingActions.actions.requestAttend(props.showing.id),
-  handleUnattend: () => showingActions.actions.requestUnattend(props.showing.id)
-});
+const mapDispatchToProps = (dispatch, props) => {
+  const { requestAttend, requestUnattend } = showingActions.actions;
+  const { showing } = props;
+
+  return {
+    handleAttend: () => dispatch(requestAttend(showing.id)),
+    handleUnattend: () => dispatch(requestUnattend(showing.id))
+  };
+};
 
 export default connect(null, mapDispatchToProps)(PendingShowing);
