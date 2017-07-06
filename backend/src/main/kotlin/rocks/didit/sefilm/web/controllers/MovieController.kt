@@ -14,6 +14,7 @@ import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.SfMetaRepository
 import rocks.didit.sefilm.domain.dto.*
+import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
