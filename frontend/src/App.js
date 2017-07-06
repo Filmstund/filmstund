@@ -18,6 +18,7 @@ const PaddingContainer = styled.div`
 `;
 
 const ScrollContainer = styled.div`
+  -webkit-overflow-scrolling: touch;
   overflow: scroll;
   height: 100vh;
   display: flex;
