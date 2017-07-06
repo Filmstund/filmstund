@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { values, sortBy } from "lodash";
+import { values, orderBy } from "lodash";
 import moment from "moment";
 
 import { jsonRequest } from "../lib/fetch";
@@ -84,7 +84,7 @@ class NewShowing extends React.Component {
         {(!meta.timestamp && "aldrig") ||
           moment(meta.timestamp).format("YYYY-MM-DD HH:mm")}
         {this.renderRequestButton()}
-        {sortBy(movies, "releaseDate")
+        {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
           .filter(m => this.searchFilter(m))
           .map(m =>
             <Movie
