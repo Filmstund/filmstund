@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { values, sortBy } from "lodash";
+import { values, orderBy } from "lodash";
 import moment from "moment";
 import styled from "styled-components";
 
@@ -17,6 +17,13 @@ import { GrayButton } from "../MainButton";
 
 import Field from "../Field";
 import Input from "../Input";
+
+const Debugging = styled.div`
+  background-color: #f5f5f5;
+  padding: 1em;
+  border: solid 1px #e0e0e0;
+  margin: 0 1em 1em;
+`;
 
 class NewShowing extends React.Component {
   constructor(props) {
@@ -76,13 +83,6 @@ class NewShowing extends React.Component {
     const { meta } = this.props;
     const { searchTerm } = this.state;
 
-    const Debugging = styled.div`
-      background-color: #f5f5f5;
-      padding: 1em;
-      border: solid 1px #e0e0e0;
-      margin: 0 1em 1em;
-    `;
-
     return (
       <div>
         <Header>Skapa besök</Header>
@@ -95,7 +95,7 @@ class NewShowing extends React.Component {
         <Field text="Sök:">
           <Input type="text" onChange={this.setSearchTerm} placeholder="Vilken film vill du se?" value={searchTerm} />
         </Field>
-        {sortBy(movies, "releaseDate")
+        {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
           .filter(m => this.searchFilter(m))
           .map(m =>
             <Movie
