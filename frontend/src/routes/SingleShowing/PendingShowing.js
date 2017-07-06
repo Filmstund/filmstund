@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { showings as showingActions } from "./store/reducers";
+import { showings as showingActions } from "../../store/reducers";
 
-import { GreenButton, RedButton } from "./MainButton";
+import { GreenButton, RedButton } from "../../MainButton";
 import buildUserComponent from "./UserComponentBuilder";
 
 const UserItem = buildUserComponent(({ user }) =>
@@ -29,9 +29,14 @@ const PendingShowing = ({
     </div>
   </div>;
 
-const mapDispatchToProps = (dispatch, props) => ({
-  handleAttend: () => showingActions.actions.requestAttend(props.showing.id),
-  handleUnattend: () => showingActions.actions.requestUnattend(props.showing.id)
-});
+const mapDispatchToProps = (dispatch, props) => {
+  const { requestAttend, requestUnattend } = showingActions.actions;
+  const { showing } = props;
+
+  return {
+    handleAttend: () => dispatch(requestAttend(showing.id)),
+    handleUnattend: () => dispatch(requestUnattend(showing.id))
+  };
+};
 
 export default connect(null, mapDispatchToProps)(PendingShowing);

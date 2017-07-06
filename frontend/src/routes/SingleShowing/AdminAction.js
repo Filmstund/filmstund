@@ -8,7 +8,7 @@ import { getJson, jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 
 import MainButton, { GrayButton } from "../../MainButton";
-import BuyModal from "../../BuyModal";
+import BuyModal from "./BuyModal";
 
 const oreToKr = price => {
   if (price === null) {
@@ -77,13 +77,11 @@ class AdminAction extends Component {
   handleMarkBought = event => {
     event.preventDefault();
 
-    this.props.dispatch(
-      showingActions.actions.requestUpdate({
-        ...this.props.showing,
-        price: this.state.ticketPrice * 100,
-        ticketsBought: true
-      })
-    );
+    this.props.requestUpdate({
+      ...this.props.showing,
+      price: this.state.ticketPrice * 100,
+      ticketsBought: true
+    });
     setTimeout(() => {
       this.handleStartBooking();
     }, 2000);
@@ -93,9 +91,7 @@ class AdminAction extends Component {
     const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
     if (proceed) {
-      this.props.dispatch(
-        showingActions.actions.requestDelete(this.props.showingId)
-      );
+      this.props.requestDelete();
     }
   };
 
@@ -177,4 +173,14 @@ AdminAction.propTypes = {
   showing: PropTypes.object.isRequired
 };
 
-export default connect()(AdminAction);
+const mapDispatchToProps = (dispatch, props) => {
+  const { requestUpdate, requestDelete } = showingActions.actions;
+  const { showing } = props;
+
+  return {
+    requestUpdate: obj => dispatch(requestUpdate(obj)),
+    requestDelete: () => dispatch(requestDelete(showing.id))
+  };
+};
+
+export default connect(null, mapDispatchToProps)(AdminAction);
