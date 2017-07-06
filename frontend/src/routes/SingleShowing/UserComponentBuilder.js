@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 
-import { users as userActions } from "./store/reducers";
-import withLoader from "./lib/withLoader";
+import { users as userActions } from "../../store/reducers";
+import withLoader from "../../lib/withLoader";
 
 const mapStateToProps = (state, { userId }) => ({
   userId,

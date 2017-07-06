@@ -9,10 +9,10 @@ import withLoader from "../../lib/withLoader";
 import { getJson } from "../../lib/fetch";
 
 import Showing from "../../Showing";
-import BoughtShowing from "../../BoughtShowing";
-import PendingShowing from "../../PendingShowing";
+import BoughtShowing from "./BoughtShowing";
+import PendingShowing from "./PendingShowing";
 import AdminAction from "./AdminAction";
-import SwishModal from "../../SwishModal";
+import SwishModal from "./SwishModal";
 
 class Showings extends Component {
   state = {

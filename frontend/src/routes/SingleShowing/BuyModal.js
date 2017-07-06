@@ -3,15 +3,15 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import Modal from "./Modal";
-import Field from "./Field";
-import Input from "./Input";
-import Header, { SmallHeader } from "./Header";
-import CopyValue from "./CopyValue";
-import Center from "./Center";
-import Loader from "./ProjectorLoader";
+import Field from "../../Field";
+import Input from "../../Input";
+import Header, { SmallHeader } from "../../Header";
+import CopyValue from "../../CopyValue";
+import Center from "../../Center";
+import Loader from "../../ProjectorLoader";
 import ParticipantsList from "./ParticipantsList";
 
-import MainButton from "./MainButton";
+import MainButton from "../../MainButton";
 
 const Padding = styled.div`padding: 1em;`;
 
