@@ -8,7 +8,7 @@ import { getJson, jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 
 import MainButton, { GrayButton } from "../../MainButton";
-import BuyModal from "../../BuyModal";
+import BuyModal from "./BuyModal";
 
 const oreToKr = price => {
   if (price === null) {

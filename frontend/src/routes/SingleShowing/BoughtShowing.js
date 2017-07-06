@@ -1,7 +1,7 @@
 import React from "react";
-import Loader from "./ProjectorLoader";
+import Loader from "../../ProjectorLoader";
 import buildUserComponent from "./UserComponentBuilder";
-import { GreenButton } from "./MainButton";
+import { GreenButton } from "../../MainButton";
 
 const UserItem = buildUserComponent(({ user }) =>
   <div>

@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { showings as showingActions } from "./store/reducers";
+import { showings as showingActions } from "../../store/reducers";
 
-import { GreenButton, RedButton } from "./MainButton";
+import { GreenButton, RedButton } from "../../MainButton";
 import buildUserComponent from "./UserComponentBuilder";
 
 const UserItem = buildUserComponent(({ user }) =>

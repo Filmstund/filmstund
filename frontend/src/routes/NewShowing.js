@@ -21,7 +21,8 @@ class NewShowing extends React.Component {
     super(props);
     const { match: { params: { movieId } } } = props;
 
-    this.state = { movieId,
+    this.state = {
+      movieId,
       searchTerm: ""
     };
   }
@@ -47,56 +48,51 @@ class NewShowing extends React.Component {
     }
   };
 
-  setSearchTerm = (term) => {
+  setSearchTerm = term => {
     this.setState({
       searchTerm: term.target.value
-    })
-  }
+    });
+  };
 
   searchFilter(m) {
-
     const { searchTerm } = this.state;
 
-    const lowerCaseTerm = searchTerm.toLowerCase()
+    const lowerCaseTerm = searchTerm.toLowerCase();
 
-    if(searchTerm && searchTerm.length > 0) {
-      if(m.title.toLowerCase().search(lowerCaseTerm) > -1) {
-        return true
+    if (searchTerm && searchTerm.length > 0) {
+      if (m.title.toLowerCase().search(lowerCaseTerm) > -1) {
+        return true;
       }
 
-      return false
+      return false;
     }
 
-    return true
-
+    return true;
   }
 
   renderSelectMovie = movies => {
     const { meta } = this.props;
-    const { searchTerm } = this.state
-
+    const { searchTerm } = this.state;
 
     return (
       <div>
         <Header>Skapa besök</Header>
         <Field text="Namn:">
-          <Input
-            type="text"
-            onChange={this.setSearchTerm}
-            value={searchTerm}
-          />
+          <Input type="text" onChange={this.setSearchTerm} value={searchTerm} />
         </Field>
         Senaste uppdatering från SF:{" "}
         {(!meta.timestamp && "aldrig") ||
           moment(meta.timestamp).format("YYYY-MM-DD HH:mm")}
         {this.renderRequestButton()}
-        {sortBy(movies, "releaseDate").filter((m) => this.searchFilter(m)).map(m =>
-          <Movie
-            key={m.id}
-            movie={m}
-            onClick={() => this.setState({ movieId: m.id })}
-          />
-        )}
+        {sortBy(movies, "releaseDate")
+          .filter(m => this.searchFilter(m))
+          .map(m =>
+            <Movie
+              key={m.id}
+              movie={m}
+              onClick={() => this.setState({ movieId: m.id })}
+            />
+          )}
       </div>
     );
   };
