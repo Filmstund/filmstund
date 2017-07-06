@@ -12,15 +12,15 @@ const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: space-between;
-  height: 100px;
+  height: 96px;
 `;
 
 const AvatarImage = styled.div`
   background-image: url(${props => props.src});
   background-size: cover;
   background-position: center;
-  height: 100px;
-  width: 100px;
+  height: 96px;
+  width: 96px;
 `;
 
 const StatusBox = styled.div`
