@@ -6,7 +6,6 @@ import { values, orderBy } from "lodash";
 import { Link } from "../MainButton";
 import Showing from "../Showing";
 import Header from "../Header";
-import Jumbotron from "../jumbotron/jumbotron";
 
 import { getTodaysDate } from "../lib/dateTools";
 
