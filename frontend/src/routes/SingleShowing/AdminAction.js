@@ -7,7 +7,7 @@ import { showings as showingActions } from "../../store/reducers";
 import { getJson, jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 
-import MainButton, { GrayButton } from "../../MainButton";
+import MainButton, { GrayButton, RedButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
 
 const oreToKr = price => {
@@ -151,19 +151,18 @@ class AdminAction extends Component {
           <div>
             {adminMessage}
           </div>}
-        <MainButton onClick={this.handleStartBooking}>
-          {ticketsBought
-            ? "Visa betalningsstatus"
-            : "Alla är med, nu bokar vi!"}
-        </MainButton>
+
+        {ticketsBought
+          ? <GrayButton onClick={this.handleStartBooking}>Visa betalningsstatus</GrayButton>
+          : <MainButton onClick={this.handleStartBooking}>Alla är med, nu bokar vi!</MainButton>}
         {ticketsBought &&
           <MainButton
             disabled={isCreatingEvent}
             onClick={this.handleCreateGoogleEvent}
           >
-            Skapa google kalender event
+            Skapa Googlekalenderevent
           </MainButton>}
-        <GrayButton onClick={this.handleDelete}>Ta bort Besök</GrayButton>
+        <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
       </div>
     );
   }

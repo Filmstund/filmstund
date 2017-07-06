@@ -19,9 +19,9 @@ const renderPremiereDate = releaseDate => {
   }
 };
 
-const Movie = ({ movie: { poster, title, releaseDate }, ...props }) =>
+const Movie = ({ movie: { poster, title, releaseDate }, onClick, ...props }) =>
   <div {...props}>
-    <PosterBox headerText={title} poster={poster}>
+    <PosterBox headerText={title} poster={poster} onClick={onClick}>
       <VerticalPaddingContainer>
         {renderPremiereDate(releaseDate)}
       </VerticalPaddingContainer>

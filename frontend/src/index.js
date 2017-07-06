@@ -10,7 +10,8 @@ injectGlobal`
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
-    background: maroon;
+    background: white;
+    color: #212121;
   }
   *, *:before, *:after {
     box-sizing: border-box;

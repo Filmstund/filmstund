@@ -1,7 +1,7 @@
 import React from "react";
 import Loader from "../../ProjectorLoader";
 import buildUserComponent from "./UserComponentBuilder";
-import { GreenButton } from "../../MainButton";
+import MainButton from "../../MainButton";
 
 const UserItem = buildUserComponent(({ user }) =>
   <div>
@@ -24,7 +24,7 @@ const BoughtShowing = ({ payData, showing, openSwish }) => {
       {!hasPaid &&
         <div>
           Betala {amountOwed / 100} till <UserItem userId={payTo} />
-          <GreenButton onClick={openSwishLink}>Betala</GreenButton>
+          <MainButton onClick={openSwishLink}>Betala</MainButton>
         </div>}
     </div>
   );
