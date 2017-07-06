@@ -28,7 +28,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledMovieUpdates() {
     val moviesThatRequiresUpdate = movieRepository
-      .findAll()
+      .findByArchivedFalse()
       .filter(this::isUpdateRequired)
     if (moviesThatRequiresUpdate.isNotEmpty()) {
       log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
@@ -63,7 +63,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     }
   }
 
-  private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || movie.isMissingImdbId()
+  private fun isUpdateRequired(movie: Movie) = !movie.archived && (movie.needsMoreInfo() || movie.isMissingImdbId())
 
   private fun updateInfo(movie: Movie) {
     if (movie.needsMoreInfo()) {

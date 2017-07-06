@@ -34,7 +34,7 @@ class MovieController(private val repo: MovieRepository,
   private val log = LoggerFactory.getLogger(MovieController::class.java)
 
   @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findAll() = repo.findAll().sortedByDescending { it.popularity }
+  fun findAll() = repo.findByArchivedFalse().sortedByDescending { it.popularity }
 
   @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun findOne(@PathVariable id: UUID): Movie {
@@ -66,6 +66,7 @@ class MovieController(private val repo: MovieRepository,
   fun populateFromSf(): SavedEntitiesDTO {
     val sfMovies = sfClient.allMovies()
 
+    // FIXME: ta hänsyn till archived flaggan
     val ourMovies = repo.findAll()
     val newMoviesWeHaventPreviouslySeen = sfMovies
       .filter { (ncgId) -> ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
@@ -86,7 +87,7 @@ class MovieController(private val repo: MovieRepository,
     val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id") }
     if (movie.sfId == null) throw MissingSfIdException()
 
-    return sfClient.getDatesAndLocations(movie.sfId).dates
+    return sfClient.getShowingDates(movie.sfId)
   }
 
   @GetMapping(PATH_WITH_ID + "/sfdates/{date}")

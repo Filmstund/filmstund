@@ -5,20 +5,33 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import rocks.didit.sefilm.domain.dto.SfDatesAndLocationsDTO
-import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
-import rocks.didit.sefilm.domain.dto.SfMovieDTO
-import rocks.didit.sefilm.domain.dto.SfShowListingEntitiesDTO
+import rocks.didit.sefilm.domain.dto.*
+import java.time.LocalDate
 
 @Component
 class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
   companion object {
     const val API_URL = "https://www.sf.se/api"
+    const val AGGREGATIONS_URL = "$API_URL/v2/show/aggregations"
   }
 
-  fun getDatesAndLocations(sfId: String): SfDatesAndLocationsDTO =
-    restTemplate.exchange("$API_URL/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfDatesAndLocationsDTO::class.java)
-      .body
+  fun getShowingDates(sfId: String): List<LocalDate> {
+    val filters = mapOf(
+      "countryAlias" to "se",
+      "cityAlias" to listOf("GB"),
+      "movieNcgId" to listOf(sfId),
+      "timeUtc" to mapOf("greaterThanOrEqualTo" to "2017-07-16T10:30")
+    )
+    val sfAggregationRequest = SfAggregationRequest(filters, "dates", listOf(SfAggregationProperty("TimeUtc")))
+    val body = SfRequestAggregations(listOf(sfAggregationRequest))
+
+    val aggregationsEntity = HttpEntity<SfRequestAggregations>(body, httpEntity.headers)
+    val responseBody = restTemplate.exchange(AGGREGATIONS_URL, HttpMethod.POST, aggregationsEntity, SfResponseAggregations::class.java).body
+
+    return responseBody.aggregations.first().buckets.map {
+      LocalDate.parse(it.properties["timeUtc"].toString())
+    }
+  }
 
   /** Date must be in ISO8601 format, i.e 2017-04-11 */
   fun getScreensForDateAndMovie(sfId: String, date: String): SfShowListingEntitiesDTO =
