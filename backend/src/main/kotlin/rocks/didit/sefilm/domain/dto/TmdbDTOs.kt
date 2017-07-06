@@ -29,7 +29,7 @@ data class TmdbMovieDetails(
   val budget: Int,
   val genres: List<TmdbGenre>,
   val homepage: String,
-  val id: Int,
+  val id: Long,
   val imdb_id: String,
   val original_language: String,
   val original_title: String,
@@ -38,7 +38,7 @@ data class TmdbMovieDetails(
   val production_companies: List<TmdbProductionCompany>,
   val production_countries: List<TmdbProductionCountry>,
   val release_date: LocalDate,
-  val revenue: Int,
+  val revenue: Long,
   val runtime: Int,
   val spoken_languages: List<TmdbSpokenLanguage>,
   val status: String,
@@ -46,7 +46,7 @@ data class TmdbMovieDetails(
   val title: String,
   val video: Boolean,
   val vote_average: Double,
-  val vote_count: Int,
+  val vote_count: Long,
   val poster_path: String?,
   val backdrop_path: String?
 ) {

@@ -39,6 +39,9 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
         .replace("ö", "o")
         .replace("!", "")
         .replace("?", "")
+        .replace("'", "")
+        .replace(":", "")
+        .replace("é", "e")
 
     fun String.isValidImdbId() = Regex("tt[0-9]{7}").matches(this)
   }
@@ -72,6 +75,11 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     validateApiKeyExists(imdbId)
 
     val tmdbId = lookupTmdbIdFromImdbId(imdbId) ?: throw ExternalProviderException("movie[$imdbId] not found")
+    return movieDetailsExact(tmdbId)
+  }
+
+  fun movieDetailsExact(tmdbId: Long): TmdbMovieDetails {
+    validateApiKeyExists(tmdbId.toString())
 
     val url = TMDB_INFO_URL.format(tmdbId, properties.tmdb.apikey)
     val body = restTemplate.exchange<TmdbMovieDetails>(url, HttpMethod.GET, httpEntity, TmdbMovieDetails::class).body
@@ -82,9 +90,9 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     if (!imdbId.isValidImdbId()) throw IllegalArgumentException("$imdbId is not a valid IMDb ID")
   }
 
-  private fun validateApiKeyExists(imdbId: String) {
+  private fun validateApiKeyExists(id: String) {
     if (!properties.tmdb.apiKeyExists()) {
-      log.warn("TMDB api not set. Unable to fetch info for $imdbId")
+      log.warn("TMDB api not set. Unable to fetch info for $id")
       throw MissingAPIKeyException("TMDB")
     }
   }

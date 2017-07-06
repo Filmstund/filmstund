@@ -10,6 +10,7 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
+import java.time.Instant
 
 internal fun currentLoggedInUser(): UserID {
   val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
@@ -17,8 +18,8 @@ internal fun currentLoggedInUser(): UserID {
 }
 
 internal fun oauthAccessToken(): OAuth2AccessToken {
-    val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
-    return principal.accessToken
+  val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
+  return principal.accessToken
 }
 
 internal fun Showing.isLoggedInUserAdmin(): Boolean {
@@ -40,6 +41,7 @@ internal fun SfExtendedMovieDTO.toMovie() =
 internal fun TmdbMovieDetails.toMovie() =
   Movie(
     imdbId = this.imdb_id,
+    tmdbId = this.id,
     title = this.title,
     poster = this.fullPosterPath(),
     releaseDate = this.release_date,
@@ -47,7 +49,9 @@ internal fun TmdbMovieDetails.toMovie() =
     genres = this.genres.map { it.name },
     productionYear = this.release_date.year,
     synopsis = this.overview,
-    runtime = Duration.ofMinutes(this.runtime.toLong())
+    runtime = Duration.ofMinutes(this.runtime.toLong()),
+    popularity = this.popularity,
+    popularityLastUpdated = Instant.now()
   )
 
 internal fun User.toLimitedUserInfo(): LimitedUserInfo {
