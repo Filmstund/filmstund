@@ -11,6 +11,7 @@ import {
 
 import Header from "../Header";
 import Showing from "../Showing";
+import { Link } from "../MainButton";
 
 const today = getTodaysDate();
 
@@ -48,9 +49,10 @@ class Showings extends Component {
 
     return (
       <div className={className}>
-        <Header>Aktuella Besök</Header>
+        <Link to="/showings/new">Skapa nytt besök</Link>
+        <Header>Aktuella besök</Header>
         {this.renderShowings(upcoming, false)}
-        <Header>Tidigare Besök</Header>
+        <Header>Tidigare besök</Header>
         {this.renderShowings(previous, true)}
       </div>
     );

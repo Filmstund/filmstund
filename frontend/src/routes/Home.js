@@ -54,16 +54,24 @@ class Home extends Component {
     return this.renderShowings(myShowings);
   };
 
+  renderPrevParticipatedByMe = showings => {
+    const { me } = this.props;
+    const myShowings = showings.filter(
+        s => s.participants.includes(me.id) && moment(s.date).isBefore(today)
+    );
+
+    return this.renderShowings(myShowings);
+  };
+
   render() {
     const { className, showings = [] } = this.props;
     return (
       <div className={className}>
-        <Jumbotron>
-          <Header>Nytt besök?</Header>
-          <Link to="/showings/new">Skapa nytt besök</Link>
-        </Jumbotron>
+        <Link to="/showings/new">Skapa nytt besök</Link>
         <Header>Mina kommande besök</Header>
         {this.renderParticipatedByMe(showings)}
+        <Header>Mina tidigare besök</Header>
+        {this.renderPrevParticipatedByMe(showings)}
         <Header>Besök jag har skapat</Header>
         {this.renderCreatedByMe(showings)}
       </div>

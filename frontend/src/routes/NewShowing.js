@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { values, sortBy } from "lodash";
 import moment from "moment";
+import styled from "styled-components";
 
 import { jsonRequest } from "../lib/fetch";
 import { withBaseURL } from "../lib/withBaseURL";
@@ -12,6 +13,7 @@ import Header from "../Header";
 import Loader from "../ProjectorLoader";
 import Movie from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
+import { GrayButton } from "../MainButton";
 
 import Field from "../Field";
 import Input from "../Input";
@@ -44,7 +46,7 @@ class NewShowing extends React.Component {
     if (this.state.requestingData) {
       return <Loader size={70} color="maroon" />;
     } else {
-      return <div onClick={this.requestSFData}>Uppdatera data från SF</div>;
+      return <GrayButton onClick={this.requestSFData}>Uppdatera data från SF</GrayButton>;
     }
   };
 
@@ -74,16 +76,25 @@ class NewShowing extends React.Component {
     const { meta } = this.props;
     const { searchTerm } = this.state;
 
+    const Debugging = styled.div`
+      background-color: #f5f5f5;
+      padding: 1em;
+      border: solid 1px #e0e0e0;
+      margin: 0 1em 1em;
+    `;
+
     return (
       <div>
         <Header>Skapa besök</Header>
-        <Field text="Namn:">
-          <Input type="text" onChange={this.setSearchTerm} value={searchTerm} />
-        </Field>
-        Senaste uppdatering från SF:{" "}
-        {(!meta.timestamp && "aldrig") ||
+        <Debugging>
+          {this.renderRequestButton()}
+          Senaste uppdatering:{" "}
+          {(!meta.timestamp && "aldrig") ||
           moment(meta.timestamp).format("YYYY-MM-DD HH:mm")}
-        {this.renderRequestButton()}
+        </Debugging>
+        <Field text="Sök:">
+          <Input type="text" onChange={this.setSearchTerm} placeholder="Vilken film vill du se?" value={searchTerm} />
+        </Field>
         {sortBy(movies, "releaseDate")
           .filter(m => this.searchFilter(m))
           .map(m =>
