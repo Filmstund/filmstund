@@ -6,7 +6,7 @@ const MainButtonStyles = css`
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  background-color: gold;
+  background-color: #fdd835;
   color: black;
   border: 0;
   height: 3em;
@@ -15,7 +15,11 @@ const MainButtonStyles = css`
   font-weight: 400;
   width: 100%;
   font-family: "Roboto", sans-serif;
-  &:hover { cursor: pointer }
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  &:hover { 
+    cursor: pointer;
+    background-color: #ffeb3b;
+  }
   &:disabled {
     background-color: #ccc;
     color: rgba(0, 0, 0, 0.87);
@@ -29,13 +33,15 @@ const MainButton = styled.button(MainButtonStyles);
 export const GrayButton = styled(MainButton)`
   background-color: #bdbdbd;
   color: rgba(0, 0, 0, 0.87);
-`;
-export const GreenButton = styled(MainButton)`
-  background-color: #66bb6a;
-  color: rgba(0, 0, 0, 0.87);
+  &:hover { 
+    background-color: #9e9e9e;
+  }
 `;
 export const RedButton = styled(MainButton)`
-  background-color: #ef5350;
+  background-color: #e53935;
   color: rgba(255, 255, 255, 0.87);
+  &:hover { 
+    background-color: #f44336;
+  }
 `;
 export default MainButton;

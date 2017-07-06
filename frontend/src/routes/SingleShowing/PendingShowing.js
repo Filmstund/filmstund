@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import { showings as showingActions } from "../../store/reducers";
 
-import { GreenButton, RedButton } from "../../MainButton";
+import MainButton, { GrayButton } from "../../MainButton";
 import buildUserComponent from "./UserComponentBuilder";
 
 const UserItem = buildUserComponent(({ user }) =>
@@ -20,8 +20,8 @@ const PendingShowing = ({
 }) =>
   <div>
     {!isParticipating &&
-      <GreenButton onClick={handleAttend}>Jag hänger på!</GreenButton>}
-    {isParticipating && <RedButton onClick={handleUnattend}>Avanmäl</RedButton>}
+      <MainButton onClick={handleAttend}>Jag hänger på!</MainButton>}
+    {isParticipating && <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
     <div>
       {showing.participants.map(userId =>
         <UserItem key={userId} userId={userId} />

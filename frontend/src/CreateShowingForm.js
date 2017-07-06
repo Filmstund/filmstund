@@ -10,7 +10,7 @@ import Header from "./Header";
 import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
-import MainButton from "./MainButton";
+import MainButton, { GrayButton } from "./MainButton";
 import { getJson } from "./lib/fetch";
 import { formatYMD } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
@@ -167,7 +167,6 @@ class NewShowing extends React.Component {
             adminId={showing.admin}
             location={showing.location}
             movieId={movieId}
-            onClick={clearSelectedMovie}
           />
           <Field text="Datum:">
             <DatePicker
@@ -198,7 +197,8 @@ class NewShowing extends React.Component {
               onChange={v => this.setShowingValueFromEvent("price", v)}
             />
           </Field>
-          <MainButton onClick={this.handleSubmit}>Skapa visning</MainButton>
+          <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>
+          <MainButton onClick={this.handleSubmit}>Skapa besök</MainButton>
         </div>
       </div>
     );
