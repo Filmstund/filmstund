@@ -17,10 +17,17 @@ jobs:
     steps:
       - checkout:
           path: ~/itbio
-      - run: npm install
-      - run: rm -rf build/*
-      - run: npm run build
-      - run: npm run test
+      - restore_cache:
+          name: Restoring node_modules
+          key: v1-node_modules-{{ checksum "yarn.lock" }}
+      - run: yarn
+      - save_cache:
+          name: Caching node_modules
+          key: v1-node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+      - run: yarn run build
+      - run: yarn run test
       - run: tar -czvf build.tar.gz build/*
       - store_artifacts:
           path: build.tar.gz
