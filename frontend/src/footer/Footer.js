@@ -4,26 +4,25 @@ import GitHubLogo from "./GithubLogo";
 import Bioord from "./Bioord";
 
 const BottomContainer = styled.div`
-  background: maroon;
+  background-color: #212121;
+  color: #fafafa;
   padding: 1em;
-  color: white;
   font-weight: 100;
 `;
 
 const FlexBox = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 `;
 
 const FlexGrow = styled.div`flex: 1;`;
 
-const TopBar = () => {
+const Footer = () => {
   return (
     <BottomContainer>
-      <Bioord />
       <FlexBox>
         <FlexGrow>
-          <small>Courtesy of didIT (& Tuna)</small>
+          <Bioord />
         </FlexGrow>
         <a href="https://github.com/cthdidit/itbio">
           <GitHubLogo />
@@ -33,4 +32,4 @@ const TopBar = () => {
   );
 };
 
-export default TopBar;
+export default Footer;

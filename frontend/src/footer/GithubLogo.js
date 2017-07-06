@@ -16,5 +16,5 @@ const Logo = ({ className }) =>
   </svg>;
 
 export default styled(Logo)`
-    fill: white;
+    fill: #fafafa;
 `;
