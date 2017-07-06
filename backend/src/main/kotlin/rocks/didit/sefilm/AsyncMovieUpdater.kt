@@ -10,6 +10,7 @@ import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 @Component
@@ -76,8 +77,9 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   private fun fetchExtendedInfoForMovie(movie: Movie) {
     log.debug("Fetching extended info for movie id=${movie.id}")
     when {
+      movie.tmdbId != null -> updateFromTmdbById(movie)
+      movie.imdbId != null -> updateFromTmdbByImdbId(movie)
       movie.sfId != null -> updateFromSf(movie)
-      movie.imdbId != null -> updateFromTmdbById(movie)
       else -> updateFromImdbByTitle(movie)
     }
   }
@@ -102,6 +104,17 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun updateFromTmdbById(movie: Movie) {
+    if (movie.tmdbId == null) {
+      log.info("[TMDb] Movie[${movie.id} is missing an TMDb id")
+      return
+    }
+
+    log.info("[TMDb] Fetching movie details by TMDb ID=${movie.tmdbId}")
+    val movieDetails = imdbClient.movieDetailsExact(movie.tmdbId)
+    movieRepository.save(movie.copyDetails(movieDetails))
+  }
+
+  private fun updateFromTmdbByImdbId(movie: Movie) {
     if (movie.imdbId == null) {
       log.info("[TMDb] Movie[${movie.id} is missing an IMDb id")
       return
@@ -156,6 +169,10 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       productionYear = movieDetails.release_date.year,
       releaseDate = movieDetails.release_date,
       genres = movieDetails.genres.map { it.name },
-      poster = movieDetails.fullPosterPath())
+      poster = movieDetails.fullPosterPath(),
+      tmdbId = movieDetails.id,
+      popularity = movieDetails.popularity,
+      popularityLastUpdated = Instant.now(),
+      imdbId = movieDetails.imdb_id)
   }
 }

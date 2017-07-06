@@ -21,6 +21,6 @@ data class ImdbResult(val l: String,
                       val id: String,
                       val s: String?,
                       val y: Int?,
-                      val q: String,
+                      val q: String?,
                       val i: List<String>?)
 

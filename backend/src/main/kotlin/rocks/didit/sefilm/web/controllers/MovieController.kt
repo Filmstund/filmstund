@@ -33,7 +33,7 @@ class MovieController(private val repo: MovieRepository,
   private val log = LoggerFactory.getLogger(MovieController::class.java)
 
   @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findAll() = repo.findAll()
+  fun findAll() = repo.findAll().sortedByDescending { it.popularity }
 
   @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun findOne(@PathVariable id: UUID): Movie {
@@ -45,6 +45,7 @@ class MovieController(private val repo: MovieRepository,
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
       body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
+      body.tmdb != null -> imdbClient.movieDetailsExact(body.tmdb).toMovie()
       body.imdb != null -> imdbClient.movieDetails(body.imdb).toMovie()
       else -> throw MissingParametersException()
     }
