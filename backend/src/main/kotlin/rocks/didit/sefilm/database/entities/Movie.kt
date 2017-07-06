@@ -42,6 +42,6 @@ data class Movie(
   fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 2
 
   fun isMissingImdbId(): Boolean {
-    return imdbId.isNullOrBlank() || imdbId != "N/A"
+    return imdbId.isNullOrBlank() || imdbId == "N/A"
   }
 }
