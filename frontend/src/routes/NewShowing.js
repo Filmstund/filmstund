@@ -44,7 +44,7 @@ class NewShowing extends React.Component {
 
   renderRequestButton = () => {
     if (this.state.requestingData) {
-      return <Loader size={70} color="maroon" />;
+      return <Loader size={70} color="#b71c1c" />;
     } else {
       return <GrayButton onClick={this.requestSFData}>Uppdatera data från SF</GrayButton>;
     }

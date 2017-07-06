@@ -1,6 +1,6 @@
 import React from "react";
 
-const Loader = ({ color = "maroon", size = 150 }) =>
+const Loader = ({ color = "#b71c1c", size = 150 }) =>
   <svg
     width={size + "px"}
     height={size + "px"}

@@ -7,7 +7,8 @@ const LoadingImage = styled.div`
     background-image: url(${props => props.src});
     background-size: cover;
     height: 96px;
-    width: 150px;
+    width: 150px;    
+    margin: 0 auto;
 `;
 
 const ProjectorLoader = () => (<div >
