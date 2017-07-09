@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, Redirect, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { ConnectedRouter } from "react-router-redux";
 import { Provider, connect } from "react-redux";
 import { me, meta } from "./store/reducers";
@@ -25,13 +25,6 @@ const ScrollContainer = styled.div`
   flex-direction: column;
 `;
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: white;
-  height: 100vh;
-`;
-
 const AsyncHome = asyncComponent(() => import("./routes/Home"));
 const AsyncUser = asyncComponent(() => import("./routes/User"));
 const AsyncShowings = asyncComponent(() => import("./routes/Showings"));
@@ -49,26 +42,14 @@ class App extends Component {
     const { status } = this.props;
     const signedIn = status.data.id !== undefined;
 
-    if (!signedIn) {
-      return (
-        <Container>
-          <Login />
-        </Container>
-      );
-    }
-
     return (
       <ConnectedRouter history={history}>
-        <Container>
+        <Login signedIn={signedIn}>
           <TopBar />
           <ScrollContainer>
             <PaddingContainer>
               <Switch>
                 <Route exact path="/" component={AsyncHome} />
-                <Route
-                  path="/login"
-                  render={() => (signedIn ? <Redirect to="/" /> : <Login />)}
-                />
                 <Route path="/user" component={AsyncUser} />
                 <Route exact path="/showings" component={AsyncShowings} />
                 <Route
@@ -83,7 +64,7 @@ class App extends Component {
             </PaddingContainer>
             <Footer />
           </ScrollContainer>
-        </Container>
+        </Login>
       </ConnectedRouter>
     );
   }
