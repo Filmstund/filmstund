@@ -1,6 +1,7 @@
 import { omit } from "lodash";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { USER_SIGNOUT_ACTION } from "./user";
+import { requestAndValidate } from "./helper";
 
 const idTransform = f => f;
 const appendId = (...pathComponents) => pathComponents.join("/");
@@ -106,7 +107,7 @@ const crudReducer = (name, path, transform = idTransform) => {
     requestIndex: () => dispatch => {
       dispatch({ type: actions.requestIndex });
 
-      fetch(path)
+      requestAndValidate(dispatch, fetch, path)
         .then(data =>
           dispatch({
             type: actions.successIndex,
@@ -119,7 +120,7 @@ const crudReducer = (name, path, transform = idTransform) => {
     requestSingle: id => dispatch => {
       dispatch({ type: actions.requestSingle, id });
 
-      fetch(appendId(path, id))
+      requestAndValidate(dispatch, fetch, appendId(path, id))
         .then(data =>
           dispatch({ type: actions.successSingle, data: transform(data) })
         )
@@ -129,7 +130,7 @@ const crudReducer = (name, path, transform = idTransform) => {
     requestCreate: data => dispatch => {
       dispatch({ type: actions.requestCreate, data });
 
-      jsonRequest(path, data)
+      requestAndValidate(dispatch, jsonRequest, path, data)
         .then(data =>
           dispatch({ type: actions.successCreate, data: transform(data) })
         )
@@ -139,7 +140,13 @@ const crudReducer = (name, path, transform = idTransform) => {
     requestUpdate: data => dispatch => {
       dispatch({ type: actions.requestUpdate, data });
 
-      jsonRequest(appendId(path, data.id), data, "PUT")
+      requestAndValidate(
+        dispatch,
+        jsonRequest,
+        appendId(path, data.id),
+        data,
+        "PUT"
+      )
         .then(data =>
           dispatch({ type: actions.successUpdate, data: transform(data) })
         )
@@ -149,7 +156,13 @@ const crudReducer = (name, path, transform = idTransform) => {
     requestDelete: id => dispatch => {
       dispatch({ type: actions.requestDelete, id });
 
-      jsonRequest(appendId(path, id), {}, "DELETE")
+      requestAndValidate(
+        dispatch,
+        jsonRequest,
+        appendId(path, id),
+        {},
+        "DELETE"
+      )
         .then(id => dispatch({ type: actions.successDelete, id }))
         .catch(error => dispatch({ type: actions.errorDelete, error }));
     }
@@ -217,7 +230,7 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
     requestSingle: () => dispatch => {
       dispatch({ type: actions.requestSingle });
 
-      fetch(path)
+      requestAndValidate(dispatch, fetch, path)
         .then(data => dispatch({ type: actions.successSingle, data }))
         .catch(error => dispatch({ type: actions.errorSingle, error }));
     },
@@ -225,7 +238,7 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
     requestUpdate: data => dispatch => {
       dispatch({ type: actions.requestUpdate, data });
 
-      jsonRequest(path, data, "PUT")
+      requestAndValidate(dispatch, jsonRequest, path, data, "PUT")
         .then(data => dispatch({ type: actions.successUpdate, data }))
         .catch(error => dispatch({ type: actions.errorUpdate, error }));
     },
