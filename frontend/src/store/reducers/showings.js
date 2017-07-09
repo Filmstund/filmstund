@@ -3,6 +3,7 @@ import { push } from "react-router-redux";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 import { USER_SIGNOUT_ACTION } from "./user";
+import { requestAndValidate } from "./helper";
 
 const path = withBaseURL("/showings");
 
@@ -137,7 +138,7 @@ const actionCreators = {
   requestIndex: () => dispatch => {
     dispatch({ type: actions.requestIndex });
 
-    fetch(path)
+    requestAndValidate(dispatch, fetch, path)
       .then(data =>
         dispatch({
           type: actions.successIndex,
@@ -150,7 +151,7 @@ const actionCreators = {
   requestSingle: id => dispatch => {
     dispatch({ type: actions.requestSingle, id });
 
-    fetch(appendId(path, id))
+    requestAndValidate(dispatch, fetch, appendId(path, id))
       .then(data =>
         dispatch({ type: actions.successSingle, data: transform(data) })
       )
@@ -160,7 +161,7 @@ const actionCreators = {
   requestCreate: data => dispatch => {
     dispatch({ type: actions.requestCreate, data });
 
-    jsonRequest(path, data)
+    requestAndValidate(dispatch, jsonRequest, path, data)
       .then(data => {
         dispatch({ type: actions.successCreate, data: transform(data) });
         dispatch(push("/showings/" + data.id));
@@ -171,7 +172,7 @@ const actionCreators = {
   requestAttend: id => dispatch => {
     dispatch({ type: actions.requestAttend, id });
 
-    jsonRequest(appendId(path, id, "attend"))
+    requestAndValidate(dispatch, jsonRequest, appendId(path, id, "attend"))
       .then(participants =>
         dispatch({ type: actions.successAttend, id, participants })
       )
@@ -181,7 +182,7 @@ const actionCreators = {
   requestUnattend: id => dispatch => {
     dispatch({ type: actions.requestUnattend, id });
 
-    jsonRequest(appendId(path, id, "unattend"))
+    requestAndValidate(dispatch, jsonRequest, appendId(path, id, "unattend"))
       .then(participants =>
         dispatch({ type: actions.successUnattend, id, participants })
       )
@@ -191,7 +192,13 @@ const actionCreators = {
   requestUpdate: data => dispatch => {
     dispatch({ type: actions.requestUpdate, data });
 
-    jsonRequest(appendId(path, data.id), data, "PUT")
+    requestAndValidate(
+      dispatch,
+      jsonRequest,
+      appendId(path, data.id),
+      data,
+      "PUT"
+    )
       .then(data =>
         dispatch({ type: actions.successUpdate, data: transform(data) })
       )
@@ -201,7 +208,7 @@ const actionCreators = {
   requestDelete: id => dispatch => {
     dispatch({ type: actions.requestDelete, id });
 
-    jsonRequest(appendId(path, id), {}, "DELETE")
+    requestAndValidate(dispatch, jsonRequest, appendId(path, id), {}, "DELETE")
       .then(id => {
         dispatch({ type: actions.successDelete, id });
         dispatch(push("/"));

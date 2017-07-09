@@ -36,28 +36,31 @@ const eTagFetch = (url = null, options = { headers: {} }) => {
   return fetch.call(undefined, url, options);
 };
 
+const parseResponse = resp => {
+  const ct = resp.headers.get("content-type");
+  if (ct && ct.indexOf("application/json") !== -1) {
+    return resp.json();
+  } else {
+    return resp.text();
+  }
+};
+
 const myFetch = (url, opts) => {
   opts = {
     credentials: "include",
     ...opts
   };
   return eTagFetch(url, opts).then(resp => {
-    if (resp.status === 202) {
-      return resp.text();
-    } else if (resp.status >= 200 && resp.status < 300) {
-      return resp.json();
-    } else if (resp.status === 400) {
-      return new Promise((resolve, reject) => {
-        return resp.json().then(json => {
-          reject({
-            ...resp,
-            reason: json.reason || json
-          });
-        });
+    return new Promise((resolve, reject) => {
+      return parseResponse(resp).then(parsedResp => {
+        if (resp.ok) {
+          resolve(parsedResp);
+        } else {
+          resp.reason = parsedResp.reason || parsedResp;
+          reject(resp);
+        }
       });
-    } else {
-      return Promise.reject(resp);
-    }
+    });
   });
 };
 

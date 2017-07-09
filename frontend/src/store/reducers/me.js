@@ -1,6 +1,7 @@
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
-import { USER_SIGNOUT_ACTION, signoutUser } from "./user";
+import { USER_SIGNOUT_ACTION } from "./user";
+import { requestAndValidate } from "./helper";
 
 const path = withBaseURL("/users/me");
 
@@ -77,23 +78,20 @@ const actionCreators = {
   requestSingle: () => dispatch => {
     dispatch({ type: actions.requestSingle });
 
-    fetch(path)
+    requestAndValidate(dispatch, fetch, path)
       .then(data => {
         dispatch({ type: actions.successSingle, data });
         dispatch({ type: "USERS_RESPONSE_SINGLE", data });
       })
       .catch(error => {
         dispatch({ type: actions.errorSingle, error });
-        if (error.status === 403) {
-          dispatch(signoutUser());
-        }
       });
   },
 
   requestUpdate: data => dispatch => {
     dispatch({ type: actions.requestUpdate, data });
 
-    jsonRequest(path, data, "PUT")
+    requestAndValidate(dispatch, jsonRequest, path, data, "PUT")
       .then(data => {
         dispatch({ type: actions.successUpdate, data });
         dispatch({ type: "USERS_UPDATE_SINGLE", data });
