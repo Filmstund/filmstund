@@ -12,16 +12,12 @@ import TopBar from "./TopBar";
 import Footer from "./footer/Footer";
 import Login from "./routes/Login";
 
-const PaddingContainer = styled.div`
-  padding: 1em;
-  flex: 1;
-`;
+const PaddingContainer = styled.div`padding: 1em;`;
 
 const ScrollContainer = styled.div`
   -webkit-overflow-scrolling: touch;
-  overflow: scroll;
-  height: 100vh;
   display: flex;
+  flex: 1;
   flex-direction: column;
 `;
 

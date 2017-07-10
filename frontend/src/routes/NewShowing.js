@@ -41,9 +41,16 @@ const FlexHeader = styled(Header)`
 `;
 
 const StyledMovie = styled(Movie)`
-  max-width: 18em;
-  min-width: 18em;
   padding: 0.5em;
+  width: 100%;
+
+  @media (min-width: 610px) {
+    max-width: 50%;
+  }
+
+  @media (min-width: 910px) {
+    max-width: 18em;
+  }
 `;
 
 const MovieContainer = styled.div`
@@ -91,6 +98,7 @@ class NewShowing extends React.Component {
           moment(meta.timestamp).format("YYYY-MM-DD HH:mm"));
       return (
         <RefreshButton
+          role="button"
           onClick={this.requestSFData}
           title={"Uppdatera data från SF.\n" + lastUpdateMessage}
         >
