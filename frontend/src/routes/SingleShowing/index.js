@@ -77,6 +77,7 @@ class Showings extends Component {
             closeSwish={() => this.setState({ swish: false })}
           />}
         <Showing
+          setTitleTag={true}
           movieId={showing.movieId}
           date={showing.date}
           adminId={showing.admin}

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { values, orderBy } from "lodash";
 import moment from "moment";
 import cx from "classnames";
+import Helmet from "react-helmet";
 import styled from "styled-components";
 
 import { jsonRequest } from "../lib/fetch";
@@ -129,6 +130,7 @@ class NewShowing extends React.Component {
 
     return (
       <div>
+        <Helmet title="Skapa besök" />
         <FlexHeader>
           Skapa besök {this.renderRequestButton()}
         </FlexHeader>

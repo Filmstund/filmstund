@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
+import Helmet from "react-helmet";
 import { movies as movieActions, users as userActions } from "./store/reducers";
 import { formatShowingDateTime } from "./lib/dateTools";
 import withLoader from "./lib/withLoader";
@@ -13,6 +14,7 @@ const Showing = ({
   movieId,
   date,
   admin,
+  setTitleTag = false,
   adminId,
   location,
   disabled,
@@ -21,6 +23,8 @@ const Showing = ({
   ...props
 }) =>
   <div {...props}>
+    {setTitleTag &&
+      <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />}
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
       <VerticalPaddingContainer>
         {formatShowingDateTime(date)}

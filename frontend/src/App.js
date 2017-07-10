@@ -4,6 +4,7 @@ import { ConnectedRouter } from "react-router-redux";
 import { Provider, connect } from "react-redux";
 import { me, meta } from "./store/reducers";
 import styled from "styled-components";
+import Helmet from "react-helmet";
 
 import store, { history } from "./store/reducer";
 
@@ -41,6 +42,7 @@ class App extends Component {
     return (
       <ConnectedRouter history={history}>
         <Login signedIn={signedIn}>
+          <Helmet titleTemplate="%s | itbio" />
           <TopBar />
           <ScrollContainer>
             <PaddingContainer>
