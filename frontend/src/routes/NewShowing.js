@@ -25,6 +25,28 @@ const Debugging = styled.div`
   margin: 0 1em 1em;
 `;
 
+const SearchField = styled(Field)`
+  max-width: 100%;
+`;
+
+const RefreshButton = styled.span`
+  color: #b71c1c;
+  mouse: pointer;
+  font-size: 16pt;
+  padding: 0 0.5em;
+`;
+
+const LoaderContainer = styled.div`
+  display: inline;
+  padding: 0 0.5em;
+`
+
+const FlexHeader = styled(Header)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
 class NewShowing extends React.Component {
   constructor(props) {
     super(props);
@@ -51,9 +73,11 @@ class NewShowing extends React.Component {
 
   renderRequestButton = () => {
     if (this.state.requestingData) {
-      return <Loader size={70} color="#b71c1c" />;
+      return <LoaderContainer><Loader height="30px" /></LoaderContainer>;
     } else {
-      return <GrayButton onClick={this.requestSFData}>Uppdatera data från SF</GrayButton>;
+      const { meta } = this.props;
+      const lastUpdateMessage = "Senaste uppdatering: " + ((!meta.timestamp && "aldrig") || moment(meta.timestamp).format("YYYY-MM-DD HH:mm"))
+      return <RefreshButton onClick={this.requestSFData} title={"Uppdatera data från SF.\n" + lastUpdateMessage}><i className="fa fa-refresh" aria-hidden="true"/></RefreshButton>;
     }
   };
 
@@ -80,21 +104,15 @@ class NewShowing extends React.Component {
   }
 
   renderSelectMovie = movies => {
-    const { meta } = this.props;
     const { searchTerm } = this.state;
+
 
     return (
       <div>
-        <Header>Skapa besök</Header>
-        <Debugging>
-          {this.renderRequestButton()}
-          Senaste uppdatering:{" "}
-          {(!meta.timestamp && "aldrig") ||
-          moment(meta.timestamp).format("YYYY-MM-DD HH:mm")}
-        </Debugging>
-        <Field text="Sök:">
+        <FlexHeader>Skapa besök {this.renderRequestButton()}</FlexHeader>
+        <SearchField text="Sök:">
           <Input type="text" onChange={this.setSearchTerm} placeholder="Vilken film vill du se?" value={searchTerm} />
-        </Field>
+        </SearchField>
         {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
           .filter(m => this.searchFilter(m))
           .map(m =>

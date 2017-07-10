@@ -62,8 +62,8 @@ class App extends Component {
                 />
               </Switch>
             </PaddingContainer>
-            <Footer />
           </ScrollContainer>
+          <Footer />
         </Login>
       </ConnectedRouter>
     );

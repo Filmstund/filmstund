@@ -2,11 +2,10 @@ import React from "react";
 import styled from "styled-components";
 
 const QuoteBox = styled.div`
-  padding: 1em 0;
+  padding: 0.5em 0;
   
   > blockquote {
     margin: 0;
-    padding-bottom: 1em;
     > span {
         font-style: italic;
     }

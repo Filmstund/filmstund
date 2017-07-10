@@ -16,6 +16,7 @@ const MainButtonStyles = css`
   width: 100%;
   font-family: "Roboto", sans-serif;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  max-width: 12em;
   &:hover { 
     cursor: pointer;
     background-color: #ffeb3b;
