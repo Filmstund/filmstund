@@ -9,11 +9,22 @@ import Header, { SmallHeader } from "../../Header";
 import CopyValue from "../../CopyValue";
 import Center from "../../Center";
 import Loader from "../../ProjectorLoader";
+import PaymentParticipantsList from "./PaymentParticipantsList";
 import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
 
-const Padding = styled.div`padding: 1em;`;
+const Padding = styled.div`padding: 0 1em;`;
+
+const Close = styled.div`
+  position: absolute;
+  display: inline;
+  font-size: 2em;
+  right: 1em;
+  top: 0.8em;
+  cursor: pointer;
+  
+`
 
 const BuyModal = ({
   ticketPrice,
@@ -38,13 +49,25 @@ const BuyModal = ({
   const { participantInfo, bioklubbnummer, sfBuyLink } = buyData;
   const { ticketsBought } = showing;
 
+  const renderBioklubbkortsnummer = () => {
+    return (<div><SmallHeader>Bioklubbnummer</SmallHeader>
+    {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
+    <hr />
+      ={" "}
+    {bioklubbnummer
+      .map(nbr => parseInt(nbr, 10))
+      .reduce((acc, nbr) => acc + nbr, 0)}
+      {bioklubbnummer.length !== showing.length && <div>Plus {showing.participants.length - bioklubbnummer.length} utan bioklubbkortsnummer</div>}
+    </div>)
+  }
+
   return (
     <Modal>
       <Padding>
-        <button onClick={closeModal}>Stäng</button>
+        <Close onClick={closeModal}><i className="fa fa-times" aria-hidden="true"></i></Close>
         <Padding>
           {ticketsBought &&
-            <ParticipantsList
+            <PaymentParticipantsList
               handlePaidChange={handlePaidChange}
               participants={participantInfo}
             />}
@@ -57,13 +80,8 @@ const BuyModal = ({
                 <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
                   Öppna SF länk i nytt fönster
                 </a>}
-              <SmallHeader>Bioklubbnummer</SmallHeader>
-              {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
-              <hr />
-              ={" "}
-              {bioklubbnummer
-                .map(nbr => parseInt(nbr, 10))
-                .reduce((acc, nbr) => acc + nbr, 0)}
+              <ParticipantsList participants={showing.participants} />
+              {renderBioklubbkortsnummer()}
               <Field text="Biljettpris:">
                 <Input
                   type="number"
