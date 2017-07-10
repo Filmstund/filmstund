@@ -28,8 +28,19 @@ const Header = styled.h3`
   overflow: hidden;
 `;
 
+const filterEnterKey = (event, callback) => {
+  if (event.which === 13) {
+    callback && callback();
+  }
+};
+
 const PosterBox = ({ className, poster, onClick, headerText, children }) =>
-  <div className={className} onClick={onClick}>
+  <div
+    tabIndex="0"
+    className={className}
+    onClick={onClick}
+    onKeyDown={e => filterEnterKey(e, onClick)}
+  >
     <Poster src={poster || alfons} />
     <PaddingContainer>
       <Header>
