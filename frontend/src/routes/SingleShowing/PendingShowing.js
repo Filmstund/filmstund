@@ -45,7 +45,6 @@ class PendingShowing extends Component {
   render() {
     const {  showing,
       isParticipating,
-      handleAttend,
       handleUnattend } = this.props;
 
     return (<div>
