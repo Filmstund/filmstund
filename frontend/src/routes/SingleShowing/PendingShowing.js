@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { showings as showingActions } from "../../store/reducers";
 
 import MainButton, { GrayButton } from "../../MainButton";
-import buildUserComponent from "./UserComponentBuilder";
 import ParticipantList from "./ParticipantsList";
 
 
