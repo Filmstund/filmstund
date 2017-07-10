@@ -36,7 +36,7 @@ const filterEnterKey = (event, callback) => {
 
 const PosterBox = ({ className, poster, onClick, headerText, children }) =>
   <div
-    tabIndex="0"
+    tabIndex={onClick ? "0" : "-1"}
     className={className}
     onClick={onClick}
     onKeyDown={e => filterEnterKey(e, onClick)}
