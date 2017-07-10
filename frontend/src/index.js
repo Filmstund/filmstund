@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "react-dom";
 import { injectGlobal } from "styled-components";
 
 import App from "./App";
@@ -13,9 +13,12 @@ injectGlobal`
     background: white;
     color: #212121;
   }
+  html, body, #root {
+     height: 100%;
+  }
   *, *:before, *:after {
     box-sizing: border-box;
   }
 `;
 
-ReactDOM.render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById("root"));

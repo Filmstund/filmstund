@@ -14,17 +14,16 @@ const LoginContainer = styled.div`
 
 const Container = styled.div`
   display: flex;
-  height: 100vh;
+  min-height: 100%;
   background-image: url(${background});
   background-size: cover;
   justify-content: center;
-  align-items: center;
 `;
 
 const ContentContainer = styled.div`
   display: flex;
   flex: 1;
-  height: 100vh;
+  min-height: 100%;
   flex-direction: column;
   background: white;
   max-width: 60em;
