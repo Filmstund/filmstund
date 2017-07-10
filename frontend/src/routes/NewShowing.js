@@ -17,7 +17,6 @@ import CreateShowingForm from "../CreateShowingForm";
 import Field from "../Field";
 import Input from "../Input";
 
-
 const SearchField = styled(Field)`
   max-width: 100%;
 `;
@@ -33,25 +32,25 @@ const RefreshButton = styled.span`
 const LoaderContainer = styled.div`
   display: inline;
   padding: 0 0.5em;
-`
+`;
 
 const FlexHeader = styled(Header)`
   display: flex;
   align-items: center;
   justify-content: center;
-`
+`;
 
 const StyledMovie = styled(Movie)`
   max-width: 18em;
   min-width: 18em;
   padding: 0.5em;
-`
+`;
 
 const MovieContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-`
+`;
 
 class NewShowing extends React.Component {
   constructor(props) {
@@ -79,11 +78,25 @@ class NewShowing extends React.Component {
 
   renderRequestButton = () => {
     if (this.state.requestingData) {
-      return <LoaderContainer><Loader height={30} /></LoaderContainer>;
+      return (
+        <LoaderContainer>
+          <Loader height={30} />
+        </LoaderContainer>
+      );
     } else {
       const { meta } = this.props;
-      const lastUpdateMessage = "Senaste uppdatering: " + ((!meta.timestamp && "aldrig") || moment(meta.timestamp).format("YYYY-MM-DD HH:mm"))
-      return <RefreshButton onClick={this.requestSFData} title={"Uppdatera data från SF.\n" + lastUpdateMessage}><i className="fa fa-refresh" aria-hidden="true"/></RefreshButton>;
+      const lastUpdateMessage =
+        "Senaste uppdatering: " +
+        ((!meta.timestamp && "aldrig") ||
+          moment(meta.timestamp).format("YYYY-MM-DD HH:mm"));
+      return (
+        <RefreshButton
+          onClick={this.requestSFData}
+          title={"Uppdatera data från SF.\n" + lastUpdateMessage}
+        >
+          <i className="fa fa-refresh" aria-hidden="true" />
+        </RefreshButton>
+      );
     }
   };
 
@@ -112,23 +125,29 @@ class NewShowing extends React.Component {
   renderSelectMovie = movies => {
     const { searchTerm } = this.state;
 
-
     return (
       <div>
-        <FlexHeader>Skapa besök {this.renderRequestButton()}</FlexHeader>
-        <SearchField >
-          <Input type="text" onChange={this.setSearchTerm} placeholder="Vilken film vill du se?" value={searchTerm} />
+        <FlexHeader>
+          Skapa besök {this.renderRequestButton()}
+        </FlexHeader>
+        <SearchField>
+          <Input
+            type="text"
+            onChange={this.setSearchTerm}
+            placeholder="Vilken film vill du se?"
+            value={searchTerm}
+          />
         </SearchField>
         <MovieContainer>
-        {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
-          .filter(m => this.searchFilter(m))
-          .map(m =>
-            <StyledMovie
-              key={m.id}
-              movie={m}
-              onClick={() => this.setState({ movieId: m.id })}
-            />
-          )}
+          {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
+            .filter(m => this.searchFilter(m))
+            .map(m =>
+              <StyledMovie
+                key={m.id}
+                movie={m}
+                onClick={() => this.setState({ movieId: m.id })}
+              />
+            )}
         </MovieContainer>
       </div>
     );

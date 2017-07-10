@@ -10,7 +10,10 @@ const Label = styled.label`
 
 const Field = ({ children, text, ...props }) =>
   <div {...props}>
-    <Label>{text}</Label><br />
+    <Label>
+      {text}
+    </Label>
+    <br />
     {children}
   </div>;
 

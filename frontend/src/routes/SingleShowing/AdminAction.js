@@ -153,8 +153,12 @@ class AdminAction extends Component {
           </div>}
 
         {ticketsBought
-          ? <GrayButton onClick={this.handleStartBooking}>Visa betalningsstatus</GrayButton>
-          : <MainButton onClick={this.handleStartBooking}>Alla är med, nu bokar vi!</MainButton>}
+          ? <GrayButton onClick={this.handleStartBooking}>
+              Visa betalningsstatus
+            </GrayButton>
+          : <MainButton onClick={this.handleStartBooking}>
+              Alla är med, nu bokar vi!
+            </MainButton>}
         {ticketsBought &&
           <MainButton
             disabled={isCreatingEvent}

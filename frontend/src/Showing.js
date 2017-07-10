@@ -6,9 +6,7 @@ import { formatShowingDateTime } from "./lib/dateTools";
 import withLoader from "./lib/withLoader";
 import PosterBox from "./PosterBox";
 
-const VerticalPaddingContainer = styled.div`
-  padding: 1em 0;
-`;
+const VerticalPaddingContainer = styled.div`padding: 1em 0;`;
 
 const Showing = ({
   movie = {},
@@ -25,10 +23,15 @@ const Showing = ({
   <div {...props}>
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
       <VerticalPaddingContainer>
-        {formatShowingDateTime(date)}<br />
-        {location}<br />
+        {formatShowingDateTime(date)}
+        <br />
+        {location}
+        <br />
       </VerticalPaddingContainer>
-      {admin && <span>Skapad av {admin.nick || admin.name}</span>}
+      {admin &&
+        <span>
+          Skapad av {admin.nick || admin.name}
+        </span>}
     </PosterBox>
   </div>;
 

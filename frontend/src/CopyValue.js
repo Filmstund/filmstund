@@ -22,7 +22,13 @@ class CopyValue extends Component {
   };
 
   render() {
-    return <div><Hover onClick={this.onClick}>{this.props.text}</Hover></div>;
+    return (
+      <div>
+        <Hover onClick={this.onClick}>
+          {this.props.text}
+        </Hover>
+      </div>
+    );
   }
 }
 

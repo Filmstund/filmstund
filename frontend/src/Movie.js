@@ -3,9 +3,7 @@ import styled from "styled-components";
 import { formatShowingDate, getTodaysDate } from "./lib/dateTools";
 import PosterBox from "./PosterBox";
 
-const VerticalPaddingContainer = styled.div`
-  padding: 1em 0;
-`;
+const VerticalPaddingContainer = styled.div`padding: 1em 0;`;
 
 const now = getTodaysDate();
 

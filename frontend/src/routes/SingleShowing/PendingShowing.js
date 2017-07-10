@@ -6,7 +6,6 @@ import { showings as showingActions } from "../../store/reducers";
 import MainButton, { GrayButton } from "../../MainButton";
 import ParticipantList from "./ParticipantsList";
 
-
 const PendingShowing = ({
   showing,
   isParticipating,
@@ -16,7 +15,8 @@ const PendingShowing = ({
   <div>
     {!isParticipating &&
       <MainButton onClick={handleAttend}>Jag hänger på!</MainButton>}
-    {isParticipating && <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
+    {isParticipating &&
+      <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
     <ParticipantList participants={showing.participants} />
   </div>;
 
