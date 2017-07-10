@@ -6,7 +6,7 @@ const Option = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1em;
-  color: #8E1B1B;
+  color: #8e1b1b;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 `;
 
@@ -24,7 +24,7 @@ const Lable = styled.div`
 const Tag = styled.div`
   display: inline-block;
   border-radius: 1.4em;
-  background-color: #9B9B9B;
+  background-color: #9b9b9b;
   color: white;
   font-size: 0.7em;
   padding: 0.4em;

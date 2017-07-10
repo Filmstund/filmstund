@@ -56,7 +56,7 @@ class Home extends Component {
   renderPrevParticipatedByMe = showings => {
     const { me } = this.props;
     const myShowings = showings.filter(
-        s => s.participants.includes(me.id) && moment(s.date).isBefore(today)
+      s => s.participants.includes(me.id) && moment(s.date).isBefore(today)
     );
 
     return this.renderShowings(myShowings);

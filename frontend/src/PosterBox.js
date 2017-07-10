@@ -15,24 +15,26 @@ const PaddingContainer = styled.div`
 `;
 
 const Poster = styled.div`
-    background-image: url(${props => props.src});
-    background-size: cover;
-    height: 100%;
-    width: 100px;
+  background-image: url(${props => props.src});
+  background-size: cover;
+  height: 100%;
+  width: 100px;
 `;
 
 const Header = styled.h3`
-    font-weight: 300;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
+  font-weight: 300;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 `;
 
 const PosterBox = ({ className, poster, onClick, headerText, children }) =>
   <div className={className} onClick={onClick}>
     <Poster src={poster || alfons} />
     <PaddingContainer>
-      <Header>{headerText}</Header>
+      <Header>
+        {headerText}
+      </Header>
       {children}
     </PaddingContainer>
   </div>;

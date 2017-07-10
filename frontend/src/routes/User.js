@@ -28,7 +28,7 @@ const StatusBox = styled.div`
   margin: 1em 0;
   padding: 1em;
   background-color: ${props => (props.error ? "#ef5353" : "#66bb6a")};
-  color: ${props => (props.error ? "white" : "black")}
+  color: ${props => (props.error ? "white" : "black")};
 `;
 
 const UserName = styled.h3`
@@ -36,9 +36,7 @@ const UserName = styled.h3`
   padding: 0;
 `;
 
-const UserInfo = styled.div`
-  padding: 1em;
-`;
+const UserInfo = styled.div`padding: 1em;`;
 
 class User extends Component {
   constructor(props) {
@@ -86,12 +84,22 @@ class User extends Component {
         <Box>
           <AvatarImage src={me.avatar || alfons} />
           <UserInfo>
-            <UserName>{me.name}</UserName>
-            {me.nick && <div>"{me.nick}"</div>}
-            <div>{me.email}</div>
+            <UserName>
+              {me.name}
+            </UserName>
+            {me.nick &&
+              <div>
+                "{me.nick}"
+              </div>}
+            <div>
+              {me.email}
+            </div>
           </UserInfo>
         </Box>
-        {error && <StatusBox error={true}>{error.reason}</StatusBox>}
+        {error &&
+          <StatusBox error={true}>
+            {error.reason}
+          </StatusBox>}
         {success === true && <StatusBox error={false}>Uppdaterades!</StatusBox>}
         <Field text="Nick:">
           <Input

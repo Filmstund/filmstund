@@ -10,7 +10,11 @@ class Bioord extends Component {
 
   render() {
     const { bioord } = this.props;
-    return <QuoteBox number={bioord.number}>{bioord.phrase}</QuoteBox>;
+    return (
+      <QuoteBox number={bioord.number}>
+        {bioord.phrase}
+      </QuoteBox>
+    );
   }
 }
 

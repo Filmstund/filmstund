@@ -28,7 +28,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   background: white;
   max-width: 60em;
-`
+`;
 
 const LoginDialog = styled.div`
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
@@ -84,7 +84,7 @@ class Login extends Component {
       return (
         <Container>
           <ContentContainer>
-          {children}
+            {children}
           </ContentContainer>
         </Container>
       );
