@@ -8,10 +8,11 @@ import {
 import withLoader from "../../lib/withLoader";
 import { getJson } from "../../lib/fetch";
 
-import Showing from "../../Showing";
+import Showing, { getStatus } from "../../Showing";
 import BoughtShowing from "./BoughtShowing";
 import PendingShowing from "./PendingShowing";
 import AdminAction from "./AdminAction";
+import ParticipantList from "./ParticipantsList";
 import SwishModal from "./SwishModal";
 
 class Showings extends Component {
@@ -49,10 +50,14 @@ class Showings extends Component {
   };
 
   renderBoughtOrPendingShowing = () => {
-    const { showing } = this.props;
+    const { showing, me } = this.props;
 
     if (showing.ticketsBought) {
-      return <BoughtShowing showing={showing} openSwish={this.openSwish} />;
+      if(showing.participants.includes(me.id)) {
+        return <BoughtShowing showing={showing} openSwish={this.openSwish} />;
+      } else {
+        return <ParticipantList participants={showing.participants} />
+      }
     } else {
       return (
         <PendingShowing
@@ -62,6 +67,7 @@ class Showings extends Component {
       );
     }
   };
+
 
   render() {
     const { className, showing, me, loading } = this.props;
@@ -82,6 +88,7 @@ class Showings extends Component {
           date={showing.date}
           adminId={showing.admin}
           location={showing.location.name}
+          status={getStatus(showing)}
         />
         {this.renderBoughtOrPendingShowing()}
         {isAdmin && <AdminAction showing={showing} loading={loading} />}
