@@ -9,6 +9,23 @@ import PosterBox from "./PosterBox";
 
 const VerticalPaddingContainer = styled.div`padding: 1em 0;`;
 
+const Status = styled.div`
+  position: absolute;
+  right: 1em;
+  top: 1em;
+`
+
+const capitilized = (s) => s.substring(0, 1).toUpperCase() + s.substring(1);
+
+export const getStatus = (showing) => {
+  if (showing.ticketsBought) {
+    return 'bokad'
+  } else {
+    return 'planeras'
+  }
+};
+
+
 const Showing = ({
   movie = {},
   movieId,
@@ -16,6 +33,7 @@ const Showing = ({
   admin,
   setTitleTag = false,
   adminId,
+  status,
   location,
   disabled,
   onClick,
@@ -26,6 +44,7 @@ const Showing = ({
     {setTitleTag &&
       <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />}
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
+      {status && <Status>{capitilized(status)}</Status>}
       <VerticalPaddingContainer>
         {formatShowingDateTime(date)}
         <br />
@@ -40,6 +59,7 @@ const Showing = ({
   </div>;
 
 const StyledShowing = styled(Showing)`
+   position: relative;
    &:not(:last-child) { margin-bottom: 1em; }
    opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
