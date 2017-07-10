@@ -6,6 +6,9 @@ import App from "./App";
 
 // eslint-disable-next-line
 injectGlobal`
+  html {
+    background: black;
+  }
   body {
     margin: 0;
     padding: 0;
