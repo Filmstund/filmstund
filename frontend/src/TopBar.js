@@ -55,7 +55,9 @@ class TopBar extends Component {
         <div>
           <Link to="/user">Profil</Link>
           {signedIn &&
-            <ExternalLink onClick={this.handleLogout}>Logga ut</ExternalLink>}
+            <ExternalLink href="#" tabIndex="0" onClick={this.handleLogout}>
+              Logga ut
+            </ExternalLink>}
         </div>
       </TopBarContainer>
     );

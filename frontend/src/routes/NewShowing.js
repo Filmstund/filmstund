@@ -21,9 +21,11 @@ const SearchField = styled(Field)`
   max-width: 100%;
 `;
 
-const RefreshButton = styled.span`
+const RefreshButton = styled.button`
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
   color: #b71c1c;
-  mouse: pointer;
   font-size: 16pt;
   padding: 0 0.5em;
   cursor: pointer;
