@@ -49,7 +49,7 @@ const StyledMovie = styled(Movie)`
 const MovieContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
 `;
 
 class NewShowing extends React.Component {
