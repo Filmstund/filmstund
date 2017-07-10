@@ -12,7 +12,8 @@ const BottomContainer = styled.div`
 
 const FlexBox = styled.div`
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  
 `;
 
 const FlexGrow = styled.div`flex: 1;`;

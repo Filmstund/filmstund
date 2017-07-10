@@ -16,6 +16,7 @@ const Field = ({ children, text, ...props }) =>
 
 export default styled(Field)`
   margin-bottom: 1em;
+  max-width: 15em;
   
   >  div { width: 100%; }
   input {

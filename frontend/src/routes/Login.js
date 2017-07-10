@@ -10,16 +10,25 @@ const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url(${background});
-  background-size: cover;
 `;
 
 const Container = styled.div`
   display: flex;
+  height: 100vh;
+  background-image: url(${background});
+  background-size: cover;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex: 1;
+  height: 100vh;
   flex-direction: column;
   background: white;
-  height: 100vh;
-`;
+  max-width: 60em;
+`
 
 const LoginDialog = styled.div`
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
@@ -74,7 +83,9 @@ class Login extends Component {
     if (signedIn) {
       return (
         <Container>
+          <ContentContainer>
           {children}
+          </ContentContainer>
         </Container>
       );
     }
