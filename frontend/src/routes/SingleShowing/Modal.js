@@ -8,6 +8,7 @@ const Padding = styled.div`
   width: 100vw;
   height: 100vh;
   padding: 1em;
+  z-index: 2;
 `;
 
 const Background = styled.div`
