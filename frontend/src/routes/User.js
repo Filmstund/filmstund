@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
+import Helmet from "react-helmet";
 import { mapValues } from "lodash";
 import Field from "../Field";
 import MainButton from "../MainButton";
@@ -81,6 +82,7 @@ class User extends Component {
     const { phone, bioklubbnummer, nick } = this.state.editedUser;
     return (
       <div className={className}>
+        <Helmet title="Profil" />
         <Box>
           <AvatarImage src={me.avatar || alfons} />
           <UserInfo>

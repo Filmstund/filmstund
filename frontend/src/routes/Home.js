@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import moment from "moment";
 import { values, orderBy } from "lodash";
+import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
 import Showing from "../Showing";
@@ -66,6 +67,7 @@ class Home extends Component {
     const { className, showings = [] } = this.props;
     return (
       <div className={className}>
+        <Helmet title="Mina Besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
         <Header>Mina kommande besök</Header>
         {this.renderParticipatedByMe(showings)}
