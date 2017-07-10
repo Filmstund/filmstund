@@ -27,6 +27,7 @@ const RefreshButton = styled.span`
   mouse: pointer;
   font-size: 16pt;
   padding: 0 0.5em;
+  cursor: pointer;
 `;
 
 const LoaderContainer = styled.div`
