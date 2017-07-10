@@ -28,7 +28,6 @@ const Close = styled.div`
 
 const BuyModal = ({
   ticketPrice,
-  showing,
   setPrice,
   loading,
   buyData,
@@ -46,8 +45,14 @@ const BuyModal = ({
     );
   }
 
-  const { participantInfo, bioklubbnummer, sfBuyLink } = buyData;
+  const { participantInfo, bioklubbnummer, sfBuyLink, showing } = buyData;
   const { ticketsBought } = showing;
+
+  const renderForetagsbiljetter = () => {
+    return (<div><SmallHeader>Företagsbiljetter</SmallHeader>
+      {showing.participants.filter(p => p.payment && p.payment !== 'swish').map(p => <CopyValue key={p.payment} text={p.payment} />)}
+    </div>)
+  }
 
   const renderBioklubbkortsnummer = () => {
     return (<div><SmallHeader>Bioklubbnummer</SmallHeader>
@@ -81,6 +86,7 @@ const BuyModal = ({
                   Öppna SF länk i nytt fönster
                 </a>}
               <ParticipantsList participants={showing.participants} />
+              {renderForetagsbiljetter()}
               {renderBioklubbkortsnummer()}
               <Field text="Biljettpris:">
                 <Input

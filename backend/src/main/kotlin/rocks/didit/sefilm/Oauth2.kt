@@ -152,7 +152,8 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                         lastName = principal.lastName,
                         nick = principal.lastName ?: "Houdini",
                         email = principal.username ?: "",
-                        avatar = principal.avatarUrl)
+                        avatar = principal.avatarUrl,
+                        foretagsbiljetter = emptyList())
                 userRepository.save(newUser)
                 log.info("Created new user ${newUser.id}")
             } else {

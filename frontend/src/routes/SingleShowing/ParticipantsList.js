@@ -12,11 +12,10 @@ const UserItem = buildUserComponent(({ user }) =>
 );
 
 const ParticipantsList = ({ participants }) => {
-
   return (<div>
     <SmallHeader>Deltagare</SmallHeader>
-    {participants.map(userId =>
-      <UserItem key={userId} userId={userId} />
+    {participants.map(user =>
+      <UserItem key={user.userID} userId={user.userID} />
     )}
     <div>
       {participants.length} deltagare

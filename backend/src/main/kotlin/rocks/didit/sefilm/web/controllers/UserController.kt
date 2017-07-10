@@ -7,10 +7,7 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.Bioklubbnummer
-import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.toLimitedUserInfo
 
@@ -45,10 +42,16 @@ class UserController(val userRepository: UserRepository) {
       else -> Bioklubbnummer(newDetails.bioklubbnummer!!)
     }
 
+    val newForetagsbiljetter = when {
+      newDetails.foretagsbiljetter == null -> emptyList()
+      else -> newDetails.foretagsbiljetter.map { ftg -> Foretagsbiljett(ftg) }
+    }
+
     val updatedUser = currentUser().copy(
       phone = PhoneNumber(newDetails.phone ?: ""),
       nick = newDetails.nick,
-      bioklubbnummer = newBioklubbnummer)
+      bioklubbnummer = newBioklubbnummer,
+      foretagsbiljetter = newForetagsbiljetter)
 
     return userRepository.save(updatedUser)
   }

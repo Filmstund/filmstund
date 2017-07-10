@@ -23,7 +23,7 @@ const UserWithPriceItem = buildUserComponent(
     </UserActiveStatus>
 );
 
-const ParticipantsList = ({ handlePaidChange, participants }) => {
+const PaymentParticipantsList = ({ handlePaidChange, participants }) => {
   const { hasPaid = [], hasNotPaid = [] } = groupBy(
     participants,
     info => (info.hasPaid ? "hasPaid" : "hasNotPaid")
@@ -58,9 +58,9 @@ const ParticipantsList = ({ handlePaidChange, participants }) => {
   );
 };
 
-ParticipantsList.propTypes = {
+PaymentParticipantsList.propTypes = {
   handlePaidChange: PropTypes.func.isRequired,
   participants: PropTypes.array.isRequired
 };
 
-export default ParticipantsList;
+export default PaymentParticipantsList;

@@ -3,6 +3,7 @@ package rocks.didit.sefilm.database.entities
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import rocks.didit.sefilm.domain.Bioklubbnummer
+import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.UserID
 
@@ -17,5 +18,6 @@ data class User(
   val email: String = "",
   val bioklubbnummer: Bioklubbnummer? = null,
   val phone: PhoneNumber? = null,
-  val avatar: String? = null
+  val avatar: String? = null,
+  val foretagsbiljetter: List<Foretagsbiljett>?
 )

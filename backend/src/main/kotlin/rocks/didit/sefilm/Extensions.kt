@@ -5,10 +5,10 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import java.rmi.UnexpectedException
 import java.time.Duration
 import java.time.Instant
 
@@ -56,4 +56,20 @@ internal fun TmdbMovieDetails.toMovie() =
 
 internal fun User.toLimitedUserInfo(): LimitedUserInfo {
   return LimitedUserInfo(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
+}
+
+internal fun Participant.toLimitedParticipant(): Participant {
+  val userId = currentLoggedInUser()
+  return when(this) {
+    is ForetagsbiljettParticipant -> if(this.userID == userId) this else LimitedParticipant(this.userID)
+    is SwishParticipant -> this
+    is LimitedParticipant -> this
+    else -> {
+      throw UnexpectedException("Oklar instans av participant");
+    }
+  }
+}
+
+internal fun Showing.toLimitedShowing(): Showing {
+  return this.copy(participants = participants.map{p -> p.toLimitedParticipant()}.toSet())
 }

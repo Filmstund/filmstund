@@ -3,6 +3,7 @@ package rocks.didit.sefilm.database.entities
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
+import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import java.time.Instant
@@ -23,6 +24,7 @@ data class Showing(@Id
                    val admin: UserID = UserID(),
                    val payToUser: UserID = admin,
                    val expectedBuyDate: LocalDate? = null,
-                   val participants: Set<UserID> = setOf(),
+                   val participants: Set<Participant> = setOf(),
                    @LastModifiedDate
-                   val lastModifiedDate: Instant = Instant.EPOCH)
+                   val lastModifiedDate: Instant = Instant.EPOCH) {
+}

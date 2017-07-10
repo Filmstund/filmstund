@@ -17,6 +17,7 @@ import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
+import java.rmi.UnexpectedException
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -38,10 +39,10 @@ class ShowingController(private val repo: ShowingRepository,
   private val log = LoggerFactory.getLogger(ShowingController::class.java)
 
   @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findAll() = repo.findByPrivate(false)
+  fun findAll() = repo.findByPrivate(false).map(Showing::toLimitedShowing)
 
   @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findOne(@PathVariable id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id") }
+  fun findOne(@PathVariable id: UUID) = repo.findById(id).map(Showing::toLimitedShowing).orElseThrow { NotFoundException("showing '$id") }
 
   @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
@@ -103,10 +104,10 @@ class ShowingController(private val repo: ShowingRepository,
       showing.location,
       showing.participants
         .stream()
-        .map { userID ->
-          userRepo.findById(userID)
+        .map { participant ->
+          userRepo.findById(participant.userID)
             .map { u -> u.email }
-            .orElseThrow { NotFoundException("user '$userID") }
+            .orElseThrow { NotFoundException("user '$participant.userID") }
 
         }
         .collect(Collectors.toList()),
@@ -137,7 +138,7 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     val participantsInfo = participantRepo.findByShowingId(showing.id)
-    return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo)
+    return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo, showing)
   }
 
   @GetMapping(PATH_WITH_ID + "/pay")
@@ -192,31 +193,41 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun attend(@PathVariable id: UUID): Set<UserID> {
+  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant> {
     val showing = findOne(id)
     verfiyTicketsNotBought(showing)
 
     val participantsPlusLoggedInUser = showing.participants.toMutableSet()
-    participantsPlusLoggedInUser.add(currentLoggedInUser())
+    val userId = currentLoggedInUser()
+
+    val participant = when {
+      body.paymentOption == "swish" -> SwishParticipant(userId)
+      else -> ForetagsbiljettParticipant(userId, Foretagsbiljett(body.paymentOption))
+    }
+
+    participantsPlusLoggedInUser.removeIf {p -> p.userID == userId }
+    participantsPlusLoggedInUser.add(participant)
 
     val savedShowing = repo.save(showing.copy(participants = participantsPlusLoggedInUser))
-    return savedShowing.participants
+
+
+    return savedShowing.participants.map(Participant::toLimitedParticipant)
   }
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun unattend(@PathVariable id: UUID): Set<UserID> {
+  fun unattend(@PathVariable id: UUID): List<Participant> {
     val showing = findOne(id)
     verfiyTicketsNotBought(showing)
 
     val participantsWithoutLoggedInUser = showing.participants.toMutableSet()
-    participantsWithoutLoggedInUser.remove(currentLoggedInUser())
+    participantsWithoutLoggedInUser.removeIf { p -> p.userID == currentLoggedInUser()}
 
     val savedShowing = repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
-    return savedShowing.participants
+    return savedShowing.participants.map(Participant::toLimitedParticipant)
   }
 
   private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
-    val ids = showing.participants.toMutableSet()
+    val ids = showing.participants.map { p -> p.userID }.toMutableList()
     ids.add(showing.admin)
 
     val bioklubbnummer = userRepo.findAllById(ids).map(User::bioklubbnummer).filterNotNull()
@@ -236,27 +247,31 @@ class ShowingController(private val repo: ShowingRepository,
       admin = admin.id,
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,
-      participants = setOf(admin.id))
+      participants = setOf(SwishParticipant(admin.id)))
   }
 
   private fun createInitialParticipantsInfo(showing: Showing) {
+    println(showing)
     val participants = showing.participants.map { participant ->
-      participantRepo.findByShowingIdAndUserId(showing.id, participant)
+      participantRepo.findByShowingIdAndUserId(showing.id, participant.userID)
         .map { p ->
           // Use existing info
           ParticipantInfo(
             id = p.id,
-            userId = participant,
+            userId = participant.userID,
+            participant = participant,
             showingId = showing.id,
             hasPaid = p.hasPaid,
             amountOwed = p.amountOwed)
         }
         .orElseGet {
           // Create new info
-          ParticipantInfo(userId = participant,
-            showingId = showing.id,
-            hasPaid = participant == showing.payToUser,
-            amountOwed = showing.price ?: SEK(0))
+          ParticipantInfo(
+                  userId = participant.userID,
+                  participant = participant,
+                  showingId = showing.id,
+                  hasPaid = participant.userID == showing.payToUser,
+                  amountOwed = showing.price ?: SEK(0))
         }
     }
     participantRepo.saveAll(participants)

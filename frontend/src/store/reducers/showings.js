@@ -169,10 +169,10 @@ const actionCreators = {
       .catch(error => dispatch({ type: actions.errorCreate, error }));
   },
 
-  requestAttend: id => dispatch => {
-    dispatch({ type: actions.requestAttend, id });
+  requestAttend: (id, paymentOption) => dispatch => {
+    dispatch({ type: actions.requestAttend, id, paymentOption });
 
-    requestAndValidate(dispatch, jsonRequest, appendId(path, id, "attend"))
+    requestAndValidate(dispatch, jsonRequest, appendId(path, id, "attend"), { paymentOption })
       .then(participants =>
         dispatch({ type: actions.successAttend, id, participants })
       )
