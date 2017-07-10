@@ -13,17 +13,10 @@ import Header from "../Header";
 import Loader from "../ProjectorLoader";
 import Movie from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
-import { GrayButton } from "../MainButton";
 
 import Field from "../Field";
 import Input from "../Input";
 
-const Debugging = styled.div`
-  background-color: #f5f5f5;
-  padding: 1em;
-  border: solid 1px #e0e0e0;
-  margin: 0 1em 1em;
-`;
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -44,6 +37,18 @@ const LoaderContainer = styled.div`
 const FlexHeader = styled(Header)`
   display: flex;
   align-items: center;
+  justify-content: center;
+`
+
+const StyledMovie = styled(Movie)`
+  max-width: 18em;
+  min-width: 18em;
+  padding: 0.5em;
+`
+
+const MovieContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
 `
 
@@ -73,7 +78,7 @@ class NewShowing extends React.Component {
 
   renderRequestButton = () => {
     if (this.state.requestingData) {
-      return <LoaderContainer><Loader height="30px" /></LoaderContainer>;
+      return <LoaderContainer><Loader height={30} /></LoaderContainer>;
     } else {
       const { meta } = this.props;
       const lastUpdateMessage = "Senaste uppdatering: " + ((!meta.timestamp && "aldrig") || moment(meta.timestamp).format("YYYY-MM-DD HH:mm"))
@@ -110,18 +115,20 @@ class NewShowing extends React.Component {
     return (
       <div>
         <FlexHeader>Skapa besök {this.renderRequestButton()}</FlexHeader>
-        <SearchField text="Sök:">
+        <SearchField >
           <Input type="text" onChange={this.setSearchTerm} placeholder="Vilken film vill du se?" value={searchTerm} />
         </SearchField>
+        <MovieContainer>
         {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
           .filter(m => this.searchFilter(m))
           .map(m =>
-            <Movie
+            <StyledMovie
               key={m.id}
               movie={m}
               onClick={() => this.setState({ movieId: m.id })}
             />
           )}
+        </MovieContainer>
       </div>
     );
   };

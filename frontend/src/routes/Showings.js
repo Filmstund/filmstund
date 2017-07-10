@@ -15,6 +15,7 @@ import { Link } from "../MainButton";
 
 const today = getTodaysDate();
 
+
 class Showings extends Component {
   componentWillMount() {
     this.props.dispatch(showingActions.actions.requestIndex());
