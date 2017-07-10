@@ -5,12 +5,8 @@ import { showings as showingActions } from "../../store/reducers";
 
 import MainButton, { GrayButton } from "../../MainButton";
 import buildUserComponent from "./UserComponentBuilder";
+import ParticipantList from "./ParticipantsList";
 
-const UserItem = buildUserComponent(({ user }) =>
-  <div>
-    {user.nick || user.name} ({user.phone})
-  </div>
-);
 
 const PendingShowing = ({
   showing,
@@ -22,11 +18,7 @@ const PendingShowing = ({
     {!isParticipating &&
       <MainButton onClick={handleAttend}>Jag hänger på!</MainButton>}
     {isParticipating && <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
-    <div>
-      {showing.participants.map(userId =>
-        <UserItem key={userId} userId={userId} />
-      )}
-    </div>
+    <ParticipantList participants={showing.participants} />
   </div>;
 
 const mapDispatchToProps = (dispatch, props) => {
