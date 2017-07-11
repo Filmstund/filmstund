@@ -16,7 +16,8 @@ const Container = styled.div`
   display: flex;
   min-height: 100%;
   background-image: url(${background});
-  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: black;
   justify-content: center;
 `;
 
