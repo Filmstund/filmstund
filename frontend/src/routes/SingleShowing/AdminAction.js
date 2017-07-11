@@ -77,14 +77,13 @@ class AdminAction extends Component {
   handleMarkBought = event => {
     event.preventDefault();
 
-    this.props.requestUpdate({
-      ...this.props.showing,
-      price: this.state.ticketPrice * 100,
-      ticketsBought: true
-    });
-    setTimeout(() => {
-      this.handleStartBooking();
-    }, 2000);
+    this.props
+      .requestUpdate({
+        ...this.props.showing,
+        price: this.state.ticketPrice * 100,
+        ticketsBought: true
+      })
+      .then(this.handleStartBooking);
   };
 
   handleDelete = () => {
