@@ -77,7 +77,7 @@ class Login extends Component {
   };
 
   render() {
-    const { children, className, signedIn } = this.props;
+    const { children, signedIn } = this.props;
 
     if (signedIn) {
       return (
@@ -91,9 +91,13 @@ class Login extends Component {
 
     return (
       <Container>
-        <LoginContainer className={className}>
-          <LoginDialog className={className}>
-            <img src={require("../assets/logo.png")} alt="IT-bio logga" />
+        <LoginContainer>
+          <LoginDialog>
+            <img
+              src={require("../assets/logo.png")}
+              height="260"
+              alt="IT-bio logga"
+            />
             <h3>Logga in för att boka biobesök!</h3>
             <GoogleButton onClick={this.handleGoogleRedirect}>
               <GoogleLogo src={require("../assets/google-logo.svg")} />
