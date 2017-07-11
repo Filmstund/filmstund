@@ -6,7 +6,7 @@ import qs from "qs";
 import background from "../assets/body_background.jpg";
 
 const LoginContainer = styled.div`
-  height: 100%;
+  min-height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
