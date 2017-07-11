@@ -3,25 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "^1.0.7"
+    "react-scripts": "^1.0.10"
   },
   "dependencies": {
-    "history": "^4.6.1",
+    "history": "^4.6.3",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "prop-types": "^15.5.10",
     "qs": "^6.5.0",
-    "react": "^15.5.4",
-    "react-datepicker": "^0.46.0",
-    "react-dom": "^15.5.4",
+    "react": "^15.6.1",
+    "react-datepicker": "^0.49.0",
+    "react-dom": "^15.6.1",
     "react-helmet": "^5.1.3",
     "react-redux": "^5.0.5",
     "react-router-dom": "^4.1.1",
     "react-router-redux": "next",
-    "redux": "^3.6.0",
+    "redux": "^3.7.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "styled-components": "^2.0.0",
+    "styled-components": "^2.1.1",
     "whatwg-fetch": "^2.0.3"
   },
   "scripts": {
