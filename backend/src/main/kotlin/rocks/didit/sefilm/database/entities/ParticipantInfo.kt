@@ -11,7 +11,6 @@ import java.util.*
 data class ParticipantInfo(
         @Id
         val id: UUID = UUID.randomUUID(),
-        val participant: Participant,
         val userId: UserID = UserID(),
         val showingId: UUID = UUID.randomUUID(),
         val hasPaid: Boolean = false,

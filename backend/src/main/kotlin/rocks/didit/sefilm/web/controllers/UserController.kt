@@ -42,10 +42,7 @@ class UserController(val userRepository: UserRepository) {
       else -> Bioklubbnummer(newDetails.bioklubbnummer!!)
     }
 
-    val newForetagsbiljetter = when {
-      newDetails.foretagsbiljetter == null -> emptyList()
-      else -> newDetails.foretagsbiljetter.map { ftg -> Foretagsbiljett(ftg) }
-    }
+    val newForetagsbiljetter = newDetails.foretagsbiljetter.map { ftg -> Foretagsbiljett(ftg) }
 
     val updatedUser = currentUser().copy(
       phone = PhoneNumber(newDetails.phone ?: ""),

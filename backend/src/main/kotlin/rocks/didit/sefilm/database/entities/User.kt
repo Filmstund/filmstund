@@ -19,5 +19,5 @@ data class User(
   val bioklubbnummer: Bioklubbnummer? = null,
   val phone: PhoneNumber? = null,
   val avatar: String? = null,
-  val foretagsbiljetter: List<Foretagsbiljett>?
+  val foretagsbiljetter: List<Foretagsbiljett> = emptyList()
 )

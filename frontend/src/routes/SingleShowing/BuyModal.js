@@ -33,7 +33,8 @@ const BuyModal = ({
   buyData,
   handleMarkBought,
   handlePaidChange,
-  closeModal
+  closeModal,
+  showing
 }) => {
   if (!buyData || loading) {
     return (
@@ -45,12 +46,12 @@ const BuyModal = ({
     );
   }
 
-  const { participantInfo, bioklubbnummer, sfBuyLink, showing } = buyData;
+  const { participantInfo, bioklubbnummer, sfBuyLink, participants } = buyData;
   const { ticketsBought } = showing;
 
   const renderForetagsbiljetter = () => {
     return (<div><SmallHeader>Företagsbiljetter</SmallHeader>
-      {showing.participants.filter(p => p.payment && p.payment !== 'swish').map(p => <CopyValue key={p.payment} text={p.payment} />)}
+      {participants.filter(p => p.payment.type === 'Företagsbiljett').map(p => <CopyValue key={p.payment.extra} text={p.payment.extra} />)}
     </div>)
   }
 

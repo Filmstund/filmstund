@@ -61,15 +61,15 @@ internal fun User.toLimitedUserInfo(): LimitedUserInfo {
 internal fun Participant.toLimitedParticipant(): Participant {
   val userId = currentLoggedInUser()
   return when(this) {
-    is ForetagsbiljettParticipant -> if(this.userID == userId) this else LimitedParticipant(this.userID)
-    is SwishParticipant -> this
-    is LimitedParticipant -> this
-    else -> {
-      throw UnexpectedException("Oklar instans av participant");
+    is PaymentParticipant -> when(this.payment.type) {
+      PaymentType.Swish -> this
+      PaymentType.Företagsbiljett -> if (this.userID == userId) this else LimitedParticipant(this.userID)
+      PaymentType.Other -> this
     }
+    else -> this
   }
 }
 
-internal fun Showing.toLimitedShowing(): Showing {
+internal fun Showing.withoutSensitiveFields(): Showing {
   return this.copy(participants = participants.map{p -> p.toLimitedParticipant()}.toSet())
 }

@@ -9,6 +9,8 @@ import alfons from "../assets/alfons.jpg";
 import { me as meActions } from "../store/reducers";
 import { SmallHeader } from "../Header"
 
+import { trim } from "../Utils";
+
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   display: flex;
@@ -124,16 +126,10 @@ class User extends Component {
     this.updateForetagsbiljetter(foretagsbiljetter);
   };
 
-  trim = (v) => {
-    if(v.trim) {
-      return v.trim()
-    } else {
-      return v.map(item => item.trim())
-    }
-  };
+
 
   handleSubmit = () => {
-    const trimmedValues = mapValues(this.state.editedUser, this.trim);
+    const trimmedValues = mapValues(this.state.editedUser, trim);
     this.props.dispatch(
       meActions.actions.requestUpdate({
         id: this.props.me.id,

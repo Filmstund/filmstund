@@ -7,37 +7,63 @@ import { SmallHeader } from "../../Header";
 import MainButton, { GrayButton } from "../../MainButton";
 import ParticipantList from "./ParticipantsList";
 
+import { capitalize } from "../../Utils";
+
+const createPaymentOption = (type, extra = null) => {
+  type = capitalize(type);
+  if(extra) {
+    return {
+      type: type,
+      extra: extra
+    }
+  }
+  return {
+    type: type,
+  }
+};
+
+const stringifyOption = (option) => {
+  const type = capitalize(option.type);
+  if(option.extra) {
+    return type + ': ' + option.extra
+  } else {
+    return type
+  }
+};
+
+
 class PendingShowing extends Component {
   state = {
-    paymentOption: 'swish'
+    paymentOptionIndex: 0,
+    paymentOptions: [createPaymentOption('swish'), ...this.props.me.foretagsbiljetter.map(ftg => createPaymentOption("företagsbiljett", ftg))]
   };
 
   setPaymentOption = (e) => {
     const {target: { value }} = e;
     this.setState({
-      paymentOption: value
+      paymentOptionIndex: value
     })
   };
 
+
+
   renderPaymentOptions = () => {
-    const { me: { foretagsbiljetter } } = this.props;
-    const { paymentOption } = this.state;
+    const { paymentOptionIndex, paymentOptions } = this.state;
 
     return (<div>
       <SmallHeader>Betalningsalternativ</SmallHeader>
-      <select name="betalningsalternativ" value={paymentOption} onChange={this.setPaymentOption} >
-        <option value="swish">Swish</option>
-        {foretagsbiljetter.map(ftg => <option key={ftg} value={ftg}>Företagsbiljett: {ftg} </option>)}
+      <select name="betalningsalternativ" value={paymentOptionIndex} onChange={this.setPaymentOption} >
+        {paymentOptions.map((option, index) => <option key={index} value={index}>{stringifyOption(option)}</option>)}
       </select>
     </div>)
   };
 
   renderAttendAction = () => {
     const { handleAttend, me } = this.props;
-    const { paymentOption } = this.state;
+    const { paymentOptionIndex, paymentOptions } = this.state;
     return (<div>
       {me.foretagsbiljetter && me.foretagsbiljetter.length > 0 && this.renderPaymentOptions(me.foretagsbiljetter)}
-      <MainButton onClick={() => handleAttend(paymentOption)}>Jag hänger på!</MainButton>
+      <MainButton onClick={() => handleAttend({paymentOption: paymentOptions[paymentOptionIndex]})}>Jag hänger på!</MainButton>
     </div>)
 
   };
@@ -67,7 +93,7 @@ const mapDispatchToProps = (dispatch, props) => {
   const { showing } = props;
 
   return {
-    handleAttend: (paymentOption) => dispatch(requestAttend(showing.id, paymentOption)),
+    handleAttend: (data) => dispatch(requestAttend(showing.id, data)),
     handleUnattend: () => dispatch(requestUnattend(showing.id))
   };
 };

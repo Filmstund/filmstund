@@ -17,7 +17,6 @@ import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
-import java.rmi.UnexpectedException
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -39,10 +38,10 @@ class ShowingController(private val repo: ShowingRepository,
   private val log = LoggerFactory.getLogger(ShowingController::class.java)
 
   @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findAll() = repo.findByPrivate(false).map(Showing::toLimitedShowing)
+  fun findAll() = repo.findByPrivate(false).map(Showing::withoutSensitiveFields)
 
   @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findOne(@PathVariable id: UUID) = repo.findById(id).map(Showing::toLimitedShowing).orElseThrow { NotFoundException("showing '$id") }
+  fun findOne(@PathVariable id: UUID) = repo.findById(id).map(Showing::withoutSensitiveFields).orElseThrow { NotFoundException("showing '$id") }
 
   @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
@@ -138,7 +137,7 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     val participantsInfo = participantRepo.findByShowingId(showing.id)
-    return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo, showing)
+    return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo, showing.participants)
   }
 
   @GetMapping(PATH_WITH_ID + "/pay")
@@ -193,25 +192,21 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant> {
+  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): Set<Participant> {
     val showing = findOne(id)
     verfiyTicketsNotBought(showing)
 
     val participantsPlusLoggedInUser = showing.participants.toMutableSet()
     val userId = currentLoggedInUser()
 
-    val participant = when {
-      body.paymentOption == "swish" -> SwishParticipant(userId)
-      else -> ForetagsbiljettParticipant(userId, Foretagsbiljett(body.paymentOption))
-    }
+    val participant = PaymentParticipant(userId, body.paymentOption)
 
     participantsPlusLoggedInUser.removeIf {p -> p.userID == userId }
     participantsPlusLoggedInUser.add(participant)
 
     val savedShowing = repo.save(showing.copy(participants = participantsPlusLoggedInUser))
 
-
-    return savedShowing.participants.map(Participant::toLimitedParticipant)
+    return savedShowing.participants.map(Participant::toLimitedParticipant).toSet()
   }
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -247,11 +242,10 @@ class ShowingController(private val repo: ShowingRepository,
       admin = admin.id,
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,
-      participants = setOf(SwishParticipant(admin.id)))
+      participants = setOf(PaymentParticipant(admin.id, PaymentOption(PaymentType.Swish, null))))
   }
 
   private fun createInitialParticipantsInfo(showing: Showing) {
-    println(showing)
     val participants = showing.participants.map { participant ->
       participantRepo.findByShowingIdAndUserId(showing.id, participant.userID)
         .map { p ->
@@ -259,7 +253,6 @@ class ShowingController(private val repo: ShowingRepository,
           ParticipantInfo(
             id = p.id,
             userId = participant.userID,
-            participant = participant,
             showingId = showing.id,
             hasPaid = p.hasPaid,
             amountOwed = p.amountOwed)
@@ -268,7 +261,6 @@ class ShowingController(private val repo: ShowingRepository,
           // Create new info
           ParticipantInfo(
                   userId = participant.userID,
-                  participant = participant,
                   showingId = showing.id,
                   hasPaid = participant.userID == showing.payToUser,
                   amountOwed = showing.price ?: SEK(0))
