@@ -242,7 +242,7 @@ class ShowingController(private val repo: ShowingRepository,
       admin = admin.id,
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,
-      participants = setOf(PaymentParticipant(admin.id, PaymentOption(PaymentType.Swish, null))))
+      participants = setOf(PaymentParticipant(admin.id, PaymentOption(PaymentType.Swish))))
   }
 
   private fun createInitialParticipantsInfo(showing: Showing) {
