@@ -171,8 +171,6 @@ const actionCreators = {
 
   requestAttend: (id, paymentOption) => dispatch => {
     dispatch({ type: actions.requestAttend, id, paymentOption });
-    console.log(paymentOption)
-    console.log('PAYMENT', JSON.stringify(paymentOption))
 
     requestAndValidate(dispatch, jsonRequest, appendId(path, id, "attend"), paymentOption)
       .then(participants =>
