@@ -20,7 +20,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 5 * 60 * 1000L
-    private const val UPDATE_INTERVAL = 120 * 60 * 1000L
+    private const val UPDATE_INTERVAL = 43200000L// 12 hours
   }
 
   private val log = LoggerFactory.getLogger(AsyncMovieUpdater::class.java)
