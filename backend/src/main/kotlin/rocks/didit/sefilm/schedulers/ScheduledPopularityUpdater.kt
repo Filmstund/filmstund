@@ -3,10 +3,14 @@ package rocks.didit.sefilm.schedulers
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @Component
@@ -56,12 +60,14 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
   private fun updatePopularity(movie: Movie) {
     val popularityAndId = when {
       movie.tmdbId != null -> fetchPopularityByTmdbId(movie)
-      !movie.isMissingImdbId() -> fetchPopularityByImdbId(movie)
+      !movie.isMissingImdbId() && movie.imdbId != "N/A" -> fetchPopularityByImdbId(movie)
       else -> fetchPopularityByTitle(movie)
     }
 
     if (popularityAndId == null) {
-      log.warn("[Popularity] No info found for movie with ID=${movie.id}")
+      log.warn("[Popularity] No info found for movie with ID=${movie.id}. Next check in approximately 4 weeks")
+      val updatedMovie = movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(4).toInstant(ZoneOffset.UTC))
+      movieRepository.save(updatedMovie)
       return
     }
 
@@ -86,12 +92,17 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun fetchPopularityByImdbId(movie: Movie): PopularityAndId? {
-    if (movie.imdbId == null) {
+    if (movie.isMissingImdbId() || movie.imdbId == "N/A" || movie.imdbId == null) {
       log.warn("[IMDb][Popularity] Movie[${movie.id} is missing an IMDb id")
       return null
     }
 
-    val movieDetails = imdbClient.movieDetails(movie.imdbId)
+    val movieDetails: TmdbMovieDetails
+    try {
+      movieDetails = imdbClient.movieDetails(movie.imdbId)
+    } catch(e: ExternalProviderException) {
+      return null
+    }
     return PopularityAndId(movieDetails.popularity, movieDetails.id, movieDetails.imdb_id)
   }
 

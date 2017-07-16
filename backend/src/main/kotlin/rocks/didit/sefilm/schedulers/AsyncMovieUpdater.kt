@@ -8,6 +8,7 @@ import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
 import java.time.Instant
@@ -20,7 +21,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 5 * 60 * 1000L
-    private const val UPDATE_INTERVAL = 43200000L// 12 hours
+    private const val UPDATE_INTERVAL = 43200000L // 12 hours
   }
 
   private val log = LoggerFactory.getLogger(AsyncMovieUpdater::class.java)
@@ -63,13 +64,13 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     }
   }
 
-  private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || movie.isMissingImdbId()
+  private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || (movie.isMissingImdbId() && movie.imdbId != "N/A")
 
   private fun updateInfo(movie: Movie) {
     if (movie.needsMoreInfo()) {
       fetchExtendedInfoForMovie(movie)
     }
-    if (movie.isMissingImdbId()) {
+    if (movie.isMissingImdbId() && movie.imdbId != "N/A") {
       updateImdbIdBasedOnTitle(movie)
     }
   }
@@ -77,15 +78,15 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   private fun fetchExtendedInfoForMovie(movie: Movie) {
     log.debug("Fetching extended info for movie id=${movie.id}")
     when {
+      movie.sfId != null -> updateFromSf(movie)
       movie.tmdbId != null -> updateFromTmdbById(movie)
       !movie.isMissingImdbId() -> updateFromTmdbByImdbId(movie)
-      movie.sfId != null -> updateFromSf(movie)
       else -> updateFromImdbByTitle(movie)
     }
   }
 
   private fun updateFromSf(movie: Movie): Movie {
-    log.debug("[SF] Fetching extended info by SF if=${movie.sfId}")
+    log.info("[SF] Fetching extended info by SF id=${movie.sfId}")
     val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
     // TODO: if movie not found, set SF id to N/A or something
 
@@ -99,7 +100,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       genres = updatedMovie.genres.map { (name) -> name })
 
     val saved = movieRepository.save(copy)
-    log.debug("[SF] Successfully updated and saved movie[${movie.id}] with SF data")
+    log.info("[SF] Successfully updated and saved movie[${movie.id}] with SF data")
     return saved
   }
 
@@ -128,35 +129,48 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
 
   private fun updateFromImdbByTitle(movie: Movie) {
     log.info("[IMDb] Update movie defaults for title=${movie.title}")
-    val imdbIdOrNA = getFirstImdbIdMatchingTitle(movie.title)
+    val imdbIdOrNA = getFirstImdbIdMatchingTitle(movie.title, movie.productionYear)
 
     if (imdbIdOrNA == "N/A") {
       log.warn("[IMDb] Didn't find an IMDb matching title '${movie.title}'")
       movieRepository.save(movie.copy(imdbId = imdbIdOrNA))
       return
     }
-    log.info("[IMDb] Using IMDb id=$imdbIdOrNA")
+    log.info("[IMDb] Using IMDb ID=$imdbIdOrNA")
     updateFromImdbByTitle(movie.copy(imdbId = imdbIdOrNA))
   }
 
   /** Returns the IMDb id of the first match or "N/A" if nothing were found */
-  private fun getFirstImdbIdMatchingTitle(title: String): String {
+  private fun getFirstImdbIdMatchingTitle(title: String, year: Int?): String {
     log.info("[IMDb] Fetching movie details by title='$title'")
     val searchResults = imdbClient.search(title)
     if (searchResults.isEmpty()) {
       log.warn("[IMDb] No movies found matching '$title'. Nothing to update")
       return "N/A"
     }
+    var firstResult = searchResults.firstOrNull {
+      it.matchesTitleAndYear(title, year)
+    }
 
-    val firstResult = searchResults[0]
-    log.debug("[IMDb] Found ${searchResults.size} results matching $title. Choosing ${firstResult.l} (${firstResult.id})")
+    if (firstResult == null) {
+      log.warn("No search result exactly matching '$title' and year=$year")
+      firstResult = searchResults[0]
+    }
+    log.info("[IMDb] Found ${searchResults.size} results matching $title. Choosing ${firstResult.l} (${firstResult.id})")
     return firstResult.id
+  }
+
+  private fun ImdbResult.matchesTitleAndYear(title: String, year: Int?): Boolean {
+    if (year == null) {
+      return this.l == title
+    }
+    return this.y == year && this.l == title
   }
 
   private fun updateImdbIdBasedOnTitle(movie: Movie) {
     log.info("[IMDb] Update IMDb ID based on title=${movie.title}")
-    val imdbId = getFirstImdbIdMatchingTitle(movie.title)
-    log.debug("[IMDb] Found ID=$imdbId")
+    val imdbId = getFirstImdbIdMatchingTitle(movie.title, movie.productionYear)
+    log.info("[IMDb] ${movie.title} -> IMDb ID=$imdbId")
     val updatedMovie = movie.copy(imdbId = imdbId)
     movieRepository.save(updatedMovie)
   }
@@ -165,9 +179,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     return this.copy(title = movieDetails.title,
       originalTitle = movieDetails.original_title,
       synopsis = movieDetails.overview,
-      runtime = Duration.ofMinutes(movieDetails.runtime.toLong()),
       productionYear = movieDetails.release_date.year,
-      releaseDate = movieDetails.release_date,
       genres = movieDetails.genres.map { it.name },
       poster = movieDetails.fullPosterPath(),
       tmdbId = movieDetails.id,

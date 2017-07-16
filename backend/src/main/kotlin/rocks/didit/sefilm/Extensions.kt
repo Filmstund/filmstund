@@ -49,7 +49,7 @@ internal fun TmdbMovieDetails.toMovie() =
     genres = this.genres.map { it.name },
     productionYear = this.release_date.year,
     synopsis = this.overview,
-    runtime = Duration.ofMinutes(this.runtime.toLong()),
+    runtime = Duration.ofMinutes(this.runtime?.toLong() ?: 0),
     popularity = this.popularity,
     popularityLastUpdated = Instant.now()
   )

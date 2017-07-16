@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Document
@@ -37,11 +38,13 @@ data class Movie(
   }
 
   /** Should we do an extended query to find more information about this movie? */
-  fun needsMoreInfo() = synopsis == null || poster == null || runtime == Duration.ZERO
+  fun needsMoreInfo() = synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
 
   fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 2
 
   fun isMissingImdbId(): Boolean {
-    return imdbId.isNullOrBlank() || imdbId == "N/A"
+    return imdbId == null || !imdbId.matches(Regex("^tt[0-9]{7}"))
   }
+
+  fun durationUntilRelease() = Duration.between(LocalDateTime.now(), releaseDate.atTime(0, 0))
 }
