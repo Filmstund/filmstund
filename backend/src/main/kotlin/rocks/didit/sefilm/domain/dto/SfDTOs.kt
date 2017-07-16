@@ -79,6 +79,10 @@ enum class SfTag {
   TXT,
   EN,
   JA,
+  SV,
+  `Sommar på bio`,
+  `Ej textad`,
+  Textad,
   Unknown
 }
 
