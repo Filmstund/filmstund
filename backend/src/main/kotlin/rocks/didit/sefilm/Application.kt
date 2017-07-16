@@ -26,7 +26,9 @@ import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
+import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
+import rocks.didit.sefilm.domain.MovieTitleExtension
 
 @SpringBootApplication
 @EnableMongoAuditing
@@ -65,6 +67,29 @@ class Application {
         registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
       }
     }
+  }
+
+  @Bean
+  fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieTitleExtension) = ApplicationRunner {
+    val unwantedMovies = movieRepository
+      .findAll()
+      .filter { titleExtensions.isTitleUnwanted(it.title) }
+    log.info("Deleting ${unwantedMovies.size} unwanted movies")
+    movieRepository.deleteAll(unwantedMovies)
+  }
+
+  @Bean
+  fun trimMovieNames(movieRepository: MovieRepository, titleExtensions: MovieTitleExtension) = ApplicationRunner {
+    movieRepository.findAll()
+      .filter {
+        titleExtensions.titleRequiresTrimming(it.title)
+      }
+      .forEach {
+        val newTitle = titleExtensions.trimTitle(it.title)
+        val updatedMovie = it.copy(title = newTitle)
+        log.info("Updating title: '${it.title}' -> '$newTitle'")
+        movieRepository.save(updatedMovie)
+      }
   }
 
   @Bean
