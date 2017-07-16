@@ -153,7 +153,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     }
 
     if (firstResult == null) {
-      log.warn("No search result exactly matching '$title' and year=$year")
+      log.warn("[IMDb] No search result exactly matching '$title' and year=$year")
       firstResult = searchResults[0]
     }
     log.info("[IMDb] Found ${searchResults.size} results matching $title. Choosing ${firstResult.l} (${firstResult.id})")
