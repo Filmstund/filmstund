@@ -66,7 +66,6 @@ class MovieController(private val repo: MovieRepository,
   fun populateFromSf(): SavedEntitiesDTO {
     val sfMovies = sfClient.allMovies()
 
-    // FIXME: ta hänsyn till archived flaggan
     val ourMovies = repo.findAll()
     val newMoviesWeHaventPreviouslySeen = sfMovies
       .filter { (ncgId) -> ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
