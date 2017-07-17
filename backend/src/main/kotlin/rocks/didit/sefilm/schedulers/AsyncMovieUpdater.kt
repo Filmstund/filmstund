@@ -8,6 +8,8 @@ import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
@@ -64,13 +66,13 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     }
   }
 
-  private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || (movie.isMissingImdbId() && movie.imdbId != "N/A")
+  private fun isUpdateRequired(movie: Movie) = movie.needsMoreInfo() || (movie.imdbId.isMissing())
 
   private fun updateInfo(movie: Movie) {
     if (movie.needsMoreInfo()) {
       fetchExtendedInfoForMovie(movie)
     }
-    if (movie.isMissingImdbId() && movie.imdbId != "N/A") {
+    if (movie.imdbId.isMissing()) {
       updateImdbIdBasedOnTitle(movie)
     }
   }
@@ -79,8 +81,8 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     log.debug("Fetching extended info for movie id=${movie.id}")
     when {
       movie.sfId != null -> updateFromSf(movie)
-      movie.tmdbId != null -> updateFromTmdbById(movie)
-      !movie.isMissingImdbId() -> updateFromTmdbByImdbId(movie)
+      movie.tmdbId.isSupplied() -> updateFromTmdbById(movie)
+      movie.imdbId.isSupplied() -> updateFromTmdbByImdbId(movie)
       else -> updateFromImdbByTitle(movie)
     }
   }
@@ -105,8 +107,8 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun updateFromTmdbById(movie: Movie) {
-    if (movie.tmdbId == null) {
-      log.info("[TMDb] Movie[${movie.id} is missing an TMDb id")
+    if (movie.tmdbId.isNotSupplied()) {
+      log.info("[TMDb] Movie[${movie.id} is missing an TMDb ID. TMDb ID state: ${movie.tmdbId.state}")
       return
     }
 
@@ -116,8 +118,8 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun updateFromTmdbByImdbId(movie: Movie) {
-    if (movie.imdbId == null) {
-      log.info("[TMDb] Movie[${movie.id} is missing an IMDb id")
+    if (movie.imdbId.isNotSupplied()) {
+      log.info("[TMDb] The IMDb ID for movie with ID=${movie.id} is not supplied")
       return
     }
 
@@ -129,24 +131,24 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
 
   private fun updateFromImdbByTitle(movie: Movie) {
     log.info("[IMDb] Update movie defaults for title=${movie.title}")
-    val imdbIdOrNA = getFirstImdbIdMatchingTitle(movie.title, movie.productionYear)
+    val imdbId = getFirstImdbIdMatchingTitle(movie.title, movie.productionYear)
 
-    if (imdbIdOrNA == "N/A") {
+    if (imdbId.isUnknown()) {
       log.warn("[IMDb] Didn't find an IMDb matching title '${movie.title}'")
-      movieRepository.save(movie.copy(imdbId = imdbIdOrNA))
+      movieRepository.save(movie.copy(imdbId = imdbId))
       return
     }
-    log.info("[IMDb] Using IMDb ID=$imdbIdOrNA")
-    updateFromImdbByTitle(movie.copy(imdbId = imdbIdOrNA))
+    log.info("[IMDb] Using IMDb ID=$imdbId")
+    updateFromImdbByTitle(movie.copy(imdbId = imdbId))
   }
 
-  /** Returns the IMDb id of the first match or "N/A" if nothing were found */
-  private fun getFirstImdbIdMatchingTitle(title: String, year: Int?): String {
+  /** Returns a Supplied IMDbID from the best match or IMDbID.UNKNOWN if nothing were found */
+  private fun getFirstImdbIdMatchingTitle(title: String, year: Int?): IMDbID {
     log.info("[IMDb] Fetching movie details by title='$title'")
     val searchResults = imdbClient.search(title)
     if (searchResults.isEmpty()) {
       log.warn("[IMDb] No movies found matching '$title'. Nothing to update")
-      return "N/A"
+      return IMDbID.UNKNOWN
     }
     var firstResult = searchResults.firstOrNull {
       it.matchesTitleAndYear(title, year)
@@ -157,7 +159,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       firstResult = searchResults[0]
     }
     log.info("[IMDb] Found ${searchResults.size} results matching $title. Choosing ${firstResult.l} (${firstResult.id})")
-    return firstResult.id
+    return IMDbID.valueOf(firstResult.id)
   }
 
   private fun ImdbResult.matchesTitleAndYear(title: String, year: Int?): Boolean {
@@ -170,7 +172,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   private fun updateImdbIdBasedOnTitle(movie: Movie) {
     log.info("[IMDb] Update IMDb ID based on title=${movie.title}")
     val imdbId = getFirstImdbIdMatchingTitle(movie.title, movie.productionYear)
-    log.info("[IMDb] ${movie.title} -> IMDb ID=$imdbId")
+    log.info("[IMDb] ${movie.title} ⟶ $imdbId")
     val updatedMovie = movie.copy(imdbId = imdbId)
     movieRepository.save(updatedMovie)
   }
@@ -182,9 +184,9 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       productionYear = movieDetails.release_date.year,
       genres = movieDetails.genres.map { it.name },
       poster = movieDetails.fullPosterPath(),
-      tmdbId = movieDetails.id,
+      tmdbId = TMDbID.valueOf(movieDetails.id),
       popularity = movieDetails.popularity,
       popularityLastUpdated = Instant.now(),
-      imdbId = movieDetails.imdb_id)
+      imdbId = IMDbID.valueOf(movieDetails.imdb_id))
   }
 }

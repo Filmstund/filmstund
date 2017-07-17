@@ -46,8 +46,8 @@ class MovieController(private val repo: MovieRepository,
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
       body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
-      body.tmdb != null -> imdbClient.movieDetailsExact(body.tmdb).toMovie()
-      body.imdb != null -> imdbClient.movieDetails(body.imdb).toMovie()
+      body.tmdb != null -> imdbClient.movieDetailsExact(body.tmdb.toTmdbId()).toMovie()
+      body.imdb != null -> imdbClient.movieDetails(body.imdb.toImdbId()).toMovie()
       else -> throw MissingParametersException()
     }
 

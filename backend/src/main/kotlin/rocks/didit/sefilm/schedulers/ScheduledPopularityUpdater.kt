@@ -7,7 +7,11 @@ import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import rocks.didit.sefilm.toImdbId
+import rocks.didit.sefilm.toTmdbId
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -59,8 +63,8 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
 
   private fun updatePopularity(movie: Movie) {
     val popularityAndId = when {
-      movie.tmdbId != null -> fetchPopularityByTmdbId(movie)
-      !movie.isMissingImdbId() && movie.imdbId != "N/A" -> fetchPopularityByImdbId(movie)
+      movie.tmdbId.isSupplied() -> fetchPopularityByTmdbId(movie)
+      movie.imdbId.isSupplied() -> fetchPopularityByImdbId(movie)
       else -> fetchPopularityByTitle(movie)
     }
 
@@ -82,17 +86,17 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun fetchPopularityByTmdbId(movie: Movie): PopularityAndId? {
-    if (movie.tmdbId == null) {
+    if (movie.tmdbId.isNotSupplied()) {
       log.warn("[TMDb][Popularity] Movie[${movie.id} is missing an TMDb id")
       return null
     }
 
     val movieDetails = imdbClient.movieDetailsExact(movie.tmdbId)
-    return PopularityAndId(movieDetails.popularity, movieDetails.id, movieDetails.imdb_id)
+    return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())
   }
 
   private fun fetchPopularityByImdbId(movie: Movie): PopularityAndId? {
-    if (movie.isMissingImdbId() || movie.imdbId == "N/A" || movie.imdbId == null) {
+    if (movie.imdbId.isNotSupplied()) {
       log.warn("[IMDb][Popularity] Movie[${movie.id} is missing an IMDb id")
       return null
     }
@@ -103,7 +107,7 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
     } catch(e: ExternalProviderException) {
       return null
     }
-    return PopularityAndId(movieDetails.popularity, movieDetails.id, movieDetails.imdb_id)
+    return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())
   }
 
   private fun fetchPopularityByTitle(movie: Movie): PopularityAndId? {
@@ -112,9 +116,9 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
 
     if (movieResults.isEmpty()) return null
 
-    val movieDetails = imdbClient.movieDetails(movieResults[0].id)
-    return PopularityAndId(movieDetails.popularity, movieDetails.id, movieDetails.imdb_id)
+    val movieDetails = imdbClient.movieDetails(movieResults[0].id.toImdbId())
+    return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())
   }
 
-  private data class PopularityAndId(val popularity: Double, val tmdbId: Long, val imdbId: String = "N/A")
+  private data class PopularityAndId(val popularity: Double, val tmdbId: TMDbID, val imdbId: IMDbID = IMDbID.MISSING)
 }

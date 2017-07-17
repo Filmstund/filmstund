@@ -13,6 +13,9 @@ import org.springframework.web.util.UriUtils
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.MissingAPIKeyException
 import rocks.didit.sefilm.Properties
+import rocks.didit.sefilm.domain.ExternalProviderId
+import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.ImdbSearchResults
 import rocks.didit.sefilm.domain.dto.TmdbFindExternalResults
@@ -42,20 +45,21 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
         .replace("'", "")
         .replace(":", "")
         .replace("é", "e")
-
-    fun String.isValidImdbId() = Regex("tt[0-9]{7}").matches(this)
   }
 
   private val log = Logger.getLogger(ImdbClient::class.java)
 
-  private fun lookupTmdbIdFromImdbId(imdbId: String): Long? {
-    validateImdbId(imdbId)
+  private fun lookupTmdbIdFromImdbId(imdbId: IMDbID): TMDbID {
+    validateProviderId(imdbId)
     validateApiKeyExists(imdbId)
-    val url = TMDB_EXTERNAL_SEARCH_URL.format(imdbId, properties.tmdb.apikey)
+    val url = TMDB_EXTERNAL_SEARCH_URL.format(imdbId.value, properties.tmdb.apikey)
     val results = restTemplate.exchange<TmdbFindExternalResults>(url, HttpMethod.GET, httpEntity, TmdbFindExternalResults::class.java::class).body
 
-    return results.movie_results.getOrNull(0)?.id
-      ?: return null
+    val movie_results = results.movie_results
+    if (movie_results.isEmpty()) {
+      return TMDbID.UNKNOWN
+    }
+    return TMDbID.valueOf(movie_results[0].id)
   }
 
   fun search(title: String): List<ImdbResult> {
@@ -67,33 +71,38 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
   }
 
   /**
-   * @throws MissingAPIKeyException if the TMDB api hasn't been supplied
+   * Lookup TMDb movie details based on the supplied IMDb ID.
+   * @throws MissingAPIKeyException if the TMDb API-key hasn't been supplied
    * @throws ExternalProviderException if the movie was not found or if the ID didn't uniquely identify the movie
    */
-  fun movieDetails(imdbId: String): TmdbMovieDetails {
-    validateImdbId(imdbId)
+  fun movieDetails(imdbId: IMDbID): TmdbMovieDetails {
+    validateProviderId(imdbId)
     validateApiKeyExists(imdbId)
 
-    val tmdbId = lookupTmdbIdFromImdbId(imdbId) ?: throw ExternalProviderException("movie[$imdbId] not found")
+    val tmdbId = lookupTmdbIdFromImdbId(imdbId)
+    if (tmdbId.isNotSupplied()) {
+      throw ExternalProviderException("movie[$imdbId] not found")
+    }
     return movieDetailsExact(tmdbId)
   }
 
-  fun movieDetailsExact(tmdbId: Long): TmdbMovieDetails {
-    validateApiKeyExists(tmdbId.toString())
+  fun movieDetailsExact(tmdbId: TMDbID): TmdbMovieDetails {
+    validateProviderId(tmdbId)
+    validateApiKeyExists(tmdbId)
 
-    val url = TMDB_INFO_URL.format(tmdbId, properties.tmdb.apikey)
+    val url = TMDB_INFO_URL.format(tmdbId.value, properties.tmdb.apikey)
     val body = restTemplate.exchange<TmdbMovieDetails>(url, HttpMethod.GET, httpEntity, TmdbMovieDetails::class).body
     return body
   }
 
-  private fun validateImdbId(imdbId: String) {
-    if (!imdbId.isValidImdbId()) throw IllegalArgumentException("$imdbId is not a valid IMDb ID")
+  private fun validateProviderId(id: ExternalProviderId) {
+    if (id.isNotSupplied()) throw IllegalArgumentException("Provider ID is not supplied. Got: $id")
   }
 
-  private fun validateApiKeyExists(id: String) {
+  private fun validateApiKeyExists(id: ExternalProviderId) {
     if (!properties.tmdb.apiKeyExists()) {
-      log.warn("TMDB api not set. Unable to fetch info for $id")
-      throw MissingAPIKeyException("TMDB")
+      log.warn("TMDb API key not set. Unable to fetch info for $id")
+      throw MissingAPIKeyException("TMDb")
     }
   }
 
