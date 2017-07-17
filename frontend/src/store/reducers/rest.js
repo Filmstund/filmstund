@@ -59,15 +59,6 @@ const crudReducer = (name, path, transform = idTransform) => {
         };
       case actions.successSingle:
       case actions.successUpdate:
-        return {
-          ...state,
-          loading: false,
-          error: null,
-          data: {
-            ...state.data,
-            [action.data.id]: action.data
-          }
-        };
       case actions.successCreate:
         return {
           ...state,
@@ -170,6 +161,7 @@ const crudReducer = (name, path, transform = idTransform) => {
 
   return {
     reducer,
+    _actions: actions,
     actions: actionCreators
   };
 };
@@ -248,6 +240,7 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
 
   return {
     reducer,
+    _actions: actions,
     actions: actionCreators
   };
 };
