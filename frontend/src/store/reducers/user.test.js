@@ -23,9 +23,21 @@ describe("userActions", () => {
       });
       signoutUser()(dispatchMock, getStateMock);
 
+      expect(dispatchMock).toHaveBeenCalledTimes(2);
       expect(dispatchMock).toHaveBeenCalledWith(
         push(`/login?return_to=${encodeURIComponent("/showings?hello=hej")}`)
       );
+    });
+    it("should not push router if return url is login", () => {
+      const dispatchMock = jest.fn();
+      const getStateMock = jest.fn().mockReturnValue({
+        router: {
+          location: { pathname: "/login", search: "?hello=hej" }
+        }
+      });
+      signoutUser()(dispatchMock, getStateMock);
+
+      expect(dispatchMock).toHaveBeenCalledTimes(1);
     });
   });
 });
