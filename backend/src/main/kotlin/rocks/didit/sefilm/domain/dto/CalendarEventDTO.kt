@@ -10,19 +10,16 @@ data class CalendarEventDTO(val summary: String,
                             val start: Map<String, Serializable>,
                             val end: Map<String, Serializable>) {
 
+  companion object Factory {
+    fun of(summary: String, location: Location?, emails: Collection<String>, start: ZonedDateTime, end: ZonedDateTime): CalendarEventDTO {
 
-    companion object Factory {
-        fun of(summary: String, location: Location?, emails: Collection<String>, start: ZonedDateTime, end: ZonedDateTime) : CalendarEventDTO {
-
-            return CalendarEventDTO(
-                    summary,
-                    (location?.name),
-                    emails.map { mail -> mapOf("email" to mail) },
-                    mapOf("dateTime" to start.toLocalDateTime().toString(), "timeZone" to start.zone),
-                    mapOf("dateTime" to end.toLocalDateTime().toString(), "timeZone" to end.zone)
-            )
-
-        }
-
+      return CalendarEventDTO(
+        summary = summary,
+        location = location?.name ?: "N/A",
+        attendees = emails.map { mapOf("email" to it) },
+        start = mapOf("dateTime" to start.toOffsetDateTime().toString()),
+        end = mapOf("dateTime" to end.toOffsetDateTime().toString())
+      )
     }
+  }
 }

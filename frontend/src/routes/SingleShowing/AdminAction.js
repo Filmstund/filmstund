@@ -122,7 +122,7 @@ class AdminAction extends Component {
   render() {
     const { showing, loading } = this.props;
 
-    const { ticketsBought } = showing;
+    const { ticketsBought, calendarEventId } = showing;
 
     const {
       isCreatingEvent,
@@ -158,7 +158,7 @@ class AdminAction extends Component {
           : <MainButton onClick={this.handleStartBooking}>
               Alla är med, nu bokar vi!
             </MainButton>}
-        {ticketsBought &&
+        {ticketsBought && calendarEventId === null &&
           <MainButton
             disabled={isCreatingEvent}
             onClick={this.handleCreateGoogleEvent}
