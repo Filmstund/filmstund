@@ -6,4 +6,6 @@ import rocks.didit.sefilm.database.entities.Movie
 import java.util.*
 
 @Repository
-interface MovieRepository : CrudRepository<Movie, UUID>
+interface MovieRepository : CrudRepository<Movie, UUID> {
+  fun findByArchivedFalse(): Iterable<Movie>
+}

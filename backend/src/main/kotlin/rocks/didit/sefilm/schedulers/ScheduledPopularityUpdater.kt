@@ -31,7 +31,7 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledMovieUpdates() {
     val moviesWithOldPopularity = movieRepository
-      .findAll()
+      .findByArchivedFalse()
       .filter(Movie::isPopularityOutdated)
     if (moviesWithOldPopularity.isNotEmpty()) {
       log.info("[Schedule] Updating popularity for ${moviesWithOldPopularity.count()} movies")

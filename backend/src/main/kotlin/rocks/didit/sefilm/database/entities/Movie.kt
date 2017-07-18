@@ -31,7 +31,10 @@ data class Movie(
   val lastModifiedDate: Instant = Instant.EPOCH,
   /** How popular the movie is, between 0 and infinity. Updated regularly */
   val popularity: Double = 0.0,
-  val popularityLastUpdated: Instant = Instant.EPOCH
+  val popularityLastUpdated: Instant = Instant.EPOCH,
+  /** If the movie is archived then it will be excluded from common functions
+   *  such as scheduled updates and it won't be visible to end users */
+  val archived: Boolean = false
 ) {
 
   /** Should we do an extended query to find more information about this movie? */
