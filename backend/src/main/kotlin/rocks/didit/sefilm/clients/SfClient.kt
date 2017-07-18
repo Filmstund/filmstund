@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import rocks.didit.sefilm.domain.dto.*
 import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Component
 class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
@@ -16,11 +20,13 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
   }
 
   fun getShowingDates(sfId: String): List<LocalDate> {
+    val startTime = currentDateTimeTruncatedToNearestHalfHour()
+      .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
     val filters = mapOf(
       "countryAlias" to "se",
       "cityAlias" to listOf("GB"),
       "movieNcgId" to listOf(sfId),
-      "timeUtc" to mapOf("greaterThanOrEqualTo" to "2017-07-16T10:30")
+      "timeUtc" to mapOf("greaterThanOrEqualTo" to startTime)
     )
     val sfAggregationRequest = SfAggregationRequest(filters, "dates", listOf(SfAggregationProperty("TimeUtc")))
     val body = SfRequestAggregations(listOf(sfAggregationRequest))
@@ -50,6 +56,12 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
       .exchange("$API_URL/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
         httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
       .body
+  }
+
+  fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
+    val now = ZonedDateTime.now(ZoneOffset.UTC)
+    return now.truncatedTo(ChronoUnit.HOURS)
+      .plusMinutes(30L * (now.minute / 30L))
   }
 }
 
