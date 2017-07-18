@@ -5,7 +5,9 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.LimitedUserInfo
+import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
@@ -40,8 +42,8 @@ internal fun SfExtendedMovieDTO.toMovie() =
 
 internal fun TmdbMovieDetails.toMovie() =
   Movie(
-    imdbId = this.imdb_id,
-    tmdbId = this.id,
+    imdbId = IMDbID.valueOf(this.imdb_id),
+    tmdbId = TMDbID.valueOf(this.id),
     title = this.title,
     poster = this.fullPosterPath(),
     releaseDate = this.release_date,
@@ -49,7 +51,7 @@ internal fun TmdbMovieDetails.toMovie() =
     genres = this.genres.map { it.name },
     productionYear = this.release_date.year,
     synopsis = this.overview,
-    runtime = Duration.ofMinutes(this.runtime.toLong()),
+    runtime = Duration.ofMinutes(this.runtime?.toLong() ?: 0),
     popularity = this.popularity,
     popularityLastUpdated = Instant.now()
   )
@@ -57,3 +59,6 @@ internal fun TmdbMovieDetails.toMovie() =
 internal fun User.toLimitedUserInfo(): LimitedUserInfo {
   return LimitedUserInfo(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
 }
+
+internal fun String.toImdbId() = IMDbID.valueOf(this)
+internal fun Long.toTmdbId() = TMDbID.valueOf(this)

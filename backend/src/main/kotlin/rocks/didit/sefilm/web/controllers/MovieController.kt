@@ -13,6 +13,7 @@ import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.SfMetaRepository
+import rocks.didit.sefilm.domain.MovieTitleExtension
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import java.time.Instant
@@ -24,7 +25,8 @@ class MovieController(private val repo: MovieRepository,
                       private val metaRepo: SfMetaRepository,
                       private val sfClient: SfClient,
                       private val imdbClient: ImdbClient,
-                      private val asyncMovieUpdater: AsyncMovieUpdater) {
+                      private val asyncMovieUpdater: AsyncMovieUpdater,
+                      private val movieTitleTrimmer: MovieTitleExtension) {
 
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/movies"
@@ -46,8 +48,8 @@ class MovieController(private val repo: MovieRepository,
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
       body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
-      body.tmdb != null -> imdbClient.movieDetailsExact(body.tmdb).toMovie()
-      body.imdb != null -> imdbClient.movieDetails(body.imdb).toMovie()
+      body.tmdb != null -> imdbClient.movieDetailsExact(body.tmdb.toTmdbId()).toMovie()
+      body.imdb != null -> imdbClient.movieDetails(body.imdb.toImdbId()).toMovie()
       else -> throw MissingParametersException()
     }
 
@@ -68,9 +70,9 @@ class MovieController(private val repo: MovieRepository,
 
     val ourMovies = repo.findAll()
     val newMoviesWeHaventPreviouslySeen = sfMovies
-      .filter { (ncgId) -> ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
+      .filter { (ncgId, title) -> !movieTitleTrimmer.isTitleUnwanted(title) && ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
       .map { (ncgId, title, releaseDate, _, posterUrl) ->
-        Movie(title = title, sfId = ncgId, releaseDate = releaseDate, poster = posterUrl)
+        Movie(title = movieTitleTrimmer.trimTitle(title), sfId = ncgId, releaseDate = releaseDate, poster = posterUrl)
       }
 
     val savedEntities = repo.saveAll(newMoviesWeHaventPreviouslySeen)
