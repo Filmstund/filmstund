@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.mongodb.config.EnableMongoAuditing
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -22,6 +23,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import rocks.didit.sefilm.database.ImdbIdConverter
+import rocks.didit.sefilm.database.TmdbIdConverter
 import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.BudordRepository
@@ -42,6 +45,12 @@ class Application {
 
   companion object {
     const val API_BASE_PATH = "/api"
+  }
+
+  @Bean
+  fun customMongoConverters(): MongoCustomConversions {
+    val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
+    return MongoCustomConversions(converters)
   }
 
   @Bean

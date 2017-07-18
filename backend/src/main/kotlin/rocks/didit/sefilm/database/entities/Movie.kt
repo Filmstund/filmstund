@@ -3,19 +3,22 @@ package rocks.didit.sefilm.database.entities
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
+import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.TMDbID
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Document
 data class Movie(
   @Id
   val id: UUID = UUID.randomUUID(),
-  val imdbId: String? = null,
+  val imdbId: IMDbID = IMDbID.MISSING,
   val sfId: String? = null,
   val sfSlug: String? = null,
-  val tmdbId: Long? = null,
+  val tmdbId: TMDbID = TMDbID.MISSING,
   val title: String = "",
   val synopsis: String? = null,
   val originalTitle: String? = null,
@@ -30,18 +33,11 @@ data class Movie(
   val popularity: Double = 0.0,
   val popularityLastUpdated: Instant = Instant.EPOCH
 ) {
-  init {
-    if (imdbId != null && imdbId != "N/A" && !imdbId.matches(Regex("^tt[0-9]{7}"))) {
-      throw IllegalArgumentException("Illegal IMDb ID format: $imdbId")
-    }
-  }
 
   /** Should we do an extended query to find more information about this movie? */
-  fun needsMoreInfo() = synopsis == null || poster == null || runtime == Duration.ZERO
+  fun needsMoreInfo() = synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
 
   fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 2
 
-  fun isMissingImdbId(): Boolean {
-    return imdbId.isNullOrBlank() || imdbId == "N/A"
-  }
+  fun durationUntilRelease(): Duration = Duration.between(LocalDateTime.now(), releaseDate.atTime(0, 0))
 }
