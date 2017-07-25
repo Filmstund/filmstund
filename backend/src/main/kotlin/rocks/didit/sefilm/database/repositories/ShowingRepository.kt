@@ -8,4 +8,6 @@ import java.util.*
 @Repository
 interface ShowingRepository : CrudRepository<Showing, UUID> {
   fun findByPrivate(isPrivate: Boolean): List<Showing>
+
+  fun findByMovieId(movieId: UUID): List<Showing>
 }

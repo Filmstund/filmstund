@@ -192,7 +192,7 @@ const actionCreators = {
   requestUpdate: data => dispatch => {
     dispatch({ type: actions.requestUpdate, data });
 
-    requestAndValidate(
+    return requestAndValidate(
       dispatch,
       jsonRequest,
       appendId(path, data.id),

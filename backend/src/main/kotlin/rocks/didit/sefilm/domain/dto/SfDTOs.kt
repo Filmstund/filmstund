@@ -46,12 +46,6 @@ data class SfExtendedMovieDTO(val ncgId: String,
                               val posterUrl: String,
                               val slug: String)
 
-data class SfNameValueDTO(val name: String, val value: String)
-
-data class SfDatesAndLocationsDTO(val cinemas: Collection<SfNameValueDTO>,
-                                  val dates: Collection<LocalDate>,
-                                  val movies: Collection<SfNameValueDTO>)
-
 data class SfAttributeDTO(val alias: String, val displayName: String)
 
 data class SfScreenDTO(val ncgId: String, val screenName: String)
@@ -73,12 +67,29 @@ data class SfShowListingDTO(val id: String, val name: String, val shows: List<Sf
 
 data class SfShowListingEntitiesDTO(val entities: List<SfShowListingDTO>, val totalNumberOfMatchingItems: Int)
 
+data class SfAggregationProperty(val name: String)
+data class SfAggregationRequest(val filters: Map<String, Any>,
+                                val name: String,
+                                val properties: List<SfAggregationProperty>)
+
+data class SfRequestAggregations(val aggregations: List<SfAggregationRequest>)
+
+data class SfResponseAggregations(val aggregations: List<SfAggregationBuckets>)
+
+data class SfAggregationBuckets(val name: String, val buckets: List<SfBucket>)
+
+data class SfBucket(val properties: Map<String, Any>, val count: Long)
+
 enum class SfTag {
   `3D`,
   VIP,
   TXT,
   EN,
   JA,
+  SV,
+  `Sommar på bio`,
+  `Ej textad`,
+  Textad,
   Unknown
 }
 

@@ -2,6 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { values, orderBy } from "lodash";
 import moment from "moment";
+import cx from "classnames";
+import Helmet from "react-helmet";
 import styled from "styled-components";
 
 import { jsonRequest } from "../lib/fetch";
@@ -10,7 +12,6 @@ import { withBaseURL } from "../lib/withBaseURL";
 import { movies, meta } from "../store/reducers";
 
 import Header from "../Header";
-import Loader from "../ProjectorLoader";
 import Movie from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
 
@@ -29,11 +30,6 @@ const RefreshButton = styled.button`
   font-size: 16pt;
   padding: 0 0.5em;
   cursor: pointer;
-`;
-
-const LoaderContainer = styled.div`
-  display: inline;
-  padding: 0 0.5em;
 `;
 
 const FlexHeader = styled(Header)`
@@ -86,28 +82,25 @@ class NewShowing extends React.Component {
   };
 
   renderRequestButton = () => {
-    if (this.state.requestingData) {
-      return (
-        <LoaderContainer>
-          <Loader height={30} />
-        </LoaderContainer>
-      );
-    } else {
-      const { meta } = this.props;
-      const lastUpdateMessage =
-        "Senaste uppdatering: " +
-        ((!meta.timestamp && "aldrig") ||
-          moment(meta.timestamp).format("YYYY-MM-DD HH:mm"));
-      return (
-        <RefreshButton
-          role="button"
-          onClick={this.requestSFData}
-          title={"Uppdatera data från SF.\n" + lastUpdateMessage}
-        >
-          <i className="fa fa-refresh" aria-hidden="true" />
-        </RefreshButton>
-      );
-    }
+    const { requestingData } = this.state;
+
+    const { meta } = this.props;
+    const lastUpdateMessage =
+      "Senaste uppdatering: " +
+      ((!meta.timestamp && "aldrig") ||
+        moment(meta.timestamp).format("YYYY-MM-DD HH:mm"));
+    return (
+      <RefreshButton
+        role="button"
+        onClick={this.requestSFData}
+        title={"Uppdatera data från SF.\n" + lastUpdateMessage}
+      >
+        <i
+          className={cx("fa fa-refresh", { "fa-spin": requestingData })}
+          aria-hidden="true"
+        />
+      </RefreshButton>
+    );
   };
 
   setSearchTerm = term => {
@@ -137,6 +130,7 @@ class NewShowing extends React.Component {
 
     return (
       <div>
+        <Helmet title="Skapa besök" />
         <FlexHeader>
           Skapa besök {this.renderRequestButton()}
         </FlexHeader>

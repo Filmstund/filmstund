@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { values, orderBy, groupBy } from "lodash";
 import moment from "moment";
+import Helmet from "react-helmet";
 
 import { getTodaysDate } from "../lib/dateTools";
 import {
@@ -49,6 +50,7 @@ class Showings extends Component {
 
     return (
       <div className={className}>
+        <Helmet title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
         <Header>Aktuella besök</Header>
         {this.renderShowings(upcoming, false)}

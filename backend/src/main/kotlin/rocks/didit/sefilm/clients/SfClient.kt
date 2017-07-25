@@ -5,20 +5,39 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import rocks.didit.sefilm.domain.dto.SfDatesAndLocationsDTO
-import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
-import rocks.didit.sefilm.domain.dto.SfMovieDTO
-import rocks.didit.sefilm.domain.dto.SfShowListingEntitiesDTO
+import rocks.didit.sefilm.domain.dto.*
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Component
 class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
   companion object {
     const val API_URL = "https://www.sf.se/api"
+    const val AGGREGATIONS_URL = "$API_URL/v2/show/aggregations"
   }
 
-  fun getDatesAndLocations(sfId: String): SfDatesAndLocationsDTO =
-    restTemplate.exchange("$API_URL/v1/shows/quickpickerdata?cityAlias=GB&cinemaIds=&movieIds=$sfId&blockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfDatesAndLocationsDTO::class.java)
-      .body
+  fun getShowingDates(sfId: String): List<LocalDate> {
+    val startTime = currentDateTimeTruncatedToNearestHalfHour()
+      .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
+    val filters = mapOf(
+      "countryAlias" to "se",
+      "cityAlias" to listOf("GB"),
+      "movieNcgId" to listOf(sfId),
+      "timeUtc" to mapOf("greaterThanOrEqualTo" to startTime)
+    )
+    val sfAggregationRequest = SfAggregationRequest(filters, "dates", listOf(SfAggregationProperty("TimeUtc")))
+    val body = SfRequestAggregations(listOf(sfAggregationRequest))
+
+    val aggregationsEntity = HttpEntity<SfRequestAggregations>(body, httpEntity.headers)
+    val responseBody = restTemplate.exchange(AGGREGATIONS_URL, HttpMethod.POST, aggregationsEntity, SfResponseAggregations::class.java).body
+
+    return responseBody.aggregations.first().buckets.map {
+      LocalDate.parse(it.properties["timeUtc"].toString())
+    }
+  }
 
   /** Date must be in ISO8601 format, i.e 2017-04-11 */
   fun getScreensForDateAndMovie(sfId: String, date: String): SfShowListingEntitiesDTO =
@@ -37,6 +56,12 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
       .exchange("$API_URL/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
         httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
       .body
+  }
+
+  fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
+    val now = ZonedDateTime.now(ZoneOffset.UTC)
+    return now.truncatedTo(ChronoUnit.HOURS)
+      .plusMinutes(30L * (now.minute / 30L))
   }
 }
 

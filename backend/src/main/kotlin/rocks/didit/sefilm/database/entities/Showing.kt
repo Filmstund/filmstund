@@ -25,6 +25,7 @@ data class Showing(@Id
                    val payToUser: UserID = admin,
                    val expectedBuyDate: LocalDate? = null,
                    val participants: Set<Participant> = setOf(),
+                   val calendarEventId: String? = null,
                    @LastModifiedDate
                    val lastModifiedDate: Instant = Instant.EPOCH) {
 }

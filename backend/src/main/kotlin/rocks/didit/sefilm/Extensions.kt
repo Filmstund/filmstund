@@ -8,7 +8,6 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
-import java.rmi.UnexpectedException
 import java.time.Duration
 import java.time.Instant
 
@@ -40,8 +39,8 @@ internal fun SfExtendedMovieDTO.toMovie() =
 
 internal fun TmdbMovieDetails.toMovie() =
   Movie(
-    imdbId = this.imdb_id,
-    tmdbId = this.id,
+    imdbId = IMDbID.valueOf(this.imdb_id),
+    tmdbId = TMDbID.valueOf(this.id),
     title = this.title,
     poster = this.fullPosterPath(),
     releaseDate = this.release_date,
@@ -49,7 +48,7 @@ internal fun TmdbMovieDetails.toMovie() =
     genres = this.genres.map { it.name },
     productionYear = this.release_date.year,
     synopsis = this.overview,
-    runtime = Duration.ofMinutes(this.runtime.toLong()),
+    runtime = Duration.ofMinutes(this.runtime?.toLong() ?: 0),
     popularity = this.popularity,
     popularityLastUpdated = Instant.now()
   )
@@ -57,6 +56,10 @@ internal fun TmdbMovieDetails.toMovie() =
 internal fun User.toLimitedUserInfo(): LimitedUserInfo {
   return LimitedUserInfo(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
 }
+
+internal fun String.toImdbId() = IMDbID.valueOf(this)
+internal fun Long.toTmdbId() = TMDbID.valueOf(this)
+
 
 internal fun Participant.toLimitedParticipant(): Participant {
   val userId = currentLoggedInUser()

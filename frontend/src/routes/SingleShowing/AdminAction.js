@@ -77,14 +77,13 @@ class AdminAction extends Component {
   handleMarkBought = event => {
     event.preventDefault();
 
-    this.props.requestUpdate({
-      ...this.props.showing,
-      price: this.state.ticketPrice * 100,
-      ticketsBought: true
-    });
-    setTimeout(() => {
-      this.handleStartBooking();
-    }, 2000);
+    this.props
+      .requestUpdate({
+        ...this.props.showing,
+        price: this.state.ticketPrice * 100,
+        ticketsBought: true
+      })
+      .then(this.handleStartBooking);
   };
 
   handleDelete = () => {
@@ -123,7 +122,7 @@ class AdminAction extends Component {
   render() {
     const { showing, loading } = this.props;
 
-    const { ticketsBought } = showing;
+    const { ticketsBought, calendarEventId } = showing;
 
     const {
       isCreatingEvent,
@@ -159,7 +158,7 @@ class AdminAction extends Component {
           : <MainButton onClick={this.handleStartBooking}>
               Alla är med, nu bokar vi!
             </MainButton>}
-        {ticketsBought &&
+        {ticketsBought && calendarEventId === null &&
           <MainButton
             disabled={isCreatingEvent}
             onClick={this.handleCreateGoogleEvent}

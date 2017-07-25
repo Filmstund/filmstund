@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.clients.GoogleCalenderClient
-import rocks.didit.sefilm.database.entities.Location
-import rocks.didit.sefilm.database.entities.ParticipantInfo
-import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.entities.*
 import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
@@ -21,7 +18,6 @@ import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
-import java.util.stream.Collectors
 
 @RestController
 class ShowingController(private val repo: ShowingRepository,
@@ -89,36 +85,28 @@ class ShowingController(private val repo: ShowingRepository,
 
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun createGoogleCalendarEvent(@PathVariable id: UUID, @RequestBody body: List<String>): ResponseStatusDTO {
-    val showing = repo.findById(id)
-      .map { showing ->
-        if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can create gcal events")
-        showing
-      }
-      .orElseThrow { NotFoundException("showing '$id") }
+    val showing = findOne(id)
+    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can create calendar events")
+    if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
 
     val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
-    val runtime = movie?.runtime ?: Duration.ofHours(2).plusMinutes(30)
+    val runtime = movie.getDurationOrDefault()
+    val participantEmails = userRepo.findAllById(showing.participants.map{ it.userID }).map { it.email }
+    val zoneId = ZoneId.of("Europe/Stockholm")
     val event = CalendarEventDTO.of(
-      movie.title,
-      showing.location,
-      showing.participants
-        .stream()
-        .map { participant ->
-          userRepo.findById(participant.userID)
-            .map { u -> u.email }
-            .orElseThrow { NotFoundException("user '$participant.userID") }
+      summary = movie.title,
+      location = showing.location,
+      emails = participantEmails,
+      start = ZonedDateTime.of(showing.date, showing.time, zoneId).plusSeconds(1),
+      end = ZonedDateTime.of(showing.date, showing.time, zoneId).plus(runtime).plusSeconds(1)
+    )
 
-        }
-        .collect(Collectors.toList()),
-      // Addition of 1 second to prevent too short string format
-      ZonedDateTime.of(showing.date, showing.time, ZoneId.systemDefault()).plusSeconds(1),
-      ZonedDateTime.of(showing.date, showing.time, ZoneId.systemDefault()).plus(runtime).plusSeconds(1))
+    log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
+    val createdEventId = googleCalenderClient.createEvent(event, oauthAccessToken())
+    val updatedShowing = showing.copy(calendarEventId = createdEventId)
+    repo.save(updatedShowing)
 
-    googleCalenderClient.createEvent(event, oauthAccessToken())
-
-    return SuccessfulStatusDTO("Event created")
-
-
+    return SuccessfulStatusDTO("Event with ID=$createdEventId created")
   }
 
   @GetMapping(PATH_WITH_ID + "/buy")
@@ -281,5 +269,12 @@ class ShowingController(private val repo: ShowingRepository,
     val truncatedMovieTitle = movieTitle.substring(0, maxSize)
 
     return StringValue("$truncatedMovieTitle$timeAndDate")
+  }
+
+  private fun Movie.getDurationOrDefault(): Duration {
+    if (this.runtime.isZero) {
+      return Duration.ofHours(2).plusMinutes(30)
+    }
+    return this.runtime
   }
 }

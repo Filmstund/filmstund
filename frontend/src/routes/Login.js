@@ -6,7 +6,7 @@ import qs from "qs";
 import background from "../assets/body_background.jpg";
 
 const LoginContainer = styled.div`
-  height: 100%;
+  min-height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,7 +16,8 @@ const Container = styled.div`
   display: flex;
   min-height: 100%;
   background-image: url(${background});
-  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: black;
   justify-content: center;
 `;
 
@@ -77,7 +78,7 @@ class Login extends Component {
   };
 
   render() {
-    const { children, className, signedIn } = this.props;
+    const { children, signedIn } = this.props;
 
     if (signedIn) {
       return (
@@ -91,9 +92,13 @@ class Login extends Component {
 
     return (
       <Container>
-        <LoginContainer className={className}>
-          <LoginDialog className={className}>
-            <img src={require("../assets/logo.png")} alt="IT-bio logga" />
+        <LoginContainer>
+          <LoginDialog>
+            <img
+              src={require("../assets/logo.png")}
+              height="260"
+              alt="IT-bio logga"
+            />
             <h3>Logga in för att boka biobesök!</h3>
             <GoogleButton onClick={this.handleGoogleRedirect}>
               <GoogleLogo src={require("../assets/google-logo.svg")} />
