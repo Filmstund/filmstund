@@ -50,13 +50,20 @@ class Showings extends Component {
   };
 
   renderBoughtOrPendingShowing = () => {
-    const { showing, me } = this.props;
+    const { showing } = this.props;
+    const { payData } = this.state;
 
     if (showing.ticketsBought) {
-      if(showing.participants.includes(me.id)) {
-        return <BoughtShowing showing={showing} openSwish={this.openSwish} />;
+      if (this.isParticipating()) {
+        return (
+          <BoughtShowing
+            showing={showing}
+            openSwish={this.openSwish}
+            payData={payData}
+          />
+        );
       } else {
-        return <ParticipantList participants={showing.participants} />
+        return <ParticipantList participants={showing.participants} />;
       }
     } else {
       return (
@@ -67,7 +74,6 @@ class Showings extends Component {
       );
     }
   };
-
 
   render() {
     const { className, showing, me, loading } = this.props;
