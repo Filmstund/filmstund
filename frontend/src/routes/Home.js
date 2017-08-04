@@ -49,7 +49,7 @@ class Home extends Component {
   renderParticipatedByMe = showings => {
     const { me } = this.props;
     const myShowings = showings.filter(
-      s => s.participants.includes(me.id) && moment(s.date).isAfter(today)
+      s => s.participants.some(p => p.userID  === me.id) && moment(s.date).isAfter(today)
     );
 
     return this.renderShowings(myShowings);
@@ -58,7 +58,7 @@ class Home extends Component {
   renderPrevParticipatedByMe = showings => {
     const { me } = this.props;
     const myShowings = showings.filter(
-      s => s.participants.includes(me.id) && moment(s.date).isBefore(today)
+      s => s.participants.some(p => p.userID === me.id) && moment(s.date).isBefore(today)
     );
 
     return this.renderShowings(myShowings);
