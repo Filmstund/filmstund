@@ -6,15 +6,17 @@ import { showings as showingActions } from "../../store/reducers";
 import { SmallHeader } from "../../Header";
 import MainButton, { GrayButton } from "../../MainButton";
 import ParticipantList from "./ParticipantsList";
+import moment from "moment";
 
 import { capitalize } from "../../Utils";
 
-const createPaymentOption = (type, extra = null) => {
+const createPaymentOption = (type, extra = null, suffix = null) => {
   type = capitalize(type);
   if(extra) {
     return {
       type: type,
-      extra: extra
+      extra: extra,
+      suffix
     }
   }
   return {
@@ -31,11 +33,16 @@ const stringifyOption = (option) => {
   }
 };
 
+const createForetagsbiljetter = (foretagsbiljetter) => {
+  return foretagsbiljetter
+    .filter(ftg => ftg.status === 'Available' && moment().isBefore(moment(ftg.expires)))
+    .map(ftg => createPaymentOption("företagsbiljett", ftg.value, ftg.expires))
+};
 
 class PendingShowing extends Component {
   state = {
     paymentOptionIndex: 0,
-    paymentOptions: [createPaymentOption('swish'), ...this.props.me.foretagsbiljetter.map(ftg => createPaymentOption("företagsbiljett", ftg))]
+    paymentOptions: [createPaymentOption('swish'), ...createForetagsbiljetter(this.props.me.foretagsbiljetter)]
   };
 
   setPaymentOption = (e) => {

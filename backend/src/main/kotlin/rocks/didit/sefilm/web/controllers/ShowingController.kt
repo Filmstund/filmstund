@@ -125,7 +125,33 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     val participantsInfo = participantRepo.findByShowingId(showing.id)
+    updateFöretagsbiljettAsUsed(showing.participants)
     return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo, showing.participants)
+  }
+
+  private fun updateFöretagsbiljettAsUsed(participants: Set<Participant>) {
+    val relevantUsers = participants.filter { p ->
+      when(p) {
+        is PaymentParticipant -> p.payment.type == PaymentType.Företagsbiljett
+        else -> false
+      }
+    }
+
+    val updatedUsers = mutableListOf<User>()
+    for (u in relevantUsers) {
+      if(u is PaymentParticipant) {
+        val user = userRepo.findById(u.userID).get()
+        val newUser = updateStatus(u, user)
+        updatedUsers.add(newUser)
+      }
+    }
+
+    userRepo.saveAll(updatedUsers)
+  }
+
+  private fun updateStatus(p: PaymentParticipant, u: User): User {
+    val newForetagsbiljetter = u.foretagsbiljetter.map { ftg -> if (ftg.value == p.payment.extra) ftg.copy(status = ForetagsbiljettStatus.Used) else ftg }
+    return u.copy(foretagsbiljetter = newForetagsbiljetter)
   }
 
   @GetMapping(PATH_WITH_ID + "/pay")
@@ -189,12 +215,35 @@ class ShowingController(private val repo: ShowingRepository,
 
     val participant = PaymentParticipant(userId, body.paymentOption)
 
+    if(participant.payment.type == PaymentType.Företagsbiljett) {
+      updateFöretagsbiljettAsPending(userId, participant)
+    }
+
     participantsPlusLoggedInUser.removeIf {p -> p.userID == userId }
     participantsPlusLoggedInUser.add(participant)
 
     val savedShowing = repo.save(showing.copy(participants = participantsPlusLoggedInUser))
 
     return savedShowing.participants.map(Participant::toLimitedParticipant).toSet()
+  }
+
+  private fun updateFöretagsbiljettAsPending(userId: UserID, participant: PaymentParticipant) {
+    val user = userRepo.findById(userId).get();
+    val predicate: (Foretagsbiljett) -> Boolean = { ticket -> ticket.value == participant.payment.extra }
+    if (user.foretagsbiljetter.any(predicate)) {
+      val oldTicket = user.foretagsbiljetter.findLast(predicate)
+      var newTickets = user.foretagsbiljetter.toMutableList()
+      newTickets.remove(oldTicket)
+      val newTicket = Foretagsbiljett(
+              value = oldTicket!!.value,
+              status = ForetagsbiljettStatus.Pending,
+              expires = oldTicket.expires)
+      newTickets.add(newTicket)
+      val newUser = user.copy(foretagsbiljetter = newTickets)
+      userRepo.save(newUser)
+    } else {
+      throw NotFoundException("No such Företagsbiljett found on user")
+    }
   }
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))

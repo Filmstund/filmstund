@@ -42,13 +42,13 @@ class UserController(val userRepository: UserRepository) {
       else -> Bioklubbnummer(newDetails.bioklubbnummer!!)
     }
 
-    val newForetagsbiljetter = newDetails.foretagsbiljetter.map { ftg -> Foretagsbiljett(ftg) }
+    //val newForetagsbiljetter = newDetails.foretagsbiljetter.map { ftg -> Foretagsbiljett(ftg) }
 
     val updatedUser = currentUser().copy(
       phone = PhoneNumber(newDetails.phone ?: ""),
       nick = newDetails.nick,
       bioklubbnummer = newBioklubbnummer,
-      foretagsbiljetter = newForetagsbiljetter)
+      foretagsbiljetter = newDetails.foretagsbiljetter)
 
     return userRepository.save(updatedUser)
   }

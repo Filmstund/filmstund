@@ -1,8 +1,14 @@
 package rocks.didit.sefilm.domain
 
-import com.fasterxml.jackson.annotation.JsonValue
+import java.time.LocalDate
 
-data class Foretagsbiljett(val value: String) {
+enum class ForetagsbiljettStatus {
+  Available, Pending, Used
+}
+
+data class Foretagsbiljett(val value: String,
+                           val status: ForetagsbiljettStatus = ForetagsbiljettStatus.Available,
+                           val expires: LocalDate = LocalDate.now().plusYears(1)) {
   init {
     if (value.length != 11) {
       throw IllegalArgumentException("Företagsbiljett has wrong size. Expected 11, got ${value.length}")
@@ -10,10 +16,5 @@ data class Foretagsbiljett(val value: String) {
     if (value.toLongOrNull() == null) {
       throw IllegalArgumentException("'$value' is an invalid företagsbiljett")
     }
-  }
-
-  @JsonValue
-  override fun toString(): String {
-    return value
   }
 }

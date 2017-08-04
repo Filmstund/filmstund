@@ -9,6 +9,10 @@ import Input from "../Input";
 import alfons from "../assets/alfons.jpg";
 import { me as meActions } from "../store/reducers";
 import { SmallHeader } from "../Header"
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment from "moment";
+import { formatYMD } from "./../lib/dateTools";
 
 import { trim } from "../Utils";
 
@@ -70,6 +74,17 @@ const AddForetagsbiljettContainer = styled.div`
 
 const UserInfo = styled.div`padding: 1em;`;
 
+const ForetagsBiljettStatus = styled.span`
+
+`
+
+const BiljettField = styled(Field)`
+  padding: 0 0.5em;
+`
+
+
+const DEFAULT_DATE = moment().add(1, 'years');
+
 class User extends Component {
   constructor(props) {
     super(props);
@@ -111,14 +126,24 @@ class User extends Component {
   editedForetagsbiljett = (index,  { target: { value } }) => {
     let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
     if(foretagsbiljetter.length > index) {
-      foretagsbiljetter[index] = value
+      let biljett = foretagsbiljetter[index];
+      biljett.value = value;
     }
     this.updateForetagsbiljetter(foretagsbiljetter)
   };
 
+  setForetagsbiljettExpires = (index, value) => {
+    let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
+    if(foretagsbiljetter.length > index) {
+      let biljett = foretagsbiljetter[index];
+      biljett.expires = value;
+    }
+    this.updateForetagsbiljetter(foretagsbiljetter)
+  }
+
   addForetagsbiljett = () => {
     let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
-    foretagsbiljetter.push("");
+    foretagsbiljetter.push({value: "", expires: DEFAULT_DATE});
     this.updateForetagsbiljetter(foretagsbiljetter)
   };
 
@@ -131,6 +156,13 @@ class User extends Component {
 
   handleSubmit = () => {
     const trimmedValues = mapValues(this.state.editedUser, trim);
+    trimmedValues.foretagsbiljetter = this.state.editedUser.foretagsbiljetter
+      .map(ftg => ({
+        value: ftg.value,
+        expires: formatYMD(ftg.expires),
+        status: ftg.status
+      }));
+
     this.props.dispatch(
       meActions.actions.requestUpdate({
         id: this.props.me.id,
@@ -140,13 +172,28 @@ class User extends Component {
   };
 
   renderForetagsbiljett = (ftg, i) => {
+    let date = DEFAULT_DATE;
+    if ( ftg.expires ) {
+      date = moment(ftg.expires)
+    }
     return (<ForetagsbiljettWrapper key={i}>
+      <BiljettField text="Kod/Värde">
       <ForetagsbiljettInput
         type="text"
-        value={ftg}
+        value={ftg.value}
         maxLength={11}
         onChange={v => this.editedForetagsbiljett(i, v)}
       />
+      </BiljettField>
+      <BiljettField text="Går ut">
+        <DatePicker
+          selected={date}
+          onChange={v => this.setForetagsbiljettExpires(i, v)}
+        />
+      </BiljettField>
+      <BiljettField text="Status">
+        <ForetagsBiljettStatus>{ftg.status || "Available"}</ForetagsBiljettStatus>
+      </BiljettField>
       <TrashIcon><i onClick={() => this.removeForetagsbiljett(i)} className="fa fa-trash" aria-hidden="true" /></TrashIcon>
     </ForetagsbiljettWrapper>)
   }
