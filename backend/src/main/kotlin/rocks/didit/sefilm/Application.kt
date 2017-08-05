@@ -11,7 +11,6 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
-import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -20,6 +19,9 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.session.data.mongo.AbstractMongoSessionConverter
+import org.springframework.session.data.mongo.JdkMongoSessionConverter
+import org.springframework.session.data.mongo.config.annotation.web.http.EnableMongoHttpSession
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -34,7 +36,8 @@ import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.domain.MovieTitleExtension
 
 @SpringBootApplication
-@EnableMongoAuditing
+@EnableMongoHttpSession
+//@EnableMongoAuditing // TODO enable when it works together with EnableMongoHttpSession
 @EnableCaching
 @EnableWebSecurity
 @EnableAsync
@@ -46,6 +49,9 @@ class Application {
   companion object {
     const val API_BASE_PATH = "/api"
   }
+
+  @Bean
+  fun mongoSessionConverter(): AbstractMongoSessionConverter = JdkMongoSessionConverter()
 
   @Bean
   fun customMongoConverters(): MongoCustomConversions {
