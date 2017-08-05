@@ -2,7 +2,7 @@ package rocks.didit.sefilm
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-@ConfigurationProperties("sefilm")
+@ConfigurationProperties("sefilm", ignoreInvalidFields = true)
 class Properties {
   var tmdb = Tmdb()
 
