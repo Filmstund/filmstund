@@ -7,7 +7,7 @@ import buildUserComponent from "./UserComponentBuilder";
 
 const UserItem = buildUserComponent(({ user }) =>
   <div>
-    {user.nick || user.name}
+    {user.firstName} '{user.nick}' {user.lastName}
   </div>
 );
 

@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.ParticipantInfo
-import rocks.didit.sefilm.database.repositories.ParticipantInfoRepository
+import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.ParticipantInfoDTO
@@ -15,14 +15,14 @@ import rocks.didit.sefilm.isLoggedInUserAdmin
 import java.util.*
 
 @RestController
-class ParticipantInfoController(private val participantInfoRepo: ParticipantInfoRepository,
+class ParticipantInfoController(private val participantInfoRepo: ParticipantPaymentInfoRepository,
                                 private val showingRepo: ShowingRepository) {
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/participantinfo"
   }
 
   @PutMapping(PATH)
-  fun update(@RequestBody body: ParticipantInfoDTO): ParticipantInfo {
+  fun update(@RequestBody body: ParticipantInfoDTO): ParticipantPaymentInfo {
     if (body.showingId == null || body.userId == null) {
       throw IllegalArgumentException("Missing showing id and/or user id")
     }
