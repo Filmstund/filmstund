@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import Helmet from "react-helmet";
-import { mapValues } from "lodash";
 import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Input from "../../Input";
