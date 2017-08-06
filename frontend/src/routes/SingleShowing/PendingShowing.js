@@ -19,13 +19,15 @@ const PendingShowing = ({
   handleAttend,
   handleUnattend
 }) =>
-  <ButtonContainer>
-    {!isParticipating &&
-      <MainButton onClick={handleAttend}>Jag hänger på!</MainButton>}
-    {isParticipating &&
-      <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
+  <div>
+    <ButtonContainer>
+      {!isParticipating &&
+        <MainButton onClick={handleAttend}>Jag hänger på!</MainButton>}
+      {isParticipating &&
+        <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
+    </ButtonContainer>;
     <ParticipantList participants={showing.participants} />
-  </ButtonContainer>;
+  </div>
 
 const mapDispatchToProps = (dispatch, props) => {
   const { requestAttend, requestUnattend } = showingActions.actions;
