@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout:
           path: ~/itbio
-      - run: gradle clean build
+      - run: ./gradlew clean build
       - store_artifacts:
           path: build/libs/sefilm.jar
   build-frontend:

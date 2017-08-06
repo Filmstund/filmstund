@@ -1,29 +1,28 @@
 import React from "react";
 import PropTypes from "prop-types";
+import styled from "styled-components";
 
-import { SmallHeader } from "../../Header";
+import UserItem from "./UserItem";
+import {SmallHeader} from "../../Header";
 
-import buildUserComponent from "./UserComponentBuilder";
+const ParticipantContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+`;
 
-const UserItem = buildUserComponent(({ user }) =>
-  <div>
-    {user.nick || user.name}
-  </div>
-);
+const ParticipantsList = ({ participants, showPhone }) => {
 
-const ParticipantsList = ({ participants }) => {
-  return (
-    <div>
-      <SmallHeader>Deltagare</SmallHeader>
-      {participants.map(user =>
-        <UserItem key={user.userID} userId={user.userID} />
+  return (<div>
+    <SmallHeader>{participants.length} Deltagare</SmallHeader>
+    <ParticipantContainer>
+      {participants.map(userId =>
+        <UserItem key={userId} showPhone={showPhone} userId={userId} />
       )}
-      <div>
-        {participants.length} deltagare
-      </div>
-    </div>
-  );
+  </ParticipantContainer>
+  </div>)
 };
+
 
 ParticipantsList.propTypes = {
   participants: PropTypes.array.isRequired

@@ -11,6 +11,7 @@ import CopyValue from "../../CopyValue";
 import Center from "../../Center";
 import Loader from "../../ProjectorLoader";
 import PaymentParticipantsList from "./PaymentParticipantsList";
+import buildUserComponent from "./UserComponentBuilder";
 import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
@@ -35,19 +36,28 @@ const ForetagsBiljetterList = ({ participants }) =>
   </div>;
 
 const sumBioklubbkortsnummer = nummer =>
-  sum(nummer.map(nbr => parseInt(nbr, 10)));
+  sum(nummer
+    .map(nbr => nbr.bioklubbnummer)
+    .map(nbr => parseInt(nbr === null ? 0 : nbr, 10)));
+
+const UserItem = buildUserComponent(({ user }) =>
+  <li>{user.firstName} '{user.nick}' {user.lastName}</li>
+);
+
+const usersWithoutBioklubbnummer = ({bioklubbnummer}) =>
+  bioklubbnummer
+  .filter(nbr => nbr.bioklubbnummer === null)
+  .map(nbr => nbr.user)
+  .map(user => <UserItem key={user} userId={user}/> );
 
 const BioklubbkortsnummerList = ({ bioklubbnummer, participants }) =>
   <div>
     <SmallHeader>Bioklubbnummer</SmallHeader>
-    {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
+    {bioklubbnummer.map(nbr => <div key={nbr.user}><CopyValue text={nbr.bioklubbnummer} /></div>)}
     <hr />
     = {sumBioklubbkortsnummer(bioklubbnummer)}
-    {bioklubbnummer.length !== participants.length &&
-      <div>
-        {participants.length - bioklubbnummer.length} deltagare utan
-        bioklubbkortsnummer
-      </div>}
+    {usersWithoutBioklubbnummer(bioklubbnummer).length !== participants.length
+    && <div>{usersWithoutBioklubbnummer(bioklubbnummer).length} deltagare saknar bioklubbnummer: <ul>{usersWithoutBioklubbnummer(bioklubbnummer)}</ul></div>}
   </div>;
 
 const BuyModal = ({
@@ -70,7 +80,7 @@ const BuyModal = ({
     );
   }
 
-  const { participantInfo, bioklubbnummer, sfBuyLink, participants } = buyData;
+  const { participantInfo, sfBuyLink, bioklubbnummer, participants } = buyData;
   const { ticketsBought } = showing;
 
   const participantsWithForetagsbiljett = participants.filter(
@@ -98,7 +108,7 @@ const BuyModal = ({
                 <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
                   Öppna SF länk i nytt fönster
                 </a>}
-              <ParticipantsList participants={showing.participants} />
+              <ParticipantsList participants={showing.participants} showPhone={true} />
               <ForetagsBiljetterList
                 participants={participantsWithForetagsbiljett}
               />

@@ -96,8 +96,8 @@ class Showings extends Component {
           location={showing.location.name}
           status={getStatus(showing)}
         />
-        {this.renderBoughtOrPendingShowing()}
         {isAdmin && <AdminAction showing={showing} loading={loading} />}
+        {this.renderBoughtOrPendingShowing()}
       </div>
     );
   }

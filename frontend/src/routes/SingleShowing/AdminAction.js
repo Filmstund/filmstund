@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import styled from "styled-components";
 
 import { showings as showingActions } from "../../store/reducers";
 
@@ -119,6 +120,7 @@ class AdminAction extends Component {
       });
   };
 
+
   render() {
     const { showing, loading } = this.props;
 
@@ -132,8 +134,14 @@ class AdminAction extends Component {
       adminMessage
     } = this.state;
 
+    const ButtonContainer = styled.div`
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    `;
+
     return (
-      <div>
+      <ButtonContainer>
         {showModal &&
           <BuyModal
             setPrice={this.setPrice}
@@ -167,7 +175,7 @@ class AdminAction extends Component {
             Skapa Googlekalenderevent
           </MainButton>}
         <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
-      </div>
+      </ButtonContainer>
     );
   }
 }
