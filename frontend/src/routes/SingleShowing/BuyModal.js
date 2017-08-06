@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { sum } from "lodash";
 
 import Modal from "./Modal";
 import Field from "../../Field";
@@ -23,8 +24,31 @@ const Close = styled.div`
   right: 1em;
   top: 0.8em;
   cursor: pointer;
-  
-`
+`;
+
+const ForetagsBiljetterList = ({ participants }) =>
+  <div>
+    <SmallHeader>Företagsbiljetter</SmallHeader>
+    {participants.map(p =>
+      <CopyValue key={p.payment.extra} text={p.payment.extra} />
+    )}
+  </div>;
+
+const sumBioklubbkortsnummer = nummer =>
+  sum(nummer.map(nbr => parseInt(nbr, 10)));
+
+const BioklubbkortsnummerList = ({ bioklubbnummer, participants }) =>
+  <div>
+    <SmallHeader>Bioklubbnummer</SmallHeader>
+    {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
+    <hr />
+    = {sumBioklubbkortsnummer(bioklubbnummer)}
+    {bioklubbnummer.length !== participants.length &&
+      <div>
+        {participants.length - bioklubbnummer.length} deltagare utan
+        bioklubbkortsnummer
+      </div>}
+  </div>;
 
 const BuyModal = ({
   ticketPrice,
@@ -49,28 +73,16 @@ const BuyModal = ({
   const { participantInfo, bioklubbnummer, sfBuyLink, participants } = buyData;
   const { ticketsBought } = showing;
 
-  const renderForetagsbiljetter = () => {
-    return (<div><SmallHeader>Företagsbiljetter</SmallHeader>
-      {participants.filter(p => p.payment.type === 'Företagsbiljett').map(p => <CopyValue key={p.payment.extra} text={p.payment.extra} />)}
-    </div>)
-  }
-
-  const renderBioklubbkortsnummer = () => {
-    return (<div><SmallHeader>Bioklubbnummer</SmallHeader>
-    {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
-    <hr />
-      ={" "}
-    {bioklubbnummer
-      .map(nbr => parseInt(nbr, 10))
-      .reduce((acc, nbr) => acc + nbr, 0)}
-      {bioklubbnummer.length !== showing.length && <div>{showing.participants.length - bioklubbnummer.length} deltagare utan bioklubbkortsnummer</div>}
-    </div>)
-  }
+  const participantsWithForetagsbiljett = participants.filter(
+    p => p.payment.type === "Företagsbiljett"
+  );
 
   return (
     <Modal>
       <Padding>
-        <Close onClick={closeModal}><i className="fa fa-times" aria-hidden="true"></i></Close>
+        <Close onClick={closeModal}>
+          <i className="fa fa-times" aria-hidden="true" />
+        </Close>
         <Padding>
           {ticketsBought &&
             <PaymentParticipantsList
@@ -87,8 +99,13 @@ const BuyModal = ({
                   Öppna SF länk i nytt fönster
                 </a>}
               <ParticipantsList participants={showing.participants} />
-              {renderForetagsbiljetter()}
-              {renderBioklubbkortsnummer()}
+              <ForetagsBiljetterList
+                participants={participantsWithForetagsbiljett}
+              />
+              <BioklubbkortsnummerList
+                bioklubbnummer={bioklubbnummer}
+                participants={participants}
+              />
               <Field text="Biljettpris:">
                 <Input
                   type="number"
