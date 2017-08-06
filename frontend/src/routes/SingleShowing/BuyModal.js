@@ -10,6 +10,7 @@ import CopyValue from "../../CopyValue";
 import Center from "../../Center";
 import Loader from "../../ProjectorLoader";
 import PaymentParticipantsList from "./PaymentParticipantsList";
+import buildUserComponent from "./UserComponentBuilder";
 import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
@@ -46,20 +47,31 @@ const BuyModal = ({
     );
   }
 
-  const { participantInfo, bioklubbnummer, sfBuyLink } = buyData;
+  const { participantInfo, sfBuyLink, bioklubbnummer } = buyData;
   const { ticketsBought } = showing;
+
+  const UserItem = buildUserComponent(({ user }) =>
+      <li>{user.firstName} '{user.nick}' {user.lastName}</li>
+  );
+
+  const usersWithoutBioklubbnummer = bioklubbnummer
+      .filter(nbr => nbr.bioklubbnummer === null)
+      .map(nbr => nbr.user)
+      .map(user => <UserItem key={user} userId={user}/> );
 
   const renderBioklubbkortsnummer = () => {
     return (<div><SmallHeader>Bioklubbnummer</SmallHeader>
-    {bioklubbnummer.map(nbr => <CopyValue key={nbr} text={nbr} />)}
+        {bioklubbnummer.map(nbr => <div key={nbr.user}><CopyValue text={nbr.bioklubbnummer} /></div>)}
     <hr />
       ={" "}
     {bioklubbnummer
-      .map(nbr => parseInt(nbr, 10))
+      .map(nbr => nbr.bioklubbnummer)
+      .map(nbr => parseInt(nbr === null ? 0 : nbr, 10))
       .reduce((acc, nbr) => acc + nbr, 0)}
-      {bioklubbnummer.length !== showing.length && <div>{showing.participants.length - bioklubbnummer.length} deltagare utan bioklubbkortsnummer</div>}
+      {usersWithoutBioklubbnummer.length !== showing.participants.length
+      && <div>{usersWithoutBioklubbnummer.length} deltagare saknar bioklubbnummer: <ul>{usersWithoutBioklubbnummer}</ul></div>}
     </div>)
-  }
+  };
 
   return (
     <Modal>

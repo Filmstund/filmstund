@@ -24,7 +24,7 @@ class ShowingController(private val repo: ShowingRepository,
                         private val locationRepo: LocationRepository,
                         private val movieRepo: MovieRepository,
                         private val userRepo: UserRepository,
-                        private val participantRepo: ParticipantInfoRepository,
+                        private val paymentInfoRepo: ParticipantPaymentInfoRepository,
                         private val googleCalenderClient: GoogleCalenderClient) {
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/showings"
@@ -37,7 +37,7 @@ class ShowingController(private val repo: ShowingRepository,
   fun findAll() = repo.findByPrivate(false)
 
   @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun findOne(@PathVariable id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id") }
+  fun findOne(@PathVariable id: UUID): Showing = repo.findById(id).orElseThrow { NotFoundException("showing '$id") }
 
   @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
@@ -68,7 +68,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val updatedShowing = repo.save(updateShowing)
     if (body.ticketsBought) {
-      createInitialParticipantsInfo(updateShowing)
+      createInitialPaymentInfo(updateShowing)
     }
     return updatedShowing
   }
@@ -78,7 +78,7 @@ class ShowingController(private val repo: ShowingRepository,
     val showing = findOne(id)
     assertLoggedInUserIsAdmin(showing)
 
-    participantRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
+    paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
     return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
   }
@@ -110,21 +110,16 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @GetMapping(PATH_WITH_ID + "/buy")
-  fun getDetailsBeforeBuyingTicket(@PathVariable id: UUID): BuyDTO {
+  fun getBuyingTicketDetails(@PathVariable id: UUID): BuyDTO {
     val showing = findOne(id)
     assertLoggedInUserIsAdmin(showing)
 
-    val movie = movieRepo
-      .findById(showing.movieId)
-      .orElseThrow { NotFoundException("movie '${showing.movieId}") }
+    // Note that this list is empty before the showing has been marked as bought
+    val paymentInfos = paymentInfoRepo.findByShowingId(showing.id)
+    val bioklubbMap = userRepo.findAllById(showing.participants)
+      .map { BioklubbUserMap(it.id, it.bioklubbnummer) }
 
-    val sfLink = when {
-      movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
-      else -> null
-    }
-
-    val participantsInfo = participantRepo.findByShowingId(showing.id)
-    return BuyDTO(shuffledBioklubbnummer(showing), sfLink, participantsInfo)
+    return BuyDTO(getSfBuyLink(showing), bioklubbMap, paymentInfos)
   }
 
   @GetMapping(PATH_WITH_ID + "/pay")
@@ -135,7 +130,7 @@ class ShowingController(private val repo: ShowingRepository,
       .orElseThrow { MissingPhoneNumberException() }
 
     val currentUser = currentLoggedInUser()
-    val participantInfo = participantRepo
+    val participantInfo = paymentInfoRepo
       .findByShowingIdAndUserId(id, currentUser)
       .orElseThrow { PaymentInfoMissing(id) }
 
@@ -189,15 +184,6 @@ class ShowingController(private val repo: ShowingRepository,
     return savedShowing.participants
   }
 
-  private fun shuffledBioklubbnummer(showing: Showing): Collection<Bioklubbnummer> {
-    val ids = showing.participants.toMutableSet()
-    ids.add(showing.admin)
-
-    val bioklubbnummer = userRepo.findAllById(ids).map(User::bioklubbnummer).filterNotNull()
-    Collections.shuffle(bioklubbnummer)
-    return bioklubbnummer
-  }
-
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {
     val location = locationRepo
@@ -213,27 +199,29 @@ class ShowingController(private val repo: ShowingRepository,
       participants = setOf(admin.id))
   }
 
-  private fun createInitialParticipantsInfo(showing: Showing) {
-    val participants = showing.participants.map { participant ->
-      participantRepo.findByShowingIdAndUserId(showing.id, participant)
-        .map { p ->
-          // Use existing info
-          ParticipantInfo(
-            id = p.id,
-            userId = participant,
-            showingId = showing.id,
-            hasPaid = p.hasPaid,
-            amountOwed = p.amountOwed)
-        }
-        .orElseGet {
-          // Create new info
-          ParticipantInfo(userId = participant,
-            showingId = showing.id,
-            hasPaid = participant == showing.payToUser,
-            amountOwed = showing.price ?: SEK(0))
-        }
-    }
-    participantRepo.saveAll(participants)
+  private fun createInitialPaymentInfo(showing: Showing) {
+    val participants = showing
+      .participants
+      .map { participant ->
+        paymentInfoRepo.findByShowingIdAndUserId(showing.id, participant)
+          .map {
+            // Use existing info
+            ParticipantPaymentInfo(
+              id = it.id,
+              userId = participant,
+              showingId = showing.id,
+              hasPaid = it.hasPaid,
+              amountOwed = it.amountOwed)
+          }
+          .orElseGet {
+            // Create new info
+            ParticipantPaymentInfo(userId = participant,
+              showingId = showing.id,
+              hasPaid = participant == showing.payToUser,
+              amountOwed = showing.price ?: SEK(0))
+          }
+      }
+    paymentInfoRepo.saveAll(participants)
   }
 
   private fun assertTicketsNotBought(showing: Showing) {
@@ -255,7 +243,7 @@ class ShowingController(private val repo: ShowingRepository,
     }
   }
 
-  private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantInfo): String {
+  private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo): String {
     val movieTitle = movieRepo
       .findById(showing.movieId)
       .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
@@ -288,6 +276,17 @@ class ShowingController(private val repo: ShowingRepository,
     userRepo
       .findById(userID)
       .orElseThrow { NotFoundException("user " + userID) }
+
+  private fun getSfBuyLink(showing: Showing): String? {
+    val movie = movieRepo
+      .findById(showing.movieId)
+      .orElseThrow { NotFoundException("movie '${showing.movieId}") }
+
+    return when {
+      movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
+      else -> null
+    }
+  }
 
   private fun PhoneNumber?.orElseThrow(exceptionSupplier: () -> Exception): PhoneNumber {
     if (this == null) {
