@@ -6,67 +6,34 @@ import { showings as showingActions } from "../../store/reducers";
 import { SmallHeader } from "../../Header";
 import MainButton, { GrayButton } from "../../MainButton";
 import ParticipantList from "./ParticipantsList";
-import moment from "moment";
 
-import { capitalize } from "../../Utils";
-
-const createPaymentOption = (type, extra = null, suffix = null) => {
-  type = capitalize(type);
-  if (extra) {
-    return {
-      type: type,
-      extra: extra,
-      suffix
-    };
-  }
-  return {
-    type: type
-  };
-};
-
-const stringifyOption = option => {
-  const type = capitalize(option.type);
-  if (option.extra) {
-    return type + ": " + option.extra;
-  } else {
-    return type;
-  }
-};
-
-const createForetagsbiljetter = foretagsbiljetter => {
-  return foretagsbiljetter
-    .filter(
-      ftg =>
-        ftg.status === "Available" && moment().isBefore(moment(ftg.expires))
-    )
-    .map(ftg => createPaymentOption("företagsbiljett", ftg.value, ftg.expires));
-};
+import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
 
 class PendingShowing extends Component {
-  state = {
-    paymentOptionIndex: 0,
-    paymentOptions: [
-      createPaymentOption("swish"),
-      ...createForetagsbiljetter(this.props.me.foretagsbiljetter)
-    ]
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedIndex: 0,
+      paymentOptions: createPaymentOptions(props.me.foretagsbiljetter || [])
+    };
+  }
 
   setPaymentOption = e => {
     const { target: { value } } = e;
     this.setState({
-      paymentOptionIndex: value
+      selectedIndex: value
     });
   };
 
   renderPaymentOptions = () => {
-    const { paymentOptionIndex, paymentOptions } = this.state;
+    const { selectedIndex, paymentOptions } = this.state;
 
     return (
       <div>
         <SmallHeader>Betalningsalternativ</SmallHeader>
         <select
           name="betalningsalternativ"
-          value={paymentOptionIndex}
+          value={selectedIndex}
           onChange={this.setPaymentOption}
         >
           {paymentOptions.map((option, index) =>
@@ -81,15 +48,13 @@ class PendingShowing extends Component {
 
   renderAttendAction = () => {
     const { handleAttend, me } = this.props;
-    const { paymentOptionIndex, paymentOptions } = this.state;
+    const { selectedIndex, paymentOptions } = this.state;
     return (
       <div>
-        {me.foretagsbiljetter &&
-          me.foretagsbiljetter.length > 0 &&
-          this.renderPaymentOptions(me.foretagsbiljetter)}
+        {me.foretagsbiljetter.length > 0 && this.renderPaymentOptions()}
         <MainButton
           onClick={() =>
-            handleAttend({ paymentOption: paymentOptions[paymentOptionIndex] })}
+            handleAttend({ paymentOption: paymentOptions[selectedIndex] })}
         >
           Jag hänger på!
         </MainButton>
