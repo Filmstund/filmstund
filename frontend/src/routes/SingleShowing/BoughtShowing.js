@@ -2,11 +2,12 @@ import React from "react";
 import Loader from "../../ProjectorLoader";
 import buildUserComponent from "./UserComponentBuilder";
 import MainButton from "../../MainButton";
+import ParticipantList from "./ParticipantsList";
 
-const UserItem = buildUserComponent(({ user }) =>
-  <div>
-    {user.nick || user.name} ({user.phone})
-  </div>
+const PayToUser = buildUserComponent(({ user }) =>
+  <span>
+    <strong>{user.phone}</strong> ({user.firstName} '{user.nick}' {user.lastName})
+  </span>
 );
 
 const BoughtShowing = ({ payData, showing, openSwish }) => {
@@ -23,9 +24,10 @@ const BoughtShowing = ({ payData, showing, openSwish }) => {
       {hasPaid && "Du har betalat!"}
       {!hasPaid &&
         <div>
-          Betala {amountOwed / 100} till <UserItem userId={payTo} />
-          <MainButton onClick={openSwishLink}>Betala</MainButton>
+          Betala <strong>{amountOwed / 100} kr</strong> till <PayToUser userId={payTo} />
+          <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
         </div>}
+      <ParticipantList participants={showing.participants} />
     </div>
   );
 };
