@@ -17,15 +17,21 @@ const Hover = styled.span`
 `;
 
 class CopyValue extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {isStricken: false};
+  }
+
   onClick = () => {
     copy(this.props.text);
+    this.setState({isStricken: !this.state.isStricken});
   };
 
   render() {
     return (
       <div>
         <Hover onClick={this.onClick}>
-          {this.props.text}
+          <span style={{textDecoration: this.state.isStricken ? "line-through" : "none"}}>{this.props.text}</span>
         </Hover>
       </div>
     );
