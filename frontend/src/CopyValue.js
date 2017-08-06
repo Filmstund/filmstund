@@ -14,24 +14,26 @@ const Hover = styled.span`
       font-size: 0.8em;
     }
   }
+  text-decoration: ${props => props.strikethrough ? "line-through" : "none" }
 `;
 
 class CopyValue extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {isStricken: false};
-  }
+
+  state = {isStricken: false};
 
   onClick = () => {
     copy(this.props.text);
-    this.setState({isStricken: !this.state.isStricken});
+    this.setState(state => ({
+      isStricken: !state.isStricken
+    }));
   };
 
   render() {
+    const {isStricken} = this.state;
     return (
       <div>
-        <Hover onClick={this.onClick}>
-          <span style={{textDecoration: this.state.isStricken ? "line-through" : "none"}}>{this.props.text}</span>
+        <Hover onClick={this.onClick} strikethrough={isStricken}>
+          {this.props.text}
         </Hover>
       </div>
     );
