@@ -17,7 +17,7 @@ const SwishModal = ({ payData, closeSwish }) => {
     return (
       <Modal>
         <button onClick={closeSwish}>Stäng</button>
-        <QRCode value={swishLink} width={"25em"} height={"25em"} />
+        <QRCode value={swishLink} width="25em" height="25em" />
       </Modal>
     );
   }
