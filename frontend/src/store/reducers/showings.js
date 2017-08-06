@@ -172,7 +172,12 @@ const actionCreators = {
   requestAttend: (id, paymentOption) => dispatch => {
     dispatch({ type: actions.requestAttend, id, paymentOption });
 
-    requestAndValidate(dispatch, jsonRequest, appendId(path, id, "attend"), paymentOption)
+    requestAndValidate(
+      dispatch,
+      jsonRequest,
+      appendId(path, id, "attend"),
+      paymentOption
+    )
       .then(participants =>
         dispatch({ type: actions.successAttend, id, participants })
       )

@@ -12,87 +12,107 @@ import { capitalize } from "../../Utils";
 
 const createPaymentOption = (type, extra = null, suffix = null) => {
   type = capitalize(type);
-  if(extra) {
+  if (extra) {
     return {
       type: type,
       extra: extra,
       suffix
-    }
+    };
   }
   return {
-    type: type,
-  }
+    type: type
+  };
 };
 
-const stringifyOption = (option) => {
+const stringifyOption = option => {
   const type = capitalize(option.type);
-  if(option.extra) {
-    return type + ': ' + option.extra
+  if (option.extra) {
+    return type + ": " + option.extra;
   } else {
-    return type
+    return type;
   }
 };
 
-const createForetagsbiljetter = (foretagsbiljetter) => {
+const createForetagsbiljetter = foretagsbiljetter => {
   return foretagsbiljetter
-    .filter(ftg => ftg.status === 'Available' && moment().isBefore(moment(ftg.expires)))
-    .map(ftg => createPaymentOption("företagsbiljett", ftg.value, ftg.expires))
+    .filter(
+      ftg =>
+        ftg.status === "Available" && moment().isBefore(moment(ftg.expires))
+    )
+    .map(ftg => createPaymentOption("företagsbiljett", ftg.value, ftg.expires));
 };
 
 class PendingShowing extends Component {
   state = {
     paymentOptionIndex: 0,
-    paymentOptions: [createPaymentOption('swish'), ...createForetagsbiljetter(this.props.me.foretagsbiljetter)]
+    paymentOptions: [
+      createPaymentOption("swish"),
+      ...createForetagsbiljetter(this.props.me.foretagsbiljetter)
+    ]
   };
 
-  setPaymentOption = (e) => {
-    const {target: { value }} = e;
+  setPaymentOption = e => {
+    const { target: { value } } = e;
     this.setState({
       paymentOptionIndex: value
-    })
+    });
   };
-
-
 
   renderPaymentOptions = () => {
     const { paymentOptionIndex, paymentOptions } = this.state;
 
-    return (<div>
-      <SmallHeader>Betalningsalternativ</SmallHeader>
-      <select name="betalningsalternativ" value={paymentOptionIndex} onChange={this.setPaymentOption} >
-        {paymentOptions.map((option, index) => <option key={index} value={index}>{stringifyOption(option)}</option>)}
-      </select>
-    </div>)
+    return (
+      <div>
+        <SmallHeader>Betalningsalternativ</SmallHeader>
+        <select
+          name="betalningsalternativ"
+          value={paymentOptionIndex}
+          onChange={this.setPaymentOption}
+        >
+          {paymentOptions.map((option, index) =>
+            <option key={index} value={index}>
+              {stringifyOption(option)}
+            </option>
+          )}
+        </select>
+      </div>
+    );
   };
 
   renderAttendAction = () => {
     const { handleAttend, me } = this.props;
     const { paymentOptionIndex, paymentOptions } = this.state;
-    return (<div>
-      {me.foretagsbiljetter && me.foretagsbiljetter.length > 0 && this.renderPaymentOptions(me.foretagsbiljetter)}
-      <MainButton onClick={() => handleAttend({paymentOption: paymentOptions[paymentOptionIndex]})}>Jag hänger på!</MainButton>
-    </div>)
-
+    return (
+      <div>
+        {me.foretagsbiljetter &&
+          me.foretagsbiljetter.length > 0 &&
+          this.renderPaymentOptions(me.foretagsbiljetter)}
+        <MainButton
+          onClick={() =>
+            handleAttend({ paymentOption: paymentOptions[paymentOptionIndex] })}
+        >
+          Jag hänger på!
+        </MainButton>
+      </div>
+    );
   };
 
   render() {
-    const {  showing,
-      isParticipating,
-      handleUnattend } = this.props;
+    const { showing, isParticipating, handleUnattend } = this.props;
 
-    return (<div>
-      {!isParticipating &&
-      this.renderAttendAction()}
-      {isParticipating && <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
-      <ParticipantList participants={showing.participants}/>
-
-    </div>)
-
+    return (
+      <div>
+        {!isParticipating && this.renderAttendAction()}
+        {isParticipating &&
+          <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
+        <ParticipantList participants={showing.participants} />
+      </div>
+    );
   }
 }
 
-const mapStateToProps = (state) => ({
-  me: state.me.data,
+const mapStateToProps = state => ({
+  me: state.me.data
 });
 
 const mapDispatchToProps = (dispatch, props) => {
@@ -100,7 +120,7 @@ const mapDispatchToProps = (dispatch, props) => {
   const { showing } = props;
 
   return {
-    handleAttend: (data) => dispatch(requestAttend(showing.id, data)),
+    handleAttend: data => dispatch(requestAttend(showing.id, data)),
     handleUnattend: () => dispatch(requestUnattend(showing.id))
   };
 };

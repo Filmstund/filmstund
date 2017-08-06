@@ -12,20 +12,21 @@ const UserItem = buildUserComponent(({ user }) =>
 );
 
 const ParticipantsList = ({ participants }) => {
-  return (<div>
-    <SmallHeader>Deltagare</SmallHeader>
-    {participants.map(user =>
-      <UserItem key={user.userID} userId={user.userID} />
-    )}
+  return (
     <div>
-      {participants.length} deltagare
+      <SmallHeader>Deltagare</SmallHeader>
+      {participants.map(user =>
+        <UserItem key={user.userID} userId={user.userID} />
+      )}
+      <div>
+        {participants.length} deltagare
+      </div>
     </div>
-  </div>)
-}
-
+  );
+};
 
 ParticipantsList.propTypes = {
   participants: PropTypes.array.isRequired
 };
 
-export default ParticipantsList
+export default ParticipantsList;

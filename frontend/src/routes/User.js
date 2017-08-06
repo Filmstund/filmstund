@@ -8,7 +8,7 @@ import MainButton from "../MainButton";
 import Input from "../Input";
 import alfons from "../assets/alfons.jpg";
 import { me as meActions } from "../store/reducers";
-import { SmallHeader } from "../Header"
+import { SmallHeader } from "../Header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
@@ -48,42 +48,38 @@ const ForetagsbiljettWrapper = styled.div`
   display: flex;
   align-items: center;
   padding: 0.5em 0;
-`
+`;
 
 const ForetagsbiljettInput = styled(Input)`
   max-width: 13.6em;
-`
+`;
 
 const TrashIcon = styled.span`
   font-size: 1.5em;
   padding-left: 0.5em;
   cursor: pointer;
-
-`
+`;
 
 const AddIcon = styled.span`
   font-size: 1.5em;
   cursor: pointer;
-`
+`;
 
 const AddForetagsbiljettContainer = styled.div`
-    max-width: 15em;
-    display: flex;
-    justify-content: center;
-`
+  max-width: 15em;
+  display: flex;
+  justify-content: center;
+`;
 
 const UserInfo = styled.div`padding: 1em;`;
 
-const ForetagsBiljettStatus = styled.span`
-
-`
+const ForetagsBiljettStatus = styled.span``;
 
 const BiljettField = styled(Field)`
   padding: 0 0.5em;
-`
+`;
 
-
-const DEFAULT_DATE = moment().add(1, 'years');
+const DEFAULT_DATE = moment().add(1, "years");
 
 class User extends Component {
   constructor(props) {
@@ -114,54 +110,55 @@ class User extends Component {
     });
   };
 
-  updateForetagsbiljetter = (foretagsbiljetter) => {
+  updateForetagsbiljetter = foretagsbiljetter => {
     this.setState({
       editedUser: {
         ...this.state.editedUser,
         foretagsbiljetter: foretagsbiljetter
       }
-    })
+    });
   };
 
-  editedForetagsbiljett = (index,  { target: { value } }) => {
+  editedForetagsbiljett = (index, { target: { value } }) => {
     let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
-    if(foretagsbiljetter.length > index) {
+    if (foretagsbiljetter.length > index) {
       let biljett = foretagsbiljetter[index];
       biljett.value = value;
     }
-    this.updateForetagsbiljetter(foretagsbiljetter)
+    this.updateForetagsbiljetter(foretagsbiljetter);
   };
 
   setForetagsbiljettExpires = (index, value) => {
     let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
-    if(foretagsbiljetter.length > index) {
+    if (foretagsbiljetter.length > index) {
       let biljett = foretagsbiljetter[index];
       biljett.expires = value;
     }
-    this.updateForetagsbiljetter(foretagsbiljetter)
-  }
-
-  addForetagsbiljett = () => {
-    let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
-    foretagsbiljetter.push({value: "", expires: DEFAULT_DATE});
-    this.updateForetagsbiljetter(foretagsbiljetter)
-  };
-
-  removeForetagsbiljett = (i) => {
-    let foretagsbiljetter = this.state.editedUser.foretagsbiljetter.filter((ftg, index) => index !== i);
     this.updateForetagsbiljetter(foretagsbiljetter);
   };
 
+  addForetagsbiljett = () => {
+    let foretagsbiljetter = this.state.editedUser.foretagsbiljetter;
+    foretagsbiljetter.push({ value: "", expires: DEFAULT_DATE });
+    this.updateForetagsbiljetter(foretagsbiljetter);
+  };
 
+  removeForetagsbiljett = i => {
+    let foretagsbiljetter = this.state.editedUser.foretagsbiljetter.filter(
+      (ftg, index) => index !== i
+    );
+    this.updateForetagsbiljetter(foretagsbiljetter);
+  };
 
   handleSubmit = () => {
     const trimmedValues = mapValues(this.state.editedUser, trim);
-    trimmedValues.foretagsbiljetter = this.state.editedUser.foretagsbiljetter
-      .map(ftg => ({
+    trimmedValues.foretagsbiljetter = this.state.editedUser.foretagsbiljetter.map(
+      ftg => ({
         value: ftg.value,
         expires: formatYMD(ftg.expires),
         status: ftg.status
-      }));
+      })
+    );
 
     this.props.dispatch(
       meActions.actions.requestUpdate({
@@ -173,34 +170,49 @@ class User extends Component {
 
   renderForetagsbiljett = (ftg, i) => {
     let date = DEFAULT_DATE;
-    if ( ftg.expires ) {
-      date = moment(ftg.expires)
+    if (ftg.expires) {
+      date = moment(ftg.expires);
     }
-    return (<ForetagsbiljettWrapper key={i}>
-      <BiljettField text="Kod/Värde">
-      <ForetagsbiljettInput
-        type="text"
-        value={ftg.value}
-        maxLength={11}
-        onChange={v => this.editedForetagsbiljett(i, v)}
-      />
-      </BiljettField>
-      <BiljettField text="Går ut">
-        <DatePicker
-          selected={date}
-          onChange={v => this.setForetagsbiljettExpires(i, v)}
-        />
-      </BiljettField>
-      <BiljettField text="Status">
-        <ForetagsBiljettStatus>{ftg.status || "Available"}</ForetagsBiljettStatus>
-      </BiljettField>
-      <TrashIcon><i onClick={() => this.removeForetagsbiljett(i)} className="fa fa-trash" aria-hidden="true" /></TrashIcon>
-    </ForetagsbiljettWrapper>)
-  }
+    return (
+      <ForetagsbiljettWrapper key={i}>
+        <BiljettField text="Kod/Värde">
+          <ForetagsbiljettInput
+            type="text"
+            value={ftg.value}
+            maxLength={11}
+            onChange={v => this.editedForetagsbiljett(i, v)}
+          />
+        </BiljettField>
+        <BiljettField text="Går ut">
+          <DatePicker
+            selected={date}
+            onChange={v => this.setForetagsbiljettExpires(i, v)}
+          />
+        </BiljettField>
+        <BiljettField text="Status">
+          <ForetagsBiljettStatus>
+            {ftg.status || "Available"}
+          </ForetagsBiljettStatus>
+        </BiljettField>
+        <TrashIcon>
+          <i
+            onClick={() => this.removeForetagsbiljett(i)}
+            className="fa fa-trash"
+            aria-hidden="true"
+          />
+        </TrashIcon>
+      </ForetagsbiljettWrapper>
+    );
+  };
 
   render() {
     const { me, className, error, success } = this.props;
-    const { phone, bioklubbnummer, nick, foretagsbiljetter } = this.state.editedUser;
+    const {
+      phone,
+      bioklubbnummer,
+      nick,
+      foretagsbiljetter
+    } = this.state.editedUser;
     return (
       <div className={className}>
         <Helmet title="Profil" />
@@ -250,7 +262,9 @@ class User extends Component {
         <SmallHeader> Företagsbiljetter </SmallHeader>
         {foretagsbiljetter.map((ftg, i) => this.renderForetagsbiljett(ftg, i))}
         <AddForetagsbiljettContainer onClick={this.addForetagsbiljett}>
-          <AddIcon><i className="fa fa-plus-circle" aria-hidden="true" /></AddIcon>
+          <AddIcon>
+            <i className="fa fa-plus-circle" aria-hidden="true" />
+          </AddIcon>
         </AddForetagsbiljettContainer>
 
         <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>

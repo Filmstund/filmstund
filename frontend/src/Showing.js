@@ -13,18 +13,17 @@ const Status = styled.div`
   position: absolute;
   right: 1em;
   top: 1em;
-`
+`;
 
-const capitilized = (s) => s.substring(0, 1).toUpperCase() + s.substring(1);
+const capitilized = s => s.substring(0, 1).toUpperCase() + s.substring(1);
 
-export const getStatus = (showing) => {
+export const getStatus = showing => {
   if (showing.ticketsBought) {
-    return 'bokad'
+    return "bokad";
   } else {
-    return 'planeras'
+    return "planeras";
   }
 };
-
 
 const Showing = ({
   movie = {},
@@ -44,7 +43,10 @@ const Showing = ({
     {setTitleTag &&
       <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />}
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
-      {status && <Status>{capitilized(status)}</Status>}
+      {status &&
+        <Status>
+          {capitilized(status)}
+        </Status>}
       <VerticalPaddingContainer>
         {formatShowingDateTime(date)}
         <br />
