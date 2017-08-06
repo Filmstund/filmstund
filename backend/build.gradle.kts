@@ -1,5 +1,12 @@
+import org.ajoberstar.grgit.Grgit
+import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.File
+import java.time.*
+import java.time.format.*
+
+project.version = "1.1-SNAPSHOT"
 
 buildscript {
   val springBootSnapshotVersion = "2.0.0.M3"
@@ -21,6 +28,7 @@ plugins {
 
   kotlin("jvm", version = kotlinVersion)
   kotlin("plugin.spring", version = kotlinVersion)
+  id("org.ajoberstar.grgit") version "2.0.0-rc.1"
 }
 
 apply {
@@ -61,3 +69,46 @@ dependencies {
   compile("org.jsoup:jsoup:1.10.3")
   testCompile("org.springframework.boot:spring-boot-starter-test:$springBootReleaseVersion")
 }
+
+tasks {
+  fun addPipeToTheEndOfStr(value: Any, length: Int = 55): String {
+    val strValue = value.toString()
+    val strLen = strValue.length
+    val times = Math.abs(length - strLen)
+    return strValue +  " ".repeat(times-1) + "│"
+  }
+  "versionBanner" {
+    doLast {
+      val grgit = Grgit.open()
+      val gitHead = grgit.head()
+      val gitCommitId = addPipeToTheEndOfStr(gitHead.id)
+      val gitCommitTime = addPipeToTheEndOfStr(gitHead.dateTime)
+      val gitBranch = grgit.branch.current.name
+      val now = addPipeToTheEndOfStr(ZonedDateTime.now())
+      val projectNameAndBranch = addPipeToTheEndOfStr("${project.name} ($gitBranch)")
+      val banner =
+"""  ┌───────────────┬───────────────────────────────────────────────────────┐
+  │ Project       │ $projectNameAndBranch
+  ├───────────────┼───────────────────────────────────────────────────────┤
+  │ Version       │ ${addPipeToTheEndOfStr(project.version)}
+  │ Revision SHA  │ $gitCommitId
+  │ Revision Date │ $gitCommitTime
+  │ Build date    │ $now
+  └───────────────┴───────────────────────────────────────────────────────┘"""
+      val bannerFile = File("build/banner.txt")
+      bannerFile.createNewFile()
+      bannerFile.writeText(banner)
+    }
+  }
+
+  "copyBanner"(Copy::class) {
+    dependsOn("versionBanner")
+    from("build/")
+    include("banner.txt")
+    into("build/resources/main")
+  }
+  "processResources" {
+    dependsOn("copyBanner")
+  }
+}
+
