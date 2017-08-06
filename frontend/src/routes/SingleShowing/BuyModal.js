@@ -68,7 +68,7 @@ const BuyModal = ({
       .map(nbr => nbr.bioklubbnummer)
       .map(nbr => parseInt(nbr === null ? 0 : nbr, 10))
       .reduce((acc, nbr) => acc + nbr, 0)}
-      {usersWithoutBioklubbnummer !== showing.participants.length
+      {usersWithoutBioklubbnummer.length !== showing.participants.length
       && <div>{usersWithoutBioklubbnummer.length} deltagare saknar bioklubbnummer: <ul>{usersWithoutBioklubbnummer}</ul></div>}
     </div>)
   };
