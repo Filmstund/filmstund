@@ -10,7 +10,7 @@ const MainButtonStyles = css`
   color: black;
   border: 0;
   height: 3em;
-  margin: 1em 0;
+  margin: 0.25em 0;
   font-size: 1.1em;
   font-weight: 400;
   width: 100%;

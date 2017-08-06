@@ -7,7 +7,7 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import java.util.*
 
-@Document
+@Document(collection = "participantInfo")
 data class ParticipantPaymentInfo(
   @Id
   val id: UUID = UUID.randomUUID(),

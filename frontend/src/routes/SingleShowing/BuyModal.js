@@ -92,7 +92,7 @@ const BuyModal = ({
                 <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
                   Öppna SF länk i nytt fönster
                 </a>}
-              <ParticipantsList participants={showing.participants} />
+              <ParticipantsList participants={showing.participants} showPhone={true} />
               {renderBioklubbkortsnummer()}
               <Field text="Biljettpris:">
                 <Input
