@@ -42,9 +42,8 @@ class ShowingController(private val repo: ShowingRepository,
   @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
     val showing = findOne(id)
-    if (currentLoggedInUser() != showing.admin) {
-      throw AccessDeniedException("Only the admin can update a showing")
-    }
+    assertLoggedInUserIsAdmin(showing)
+    assertUserHasPhoneNumber(showing.admin)
 
     val newPayToUser = when {
       body.payToUser != null -> UserID(body.payToUser)
@@ -77,7 +76,8 @@ class ShowingController(private val repo: ShowingRepository,
   @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun deleteShowing(@PathVariable id: UUID): SuccessfulStatusDTO {
     val showing = findOne(id)
-    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can delete a showing")
+    assertLoggedInUserIsAdmin(showing)
+
     participantRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
     return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
@@ -86,7 +86,7 @@ class ShowingController(private val repo: ShowingRepository,
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun createGoogleCalendarEvent(@PathVariable id: UUID, @RequestBody body: List<String>): ResponseStatusDTO {
     val showing = findOne(id)
-    if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can create calendar events")
+    assertLoggedInUserIsAdmin(showing)
     if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
 
     val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
@@ -110,14 +110,13 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @GetMapping(PATH_WITH_ID + "/buy")
-  fun findBioklubbnummerForShowing(@PathVariable id: UUID): BuyDTO {
-    val showing = repo.findById(id)
-      .map { showing ->
-        if (!showing.isLoggedInUserAdmin()) throw AccessDeniedException("Only the admin can view buy page")
-        showing
-      }
-      .orElseThrow { NotFoundException("showing '$id") }
-    val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '${showing.movieId}") }
+  fun getDetailsBeforeBuyingTicket(@PathVariable id: UUID): BuyDTO {
+    val showing = findOne(id)
+    assertLoggedInUserIsAdmin(showing)
+
+    val movie = movieRepo
+      .findById(showing.movieId)
+      .orElseThrow { NotFoundException("movie '${showing.movieId}") }
 
     val sfLink = when {
       movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
@@ -129,12 +128,11 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @GetMapping(PATH_WITH_ID + "/pay")
-  fun paymentInfo(@PathVariable id: UUID): PaymentDTO {
+  fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO {
     val showing = findOne(id)
-
-    val payeePhone = userRepo.findById(showing.payToUser)
-      .map { it.phone }
-      .orElseThrow { NotFoundException("payment info for showing " + id) }
+    val payeePhone = findUser(showing.payToUser)
+      .phone
+      .orElseThrow { MissingPhoneNumberException() }
 
     val currentUser = currentLoggedInUser()
     val participantInfo = participantRepo
@@ -142,19 +140,7 @@ class ShowingController(private val repo: ShowingRepository,
       .orElseThrow { PaymentInfoMissing(id) }
 
     val swishTo = when {
-      !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 && payeePhone != null -> {
-        val movieTitle = movieRepo
-          .findById(showing.movieId)
-          .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
-          .title
-
-        SwishDataDTO(
-          payee = StringValue(payeePhone.number),
-          amount = IntValue(participantInfo.amountOwed.toKronor()),
-          message = generateSwishMessage(movieTitle, showing))
-          .generateUri()
-          .toASCIIString()
-      }
+      !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 -> constructSwishUri(showing, payeePhone, participantInfo)
       else -> null
     }
 
@@ -163,7 +149,7 @@ class ShowingController(private val repo: ShowingRepository,
 
   @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   @ResponseStatus(HttpStatus.CREATED)
-  fun saveShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
+  fun createShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
     if (body.date == null || body.location == null || body.movieId == null || body.time == null) throw MissingParametersException()
     if (!movieRepo.existsById(body.movieId)) {
       throw NotFoundException("movie '${body.movieId}'. Can't create showing for movie that does not exist")
@@ -182,7 +168,7 @@ class ShowingController(private val repo: ShowingRepository,
   @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun attend(@PathVariable id: UUID): Set<UserID> {
     val showing = findOne(id)
-    verfiyTicketsNotBought(showing)
+    assertTicketsNotBought(showing)
 
     val participantsPlusLoggedInUser = showing.participants.toMutableSet()
     participantsPlusLoggedInUser.add(currentLoggedInUser())
@@ -194,7 +180,7 @@ class ShowingController(private val repo: ShowingRepository,
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun unattend(@PathVariable id: UUID): Set<UserID> {
     val showing = findOne(id)
-    verfiyTicketsNotBought(showing)
+    assertTicketsNotBought(showing)
 
     val participantsWithoutLoggedInUser = showing.participants.toMutableSet()
     participantsWithoutLoggedInUser.remove(currentLoggedInUser())
@@ -250,10 +236,37 @@ class ShowingController(private val repo: ShowingRepository,
     participantRepo.saveAll(participants)
   }
 
-  private fun verfiyTicketsNotBought(showing: Showing) {
+  private fun assertTicketsNotBought(showing: Showing) {
     if (showing.ticketsBought) {
       throw TicketsAlreadyBoughtException(showing.id)
     }
+  }
+
+  private fun assertLoggedInUserIsAdmin(showing: Showing) {
+    if (currentLoggedInUser() != showing.admin) {
+      throw AccessDeniedException("Only the showing admin is allowed to do that")
+    }
+  }
+
+  private fun assertUserHasPhoneNumber(userID: UserID) {
+    val user = findUser(userID)
+    if (user.phone == null || user.phone.number.isNullOrBlank()) {
+      throw MissingPhoneNumberException()
+    }
+  }
+
+  private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantInfo): String {
+    val movieTitle = movieRepo
+      .findById(showing.movieId)
+      .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
+      .title
+
+    return SwishDataDTO(
+      payee = StringValue(payeePhone.number),
+      amount = IntValue(participantInfo.amountOwed.toKronor()),
+      message = generateSwishMessage(movieTitle, showing))
+      .generateUri()
+      .toASCIIString()
   }
 
   private fun generateSwishMessage(movieTitle: String, showing: Showing): StringValue {
@@ -269,5 +282,17 @@ class ShowingController(private val repo: ShowingRepository,
       return Duration.ofHours(2).plusMinutes(30)
     }
     return this.runtime
+  }
+
+  private fun findUser(userID: UserID) =
+    userRepo
+      .findById(userID)
+      .orElseThrow { NotFoundException("user " + userID) }
+
+  private fun PhoneNumber?.orElseThrow(exceptionSupplier: () -> Exception): PhoneNumber {
+    if (this == null) {
+      throw exceptionSupplier()
+    }
+    return this
   }
 }

@@ -45,8 +45,13 @@ class UserController(val userRepository: UserRepository) {
       else -> Bioklubbnummer(newDetails.bioklubbnummer!!)
     }
 
+    val newPhoneNumber = when {
+      newDetails.phone == null || newDetails.phone.isBlank() -> null
+      else -> PhoneNumber(newDetails.phone)
+    }
+
     val updatedUser = currentUser().copy(
-      phone = PhoneNumber(newDetails.phone ?: ""),
+      phone = newPhoneNumber,
       nick = newDetails.nick,
       bioklubbnummer = newBioklubbnummer)
 
