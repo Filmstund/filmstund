@@ -79,7 +79,7 @@ class PendingShowing extends Component {
           {!isParticipating && this.renderAttendAction()}
           {isParticipating &&
           <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
-        </ButtonContainer>;
+        </ButtonContainer>
         <ParticipantList participants={showing.participants} />
       </div>
     );

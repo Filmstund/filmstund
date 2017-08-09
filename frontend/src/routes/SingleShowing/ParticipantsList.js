@@ -12,12 +12,11 @@ const ParticipantContainer = styled.div`
 `;
 
 const ParticipantsList = ({ participants, showPhone }) => {
-
   return (<div>
     <SmallHeader>{participants.length} Deltagare</SmallHeader>
     <ParticipantContainer>
-      {participants.map(userId =>
-        <UserItem key={userId} showPhone={showPhone} userId={userId} />
+      {participants.map(p =>
+        <UserItem key={p.userID} showPhone={showPhone} userId={p.userID} />
       )}
   </ParticipantContainer>
   </div>)

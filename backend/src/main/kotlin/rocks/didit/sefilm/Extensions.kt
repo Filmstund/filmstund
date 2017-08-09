@@ -60,19 +60,14 @@ internal fun User.toLimitedUserInfo(): LimitedUserInfo {
 internal fun String.toImdbId() = IMDbID.valueOf(this)
 internal fun Long.toTmdbId() = TMDbID.valueOf(this)
 
-
-internal fun Participant.toLimitedParticipant(): Participant {
-  val userId = currentLoggedInUser()
-  return when(this) {
-    is PaymentParticipant -> when(this.payment.type) {
-      PaymentType.Swish -> this
-      PaymentType.Företagsbiljett -> if (this.userID == userId) this else LimitedParticipant(this.userID)
-      PaymentType.Other -> this
-    }
-    else -> this
+internal fun Participant.redact(): Participant {
+  return when (this) {
+    is SwishParticipant -> RedactedParticipant(this.userID, PaymentType.Swish)
+    is FtgBiljettParticipant -> RedactedParticipant(this.userID, PaymentType.Företagsbiljett)
+    is RedactedParticipant -> this
   }
 }
 
 internal fun Showing.withoutSensitiveFields(): Showing {
-  return this.copy(participants = participants.map{p -> p.toLimitedParticipant()}.toSet())
+  return this.copy(participants = participants.map(Participant::redact).toSet())
 }

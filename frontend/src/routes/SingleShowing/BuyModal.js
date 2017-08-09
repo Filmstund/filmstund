@@ -27,37 +27,42 @@ const Close = styled.div`
   cursor: pointer;
 `;
 
-const ForetagsBiljetterList = ({ participants }) =>
+const ForetagsBiljetterList = ({ tickets }) =>
   <div>
     <SmallHeader>Företagsbiljetter</SmallHeader>
-    {participants.map(p =>
-      <CopyValue key={p.payment.extra} text={p.payment.extra} />
+    {tickets.map(t =>
+      <CopyValue key={t.user} text={t.företagsbiljett} />
     )}
   </div>;
 
-const sumBioklubbkortsnummer = nummer =>
-  sum(nummer
-    .map(nbr => nbr.bioklubbnummer)
+const sumBioklubbkortsnummer = tickets =>
+  sum(tickets
+    .map(t => t.bioklubbnummer)
     .map(nbr => parseInt(nbr === null ? 0 : nbr, 10)));
 
 const UserItem = buildUserComponent(({ user }) =>
   <li>{user.firstName} '{user.nick}' {user.lastName}</li>
 );
 
-const usersWithoutBioklubbnummer = ({bioklubbnummer}) =>
-  bioklubbnummer
-  .filter(nbr => nbr.bioklubbnummer === null)
-  .map(nbr => nbr.user)
-  .map(user => <UserItem key={user} userId={user}/> );
+const usersWithoutBioklubbnummer = tickets => {
+  return tickets
+    .filter(t => t.bioklubbnummer === null)
+    .map(t => t.user)
+    .map(user => <UserItem key={user} userId={user}/>);
+};
 
-const BioklubbkortsnummerList = ({ bioklubbnummer, participants }) =>
+const BioklubbkortsnummerList = ({ tickets, participants }) =>
   <div>
     <SmallHeader>Bioklubbnummer</SmallHeader>
-    {bioklubbnummer.map(nbr => <div key={nbr.user}><CopyValue text={nbr.bioklubbnummer} /></div>)}
-    <hr />
-    = {sumBioklubbkortsnummer(bioklubbnummer)}
-    {usersWithoutBioklubbnummer(bioklubbnummer).length !== participants.length
-    && <div>{usersWithoutBioklubbnummer(bioklubbnummer).length} deltagare saknar bioklubbnummer: <ul>{usersWithoutBioklubbnummer(bioklubbnummer)}</ul></div>}
+    {tickets
+      .filter(t => t.bioklubbnummer !== null)
+      .map(t => <CopyValue key={t.user} text={t.bioklubbnummer}/>)}
+    <hr/>
+    = {sumBioklubbkortsnummer(tickets)}
+    {usersWithoutBioklubbnummer(tickets).length !== participants.length
+    && <div>{usersWithoutBioklubbnummer(tickets).length} deltagare saknar bioklubbnummer:
+      <ul>{usersWithoutBioklubbnummer(tickets)}</ul>
+    </div>}
   </div>;
 
 const BuyModal = ({
@@ -80,11 +85,11 @@ const BuyModal = ({
     );
   }
 
-  const { participantInfo, sfBuyLink, bioklubbnummer, participants } = buyData;
-  const { ticketsBought } = showing;
+  const { participantInfo, sfBuyLink, tickets } = buyData;
+  const { ticketsBought, participants } = showing;
 
-  const participantsWithForetagsbiljett = participants.filter(
-    p => p.payment.type === "Företagsbiljett"
+  const participantsWithForetagsbiljett = tickets.filter(
+    user => user.företagsbiljett !== null
   );
 
   return (
@@ -110,10 +115,10 @@ const BuyModal = ({
                 </a>}
               <ParticipantsList participants={showing.participants} showPhone={true} />
               <ForetagsBiljetterList
-                participants={participantsWithForetagsbiljett}
+                tickets={participantsWithForetagsbiljett}
               />
               <BioklubbkortsnummerList
-                bioklubbnummer={bioklubbnummer}
+                tickets={tickets}
                 participants={participants}
               />
               <Field text="Biljettpris:">

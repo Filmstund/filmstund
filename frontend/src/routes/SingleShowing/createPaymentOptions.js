@@ -1,10 +1,10 @@
 import { capitalize } from "../../Utils";
 import moment from "moment";
 
-const createPaymentOption = (type, extra = null, suffix = null) => {
+const createPaymentOption = (type, ticketNumber = null, suffix = null) => {
   type = capitalize(type);
-  if (extra) {
-    return { type, extra, suffix };
+  if (ticketNumber) {
+    return { type, ticketNumber, suffix };
   }
   return { type };
 };
@@ -17,15 +17,15 @@ const createForetagsbiljetter = foretagsbiljetter => {
       ({ status, expires }) =>
         status === "Available" && now.isBefore(moment(expires))
     )
-    .map(({ value, expires }) =>
-      createPaymentOption("företagsbiljett", value, expires)
+    .map(({ number, expires }) =>
+      createPaymentOption("företagsbiljett", number, expires)
     );
 };
 
 export const stringifyOption = option => {
   const type = capitalize(option.type);
-  if (option.extra) {
-    return type + ": " + option.extra;
+  if (option.ticketNumber) {
+    return type + ": " + option.ticketNumber;
   } else {
     return type;
   }

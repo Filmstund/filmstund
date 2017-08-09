@@ -51,7 +51,7 @@ const Foretagsbiljett = ({
     <BiljettField text="Kortnummer">
       <ForetagsbiljettInput
         type="text"
-        value={biljett.value}
+        value={biljett.number}
         maxLength={11}
         onChange={v => handleChangeForetagsbiljett(index, v)}
       />
@@ -79,27 +79,28 @@ export default class ForetagsbiljettList extends Component {
     const { biljetter } = this.props;
 
     this.props.onChange(
-      biljetter.map((value, i) => {
+      biljetter.map((number, i) => {
         if (index === i) {
           return {
-            ...value,
+            ...number,
             ...biljett
           };
         } else {
-          return value;
+          return number;
         }
       })
     );
   };
 
-  handleChangeForetagsbiljett = (index, { target: { value } }) =>
-    this.updateForetagsbiljett(index, { value });
+  handleChangeForetagsbiljett = (index, { target: { value } }) => {
+    this.updateForetagsbiljett(index, { number: value });
+  }
 
   handleSetExpiresForetagsbiljett = (index, expires) =>
     this.updateForetagsbiljett(index, { expires });
 
   addForetagsbiljett = () => {
-    const foretagsbiljett = { value: "", expires: DEFAULT_DATE };
+    const foretagsbiljett = { number: "", expires: DEFAULT_DATE };
     this.props.onChange([...this.props.biljetter, foretagsbiljett]);
   };
 

@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.domain
 
 enum class PaymentType {
-    Swish, Företagsbiljett, Other
+  Swish, Företagsbiljett
 }
 
-data class PaymentOption(val type: PaymentType, val extra: String? = null)
+data class PaymentOption(val type: PaymentType, val ticketNumber: String? = null)

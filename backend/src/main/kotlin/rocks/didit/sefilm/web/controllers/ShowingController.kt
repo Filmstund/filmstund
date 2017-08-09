@@ -45,9 +45,11 @@ class ShowingController(private val repo: ShowingRepository,
   @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun findOne(@PathVariable id: UUID): Showing = repo.findById(id).map(Showing::withoutSensitiveFields).orElseThrow { NotFoundException("showing '$id") }
 
+  private fun findShowing(id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
+
   @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
-    val showing = findOne(id)
+    val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
     assertUserHasPhoneNumber(showing.admin)
 
@@ -63,6 +65,7 @@ class ShowingController(private val repo: ShowingRepository,
       else -> showing.location
     }
 
+    // TODO update calendar event
     val updateShowing = showing.copy(
       price = SEK(body.price),
       private = body.private,
@@ -74,6 +77,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val updatedShowing = repo.save(updateShowing)
     if (body.ticketsBought) {
+      markFöretagsbiljetterAsUsed(showing.participants)
       createInitialPaymentInfo(updateShowing)
     }
     return updatedShowing
@@ -81,7 +85,7 @@ class ShowingController(private val repo: ShowingRepository,
 
   @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun deleteShowing(@PathVariable id: UUID): SuccessfulStatusDTO {
-    val showing = findOne(id)
+    val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
 
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
@@ -91,13 +95,13 @@ class ShowingController(private val repo: ShowingRepository,
 
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun createGoogleCalendarEvent(@PathVariable id: UUID, @RequestBody body: List<String>): ResponseStatusDTO {
-    val showing = findOne(id)
+    val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
     if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
 
     val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
     val runtime = movie.getDurationOrDefault()
-    val participantEmails = userRepo.findAllById(showing.participants.map { it.userID }).map { it.email }
+    val participantEmails = userRepo.findAllById(showing.participants.map { it.extractUserId() }).map { it.email }
     val zoneId = ZoneId.of("Europe/Stockholm")
     val event = CalendarEventDTO.of(
       summary = movie.title,
@@ -117,47 +121,58 @@ class ShowingController(private val repo: ShowingRepository,
 
   @GetMapping(PATH_WITH_ID + "/buy")
   fun getBuyingTicketDetails(@PathVariable id: UUID): BuyDTO {
-    val showing = findOne(id)
+    val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
 
     // Note that this list is empty before the showing has been marked as bought
     val paymentInfos = paymentInfoRepo.findByShowingId(showing.id)
-    val bioklubbMap = userRepo.findAllById(showing.participants.map { it.userID })
-      .map { BioklubbUserMap(it.id, it.bioklubbnummer) }
+    val ticketMap = showing.participants.map {
+      val user = findUser(it.extractUserId())
+      val ftgTicket = when (it) {
+        is FtgBiljettParticipant -> it.ticketNumber
+        else -> null
+      }
 
-    updateFöretagsbiljettAsUsed(showing.participants)
+      UserToTicketMap(user.id, user.bioklubbnummer, ftgTicket)
+    }
 
-    return BuyDTO(getSfBuyLink(showing), bioklubbMap, paymentInfos, showing.participants)
+    return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)
   }
 
-  private fun updateFöretagsbiljettAsUsed(participants: Set<Participant>) {
-    val relevantUsers = participants.filter { p ->
-      when(p) {
-        is PaymentParticipant -> p.payment.type == PaymentType.Företagsbiljett
-        else -> false
-      }
-    }
+  private fun markFöretagsbiljetterAsUsed(participants: Set<Participant>) {
+    val relevantParticipants = participants
+      .filter { it is FtgBiljettParticipant }
+      .map { it as FtgBiljettParticipant }
 
-    val updatedUsers = mutableListOf<User>()
-    for (u in relevantUsers) {
-      if(u is PaymentParticipant) {
-        val user = userRepo.findById(u.userID).get()
-        val newUser = updateStatus(u, user)
-        updatedUsers.add(newUser)
+    val updatedUsers = relevantParticipants
+      .map {
+        updateFtgbiljettStatusOnUser(findUser(it.userID), it.ticketNumber, Företagsbiljett.Status.Used)
       }
-    }
-
     userRepo.saveAll(updatedUsers)
   }
 
-  private fun updateStatus(p: PaymentParticipant, u: User): User {
-    val newForetagsbiljetter = u.foretagsbiljetter.map { ftg -> if (ftg.value == p.payment.extra) ftg.copy(status = ForetagsbiljettStatus.Used) else ftg }
-    return u.copy(foretagsbiljetter = newForetagsbiljetter)
+  private fun markFöretagsbiljettAsAvailable(userID: UserID, ticketNumber: TicketNumber) {
+    userRepo.save(updateFtgbiljettStatusOnUser(findUser(userID), ticketNumber, Företagsbiljett.Status.Available))
+  }
+
+  private fun updateFtgbiljettStatusOnUser(user: User, ticketNumber: TicketNumber, newStatus: Företagsbiljett.Status): User {
+    if (user.foretagsbiljetter.filter { it.number == ticketNumber }.size != 1) {
+      throw TicketNotFoundException(ticketNumber)
+    }
+
+    val newForetagsbiljetter = user.foretagsbiljetter.map {
+      if (it.number == ticketNumber) {
+        it.copy(status = newStatus)
+      } else {
+        it
+      }
+    }
+    return user.copy(foretagsbiljetter = newForetagsbiljetter)
   }
 
   @GetMapping(PATH_WITH_ID + "/pay")
   fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO {
-    val showing = findOne(id)
+    val showing = findShowing(id)
     val payeePhone = findUser(showing.payToUser)
       .phone
       .orElseThrow { MissingPhoneNumberException() }
@@ -194,56 +209,56 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): Set<Participant> {
-    val showing = findOne(id)
-    assertTicketsNotBought(showing)
-
-    val participantsPlusLoggedInUser = showing.participants.toMutableSet()
+  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant> {
+    val showing = findShowing(id)
     val userId = currentLoggedInUser()
+    assertTicketsNotBought(showing)
+    assertUserNotAlreadyAttended(userId, showing)
 
-    val participant = PaymentParticipant(userId, body.paymentOption)
+    val participant: Participant = when (body.paymentOption.type) {
+      PaymentType.Företagsbiljett -> {
+        val suppliedTicket = body.paymentOption.ticketNumber ?: throw MissingParametersException("företagsbiljett ticket number")
 
-    if (participant.payment.type == PaymentType.Företagsbiljett) {
-      updateFöretagsbiljettAsPending(userId, participant)
+        markFöretagsbiljettAsPending(userId, TicketNumber(suppliedTicket))
+        FtgBiljettParticipant(userId, TicketNumber(suppliedTicket))
+      }
+      PaymentType.Swish -> SwishParticipant(userId)
     }
 
-    participantsPlusLoggedInUser.removeIf { p -> p.userID == userId }
-    participantsPlusLoggedInUser.add(participant)
+    val newParticipants = showing.participants.plus(participant)
+    val savedShowing = repo.save(showing.copy(participants = newParticipants))
 
-    val savedShowing = repo.save(showing.copy(participants = participantsPlusLoggedInUser))
-
-    return savedShowing.participants.map(Participant::toLimitedParticipant).toSet()
+    return savedShowing.participants.map(Participant::redact)
   }
 
-  private fun updateFöretagsbiljettAsPending(userId: UserID, participant: PaymentParticipant) {
-    val user = userRepo.findById(userId).get();
-    val predicate: (Foretagsbiljett) -> Boolean = { ticket -> ticket.value == participant.payment.extra }
-    if (user.foretagsbiljetter.any(predicate)) {
-      val oldTicket = user.foretagsbiljetter.findLast(predicate)
-      var newTickets = user.foretagsbiljetter.toMutableList()
-      newTickets.remove(oldTicket)
-      val newTicket = Foretagsbiljett(
-        value = oldTicket!!.value,
-        status = ForetagsbiljettStatus.Pending,
-        expires = oldTicket.expires)
-      newTickets.add(newTicket)
-      val newUser = user.copy(foretagsbiljetter = newTickets)
-      userRepo.save(newUser)
-    } else {
-      throw NotFoundException("No such Företagsbiljett found on user")
-    }
+  private fun markFöretagsbiljettAsPending(userId: UserID, ticketNumber: TicketNumber) {
+    val user = getUser(userId)
+    val updatedUser = updateFtgbiljettStatusOnUser(user, ticketNumber, Företagsbiljett.Status.Pending)
+    userRepo.save(updatedUser)
   }
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun unattend(@PathVariable id: UUID): List<Participant> {
-    val showing = findOne(id)
+    val showing = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
+    val userId = currentLoggedInUser()
     assertTicketsNotBought(showing)
 
-    val participantsWithoutLoggedInUser = showing.participants.toMutableSet()
-    participantsWithoutLoggedInUser.removeIf { p -> p.userID == currentLoggedInUser() }
+    val participantLst = showing.participants.filter { it.hasUserId(userId) }
+    if (participantLst.isEmpty()) {
+      return showing.participants.map(Participant::redact)
+    } else if (participantLst.size > 1) {
+      throw AssertionError("Participant $userId has participated more than one time on showing $id")
+    }
 
+    val participant = participantLst.first()
+    if (participant is FtgBiljettParticipant) {
+      markFöretagsbiljettAsAvailable(userId, participant.ticketNumber)
+    }
+
+    val participantsWithoutLoggedInUser = showing.participants.minus(participant)
     val savedShowing = repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
-    return savedShowing.participants.map(Participant::toLimitedParticipant)
+
+    return savedShowing.participants.map(Participant::redact)
   }
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
@@ -258,26 +273,26 @@ class ShowingController(private val repo: ShowingRepository,
       admin = admin.id,
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,
-      participants = setOf(PaymentParticipant(admin.id, PaymentOption(PaymentType.Swish))))
+      participants = setOf(SwishParticipant(admin.id)))
   }
 
   private fun createInitialPaymentInfo(showing: Showing) {
     val participants = showing.participants.map { participant ->
-      paymentInfoRepo.findByShowingIdAndUserId(showing.id, participant.userID)
+      paymentInfoRepo.findByShowingIdAndUserId(showing.id, participant.extractUserId())
         .map {
           // Use existing info
           ParticipantPaymentInfo(
             id = it.id,
-            userId = participant.userID,
+            userId = participant.extractUserId(),
             showingId = showing.id,
-            hasPaid = it.hasPaid,
+            hasPaid = it.hasPaid || participant is FtgBiljettParticipant,
             amountOwed = it.amountOwed)
         }
         .orElseGet {
           // Create new info
-          ParticipantPaymentInfo(userId = participant.userID,
+          ParticipantPaymentInfo(userId = participant.extractUserId(),
             showingId = showing.id,
-            hasPaid = participant.userID == showing.payToUser,
+            hasPaid = participant.extractUserId() == showing.payToUser || participant is FtgBiljettParticipant,
             amountOwed = showing.price ?: SEK(0))
         }
     }
@@ -287,6 +302,12 @@ class ShowingController(private val repo: ShowingRepository,
   private fun assertTicketsNotBought(showing: Showing) {
     if (showing.ticketsBought) {
       throw TicketsAlreadyBoughtException(showing.id)
+    }
+  }
+
+  private fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
+    if (showing.participants.any { it.hasUserId(userID) }) {
+      throw UserAlreadyAttendedException()
     }
   }
 
@@ -346,6 +367,11 @@ class ShowingController(private val repo: ShowingRepository,
       movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
       else -> null
     }
+  }
+
+  private fun getUser(userId: UserID): User {
+    return userRepo.findById(userId)
+      .orElseThrow { NotFoundException(" user with ID: " + userId) }
   }
 
   private fun PhoneNumber?.orElseThrow(exceptionSupplier: () -> Exception): PhoneNumber {

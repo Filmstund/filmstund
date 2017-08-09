@@ -15,3 +15,4 @@ data class ParticipantPaymentInfo(
   val hasPaid: Boolean = false,
   val amountOwed: SEK = SEK(0))
 
+
