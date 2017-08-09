@@ -63,7 +63,7 @@ class Showings extends Component {
           />
         );
       } else {
-        return <ParticipantList participants={showing.participants} />
+        return <ParticipantList participants={showing.participants} />;
       }
     } else {
       return (
