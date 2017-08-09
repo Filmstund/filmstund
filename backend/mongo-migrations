@@ -10,7 +10,7 @@ db.movie.update({}, {$set: {"imdbId": null}}, {upsert: false, multi:true})
 db.showing.find({}).forEach(s => {
     newParts = s.participants.map(p => {
        return {
-            userID: p,
+            userId: p,
             _class: "rocks.didit.sefilm.domain.SwishParticipant"
           };
     });

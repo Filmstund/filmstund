@@ -31,7 +31,7 @@ const ForetagsBiljetterList = ({ tickets }) =>
   <div>
     <SmallHeader>Företagsbiljetter</SmallHeader>
     {tickets.map(t =>
-      <CopyValue key={t.user} text={t.företagsbiljett} />
+      <CopyValue key={t.foretagsbiljett} text={t.foretagsbiljett} />
     )}
   </div>;
 
@@ -47,8 +47,8 @@ const UserItem = buildUserComponent(({ user }) =>
 const usersWithoutBioklubbnummer = tickets => {
   return tickets
     .filter(t => t.bioklubbnummer === null)
-    .map(t => t.user)
-    .map(user => <UserItem key={user} userId={user}/>);
+    .map(t => t.userId)
+    .map(userId => <UserItem key={userId} userId={userId}/>);
 };
 
 const BioklubbkortsnummerList = ({ tickets, participants }) =>
@@ -56,7 +56,7 @@ const BioklubbkortsnummerList = ({ tickets, participants }) =>
     <SmallHeader>Bioklubbnummer</SmallHeader>
     {tickets
       .filter(t => t.bioklubbnummer !== null)
-      .map(t => <CopyValue key={t.user} text={t.bioklubbnummer}/>)}
+      .map(t => <CopyValue key={t.userId} text={t.bioklubbnummer}/>)}
     <hr/>
     = {sumBioklubbkortsnummer(tickets)}
     {usersWithoutBioklubbnummer(tickets).length !== participants.length
@@ -89,7 +89,7 @@ const BuyModal = ({
   const { ticketsBought, participants } = showing;
 
   const participantsWithForetagsbiljett = tickets.filter(
-    user => user.företagsbiljett !== null
+    user => user.foretagsbiljett !== null
   );
 
   return (

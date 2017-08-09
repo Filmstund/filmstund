@@ -146,7 +146,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val updatedUsers = relevantParticipants
       .map {
-        updateFtgbiljettStatusOnUser(findUser(it.userID), it.ticketNumber, Företagsbiljett.Status.Used)
+        updateFtgbiljettStatusOnUser(findUser(it.userId), it.ticketNumber, Företagsbiljett.Status.Used)
       }
     userRepo.saveAll(updatedUsers)
   }

@@ -46,7 +46,7 @@ class Showings extends Component {
 
   isParticipating = () => {
     const { showing, me } = this.props;
-    return showing.participants.some(p => p.userID === me.id);
+    return showing.participants.some(p => p.userId === me.id);
   };
 
   renderBoughtOrPendingShowing = () => {

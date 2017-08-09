@@ -16,7 +16,7 @@ const ParticipantsList = ({ participants, showPhone }) => {
     <SmallHeader>{participants.length} Deltagare</SmallHeader>
     <ParticipantContainer>
       {participants.map(p =>
-        <UserItem key={p.userID} showPhone={showPhone} userId={p.userID} />
+        <UserItem key={p.userId} showPhone={showPhone} userId={p.userId} />
       )}
   </ParticipantContainer>
   </div>)

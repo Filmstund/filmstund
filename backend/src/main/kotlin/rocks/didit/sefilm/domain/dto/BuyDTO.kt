@@ -9,4 +9,4 @@ data class BuyDTO(val sfBuyLink: String? = null,
                   val tickets: List<UserToTicketMap>,
                   val participantInfo: Collection<ParticipantPaymentInfo> = emptyList())
 
-data class UserToTicketMap(val user: UserID, val bioklubbnummer: Bioklubbnummer?, val företagsbiljett: TicketNumber?)
+data class UserToTicketMap(val userId: UserID, val bioklubbnummer: Bioklubbnummer?, val foretagsbiljett: TicketNumber?)
