@@ -7,7 +7,7 @@ describe("showingsReducer", () => {
 
   it("should have a default state", () => {
     expect(showingsReducer(undefined, { type: undefined })).toEqual({
-      loading: false,
+      loading: {},
       data: {},
       error: null
     });
@@ -25,7 +25,7 @@ describe("showingsReducer", () => {
       }
     };
     const expectedState = {
-      loading: false,
+      loading: { index: false },
       data: data,
       error: null
     };
@@ -44,41 +44,85 @@ describe("showingsReducer", () => {
     ).toEqual(expectedState);
   });
   it("should set loading on request", () => {
-    const prevState = { loading: false, error: "hello error" };
-    const expectedState = {
-      loading: true,
-      error: null
+    const id = 10;
+    const prevState = {
+      data: {},
+      loading: { [id]: false },
+      error: "hello error"
     };
-    const actionWithType = type => ({ type });
+    const expectedState = {
+      loading: { [id]: true },
+      error: null,
+      data: {}
+    };
+    const actionWithType = type => ({ type, id });
 
     const requestActions = [
+      actions.requestSingle,
       actions.requestCreate,
-      actions.requestIndex,
       actions.requestDelete,
-      actions.requestUpdate
+      actions.requestUpdate,
+      actions.requestAttend,
+      actions.requestUnattend
     ].map(actionWithType);
 
     requestActions.forEach(action => {
       expect(showingsReducer(prevState, action)).toEqual(expectedState);
     });
   });
+  it("should set loading on index request", () => {
+    const prevState = {
+      data: {},
+      loading: { index: false },
+      error: "hello error"
+    };
+    const expectedState = {
+      loading: { index: true },
+      error: null,
+      data: {}
+    };
+    const actionWithType = type => ({ type });
+
+    expect(
+      showingsReducer(prevState, actionWithType(actions.requestIndex))
+    ).toEqual(expectedState);
+  });
   it("should unset loading on success", () => {
-    const prevState = { loading: true, error: "hello error" };
+    const id = "6";
+    const prevState = { loading: { [id]: true }, error: "hello error" };
+
+    const actionWithType = type => ({ type, id, data: { id } });
 
     const successActions = [
       actions.successCreate,
-      actions.successIndex,
-      actions.successDelete,
-      actions.successUpdate
+      actions.successUpdate,
+      actions.successAttend,
+      actions.successUnattend
     ].map(actionWithType);
 
     successActions.forEach(action => {
-      expect(showingsReducer(prevState, action).loading).toBe(false);
+      expect(showingsReducer(prevState, action).loading[id]).toBe(false);
+    });
+  });
+  it("should unset error on success", () => {
+    const id = "6";
+    const prevState = { loading: { [id]: true }, error: "hello error" };
+
+    const actionWithType = type => ({ type, id, data: { id } });
+
+    const successActions = [
+      actions.successCreate,
+      actions.successUpdate,
+      actions.successAttend,
+      actions.successUnattend
+    ].map(actionWithType);
+
+    successActions.forEach(action => {
       expect(showingsReducer(prevState, action).error).toBe(null);
     });
   });
   it("should set error on error", () => {
-    const prevState = { loading: true, error: null };
+    const prevState = { loading: { 10: true }, error: null };
 
     const errorActions = [
       actions.errorCreate,
@@ -88,7 +132,6 @@ describe("showingsReducer", () => {
     ].map(actionWithType);
 
     errorActions.forEach(action => {
-      expect(showingsReducer(prevState, action).loading).toBe(false);
       expect(showingsReducer(prevState, action).error).toBe("hello");
     });
   });
@@ -98,7 +141,7 @@ describe("showingsReducer", () => {
       hello: "data"
     };
     const prevState = {
-      loading: true,
+      loading: {},
       error: null,
       data: {
         5: { id: 5, hello: "object" },
@@ -107,17 +150,13 @@ describe("showingsReducer", () => {
     };
 
     const expectedCreateState = {
-      loading: false,
-      error: null,
-      data: {
-        5: { id: 5, hello: "object" },
-        6: { id: 6, hello: "my man" },
-        10: data
-      }
+      5: { id: 5, hello: "object" },
+      6: { id: 6, hello: "my man" },
+      10: data
     };
 
     expect(
-      showingsReducer(prevState, { type: actions.successCreate, data })
+      showingsReducer(prevState, { type: actions.successCreate, data }).data
     ).toEqual(expectedCreateState);
   });
 
@@ -136,16 +175,12 @@ describe("showingsReducer", () => {
     };
 
     const expectedUpdateState = {
-      loading: false,
-      error: null,
-      data: {
-        5: data,
-        6: { id: 6, hello: "my man" }
-      }
+      5: data,
+      6: { id: 6, hello: "my man" }
     };
 
     expect(
-      showingsReducer(prevState, { type: actions.successUpdate, data })
+      showingsReducer(prevState, { type: actions.successUpdate, data }).data
     ).toEqual(expectedUpdateState);
   });
 
@@ -161,12 +196,8 @@ describe("showingsReducer", () => {
     };
 
     const expectedUpdateState = {
-      loading: false,
-      error: null,
-      data: {
-        5: { id: 5, participants: participants },
-        6: { id: 6, hello: "my man" }
-      }
+      5: { id: 5, participants: participants },
+      6: { id: 6, hello: "my man" }
     };
 
     expect(
@@ -174,7 +205,7 @@ describe("showingsReducer", () => {
         type: actions.successAttend,
         id: 5,
         participants
-      })
+      }).data
     ).toEqual(expectedUpdateState);
 
     expect(
@@ -182,7 +213,7 @@ describe("showingsReducer", () => {
         type: actions.successUnattend,
         id: 5,
         participants
-      })
+      }).data
     ).toEqual(expectedUpdateState);
   });
   it("should remove with id on success delete", () => {
@@ -197,15 +228,11 @@ describe("showingsReducer", () => {
     };
 
     const expectedDeleteState = {
-      loading: false,
-      error: null,
-      data: {
-        5: { id: 5, hello: "object" }
-      }
+      5: { id: 5, hello: "object" }
     };
 
     expect(
-      showingsReducer(prevState, { type: actions.successDelete, id })
+      showingsReducer(prevState, { type: actions.successDelete, id }).data
     ).toEqual(expectedDeleteState);
   });
 });
