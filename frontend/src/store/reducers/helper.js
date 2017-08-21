@@ -1,3 +1,4 @@
+import { omit } from "lodash";
 import { signoutUser } from "./user";
 
 export const requestAndValidate = (dispatch, fetchish, ...args) =>
@@ -7,3 +8,10 @@ export const requestAndValidate = (dispatch, fetchish, ...args) =>
     }
     return Promise.reject(resp);
   });
+
+export const mergeIntoCollection = (collection, object) => ({
+  ...collection,
+  [object.id]: object
+});
+
+export const removeFromCollection = (collection, id) => omit(collection, id);
