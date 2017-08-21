@@ -5,10 +5,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.TMDbID
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
@@ -62,3 +59,15 @@ internal fun User.toLimitedUserInfo(): LimitedUserInfo {
 
 internal fun String.toImdbId() = IMDbID.valueOf(this)
 internal fun Long.toTmdbId() = TMDbID.valueOf(this)
+
+internal fun Participant.redact(): Participant {
+  return when (this) {
+    is SwishParticipant -> RedactedParticipant(this.userId, PaymentType.Swish)
+    is FtgBiljettParticipant -> RedactedParticipant(this.userId, PaymentType.Företagsbiljett)
+    is RedactedParticipant -> this
+  }
+}
+
+internal fun Showing.withoutSensitiveFields(): Showing {
+  return this.copy(participants = participants.map(Participant::redact).toSet())
+}

@@ -2,7 +2,6 @@ package rocks.didit.sefilm.database.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.domain.Bioklubbnummer
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import java.util.*
@@ -15,4 +14,5 @@ data class ParticipantPaymentInfo(
   val showingId: UUID = UUID.randomUUID(),
   val hasPaid: Boolean = false,
   val amountOwed: SEK = SEK(0))
+
 

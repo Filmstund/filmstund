@@ -1,3 +1,22 @@
+### Pending migrations ###
+#
 # Add archived flag
 db.movie.update({}, {$set: {"archived": false}}, {upsert: false, multi:true})
 
+# Remove all IMDb ID
+db.movie.update({}, {$set: {"imdbId": null}}, {upsert: false, multi:true})
+
+# Update participants to new format introduced in feature/ftg-biljetter
+db.showing.find({}).forEach(s => {
+    newParts = s.participants.map(p => {
+       return {
+            userId: p,
+            _class: "rocks.didit.sefilm.domain.SwishParticipant"
+          };
+    });
+    s.participants = newParts;
+    db.showing.save(s);
+});
+
+
+### Migrations already done in deployed application ###

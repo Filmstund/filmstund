@@ -166,7 +166,8 @@ class AdminAction extends Component {
           : <MainButton onClick={this.handleStartBooking}>
               Alla är med, nu bokar vi!
             </MainButton>}
-        {ticketsBought && calendarEventId === null &&
+        {ticketsBought &&
+          calendarEventId === null &&
           <MainButton
             disabled={isCreatingEvent}
             onClick={this.handleCreateGoogleEvent}

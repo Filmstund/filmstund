@@ -5,7 +5,7 @@ import { values, orderBy } from "lodash";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
-import Showing, {getStatus} from "../Showing";
+import Showing, { getStatus } from "../Showing";
 import Header from "../Header";
 
 import { getTodaysDate } from "../lib/dateTools";
@@ -49,7 +49,9 @@ class Home extends Component {
   renderParticipatedByMe = showings => {
     const { me } = this.props;
     const myShowings = showings.filter(
-      s => s.participants.includes(me.id) && moment(s.date).isAfter(today)
+      s =>
+        s.participants.some(p => p.userId === me.id) &&
+        moment(s.date).isAfter(today)
     );
 
     return this.renderShowings(myShowings);
@@ -58,7 +60,9 @@ class Home extends Component {
   renderPrevParticipatedByMe = showings => {
     const { me } = this.props;
     const myShowings = showings.filter(
-      s => s.participants.includes(me.id) && moment(s.date).isBefore(today)
+      s =>
+        s.participants.some(p => p.userId === me.id) &&
+        moment(s.date).isBefore(today)
     );
 
     return this.renderShowings(myShowings);

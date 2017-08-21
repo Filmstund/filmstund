@@ -2,17 +2,12 @@ package rocks.didit.sefilm.web.controllers
 
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import rocks.didit.sefilm.Application
-import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.Bioklubbnummer
-import rocks.didit.sefilm.domain.LimitedUserInfo
-import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
-import rocks.didit.sefilm.toLimitedUserInfo
 
 @RestController
 class UserController(val userRepository: UserRepository) {
@@ -40,6 +35,8 @@ class UserController(val userRepository: UserRepository) {
 
   @PutMapping(ME_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
+    assertNoDuplicateForetagsbiljetter(newDetails.foretagsbiljetter)
+
     val newBioklubbnummer = when {
       newDetails.bioklubbnummer.isNullOrBlank() -> null
       else -> Bioklubbnummer(newDetails.bioklubbnummer!!)
@@ -53,9 +50,21 @@ class UserController(val userRepository: UserRepository) {
     val updatedUser = currentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
-      bioklubbnummer = newBioklubbnummer)
+      bioklubbnummer = newBioklubbnummer,
+      foretagsbiljetter = newDetails.foretagsbiljetter.map { Företagsbiljett.valueOf(it) })
 
     return userRepository.save(updatedUser)
+  }
+
+  private fun assertNoDuplicateForetagsbiljetter(tickets: List<FöretagsbiljettDTO>) {
+    val numDistinctTickets = tickets
+      .map { it.number }
+      .distinct()
+      .size
+
+    if (numDistinctTickets != tickets.size) {
+      throw DuplicateTicketException()
+    }
   }
 }
 

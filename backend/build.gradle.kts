@@ -24,7 +24,7 @@ buildscript {
 }
 
 plugins {
-  val kotlinVersion = "1.1.3-2"
+  val kotlinVersion = "1.1.4"
 
   kotlin("jvm", version = kotlinVersion)
   kotlin("plugin.spring", version = kotlinVersion)
@@ -62,8 +62,8 @@ dependencies {
   compile(kotlin("stdlib"))
   compile(kotlin("stdlib-jre8"))
   compile(kotlin("reflect"))
-  compile("com.fasterxml.jackson.module:jackson-module-kotlin")
-  compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+  compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0")
+  compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0")
   compile("com.googlecode.libphonenumber:libphonenumber:8.4.2")
   compile("com.google.guava:guava:21.0")
   compile("org.jsoup:jsoup:1.10.3")

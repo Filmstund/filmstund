@@ -2,6 +2,7 @@ package rocks.didit.sefilm
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
+import rocks.didit.sefilm.domain.TicketNumber
 import java.util.*
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -11,7 +12,7 @@ class NotFoundException(what: String) : RuntimeException("Could not find $what")
 class MissingPhoneNumberException() : RuntimeException("User is missing a phone number")
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-class MissingParametersException() : RuntimeException("Some required parameters were missing")
+class MissingParametersException(what: String = "") : RuntimeException("Some required parameters were missing: " + what)
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class ExternalProviderException(msg: String) : RuntimeException("Unable to fetch information from external provider: $msg")
@@ -27,6 +28,15 @@ class PaymentInfoMissing(showingId: UUID) : RuntimeException("Payment info for $
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class TicketsAlreadyBoughtException(showingId: UUID) : RuntimeException("The action is not allowd since the tickets for showing $showingId is already bought")
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class UserAlreadyAttendedException() : RuntimeException("The user has already attended this showing")
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class TicketNotFoundException(ticketNumber: TicketNumber) : RuntimeException("Ticket " + ticketNumber + " not found")
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class DuplicateTicketException() : RuntimeException("Found duplicate tickets")
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(msg: String) : RuntimeException(msg)

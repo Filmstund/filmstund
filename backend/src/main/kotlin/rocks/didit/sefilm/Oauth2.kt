@@ -150,7 +150,7 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                         name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
                         firstName = principal.firstName,
                         lastName = principal.lastName,
-                        nick = principal.lastName ?: "Houdini",
+                        nick = principal.firstName ?: "Houdini",
                         email = principal.username ?: "",
                         avatar = principal.avatarUrl)
                 userRepository.save(newUser)

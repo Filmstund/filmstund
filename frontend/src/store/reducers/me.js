@@ -36,13 +36,6 @@ const reducer = (state = initialState, action) => {
         loading: true
       };
     case actions.successSingle:
-      return {
-        ...state,
-        loading: false,
-        success: null,
-        error: null,
-        data: action.data
-      };
     case actions.successUpdate:
       return {
         ...state,

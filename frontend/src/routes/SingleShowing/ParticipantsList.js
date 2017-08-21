@@ -12,12 +12,11 @@ const ParticipantContainer = styled.div`
 `;
 
 const ParticipantsList = ({ participants, showPhone }) => {
-
   return (<div>
     <SmallHeader>{participants.length} Deltagare</SmallHeader>
     <ParticipantContainer>
-      {participants.map(userId =>
-        <UserItem key={userId} showPhone={showPhone} userId={userId} />
+      {participants.map(p =>
+        <UserItem key={p.userId} showPhone={showPhone} userId={p.userId} />
       )}
   </ParticipantContainer>
   </div>)
@@ -28,4 +27,4 @@ ParticipantsList.propTypes = {
   participants: PropTypes.array.isRequired
 };
 
-export default ParticipantsList
+export default ParticipantsList;

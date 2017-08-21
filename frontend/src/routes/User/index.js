@@ -2,12 +2,16 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import Helmet from "react-helmet";
-import { mapValues } from "lodash";
-import Field from "../Field";
-import MainButton from "../MainButton";
-import Input from "../Input";
-import alfons from "../assets/alfons.jpg";
-import { me as meActions } from "../store/reducers";
+import Field from "../../Field";
+import MainButton from "../../MainButton";
+import Input from "../../Input";
+import alfons from "../../assets/alfons.jpg";
+import { me as meActions } from "../../store/reducers";
+import { formatYMD } from "../../lib/dateTools";
+
+import { trim } from "../../Utils";
+
+import ForetagsbiljettList from "./ForetagsbiljettList";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -43,13 +47,14 @@ class User extends Component {
   constructor(props) {
     super(props);
 
-    const me = this.props.me;
+    const { me } = this.props;
 
     this.state = {
       editedUser: {
         nick: me.nick || "",
         phone: me.phone || "",
-        bioklubbnummer: me.bioklubbnummer || ""
+        bioklubbnummer: me.bioklubbnummer || "",
+        foretagsbiljetter: me.foretagsbiljetter || []
       }
     };
   }
@@ -59,19 +64,38 @@ class User extends Component {
   }
 
   setEditedUserValue = (key, { target: { value } }) => {
-    this.setState({
+    this.setState(state => ({
       editedUser: {
-        ...this.state.editedUser,
+        ...state.editedUser,
         [key]: value
       }
-    });
+    }));
+  };
+
+  setBiljetter = foretagsbiljetter => {
+    this.setState(state => ({
+      editedUser: {
+        ...state.editedUser,
+        foretagsbiljetter
+      }
+    }));
   };
 
   handleSubmit = () => {
-    const trimmedValues = mapValues(this.state.editedUser, s => s.trim());
+    const { editedUser } = this.state;
+    const { me } = this.props;
+
+    const trimmedValues = trim({
+      ...editedUser,
+      foretagsbiljetter: editedUser.foretagsbiljetter.map(ftg => ({
+        ...ftg,
+        expires: formatYMD(ftg.expires)
+      }))
+    });
+
     this.props.dispatch(
       meActions.actions.requestUpdate({
-        id: this.props.me.id,
+        id: me.id,
         ...trimmedValues
       })
     );
@@ -79,7 +103,12 @@ class User extends Component {
 
   render() {
     const { me, className, error, success } = this.props;
-    const { phone, bioklubbnummer, nick } = this.state.editedUser;
+    const {
+      phone,
+      bioklubbnummer,
+      nick,
+      foretagsbiljetter
+    } = this.state.editedUser;
     return (
       <div className={className}>
         <Helmet title="Profil" />
@@ -125,6 +154,10 @@ class User extends Component {
             onChange={v => this.setEditedUserValue("phone", v)}
           />
         </Field>
+        <ForetagsbiljettList
+          biljetter={foretagsbiljetter}
+          onChange={this.setBiljetter}
+        />
         <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>
       </div>
     );
