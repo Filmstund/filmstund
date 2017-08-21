@@ -4,7 +4,7 @@
 db.movie.update({}, {$set: {"archived": false}}, {upsert: false, multi:true})
 
 # Remove all IMDb ID
-db.movie.update({}, {$set: {"imdbId": null}}, {upsert: false, multi:true})
+db.movie.update({}, {$set: {"imdbId": {"value" : null,"state" : "Missing"}}}, {upsert: false, multi:true})
 
 # Update participants to new format introduced in feature/ftg-biljetter
 db.showing.find({}).forEach(s => {
