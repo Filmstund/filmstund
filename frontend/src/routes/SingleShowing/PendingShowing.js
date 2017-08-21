@@ -1,20 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import styled from "styled-components";
 
 import { showings as showingActions } from "../../store/reducers";
 
 import { SmallHeader } from "../../Header";
-import MainButton, { GrayButton } from "../../MainButton";
+import MainButton, { GrayButton, ButtonContainer } from "../../MainButton";
 import ParticipantList from "./ParticipantsList";
 
 import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
-
-const ButtonContainer = styled.div`
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-    `;
 
 class PendingShowing extends Component {
   constructor(props) {
@@ -69,7 +62,6 @@ class PendingShowing extends Component {
     );
   };
 
-
   render() {
     const { showing, isParticipating, handleUnattend } = this.props;
 
@@ -78,7 +70,7 @@ class PendingShowing extends Component {
         <ButtonContainer>
           {!isParticipating && this.renderAttendAction()}
           {isParticipating &&
-          <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
+            <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>}
         </ButtonContainer>
         <ParticipantList participants={showing.participants} />
       </div>
@@ -89,7 +81,6 @@ class PendingShowing extends Component {
 const mapStateToProps = state => ({
   me: state.me.data
 });
-
 
 const mapDispatchToProps = (dispatch, props) => {
   const { requestAttend, requestUnattend } = showingActions.actions;

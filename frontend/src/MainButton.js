@@ -47,4 +47,11 @@ export const RedButton = styled(MainButton)`
     background-color: #f44336;
   }
 `;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+`;
+
 export default MainButton;

@@ -1,14 +1,17 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import styled from "styled-components";
 
 import { showings as showingActions } from "../../store/reducers";
 
 import { getJson, jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 
-import MainButton, { GrayButton, RedButton } from "../../MainButton";
+import MainButton, {
+  GrayButton,
+  RedButton,
+  ButtonContainer
+} from "../../MainButton";
 import BuyModal from "./BuyModal";
 
 const oreToKr = price => {
@@ -120,7 +123,6 @@ class AdminAction extends Component {
       });
   };
 
-
   render() {
     const { showing, loading } = this.props;
 
@@ -133,12 +135,6 @@ class AdminAction extends Component {
       buyData,
       adminMessage
     } = this.state;
-
-    const ButtonContainer = styled.div`
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-    `;
 
     return (
       <ButtonContainer>
