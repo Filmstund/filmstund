@@ -25,7 +25,7 @@ class Home extends Component {
   };
 
   renderShowings = showings => {
-    return orderBy(showings, ["date"], ["desc"]).map(showing =>
+    return orderBy(showings, ["date"], ["asc"]).map(showing =>
       <Showing
         onClick={() => this.navigateToShowing(showing)}
         status={getStatus(showing)}
