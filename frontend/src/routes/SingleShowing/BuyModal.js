@@ -67,7 +67,9 @@ const BioklubbkortsnummerList = ({ tickets, participants }) =>
 
 const BuyModal = ({
   ticketPrice,
+  ticketLink,
   setPrice,
+  setTicketLink,
   loading,
   buyData,
   handleMarkBought,
@@ -127,6 +129,12 @@ const BuyModal = ({
                   value={ticketPrice}
                   min={0}
                   onChange={event => setPrice(event.target.value)}
+                />
+              </Field>
+              <Field text="Biljettlänk:">
+                <Input
+                  value={ticketLink}
+                  onChange={event => setTicketLink(event.target.value)}
                 />
               </Field>
               <MainButton>Markera som bokad</MainButton>

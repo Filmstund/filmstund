@@ -30,6 +30,7 @@ class AdminAction extends Component {
       isCreatingEvent: false,
       adminMessage: null,
       ticketPrice: oreToKr(props.showing.price),
+      sfTicketLink: "",
       buyData: null,
       showModal: false
     };
@@ -40,6 +41,12 @@ class AdminAction extends Component {
 
     this.setState({
       ticketPrice: isNaN(int) ? 0 : int
+    });
+  };
+
+  setTicketLink = sfTicketLink => {
+    this.setState({
+      sfTicketLink
     });
   };
 
@@ -81,10 +88,14 @@ class AdminAction extends Component {
   handleMarkBought = event => {
     event.preventDefault();
 
+    const { showing } = this.props;
+    const { sfTicketLink, ticketPrice } = this.state;
+
     this.props
       .requestUpdate({
-        ...this.props.showing,
-        price: this.state.ticketPrice * 100,
+        ...showing,
+        sfTicketLink,
+        price: ticketPrice * 100,
         ticketsBought: true
       })
       .then(this.handleStartBooking);
@@ -131,6 +142,7 @@ class AdminAction extends Component {
     const {
       isCreatingEvent,
       ticketPrice,
+      sfTicketLink,
       showModal,
       buyData,
       adminMessage
@@ -141,11 +153,13 @@ class AdminAction extends Component {
         {showModal &&
           <BuyModal
             setPrice={this.setPrice}
+            setTicketLink={this.setTicketLink}
             loading={loading}
             showing={showing}
             handleMarkBought={this.handleMarkBought}
             handlePaidChange={this.handlePaidChange}
             ticketPrice={ticketPrice}
+            ticketLink={sfTicketLink}
             buyData={buyData}
             closeModal={() =>
               this.setState({ showModal: false, buyData: null })}
