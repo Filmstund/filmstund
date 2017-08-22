@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.domain
 
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
@@ -19,10 +20,9 @@ class TicketManager(private val sfClient: SfClient,
     val ids = parts.subList(parts.size - 3, parts.size)
     val sfTickets = sfClient.fetchTickets(ids[0], ids[1], ids[2])
 
-    // FIXME: uncommment when done
-    //if (showing.participants.size != sfTickets.size) {
-    //  throw SfTicketException("Ticket mismatch: Showing (${showing.id}) has ${showing.participants.size} participants, but SF supplied ${sfTickets.size} tickets")
-    //}
+    if (showing.participants.size != sfTickets.size) {
+      throw SfTicketException("Ticket mismatch: Showing (${showing.id}) has ${showing.participants.size} participants, but SF supplied ${sfTickets.size} tickets")
+    }
 
     val tickets = showing.participants.mapIndexed { index, participant ->
       val barcode = sfClient.fetchBarcode(sfTickets[index].id)
