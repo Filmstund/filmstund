@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.UserHasNotPayedException
+import rocks.didit.sefilm.UserHasNotPaidException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
@@ -23,11 +23,15 @@ class TicketController(private val ticketRepository: TicketRepository,
   fun myTicket(@PathVariable showingId: UUID): Ticket {
     val currentLoggedInUser = currentLoggedInUser()
 
-    paymentInfoRepository
+    val participant = paymentInfoRepository
       .findByShowingIdAndUserId(showingId, currentLoggedInUser)
       .orElseThrow {
-        throw UserHasNotPayedException("User has not payed for this showing yet")
+        throw NotFoundException("user. Not enrolled on this showing")
       }
+
+    if (!participant.hasPaid) {
+      throw UserHasNotPaidException("User has not paid for this showing")
+    }
 
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, currentLoggedInUser)
       .orElseThrow { NotFoundException("Ticket not for this user and showing") }
