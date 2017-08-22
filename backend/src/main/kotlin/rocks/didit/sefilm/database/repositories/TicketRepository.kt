@@ -9,4 +9,6 @@ import java.util.*
 @Repository
 interface TicketRepository : CrudRepository<Ticket, String> {
   fun findByShowingIdAndAssignedToUser(showingId: UUID, userId: UserID): Optional<Ticket>
+
+  fun findByShowingId(showingId: UUID): List<Ticket>
 }

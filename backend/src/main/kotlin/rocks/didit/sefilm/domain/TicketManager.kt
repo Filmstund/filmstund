@@ -1,7 +1,6 @@
 package rocks.didit.sefilm.domain
 
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
@@ -20,21 +19,28 @@ class TicketManager(private val sfClient: SfClient,
     val ids = parts.subList(parts.size - 3, parts.size)
     val sfTickets = sfClient.fetchTickets(ids[0], ids[1], ids[2])
 
-    if (showing.participants.size != sfTickets.size) {
-      throw SfTicketException("Ticket mismatch: Showing (${showing.id}) has ${showing.participants.size} participants, but SF supplied ${sfTickets.size} tickets")
-    }
+    //if (showing.participants.size != sfTickets.size) {
+    //  throw SfTicketException("Ticket mismatch: Showing (${showing.id}) has ${showing.participants.size} participants, but SF supplied ${sfTickets.size} tickets")
+    //}
 
     val tickets = showing.participants.mapIndexed { index, participant ->
-      sfTickets[index].toTicket(showing.id, participant.extractUserId())
+      val barcode = sfClient.fetchBarcode(sfTickets[index].id)
+      sfTickets[index].toTicket(showing.id, participant.extractUserId(), barcode)
     }
     ticketRepository.saveAll(tickets)
   }
 
-  private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID): Ticket {
+  fun deleteTickets(showing: Showing) {
+    val ticketsForShowing = ticketRepository.findByShowingId(showingId = showing.id)
+    ticketRepository.deleteAll(ticketsForShowing)
+  }
+
+  private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
     val seat = Seat(this.seat.row, this.seat.number)
     return Ticket(id = this.id, showingId = showingId, assignedToUser = assignedToUser,
       customerType = this.customerType, customerTypeDefinition = this.customerTypeDefinition, cinema = this.cinema.title,
       cinemaCity = this.cinema.city.name, screen = this.screen.title, seat = seat, date = this.show.date, time = this.show.time,
-      movieName = this.movie.title, movieRating = this.movie.rating.displayName, showAttributes = this.show.attributes.map { it.displayName })
+      movieName = this.movie.title, movieRating = this.movie.rating.displayName, showAttributes = this.show.attributes.map { it.displayName },
+      barcode = barcode)
   }
 }
