@@ -96,6 +96,8 @@ class ShowingController(private val repo: ShowingRepository,
 
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
+    ticketManager.deleteTickets(showing)
+
     return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
   }
 

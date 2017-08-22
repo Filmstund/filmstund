@@ -2,6 +2,8 @@ package rocks.didit.sefilm.web.controllers
 
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
@@ -12,12 +14,13 @@ import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import java.util.*
 
-@RestController(Application.API_BASE_PATH + "/tickets")
+@RestController
+@RequestMapping(Application.API_BASE_PATH + "/tickets")
 class TicketController(private val ticketRepository: TicketRepository,
                        private val paymentInfoRepository: ParticipantPaymentInfoRepository) {
 
   @GetMapping("/{showingId}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun myTicket(showingId: UUID): Ticket {
+  fun myTicket(@PathVariable showingId: UUID): Ticket {
     val currentLoggedInUser = currentLoggedInUser()
 
     paymentInfoRepository

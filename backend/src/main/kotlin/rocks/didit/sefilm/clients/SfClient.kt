@@ -66,6 +66,15 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
       .body
   }
 
+  /** Returns base64 encoding jpeg of the ticket */
+  fun fetchBarcode(ticketId: String): String {
+    val url = "$API_URL/v2/barcode/{ticketId}/128/128"
+    return restTemplate
+      .exchange(url, HttpMethod.GET, httpEntity, String::class.java, ticketId)
+      .body
+      .replace("\"", "")
+  }
+
   fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
     val now = ZonedDateTime.now(ZoneOffset.UTC)
     return now.truncatedTo(ChronoUnit.HOURS)
