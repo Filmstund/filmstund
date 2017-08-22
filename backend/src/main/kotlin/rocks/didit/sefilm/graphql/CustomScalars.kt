@@ -5,10 +5,7 @@ import graphql.language.StringValue
 import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.TMDbID
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -28,6 +25,25 @@ class CustomScalarUUID : GraphQLScalarType("UUID", "UUID", object : Coercing<UUI
   override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
     is String -> dataFetcherResult
     is UUID -> dataFetcherResult.toString()
+    else -> null
+  }
+})
+
+@Component
+class CustomScalarBase64ID : GraphQLScalarType("Base64ID", "Base64ID", object : Coercing<Base64ID, String> {
+  override fun parseLiteral(input: Any?): Base64ID {
+    return when (input) {
+      is StringValue -> Base64ID(input.value)
+      is String -> Base64ID(input)
+      else -> throw IllegalArgumentException("Unable to parse Base64ID from $input")
+    }
+  }
+
+  override fun parseValue(input: Any?): Base64ID = parseLiteral(input)
+
+  override fun serialize(input: Any?): String? = when (input) {
+    is String -> input
+    is Base64ID -> input.id
     else -> null
   }
 })

@@ -38,6 +38,11 @@ class ShowingService(
     .map { it.toDto() }
     .orElse(null)
 
+  fun getShowing(webId: Base64ID): ShowingDTO? = showingRepo
+    .findByWebId(webId)
+    .map { it.toDto() }
+    .orElse(null)
+
   fun getShowingOrThrow(id: UUID): ShowingDTO = getShowing(id)
     ?: throw NotFoundException(what = "showing", showingId = id)
 

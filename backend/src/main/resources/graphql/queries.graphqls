@@ -5,7 +5,7 @@ type Query {
     movie(id: UUID!): Movie
 
     ## Showings ##
-    showing(id: UUID): Showing
+    showing(id: UUID, webId: Base64ID): Showing
     publicShowings(afterDate: LocalDate): [Showing!]!
     privateShowingsForCurrentUser(afterDate: LocalDate): [Showing!]!
     showingForMovie(movieId: UUID): [Showing!]!

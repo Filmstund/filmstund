@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
 import rocks.didit.sefilm.MissingParametersException
+import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
@@ -19,6 +20,8 @@ import java.util.*
 data class Showing(
   @Id
   val id: UUID = UUID.randomUUID(),
+  val webId: Base64ID = Base64ID.MISSING,
+  val slug: String = "slug-less",
   val date: LocalDate? = null,
   val time: LocalTime? = null,
   val movieId: UUID? = null,
@@ -40,6 +43,8 @@ data class Showing(
 
   fun toDto() = ShowingDTO(
     id = id,
+    webId = webId,
+    slug = slug,
     date = date ?: throw MissingParametersException("date"),
     time = time ?: throw MissingParametersException("time"),
     movieId = movieId ?: throw MissingParametersException("movieId"),

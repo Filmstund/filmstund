@@ -40,7 +40,7 @@ const ShowingsWrapper = styled.div`
 
 class Showings extends Component {
   navigateToShowing = showing => {
-    this.props.history.push(`/showings/${showing.id}`);
+    this.props.history.push(`/showings/${showing.webId}/${showing.slug}`);
   };
 
   navigateToTickets = showing => {

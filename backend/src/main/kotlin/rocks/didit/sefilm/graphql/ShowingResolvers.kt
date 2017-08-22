@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Ticket
+import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.orElseThrow
@@ -24,7 +25,15 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
   fun privateShowingsForCurrentUser(afterDate: LocalDate?) =
     showingService.getPrivateShowingsForCurrentUser(afterDate ?: LocalDate.MIN)
 
-  fun showing(id: UUID): ShowingDTO? = showingService.getShowing(id)
+  fun showing(id: UUID?, webId: Base64ID?): ShowingDTO? {
+    return when {
+      id != null -> showingService.getShowing(id)
+      webId != null -> showingService.getShowing(webId)
+      else -> null
+    }
+  }
+
+  fun showing(webId: Base64ID): ShowingDTO? = showingService.getShowing(webId)
   fun showingForMovie(movieId: UUID) = showingService.getShowingByMovie(movieId)
 }
 

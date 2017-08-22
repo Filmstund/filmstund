@@ -1,9 +1,11 @@
 type Showing {
     id: UUID!
-    date: String
-    time: String
+    webId: Base64ID!
+    slug: String!
+    date: String!
+    time: String!
     movie: Movie!
-    location: Location
+    location: Location!
     sfScreen: SfScreen
     private: Boolean!
     price: SEK

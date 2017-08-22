@@ -35,8 +35,11 @@ import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
+import rocks.didit.sefilm.managers.SlugManager
 import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import rocks.didit.sefilm.web.controllers.CalendarController
@@ -104,6 +107,20 @@ class Application {
       .filter { titleExtensions.isMovieUnwantedBasedOnGenre(it.genres) || titleExtensions.isTitleUnwanted(it.title) }
     log.info("Deleting ${unwantedMovies.size} unwanted movies")
     movieRepository.deleteAll(unwantedMovies)
+  }
+
+  @Bean
+  fun createSlugsAndWebIds(showingRepository: ShowingRepository, slugManager: SlugManager) = ApplicationRunner {
+    val showingsWithMissingWebId = showingRepository
+      .findAll()
+      .filter {
+        it.webId == Base64ID.MISSING
+      }
+
+    val updatedShowings = showingsWithMissingWebId.map {
+      it.copy(webId = Base64ID.random(), slug = slugManager.generateSlugFor(it))
+    }
+    showingRepository.saveAll(updatedShowings)
   }
 
   @Bean
