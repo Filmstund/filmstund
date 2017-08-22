@@ -82,7 +82,7 @@ class ShowingController(private val repo: ShowingRepository,
       createInitialPaymentInfo(updateShowing)
     }
 
-    if (body.sfTicketLink != null) {
+    if (body.sfTicketLink != null && body.sfTicketLink.isNotBlank()) {
       ticketManager.processTickets(body.sfTicketLink, updatedShowing)
     }
 

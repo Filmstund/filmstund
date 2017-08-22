@@ -8,15 +8,14 @@ import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
-import java.net.URI
 import java.util.*
 
 @Component
 class TicketManager(private val sfClient: SfClient,
                     private val ticketRepository: TicketRepository) {
 
-  fun processTickets(userSuppliedTicketUrl: URI, showing: Showing) {
-    val parts = userSuppliedTicketUrl.path.split('/')
+  fun processTickets(userSuppliedTicketUrl: String, showing: Showing) {
+    val parts = userSuppliedTicketUrl.split('/')
     val ids = parts.subList(parts.size - 3, parts.size)
     val sfTickets = sfClient.fetchTickets(ids[0], ids[1], ids[2])
 
