@@ -12,12 +12,23 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
+import java.time.LocalDate
 import java.util.*
 
 @RestController
 @RequestMapping(Application.API_BASE_PATH + "/tickets")
 class TicketController(private val ticketRepository: TicketRepository,
                        private val paymentInfoRepository: ParticipantPaymentInfoRepository) {
+
+  @GetMapping("/", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  fun allMyTickets(): List<Ticket> {
+    val currentLoggedInUser = currentLoggedInUser()
+    val now = LocalDate.now()
+    return ticketRepository.findByAssignedToUser(currentLoggedInUser)
+      .filter {
+        it.date.isEqual(now) || it.date.isAfter(now)
+      }
+  }
 
   @GetMapping("/{showingId}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun myTicket(@PathVariable showingId: UUID): Ticket {

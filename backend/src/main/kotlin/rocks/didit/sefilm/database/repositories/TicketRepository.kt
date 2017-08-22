@@ -11,4 +11,6 @@ interface TicketRepository : CrudRepository<Ticket, String> {
   fun findByShowingIdAndAssignedToUser(showingId: UUID, userId: UserID): Optional<Ticket>
 
   fun findByShowingId(showingId: UUID): List<Ticket>
+
+  fun findByAssignedToUser(userId: UserID): List<Ticket>
 }

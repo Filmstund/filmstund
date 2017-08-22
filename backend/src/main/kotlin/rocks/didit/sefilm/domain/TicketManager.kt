@@ -19,6 +19,7 @@ class TicketManager(private val sfClient: SfClient,
     val ids = parts.subList(parts.size - 3, parts.size)
     val sfTickets = sfClient.fetchTickets(ids[0], ids[1], ids[2])
 
+    // FIXME: uncommment when done
     //if (showing.participants.size != sfTickets.size) {
     //  throw SfTicketException("Ticket mismatch: Showing (${showing.id}) has ${showing.participants.size} participants, but SF supplied ${sfTickets.size} tickets")
     //}
