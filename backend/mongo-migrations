@@ -1,4 +1,8 @@
 ### Pending migrations ###
+
+
+
+### Migrations already done in deployed application ###
 #
 # Add archived flag
 db.movie.update({}, {$set: {"archived": false}}, {upsert: false, multi:true})
@@ -19,4 +23,3 @@ db.showing.find({}).forEach(s => {
 });
 
 
-### Migrations already done in deployed application ###
