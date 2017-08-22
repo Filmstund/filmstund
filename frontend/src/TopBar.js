@@ -9,7 +9,7 @@ import { BASE_URL } from "./lib/withBaseURL";
 
 const TopBarContainer = styled.div`
   background-color: #b71c1c;
-  padding: 1em 0;
+  padding: 1rem 0;
   display: flex;
   justify-content: space-between;
   position: sticky;
@@ -18,7 +18,7 @@ const TopBarContainer = styled.div`
 `;
 
 const ExternalLink = styled.a`
-  padding: 1em;
+  padding: 0.8rem;
   color: white;
   text-decoration: none;
   cursor: pointer;
@@ -28,7 +28,7 @@ const ExternalLink = styled.a`
 `;
 
 const Link = styled(RouterLink)`
-  padding: 1em;
+  padding: 0.8rem;
   color: white;
   text-decoration: none;
   cursor: pointer;
