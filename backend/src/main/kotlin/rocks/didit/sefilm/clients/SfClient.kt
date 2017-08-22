@@ -58,6 +58,14 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
       .body
   }
 
+  // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
+  fun fetchTickets(sysId: String, sfShowingId: String, ticketId: String): List<SfTicketDTO> {
+    val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
+    return restTemplate
+      .exchange(url, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<SfTicketDTO>>() {})
+      .body
+  }
+
   fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
     val now = ZonedDateTime.now(ZoneOffset.UTC)
     return now.truncatedTo(ChronoUnit.HOURS)

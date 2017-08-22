@@ -25,6 +25,7 @@ class ShowingController(private val repo: ShowingRepository,
                         private val movieRepo: MovieRepository,
                         private val userRepo: UserRepository,
                         private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+                        private val ticketManager: TicketManager,
                         private val googleCalenderClient: GoogleCalenderClient) {
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/showings"
@@ -80,6 +81,11 @@ class ShowingController(private val repo: ShowingRepository,
       markFöretagsbiljetterAsUsed(showing.participants)
       createInitialPaymentInfo(updateShowing)
     }
+
+    if (body.sfTicketLink != null) {
+      ticketManager.processTickets(body.sfTicketLink, updatedShowing)
+    }
+
     return updatedShowing
   }
 
