@@ -38,5 +38,11 @@ class TicketNotFoundException(ticketNumber: TicketNumber) : RuntimeException("Ti
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class DuplicateTicketException() : RuntimeException("Found duplicate tickets")
 
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+class SfTicketException(msg: String) : RuntimeException(msg)
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class UserHasNotPayedException(msg: String) : RuntimeException(msg)
+
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(msg: String) : RuntimeException(msg)

@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.domain.dto
 
+import java.net.URI
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -9,4 +10,5 @@ data class UpdateShowingDTO(val price: Long = 0,
                             val payToUser: String? = null,
                             val expectedBuyDate: LocalDate? = null,
                             val newLocation: String? = null,
-                            val newTime: LocalTime? = null)
+                            val newTime: LocalTime? = null,
+                            val sfTicketLink: URI? = null)
