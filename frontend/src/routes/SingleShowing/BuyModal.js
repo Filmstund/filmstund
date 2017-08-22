@@ -36,19 +36,23 @@ const ForetagsBiljetterList = ({ tickets }) =>
   </div>;
 
 const sumBioklubbkortsnummer = tickets =>
-  sum(tickets
-    .map(t => t.bioklubbnummer)
-    .map(nbr => parseInt(nbr === null ? 0 : nbr, 10)));
+  sum(
+    tickets
+      .map(t => t.bioklubbnummer)
+      .map(nbr => parseInt(nbr === null ? 0 : nbr, 10))
+  );
 
 const UserItem = buildUserComponent(({ user }) =>
-  <li>{user.firstName} '{user.nick}' {user.lastName}</li>
+  <li>
+    {user.firstName} '{user.nick}' {user.lastName}
+  </li>
 );
 
 const usersWithoutBioklubbnummer = tickets => {
   return tickets
     .filter(t => t.bioklubbnummer === null)
     .map(t => t.userId)
-    .map(userId => <UserItem key={userId} userId={userId}/>);
+    .map(userId => <UserItem key={userId} userId={userId} />);
 };
 
 const BioklubbkortsnummerList = ({ tickets, participants }) =>
@@ -56,13 +60,15 @@ const BioklubbkortsnummerList = ({ tickets, participants }) =>
     <SmallHeader>Bioklubbnummer</SmallHeader>
     {tickets
       .filter(t => t.bioklubbnummer !== null)
-      .map(t => <CopyValue key={t.userId} text={t.bioklubbnummer}/>)}
-    <hr/>
+      .map(t => <CopyValue key={t.userId} text={t.bioklubbnummer} />)}
+    <hr />
     = {sumBioklubbkortsnummer(tickets)}
-    {usersWithoutBioklubbnummer(tickets).length !== participants.length
-    && <div>{usersWithoutBioklubbnummer(tickets).length} deltagare saknar bioklubbnummer:
-      <ul>{usersWithoutBioklubbnummer(tickets)}</ul>
-    </div>}
+    {usersWithoutBioklubbnummer(tickets).length !== participants.length &&
+      <div>
+        {usersWithoutBioklubbnummer(tickets).length} deltagare saknar
+        bioklubbnummer:
+        <ul>{usersWithoutBioklubbnummer(tickets)}</ul>
+      </div>}
   </div>;
 
 const BuyModal = ({
@@ -115,7 +121,10 @@ const BuyModal = ({
                 <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
                   Öppna SF länk i nytt fönster
                 </a>}
-              <ParticipantsList participants={showing.participants} showPhone={true} />
+              <ParticipantsList
+                participants={showing.participants}
+                showPhone={true}
+              />
               <ForetagsBiljetterList
                 tickets={participantsWithForetagsbiljett}
               />
