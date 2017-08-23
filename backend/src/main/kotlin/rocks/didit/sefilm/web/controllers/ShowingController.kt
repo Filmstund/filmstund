@@ -102,7 +102,7 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun createGoogleCalendarEvent(@PathVariable id: UUID, @RequestBody body: List<String>): ResponseStatusDTO {
+  fun createGoogleCalendarEvent(@PathVariable id: UUID): ResponseStatusDTO {
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
     if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
