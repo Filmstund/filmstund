@@ -118,7 +118,7 @@ class AdminAction extends Component {
 
     jsonRequest(
       withBaseURL(`/showings/${showing.id}/invite/googlecalendar`),
-      showing.participants
+      "" // Empty post
     )
       .then(resp => {
         this.setState({
