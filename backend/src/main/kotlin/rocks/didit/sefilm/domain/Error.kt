@@ -1,7 +1,6 @@
 package rocks.didit.sefilm.domain
 
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.ResponseErrorHandler
 import rocks.didit.sefilm.ExternalProviderException
@@ -16,7 +15,7 @@ data class ErrorDTO(val error: Boolean = true,
 internal class ExternalProviderErrorHandler : ResponseErrorHandler {
   private val log = LoggerFactory.getLogger(ExternalProviderErrorHandler::class.java)
   override fun hasError(response: ClientHttpResponse): Boolean {
-    return response.statusCode != HttpStatus.OK
+    return response.rawStatusCode >= 400
   }
 
   override fun handleError(response: ClientHttpResponse) {

@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.clients
 
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -9,9 +10,10 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import rocks.didit.sefilm.domain.dto.CalendarEventDTO
+import rocks.didit.sefilm.oauthAccessToken
 
 @Component
-class GoogleCalenderClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
+class GoogleCalenderClient(private val restTemplate: RestTemplate) {
   companion object {
     const val API_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events"
   }
@@ -19,18 +21,37 @@ class GoogleCalenderClient(private val restTemplate: RestTemplate, private val h
   @Value("\${google.clientSecret}")
   private val clientSecret: String? = null
 
-  /** @return the event id of the newly created event */
-  fun createEvent(event: CalendarEventDTO, accessToken: OAuth2AccessToken): String {
-    val headers = HttpHeaders()
-    headers.contentType = APPLICATION_JSON_UTF8
-    headers.set("authorization", accessToken.tokenType + " " + accessToken.value)
+  val log = Logger.getLogger(GoogleCalenderClient::class.java)
 
-    val entity = HttpEntity(event, headers)
+  /** @return the event id of the newly created event */
+  fun createEvent(event: CalendarEventDTO): String {
+    val accessToken = oauthAccessToken()
+
+    val entity = HttpEntity(event, headersWithToken(accessToken))
 
     return restTemplate
       .exchange(API_URL, HttpMethod.POST, entity, Map::class.java, mapOf("sendNotifications" to "true", "key" to clientSecret))
       .body["id"]
       .toString()
+  }
+
+  fun deleteEvent(eventId: String) {
+    val accessToken = oauthAccessToken()
+    val headers = headersWithToken(accessToken)
+    val entity = HttpEntity<Void>(headers)
+
+    try {
+      restTemplate.exchange("https://www.googleapis.com/calendar/v3/calendars/primary/events/{eventId}", HttpMethod.DELETE, entity, Void::class.java, eventId)
+    } catch (e: Exception) {
+      log.warn("Unable to delete calendar event with ID: $eventId", e)
+    }
+  }
+
+  private fun headersWithToken(accessToken: OAuth2AccessToken): HttpHeaders {
+    val headers = HttpHeaders()
+    headers.contentType = APPLICATION_JSON_UTF8
+    headers.set("authorization", accessToken.tokenType + " " + accessToken.value)
+    return headers
   }
 }
 

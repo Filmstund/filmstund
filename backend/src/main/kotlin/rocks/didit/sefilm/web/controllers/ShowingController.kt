@@ -94,6 +94,9 @@ class ShowingController(private val repo: ShowingRepository,
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
 
+    if (showing.calendarEventId != null) {
+      googleCalenderClient.deleteEvent(showing.calendarEventId)
+    }
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
     ticketManager.deleteTickets(showing)
@@ -120,7 +123,7 @@ class ShowingController(private val repo: ShowingRepository,
     )
 
     log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
-    val createdEventId = googleCalenderClient.createEvent(event, oauthAccessToken())
+    val createdEventId = googleCalenderClient.createEvent(event)
     val updatedShowing = showing.copy(calendarEventId = createdEventId)
     repo.save(updatedShowing)
 
