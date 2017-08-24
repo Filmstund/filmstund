@@ -10,6 +10,9 @@ import {
   removeFromCollection
 } from "./helper";
 
+export const getIsLoading = (state, id) => state.showings.loading[id];
+export const getShowing = (state, id) => state.showings.data[id];
+
 const path = withBaseURL("/showings");
 
 const appendId = (...pathComponents) => pathComponents.join("/");
@@ -177,13 +180,19 @@ const actionCreators = {
       .catch(error => dispatch({ type: actions.errorIndex, error }));
   },
 
-  requestSingle: id => dispatch => {
+  requestSingle: id => (dispatch, getState) => {
+    const state = getState();
+    if (getIsLoading(state, id)) {
+      return;
+    }
+
     dispatch({ type: actions.requestSingle, id });
 
-    requestAndValidate(dispatch, fetch, appendId(path, id))
-      .then(data =>
-        dispatch({ type: actions.successSingle, data: transform(data) })
-      )
+    return requestAndValidate(dispatch, fetch, appendId(path, id))
+      .then(data => {
+        dispatch({ type: actions.successSingle, data: transform(data) });
+        return data;
+      })
       .catch(error => dispatch({ type: actions.errorSingle, error }));
   },
 
