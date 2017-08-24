@@ -1,128 +1,58 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { connect } from "react-redux";
+
 import {
   showings as showingActions,
   users as userActions
 } from "../../store/reducers";
 
-import withLoader from "../../lib/withLoader";
-import { getJson } from "../../lib/fetch";
+import Loader from "../../ProjectorLoader";
+import SingleShowing from "./SingleShowing";
 
-import Showing, { getStatus } from "../../Showing";
-import BoughtShowing from "./BoughtShowing";
-import PendingShowing from "./PendingShowing";
-import AdminAction from "./AdminAction";
-import ParticipantList from "./ParticipantsList";
-import SwishModal from "./SwishModal";
-
-class Showings extends Component {
-  state = {
-    payData: null,
-    showModal: false
-  };
-
+class ShowingLoader extends PureComponent {
   componentWillMount() {
-    if (this.props.showing.ticketsBought) {
-      this.requestPaymentInfo();
-    }
-  }
-
-  requestPaymentInfo = () => {
-    if (!this.isParticipating()) return;
-
-    const { showing } = this.props;
-
-    getJson(`/showings/${showing.id}/pay`).then(payData => {
-      this.setState({
-        payData
-      });
-    });
-  };
-
-  openSwish = swishLink => {
-    this.setState({ swish: true });
-    window.location = swishLink;
-  };
-
-  isParticipating = () => {
-    const { showing, me } = this.props;
-    return showing.participants.some(p => p.userId === me.id);
-  };
-
-  renderBoughtOrPendingShowing = () => {
-    const { showing } = this.props;
-    const { payData } = this.state;
-
-    if (showing.ticketsBought) {
-      if (this.isParticipating()) {
-        return (
-          <BoughtShowing
-            showing={showing}
-            openSwish={this.openSwish}
-            payData={payData}
-          />
-        );
-      } else {
-        return <ParticipantList participants={showing.participants} />;
+    let adminId = null;
+    if (this.props.showing) {
+      adminId = this.props.showing.adminId;
+      if (adminId) {
+        this.props.requestUser(adminId);
       }
-    } else {
-      return (
-        <PendingShowing
-          showing={showing}
-          isParticipating={this.isParticipating()}
-        />
-      );
     }
-  };
 
+    this.props.requestShowing(this.props.showingId).then(showing => {
+      if (showing.adminId !== adminId) {
+        this.props.requestUser(showing.adminId);
+      }
+    });
+  }
   render() {
-    const { className, showing, me, loading } = this.props;
-    const { swish, payData } = this.state;
+    const { admin, showing } = this.props;
 
-    const isAdmin = showing.admin === me.id;
-
-    return (
-      <div className={className}>
-        {swish &&
-          <SwishModal
-            payData={payData}
-            closeSwish={() => this.setState({ swish: false })}
-          />}
-        <Showing
-          setTitleTag={true}
-          movieId={showing.movieId}
-          date={showing.date}
-          adminId={showing.admin}
-          location={showing.location.name}
-          status={getStatus(showing)}
-        />
-        {isAdmin && <AdminAction showing={showing} loading={loading} />}
-        {this.renderBoughtOrPendingShowing()}
-      </div>
-    );
+    if (admin && showing) {
+      return <SingleShowing {...this.props} />;
+    } else {
+      return <Loader />;
+    }
   }
 }
 
-const mapStateToProps = (state, props) => {
-  const { showingId } = props.match.params;
-  const showing = state.showings.data[showingId];
-  const adminId = showing && showing.admin;
+export default connect(
+  (state, props) => {
+    const { showingId } = props.match.params;
+    const showing = state.showings.data[showingId];
 
-  return {
-    showingId,
-    adminId,
-    isCreatingEvent: false,
-    adminMessage: null,
-    loading: state.showings.loading,
-    showing: { ...state.showings, data: showing },
-    admin: { ...state.users, data: state.users.data[adminId] },
-    me: state.me.data
-  };
-};
+    const adminId = showing && showing.admin;
 
-export default connect(mapStateToProps)(
-  withLoader({
-    showing: ["showingId", showingActions.actions.requestSingle],
-    admin: ["adminId", userActions.actions.requestSingle]
-  })(Showings)
-);
+    return {
+      showingId,
+      adminId,
+      showing,
+      admin: state.users.data[adminId],
+      me: state.me.data
+    };
+  },
+  {
+    requestShowing: showingActions.actions.requestSingle,
+    requestUser: userActions.actions.requestSingle
+  }
+)(ShowingLoader);

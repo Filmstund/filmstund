@@ -112,9 +112,10 @@ const crudReducer = (name, path, transform = idTransform) => {
       dispatch({ type: actions.requestSingle, id });
 
       requestAndValidate(dispatch, fetch, appendId(path, id))
-        .then(data =>
-          dispatch({ type: actions.successSingle, data: transform(data) })
-        )
+        .then(data => {
+          dispatch({ type: actions.successSingle, data: transform(data) });
+          return data;
+        })
         .catch(error => dispatch({ type: actions.errorSingle, error }));
     },
 
