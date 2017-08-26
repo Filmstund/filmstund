@@ -1,7 +1,11 @@
-import { omit } from "lodash";
+import { combineReducers } from "redux";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { USER_SIGNOUT_ACTION } from "./user";
-import { requestAndValidate } from "./helper";
+import {
+  requestAndValidate,
+  mergeIntoCollection,
+  removeFromCollection
+} from "./helper";
 
 const idTransform = f => f;
 const appendId = (...pathComponents) => pathComponents.join("/");
@@ -32,67 +36,83 @@ const crudReducer = (name, path, transform = idTransform) => {
     errorDelete: `${name}_ERROR_DELETE`
   };
 
-  const initialState = {
-    loading: false,
-    data: {},
-    error: null
+  const loadingReducer = (state = {}, action) => {
+    switch (action.type) {
+      case actions.requestIndex:
+        return { ...state, index: true };
+      case actions.successIndex:
+        return { ...state, index: false };
+      case actions.requestSingle:
+      case actions.requestCreate:
+      case actions.requestUpdate:
+      case actions.requestDelete:
+        return { ...state, [action.id]: true };
+      case actions.successSingle:
+      case actions.successUpdate:
+      case actions.successCreate:
+      case actions.errorIndex:
+      case actions.errorSingle:
+      case actions.errorCreate:
+      case actions.errorUpdate:
+      case actions.errorDelete:
+        return { ...state, [action.id]: false };
+      case actions.successDelete:
+        return removeFromCollection(state, action.id);
+      case USER_SIGNOUT_ACTION:
+        return {};
+      default:
+        return state;
+    }
   };
 
-  const reducer = (state = initialState, action) => {
+  const errorReducer = (state = null, action) => {
     switch (action.type) {
       case actions.requestIndex:
       case actions.requestSingle:
       case actions.requestCreate:
       case actions.requestUpdate:
       case actions.requestDelete:
-        return {
-          ...state,
-          error: null,
-          loading: true
-        };
       case actions.successIndex:
-        return {
-          ...state,
-          loading: false,
-          error: null,
-          data: action.data
-        };
       case actions.successSingle:
       case actions.successUpdate:
       case actions.successCreate:
-        return {
-          ...state,
-          loading: false,
-          error: null,
-          data: {
-            ...state.data,
-            [action.data.id]: action.data
-          }
-        };
-      case actions.successDelete:
-        return {
-          ...state,
-          loading: false,
-          error: null,
-          data: omit(state.data, action.id)
-        };
+        return null;
       case actions.errorIndex:
       case actions.errorSingle:
       case actions.errorCreate:
       case actions.errorUpdate:
       case actions.errorDelete:
-        return {
-          ...state,
-          loading: false,
-          error: action.error
-        };
+        return action.error;
       case USER_SIGNOUT_ACTION:
-        return initialState;
+        return null;
+      default:
+        return state;
+    }
+  };
+
+  const dataReducer = (state = {}, action) => {
+    switch (action.type) {
+      case actions.successIndex:
+        return action.data;
+      case actions.successSingle:
+      case actions.successUpdate:
+      case actions.successCreate:
+        return mergeIntoCollection(state, action.data);
+      case actions.successDelete:
+        return removeFromCollection(state, action.id);
+      case USER_SIGNOUT_ACTION:
+        return {};
 
       default:
         return state;
     }
   };
+
+  const reducer = combineReducers({
+    data: dataReducer,
+    error: errorReducer,
+    loading: loadingReducer
+  });
 
   const actionCreators = {
     requestIndex: () => dispatch => {
