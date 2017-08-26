@@ -1,18 +1,25 @@
 import { connect } from "react-redux";
-
-import { users as userActions } from "../../store/reducers";
-import withLoader from "../../lib/withLoader";
+import { compose, lifecycle, branch } from "recompose";
+import * as fetchers from "../../lib/fetchers";
+import Loader from "../../ProjectorLoader";
 
 const mapStateToProps = (state, { userId }) => ({
-  userId,
-  user: { ...state.users, data: state.users.data[userId] }
+  user: state.users.data[userId]
 });
 
-const UserComponentBuilder = UserComponent =>
-  connect(mapStateToProps)(
-    withLoader({
-      user: ["userId", userActions.actions.requestSingle]
-    })(UserComponent)
-  );
+const selectUser = connect(mapStateToProps, { ...fetchers });
 
-export default UserComponentBuilder;
+const withUserData = lifecycle({
+  componentDidMount() {
+    const { fetchUser, userId } = this.props;
+    fetchUser(userId);
+  }
+});
+
+const userIsUndefined = ({ user }) => user === undefined;
+
+// Will show Loader if user is undefined
+const showLoaderWhileFetching = branch(userIsUndefined, Loader);
+
+// Combine all of the HOCs into a single enhancer
+export default compose(selectUser, withUserData, showLoaderWhileFetching);

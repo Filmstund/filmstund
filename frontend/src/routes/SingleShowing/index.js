@@ -1,67 +1,112 @@
-import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import React, { Component } from "react";
 
-import {
-  showings as showingActions,
-  movies as movieActions,
-  users as userActions
-} from "../../store/reducers";
-import { getShowing } from "../../store/reducers/showings";
+import { compose, withProps } from "recompose";
 
-import Loader from "../../ProjectorLoader";
-import SingleShowing from "./SingleShowing";
+import { getJson } from "../../lib/fetch";
 
-class ShowingLoader extends PureComponent {
+import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
+import Showing, { getStatus } from "../../Showing";
+import BoughtShowing from "./BoughtShowing";
+import PendingShowing from "./PendingShowing";
+import AdminAction from "./AdminAction";
+import ParticipantList from "./ParticipantsList";
+import SwishModal from "./SwishModal";
+
+class SingleShowing extends Component {
+  state = {
+    payData: null,
+    showModal: false
+  };
+
   componentWillMount() {
-    let { admin: adminId, movieId } = this.props.showing || {};
-
-    if (adminId) {
-      this.props.requestUser(adminId);
+    if (this.props.showing.ticketsBought) {
+      this.requestPaymentInfo();
     }
-    if (movieId) {
-      this.props.requestMovie(movieId);
-    }
-
-    this.props.requestShowing(this.props.showingId).then(showing => {
-      if (showing.adminId !== adminId) {
-        this.props.requestUser(showing.adminId);
-      }
-      if (showing.movieId !== movieId) {
-        this.props.requestMovie(showing.movieId);
-      }
-    });
   }
-  render() {
-    const { admin, showing, movie } = this.props;
 
-    if (admin && showing && movie) {
-      return <SingleShowing {...this.props} />;
+  requestPaymentInfo = () => {
+    if (!this.isParticipating()) return;
+
+    const { showing } = this.props;
+
+    getJson(`/showings/${showing.id}/pay`).then(payData => {
+      this.setState({
+        payData
+      });
+    });
+  };
+
+  openSwish = swishLink => {
+    this.setState({ swish: true });
+    window.location = swishLink;
+  };
+
+  isParticipating = () => {
+    const { showing, me } = this.props;
+    return showing.participants.some(p => p.userId === me.id);
+  };
+
+  renderBoughtOrPendingShowing = () => {
+    const { showing } = this.props;
+    const { payData } = this.state;
+
+    if (showing.ticketsBought) {
+      if (this.isParticipating()) {
+        return (
+          <BoughtShowing
+            showing={showing}
+            openSwish={this.openSwish}
+            payData={payData}
+          />
+        );
+      } else {
+        return <ParticipantList participants={showing.participants} />;
+      }
     } else {
-      return <Loader />;
+      return (
+        <PendingShowing
+          showing={showing}
+          isParticipating={this.isParticipating()}
+        />
+      );
     }
+  };
+
+  render() {
+    const { className, showing, me, loading } = this.props;
+    const { swish, payData } = this.state;
+
+    const isAdmin = showing.admin === me.id;
+
+    return (
+      <div className={className}>
+        {swish &&
+          <SwishModal
+            payData={payData}
+            closeSwish={() => this.setState({ swish: false })}
+          />}
+        <Showing
+          setTitleTag={true}
+          movieId={showing.movieId}
+          date={showing.date}
+          adminId={showing.admin}
+          location={showing.location.name}
+          status={getStatus(showing)}
+        />
+        {isAdmin && <AdminAction showing={showing} loading={loading} />}
+        {this.renderBoughtOrPendingShowing()}
+      </div>
+    );
   }
 }
 
-export default connect(
-  (state, props) => {
-    const { showingId } = props.match.params;
-    const showing = getShowing(state, showingId);
+const routerParamsToShowingId = ({ match }) => {
+  const { showingId } = match.params;
 
-    const adminId = showing && showing.admin;
-    const movieId = showing && showing.movieId;
+  return { showingId };
+};
 
-    return {
-      showingId,
-      adminId,
-      showing,
-      movie: state.movies.data[movieId],
-      admin: state.users.data[adminId],
-      me: state.me.data
-    };
-  },
-  {
-    requestShowing: showingActions.actions.requestSingle,
-    requestMovie: movieActions.actions.requestSingle,
-    requestUser: userActions.actions.requestSingle
-  }
-)(ShowingLoader);
+export default compose(
+  withProps(routerParamsToShowingId),
+  withShowingRouteLoader
+)(SingleShowing);

@@ -27,6 +27,7 @@ class Home extends Component {
   renderShowings = showings => {
     return orderBy(showings, ["date"], ["asc"]).map(showing =>
       <Showing
+        showingId={showing.id}
         onClick={() => this.navigateToShowing(showing)}
         status={getStatus(showing)}
         disabled={moment(showing.date).isBefore(today)}

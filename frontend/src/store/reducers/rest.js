@@ -111,7 +111,7 @@ const crudReducer = (name, path, transform = idTransform) => {
     requestSingle: id => dispatch => {
       dispatch({ type: actions.requestSingle, id });
 
-      requestAndValidate(dispatch, fetch, appendId(path, id))
+      return requestAndValidate(dispatch, fetch, appendId(path, id))
         .then(data => {
           dispatch({ type: actions.successSingle, data: transform(data) });
           return data;
@@ -223,8 +223,11 @@ export const crudSingleReducer = (name, path, transform = idTransform) => {
     requestSingle: () => dispatch => {
       dispatch({ type: actions.requestSingle });
 
-      requestAndValidate(dispatch, fetch, path)
-        .then(data => dispatch({ type: actions.successSingle, data }))
+      return requestAndValidate(dispatch, fetch, path)
+        .then(data => {
+          dispatch({ type: actions.successSingle, data });
+          return data;
+        })
         .catch(error => dispatch({ type: actions.errorSingle, error }));
     },
 
