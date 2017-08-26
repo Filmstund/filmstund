@@ -6,13 +6,13 @@ import Header from "../../Header";
 
 import { groupBy } from "lodash";
 
-import buildUserComponent from "./UserComponentBuilder";
+import withUserLoader from "../../loaders/UserLoader";
 
 const UserActiveStatus = styled.div`
   color: ${props => (props.active ? "#000" : "#ccc")};
 `;
 
-const UserWithPriceItem = buildUserComponent(
+const UserWithPriceItem = withUserLoader(
   ({ user, active, price, onPaidChange, hasPaid }) =>
     <UserActiveStatus active={active}>
       {user.nick || user.name}{" "}

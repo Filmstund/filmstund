@@ -1,11 +1,11 @@
 import React from "react";
 import Loader from "../../ProjectorLoader";
-import buildUserComponent from "./UserComponentBuilder";
+import withUserLoader from "../../loaders/UserLoader";
 import MainButton from "../../MainButton";
 import ParticipantList from "./ParticipantsList";
 import Ticket from "./Ticket";
 
-const PayToUser = buildUserComponent(({ user }) =>
+const PayToUser = withUserLoader(({ user }) =>
   <span>
     <strong>{user.phone}</strong> ({user.firstName} '{user.nick}'{" "}
     {user.lastName})
