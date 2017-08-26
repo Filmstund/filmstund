@@ -7,13 +7,13 @@ import meReducer from "./me";
 import showingsReducer from "./showings";
 
 export const showings = showingsReducer;
-export const movies = createCrudReducer("MOVIES", withBaseURL("/movies"));
-export const users = createCrudReducer("USERS", withBaseURL("/users"));
+export const movies = createCrudReducer("movies", withBaseURL("/movies"));
+export const users = createCrudReducer("users", withBaseURL("/users"));
 export const bioord = crudSingleReducer(
-  "BIOORD",
+  "bioord",
   withBaseURL("/budord/random")
 );
-export const meta = crudSingleReducer("META", withBaseURL("/movies/sf/meta"));
+export const meta = crudSingleReducer("meta", withBaseURL("/movies/sf/meta"));
 export const me = meReducer;
 
 export default combineReducers({
