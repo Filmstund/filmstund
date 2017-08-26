@@ -14,26 +14,27 @@ const reduceToObject = (array, transform) =>
   array.reduce((acc, elem) => ({ ...acc, [elem.id]: transform(elem) }), {});
 
 const crudReducer = (name, path, transform = idTransform) => {
+  const upperName = name.toUpperCase();
   const actions = {
-    requestIndex: `${name}_REQUEST_INDEX`,
-    successIndex: `${name}_RESPONSE_INDEX`,
-    errorIndex: `${name}_ERROR_INDEX`,
+    requestIndex: `${upperName}_REQUEST_INDEX`,
+    successIndex: `${upperName}_RESPONSE_INDEX`,
+    errorIndex: `${upperName}_ERROR_INDEX`,
 
-    requestSingle: `${name}_REQUEST_SINGLE`,
-    successSingle: `${name}_RESPONSE_SINGLE`,
-    errorSingle: `${name}_ERROR_SINGLE`,
+    requestSingle: `${upperName}_REQUEST_SINGLE`,
+    successSingle: `${upperName}_RESPONSE_SINGLE`,
+    errorSingle: `${upperName}_ERROR_SINGLE`,
 
-    requestCreate: `${name}_REQUEST_CREATE`,
-    successCreate: `${name}_RESPONSE_CREATE`,
-    errorCreate: `${name}_ERROR_CREATE`,
+    requestCreate: `${upperName}_REQUEST_CREATE`,
+    successCreate: `${upperName}_RESPONSE_CREATE`,
+    errorCreate: `${upperName}_ERROR_CREATE`,
 
-    requestUpdate: `${name}_REQUEST_UPDATE`,
-    successUpdate: `${name}_RESPONSE_UPDATE`,
-    errorUpdate: `${name}_ERROR_UPDATE`,
+    requestUpdate: `${upperName}_REQUEST_UPDATE`,
+    successUpdate: `${upperName}_RESPONSE_UPDATE`,
+    errorUpdate: `${upperName}_ERROR_UPDATE`,
 
-    requestDelete: `${name}_REQUEST_DELETE`,
-    successDelete: `${name}_RESPONSE_DELETE`,
-    errorDelete: `${name}_ERROR_DELETE`
+    requestDelete: `${upperName}_REQUEST_DELETE`,
+    successDelete: `${upperName}_RESPONSE_DELETE`,
+    errorDelete: `${upperName}_ERROR_DELETE`
   };
 
   const loadingReducer = (state = {}, action) => {
@@ -188,16 +189,17 @@ const crudReducer = (name, path, transform = idTransform) => {
 };
 
 export const crudSingleReducer = (name, path, transform = idTransform) => {
+  const upperName = name.toUpperCase();
   const actions = {
-    requestSingle: `${name}_REQUEST_SINGLE`,
-    successSingle: `${name}_RESPONSE_SINGLE`,
-    errorSingle: `${name}_ERROR_SINGLE`,
+    requestSingle: `${upperName}_REQUEST_SINGLE`,
+    successSingle: `${upperName}_RESPONSE_SINGLE`,
+    errorSingle: `${upperName}_ERROR_SINGLE`,
 
-    requestUpdate: `${name}_REQUEST_UPDATE`,
-    successUpdate: `${name}_RESPONSE_UPDATE`,
-    errorUpdate: `${name}_ERROR_UPDATE`,
+    requestUpdate: `${upperName}_REQUEST_UPDATE`,
+    successUpdate: `${upperName}_RESPONSE_UPDATE`,
+    errorUpdate: `${upperName}_ERROR_UPDATE`,
 
-    clearSingle: `${name}_CLEAR_SINGLE`
+    clearSingle: `${upperName}_CLEAR_SINGLE`
   };
 
   const initialState = {
