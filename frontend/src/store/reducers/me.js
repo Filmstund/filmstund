@@ -68,7 +68,12 @@ const reducer = (state = initialState, action) => {
 };
 
 const actionCreators = {
-  requestSingle: () => dispatch => {
+  requestSingle: () => (dispatch, getState) => {
+    const state = getState();
+    if (state.me.loading) {
+      return Promise.resolve();
+    }
+
     dispatch({ type: actions.requestSingle });
 
     requestAndValidate(dispatch, fetch, path)
