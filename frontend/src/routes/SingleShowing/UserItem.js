@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import buildUserComponent from "./UserComponentBuilder";
+import withUserLoader from "../../loaders/UserLoader";
 
 const pointerHover = `
   &:hover {
@@ -28,19 +28,22 @@ const Header = styled.h3`
   margin: 0;
   overflow: hidden;
 `;
-const UserItem = buildUserComponent(({ className, showPhone, user, children }) =>
-  <div
-      className={className}
-  >
+const UserItem = withUserLoader(({ className, showPhone, user, children }) =>
+  <div className={className}>
     <Poster src={user.avatar} />
     <PaddingContainer>
       <Header>
         {user.firstName} '{user.nick}' {user.lastName}
       </Header>
-        {showPhone && user.phone && <span>{user.phone}</span>}
+      {showPhone &&
+        user.phone &&
+        <span>
+          {user.phone}
+        </span>}
       {children}
     </PaddingContainer>
-  </div>);
+  </div>
+);
 
 export default styled(UserItem)`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);

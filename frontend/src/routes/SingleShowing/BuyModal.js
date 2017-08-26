@@ -11,7 +11,7 @@ import CopyValue from "../../CopyValue";
 import Center from "../../Center";
 import Loader from "../../ProjectorLoader";
 import PaymentParticipantsList from "./PaymentParticipantsList";
-import buildUserComponent from "./UserComponentBuilder";
+import withUserLoader from "../../loaders/UserLoader";
 import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
@@ -42,7 +42,7 @@ const sumBioklubbkortsnummer = tickets =>
       .map(nbr => parseInt(nbr === null ? 0 : nbr, 10))
   );
 
-const UserItem = buildUserComponent(({ user }) =>
+const UserItem = withUserLoader(({ user }) =>
   <li>
     {user.firstName} '{user.nick}' {user.lastName}
   </li>

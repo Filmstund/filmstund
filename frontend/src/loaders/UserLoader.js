@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import { compose, lifecycle, branch } from "recompose";
-import * as fetchers from "../../lib/fetchers";
-import Loader from "../../ProjectorLoader";
+import * as fetchers from "../lib/fetchers";
+import Loader from "../ProjectorLoader";
 
 const mapStateToProps = (state, { userId }) => ({
   user: state.users.data[userId]
