@@ -1,4 +1,5 @@
 import moment from "moment";
+import "moment/locale/sv";
 import { padStart, take } from "lodash";
 
 moment.locale("sv");
