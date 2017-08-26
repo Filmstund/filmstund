@@ -94,7 +94,7 @@ export default class ForetagsbiljettList extends Component {
 
   handleChangeForetagsbiljett = (index, { target: { value } }) => {
     this.updateForetagsbiljett(index, { number: value });
-  }
+  };
 
   handleSetExpiresForetagsbiljett = (index, expires) =>
     this.updateForetagsbiljett(index, { expires });
@@ -107,7 +107,12 @@ export default class ForetagsbiljettList extends Component {
   handleRemoveForetagsbiljett = index => {
     const { biljetter } = this.props;
 
-    this.props.onChange(biljetter.slice(index, 1));
+    const biljetterWithoutAtIndex = [
+      ...biljetter.slice(0, index),
+      ...biljetter.slice(index + 1)
+    ];
+
+    this.props.onChange(biljetterWithoutAtIndex);
   };
 
   render() {
