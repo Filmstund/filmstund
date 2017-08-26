@@ -10,7 +10,7 @@ describe("createCrudReducer", () => {
 
     it("should have a default state", () => {
       expect(moviesReducer(undefined, { type: undefined })).toEqual({
-        loading: false,
+        loading: {},
         data: {},
         error: null
       });
@@ -28,7 +28,7 @@ describe("createCrudReducer", () => {
         }
       };
       const expectedState = {
-        loading: false,
+        loading: { index: false },
         data: data,
         error: null
       };
@@ -47,16 +47,17 @@ describe("createCrudReducer", () => {
       ).toEqual(expectedState);
     });
     it("should set loading on request", () => {
-      const prevState = { loading: false, error: "hello error" };
+      const id = 10;
+      const prevState = { loading: {}, error: "hello error", data: {} };
       const expectedState = {
-        loading: true,
-        error: null
+        loading: { [id]: true },
+        error: null,
+        data: {}
       };
-      const actionWithType = type => ({ type });
+      const actionWithType = type => ({ type, id });
 
       const requestActions = [
         actions.requestCreate,
-        actions.requestIndex,
         actions.requestDelete,
         actions.requestUpdate
       ].map(actionWithType);
@@ -66,18 +67,21 @@ describe("createCrudReducer", () => {
       });
     });
     it("should unset loading on success", () => {
-      const prevState = { loading: true, error: "hello error" };
+      const id = 11;
+      const prevState = {
+        loading: { [id]: true },
+        error: "hello error",
+        data: {}
+      };
 
-      const successActions = [
-        actions.successCreate,
-        actions.successIndex,
-        actions.successDelete,
-        actions.successUpdate
-      ].map(actionWithType);
+      const actionWithType = type => ({ type, id, data: { id } });
+
+      const successActions = [actions.successCreate, actions.successUpdate].map(
+        actionWithType
+      );
 
       successActions.forEach(action => {
-        expect(moviesReducer(prevState, action).loading).toBe(false);
-        expect(moviesReducer(prevState, action).error).toBe(null);
+        expect(moviesReducer(prevState, action).loading[id]).toBe(false);
       });
     });
     it("should set error on error", () => {
@@ -91,7 +95,6 @@ describe("createCrudReducer", () => {
       ].map(actionWithType);
 
       errorActions.forEach(action => {
-        expect(moviesReducer(prevState, action).loading).toBe(false);
         expect(moviesReducer(prevState, action).error).toBe("hello");
       });
     });
@@ -101,7 +104,7 @@ describe("createCrudReducer", () => {
         hello: "data"
       };
       const prevState = {
-        loading: true,
+        loading: { 10: true },
         error: null,
         data: {
           5: { id: 5, hello: "object" },
@@ -110,7 +113,7 @@ describe("createCrudReducer", () => {
       };
 
       const expectedCreateState = {
-        loading: false,
+        loading: { 10: false },
         error: null,
         data: {
           5: { id: 5, hello: "object" },
@@ -120,7 +123,7 @@ describe("createCrudReducer", () => {
       };
 
       expect(
-        moviesReducer(prevState, { type: actions.successCreate, data })
+        moviesReducer(prevState, { type: actions.successCreate, id: 10, data })
       ).toEqual(expectedCreateState);
     });
 
@@ -130,7 +133,7 @@ describe("createCrudReducer", () => {
         hello: "data"
       };
       const prevState = {
-        loading: true,
+        loading: { 5: true },
         error: null,
         data: {
           5: { id: 5, hello: "object" },
@@ -139,7 +142,7 @@ describe("createCrudReducer", () => {
       };
 
       const expectedUpdateState = {
-        loading: false,
+        loading: { 5: false },
         error: null,
         data: {
           5: data,
@@ -148,13 +151,13 @@ describe("createCrudReducer", () => {
       };
 
       expect(
-        moviesReducer(prevState, { type: actions.successUpdate, data })
+        moviesReducer(prevState, { type: actions.successUpdate, id: 5, data })
       ).toEqual(expectedUpdateState);
     });
     it("should remove with id on success delete", () => {
       const id = 6;
       const prevState = {
-        loading: true,
+        loading: { [id]: true },
         error: null,
         data: {
           5: { id: 5, hello: "object" },
@@ -163,7 +166,7 @@ describe("createCrudReducer", () => {
       };
 
       const expectedDeleteState = {
-        loading: false,
+        loading: {},
         error: null,
         data: {
           5: { id: 5, hello: "object" }
