@@ -55,7 +55,7 @@ const actions = {
   errorDelete: `SHOWINGS_ERROR_DELETE`
 };
 
-const isFetchingReducer = (state = {}, action) => {
+const loadingReducer = (state = {}, action) => {
   switch (action.type) {
     case actions.requestIndex:
       return {
@@ -163,7 +163,7 @@ const errorReducer = (state = null, action) => {
 const reducer = combineReducers({
   error: errorReducer,
   data: dataReducer,
-  loading: isFetchingReducer
+  loading: loadingReducer
 });
 
 const actionCreators = {
