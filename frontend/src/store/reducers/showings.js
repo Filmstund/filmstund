@@ -167,7 +167,12 @@ const reducer = combineReducers({
 });
 
 const actionCreators = {
-  requestIndex: () => dispatch => {
+  requestIndex: () => (dispatch, getState) => {
+    const state = getState();
+    if (state.showings.loading.index) {
+      return Promise.resolve();
+    }
+
     dispatch({ type: actions.requestIndex });
 
     requestAndValidate(dispatch, fetch, path)

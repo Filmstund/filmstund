@@ -116,7 +116,12 @@ const crudReducer = (name, path, transform = idTransform) => {
   });
 
   const actionCreators = {
-    requestIndex: () => dispatch => {
+    requestIndex: () => (dispatch, getState) => {
+      const state = getState();
+      if (state[name].loading.index) {
+        return Promise.resolve();
+      }
+
       dispatch({ type: actions.requestIndex });
 
       requestAndValidate(dispatch, fetch, path)
@@ -129,7 +134,12 @@ const crudReducer = (name, path, transform = idTransform) => {
         .catch(error => dispatch({ type: actions.errorIndex, error }));
     },
 
-    requestSingle: id => dispatch => {
+    requestSingle: id => (dispatch, getState) => {
+      const state = getState();
+      if (state[name].loading[id]) {
+        return Promise.resolve();
+      }
+
       dispatch({ type: actions.requestSingle, id });
 
       return requestAndValidate(dispatch, fetch, appendId(path, id))
