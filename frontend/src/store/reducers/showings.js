@@ -183,7 +183,7 @@ const actionCreators = {
   requestSingle: id => (dispatch, getState) => {
     const state = getState();
     if (getIsLoading(state, id)) {
-      return;
+      return Promise.resolve();
     }
 
     dispatch({ type: actions.requestSingle, id });
