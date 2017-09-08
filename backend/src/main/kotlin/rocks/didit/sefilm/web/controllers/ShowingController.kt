@@ -78,7 +78,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val updatedShowing = repo.save(updateShowing)
     if (body.ticketsBought) {
-      markFöretagsbiljetterAsUsed(showing.participants)
+      markAllFöretagsbiljetterAsUsed(showing.participants)
       createInitialPaymentInfo(updateShowing)
     }
 
@@ -97,6 +97,7 @@ class ShowingController(private val repo: ShowingRepository,
     if (showing.calendarEventId != null) {
       googleCalenderClient.deleteEvent(showing.calendarEventId)
     }
+    markAllFöretagsbiljetterAsAvailable(showing.participants)
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
     ticketManager.deleteTickets(showing)
@@ -150,17 +151,20 @@ class ShowingController(private val repo: ShowingRepository,
     return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)
   }
 
-  private fun markFöretagsbiljetterAsUsed(participants: Set<Participant>) {
+  private fun markAllFöretagsbiljetterAs(participants: Set<Participant>, status: Företagsbiljett.Status) {
     val relevantParticipants = participants
       .filter { it is FtgBiljettParticipant }
       .map { it as FtgBiljettParticipant }
 
     val updatedUsers = relevantParticipants
       .map {
-        updateFtgbiljettStatusOnUser(findUser(it.userId), it.ticketNumber, Företagsbiljett.Status.Used)
+        updateFtgbiljettStatusOnUser(findUser(it.userId), it.ticketNumber, status)
       }
     userRepo.saveAll(updatedUsers)
   }
+
+  private fun markAllFöretagsbiljetterAsUsed(participants: Set<Participant>) = markAllFöretagsbiljetterAs(participants, Företagsbiljett.Status.Used)
+  private fun markAllFöretagsbiljetterAsAvailable(participants: Set<Participant>) = markAllFöretagsbiljetterAs(participants, Företagsbiljett.Status.Available)
 
   private fun markFöretagsbiljettAsAvailable(userID: UserID, ticketNumber: TicketNumber) {
     userRepo.save(updateFtgbiljettStatusOnUser(findUser(userID), ticketNumber, Företagsbiljett.Status.Available))
