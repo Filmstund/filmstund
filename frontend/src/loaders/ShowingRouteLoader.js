@@ -23,9 +23,11 @@ const withShowingData = lifecycle({
       showing,
       fetchShowing,
       fetchUser,
+      fetchMe,
       fetchMovie
     } = this.props;
 
+    fetchMe();
     if (showing) {
       fetchUser(showing.admin);
       fetchMovie(showing.movieId);
