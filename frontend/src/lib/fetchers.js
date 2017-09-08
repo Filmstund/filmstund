@@ -1,8 +1,11 @@
 import {
   showings as showingActions,
   movies as movieActions,
+  me as meActions,
   users as userActions
 } from "../store/reducers";
+
+export const fetchMe = meActions.actions.requestSingle;
 
 export const fetchMovie = id => dispatch =>
   dispatch(movieActions.actions.requestSingle(id));
