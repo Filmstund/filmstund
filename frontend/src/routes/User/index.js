@@ -115,22 +115,12 @@ class User extends Component {
         <Box>
           <AvatarImage src={me.avatar || alfons} />
           <UserInfo>
-            <UserName>
-              {me.name}
-            </UserName>
-            {me.nick &&
-              <div>
-                "{me.nick}"
-              </div>}
-            <div>
-              {me.email}
-            </div>
+            <UserName>{me.name}</UserName>
+            {me.nick && <div>"{me.nick}"</div>}
+            <div>{me.email}</div>
           </UserInfo>
         </Box>
-        {error &&
-          <StatusBox error={true}>
-            {error.reason}
-          </StatusBox>}
+        {error && <StatusBox error={true}>{error.reason}</StatusBox>}
         {success === true && <StatusBox error={false}>Uppdaterades!</StatusBox>}
         <Field text="Nick:">
           <Input
