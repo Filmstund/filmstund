@@ -8,7 +8,8 @@ class MovieTitleExtension {
     val STUFF_TO_REMOVE = listOf(
       " - Klassiker",
       " - Bollywood",
-      " (Director´s cut)"
+      " (Director´s cut)",
+      " (IMAX®)"
     )
 
     val TITLES_TO_IGNORE = listOf(
