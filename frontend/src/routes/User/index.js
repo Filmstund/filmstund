@@ -7,6 +7,7 @@ import MainButton from "../../MainButton";
 import Input from "../../Input";
 import alfons from "../../assets/alfons.jpg";
 import { me as meActions } from "../../store/reducers";
+import * as fetchers from "../../lib/fetchers";
 import { formatYMD } from "../../lib/dateTools";
 
 import { trim } from "../../Utils";
@@ -59,8 +60,13 @@ class User extends Component {
     };
   }
 
+  componentWillMount() {
+    const { fetchMe } = this.props;
+    fetchMe();
+  }
+
   componentWillUnmount() {
-    this.props.dispatch(meActions.actions.clearStatus());
+    this.props.clearViewStatus();
   }
 
   setEditedUserValue = (key, { target: { value } }) => {
@@ -93,12 +99,10 @@ class User extends Component {
       }))
     });
 
-    this.props.dispatch(
-      meActions.actions.requestUpdate({
-        id: me.id,
-        ...trimmedValues
-      })
-    );
+    this.props.requestUpdateMe({
+      id: me.id,
+      ...trimmedValues
+    });
   };
 
   render() {
@@ -154,8 +158,15 @@ class User extends Component {
   }
 }
 
-export default connect(state => ({
-  me: state.me.data,
-  error: state.me.error,
-  success: state.me.success
-}))(User);
+export default connect(
+  state => ({
+    me: state.me.data,
+    error: state.me.error,
+    success: state.me.success
+  }),
+  {
+    ...fetchers,
+    requestUpdateMe: meActions.actions.requestUpdate,
+    clearViewStatus: meActions.actions.clearStatus
+  }
+)(User);
