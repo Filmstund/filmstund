@@ -36,7 +36,7 @@ class UserAlreadyAttendedException() : RuntimeException("The user has already at
 class TicketNotFoundException(ticketNumber: TicketNumber) : RuntimeException("Ticket " + ticketNumber + " not found")
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-class DuplicateTicketException() : RuntimeException("Found duplicate tickets")
+class DuplicateTicketException(msg: String = "") : RuntimeException("Found duplicate tickets" + msg)
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class SfTicketException(msg: String) : RuntimeException(msg)

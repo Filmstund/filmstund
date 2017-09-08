@@ -233,9 +233,11 @@ class ShowingController(private val repo: ShowingRepository,
     val participant: Participant = when (body.paymentOption.type) {
       PaymentType.Företagsbiljett -> {
         val suppliedTicket = body.paymentOption.ticketNumber ?: throw MissingParametersException("företagsbiljett ticket number")
+        val ticketNumber = TicketNumber(suppliedTicket)
 
-        markFöretagsbiljettAsPending(userId, TicketNumber(suppliedTicket))
-        FtgBiljettParticipant(userId, TicketNumber(suppliedTicket))
+        assertFöretagsticketIsAvailable(userId, ticketNumber)
+        markFöretagsbiljettAsPending(userId, ticketNumber)
+        FtgBiljettParticipant(userId, ticketNumber)
       }
       PaymentType.Swish -> SwishParticipant(userId)
     }
@@ -336,6 +338,24 @@ class ShowingController(private val repo: ShowingRepository,
     val user = findUser(userID)
     if (user.phone == null || user.phone.number.isNullOrBlank()) {
       throw MissingPhoneNumberException()
+    }
+  }
+
+  private fun assertFöretagsticketIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
+    val user = findUser(userId)
+    val matchingTickets = user.foretagsbiljetter.filter {
+      it.number == suppliedTicket
+    }
+
+    if (matchingTickets.isEmpty()) {
+      throw TicketNotFoundException(suppliedTicket)
+    }
+    if (matchingTickets.size > 1) {
+      throw DuplicateTicketException(": $suppliedTicket")
+    }
+
+    if (matchingTickets.first().status != Företagsbiljett.Status.Available) {
+      throw BadRequestException("Ticket has already been used: " + suppliedTicket.number)
     }
   }
 
