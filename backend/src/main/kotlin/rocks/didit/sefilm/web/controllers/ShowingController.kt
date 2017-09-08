@@ -97,7 +97,9 @@ class ShowingController(private val repo: ShowingRepository,
     if (showing.calendarEventId != null) {
       googleCalenderClient.deleteEvent(showing.calendarEventId)
     }
-    markAllFöretagsbiljetterAsAvailable(showing.participants)
+    if (!showing.ticketsBought) {
+      markAllFöretagsbiljetterAsAvailable(showing.participants)
+    }
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
     ticketManager.deleteTickets(showing)
