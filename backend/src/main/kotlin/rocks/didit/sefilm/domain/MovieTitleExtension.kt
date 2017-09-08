@@ -9,7 +9,8 @@ class MovieTitleExtension {
       " - Klassiker",
       " - Bollywood",
       " (Director´s cut)",
-      " (IMAX®)"
+      " (IMAX®)",
+      " 70 mm"
     )
 
     val TITLES_TO_IGNORE = listOf(
