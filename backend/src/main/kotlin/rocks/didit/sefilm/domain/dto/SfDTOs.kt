@@ -90,6 +90,7 @@ enum class SfTag {
   `Sommar på bio`,
   `Ej textad`,
   Textad,
+  Familj,
   Unknown
 }
 
