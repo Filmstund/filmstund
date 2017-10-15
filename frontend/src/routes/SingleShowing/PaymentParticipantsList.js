@@ -23,6 +23,17 @@ const UserWithPriceItem = withUserLoader(
     </UserActiveStatus>
 );
 
+const renderUserWithPriceItem = (info, handlePaidChange, active) => (
+  <UserWithPriceItem
+    key={info.id}
+    active={active}
+    userId={info.userId}
+    onPaidChange={() => handlePaidChange(info)}
+    price={info.amountOwed}
+    hasPaid={info.hasPaid}
+  />
+)
+
 const PaymentParticipantsList = ({ handlePaidChange, participants }) => {
   const { hasPaid = [], hasNotPaid = [] } = groupBy(
     participants,
@@ -33,27 +44,9 @@ const PaymentParticipantsList = ({ handlePaidChange, participants }) => {
     <div>
       <Header>Deltagare</Header>
       {hasNotPaid.length === 0 && "Alla har betalat!"}
-      {hasNotPaid.map(info =>
-        <UserWithPriceItem
-          key={info.id}
-          active={true}
-          userId={info.userId}
-          onPaidChange={() => handlePaidChange(info)}
-          price={info.amountOwed}
-          hasPaid={info.hasPaid}
-        />
-      )}
+      {hasNotPaid.map(info => renderUserWithPriceItem(info, () => handlePaidChange(info), true))}
       <hr />
-      {hasPaid.map(info =>
-        <UserWithPriceItem
-          key={info.id}
-          active={false}
-          userId={info.userId}
-          onPaidChange={() => handlePaidChange(info)}
-          price={info.amountOwed}
-          hasPaid={info.hasPaid}
-        />
-      )}
+      {hasPaid.map(info => renderUserWithPriceItem(info, () => handlePaidChange(info), false))}
     </div>
   );
 };
