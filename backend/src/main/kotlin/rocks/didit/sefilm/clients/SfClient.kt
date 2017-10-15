@@ -47,9 +47,12 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
       .exchange("$API_URL/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
       .body ?: throw ExternalProviderException("Response body is null")
 
-  fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO {
-    val responseEntity = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId)
-    return responseEntity.body ?: throw ExternalProviderException("Response body is null")
+  fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
+    val body = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId).body
+    if (body?.ncgId == null) {
+      return null
+    }
+    return body
   }
 
   fun allMovies(cityAlias: String = "GB"): List<SfMovieDTO> {

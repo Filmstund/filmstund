@@ -45,6 +45,6 @@ class TicketController(private val ticketRepository: TicketRepository,
     }
 
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, currentLoggedInUser)
-      .orElseThrow { NotFoundException("Ticket not for this user and showing") }
+      .orElseThrow { NotFoundException("ticket for this user and showing") }
   }
 }

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import QRCode from "./QRCode";
 import Loader from "../../ProjectorLoader";
-import Modal from "./Modal";
+import Modal from "../../Modal";
 
 const SwishModal = ({ payData, closeSwish }) => {
   if (!payData) {

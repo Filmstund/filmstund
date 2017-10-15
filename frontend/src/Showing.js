@@ -11,15 +11,16 @@ const Status = styled.div`
   position: absolute;
   right: 1em;
   top: 1em;
+  font-style: ${props => props.ticketsBought ? '' : 'italic'}
 `;
 
 const capitilized = s => s.substring(0, 1).toUpperCase() + s.substring(1);
 
-export const getStatus = showing => {
-  if (showing.ticketsBought) {
+const getStatus = ticketsBought => {
+  if (ticketsBought) {
     return "bokad";
   } else {
-    return "planeras";
+    return "preliminär";
   }
 };
 
@@ -36,7 +37,7 @@ const Showing = ({
   date,
   admin,
   setTitleTag = false,
-  status,
+  ticketsBought,
   location,
   disabled,
   onClick
@@ -45,9 +46,9 @@ const Showing = ({
     {setTitleTag &&
       <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />}
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
-      {status &&
-        <Status>
-          {capitilized(status)}
+      {ticketsBought !== undefined &&
+        <Status ticketsBought={ticketsBought}>
+          {capitilized(getStatus(ticketsBought))}
         </Status>}
       <VerticalPaddingContainer>
         {formatShowingDateTime(date)}

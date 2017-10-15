@@ -5,7 +5,7 @@ import { values, orderBy } from "lodash";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
-import Showing, { getStatus } from "../Showing";
+import Showing from "../Showing";
 import Header from "../Header";
 
 import { getTodaysDate } from "../lib/dateTools";
@@ -29,7 +29,7 @@ class Home extends Component {
       <Showing
         showingId={showing.id}
         onClick={() => this.navigateToShowing(showing)}
-        status={getStatus(showing)}
+        ticketsBought={showing.ticketsBought}
         disabled={moment(showing.date).isBefore(today)}
         movieId={showing.movieId}
         key={showing.id}

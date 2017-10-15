@@ -49,7 +49,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       log.info("Fetching extended info for '${it.title}' with id=${it.id}")
       try {
         updateInfo(it)
-      } catch(e: Exception) {
+      } catch (e: Exception) {
         log.warn("An error occurred when updating '${it.title}' ID=${it.id}, SF id=${it.sfId}", e)
       }
       randomBackoff()
@@ -60,7 +60,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
     val waitTime = 3000L + Random().nextInt(7000)
     try {
       Thread.sleep(waitTime)
-    } catch(e: InterruptedException) {
+    } catch (e: InterruptedException) {
       log.info("randomBackoff were interrupted")
       Thread.currentThread().interrupt()
     }
@@ -90,16 +90,19 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   private fun updateFromSf(movie: Movie): Movie {
     log.info("[SF] Fetching extended info by SF id=${movie.sfId}")
     val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
-    // TODO: if movie not found, set SF id to N/A or something
+    if (updatedMovie == null) {
+      log.info("[SF] ${movie.sfId} not found. Removing that SF id...")
+      return movieRepository.save(movie.copy(sfId = null))
+    }
 
     val copy = movie.copy(synopsis = updatedMovie.shortDescription,
       sfSlug = updatedMovie.slug,
       originalTitle = updatedMovie.originalTitle,
-      releaseDate = updatedMovie.releaseDate,
+      releaseDate = updatedMovie.releaseDate ?: movie.releaseDate,
       productionYear = updatedMovie.productionYear,
-      runtime = Duration.ofMinutes(updatedMovie.length),
+      runtime = Duration.ofMinutes(updatedMovie.length ?: 0L),
       poster = updatedMovie.posterUrl,
-      genres = updatedMovie.genres.map { (name) -> name })
+      genres = updatedMovie.genres?.map { it.name } ?: listOf())
 
     val saved = movieRepository.save(copy)
     log.info("[SF] Successfully updated and saved movie[${movie.id}] with SF data")

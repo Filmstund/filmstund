@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
-import Modal from "./Modal";
+import Modal from "../../Modal";
 import Field from "../../Field";
 import Input from "../../Input";
 import Header, { SmallHeader } from "../../Header";

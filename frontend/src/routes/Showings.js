@@ -11,7 +11,7 @@ import {
 } from "../store/reducers";
 
 import Header from "../Header";
-import Showing, { getStatus } from "../Showing";
+import Showing from "../Showing";
 import { Link } from "../MainButton";
 
 const today = getTodaysDate();
@@ -32,7 +32,7 @@ class Showings extends Component {
         showingId={showing.id}
         key={showing.id}
         onClick={() => this.navigateToShowing(showing)}
-        status={getStatus(showing)}
+        ticketsBought={showing.ticketsBought}
         movieId={showing.movieId}
         disabled={disabled}
         date={showing.date}

@@ -7,7 +7,7 @@ import { getJson } from "../../lib/fetch";
 import { ftgTickets as ftgTicketsActions } from "../../store/reducers";
 
 import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
-import Showing, { getStatus } from "../../Showing";
+import Showing from "../../Showing";
 import { ButtonContainer } from "../../MainButton";
 import BoughtShowing from "./BoughtShowing";
 import PendingShowing from "./PendingShowing";
@@ -95,7 +95,7 @@ class SingleShowing extends Component {
           date={showing.date}
           adminId={showing.admin}
           location={showing.location.name}
-          status={getStatus(showing)}
+          ticketsBought={showing.ticketsBought}
         />
         <ButtonContainer>
           {isAdmin && <AdminAction showing={showing} />}
