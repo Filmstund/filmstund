@@ -59,9 +59,9 @@ class ShowingController(private val repo: ShowingRepository,
       else -> showing.payToUser
     }
     val newLocation = when {
-      body.newLocation != null -> {
-        locationRepo.findById(body.newLocation)
-          .orElseGet { locationRepo.save(Location(body.newLocation)) }
+      body.location != null -> {
+        locationRepo.findById(body.location)
+          .orElseGet { locationRepo.save(Location(body.location)) }
       }
       else -> showing.location
     }
@@ -73,7 +73,7 @@ class ShowingController(private val repo: ShowingRepository,
       ticketsBought = body.ticketsBought,
       expectedBuyDate = body.expectedBuyDate,
       payToUser = newPayToUser,
-      time = body.newTime ?: showing.time,
+      time = body.time ?: showing.time,
       location = newLocation)
 
     val updatedShowing = repo.save(updateShowing)
