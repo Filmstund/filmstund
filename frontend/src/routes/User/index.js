@@ -6,9 +6,11 @@ import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Input from "../../Input";
 import alfons from "../../assets/alfons.jpg";
-import { me as meActions } from "../../store/reducers";
+import {
+  me as meActions,
+  ftgTickets as ftgTicketsActions
+} from "../../store/reducers";
 import * as fetchers from "../../lib/fetchers";
-import { formatYMD } from "../../lib/dateTools";
 
 import { trim } from "../../Utils";
 
@@ -61,7 +63,8 @@ class User extends Component {
   }
 
   componentWillMount() {
-    const { fetchMe } = this.props;
+    const { fetchMe, requestTickets } = this.props;
+    requestTickets();
     fetchMe();
   }
 
@@ -78,25 +81,12 @@ class User extends Component {
     }));
   };
 
-  setBiljetter = foretagsbiljetter => {
-    this.setState(state => ({
-      editedUser: {
-        ...state.editedUser,
-        foretagsbiljetter
-      }
-    }));
-  };
-
   handleSubmit = () => {
     const { editedUser } = this.state;
     const { me } = this.props;
 
     const trimmedValues = trim({
-      ...editedUser,
-      foretagsbiljetter: editedUser.foretagsbiljetter.map(ftg => ({
-        ...ftg,
-        expires: formatYMD(ftg.expires)
-      }))
+      ...editedUser
     });
 
     this.props.requestUpdateMe({
@@ -106,21 +96,24 @@ class User extends Component {
   };
 
   render() {
-    const { me, className, error, success } = this.props;
     const {
-      phone,
-      sfMembershipId,
-      nick,
-      foretagsbiljetter
-    } = this.state.editedUser;
+      me,
+      className,
+      error,
+      success,
+      ftgTickets,
+      errorFtgTickets,
+      successFtgTickets
+    } = this.props;
+    const { phone, sfMembershipId, nick } = this.state.editedUser;
     return (
       <div className={className}>
         <Helmet title="Profil" />
         <Box>
           <AvatarImage src={me.avatar || alfons} />
           <UserInfo>
-            <UserName>{me.name}</UserName>
-            {me.nick && <div>"{me.nick}"</div>}
+            {me.nick && <UserName>{me.nick}</UserName>}
+            <div>"{me.name}"</div>
             <div>{me.email}</div>
           </UserInfo>
         </Box>
@@ -150,11 +143,14 @@ class User extends Component {
             onChange={v => this.setEditedUserValue("phone", v)}
           />
         </Field>
-        <ForetagsbiljettList
-          biljetter={foretagsbiljetter}
-          onChange={this.setBiljetter}
-        />
         <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>
+        {errorFtgTickets && (
+          <StatusBox error={true}>{errorFtgTickets.reason}</StatusBox>
+        )}
+        {successFtgTickets === true && (
+          <StatusBox error={false}>Företagsbiljetter uppdaterades!</StatusBox>
+        )}
+        <ForetagsbiljettList biljetter={ftgTickets} />
       </div>
     );
   }
@@ -163,11 +159,15 @@ class User extends Component {
 export default connect(
   state => ({
     me: state.me.data,
+    ftgTickets: state.ftgTickets.data || [],
+    errorFtgTickets: state.ftgTickets.error,
+    successFtgTickets: state.ftgTickets.success,
     error: state.me.error,
     success: state.me.success
   }),
   {
     ...fetchers,
+    requestTickets: ftgTicketsActions.actions.requestSingle,
     requestUpdateMe: meActions.actions.requestUpdate,
     clearViewStatus: meActions.actions.clearStatus
   }

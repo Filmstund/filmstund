@@ -8,12 +8,15 @@ import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.web.services.FöretagsbiljettService
 
 @RestController
-class UserController(val userRepository: UserRepository) {
+class UserController(val userRepository: UserRepository,
+                     val företagsbiljettService: FöretagsbiljettService) {
   companion object {
     private const val BASE_PATH = Application.API_BASE_PATH + "/users"
     private const val ME_PATH = BASE_PATH + "/me"
+    private const val FTG_TICKET_PATH = ME_PATH + "/ftgtickets"
   }
 
   @GetMapping(ME_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -22,6 +25,40 @@ class UserController(val userRepository: UserRepository) {
     return userRepository
       .findById(currentLoggedInUser)
       .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
+  }
+
+  @GetMapping(FTG_TICKET_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  fun getFtgTickets(): List<FöretagsbiljettDTO> {
+    val currentLoggedInUser = currentLoggedInUser()
+    return userRepository
+      .findById(currentLoggedInUser)
+      .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
+      .foretagsbiljetter
+      .map {
+        FöretagsbiljettDTO(number = it.number.number,
+          expires = it.expires,
+          status = this.företagsbiljettService.getStatusOfTicket(it))
+      }
+  }
+
+  @PutMapping(FTG_TICKET_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  fun updateFtgTickets(@RequestBody tickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
+    assertNoDuplicateForetagsbiljetter(tickets)
+    val tickets = tickets.map { Företagsbiljett.valueOf(it) }
+    val updatedUser = currentUser().copy(
+      foretagsbiljetter = tickets
+    )
+
+    userRepository.save(updatedUser)
+
+    return tickets.map { f ->
+      FöretagsbiljettDTO(
+        number = f.number.number,
+        expires = f.expires,
+        status = this.företagsbiljettService.getStatusOfTicket(f)
+      )
+    }
+
   }
 
   @GetMapping(BASE_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -35,8 +72,6 @@ class UserController(val userRepository: UserRepository) {
 
   @PutMapping(ME_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
-    assertNoDuplicateForetagsbiljetter(newDetails.foretagsbiljetter)
-
     val newBioklubbnummer = when {
       newDetails.sfMembershipId.isNullOrBlank() -> null
       else -> SfMembershipId(newDetails.sfMembershipId!!)
@@ -50,8 +85,8 @@ class UserController(val userRepository: UserRepository) {
     val updatedUser = currentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
-      sfMembershipId = newBioklubbnummer,
-      foretagsbiljetter = newDetails.foretagsbiljetter.map { Företagsbiljett.valueOf(it) })
+      sfMembershipId = newBioklubbnummer
+    )
 
     return userRepository.save(updatedUser)
   }

@@ -1,11 +1,17 @@
 import React, { Component } from "react";
-import styled from "styled-components";
-import { SingleDatePicker as DatePicker } from "react-dates";
+import { connect } from "react-redux";
 import moment from "moment";
+import styled from "styled-components";
+import MainButton from "../../MainButton";
+
+import { ftgTickets as ftgTicketsActions } from "../../store/reducers";
+import { SingleDatePicker as DatePicker } from "react-dates";
 import 'react-dates/lib/css/_datepicker.css';
 import Field from "../../Field";
 import { SmallHeader } from "../../Header";
 import Input from "../../Input";
+
+import { formatYMD } from "../../lib/dateTools";
 
 const DEFAULT_DATE = moment().add(1, "years");
 
@@ -38,6 +44,7 @@ const AddForetagsbiljettContainer = styled.div`
   max-width: 15em;
   display: flex;
   justify-content: center;
+  padding-bottom: 2em;
 `;
 
 const Foretagsbiljett = ({
@@ -48,57 +55,59 @@ const Foretagsbiljett = ({
   handleChangeForetagsbiljett,
   handleSetExpiresForetagsbiljett,
   handleRemoveForetagsbiljett
-}) =>
-  <ForetagsbiljettWrapper>
-    <BiljettField text="Kortnummer">
-      <ForetagsbiljettInput
-        type="text"
-        value={biljett.number}
-        maxLength={11}
-        onChange={v => handleChangeForetagsbiljett(index, v)}
-      />
-    </BiljettField>
-    <BiljettField text="Utgångsdatum">
-      <DatePicker
-        numberOfMonths={1}
-        focused={dateFocused}
-        onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
-        onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
-        date={moment(biljett.expires)}
-      />
-    </BiljettField>
-    <BiljettField text="Status">
-      {biljett.status || "Available"}
-    </BiljettField>
-    <TrashIcon>
-      <i
-        onClick={() => handleRemoveForetagsbiljett(index)}
-        className="fa fa-trash"
-        aria-hidden="true"
-      />
-    </TrashIcon>
-  </ForetagsbiljettWrapper>;
+}) => (
+    <ForetagsbiljettWrapper>
+      <BiljettField text="Nummer">
+        <ForetagsbiljettInput
+          type="text"
+          value={biljett.number}
+          maxLength={11}
+          onChange={v => handleChangeForetagsbiljett(index, v)}
+        />
+      </BiljettField>
+      <BiljettField text="Utgångsdatum">
+        <DatePicker
+          numberOfMonths={1}
+          focused={dateFocused}
+          onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
+          onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
+          date={moment(biljett.expires)}
+        />
+      </BiljettField>
+      <BiljettField text="Status">{biljett.status || "Available"}</BiljettField>
+      <TrashIcon>
+        <i
+          onClick={() => handleRemoveForetagsbiljett(index)}
+          className="fa fa-trash"
+          aria-hidden="true"
+        />
+      </TrashIcon>
+    </ForetagsbiljettWrapper>
+  );
 
-export default class ForetagsbiljettList extends Component {
-  state = {
-    focusedIndex: -1
-  };
+class ForetagsbiljettList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      focusedIndex: -1,
+      biljetter: props.biljetter
+    };
+  }
 
   updateForetagsbiljett = (index, biljett) => {
-    const { biljetter } = this.props;
+    const { biljetter } = this.state;
+    const newTickets = biljetter.map((number, i) => {
+      if (index === i) {
+        return {
+          ...number,
+          ...biljett
+        };
+      } else {
+        return number;
+      }
+    });
 
-    this.props.onChange(
-      biljetter.map((number, i) => {
-        if (index === i) {
-          return {
-            ...number,
-            ...biljett
-          };
-        } else {
-          return number;
-        }
-      })
-    );
+    this.setState({ biljetter: newTickets });
   };
 
   handleChangeFocus = (index, focused) => {
@@ -116,28 +125,37 @@ export default class ForetagsbiljettList extends Component {
 
   addForetagsbiljett = () => {
     const foretagsbiljett = { number: "", expires: DEFAULT_DATE };
-    this.props.onChange([...this.props.biljetter, foretagsbiljett]);
+    const newTickets = [...this.state.biljetter, foretagsbiljett];
+    this.setState({ biljetter: newTickets });
   };
 
   handleRemoveForetagsbiljett = index => {
-    const { biljetter } = this.props;
+    const { biljetter } = this.state;
 
     const biljetterWithoutAtIndex = [
       ...biljetter.slice(0, index),
       ...biljetter.slice(index + 1)
     ];
 
-    this.props.onChange(biljetterWithoutAtIndex);
+    this.setState({ biljetter: biljetterWithoutAtIndex });
+  };
+
+  handleSubmit = () => {
+    const tickets = this.state.biljetter.map(ftg => ({
+      number: ftg.number,
+      expires: formatYMD(ftg.expires)
+    }));
+
+    this.props.updateTickets(tickets);
   };
 
   render() {
-    const { biljetter } = this.props;
-    const { focusedIndex } = this.state;
+    const { biljetter, focusedIndex } = this.state;
 
     return (
       <div>
         <SmallHeader>Företagsbiljetter</SmallHeader>
-        {biljetter.map((biljett, i) =>
+        {biljetter.map((biljett, i) => (
           <Foretagsbiljett
             key={i}
             biljett={biljett}
@@ -150,13 +168,20 @@ export default class ForetagsbiljettList extends Component {
             }
             handleRemoveForetagsbiljett={this.handleRemoveForetagsbiljett}
           />
-        )}
+        ))}
         <AddForetagsbiljettContainer onClick={this.addForetagsbiljett}>
           <AddIcon>
             <i className="fa fa-plus-circle" aria-hidden="true" />
           </AddIcon>
         </AddForetagsbiljettContainer>
+        <MainButton onClick={this.handleSubmit}>
+          Spara företagsbiljetter
+        </MainButton>
       </div>
     );
   }
 }
+
+export default connect(null, {
+  updateTickets: ftgTicketsActions.actions.requestUpdate
+})(ForetagsbiljettList);

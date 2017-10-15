@@ -9,7 +9,6 @@ const SwishModal = ({ payData, closeSwish }) => {
   if (!payData) {
     return <Loader />;
   }
-  // const { amountOwed, swishLink, hasPaid, payTo } = payData
 
   const { swishLink } = payData;
 

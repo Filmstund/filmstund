@@ -3,6 +3,7 @@ import { push } from "react-router-redux";
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 import { USER_SIGNOUT_ACTION } from "./user";
+import ftgTicketsActions from "./ftgTickets";
 import { combineReducers } from "redux";
 import {
   requestAndValidate,
@@ -221,19 +222,25 @@ const actionCreators = {
       appendId(path, id, "attend"),
       paymentOption
     )
-      .then(participants =>
-        dispatch({ type: actions.successAttend, id, participants })
-      )
+      .then(participants => {
+        dispatch(ftgTicketsActions.actions.requestSingle());
+        return dispatch({ type: actions.successAttend, id, participants });
+      })
       .catch(error => dispatch({ type: actions.errorAttend, error }));
   },
 
   requestUnattend: id => dispatch => {
     dispatch({ type: actions.requestUnattend, id });
 
-    return requestAndValidate(dispatch, jsonRequest, appendId(path, id, "unattend"))
-      .then(participants =>
-        dispatch({ type: actions.successUnattend, id, participants })
-      )
+    return requestAndValidate(
+      dispatch,
+      jsonRequest,
+      appendId(path, id, "unattend")
+    )
+      .then(participants => {
+        dispatch(ftgTicketsActions.actions.requestSingle());
+        return dispatch({ type: actions.successUnattend, id, participants });
+      })
       .catch(error => dispatch({ type: actions.errorUnattend, error }));
   },
 
