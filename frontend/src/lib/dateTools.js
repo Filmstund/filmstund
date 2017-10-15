@@ -5,6 +5,7 @@ import { padStart, take } from "lodash";
 moment.locale("sv");
 
 const DATE_MONTH_TIME = "D MMM HH:mm";
+const HOUR_MINUTE = "HH:mm";
 const DATE_MONTH = "D MMMM YYYY";
 const YMD = "YYYY-MM-DD";
 
@@ -22,6 +23,9 @@ export const showingDateToString = (date, time = ["0", "0", "0"]) => {
 
 export const formatShowingDateTime = date =>
   moment(date).format(DATE_MONTH_TIME);
+
+export const formatTime = date =>
+  moment(date).format(HOUR_MINUTE);
 
 export const formatShowingDate = date => moment(date).format(DATE_MONTH);
 

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router";
 
 import { showings as showingActions } from "../../store/reducers";
 
@@ -133,6 +134,11 @@ class AdminAction extends Component {
       });
   };
 
+  handleEdit = () => {
+    const { showing } = this.props;
+    this.props.history.push(`/showings/${showing.id}/edit`);
+  };
+
   render() {
     const { showing } = this.props;
 
@@ -174,6 +180,9 @@ class AdminAction extends Component {
         : <MainButton key="allaarmed" onClick={this.handleStartBooking}>
           Alla är med, nu bokar vi!
             </MainButton>,
+      !ticketsBought && <GrayButton key="edit" onClick={this.handleEdit}>
+        Ändra besök
+          </GrayButton>,
       ticketsBought &&
       calendarEventId === null &&
       <MainButton
@@ -203,4 +212,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(AdminAction);
+export default withRouter(connect(null, mapDispatchToProps)(AdminAction));

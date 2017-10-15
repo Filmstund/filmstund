@@ -1,8 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
-import DatePicker from "react-datepicker";
+import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-dates/lib/css/_datepicker.css';
 
 import { showings } from "./store/reducers";
 
@@ -21,6 +21,7 @@ class NewShowing extends React.Component {
     const now = moment();
 
     this.state = {
+      dateFocused: false,
       showing: {
         date: now,
         time: now.format("HH:mm"),
@@ -118,6 +119,7 @@ class NewShowing extends React.Component {
   handleSubmit = () => {
     const submitObject = {
       ...this.state.showing,
+      price: parseFloat(this.state.showing.price, 10) * 100,
       date: formatYMD(this.state.showing.date)
     };
 
@@ -155,7 +157,7 @@ class NewShowing extends React.Component {
   };
 
   render() {
-    const { showing, sfTimes } = this.state;
+    const { showing, sfTimes, dateFocused } = this.state;
     const { movieId, clearSelectedMovie } = this.props;
 
     return (
@@ -170,8 +172,11 @@ class NewShowing extends React.Component {
           />
           <Field text="Datum:">
             <DatePicker
-              selected={showing.date}
-              onChange={v => this.setShowingDate(v)}
+              numberOfMonths={1}
+              focused={dateFocused}
+              onFocusChange={({ focused }) => this.setState({ dateFocused: focused })}
+              date={showing.date}
+              onDateChange={this.setShowingDate}
             />
           </Field>
           {this.renderSelectSfTime(sfTimes, showing)}
