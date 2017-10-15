@@ -12,7 +12,7 @@ import Header from "./Header";
 import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
-import MainButton, { GrayButton } from "./MainButton";
+import MainButton from "./MainButton";
 import { formatTime, formatYMD } from "./lib/dateTools";
 
 const today = moment();
