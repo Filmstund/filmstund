@@ -1,7 +1,4 @@
 ### Pending migrations ###
-db.getCollection('user').updateMany( {}, {$unset: {"bioklubbnummer": "", "sfMembershipId": ""}})
-db.getCollection('movie').updateMany({poster: /.*msprod-catalogapi.*/}, {$unset: {"poster": ""}})
-
 
 ### Migrations already done in deployed application ###
 #
@@ -23,4 +20,8 @@ db.showing.find({}).forEach(s => {
     db.showing.save(s);
 });
 
+# Remove old bioklubbnummer
+db.getCollection('user').updateMany( {}, {$unset: {"bioklubbnummer": "", "sfMembershipId": ""}})
+# Remove old non-working posters
+db.getCollection('movie').updateMany({poster: /.*msprod-catalogapi.*/}, {$unset: {"poster": ""}})
 
