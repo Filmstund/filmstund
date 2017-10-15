@@ -28,7 +28,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     private const val TMDB_INFO_URL = "https://api.themoviedb.org/3/movie/%d?api_key=%s&language=en-US"
     private const val SEARCH_URL = "https://v2.sg.media-imdb.com/suggests/%s/%s.json" // Spaces should be replaced with _
     private fun getSearchUrl(query: String): String {
-      if (query.isNullOrBlank()) throw IllegalArgumentException("Query cannot be blank")
+      if (query.isBlank()) throw IllegalArgumentException("Query cannot be blank")
 
       val normalized = query.removeSwedishChars()
       val encodedQuery = UriUtils.encode(normalized.replace(" ", "_"), Charsets.UTF_8)
@@ -55,17 +55,17 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     val url = TMDB_EXTERNAL_SEARCH_URL.format(imdbId.value, properties.tmdb.apikey)
     val results = restTemplate.exchange<TmdbFindExternalResults>(url, HttpMethod.GET, httpEntity, TmdbFindExternalResults::class.java::class).body
 
-    val movie_results = results.movie_results
-    if (movie_results.isEmpty()) {
+    val movieResults = results?.movie_results ?: listOf()
+    if (movieResults.isEmpty()) {
       return TMDbID.UNKNOWN
     }
-    return TMDbID.valueOf(movie_results[0].id)
+    return TMDbID.valueOf(movieResults[0].id)
   }
 
   fun search(title: String): List<ImdbResult> {
     val url = getSearchUrl(title)
     val resultWithCallback = restTemplate.exchange<String>(url, HttpMethod.GET, httpEntity, String::javaClass).body
-    val resultWithoutCallback = removeCallback(resultWithCallback)
+    val resultWithoutCallback = removeCallback(resultWithCallback ?: "")
     return jsonToSearchResult(resultWithoutCallback).d
       ?.filter { it.q == "feature" } ?: listOf()
   }
@@ -108,7 +108,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
 
   /** IMDb returns jsonp with a callback we need to remove */
   private fun removeCallback(result: String): String {
-    if (result.isNullOrBlank()) throw IllegalArgumentException("Result with callback mustn't be empty")
+    if (result.isBlank()) throw IllegalArgumentException("Result with callback mustn't be empty")
     val firstParenthesis = result.indexOf("(") + 1
     val lastParenthesis = result.lastIndexOf(")")
     return result.substring(firstParenthesis, lastParenthesis)

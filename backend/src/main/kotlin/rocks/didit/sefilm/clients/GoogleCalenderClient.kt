@@ -29,10 +29,10 @@ class GoogleCalenderClient(private val restTemplate: RestTemplate) {
 
     val entity = HttpEntity(event, headersWithToken(accessToken))
 
-    return restTemplate
+    val resultBody = restTemplate
       .exchange(API_URL, HttpMethod.POST, entity, Map::class.java, mapOf("sendNotifications" to "true", "key" to clientSecret))
-      .body["id"]
-      .toString()
+
+    return resultBody.body?.toString() ?: ""
   }
 
   fun deleteEvent(eventId: String) {
