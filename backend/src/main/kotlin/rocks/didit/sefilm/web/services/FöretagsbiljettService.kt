@@ -30,9 +30,8 @@ class FöretagsbiljettService(private val showingRepository: ShowingRepository) 
         return if(showings.first().ticketsBought) {
             Företagsbiljett.Status.Used
         } else {
-            Företagsbiljett.Status.Available
+            Företagsbiljett.Status.Pending
         }
-
     }
 
     private fun hasTicket(p: Participant, ticket: Företagsbiljett): Boolean {

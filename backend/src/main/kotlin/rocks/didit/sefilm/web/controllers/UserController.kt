@@ -17,6 +17,7 @@ class UserController(val userRepository: UserRepository,
   companion object {
     private const val BASE_PATH = Application.API_BASE_PATH + "/users"
     private const val ME_PATH = BASE_PATH + "/me"
+    private const val FTG_TICKET_PATH = ME_PATH + "/ftgtickets"
   }
 
   @GetMapping(ME_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -27,7 +28,7 @@ class UserController(val userRepository: UserRepository,
       .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
   }
 
-  @GetMapping(ME_PATH + "/ftgtickets",  produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(FTG_TICKET_PATH,  produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun getFtgTickets(): List<FöretagsbiljettDTO> {
     val currentLoggedInUser = currentLoggedInUser()
     return userRepository
@@ -41,6 +42,26 @@ class UserController(val userRepository: UserRepository,
               }
             }
             .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
+  }
+
+
+  @PutMapping(FTG_TICKET_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  fun updateFtgBiljetter(@RequestBody tickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
+    assertNoDuplicateForetagsbiljetter(tickets)
+    val foretagsbiljetter = tickets.map { Företagsbiljett.valueOf(it) }
+    val updatedUser = currentUser().copy(
+            foretagsbiljetter = foretagsbiljetter
+    )
+
+    userRepository.save(updatedUser)
+
+    return foretagsbiljetter.map { f ->
+      FöretagsbiljettDTO(
+              number = f.number.number,
+              expires = f.expires,
+              status = this.företagsbiljettService.getStatusOfTicket(f)
+      )
+    }
 
   }
 
@@ -55,8 +76,6 @@ class UserController(val userRepository: UserRepository,
 
   @PutMapping(ME_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
-    assertNoDuplicateForetagsbiljetter(newDetails.foretagsbiljetter)
-
     val newBioklubbnummer = when {
       newDetails.sfMembershipId.isNullOrBlank() -> null
       else -> SfMembershipId(newDetails.sfMembershipId!!)
@@ -70,8 +89,8 @@ class UserController(val userRepository: UserRepository,
     val updatedUser = currentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
-      sfMembershipId = newBioklubbnummer,
-      foretagsbiljetter = newDetails.foretagsbiljetter.map { Företagsbiljett.valueOf(it) })
+      sfMembershipId = newBioklubbnummer
+    )
 
     return userRepository.save(updatedUser)
   }

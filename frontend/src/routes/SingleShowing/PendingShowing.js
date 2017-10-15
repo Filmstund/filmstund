@@ -12,10 +12,11 @@ import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
 class PendingShowing extends Component {
   constructor(props) {
     super(props);
+    console.log(props.ftgTickets);
     this.state = {
       modalOpen: false,
       selectedIndex: 0,
-      paymentOptions: createPaymentOptions(props.me.foretagsbiljetter || [])
+      paymentOptions: createPaymentOptions(props.ftgTickets || [])
     };
   }
 
@@ -30,27 +31,33 @@ class PendingShowing extends Component {
     const { selectedIndex, paymentOptions } = this.state;
 
     return (
-      <Modal key="modal" onRequestClose={() => this.setState({ modalOpen: false })}>
+      <Modal
+        key="modal"
+        onRequestClose={() => this.setState({ modalOpen: false })}
+      >
         <SmallHeader>Betalningsalternativ</SmallHeader>
         <select
           name="betalningsalternativ"
           value={selectedIndex}
           onChange={this.setPaymentOption}
         >
-          {paymentOptions.map((option, index) =>
+          {paymentOptions.map((option, index) => (
             <option key={index} value={index}>
               {stringifyOption(option)}
             </option>
-          )}
+          ))}
         </select>
-        <MainButton onClick={this.handleClickSelectPaymentOption}>Jag hänger på!</MainButton>
+        <MainButton onClick={this.handleClickSelectPaymentOption}>
+          Jag hänger på!
+        </MainButton>
       </Modal>
     );
   };
 
   handleClickSelectPaymentOption = () => {
     const { selectedIndex, paymentOptions } = this.state;
-    this.props.handleAttend({ paymentOption: paymentOptions[selectedIndex] })
+    this.props
+      .handleAttend({ paymentOption: paymentOptions[selectedIndex] })
       .then(result => {
         this.setState({
           modalOpen: false
@@ -64,7 +71,6 @@ class PendingShowing extends Component {
     if (me.foretagsbiljetter.length > 0) {
       this.setState({ modalOpen: true });
     } else {
-
       // Attend with Swish option
       handleAttend({ paymentOption: paymentOptions[0] });
     }
@@ -76,15 +82,23 @@ class PendingShowing extends Component {
 
     return [
       modalOpen && this.renderModalPaymentOptions(),
-      !isParticipating && <MainButton key="attend" onClick={this.handleClickAttend}>Jag hänger på!</MainButton>,
-      isParticipating &&
-      <GrayButton key="unattend" onClick={handleUnattend}>Avanmäl</GrayButton>
+      !isParticipating && (
+        <MainButton key="attend" onClick={this.handleClickAttend}>
+          Jag hänger på!
+        </MainButton>
+      ),
+      isParticipating && (
+        <GrayButton key="unattend" onClick={handleUnattend}>
+          Avanmäl
+        </GrayButton>
+      )
     ];
   }
 }
 
 const mapStateToProps = state => ({
-  me: state.me.data
+  me: state.me.data,
+  ftgTickets: state.ftgTickets.data
 });
 
 const mapDispatchToProps = (dispatch, props) => {

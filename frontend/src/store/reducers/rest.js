@@ -10,10 +10,11 @@ import {
 const idTransform = f => f;
 const appendId = (...pathComponents) => pathComponents.join("/");
 
-const reduceToObject = (array, transform) =>
-  array.reduce((acc, elem) => ({ ...acc, [elem.id]: transform(elem) }), {});
+const reduceToObject = (array, transform, key) =>
+  array.reduce((acc, elem) => ({ ...acc, [elem[key]]: transform(elem) }), {});
 
-const crudReducer = (name, path, transform = idTransform) => {
+const crudReducer = (name, path, key = "id") => {
+  const transform = idTransform;
   const upperName = name.toUpperCase();
   const actions = {
     requestIndex: `${upperName}_REQUEST_INDEX`,
@@ -42,6 +43,7 @@ const crudReducer = (name, path, transform = idTransform) => {
       case actions.requestIndex:
         return { ...state, index: true };
       case actions.successIndex:
+      case actions.errorIndex:
         return { ...state, index: false };
       case actions.requestSingle:
       case actions.requestCreate:
@@ -51,7 +53,6 @@ const crudReducer = (name, path, transform = idTransform) => {
       case actions.successSingle:
       case actions.successUpdate:
       case actions.successCreate:
-      case actions.errorIndex:
       case actions.errorSingle:
       case actions.errorCreate:
       case actions.errorUpdate:
@@ -124,14 +125,14 @@ const crudReducer = (name, path, transform = idTransform) => {
 
       dispatch({ type: actions.requestIndex });
 
-      requestAndValidate(dispatch, fetch, path)
-        .then(data =>
+      requestAndValidate(dispatch, fetch, path).then(
+        data =>
           dispatch({
             type: actions.successIndex,
-            data: reduceToObject(data, transform)
-          })
-        )
-        .catch(error => dispatch({ type: actions.errorIndex, error }));
+            data: reduceToObject(data, transform, key)
+          }),
+        error => dispatch({ type: actions.errorIndex, error })
+      );
     },
 
     requestSingle: id => (dispatch, getState) => {
