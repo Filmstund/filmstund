@@ -15,7 +15,7 @@ const PaddingContainer = styled.div`
 `;
 
 const Poster = styled.div`
-  background-image: url(${props => props.src});
+  background-image: url(${props => props.src}), url(${alfons});
   background-size: cover;
   height: 100%;
   width: 100px;
@@ -41,7 +41,7 @@ const PosterBox = ({ className, poster, onClick, headerText, children }) =>
     onClick={onClick}
     onKeyDown={e => filterEnterKey(e, onClick)}
   >
-    <Poster src={poster || alfons} />
+    <Poster src={poster} />
     <PaddingContainer>
       <Header>
         {headerText}
