@@ -1,5 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
+import { withRouter } from "react-router";
+import { compose } from "recompose";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
 import 'react-dates/lib/css/_datepicker.css';
@@ -64,12 +66,12 @@ class EditShowingForm extends React.Component {
   };
 
   handleSubmit = () => {
-    const submitObject = this.state.showing;
+    const { showing } = this.state;
 
-    this.props.updateShowing({
-      ...submitObject,
+    this.props.updateShowing(showing).then(() => {
+      this.props.history.push(`/showings/${showing.id}`);
     });
-  };
+  }
 
   render() {
     const { showing: { movieId, admin, date } } = this.props;
@@ -116,7 +118,7 @@ class EditShowingForm extends React.Component {
               onChange={v => this.setShowingValueFromEvent("price", v)}
             />
           </Field>
-          <MainButton onClick={this.handleSubmit}>Skapa besök</MainButton>
+          <MainButton onClick={this.handleSubmit}>Uppdatera besök</MainButton>
         </div>
       </div>
     );
@@ -124,6 +126,9 @@ class EditShowingForm extends React.Component {
 }
 
 
-export default connect(null, {
-  updateShowing: showingActions.actions.requestUpdate
-})(EditShowingForm);
+export default compose(
+  connect(null, {
+    updateShowing: showingActions.actions.requestUpdate
+  }),
+  withRouter
+)(EditShowingForm);
