@@ -76,14 +76,13 @@ const BuyModal = ({
   ticketLink,
   setPrice,
   setTicketLink,
-  loading,
   buyData,
   handleMarkBought,
   handlePaidChange,
   closeModal,
   showing
 }) => {
-  if (!buyData || loading) {
+  if (!buyData) {
     return (
       <Modal>
         <Center>
@@ -158,7 +157,6 @@ BuyModal.propTypes = {
   ticketPrice: PropTypes.number.isRequired,
   showing: PropTypes.object.isRequired,
   setPrice: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
   buyData: PropTypes.object,
   handleMarkBought: PropTypes.func.isRequired,
   handlePaidChange: PropTypes.func.isRequired,
