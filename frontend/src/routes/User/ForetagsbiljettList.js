@@ -136,7 +136,6 @@ class ForetagsbiljettList extends Component {
 
   render() {
     const { biljetter } = this.state;
-    console.log("biljetter", biljetter);
 
     return (
       <div>

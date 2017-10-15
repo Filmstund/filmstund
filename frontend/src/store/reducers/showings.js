@@ -11,7 +11,6 @@ import {
   removeFromCollection
 } from "./helper";
 
-console.log(ftgTicketsActions);
 export const getIsLoading = (state, id) => state.showings.loading[id];
 export const getShowing = (state, id) => state.showings.data[id];
 

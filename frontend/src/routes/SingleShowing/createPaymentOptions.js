@@ -11,7 +11,6 @@ const createPaymentOption = (type, ticketNumber = null, suffix = null) => {
 
 const createForetagsbiljetter = foretagsbiljetter => {
   const now = moment();
-  console.log(foretagsbiljetter);
 
   return foretagsbiljetter
     .filter(
