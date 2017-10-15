@@ -46,16 +46,16 @@ class UserController(val userRepository: UserRepository,
 
 
   @PutMapping(FTG_TICKET_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun updateFtgBiljetter(@RequestBody tickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
+  fun updateFtgTickets(@RequestBody tickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
     assertNoDuplicateForetagsbiljetter(tickets)
-    val foretagsbiljetter = tickets.map { Företagsbiljett.valueOf(it) }
+    val tickets = tickets.map { Företagsbiljett.valueOf(it) }
     val updatedUser = currentUser().copy(
-            foretagsbiljetter = foretagsbiljetter
+            foretagsbiljetter = tickets
     )
 
     userRepository.save(updatedUser)
 
-    return foretagsbiljetter.map { f ->
+    return tickets.map { f ->
       FöretagsbiljettDTO(
               number = f.number.number,
               expires = f.expires,
