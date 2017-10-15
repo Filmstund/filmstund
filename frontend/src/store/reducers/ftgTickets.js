@@ -1,5 +1,6 @@
 import fetch, { jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
+import { USER_SIGNOUT_ACTION } from "./user";
 import { requestAndValidate } from "./helper";
 
 const path = withBaseURL("/users/me/ftgtickets");
@@ -16,7 +17,7 @@ const actions = {
 
 const initialState = {
   loading: false,
-  data: {},
+  data: [],
   success: null,
   error: null
 };
@@ -54,6 +55,9 @@ const reducer = (state = initialState, action) => {
         success: false,
         error: action.error
       };
+    case USER_SIGNOUT_ACTION:
+      return initialState;
+
     default:
       return state;
   }
