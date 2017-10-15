@@ -9,8 +9,7 @@ import { withBaseURL } from "../../lib/withBaseURL";
 
 import MainButton, {
   GrayButton,
-  RedButton,
-  ButtonContainer
+  RedButton
 } from "../../MainButton";
 import BuyModal from "./BuyModal";
 
@@ -135,7 +134,7 @@ class AdminAction extends Component {
   };
 
   render() {
-    const { showing, loading } = this.props;
+    const { showing } = this.props;
 
     const { ticketsBought, calendarEventId } = showing;
 
@@ -148,45 +147,45 @@ class AdminAction extends Component {
       adminMessage
     } = this.state;
 
-    return (
-      <ButtonContainer>
-        {showModal &&
-          <BuyModal
-            setPrice={this.setPrice}
-            setTicketLink={this.setTicketLink}
-            loading={loading}
-            showing={showing}
-            handleMarkBought={this.handleMarkBought}
-            handlePaidChange={this.handlePaidChange}
-            ticketPrice={ticketPrice}
-            ticketLink={sfTicketLink}
-            buyData={buyData}
-            closeModal={() =>
-              this.setState({ showModal: false, buyData: null })}
-          />}
-        {adminMessage &&
-          <div>
-            {adminMessage}
-          </div>}
+    return [
+      showModal &&
+      <BuyModal
+        key="buymodal"
+        setPrice={this.setPrice}
+        setTicketLink={this.setTicketLink}
+        showing={showing}
+        handleMarkBought={this.handleMarkBought}
+        handlePaidChange={this.handlePaidChange}
+        ticketPrice={ticketPrice}
+        ticketLink={sfTicketLink}
+        buyData={buyData}
+        closeModal={() =>
+          this.setState({ showModal: false, buyData: null })}
+      />,
+      adminMessage &&
+      <div key="admMessage">
+        {adminMessage}
+      </div>,
 
-        {ticketsBought
-          ? <GrayButton onClick={this.handleStartBooking}>
-              Visa betalningsstatus
+      ticketsBought
+        ? <GrayButton key="betalningsstatus" onClick={this.handleStartBooking}>
+          Visa betalningsstatus
             </GrayButton>
-          : <MainButton onClick={this.handleStartBooking}>
-              Alla är med, nu bokar vi!
-            </MainButton>}
-        {ticketsBought &&
-          calendarEventId === null &&
-          <MainButton
-            disabled={isCreatingEvent}
-            onClick={this.handleCreateGoogleEvent}
-          >
-            Skapa Googlekalenderevent
-          </MainButton>}
-        <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
-      </ButtonContainer>
-    );
+        : <MainButton key="allaarmed" onClick={this.handleStartBooking}>
+          Alla är med, nu bokar vi!
+            </MainButton>,
+      ticketsBought &&
+      calendarEventId === null &&
+      <MainButton
+        key="googlecal"
+        disabled={isCreatingEvent}
+        onClick={this.handleCreateGoogleEvent}
+      >
+        Skapa Googlekalenderevent
+          </MainButton>,
+      <RedButton key="deleteshowing" onClick={this.handleDelete}>Ta bort besök</RedButton>
+
+    ];
   }
 }
 

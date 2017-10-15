@@ -2,7 +2,6 @@ import React from "react";
 import Loader from "../../ProjectorLoader";
 import withUserLoader from "../../loaders/UserLoader";
 import MainButton from "../../MainButton";
-import ParticipantList from "./ParticipantsList";
 import Ticket from "./Ticket";
 
 const PayToUser = withUserLoader(({ user }) =>
@@ -30,7 +29,6 @@ const BoughtShowing = ({ payData, showing, openSwish }) => {
           <PayToUser userId={payTo} />
           <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
         </div>}
-      <ParticipantList participants={showing.participants} />
     </div>
   );
 };

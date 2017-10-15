@@ -6,6 +6,7 @@ import { getJson } from "../../lib/fetch";
 
 import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
 import Showing, { getStatus } from "../../Showing";
+import { ButtonContainer } from "../../MainButton";
 import BoughtShowing from "./BoughtShowing";
 import PendingShowing from "./PendingShowing";
 import AdminAction from "./AdminAction";
@@ -59,8 +60,6 @@ class SingleShowing extends Component {
             payData={payData}
           />
         );
-      } else {
-        return <ParticipantList participants={showing.participants} />;
       }
     } else {
       return (
@@ -73,7 +72,7 @@ class SingleShowing extends Component {
   };
 
   render() {
-    const { className, showing, me, loading } = this.props;
+    const { className, showing, me } = this.props;
     const { swish, payData } = this.state;
 
     const isAdmin = showing.admin === me.id;
@@ -93,8 +92,11 @@ class SingleShowing extends Component {
           location={showing.location.name}
           status={getStatus(showing)}
         />
-        {isAdmin && <AdminAction showing={showing} loading={loading} />}
-        {this.renderBoughtOrPendingShowing()}
+        <ButtonContainer>
+          {isAdmin && <AdminAction showing={showing} />}
+          {this.renderBoughtOrPendingShowing()}
+        </ButtonContainer>
+        <ParticipantList participants={showing.participants} />
       </div>
     );
   }

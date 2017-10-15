@@ -1,27 +1,17 @@
 import React from "react";
-import styled from "styled-components";
+import ReactModal from "react-modal";
 
-const Padding = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 100vw;
-  height: 100vh;
-  padding: 1em;
-  z-index: 2;
-`;
-
-const Background = styled.div`
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  background-color: white;
-  height: 100%;
-`;
+const modalOverlayStyle = {
+  zIndex: 2
+};
+const modalContentStyle = {
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+  backgroundColor: 'white'
+};
 
 const Modal = ({ children, ...props }) =>
-  <Padding>
-    <Background {...props}>
-      {children}
-    </Background>
-  </Padding>;
+  <ReactModal isOpen={true} style={{ content: modalContentStyle, overlay: modalOverlayStyle }} {...props}>
+    {children}
+  </ReactModal>;
 
 export default Modal;

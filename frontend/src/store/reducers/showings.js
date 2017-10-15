@@ -215,7 +215,7 @@ const actionCreators = {
   requestAttend: (id, paymentOption) => dispatch => {
     dispatch({ type: actions.requestAttend, id, paymentOption });
 
-    requestAndValidate(
+    return requestAndValidate(
       dispatch,
       jsonRequest,
       appendId(path, id, "attend"),
@@ -230,7 +230,7 @@ const actionCreators = {
   requestUnattend: id => dispatch => {
     dispatch({ type: actions.requestUnattend, id });
 
-    requestAndValidate(dispatch, jsonRequest, appendId(path, id, "unattend"))
+    return requestAndValidate(dispatch, jsonRequest, appendId(path, id, "unattend"))
       .then(participants =>
         dispatch({ type: actions.successUnattend, id, participants })
       )
