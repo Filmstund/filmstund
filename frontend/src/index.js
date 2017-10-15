@@ -2,7 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import { injectGlobal } from "styled-components";
 
-import App from "./App";
+import Root from "./Root";
 
 // eslint-disable-next-line
 injectGlobal`
@@ -24,4 +24,4 @@ injectGlobal`
   }
 `;
 
-render(<App />, document.getElementById("root"));
+render(<Root />, document.getElementById("root"));

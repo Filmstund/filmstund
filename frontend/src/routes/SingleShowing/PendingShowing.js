@@ -5,7 +5,7 @@ import { showings as showingActions } from "../../store/reducers";
 
 import { SmallHeader } from "../../Header";
 import MainButton, { GrayButton } from "../../MainButton";
-import Modal from "./Modal";
+import Modal from "../../Modal";
 
 import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
 
