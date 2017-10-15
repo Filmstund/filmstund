@@ -14,7 +14,9 @@ import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
+import rocks.didit.sefilm.web.services.FöretagsbiljettService
 import java.time.Duration
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -26,7 +28,8 @@ class ShowingController(private val repo: ShowingRepository,
                         private val userRepo: UserRepository,
                         private val paymentInfoRepo: ParticipantPaymentInfoRepository,
                         private val ticketManager: TicketManager,
-                        private val googleCalenderClient: GoogleCalenderClient) {
+                        private val googleCalenderClient: GoogleCalenderClient,
+                        private val företagsbiljettService: FöretagsbiljettService) {
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/showings"
     private const val PATH_WITH_ID = PATH + "/{id}"
@@ -78,7 +81,6 @@ class ShowingController(private val repo: ShowingRepository,
 
     val updatedShowing = repo.save(updateShowing)
     if (body.ticketsBought) {
-      markAllFöretagsbiljetterAsUsed(showing.participants)
       createInitialPaymentInfo(updateShowing)
     }
 
@@ -97,9 +99,7 @@ class ShowingController(private val repo: ShowingRepository,
     if (showing.calendarEventId != null) {
       googleCalenderClient.deleteEvent(showing.calendarEventId)
     }
-    if (!showing.ticketsBought) {
-      markAllFöretagsbiljetterAsAvailable(showing.participants)
-    }
+
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
     ticketManager.deleteTickets(showing)
@@ -153,40 +153,6 @@ class ShowingController(private val repo: ShowingRepository,
     return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)
   }
 
-  private fun markAllFöretagsbiljetterAs(participants: Set<Participant>, status: Företagsbiljett.Status) {
-    val relevantParticipants = participants
-      .filter { it is FtgBiljettParticipant }
-      .map { it as FtgBiljettParticipant }
-
-    val updatedUsers = relevantParticipants
-      .map {
-        updateFtgbiljettStatusOnUser(findUser(it.userId), it.ticketNumber, status)
-      }
-    userRepo.saveAll(updatedUsers)
-  }
-
-  private fun markAllFöretagsbiljetterAsUsed(participants: Set<Participant>) = markAllFöretagsbiljetterAs(participants, Företagsbiljett.Status.Used)
-  private fun markAllFöretagsbiljetterAsAvailable(participants: Set<Participant>) = markAllFöretagsbiljetterAs(participants, Företagsbiljett.Status.Available)
-
-  private fun markFöretagsbiljettAsAvailable(userID: UserID, ticketNumber: TicketNumber) {
-    userRepo.save(updateFtgbiljettStatusOnUser(findUser(userID), ticketNumber, Företagsbiljett.Status.Available))
-  }
-
-  private fun updateFtgbiljettStatusOnUser(user: User, ticketNumber: TicketNumber, newStatus: Företagsbiljett.Status): User {
-    if (user.foretagsbiljetter.filter { it.number == ticketNumber }.size != 1) {
-      throw TicketNotFoundException(ticketNumber)
-    }
-
-    val newForetagsbiljetter = user.foretagsbiljetter.map {
-      if (it.number == ticketNumber) {
-        it.copy(status = newStatus)
-      } else {
-        it
-      }
-    }
-    return user.copy(foretagsbiljetter = newForetagsbiljetter)
-  }
-
   @GetMapping(PATH_WITH_ID + "/pay")
   fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO {
     val showing = findShowing(id)
@@ -238,7 +204,6 @@ class ShowingController(private val repo: ShowingRepository,
         val ticketNumber = TicketNumber(suppliedTicket)
 
         assertFöretagsticketIsAvailable(userId, ticketNumber)
-        markFöretagsbiljettAsPending(userId, ticketNumber)
         FtgBiljettParticipant(userId, ticketNumber)
       }
       PaymentType.Swish -> SwishParticipant(userId)
@@ -248,12 +213,6 @@ class ShowingController(private val repo: ShowingRepository,
     val savedShowing = repo.save(showing.copy(participants = newParticipants))
 
     return savedShowing.participants.map(Participant::redact)
-  }
-
-  private fun markFöretagsbiljettAsPending(userId: UserID, ticketNumber: TicketNumber) {
-    val user = getUser(userId)
-    val updatedUser = updateFtgbiljettStatusOnUser(user, ticketNumber, Företagsbiljett.Status.Pending)
-    userRepo.save(updatedUser)
   }
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -270,9 +229,6 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     val participant = participantLst.first()
-    if (participant is FtgBiljettParticipant) {
-      markFöretagsbiljettAsAvailable(userId, participant.ticketNumber)
-    }
 
     val participantsWithoutLoggedInUser = showing.participants.minus(participant)
     val savedShowing = repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
@@ -356,7 +312,7 @@ class ShowingController(private val repo: ShowingRepository,
       throw DuplicateTicketException(": $suppliedTicket")
     }
 
-    if (matchingTickets.first().status != Företagsbiljett.Status.Available) {
+    if (företagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Företagsbiljett.Status.Available) {
       throw BadRequestException("Ticket has already been used: " + suppliedTicket.number)
     }
   }

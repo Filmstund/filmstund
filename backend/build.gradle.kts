@@ -6,10 +6,13 @@ import java.io.File
 import java.time.*
 import java.time.format.*
 
+val kotlin_version: String by extra
 project.version = "1.1-SNAPSHOT"
 
 buildscript {
-  val springBootSnapshotVersion = "2.0.0.M3"
+  var kotlin_version: String by extra
+    kotlin_version = "1.1.51"
+    val springBootSnapshotVersion = "2.0.0.M3"
 
   repositories {
     mavenCentral()
@@ -20,6 +23,7 @@ buildscript {
 
   dependencies {
     classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootSnapshotVersion")
+      classpath(kotlinModule("gradle-plugin", kotlin_version))
   }
 }
 
@@ -33,6 +37,7 @@ plugins {
 
 apply {
   plugin("org.springframework.boot")
+    plugin("kotlin")
 }
 
 tasks.withType<KotlinCompile> {
@@ -68,6 +73,7 @@ dependencies {
   compile("com.google.guava:guava:21.0")
   compile("org.jsoup:jsoup:1.10.3")
   testCompile("org.springframework.boot:spring-boot-starter-test:$springBootReleaseVersion")
+    compile(kotlinModule("stdlib-jre8", kotlin_version))
 }
 
 tasks {
@@ -110,5 +116,13 @@ tasks {
   "processResources" {
     dependsOn("copyBanner")
   }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }
 

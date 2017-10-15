@@ -15,8 +15,9 @@ data class TicketNumber(@JsonValue val number: String) {
   }
 }
 
+
+
 data class Företagsbiljett(val number: TicketNumber,
-                           val status: Status = Status.Available,
                            val expires: LocalDate = LocalDate.now().plusYears(1)) {
 
   companion object {
@@ -24,6 +25,6 @@ data class Företagsbiljett(val number: TicketNumber,
   }
 
   enum class Status {
-    Available, Pending, Used
+    Available, Pending, Used, Expired
   }
 }

@@ -4,13 +4,16 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.web.services.FöretagsbiljettService
 
 @RestController
-class UserController(val userRepository: UserRepository) {
+class UserController(val userRepository: UserRepository,
+                     val företagsbiljettService: FöretagsbiljettService) {
   companion object {
     private const val BASE_PATH = Application.API_BASE_PATH + "/users"
     private const val ME_PATH = BASE_PATH + "/me"
@@ -22,6 +25,23 @@ class UserController(val userRepository: UserRepository) {
     return userRepository
       .findById(currentLoggedInUser)
       .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
+  }
+
+  @GetMapping(ME_PATH + "/ftgtickets",  produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  fun getFtgTickets(): List<FöretagsbiljettDTO> {
+    val currentLoggedInUser = currentLoggedInUser()
+    return userRepository
+            .findById(currentLoggedInUser)
+            .map { u -> u.foretagsbiljetter }
+            .map { tickets ->
+              tickets.map { t ->
+                FöretagsbiljettDTO(number = t.number.number,
+                        expires = t.expires,
+                        status = this.företagsbiljettService.getStatusOfTicket(t))
+              }
+            }
+            .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
+
   }
 
   @GetMapping(BASE_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
