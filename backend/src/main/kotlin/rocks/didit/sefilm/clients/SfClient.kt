@@ -5,6 +5,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.domain.dto.*
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -31,8 +32,9 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     val sfAggregationRequest = SfAggregationRequest(filters, "dates", listOf(SfAggregationProperty("TimeUtc")))
     val body = SfRequestAggregations(listOf(sfAggregationRequest))
 
-    val aggregationsEntity = HttpEntity<SfRequestAggregations>(body, httpEntity.headers)
-    val responseBody = restTemplate.exchange(AGGREGATIONS_URL, HttpMethod.POST, aggregationsEntity, SfResponseAggregations::class.java).body
+    val aggregationsEntity = HttpEntity(body, httpEntity.headers)
+    val responseBody = restTemplate.exchange(AGGREGATIONS_URL, HttpMethod.POST, aggregationsEntity, SfResponseAggregations::class.java)
+      .body ?: throw ExternalProviderException("Response body is null")
 
     return responseBody.aggregations.first().buckets.map {
       LocalDate.parse(it.properties["timeUtc"].toString())
@@ -43,19 +45,18 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
   fun getScreensForDateAndMovie(sfId: String, date: String): SfShowListingEntitiesDTO =
     restTemplate
       .exchange("$API_URL/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
-      .body
+      .body ?: throw ExternalProviderException("Response body is null")
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO {
-    val responseEntity = restTemplate
-      .exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId)
-    return responseEntity.body
+    val responseEntity = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId)
+    return responseEntity.body ?: throw ExternalProviderException("Response body is null")
   }
 
   fun allMovies(cityAlias: String = "GB"): List<SfMovieDTO> {
     return restTemplate
       .exchange("$API_URL/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
         httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
-      .body
+      .body ?: listOf()
   }
 
   // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
@@ -63,7 +64,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<SfTicketDTO>>() {})
-      .body
+      .body ?: listOf()
   }
 
   /** Returns base64 encoding jpeg of the ticket */
@@ -71,7 +72,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     val url = "$API_URL/v2/barcode/{ticketId}/128/128"
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, String::class.java, ticketId)
-      .body
+      .body ?: ""
       .replace("\"", "")
   }
 

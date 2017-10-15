@@ -1,5 +1,5 @@
 ### Pending migrations ###
-
+db.getCollection('user').updateMany( {}, {$unset: {"bioklubbnummer": "", "sfMembershipId": ""}})
 
 
 ### Migrations already done in deployed application ###

@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { sum } from "lodash";
 
 import Modal from "./Modal";
 import Field from "../../Field";
@@ -35,39 +34,31 @@ const ForetagsBiljetterList = ({ tickets }) =>
     )}
   </div>;
 
-const sumBioklubbkortsnummer = tickets =>
-  sum(
-    tickets
-      .map(t => t.bioklubbnummer)
-      .map(nbr => parseInt(nbr === null ? 0 : nbr, 10))
-  );
-
 const UserItem = withUserLoader(({ user }) =>
   <li>
     {user.firstName} '{user.nick}' {user.lastName}
   </li>
 );
 
-const usersWithoutBioklubbnummer = tickets => {
+const usersWithoutSfMembershipIds = tickets => {
   return tickets
-    .filter(t => t.bioklubbnummer === null)
+    .filter(t => t.sfMembershipId === null)
     .map(t => t.userId)
     .map(userId => <UserItem key={userId} userId={userId} />);
 };
 
-const BioklubbkortsnummerList = ({ tickets, participants }) =>
+const SfMembershipListList = ({ tickets, participants }) =>
   <div>
-    <SmallHeader>Bioklubbnummer</SmallHeader>
+    <SmallHeader>SF medlemsnummer</SmallHeader>
     {tickets
-      .filter(t => t.bioklubbnummer !== null)
-      .map(t => <CopyValue key={t.userId} text={t.bioklubbnummer} />)}
+      .filter(t => t.sfMembershipId !== null)
+      .map(t => <CopyValue key={t.userId} text={t.sfMembershipId} />)}
     <hr />
-    = {sumBioklubbkortsnummer(tickets)}
-    {usersWithoutBioklubbnummer(tickets).length !== participants.length &&
+    {usersWithoutSfMembershipIds(tickets).length !== participants.length &&
       <div>
-        {usersWithoutBioklubbnummer(tickets).length} deltagare saknar
-        bioklubbnummer:
-        <ul>{usersWithoutBioklubbnummer(tickets)}</ul>
+        {usersWithoutSfMembershipIds(tickets).length} deltagare saknar
+        SF medlemsnummer:
+        <ul>{usersWithoutSfMembershipIds(tickets)}</ul>
       </div>}
   </div>;
 
@@ -76,14 +67,13 @@ const BuyModal = ({
   ticketLink,
   setPrice,
   setTicketLink,
-  loading,
   buyData,
   handleMarkBought,
   handlePaidChange,
   closeModal,
   showing
 }) => {
-  if (!buyData || loading) {
+  if (!buyData) {
     return (
       <Modal>
         <Center>
@@ -128,7 +118,7 @@ const BuyModal = ({
               <ForetagsBiljetterList
                 tickets={participantsWithForetagsbiljett}
               />
-              <BioklubbkortsnummerList
+              <SfMembershipListList
                 tickets={tickets}
                 participants={participants}
               />
@@ -158,7 +148,6 @@ BuyModal.propTypes = {
   ticketPrice: PropTypes.number.isRequired,
   showing: PropTypes.object.isRequired,
   setPrice: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
   buyData: PropTypes.object,
   handleMarkBought: PropTypes.func.isRequired,
   handlePaidChange: PropTypes.func.isRequired,

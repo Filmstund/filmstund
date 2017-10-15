@@ -58,8 +58,8 @@ class UserController(val userRepository: UserRepository,
     assertNoDuplicateForetagsbiljetter(newDetails.foretagsbiljetter)
 
     val newBioklubbnummer = when {
-      newDetails.bioklubbnummer.isNullOrBlank() -> null
-      else -> Bioklubbnummer(newDetails.bioklubbnummer!!)
+      newDetails.sfMembershipId.isNullOrBlank() -> null
+      else -> SfMembershipId(newDetails.sfMembershipId!!)
     }
 
     val newPhoneNumber = when {
@@ -70,7 +70,7 @@ class UserController(val userRepository: UserRepository,
     val updatedUser = currentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
-      bioklubbnummer = newBioklubbnummer,
+      sfMembershipId = newBioklubbnummer,
       foretagsbiljetter = newDetails.foretagsbiljetter.map { Företagsbiljett.valueOf(it) })
 
     return userRepository.save(updatedUser)

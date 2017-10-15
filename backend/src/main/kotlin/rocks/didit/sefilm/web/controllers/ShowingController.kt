@@ -112,6 +112,7 @@ class ShowingController(private val repo: ShowingRepository,
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
     if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
+    if (showing.movieId == null) throw BadRequestException("Missing movie ID for showing ${showing.id}")
 
     val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
     val runtime = movie.getDurationOrDefault()
@@ -147,7 +148,7 @@ class ShowingController(private val repo: ShowingRepository,
         else -> null
       }
 
-      UserToTicketMap(user.id, user.bioklubbnummer, ftgTicket)
+      UserToTicketMap(user.id, user.sfMembershipId, ftgTicket)
     }
 
     return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)
@@ -203,7 +204,7 @@ class ShowingController(private val repo: ShowingRepository,
         val suppliedTicket = body.paymentOption.ticketNumber ?: throw MissingParametersException("företagsbiljett ticket number")
         val ticketNumber = TicketNumber(suppliedTicket)
 
-        assertFöretagsticketIsAvailable(userId, ticketNumber)
+        assertForetagsbiljettIsAvailable(userId, ticketNumber)
         FtgBiljettParticipant(userId, ticketNumber)
       }
       PaymentType.Swish -> SwishParticipant(userId)
@@ -214,6 +215,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     return savedShowing.participants.map(Participant::redact)
   }
+
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun unattend(@PathVariable id: UUID): List<Participant> {
@@ -238,6 +240,9 @@ class ShowingController(private val repo: ShowingRepository,
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {
+    if (this.location == null) {
+      throw IllegalArgumentException("Location may not be null")
+    }
     val location = locationRepo
       .findById(this.location)
       .orElseGet { locationRepo.save(Location(name = this.location)) }
@@ -294,12 +299,12 @@ class ShowingController(private val repo: ShowingRepository,
 
   private fun assertUserHasPhoneNumber(userID: UserID) {
     val user = findUser(userID)
-    if (user.phone == null || user.phone.number.isNullOrBlank()) {
+    if (user.phone == null || user.phone.number.isBlank()) {
       throw MissingPhoneNumberException()
     }
   }
 
-  private fun assertFöretagsticketIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
+  private fun assertForetagsbiljettIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
     val user = findUser(userId)
     val matchingTickets = user.foretagsbiljetter.filter {
       it.number == suppliedTicket
@@ -318,6 +323,9 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo): String {
+    if (showing.movieId == null) {
+      throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
+    }
     val movieTitle = movieRepo
       .findById(showing.movieId)
       .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
@@ -352,6 +360,9 @@ class ShowingController(private val repo: ShowingRepository,
       .orElseThrow { NotFoundException("user " + userID) }
 
   private fun getSfBuyLink(showing: Showing): String? {
+    if (showing.movieId == null) {
+      throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
+    }
     val movie = movieRepo
       .findById(showing.movieId)
       .orElseThrow { NotFoundException("movie '${showing.movieId}") }
