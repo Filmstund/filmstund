@@ -1,5 +1,6 @@
 ### Pending migrations ###
 db.getCollection('user').updateMany( {}, {$unset: {"bioklubbnummer": "", "sfMembershipId": ""}})
+db.getCollection('movie').updateMany({poster: /.*msprod-catalogapi.*/}, {$unset: {"poster": ""}})
 
 
 ### Migrations already done in deployed application ###
