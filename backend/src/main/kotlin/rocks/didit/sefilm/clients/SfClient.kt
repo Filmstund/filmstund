@@ -55,7 +55,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     return restTemplate
       .exchange("$API_URL/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
         httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
-      .body
+      .body ?: listOf()
   }
 
   // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
@@ -63,7 +63,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<SfTicketDTO>>() {})
-      .body
+      .body ?: listOf()
   }
 
   /** Returns base64 encoding jpeg of the ticket */
@@ -71,7 +71,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     val url = "$API_URL/v2/barcode/{ticketId}/128/128"
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, String::class.java, ticketId)
-      .body
+      .body ?: ""
       .replace("\"", "")
   }
 

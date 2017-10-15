@@ -13,9 +13,6 @@ data class SfMovieDTO(val ncgId: String,
                       val releaseDate: LocalDate,
                       val rating: SfRatingDTO,
                       val posterUrl: String,
-                      val badge: String,
-                      val isNew: Boolean,
-                      val isUpcoming: Boolean,
                       val slug: String)
 
 data class SfOriginalLanguageDTO(val alias: String,
