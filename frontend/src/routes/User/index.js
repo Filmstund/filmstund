@@ -54,7 +54,7 @@ class User extends Component {
       editedUser: {
         nick: me.nick || "",
         phone: me.phone || "",
-        bioklubbnummer: me.bioklubbnummer || "",
+        sfMembershipId: me.sfMembershipId || "",
         foretagsbiljetter: me.foretagsbiljetter || []
       }
     };
@@ -109,7 +109,7 @@ class User extends Component {
     const { me, className, error, success } = this.props;
     const {
       phone,
-      bioklubbnummer,
+      sfMembershipId,
       nick,
       foretagsbiljetter
     } = this.state.editedUser;
@@ -133,18 +133,20 @@ class User extends Component {
             onChange={v => this.setEditedUserValue("nick", v)}
           />
         </Field>
-        <Field text="Bioklubbnummer:">
+        <Field text="SF medlemsnummer:">
           <Input
             type="text"
-            value={bioklubbnummer}
-            maxLength={11}
-            onChange={v => this.setEditedUserValue("bioklubbnummer", v)}
+            value={sfMembershipId}
+            placeholder="XXX-XXX"
+            maxLength={7}
+            onChange={v => this.setEditedUserValue("sfMembershipId", v)}
           />
         </Field>
         <Field text="Telefonnummer:">
           <Input
             type="phone"
             value={phone}
+            placeholder={"07x-000 00 00"}
             onChange={v => this.setEditedUserValue("phone", v)}
           />
         </Field>

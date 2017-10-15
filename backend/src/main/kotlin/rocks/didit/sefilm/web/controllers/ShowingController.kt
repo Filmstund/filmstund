@@ -147,7 +147,7 @@ class ShowingController(private val repo: ShowingRepository,
         else -> null
       }
 
-      UserToTicketMap(user.id, user.bioklubbnummer, ftgTicket)
+      UserToTicketMap(user.id, user.sfMembershipId, ftgTicket)
     }
 
     return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)

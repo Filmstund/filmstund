@@ -1,5 +1,5 @@
 ### Pending migrations ###
-
+db.getCollection('user').updateMany( {}, {$rename: {"bioklubbnummer": "sfMembershipId"}})
 
 
 ### Migrations already done in deployed application ###
