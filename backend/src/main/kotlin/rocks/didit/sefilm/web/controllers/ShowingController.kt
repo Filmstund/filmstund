@@ -78,7 +78,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val updatedShowing = repo.save(updateShowing)
     if (body.ticketsBought) {
-      markAllFöretagsbiljetterAsUsed(showing.participants)
+      markAllForetagsbiljetterAsUsed(showing.participants)
       createInitialPaymentInfo(updateShowing)
     }
 
@@ -98,7 +98,7 @@ class ShowingController(private val repo: ShowingRepository,
       googleCalenderClient.deleteEvent(showing.calendarEventId)
     }
     if (!showing.ticketsBought) {
-      markAllFöretagsbiljetterAsAvailable(showing.participants)
+      markAllForetagsbiljetterAsAvailable(showing.participants)
     }
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
@@ -112,6 +112,7 @@ class ShowingController(private val repo: ShowingRepository,
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
     if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
+    if (showing.movieId == null) throw BadRequestException("Missing movie ID for showing ${showing.id}")
 
     val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
     val runtime = movie.getDurationOrDefault()
@@ -153,7 +154,7 @@ class ShowingController(private val repo: ShowingRepository,
     return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)
   }
 
-  private fun markAllFöretagsbiljetterAs(participants: Set<Participant>, status: Företagsbiljett.Status) {
+  private fun markAllForetagsbiljetterAs(participants: Set<Participant>, status: Företagsbiljett.Status) {
     val relevantParticipants = participants
       .filter { it is FtgBiljettParticipant }
       .map { it as FtgBiljettParticipant }
@@ -165,10 +166,10 @@ class ShowingController(private val repo: ShowingRepository,
     userRepo.saveAll(updatedUsers)
   }
 
-  private fun markAllFöretagsbiljetterAsUsed(participants: Set<Participant>) = markAllFöretagsbiljetterAs(participants, Företagsbiljett.Status.Used)
-  private fun markAllFöretagsbiljetterAsAvailable(participants: Set<Participant>) = markAllFöretagsbiljetterAs(participants, Företagsbiljett.Status.Available)
+  private fun markAllForetagsbiljetterAsUsed(participants: Set<Participant>) = markAllForetagsbiljetterAs(participants, Företagsbiljett.Status.Used)
+  private fun markAllForetagsbiljetterAsAvailable(participants: Set<Participant>) = markAllForetagsbiljetterAs(participants, Företagsbiljett.Status.Available)
 
-  private fun markFöretagsbiljettAsAvailable(userID: UserID, ticketNumber: TicketNumber) {
+  private fun markForetagsbiljettAsAvailable(userID: UserID, ticketNumber: TicketNumber) {
     userRepo.save(updateFtgbiljettStatusOnUser(findUser(userID), ticketNumber, Företagsbiljett.Status.Available))
   }
 
@@ -237,8 +238,8 @@ class ShowingController(private val repo: ShowingRepository,
         val suppliedTicket = body.paymentOption.ticketNumber ?: throw MissingParametersException("företagsbiljett ticket number")
         val ticketNumber = TicketNumber(suppliedTicket)
 
-        assertFöretagsticketIsAvailable(userId, ticketNumber)
-        markFöretagsbiljettAsPending(userId, ticketNumber)
+        assertForetagsbiljettIsAvailable(userId, ticketNumber)
+        markForetagsbiljettAsPending(userId, ticketNumber)
         FtgBiljettParticipant(userId, ticketNumber)
       }
       PaymentType.Swish -> SwishParticipant(userId)
@@ -250,7 +251,7 @@ class ShowingController(private val repo: ShowingRepository,
     return savedShowing.participants.map(Participant::redact)
   }
 
-  private fun markFöretagsbiljettAsPending(userId: UserID, ticketNumber: TicketNumber) {
+  private fun markForetagsbiljettAsPending(userId: UserID, ticketNumber: TicketNumber) {
     val user = getUser(userId)
     val updatedUser = updateFtgbiljettStatusOnUser(user, ticketNumber, Företagsbiljett.Status.Pending)
     userRepo.save(updatedUser)
@@ -271,7 +272,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val participant = participantLst.first()
     if (participant is FtgBiljettParticipant) {
-      markFöretagsbiljettAsAvailable(userId, participant.ticketNumber)
+      markForetagsbiljettAsAvailable(userId, participant.ticketNumber)
     }
 
     val participantsWithoutLoggedInUser = showing.participants.minus(participant)
@@ -282,6 +283,9 @@ class ShowingController(private val repo: ShowingRepository,
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {
+    if (this.location == null) {
+      throw IllegalArgumentException("Location may not be null")
+    }
     val location = locationRepo
       .findById(this.location)
       .orElseGet { locationRepo.save(Location(name = this.location)) }
@@ -338,12 +342,12 @@ class ShowingController(private val repo: ShowingRepository,
 
   private fun assertUserHasPhoneNumber(userID: UserID) {
     val user = findUser(userID)
-    if (user.phone == null || user.phone.number.isNullOrBlank()) {
+    if (user.phone == null || user.phone.number.isBlank()) {
       throw MissingPhoneNumberException()
     }
   }
 
-  private fun assertFöretagsticketIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
+  private fun assertForetagsbiljettIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
     val user = findUser(userId)
     val matchingTickets = user.foretagsbiljetter.filter {
       it.number == suppliedTicket
@@ -362,6 +366,9 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo): String {
+    if (showing.movieId == null) {
+      throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
+    }
     val movieTitle = movieRepo
       .findById(showing.movieId)
       .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
@@ -396,6 +403,9 @@ class ShowingController(private val repo: ShowingRepository,
       .orElseThrow { NotFoundException("user " + userID) }
 
   private fun getSfBuyLink(showing: Showing): String? {
+    if (showing.movieId == null) {
+      throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
+    }
     val movie = movieRepo
       .findById(showing.movieId)
       .orElseThrow { NotFoundException("movie '${showing.movieId}") }

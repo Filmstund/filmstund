@@ -91,8 +91,8 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     validateApiKeyExists(tmdbId)
 
     val url = TMDB_INFO_URL.format(tmdbId.value, properties.tmdb.apikey)
-    val body = restTemplate.exchange<TmdbMovieDetails>(url, HttpMethod.GET, httpEntity, TmdbMovieDetails::class).body
-    return body
+    return restTemplate.exchange<TmdbMovieDetails>(url, HttpMethod.GET, httpEntity, TmdbMovieDetails::class).body
+      ?: throw ExternalProviderException("Null response body")
   }
 
   private fun validateProviderId(id: ExternalProviderId) {
@@ -116,6 +116,6 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
 
   private fun jsonToSearchResult(json: String): ImdbSearchResults {
     val objectMapper = Jackson2ObjectMapperBuilder.json().build<ObjectMapper>()
-    return objectMapper.readValue<ImdbSearchResults>(json)
+    return objectMapper.readValue(json)
   }
 }
