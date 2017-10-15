@@ -10,6 +10,7 @@ import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 
 internal fun currentLoggedInUser(): UserID {
   val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
@@ -28,12 +29,12 @@ internal fun Showing.isLoggedInUserAdmin(): Boolean {
 internal fun SfExtendedMovieDTO.toMovie() =
   Movie(sfId = this.ncgId,
     sfSlug = this.slug,
-    title = this.title,
+    title = this.title ?: "N/A",
     poster = this.posterUrl,
-    releaseDate = this.releaseDate,
+    releaseDate = this.releaseDate ?: LocalDate.EPOCH,
     originalTitle = this.originalTitle,
-    genres = this.genres.map { (name) -> name },
-    runtime = Duration.ofMinutes(this.length),
+    genres = this.genres?.map { (name) -> name } ?: listOf(),
+    runtime = Duration.ofMinutes(this.length ?: 0L),
     productionYear = this.productionYear,
     synopsis = this.shortDescription)
 

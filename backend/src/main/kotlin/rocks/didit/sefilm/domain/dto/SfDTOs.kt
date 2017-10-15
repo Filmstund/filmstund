@@ -24,24 +24,24 @@ data class SfPersonDTO(val displayName: String?, val firstName: String?, val las
 
 data class SfGenreDTO(val name: String)
 
-data class SfExtendedMovieDTO(val ncgId: String,
-                              val languageId: String,
-                              val originalLanguage: String,
-                              val originalLanguages: Collection<SfOriginalLanguageDTO>,
-                              val productionYear: Int,
-                              val producers: Collection<SfPersonDTO>,
-                              val genres: Collection<SfGenreDTO>,
-                              val title: String,
-                              val originalTitle: String,
-                              val shortDescription: String,
+data class SfExtendedMovieDTO(val ncgId: String?,
+                              val languageId: String?,
+                              val originalLanguage: String?,
+                              val originalLanguages: Collection<SfOriginalLanguageDTO>?,
+                              val productionYear: Int?,
+                              val producers: Collection<SfPersonDTO>?,
+                              val genres: Collection<SfGenreDTO>?,
+                              val title: String?,
+                              val originalTitle: String?,
+                              val shortDescription: String?,
                               val longDescription: String?,
-                              val releaseDate: LocalDate,
-                              val actors: Collection<SfPersonDTO>,
-                              val directors: Collection<SfPersonDTO>,
-                              val rating: SfRatingDTO,
-                              val length: Long,
-                              val posterUrl: String,
-                              val slug: String)
+                              val releaseDate: LocalDate?,
+                              val actors: Collection<SfPersonDTO>?,
+                              val directors: Collection<SfPersonDTO>?,
+                              val rating: SfRatingDTO?,
+                              val length: Long?,
+                              val posterUrl: String?,
+                              val slug: String?)
 
 data class SfAttributeDTO(val alias: String, val displayName: String)
 

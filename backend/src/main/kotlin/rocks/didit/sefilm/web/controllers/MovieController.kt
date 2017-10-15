@@ -47,11 +47,11 @@ class MovieController(private val repo: MovieRepository,
   @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
-      body.sf != null -> sfClient.fetchExtendedInfo(body.sf).toMovie()
+      body.sf != null -> sfClient.fetchExtendedInfo(body.sf)?.toMovie()
       body.tmdb != null -> imdbClient.movieDetailsExact(body.tmdb.toTmdbId()).toMovie()
       body.imdb != null -> imdbClient.movieDetails(body.imdb.toImdbId()).toMovie()
       else -> throw MissingParametersException()
-    }
+    } ?: return ResponseEntity.unprocessableEntity().build()
 
     val movie = repo.save(movieInfo)
     val createdUri = b.path(PATH_WITH_ID).buildAndExpand(movie.id).toUri()
@@ -111,7 +111,7 @@ class MovieController(private val repo: MovieRepository,
     return attributes.map { a ->
       try {
         SfTag.valueOf(a.displayName)
-      } catch(e: IllegalArgumentException) {
+      } catch (e: IllegalArgumentException) {
         log.warn("SfTag with name $a does not exist")
         return@map null
       }
