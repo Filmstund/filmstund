@@ -12,12 +12,18 @@ import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
 class PendingShowing extends Component {
   constructor(props) {
     super(props);
-    console.log(props.ftgTickets);
     this.state = {
       modalOpen: false,
       selectedIndex: 0,
       paymentOptions: createPaymentOptions(props.ftgTickets || [])
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      selectedIndex: 0,
+      paymentOptions: createPaymentOptions(nextProps.ftgTickets || [])
+    });
   }
 
   setPaymentOption = e => {
@@ -66,9 +72,9 @@ class PendingShowing extends Component {
   };
 
   handleClickAttend = () => {
-    const { handleAttend, me } = this.props;
+    const { handleAttend, ftgTickets } = this.props;
     const { paymentOptions } = this.state;
-    if (me.foretagsbiljetter.length > 0) {
+    if (ftgTickets.length > 0) {
       this.setState({ modalOpen: true });
     } else {
       // Attend with Swish option

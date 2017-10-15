@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
 import { compose, withProps } from "recompose";
 
 import { getJson } from "../../lib/fetch";
+import { ftgTickets as ftgTicketsActions } from "../../store/reducers";
 
 import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
 import Showing, { getStatus } from "../../Showing";
@@ -22,6 +24,8 @@ class SingleShowing extends Component {
   componentWillMount() {
     if (this.props.showing.ticketsBought) {
       this.requestPaymentInfo();
+    } else {
+      this.props.requestTickets();
     }
   }
 
@@ -79,11 +83,12 @@ class SingleShowing extends Component {
 
     return (
       <div className={className}>
-        {swish &&
+        {swish && (
           <SwishModal
             payData={payData}
             closeSwish={() => this.setState({ swish: false })}
-          />}
+          />
+        )}
         <Showing
           setTitleTag={true}
           movieId={showing.movieId}
@@ -109,6 +114,9 @@ const routerParamsToShowingId = ({ match }) => {
 };
 
 export default compose(
+  connect(null, {
+    requestTickets: ftgTicketsActions.actions.requestSingle
+  }),
   withProps(routerParamsToShowingId),
   withShowingRouteLoader
 )(SingleShowing);
