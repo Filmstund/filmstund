@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import moment from "moment";
 import styled from "styled-components";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { SingleDatePicker as DatePicker } from "react-dates";
+import moment from "moment";
+import 'react-dates/lib/css/_datepicker.css';
 import Field from "../../Field";
 import { SmallHeader } from "../../Header";
 import Input from "../../Input";
@@ -15,7 +15,7 @@ const ForetagsbiljettWrapper = styled.div`
   padding: 0.5em 0;
 `;
 
-const ForetagsbiljettInput = styled(Input)`
+const ForetagsbiljettInput = styled(Input) `
   max-width: 13.6em;
 `;
 
@@ -25,7 +25,7 @@ const TrashIcon = styled.span`
   cursor: pointer;
 `;
 
-const BiljettField = styled(Field)`
+const BiljettField = styled(Field) `
   padding: 0 0.5em;
 `;
 
@@ -41,8 +41,10 @@ const AddForetagsbiljettContainer = styled.div`
 `;
 
 const Foretagsbiljett = ({
+  dateFocused,
   biljett,
   index,
+  handleChangeFocus,
   handleChangeForetagsbiljett,
   handleSetExpiresForetagsbiljett,
   handleRemoveForetagsbiljett
@@ -58,8 +60,11 @@ const Foretagsbiljett = ({
     </BiljettField>
     <BiljettField text="Utgångsdatum">
       <DatePicker
-        selected={moment(biljett.expires)}
-        onChange={v => handleSetExpiresForetagsbiljett(index, v)}
+        numberOfMonths={1}
+        focused={dateFocused}
+        onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
+        onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
+        date={moment(biljett.expires)}
       />
     </BiljettField>
     <BiljettField text="Status">
@@ -75,6 +80,10 @@ const Foretagsbiljett = ({
   </ForetagsbiljettWrapper>;
 
 export default class ForetagsbiljettList extends Component {
+  state = {
+    focusedIndex: -1
+  };
+
   updateForetagsbiljett = (index, biljett) => {
     const { biljetter } = this.props;
 
@@ -91,6 +100,12 @@ export default class ForetagsbiljettList extends Component {
       })
     );
   };
+
+  handleChangeFocus = (index, focused) => {
+    this.setState(state => ({
+      focusedIndex: !focused ? -1 : index
+    }))
+  }
 
   handleChangeForetagsbiljett = (index, { target: { value } }) => {
     this.updateForetagsbiljett(index, { number: value });
@@ -117,6 +132,7 @@ export default class ForetagsbiljettList extends Component {
 
   render() {
     const { biljetter } = this.props;
+    const { focusedIndex } = this.state;
 
     return (
       <div>
@@ -126,6 +142,8 @@ export default class ForetagsbiljettList extends Component {
             key={i}
             biljett={biljett}
             index={i}
+            dateFocused={i === focusedIndex}
+            handleChangeFocus={this.handleChangeFocus}
             handleChangeForetagsbiljett={this.handleChangeForetagsbiljett}
             handleSetExpiresForetagsbiljett={
               this.handleSetExpiresForetagsbiljett
