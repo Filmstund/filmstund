@@ -36,4 +36,18 @@ class SfMembershipIdTest {
     val e = assertThrows(IllegalArgumentException::class.java, { SfMembershipId("123+456") })
     assertThat(e).hasMessageContaining("is an invalid membership id. Expected XXX-XXX")
   }
+
+  @Test
+  fun testValueOfWithoutDash() {
+    val profileId = "asdfgh"
+    val membershipId = SfMembershipId.valueOf(profileId)
+    assertThat(membershipId.value).isEqualTo("asd-fgh")
+  }
+
+  @Test
+  fun testValueOfWithDash() {
+    val profileId = "asd-fgh"
+    val membershipId = SfMembershipId.valueOf(profileId)
+    assertThat(membershipId.value).isEqualTo("asd-fgh")
+  }
 }

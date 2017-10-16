@@ -73,8 +73,8 @@ class UserController(val userRepository: UserRepository,
   @PutMapping(ME_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
     val newBioklubbnummer = when {
-      newDetails.sfMembershipId.isNullOrBlank() -> null
-      else -> SfMembershipId(newDetails.sfMembershipId!!)
+      newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
+      else -> SfMembershipId.valueOf(newDetails.sfMembershipId)
     }
 
     val newPhoneNumber = when {
