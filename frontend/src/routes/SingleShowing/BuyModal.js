@@ -26,11 +26,18 @@ const Close = styled.div`
   cursor: pointer;
 `;
 
+const UserTooltip = withUserLoader(({ user, children }) =>
+  <div title={`${user.firstName} '${user.nick}' ${user.lastName}`}>
+    {children}
+  </div>);
+
 const ForetagsBiljetterList = ({ tickets }) =>
   <div>
     <SmallHeader>Företagsbiljetter</SmallHeader>
-    {tickets.map(t =>
-      <CopyValue key={t.foretagsbiljett} text={t.foretagsbiljett} />
+    {tickets.map(ticket =>
+      <UserTooltip userId={ticket.userId} ticket={ticket}>
+        <CopyValue key={ticket.foretagsbiljett} text={ticket.foretagsbiljett} />
+      </UserTooltip>
     )}
   </div>;
 
@@ -40,26 +47,35 @@ const UserItem = withUserLoader(({ user }) =>
   </li>
 );
 
-const usersWithoutSfMembershipIds = tickets => {
-  return tickets
+
+const renderUsersWithoutSfMembershipIds = tickets => {
+  const userIdsWithoutSfMembershipIds = tickets
     .filter(t => t.sfMembershipId === null)
-    .map(t => t.userId)
-    .map(userId => <UserItem key={userId} userId={userId} />);
-};
+    .map(t => t.userId);
+
+  if (userIdsWithoutSfMembershipIds.length > 0) {
+    return <div>
+      {userIdsWithoutSfMembershipIds.length} deltagare saknar
+      SF medlemsnummer:
+      <ul>{userIdsWithoutSfMembershipIds.map(userId =>
+        <UserItem key={userId} userId={userId} />
+      )}</ul>
+    </div>
+  } else {
+    return null;
+  }
+}
 
 const SfMembershipListList = ({ tickets, participants }) =>
   <div>
     <SmallHeader>SF medlemsnummer</SmallHeader>
     {tickets
       .filter(t => t.sfMembershipId !== null)
-      .map(t => <CopyValue key={t.userId} text={t.sfMembershipId} />)}
+      .map(t => <UserTooltip userId={t.userId}>
+        <CopyValue key={t.userId} text={t.sfMembershipId} />
+      </UserTooltip>)}
     <hr />
-    {usersWithoutSfMembershipIds(tickets).length !== participants.length &&
-      <div>
-        {usersWithoutSfMembershipIds(tickets).length} deltagare saknar
-        SF medlemsnummer:
-        <ul>{usersWithoutSfMembershipIds(tickets)}</ul>
-      </div>}
+    {renderUsersWithoutSfMembershipIds(tickets)}
   </div>;
 
 const BuyModal = ({
