@@ -69,7 +69,6 @@ class ShowingController(private val repo: ShowingRepository,
       else -> showing.location
     }
 
-    // TODO update calendar event
     val updateShowing = showing.copy(
       price = SEK(body.price),
       private = body.private,
@@ -215,7 +214,6 @@ class ShowingController(private val repo: ShowingRepository,
 
     return savedShowing.participants.map(Participant::redact)
   }
-
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun unattend(@PathVariable id: UUID): List<Participant> {
