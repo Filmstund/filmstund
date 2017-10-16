@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { getJson } from "../../lib/fetch";
 import Loader from "../../ProjectorLoader";
+import sflogo from '../../assets/sf.jpg'
 
 const TicketWrapper = styled.div`
   margin: 3rem 0;
@@ -45,13 +46,13 @@ const ShowAttribute = styled.span`
   background: #d6d6d6;
 `;
 
-const FlexRowPaddingContainer = styled(FlexRowContainer)`padding: 1rem`;
+const FlexRowPaddingContainer = styled(FlexRowContainer) `padding: 1rem`;
 
 const CompanyHeader = ({ cinema }) =>
   <FlexRowContainer style={{ marginBottom: "1rem" }}>
     <img
       alt="Sf logo"
-      src="https://msprod-catalogapi.dxcloud.episerver.net/images/ncg-images/37aca75e43d44104b54405cca445dd33.jpg?width=120&version=46D168EDFD626F8CFB66B4E2E0EED76C"
+      src={sflogo}
       style={{ height: "3rem", width: "auto", marginRight: "1rem" }}
     />
     <FlexColumnContainer>
@@ -113,29 +114,29 @@ const TicketCustomerType = ({ customerType }) =>
     {customerType}
   </FlexRowContainer>;
 
-const TicketCode = ({ src, id }) => {
+const TicketCode = ({ src, id, profileId }) => {
   return (
     <FlexRowContainer style={{ marginBottom: "1rem" }}>
-      <FlexColumnContainer style={{ alignItems: "center" }}>
+      <FlexColumnContainer style={{ alignItems: "left" }}>
         <img alt={id} src={src} />
         <div>
-          {id}
+          {id} {profileId}
         </div>
       </FlexColumnContainer>
     </FlexRowContainer>
   );
 };
 
-export default class Ticket extends Component {
+export default class TicketContainer extends Component {
   state = {
-    ticketdata: null,
+    tickets: null,
     error: null
   };
 
   componentWillMount() {
     getJson(`/tickets/${this.props.showingId}`).then(
-      ticketdata => {
-        this.setState({ ticketdata });
+      tickets => {
+        this.setState({ tickets });
       },
       err => {
         this.setState({
@@ -146,43 +147,50 @@ export default class Ticket extends Component {
   }
 
   render() {
-    const { ticketdata, error } = this.state;
+    const { tickets, error } = this.state;
     if (error) {
       return (
         <div>
           {error}
         </div>
       );
-    } else if (!ticketdata) {
+    } else if (!tickets) {
       return <Loader />;
     } else {
-      const {
-        id,
-        cinema,
-        time,
-        date,
-        movieName,
-        movieRating,
-        screen,
-        customerType,
-        showAttributes,
-        seat,
-        barcode
-      } = ticketdata;
-      return (
-        <TicketWrapper>
-          <CompanyHeader cinema={cinema} />
-          <TicketHeader
-            showAttributes={showAttributes}
-            movieName={movieName}
-            movieRating={movieRating}
-          />
-          <TicketDateTime date={date} time={time} />
-          <TicketPlacement screen={screen} seat={seat} />
-          <TicketCustomerType customerType={customerType} />
-          <TicketCode id={id} src={barcode} />
-        </TicketWrapper>
-      );
+      return <div>
+        {tickets.map(ticket =>
+          <Ticket key={ticket.id} {...ticket} />
+        )}
+      </div>
     }
   }
 }
+
+
+const Ticket = ({
+  id,
+  cinema,
+  time,
+  date,
+  movieName,
+  movieRating,
+  screen,
+  customerType,
+  showAttributes,
+  profileId,
+  seat,
+  barcode
+}) => (
+    <TicketWrapper>
+      <CompanyHeader cinema={cinema} />
+      <TicketHeader
+        showAttributes={showAttributes}
+        movieName={movieName}
+        movieRating={movieRating}
+      />
+      <TicketDateTime date={date} time={time} />
+      <TicketPlacement screen={screen} seat={seat} />
+      <TicketCustomerType customerType={customerType} />
+      <TicketCode id={id} profileId={profileId} src={barcode} />
+    </TicketWrapper>
+  );
