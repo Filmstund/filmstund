@@ -34,7 +34,7 @@ class TicketService(private val sfClient: SfClient,
       }
 
       val userIdForThatMember = userRepository
-        .findBySfMembershipId(SfMembershipId(it.profileId))
+        .findBySfMembershipId(SfMembershipId.valueOf(it.profileId))
         ?.id
         ?: showing.admin
       it.toTicket(showing.id, userIdForThatMember, barcode)
