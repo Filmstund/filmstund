@@ -75,8 +75,9 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
     val url = "$API_URL/v2/barcode/{ticketId}/128/128"
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, String::class.java, ticketId)
-      .body ?: ""
-      .replace("\"", "")
+      .body
+      ?.replace("\"", "")
+      ?: ""
   }
 
   fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
