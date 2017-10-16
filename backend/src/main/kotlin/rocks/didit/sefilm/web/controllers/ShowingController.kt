@@ -8,15 +8,15 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
-import rocks.didit.sefilm.clients.GoogleCalenderClient
 import rocks.didit.sefilm.database.entities.*
 import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
 import rocks.didit.sefilm.web.services.FöretagsbiljettService
+import rocks.didit.sefilm.web.services.GoogleCalenderService
+import rocks.didit.sefilm.web.services.TicketService
 import java.time.Duration
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -27,9 +27,9 @@ class ShowingController(private val repo: ShowingRepository,
                         private val movieRepo: MovieRepository,
                         private val userRepo: UserRepository,
                         private val paymentInfoRepo: ParticipantPaymentInfoRepository,
-                        private val ticketManager: TicketManager,
-                        private val googleCalenderClient: GoogleCalenderClient,
-                        private val företagsbiljettService: FöretagsbiljettService) {
+                        private val ticketService: TicketService,
+                        private val googleCalenderService: GoogleCalenderService,
+                        private val foretagsbiljettService: FöretagsbiljettService) {
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/showings"
     private const val PATH_WITH_ID = PATH + "/{id}"
@@ -85,7 +85,7 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     if (body.sfTicketLink != null && body.sfTicketLink.isNotBlank()) {
-      ticketManager.processTickets(body.sfTicketLink, updatedShowing)
+      ticketService.processTickets(body.sfTicketLink, updatedShowing)
     }
 
     return updatedShowing
@@ -97,12 +97,12 @@ class ShowingController(private val repo: ShowingRepository,
     assertLoggedInUserIsAdmin(showing)
 
     if (showing.calendarEventId != null) {
-      googleCalenderClient.deleteEvent(showing.calendarEventId)
+      googleCalenderService.deleteEvent(showing.calendarEventId)
     }
 
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     repo.delete(showing)
-    ticketManager.deleteTickets(showing)
+    ticketService.deleteTickets(showing)
 
     return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
   }
@@ -127,7 +127,7 @@ class ShowingController(private val repo: ShowingRepository,
     )
 
     log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
-    val createdEventId = googleCalenderClient.createEvent(event)
+    val createdEventId = googleCalenderService.createEvent(event)
     val updatedShowing = showing.copy(calendarEventId = createdEventId)
     repo.save(updatedShowing)
 
@@ -317,7 +317,7 @@ class ShowingController(private val repo: ShowingRepository,
       throw DuplicateTicketException(": $suppliedTicket")
     }
 
-    if (företagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Företagsbiljett.Status.Available) {
+    if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Företagsbiljett.Status.Available) {
       throw BadRequestException("Ticket has already been used: " + suppliedTicket.number)
     }
   }
@@ -371,11 +371,6 @@ class ShowingController(private val repo: ShowingRepository,
       movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
       else -> null
     }
-  }
-
-  private fun getUser(userId: UserID): User {
-    return userRepo.findById(userId)
-      .orElseThrow { NotFoundException(" user with ID: " + userId) }
   }
 
   private fun PhoneNumber?.orElseThrow(exceptionSupplier: () -> Exception): PhoneNumber {

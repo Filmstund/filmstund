@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.clients
+package rocks.didit.sefilm.web.services
 
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Value
@@ -13,7 +13,7 @@ import rocks.didit.sefilm.domain.dto.CalendarEventDTO
 import rocks.didit.sefilm.oauthAccessToken
 
 @Component
-class GoogleCalenderClient(private val restTemplate: RestTemplate) {
+class GoogleCalenderService(private val restTemplate: RestTemplate) {
   companion object {
     const val API_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events"
   }
@@ -21,7 +21,7 @@ class GoogleCalenderClient(private val restTemplate: RestTemplate) {
   @Value("\${google.clientSecret}")
   private val clientSecret: String? = null
 
-  val log = Logger.getLogger(GoogleCalenderClient::class.java)
+  val log = Logger.getLogger(GoogleCalenderService::class.java)
 
   /** @return the event id of the newly created event */
   fun createEvent(event: CalendarEventDTO): String {
