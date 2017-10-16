@@ -49,7 +49,9 @@ class TicketController(private val ticketRepository: TicketRepository,
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, currentLoggedInUser)
   }
 
-  @PostMapping("/{showingId}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PostMapping("/{showingId}",
+    consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE),
+    produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
   fun processTickets(@PathVariable showingId: UUID, @RequestBody urls: List<String>): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
     val showing = showingRepository.findById(showingId)
