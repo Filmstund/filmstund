@@ -64,6 +64,6 @@ class TicketService(private val sfClient: SfClient,
       customerType = this.customerType, customerTypeDefinition = this.customerTypeDefinition, cinema = this.cinema.title,
       cinemaCity = this.cinema.city.name, screen = this.screen.title, seat = seat, date = this.show.date, time = this.show.time,
       movieName = this.movie.title, movieRating = this.movie.rating.displayName, showAttributes = this.show.attributes.map { it.displayName },
-      barcode = barcode)
+      barcode = barcode, profileId = this.profileId)
   }
 }
