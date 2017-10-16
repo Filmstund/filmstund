@@ -20,6 +20,7 @@ buildscript {
 
 plugins {
   id("org.ajoberstar.grgit") version "2.0.1"
+  id("net.researchgate.release") version "2.6.0"
 }
 
 apply plugin: "kotlin"
@@ -109,16 +110,6 @@ tasks {
   task printVersion  {
     description = "Prints the current version"
     println("Current version: $version")
-  }
-
-  task tagRelease {
-    description = "Tags the current head with the project's version."
-    doLast {
-      grgit.tag.add {
-        name = version
-        message = "Release of ${version}"
-      }
-    }
   }
 }
 
