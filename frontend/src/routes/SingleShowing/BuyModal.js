@@ -64,9 +64,9 @@ const SfMembershipListList = ({ tickets, participants }) =>
 
 const BuyModal = ({
   ticketPrice,
-  ticketLink,
+  cinemaTicketUrls,
   setPrice,
-  setTicketLink,
+  setCinemaTicketUrls,
   buyData,
   handleMarkBought,
   handlePaidChange,
@@ -130,10 +130,12 @@ const BuyModal = ({
                   onChange={event => setPrice(event.target.value)}
                 />
               </Field>
-              <Field text="Biljettlänk:">
-                <Input
-                  value={ticketLink}
-                  onChange={event => setTicketLink(event.target.value)}
+              <Field text="SF-biljettlänkar: (en per rad)">
+                <textarea
+                  cols={90}
+                  rows={5}
+                  value={cinemaTicketUrls.join('\n')}
+                  onChange={event => setCinemaTicketUrls(event.target.value.split('\n'))}
                 />
               </Field>
               <MainButton>Markera som bokad</MainButton>

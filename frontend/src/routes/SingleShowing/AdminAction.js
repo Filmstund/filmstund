@@ -30,7 +30,7 @@ class AdminAction extends Component {
       isCreatingEvent: false,
       adminMessage: null,
       ticketPrice: oreToKr(props.showing.price),
-      sfTicketLink: "",
+      cinemaTicketUrls: [],
       buyData: null,
       showModal: false
     };
@@ -44,9 +44,9 @@ class AdminAction extends Component {
     });
   };
 
-  setTicketLink = sfTicketLink => {
+  setCinemaTicketUrls = cinemaTicketUrls => {
     this.setState({
-      sfTicketLink
+      cinemaTicketUrls
     });
   };
 
@@ -89,12 +89,12 @@ class AdminAction extends Component {
     event.preventDefault();
 
     const { showing } = this.props;
-    const { sfTicketLink, ticketPrice } = this.state;
+    const { cinemaTicketUrls, ticketPrice } = this.state;
 
     this.props
       .requestUpdate({
         id: showing.id,
-        sfTicketLink,
+        cinemaTicketUrls: cinemaTicketUrls.filter(line => line.trim().length !== 0),
         price: ticketPrice * 100,
         ticketsBought: true
       })
@@ -147,7 +147,7 @@ class AdminAction extends Component {
     const {
       isCreatingEvent,
       ticketPrice,
-      sfTicketLink,
+      cinemaTicketUrls,
       showModal,
       buyData,
       adminMessage
@@ -158,12 +158,12 @@ class AdminAction extends Component {
       <BuyModal
         key="buymodal"
         setPrice={this.setPrice}
-        setTicketLink={this.setTicketLink}
+        setCinemaTicketUrls={this.setCinemaTicketUrls}
         showing={showing}
         handleMarkBought={this.handleMarkBought}
         handlePaidChange={this.handlePaidChange}
         ticketPrice={ticketPrice}
-        ticketLink={sfTicketLink}
+        cinemaTicketUrls={cinemaTicketUrls}
         buyData={buyData}
         closeModal={() =>
           this.setState({ showModal: false, buyData: null })}
