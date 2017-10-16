@@ -93,7 +93,7 @@ class AdminAction extends Component {
 
     this.props
       .requestUpdate({
-        ...showing,
+        id: showing.id,
         sfTicketLink,
         price: ticketPrice * 100,
         ticketsBought: true
