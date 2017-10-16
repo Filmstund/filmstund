@@ -22,6 +22,7 @@ const AsyncUser = asyncComponent(() => import("./routes/User"));
 const AsyncShowings = asyncComponent(() => import("./routes/Showings"));
 const AsyncNewShowing = asyncComponent(() => import("./routes/NewShowing"));
 const AsyncEditShowing = asyncComponent(() => import("./routes/EditShowing"));
+const AsyncShowingTickets = asyncComponent(() => import("./routes/ShowingTickets"));
 const AsyncSingleShowing = asyncComponent(() =>
   import("./routes/SingleShowing")
 );
@@ -43,6 +44,10 @@ class App extends Component {
             <Route
               path="/showings/new/:movieId?"
               component={AsyncNewShowing}
+            />
+            <Route
+              path="/showings/:showingId/tickets"
+              component={AsyncShowingTickets}
             />
             <Route
               path="/showings/:showingId/edit"

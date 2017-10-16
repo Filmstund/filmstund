@@ -9,6 +9,7 @@ import Header, { SmallHeader } from "../../Header";
 import CopyValue from "../../CopyValue";
 import Center from "../../Center";
 import Loader from "../../ProjectorLoader";
+import TicketURLInput from "../../TicketURLInput";
 import PaymentParticipantsList from "./PaymentParticipantsList";
 import withUserLoader from "../../loaders/UserLoader";
 import ParticipantsList from "./ParticipantsList";
@@ -131,11 +132,9 @@ const BuyModal = ({
                 />
               </Field>
               <Field text="SF-biljettlänkar: (en per rad)">
-                <textarea
-                  cols={90}
-                  rows={5}
-                  value={cinemaTicketUrls.join('\n')}
-                  onChange={event => setCinemaTicketUrls(event.target.value.split('\n'))}
+                <TicketURLInput
+                  cinemaTicketUrls={cinemaTicketUrls}
+                  onChange={setCinemaTicketUrls}
                 />
               </Field>
               <MainButton>Markera som bokad</MainButton>
