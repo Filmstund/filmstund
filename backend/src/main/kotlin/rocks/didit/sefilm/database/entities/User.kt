@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.database.entities
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import rocks.didit.sefilm.domain.Företagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
@@ -16,6 +17,7 @@ data class User(
   val lastName: String? = null,
   val nick: String? = null,
   val email: String = "",
+  @Indexed(unique = true, sparse = true)
   val sfMembershipId: SfMembershipId? = null,
   val phone: PhoneNumber? = null,
   val avatar: String? = null,
