@@ -147,7 +147,6 @@ const BuyModal = ({
 };
 
 BuyModal.propTypes = {
-  ticketPrice: PropTypes.number.isRequired,
   showing: PropTypes.object.isRequired,
   setPrice: PropTypes.func.isRequired,
   buyData: PropTypes.object,

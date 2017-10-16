@@ -40,7 +40,7 @@ class AdminAction extends Component {
     const int = parseInt(price, 10);
 
     this.setState({
-      ticketPrice: isNaN(int) ? 0 : int
+      ticketPrice: isNaN(int) ? "" : int
     });
   };
 
