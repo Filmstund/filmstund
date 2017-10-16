@@ -12,7 +12,7 @@ import rocks.didit.sefilm.web.services.FöretagsbiljettService
 
 @RestController
 class UserController(val userRepository: UserRepository,
-                     val företagsbiljettService: FöretagsbiljettService) {
+                     val foretagsbiljettService: FöretagsbiljettService) {
   companion object {
     private const val BASE_PATH = Application.API_BASE_PATH + "/users"
     private const val ME_PATH = BASE_PATH + "/me"
@@ -37,14 +37,14 @@ class UserController(val userRepository: UserRepository,
       .map {
         FöretagsbiljettDTO(number = it.number.number,
           expires = it.expires,
-          status = this.företagsbiljettService.getStatusOfTicket(it))
+          status = this.foretagsbiljettService.getStatusOfTicket(it))
       }
   }
 
   @PutMapping(FTG_TICKET_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun updateFtgTickets(@RequestBody tickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
-    assertNoDuplicateForetagsbiljetter(tickets)
-    val tickets = tickets.map { Företagsbiljett.valueOf(it) }
+  fun updateFtgTickets(@RequestBody suppliedFtgTickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
+    assertNoDuplicateForetagsbiljetter(suppliedFtgTickets)
+    val tickets = suppliedFtgTickets.map { Företagsbiljett.valueOf(it) }
     val updatedUser = currentUser().copy(
       foretagsbiljetter = tickets
     )
@@ -55,7 +55,7 @@ class UserController(val userRepository: UserRepository,
       FöretagsbiljettDTO(
         number = f.number.number,
         expires = f.expires,
-        status = this.företagsbiljettService.getStatusOfTicket(f)
+        status = this.foretagsbiljettService.getStatusOfTicket(f)
       )
     }
 

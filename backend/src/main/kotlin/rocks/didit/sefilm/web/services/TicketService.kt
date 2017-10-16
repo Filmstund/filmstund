@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.web.services
 
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.SfTicketException
@@ -7,11 +7,12 @@ import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.TicketRepository
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
 import java.util.*
 
 @Component
-class TicketManager(private val sfClient: SfClient,
+class TicketService(private val sfClient: SfClient,
                     private val ticketRepository: TicketRepository) {
 
   fun processTickets(userSuppliedTicketUrl: String, showing: Showing) {
