@@ -1,34 +1,56 @@
 package rocks.didit.sefilm.web.services
 
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.TicketRepository
+import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
 import java.util.*
 
 @Component
 class TicketService(private val sfClient: SfClient,
+                    private val userRepository: UserRepository,
                     private val ticketRepository: TicketRepository) {
 
-  fun processTickets(userSuppliedTicketUrl: String, showing: Showing) {
+  fun processTickets(userSuppliedTicketUrl: List<String>, showing: Showing) {
+    userSuppliedTicketUrl.forEach {
+      processTicketUrl(it, showing)
+    }
+  }
+
+  private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {
+    val (sysId, sfShowingId, ticketId) = extractIdsFromUrl(userSuppliedTicketUrl)
+    val sfTickets = sfClient.fetchTickets(sysId, sfShowingId, ticketId)
+
+    val tickets = sfTickets.map {
+      val barcode = sfClient.fetchBarcode(it.id)
+      if (it.profileId == null || it.profileId.isBlank()) {
+        return@map it.toTicket(showing.id, showing.admin, barcode)
+      }
+
+      val userIdForThatMember = userRepository
+        .findBySfMembershipId(SfMembershipId(it.profileId))
+        ?.id
+        ?: showing.admin
+      it.toTicket(showing.id, userIdForThatMember, barcode)
+
+    }
+
+    ticketRepository.saveAll(tickets)
+  }
+
+  private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {
     val parts = userSuppliedTicketUrl.split('/')
     val ids = parts.subList(parts.size - 3, parts.size)
-    val sfTickets = sfClient.fetchTickets(ids[0], ids[1], ids[2])
-
-    if (showing.participants.size != sfTickets.size) {
-      throw SfTicketException("Ticket mismatch: Showing (${showing.id}) has ${showing.participants.size} participants, but SF supplied ${sfTickets.size} tickets")
+    if (ids.size != 3) {
+      throw IllegalArgumentException("$userSuppliedTicketUrl does not contain three ids.")
     }
-
-    val tickets = showing.participants.mapIndexed { index, participant ->
-      val barcode = sfClient.fetchBarcode(sfTickets[index].id)
-      sfTickets[index].toTicket(showing.id, participant.extractUserId(), barcode)
-    }
-    ticketRepository.saveAll(tickets)
+    return Triple(ids[0], ids[1], ids[2])
   }
 
   fun deleteTickets(showing: Showing) {

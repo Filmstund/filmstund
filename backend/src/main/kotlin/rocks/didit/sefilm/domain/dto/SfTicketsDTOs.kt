@@ -3,18 +3,22 @@ package rocks.didit.sefilm.domain.dto
 import java.time.LocalDate
 import java.time.LocalTime
 
-data class SfTicketDTO(val cinema: SfCinemaDTO,
-                       val customerType: String,
-                       val customerTypeDefinition: String,
-                       val id: String,
-                       val labels: Map<String, Any?>,
-                       val movie: SfNamedMovieDTO,
-                       val products: List<Map<Any, Any>>,
-                       val receipt: Map<String, Any>,
-                       val screen: SfTicketScreenDTO,
-                       val seat: SfSeatDTO,
-                       val show: SfTicketShowDTO,
-                       val toiletCode: String
+data class SfTicketDTO(
+  val id: String,
+  val profileId: String?,
+  val customerTypeDefinition: String,
+  val customerType: String,
+  val qrCode: String,
+  val toiletCode: String,
+  val isRefunded: Boolean,
+  val cinema: SfCinemaDTO,
+  val movie: SfNamedMovieDTO,
+  val show: SfTicketShowDTO,
+  val seat: SfSeatDTO,
+  val screen: SfTicketScreenDTO,
+  val receipt: Map<String, Any>,
+  val labels: Map<String, Any?>,
+  val products: List<Map<Any, Any>>
 )
 
 data class SfCinemaDTO(val city: SfCityDTO, val title: String, val company: Map<String, Any?>)

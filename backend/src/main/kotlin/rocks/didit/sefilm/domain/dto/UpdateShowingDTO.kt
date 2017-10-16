@@ -10,4 +10,5 @@ data class UpdateShowingDTO(val price: Long = 0,
                             val expectedBuyDate: LocalDate? = null,
                             val location: String? = null,
                             val time: LocalTime? = null,
-                            val sfTicketLink: String? = null)
+                            /** Links to SF tickets, i.e https://www.sf.se/bokning/mina-e-biljetter/Sys99-SE/AA-1033-201712132045/RE-XXXXXXXXXX */
+                            val cinemaTicketUrls: List<String> = listOf())
