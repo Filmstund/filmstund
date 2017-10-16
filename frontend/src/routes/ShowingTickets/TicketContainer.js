@@ -58,6 +58,10 @@ export default class TicketContainer extends Component {
     </Field>
   };
 
+  handleGoBackToShowing = () => {
+    this.props.history.goBack();
+  };
+
   render() {
     const { tickets, error } = this.state;
     const { me, showing } = this.props;
@@ -65,13 +69,17 @@ export default class TicketContainer extends Component {
     if (error) {
       return (
         <div>
-          {error}
+          <MainButton onClick={this.handleGoBackToShowing}>Tillbaka till visning</MainButton>
+          <div>
+            {error}
+          </div>
         </div>
       );
     } else if (!tickets) {
       return <Loader />;
     } else {
       return <div>
+        <MainButton onClick={this.handleGoBackToShowing}>Tillbaka till visning</MainButton>
         {tickets.map(ticket =>
           <Ticket key={ticket.id} {...ticket} />
         )}

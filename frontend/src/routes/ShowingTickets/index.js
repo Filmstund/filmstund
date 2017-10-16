@@ -1,5 +1,6 @@
 import { compose, withProps } from "recompose";
 import { connect } from "react-redux";
+import { withRouter } from "react-router";
 import TicketContainer from "./TicketContainer";
 import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
 
@@ -17,6 +18,7 @@ export default compose(
   }), {
       requestUpdate: showingActions.actions.requestUpdate
     }),
+  withRouter,
   withProps(routerParamsToShowingId),
   withShowingRouteLoader
 )(TicketContainer);
