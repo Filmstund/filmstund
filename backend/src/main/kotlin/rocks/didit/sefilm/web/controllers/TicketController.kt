@@ -31,7 +31,7 @@ class TicketController(private val ticketRepository: TicketRepository,
   }
 
   @GetMapping("/{showingId}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
-  fun myTicket(@PathVariable showingId: UUID): Ticket {
+  fun myTickets(@PathVariable showingId: UUID): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
 
     val participant = paymentInfoRepository
@@ -45,6 +45,5 @@ class TicketController(private val ticketRepository: TicketRepository,
     }
 
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, currentLoggedInUser)
-      .orElseThrow { NotFoundException("ticket for this user and showing") }
   }
 }
