@@ -2,7 +2,6 @@ import React from "react";
 import Loader from "../../ProjectorLoader";
 import withUserLoader from "../../loaders/UserLoader";
 import MainButton from "../../MainButton";
-import Ticket from "./Ticket";
 
 const PayToUser = withUserLoader(({ user }) =>
   <span>
@@ -11,7 +10,7 @@ const PayToUser = withUserLoader(({ user }) =>
   </span>
 );
 
-const BoughtShowing = ({ payData, showing, openSwish }) => {
+const BoughtShowing = ({ payData, showing, onClickTickets, openSwish }) => {
   if (!payData) {
     return <Loader />;
   }
@@ -20,17 +19,17 @@ const BoughtShowing = ({ payData, showing, openSwish }) => {
 
   const openSwishLink = () => openSwish(swishLink);
 
-  return (
-    <div>
-      {hasPaid && showing && <Ticket showingId={showing.id} />}
-      {!hasPaid &&
-        <div>
-          Betala <strong>{amountOwed / 100} kr</strong> till{" "}
-          <PayToUser userId={payTo} />
-          <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
-        </div>}
+  if (hasPaid) {
+    if (showing) {
+      return <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>
+    }
+  } else {
+    return <div>
+      Betala <strong>{amountOwed / 100} kr</strong> till{" "}
+      <PayToUser userId={payTo} />
+      <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
     </div>
-  );
+  }
 };
 
 export default BoughtShowing;

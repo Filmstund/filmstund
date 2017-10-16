@@ -1,52 +1,53 @@
-import React, { Component } from "react";
+import React from "react";
 import styled from "styled-components";
-import { getJson } from "../../lib/fetch";
-import Loader from "../../ProjectorLoader";
 import sflogo from '../../assets/sf.jpg'
 
+
 const TicketWrapper = styled.div`
-  margin: 3rem 0;
-  padding: 1rem;
-  max-width: 24rem;
-  border: .0625rem dotted #c5c5c5;
+margin: 3rem 0;
+padding: 1rem;
+max-width: 24rem;
+border: .0625rem dotted #c5c5c5;
 `;
+
 const FlexRowContainer = styled.div`
-  display: flex;
-  flex-direction: row;
+display: flex;
+flex-direction: row;
 `;
 
 const FlexSpaceRowContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+display: flex;
+flex-direction: row;
+justify-content: space-between;
 `;
 
 const FlexColumnContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+display: flex;
+flex-direction: column;
+justify-content: center;
 `;
 
 const HeaderText = styled.div`
-  font-size: 1.375rem;
-  font-weight: bold;
+font-size: 1.375rem;
+font-weight: bold;
 `;
 
 const LabelText = styled.div`
-  font-size: 0.75rem;
-  opacity: 0.54;
+font-size: 0.75rem;
+opacity: 0.54;
 `;
 
 const ShowAttribute = styled.span`
-  display: inline-block;
-  font-size: 0.625rem;
-  padding: .125rem .25rem;
-  color: #000;
-  margin-right: 0.25rem;
-  background: #d6d6d6;
+display: inline-block;
+font-size: 0.625rem;
+padding: .125rem .25rem;
+color: #000;
+margin-right: 0.25rem;
+background: #d6d6d6;
 `;
 
 const FlexRowPaddingContainer = styled(FlexRowContainer) `padding: 1rem`;
+
 
 const CompanyHeader = ({ cinema }) =>
   <FlexRowContainer style={{ marginBottom: "1rem" }}>
@@ -127,46 +128,6 @@ const TicketCode = ({ src, id, profileId }) => {
   );
 };
 
-export default class TicketContainer extends Component {
-  state = {
-    tickets: null,
-    error: null
-  };
-
-  componentWillMount() {
-    getJson(`/tickets/${this.props.showingId}`).then(
-      tickets => {
-        this.setState({ tickets });
-      },
-      err => {
-        this.setState({
-          error: "Ingen biljett registrerad för köpet"
-        });
-      }
-    );
-  }
-
-  render() {
-    const { tickets, error } = this.state;
-    if (error) {
-      return (
-        <div>
-          {error}
-        </div>
-      );
-    } else if (!tickets) {
-      return <Loader />;
-    } else {
-      return <div>
-        {tickets.map(ticket =>
-          <Ticket key={ticket.id} {...ticket} />
-        )}
-      </div>
-    }
-  }
-}
-
-
 const Ticket = ({
   id,
   cinema,
@@ -194,3 +155,6 @@ const Ticket = ({
       <TicketCode id={id} profileId={profileId} src={barcode} />
     </TicketWrapper>
   );
+
+
+export default Ticket;

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { withRouter } from "react-router";
 
 import { compose, withProps } from "recompose";
 
@@ -51,6 +52,12 @@ class SingleShowing extends Component {
     return showing.participants.some(p => p.userId === me.id);
   };
 
+  navigateToTickets = () => {
+    const { showing } = this.props;
+
+    this.props.history.push(`/showings/${showing.id}/tickets`)
+  };
+
   renderBoughtOrPendingShowing = () => {
     const { showing } = this.props;
     const { payData } = this.state;
@@ -60,6 +67,7 @@ class SingleShowing extends Component {
         return (
           <BoughtShowing
             showing={showing}
+            onClickTickets={this.navigateToTickets}
             openSwish={this.openSwish}
             payData={payData}
           />
@@ -117,6 +125,7 @@ export default compose(
   connect(null, {
     requestTickets: ftgTicketsActions.actions.requestSingle
   }),
+  withRouter,
   withProps(routerParamsToShowingId),
   withShowingRouteLoader
 )(SingleShowing);
