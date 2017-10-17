@@ -41,6 +41,7 @@ import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.BudordController
 import java.io.IOException
+import java.time.Instant
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -152,7 +153,10 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                         lastName = principal.lastName,
                         nick = principal.firstName ?: "Houdini",
                         email = principal.username ?: "",
-                        avatar = principal.avatarUrl)
+                        avatar = principal.avatarUrl,
+                        lastLogin = Instant.now(),
+                        signupDate = Instant.now()
+                  )
                 userRepository.save(newUser)
                 log.info("Created new user ${newUser.id}")
             } else {
@@ -160,7 +164,8 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
                     it.copy(name = "${principal.firstName} ${principal.lastName}",
                             firstName = principal.firstName,
                             lastName = principal.lastName,
-                            avatar = principal.avatarUrl)
+                            avatar = principal.avatarUrl,
+                            lastLogin = Instant.now())
                 }.get()
                 val savedUser = userRepository.save(updatedUser)
                 if (savedUser != updatedUser) {
