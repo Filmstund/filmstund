@@ -124,17 +124,17 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
       throw BadCredentialsException("Could not obtain access token", e)
     }
 
-        try {
-            val idToken = accessToken.additionalInformation["id_token"].toString()
-            val tokenDecoded = JwtHelper.decode(idToken)
+    try {
+      val idToken = accessToken.additionalInformation["id_token"].toString()
+      val tokenDecoded = JwtHelper.decode(idToken)
 
-            val authInfo: Map<String, String> = ObjectMapper().readValue(tokenDecoded.claims)
+      val authInfo: Map<String, String> = ObjectMapper().readValue(tokenDecoded.claims)
 
-            val user = OpenIdConnectUserDetails(authInfo, accessToken)
-            return UsernamePasswordAuthenticationToken(user, null, user.authorities)
-        } catch (e: InvalidTokenException) {
-            throw BadCredentialsException("Could not obtain user details from token", e)
-        }
+      val user = OpenIdConnectUserDetails(authInfo, accessToken)
+      return UsernamePasswordAuthenticationToken(user, null, user.authorities)
+    } catch (e: InvalidTokenException) {
+      throw BadCredentialsException("Could not obtain user details from token", e)
+    }
 
   }
 
@@ -145,33 +145,33 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
       val principal = authentication?.principal as OpenIdConnectUserDetails?
         ?: throw BadCredentialsException("Successful authentication without a given principal")
 
-            val maybeUser = userRepository.findById(UserID(principal.userId))
-            if (!maybeUser.isPresent) {
-                val newUser = User(id = UserID(principal.userId),
-                        name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
-                        firstName = principal.firstName,
-                        lastName = principal.lastName,
-                        nick = principal.firstName ?: "Houdini",
-                        email = principal.username ?: "",
-                        avatar = principal.avatarUrl,
-                        lastLogin = Instant.now(),
-                        signupDate = Instant.now()
-                  )
-                userRepository.save(newUser)
-                log.info("Created new user ${newUser.id}")
-            } else {
-                val updatedUser = maybeUser.map {
-                    it.copy(name = "${principal.firstName} ${principal.lastName}",
-                            firstName = principal.firstName,
-                            lastName = principal.lastName,
-                            avatar = principal.avatarUrl,
-                            lastLogin = Instant.now())
-                }.get()
-                val savedUser = userRepository.save(updatedUser)
-                if (savedUser != updatedUser) {
-                    log.info("Updated user ${savedUser.id}")
-                }
-            }
+      val maybeUser = userRepository.findById(UserID(principal.userId))
+      if (!maybeUser.isPresent) {
+        val newUser = User(id = UserID(principal.userId),
+          name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
+          firstName = principal.firstName,
+          lastName = principal.lastName,
+          nick = principal.firstName ?: "Houdini",
+          email = principal.username ?: "",
+          avatar = principal.avatarUrl,
+          lastLogin = Instant.now(),
+          signupDate = Instant.now()
+        )
+        userRepository.save(newUser)
+        log.info("Created new user ${newUser.id}")
+      } else {
+        val updatedUser = maybeUser.map {
+          it.copy(name = "${principal.firstName} ${principal.lastName}",
+            firstName = principal.firstName,
+            lastName = principal.lastName,
+            avatar = principal.avatarUrl,
+            lastLogin = Instant.now())
+        }.get()
+        val savedUser = userRepository.save(updatedUser)
+        if (savedUser != updatedUser) {
+          log.info("Updated user ${savedUser.id}")
+        }
+      }
 
       val redirectPath = request.session.getAttribute("redirectPath").toString()
       request.session.setAttribute("redirectPath", null)
@@ -195,8 +195,7 @@ class OpenIdConnectUserDetails(userInfo: Map<String, String>, accessToken: OAuth
   val firstName: String? = userInfo["given_name"]
   val lastName: String? = userInfo["family_name"]
   val avatarUrl: String? = userInfo["picture"]
-  val verifiedMail: Boolean = userInfo["email_verified"]?.toBoolean() ?: false
-    val accessToken: OAuth2AccessToken = accessToken
+  val accessToken: OAuth2AccessToken = accessToken
 
   override fun getUsername(): String? {
     return username
@@ -236,8 +235,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
   @Autowired
   private val userRepository: UserRepository? = null
 
-    @Value("\${login.baseRedirectUri}")
-    private lateinit var loginRedirectUri: String
+  @Value("\${login.baseRedirectUri}")
+  private lateinit var loginRedirectUri: String
 
   @Value("\${login.defaultRedirectPath}")
   private lateinit var defaultRedirectPath: String
