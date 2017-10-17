@@ -36,7 +36,7 @@ import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.domain.MovieTitleExtension
 
 @SpringBootApplication
-@EnableMongoHttpSession
+@EnableMongoHttpSession(maxInactiveIntervalInSeconds = 43200)
 //@EnableMongoAuditing // TODO enable when it works together with EnableMongoHttpSession
 @EnableCaching
 @EnableWebSecurity
