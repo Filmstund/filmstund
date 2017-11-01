@@ -18,22 +18,10 @@ const selectShowing = connect(mapStateToProps, { ...fetchers });
 
 const withShowingData = lifecycle({
   componentDidMount() {
-    const {
-      showingId,
-      showing,
-      fetchShowing,
-      fetchUser,
-      fetchMe,
-      fetchMovie
-    } = this.props;
+    const { showingId, fetchShowing, fetchMe } = this.props;
 
     fetchMe();
-    if (showing) {
-      fetchUser(showing.admin);
-      fetchMovie(showing.movieId);
-    } else {
-      fetchShowing(showingId);
-    }
+    fetchShowing(showingId);
   }
 });
 
