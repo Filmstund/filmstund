@@ -34,6 +34,7 @@ import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.domain.MovieTitleExtension
+import java.time.Duration
 
 @SpringBootApplication
 @EnableMongoHttpSession(maxInactiveIntervalInSeconds = 43200)
@@ -51,7 +52,7 @@ class Application {
   }
 
   @Bean
-  fun mongoSessionConverter(): AbstractMongoSessionConverter = JdkMongoSessionConverter()
+  fun mongoSessionConverter(): AbstractMongoSessionConverter = JdkMongoSessionConverter(Duration.ofSeconds(43200))
 
   @Bean
   fun customMongoConverters(): MongoCustomConversions {
