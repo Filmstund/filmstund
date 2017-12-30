@@ -3,10 +3,6 @@ package rocks.didit.sefilm.domain.dto
 import java.time.LocalDate
 
 data class TmdbFindExternalResults(val movie_results: List<TmdbMovieResult>)
-//val person_results: List<TmdbPersonResult>,
-//val tv_results: List<TmdbTVResult>,
-//val tv_episode_results: List<TmdbTvEpisodeResult>,
-//val tv_season_results: List<TmbdbTvSeasonEpisodeResult>)
 
 data class TmdbMovieResult(val adult: Boolean,
                            val backdrop_path: String?,
@@ -15,7 +11,7 @@ data class TmdbMovieResult(val adult: Boolean,
                            val original_language: String,
                            val original_title: String,
                            val overview: String?,
-                           val release_date: LocalDate,
+                           val release_date: LocalDate?,
                            val poster_path: String?,
                            val popularity: Double,
                            val title: String,
@@ -37,7 +33,7 @@ data class TmdbMovieDetails(
   val popularity: Double,
   val production_companies: List<TmdbProductionCompany>,
   val production_countries: List<TmdbProductionCountry>,
-  val release_date: LocalDate,
+  val release_date: LocalDate?,
   val revenue: Long,
   val runtime: Int?,
   val spoken_languages: List<TmdbSpokenLanguage>,
