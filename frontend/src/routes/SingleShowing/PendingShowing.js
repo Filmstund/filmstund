@@ -72,9 +72,9 @@ class PendingShowing extends Component {
   };
 
   handleClickAttend = () => {
-    const { handleAttend, ftgTickets } = this.props;
+    const { handleAttend } = this.props;
     const { paymentOptions } = this.state;
-    if (ftgTickets.length > 0) {
+    if (paymentOptions.length > 1) {
       this.setState({ modalOpen: true });
     } else {
       // Attend with Swish option
