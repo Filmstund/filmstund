@@ -1,7 +1,9 @@
 package rocks.didit.sefilm.domain.dto
 
+import org.slf4j.LoggerFactory
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class SfRatingDTO(val age: Int,
                        val ageAccompanied: Int,
@@ -45,39 +47,62 @@ data class SfExtendedMovieDTO(val ncgId: String?,
 
 data class SfAttributeDTO(val alias: String, val displayName: String)
 
-data class SfScreenDTO(val ncgId: String, val screenName: String)
+data class SfScreenDTO(val ncgId: String, val title: String, val slug: String, val seatCount: Int, val remoteSystemAlias: String, val remoteEntityId: String)
 
-data class SfShowDTO(val attributes: List<SfAttributeDTO>,
-                     val cinemaId: String,
-                     val cinemaName: String,
-                     val cityAlias: String,
-                     val cityName: String,
-                     val movieId: String,
-                     val movieTitle: String,
-                     val posterUrl: String,
-                     val remoteEntityId: String,
-                     val remoteSystemAlias: String,
-                     val screen: SfScreenDTO,
-                     val time: LocalDateTime)
+data class SfShowItemsDTO(val totalNbrOfItems: Int, val items: List<SfShowDTO>)
 
-data class SfShowListingDTO(val id: String, val name: String, val shows: List<SfShowDTO>)
+data class SfShowDTO(
+  val remoteSystemAlias: String,
+  val remoteEntityId: String,
+  val unnumbered: Boolean,
+  val time: ZonedDateTime,
+  val timeUtc: Instant,
+  val movie: SfMovieDTO,
+  val movieVersion: Map<String, Any>,
+  val attributes: List<SfAttributeDTO>,
+  val cinema: SfCinemaWithAddressDTO,
+  val screen: SfScreenDTO
+)
 
-data class SfShowListingEntitiesDTO(val entities: List<SfShowListingDTO>, val totalNumberOfMatchingItems: Int)
+data class SfCinemaWithAddressDTO(
+  val ncgId: String,
+  val title: String,
+  val address: SfAddressDTO,
+  val slug: String,
+  val remoteSystemAlias: String,
+  val remoteEntityId: String
+)
 
-data class SfAggregationProperty(val name: String)
-data class SfAggregationRequest(val filters: Map<String, Any>,
-                                val name: String,
-                                val properties: List<SfAggregationProperty>)
+data class SfAddressDTO(
+  val phoneNumber: String?,
+  val streetAddress: String,
+  val postalCode: String,
+  val postalAddress: String,
+  val city: Map<String, String>,
+  val country: Map<String, String>,
+  val coordinates: SfCoordinatesDTO
+)
 
-data class SfRequestAggregations(val aggregations: List<SfAggregationRequest>)
+data class SfCoordinatesDTO(val latitude: String, val longitude: String)
 
-data class SfResponseAggregations(val aggregations: List<SfAggregationBuckets>)
-
-data class SfAggregationBuckets(val name: String, val buckets: List<SfBucket>)
-
-data class SfBucket(val properties: Map<String, Any>, val count: Long)
+data class SfShowingDTO(
+  val cinemaName: String,
+  val screenName: String,
+  val seatCount: Int,
+  val timeUtc: Instant,
+  val tags: List<SfTag>
+) {
+  companion object {
+    fun from(show: SfShowDTO) = SfShowingDTO(show.cinema.title,
+      show.screen.title,
+      show.screen.seatCount,
+      show.timeUtc,
+      SfTag.convertTags(show.attributes))
+  }
+}
 
 enum class SfTag {
+  `18år`,
   `3D`,
   VIP,
   TXT,
@@ -88,7 +113,22 @@ enum class SfTag {
   `Ej textad`,
   Textad,
   Familj,
-  Unknown
+  Unknown;
+
+  companion object {
+    private val log = LoggerFactory.getLogger(SfTag::class.java)
+
+    fun convertTags(attributes: List<SfAttributeDTO>): List<SfTag> {
+      return attributes.map { a ->
+        try {
+          SfTag.valueOf(a.displayName)
+        } catch (e: IllegalArgumentException) {
+          log.warn("SfTag with name $a does not exist")
+          return@map null
+        }
+      }.filterNotNull()
+    }
+  }
 }
 
 
