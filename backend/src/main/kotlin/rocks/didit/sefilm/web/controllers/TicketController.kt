@@ -11,6 +11,9 @@ import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
+import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.FirstLast
+import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.web.services.TicketService
 import java.time.LocalDate
 import java.util.*
@@ -35,18 +38,32 @@ class TicketController(private val ticketRepository: TicketRepository,
   @GetMapping("/{showingId}", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun myTickets(@PathVariable showingId: UUID): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
-
-    val participant = paymentInfoRepository
-      .findByShowingIdAndUserId(showingId, currentLoggedInUser)
-      .orElseThrow {
-        throw NotFoundException("user. Not enrolled on this showing")
-      }
-
-    if (!participant.hasPaid) {
-      throw UserHasNotPaidException("User has not paid for this showing")
-    }
+    assertPaidAndEnrolled(showingId, currentLoggedInUser)
 
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, currentLoggedInUser)
+  }
+
+  @GetMapping("/{showingId}/seating-range", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
+  fun seatingRange(@PathVariable showingId: UUID): TicketRange {
+    val currentLoggedInUser = currentLoggedInUser()
+    assertPaidAndEnrolled(showingId, currentLoggedInUser)
+
+    val allSeatsForShowing = ticketRepository.findByShowingId(showingId)
+      .map { it.seat }
+
+    val rows = allSeatsForShowing
+      .map { it.row }
+      .distinct()
+      .sorted()
+
+    val groupedSeats = allSeatsForShowing.groupBy { it.row }
+    val seatingRange = groupedSeats.mapValues {
+      val first = it.value.minBy { it.number }?.number ?: 0
+      val last = it.value.maxBy { it.number }?.number ?: 0
+      FirstLast(first, last, it.value.size)
+    }
+
+    return TicketRange(rows, seatingRange, allSeatsForShowing.size)
   }
 
   @PostMapping("/{showingId}",
@@ -63,5 +80,17 @@ class TicketController(private val ticketRepository: TicketRepository,
 
     ticketService.processTickets(urls, showing)
     return myTickets(showingId)
+  }
+
+  private fun assertPaidAndEnrolled(showingId: UUID, currentLoggedInUser: UserID) {
+    val participant = paymentInfoRepository
+      .findByShowingIdAndUserId(showingId, currentLoggedInUser)
+      .orElseThrow {
+        throw NotFoundException("user. Not enrolled on this showing")
+      }
+
+    if (!participant.hasPaid) {
+      throw UserHasNotPaidException("User has not paid for this showing")
+    }
   }
 }
