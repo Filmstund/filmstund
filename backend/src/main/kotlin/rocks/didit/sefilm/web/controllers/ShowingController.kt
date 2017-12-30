@@ -37,7 +37,7 @@ class ShowingController(private val repo: ShowingRepository,
 
   private val log = LoggerFactory.getLogger(ShowingController::class.java)
 
-  @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findAll(): List<Showing> {
     val showings = repo.findByPrivate(false)
     val fromThisDate = ZonedDateTime.now().minusDays(7).toLocalDate()
@@ -46,12 +46,12 @@ class ShowingController(private val repo: ShowingRepository,
       .map(Showing::withoutSensitiveFields)
   }
 
-  @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findOne(@PathVariable id: UUID): Showing = repo.findById(id).map(Showing::withoutSensitiveFields).orElseThrow { NotFoundException("showing '$id") }
 
   private fun findShowing(id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
 
-  @PutMapping(PATH_WITH_ID, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PutMapping(PATH_WITH_ID, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
@@ -90,7 +90,7 @@ class ShowingController(private val repo: ShowingRepository,
     return updatedShowing
   }
 
-  @DeleteMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @DeleteMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun deleteShowing(@PathVariable id: UUID): SuccessfulStatusDTO {
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
@@ -106,7 +106,7 @@ class ShowingController(private val repo: ShowingRepository,
     return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
   }
 
-  @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun createGoogleCalendarEvent(@PathVariable id: UUID): ResponseStatusDTO {
     val showing = findShowing(id)
     assertLoggedInUserIsAdmin(showing)
@@ -173,7 +173,7 @@ class ShowingController(private val repo: ShowingRepository,
     return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, showing.payToUser, swishTo, currentUser)
   }
 
-  @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   @ResponseStatus(HttpStatus.CREATED)
   fun createShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
     if (body.date == null || body.location == null || body.movieId == null || body.time == null) throw MissingParametersException()
@@ -191,7 +191,7 @@ class ShowingController(private val repo: ShowingRepository,
     return ResponseEntity.created(newLocation).body(savedShowing)
   }
 
-  @PostMapping(PATH_WITH_ID + "/attend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PostMapping(PATH_WITH_ID + "/attend", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant> {
     val showing = findShowing(id)
     val userId = currentLoggedInUser()
@@ -215,7 +215,7 @@ class ShowingController(private val repo: ShowingRepository,
     return savedShowing.participants.map(Participant::redact)
   }
 
-  @PostMapping(PATH_WITH_ID + "/unattend", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PostMapping(PATH_WITH_ID + "/unattend", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun unattend(@PathVariable id: UUID): List<Participant> {
     val showing = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
     val userId = currentLoggedInUser()

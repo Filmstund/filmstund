@@ -22,7 +22,7 @@ class TicketController(private val ticketRepository: TicketRepository,
                        private val ticketService: TicketService,
                        private val paymentInfoRepository: ParticipantPaymentInfoRepository) {
 
-  @GetMapping("/", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping("/", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun allMyTickets(): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
     val now = LocalDate.now()
@@ -32,7 +32,7 @@ class TicketController(private val ticketRepository: TicketRepository,
       }
   }
 
-  @GetMapping("/{showingId}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping("/{showingId}", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun myTickets(@PathVariable showingId: UUID): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
 
@@ -50,8 +50,8 @@ class TicketController(private val ticketRepository: TicketRepository,
   }
 
   @PostMapping("/{showingId}",
-    consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE),
-    produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)],
+    produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun processTickets(@PathVariable showingId: UUID, @RequestBody urls: List<String>): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
     val showing = showingRepository.findById(showingId)

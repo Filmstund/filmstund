@@ -35,16 +35,15 @@ class MovieController(private val repo: MovieRepository,
 
   private val log = LoggerFactory.getLogger(MovieController::class.java)
 
-  @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findAll() = repo.findByArchivedFalse().sortedByDescending { it.popularity }
 
-  @GetMapping(PATH_WITH_ID, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findOne(@PathVariable id: UUID): Movie {
-    val movie = repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
-    return movie
+    return repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
   }
 
-  @PostMapping(PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
       body.sf != null -> sfClient.fetchExtendedInfo(body.sf)?.toMovie()

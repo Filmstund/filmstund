@@ -15,10 +15,10 @@ class BudordController(private val budordRepo: BudordRepository) {
     internal const val PATH = Application.API_BASE_PATH + "/budord"
   }
 
-  @GetMapping(PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun all() = budordRepo.findAll()
 
-  @GetMapping(PATH + "/random", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(PATH + "/random", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun random(): BioBudord {
     val all = budordRepo.findAll()
     val count = all.count() - 1

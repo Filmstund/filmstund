@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.web.services
 
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -21,7 +21,7 @@ class GoogleCalenderService(private val restTemplate: RestTemplate) {
   @Value("\${google.clientSecret}")
   private val clientSecret: String? = null
 
-  val log = Logger.getLogger(GoogleCalenderService::class.java)
+  val log = LoggerFactory.getLogger(GoogleCalenderService::class.java)
 
   /** @return the event id of the newly created event */
   fun createEvent(event: CalendarEventDTO): String {

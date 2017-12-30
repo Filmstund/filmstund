@@ -80,7 +80,10 @@ class Application {
   fun corsConfigurer(): WebMvcConfigurer {
     return object : WebMvcConfigurer {
       override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+        registry.addMapping("/**")
+          .allowedOrigins("http://localhost:3000", "https://bio.didit.rocks")
+          .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+          .allowCredentials(true)
       }
     }
   }

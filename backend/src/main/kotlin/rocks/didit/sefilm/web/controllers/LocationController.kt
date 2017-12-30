@@ -15,10 +15,10 @@ class LocationController(private val repo: LocationRepository) {
     private const val BASE_PATH = Application.API_BASE_PATH + "/locations"
   }
 
-  @GetMapping(BASE_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(BASE_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findAll() = repo.findAll()
 
-  @GetMapping(BASE_PATH + "/{id}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(BASE_PATH + "/{id}", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findOne(@PathVariable id: String): Location {
     return repo.findById(id)
       .orElseThrow { NotFoundException("location '$id'") }

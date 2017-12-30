@@ -43,7 +43,7 @@ class ParticipantInfoController(private val participantInfoRepo: ParticipantPaym
   private fun onlyAllowAdminToContinue(showingId: UUID) {
     val showing = showingRepo
       .findById(showingId)
-      .orElseThrow { NotFoundException("showing '${showingId}") }
+      .orElseThrow { NotFoundException("showing '$showingId") }
     if (!showing.isLoggedInUserAdmin()) {
       throw AccessDeniedException("Only the showing admin can update the participant info")
     }

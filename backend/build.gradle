@@ -1,9 +1,11 @@
 import java.time.ZonedDateTime
 
 buildscript {
-  ext.kotlinVersion = '1.1.60'
-  ext.springBootSnapshotVersion = '2.0.0.M6'
-  ext.junitJupiterVersion = '5.0.2'
+  ext {
+    kotlinVersion = '1.2.10'
+    springBootSnapshotVersion = '2.0.0.M7'
+    junitJupiterVersion = '5.0.2'
+  }
 
   repositories {
     mavenCentral()
@@ -45,6 +47,7 @@ repositories {
 
 dependencies {
   compile("org.springframework.boot:spring-boot-starter-web-services:$springBootSnapshotVersion")
+  compile("org.springframework.boot:spring-boot-starter-logging:$springBootSnapshotVersion")
   compile("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootSnapshotVersion")
   compile("org.springframework.boot:spring-boot-starter-cache:$springBootSnapshotVersion")
   compile("org.springframework.boot:spring-boot-starter-security:$springBootSnapshotVersion")
@@ -53,10 +56,12 @@ dependencies {
   compile("org.springframework.session:spring-session-data-mongodb:2.0.0.RC1")
   compile("org.springframework.session:spring-session-core:2.0.0.RC1")
   compile("com.github.ben-manes.caffeine:caffeine:2.+")
-  compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion")
-  compile("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-  compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.1")
-  compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.1")
+  compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
+  compile("org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}")
+  compile("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
+  compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+  compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.3")
+  compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.3")
   compile("com.googlecode.libphonenumber:libphonenumber:8.4.2")
   compile("com.google.guava:guava:21.0")
   compile("org.jsoup:jsoup:1.10.3")

@@ -2,7 +2,7 @@ package rocks.didit.sefilm.clients
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
@@ -47,7 +47,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
         .replace("é", "e")
   }
 
-  private val log = Logger.getLogger(ImdbClient::class.java)
+  private val log = LoggerFactory.getLogger(ImdbClient::class.java)
 
   private fun lookupTmdbIdFromImdbId(imdbId: IMDbID): TMDbID {
     validateProviderId(imdbId)

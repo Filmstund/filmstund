@@ -14,7 +14,7 @@ class ErrorController(private val errorAttributes: ErrorAttributes) : ErrorContr
     private const val PATH = "/error"
   }
 
-  @RequestMapping(value = PATH)
+  @RequestMapping(value = [PATH])
   internal fun error(request: WebRequest): ErrorDTO {
     val errorAttribs = getErrorAttributes(request, true)
     val exception = getError(request)

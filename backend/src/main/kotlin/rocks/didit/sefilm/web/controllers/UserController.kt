@@ -19,7 +19,7 @@ class UserController(val userRepository: UserRepository,
     private const val FTG_TICKET_PATH = ME_PATH + "/ftgtickets"
   }
 
-  @GetMapping(ME_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(ME_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun currentUser(): User {
     val currentLoggedInUser = currentLoggedInUser()
     return userRepository
@@ -27,7 +27,7 @@ class UserController(val userRepository: UserRepository,
       .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
   }
 
-  @GetMapping(FTG_TICKET_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(FTG_TICKET_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun getFtgTickets(): List<FöretagsbiljettDTO> {
     val currentLoggedInUser = currentLoggedInUser()
     return userRepository
@@ -41,7 +41,7 @@ class UserController(val userRepository: UserRepository,
       }
   }
 
-  @PutMapping(FTG_TICKET_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PutMapping(FTG_TICKET_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateFtgTickets(@RequestBody suppliedFtgTickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
     assertNoDuplicateForetagsbiljetter(suppliedFtgTickets)
     val tickets = suppliedFtgTickets.map { Företagsbiljett.valueOf(it) }
@@ -61,16 +61,16 @@ class UserController(val userRepository: UserRepository,
 
   }
 
-  @GetMapping(BASE_PATH, produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(BASE_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findAll(): Iterable<LimitedUserInfo> = userRepository.findAll().map(User::toLimitedUserInfo)
 
-  @GetMapping(BASE_PATH + "/{id}", produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @GetMapping(BASE_PATH + "/{id}", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findOne(@PathVariable id: UserID): LimitedUserInfo =
     userRepository.findById(id)
       .map(User::toLimitedUserInfo)
       .orElseThrow { NotFoundException("user '$id'") }
 
-  @PutMapping(ME_PATH, consumes = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE), produces = arrayOf(MediaType.APPLICATION_JSON_UTF8_VALUE))
+  @PutMapping(ME_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
     val newBioklubbnummer = when {
       newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
