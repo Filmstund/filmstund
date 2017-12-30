@@ -5,6 +5,8 @@ import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
+import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.SfMembershipId
@@ -15,7 +17,8 @@ import java.util.*
 @Component
 class TicketService(private val sfClient: SfClient,
                     private val userRepository: UserRepository,
-                    private val ticketRepository: TicketRepository) {
+                    private val ticketRepository: TicketRepository,
+                    private val showingRepository: ShowingRepository) {
 
   fun processTickets(userSuppliedTicketUrl: List<String>, showing: Showing) {
     userSuppliedTicketUrl.forEach {
@@ -33,15 +36,24 @@ class TicketService(private val sfClient: SfClient,
         return@map it.toTicket(showing.id, showing.admin, barcode)
       }
 
-      val userIdForThatMember = userRepository
-        .findBySfMembershipId(SfMembershipId.valueOf(it.profileId))
-        ?.id
-        ?: showing.admin
+      val userIdForThatMember = getUserIdFromSfMembershipId(SfMembershipId.valueOf(it.profileId), showing, listOf())
       it.toTicket(showing.id, userIdForThatMember, barcode)
-
     }
 
     ticketRepository.saveAll(tickets)
+  }
+
+  private fun getUserIdFromSfMembershipId(sfMembershipId: SfMembershipId, showing: Showing, attendingUsers: List<User>): UserID {
+    val userIdForThatMember = userRepository
+      .findBySfMembershipId(sfMembershipId)
+      ?.id
+      ?: return showing.admin
+
+    if (showing.participants.any { it.hasUserId(userIdForThatMember) }) {
+      return userIdForThatMember
+    }
+
+    return showing.admin
   }
 
   private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {
