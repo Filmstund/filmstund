@@ -12,7 +12,6 @@ import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.domain.dto.FirstLast
 import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.web.services.TicketService
 import java.time.LocalDate
@@ -50,20 +49,15 @@ class TicketController(private val ticketRepository: TicketRepository,
 
     val allSeatsForShowing = ticketRepository.findByShowingId(showingId)
       .map { it.seat }
+      .sortedBy { it.number }
 
     val rows = allSeatsForShowing
       .map { it.row }
       .distinct()
       .sorted()
 
-    val groupedSeats = allSeatsForShowing.groupBy { it.row }
-    val seatingRange = groupedSeats.mapValues {
-      val first = it.value.minBy { it.number }?.number ?: 0
-      val last = it.value.maxBy { it.number }?.number ?: 0
-      FirstLast(first, last, it.value.size)
-    }
-
-    return TicketRange(rows, seatingRange, allSeatsForShowing.size)
+    val groupedSeats = allSeatsForShowing.groupBy({ it.row }, { it.number })
+    return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
   }
 
   @PostMapping("/{showingId}",
