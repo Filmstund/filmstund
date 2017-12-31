@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.clients
 
+import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -18,6 +19,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
   companion object {
     const val API_URL = "https://www.sf.se/api"
     const val AGGREGATIONS_URL = "$API_URL/v2/show/aggregations"
+    private val log = LoggerFactory.getLogger(SfClient::class.java)
   }
 
   fun getShowingDates(sfId: String): List<LocalDate> {
@@ -65,6 +67,8 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
   // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
   fun fetchTickets(sysId: String, sfShowingId: String, ticketId: String): List<SfTicketDTO> {
     val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
+
+    log.debug("Fetching tickets from $url")
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<SfTicketDTO>>() {})
       .body ?: listOf()
@@ -73,6 +77,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
   /** Returns base64 encoding jpeg of the ticket */
   fun fetchBarcode(ticketId: String): String {
     val url = "$API_URL/v2/barcode/{ticketId}/128/128"
+    log.debug("Fetching barcode from $url")
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, String::class.java, ticketId)
       .body

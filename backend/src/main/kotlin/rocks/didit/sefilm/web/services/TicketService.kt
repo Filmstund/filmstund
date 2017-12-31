@@ -3,6 +3,7 @@ package rocks.didit.sefilm.web.services
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.UserHasNotPaidException
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.currentLoggedInUser
@@ -41,6 +42,7 @@ class TicketService(private val sfClient: SfClient,
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
 
+    validateSfTicketUrls(userSuppliedTicketUrl)
     userSuppliedTicketUrl.forEach {
       processTicketUrl(it, showing)
     }
@@ -118,6 +120,15 @@ class TicketService(private val sfClient: SfClient,
 
     if (!participant.hasPaid) {
       throw UserHasNotPaidException("User has not paid for this showing")
+    }
+  }
+
+  private fun validateSfTicketUrls(links: List<String>) {
+    val linkRegex = Regex(".+sf\\.se/bokning/mina-e-biljetter/Sys.+?/AA.+?/RE.+")
+    links.forEach {
+      if (!it.matches(linkRegex)) {
+        throw SfTicketException("$it does not look lika a valid ticket link. The link should look like this: https://www.sf.se/bokning/mina-e-biljetter/Sys99-SE/AA-1156-201712271800/RE-HPOUKRTI2N")
+      }
     }
   }
 }
