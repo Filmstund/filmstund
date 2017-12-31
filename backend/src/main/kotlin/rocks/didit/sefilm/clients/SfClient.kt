@@ -33,7 +33,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
       .build().toUri()
 
     val responseBody = restTemplate.getForEntity<SfShowItemsDTO>(uri)
-      .body ?: throw ExternalProviderException("Response body is null")
+      .body ?: throw ExternalProviderException("[SF] Response body is null")
 
     return responseBody.items.map { SfShowingDTO.from(it) }
   }
