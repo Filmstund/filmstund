@@ -15,6 +15,7 @@ import PendingShowing from "./PendingShowing";
 import AdminAction from "./AdminAction";
 import ParticipantList from "./ParticipantsList";
 import SwishModal from "./SwishModal";
+import IMDbLink from "../../IMDbLink";
 
 class SingleShowing extends Component {
   state = {
@@ -55,7 +56,7 @@ class SingleShowing extends Component {
   navigateToTickets = () => {
     const { showing } = this.props;
 
-    this.props.history.push(`/showings/${showing.id}/tickets`)
+    this.props.history.push(`/showings/${showing.id}/tickets`);
   };
 
   renderBoughtOrPendingShowing = () => {
@@ -84,7 +85,7 @@ class SingleShowing extends Component {
   };
 
   render() {
-    const { className, showing, me } = this.props;
+    const { className, movie, showing, me } = this.props;
     const { swish, payData } = this.state;
 
     const isAdmin = showing.admin === me.id;
@@ -106,6 +107,7 @@ class SingleShowing extends Component {
           ticketsBought={showing.ticketsBought}
         />
         <ButtonContainer>
+          <IMDbLink imdbId={movie.imdbId} />
           {isAdmin && <AdminAction showing={showing} />}
           {this.renderBoughtOrPendingShowing()}
         </ButtonContainer>
