@@ -36,27 +36,24 @@ const RightArrow = styled.div`
   margin-left: 0.4em;
 `;
 
-const SelectBox = ({ options, onChange, ...props }) =>
+const SelectBox = ({ options, onChange, ...props }) => (
   <Box>
-    {options.map(option =>
+    {options.map(option => (
       <Option
-        key={option.cinema + option.screen + option.localTime}
+        key={option.cinemaName + option.screenName + option.localTime}
         onClick={() => onChange(option)}
       >
         <Lable>
-          {option.localTime} {option.screen},{" "}
-          {option.cinema.replace(/ ?Filmstaden ?/, "")}
+          {option.localTime} {option.screenName},{" "}
+          {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag =>
-            <Tag key={tag}>
-              {tag}
-            </Tag>
-          )}
+          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>
-    )}
-  </Box>;
+    ))}
+  </Box>
+);
 
 export default SelectBox;

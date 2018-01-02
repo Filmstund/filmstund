@@ -2,7 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
-import 'react-dates/lib/css/_datepicker.css';
+import _ from "lodash";
+import "react-dates/lib/css/_datepicker.css";
 
 import { showings } from "./store/reducers";
 
@@ -30,8 +31,8 @@ class NewShowing extends React.Component {
         movieId: this.props.movieId,
         admin: this.props.me.id
       },
-      sfTimes: [],
-      datesForMovieId: []
+      sfdates: {},
+      selectedDate: null
     };
   }
 
@@ -40,7 +41,8 @@ class NewShowing extends React.Component {
   }
 
   setShowingDate = value => {
-    this.setShowingValue("date", value, this.requestSFTimes);
+    this.setShowingValue("date", value);
+    this.setState({ selectedDate: formatYMD(value) });
   };
 
   setShowingCity = ({ target: { value } }) => {
@@ -51,39 +53,21 @@ class NewShowing extends React.Component {
   requestDatesForMovie = movieId => {
     const url = `/movies/${movieId}/sfdates`;
 
-    getJson(url).then(data => {
-      const dates = data.map(formatYMD);
-
-      this.setState(
-        {
-          datesForMovieId: dates
-        },
-        this.requestSFTimes
-      );
-    });
-  };
-
-  requestSFTimes = () => {
-    const { datesForMovieId, showing: { movieId, date } } = this.state;
-
-    if (!datesForMovieId.includes(formatYMD(date))) {
-      this.setState({
-        sfTimes: []
-      });
-
-      return;
-    }
-
-    const url = `/movies/${movieId}/sfdates/${formatYMD(date)}`;
-
-    getJson(url).then(data => {
-      const sfTimes = data.map(d => {
+    getJson(url).then(dates => {
+      const datesWithLocalTime = dates.map(d => {
+        const timeUtc = moment.utc(d.timeUtc).local();
         return {
           ...d,
-          localTime: moment(formatYMD(date) + " " + d.localTime).format("HH:mm")
+          localDate: formatYMD(timeUtc),
+          localTime: timeUtc.format("HH:mm")
         };
       });
-      this.setState({ sfTimes });
+
+      const sfdates = _.groupBy(datesWithLocalTime, "localDate");
+      this.setState({
+        sfdates,
+        selectedDate: _.keys(sfdates)[0]
+      });
     });
   };
 
@@ -93,7 +77,7 @@ class NewShowing extends React.Component {
         showing: {
           ...this.state.showing,
           time: sfTime.localTime,
-          location: sfTime.cinema
+          location: sfTime.cinemaName
         }
       },
       this.handleSubmit
@@ -116,6 +100,13 @@ class NewShowing extends React.Component {
     );
   };
 
+  isDayHighlighted = date => {
+    const { sfdates } = this.state;
+    const availableDates = _.keys(sfdates);
+
+    return availableDates.includes(formatYMD(date));
+  };
+
   handleSubmit = () => {
     const submitObject = {
       ...this.state.showing,
@@ -127,12 +118,8 @@ class NewShowing extends React.Component {
   };
 
   renderSelectSfTime = (sfTimes, showing) => {
-    if (sfTimes.length === 0) {
-      return (
-        <div>
-          Inga tider från SF för {formatYMD(showing.date)}
-        </div>
-      );
+    if (!sfTimes || sfTimes.length === 0) {
+      return <div>Inga tider från SF för {formatYMD(showing.date)}</div>;
     } else {
       return (
         <div>
@@ -157,7 +144,7 @@ class NewShowing extends React.Component {
   };
 
   render() {
-    const { showing, sfTimes, dateFocused } = this.state;
+    const { showing, sfdates, selectedDate, dateFocused } = this.state;
     const { movieId, clearSelectedMovie } = this.props;
 
     return (
@@ -174,12 +161,15 @@ class NewShowing extends React.Component {
             <DatePicker
               numberOfMonths={1}
               focused={dateFocused}
-              onFocusChange={({ focused }) => this.setState({ dateFocused: focused })}
+              isDayHighlighted={this.isDayHighlighted}
+              onFocusChange={({ focused }) =>
+                this.setState({ dateFocused: focused })
+              }
               date={showing.date}
               onDateChange={this.setShowingDate}
             />
           </Field>
-          {this.renderSelectSfTime(sfTimes, showing)}
+          {this.renderSelectSfTime(sfdates[selectedDate], showing)}
           <Header>...eller skapa egen tid</Header>
           <Field text="Tid:">
             <Input

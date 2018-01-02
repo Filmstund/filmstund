@@ -60,15 +60,24 @@ class TicketService(private val sfClient: SfClient,
         return@map it.toTicket(showing.id, showing.admin, barcode)
       }
 
-      val userIdForThatMember = userRepository
-        .findBySfMembershipId(SfMembershipId.valueOf(it.profileId))
-        ?.id
-        ?: showing.admin
+      val userIdForThatMember = getUserIdFromSfMembershipId(SfMembershipId.valueOf(it.profileId), showing)
       it.toTicket(showing.id, userIdForThatMember, barcode)
-
     }
 
     ticketRepository.saveAll(tickets)
+  }
+
+  private fun getUserIdFromSfMembershipId(sfMembershipId: SfMembershipId, showing: Showing): UserID {
+    val userIdForThatMember = userRepository
+      .findBySfMembershipId(sfMembershipId)
+      ?.id
+      ?: return showing.admin
+
+    if (showing.participants.any { it.hasUserId(userIdForThatMember) }) {
+      return userIdForThatMember
+    }
+
+    return showing.admin
   }
 
   private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {

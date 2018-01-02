@@ -44,7 +44,10 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
       log.info("[Popularity] Updating popularity for '${it.title}' with id=${it.id}")
       try {
         updatePopularity(it)
-      } catch(e: Exception) {
+      } catch (e: ExternalProviderException) {
+        log.warn("[Popularity] Provider error: " + e.message)
+        rescheduleNextPopularityUpdate(movie = it)
+      } catch (e: Exception) {
         log.warn("[Popularity] An error occurred when updating popularity for '${it.title}' ID=${it.id}", e)
       }
       randomBackoff()
@@ -55,7 +58,7 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
     val waitTime = 3000L + Random().nextInt(10000)
     try {
       Thread.sleep(waitTime)
-    } catch(e: InterruptedException) {
+    } catch (e: InterruptedException) {
       log.info("[Popularity] randomBackoff were interrupted")
       Thread.currentThread().interrupt()
     }
@@ -69,9 +72,7 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
     }
 
     if (popularityAndId == null) {
-      log.warn("[Popularity] No info found for movie with ID=${movie.id}. Next check in approximately 4 weeks")
-      val updatedMovie = movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(4).toInstant(ZoneOffset.UTC))
-      movieRepository.save(updatedMovie)
+      rescheduleNextPopularityUpdate(movie = movie)
       return
     }
 
@@ -82,6 +83,12 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
       imdbId = popularityAndId.imdbId
     )
     log.info("[Popularity] Popularity updated from ${movie.popularity} → ${updatedMovie.popularity} for '${movie.title}'")
+    movieRepository.save(updatedMovie)
+  }
+
+  private fun rescheduleNextPopularityUpdate(weeks: Long = 4, movie: Movie) {
+    log.warn("[Popularity] No info found for movie with ID=${movie.id}. Next check in approximately $weeks weeks")
+    val updatedMovie = movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(weeks).toInstant(ZoneOffset.UTC))
     movieRepository.save(updatedMovie)
   }
 
@@ -104,7 +111,7 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
     val movieDetails: TmdbMovieDetails
     try {
       movieDetails = imdbClient.movieDetails(movie.imdbId)
-    } catch(e: ExternalProviderException) {
+    } catch (e: ExternalProviderException) {
       return null
     }
     return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())

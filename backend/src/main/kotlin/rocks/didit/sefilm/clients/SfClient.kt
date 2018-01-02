@@ -6,9 +6,10 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForEntity
+import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.domain.dto.*
-import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -18,36 +19,26 @@ import java.time.temporal.ChronoUnit
 class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
   companion object {
     const val API_URL = "https://www.sf.se/api"
-    const val AGGREGATIONS_URL = "$API_URL/v2/show/aggregations"
+    const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
     private val log = LoggerFactory.getLogger(SfClient::class.java)
   }
 
-  fun getShowingDates(sfId: String): List<LocalDate> {
+  fun getShowingDates(sfId: String): List<SfShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
-    val filters = mapOf(
-      "countryAlias" to "se",
-      "cityAlias" to listOf("GB"),
-      "movieNcgId" to listOf(sfId),
-      "timeUtc" to mapOf("greaterThanOrEqualTo" to startTime)
-    )
-    val sfAggregationRequest = SfAggregationRequest(filters, "dates", listOf(SfAggregationProperty("TimeUtc")))
-    val body = SfRequestAggregations(listOf(sfAggregationRequest))
 
-    val aggregationsEntity = HttpEntity(body, httpEntity.headers)
-    val responseBody = restTemplate.exchange(AGGREGATIONS_URL, HttpMethod.POST, aggregationsEntity, SfResponseAggregations::class.java)
-      .body ?: throw ExternalProviderException("Response body is null")
+    val uri = UriComponentsBuilder.fromUriString(SHOW_URL)
+      .queryParam("filter.countryAlias", "se")
+      .queryParam("filter.cityAlias", "GB")
+      .queryParam("filter.movieNcgId", sfId)
+      .queryParam("filter.timeUtc.greaterThanOrEqualTo", startTime)
+      .build().toUri()
 
-    return responseBody.aggregations.first().buckets.map {
-      LocalDate.parse(it.properties["timeUtc"].toString())
-    }
+    val responseBody = restTemplate.getForEntity<SfShowItemsDTO>(uri)
+      .body ?: throw ExternalProviderException("[SF] Response body is null")
+
+    return responseBody.items.map { SfShowingDTO.from(it) }
   }
-
-  /** Date must be in ISO8601 format, i.e 2017-04-11 */
-  fun getScreensForDateAndMovie(sfId: String, date: String): SfShowListingEntitiesDTO =
-    restTemplate
-      .exchange("$API_URL/v1/shows/ShowListing?Cinemas=&Movies=$sfId&Cities=GB&GroupBy=Cinema&ShowListingFilterDate.SelectedDate=$date&BlockId=1443&imageContentType=webp", HttpMethod.GET, httpEntity, SfShowListingEntitiesDTO::class.java)
-      .body ?: throw ExternalProviderException("Response body is null")
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
     val body = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId).body

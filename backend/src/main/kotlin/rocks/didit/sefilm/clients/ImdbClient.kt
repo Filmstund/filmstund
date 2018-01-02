@@ -81,7 +81,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
 
     val tmdbId = lookupTmdbIdFromImdbId(imdbId)
     if (tmdbId.isNotSupplied()) {
-      throw ExternalProviderException("movie[$imdbId] not found")
+      throw ExternalProviderException("[IMDb] movie[$imdbId] not found")
     }
     return movieDetailsExact(tmdbId)
   }
@@ -92,7 +92,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
 
     val url = TMDB_INFO_URL.format(tmdbId.value, properties.tmdb.apikey)
     return restTemplate.exchange<TmdbMovieDetails>(url, HttpMethod.GET, httpEntity, TmdbMovieDetails::class).body
-      ?: throw ExternalProviderException("Null response body")
+      ?: throw ExternalProviderException("[TMDb] Null response body")
   }
 
   private fun validateProviderId(id: ExternalProviderId) {
