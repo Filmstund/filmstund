@@ -1,4 +1,4 @@
-export const groupRange = nums =>
+export const groupSeatingRange = nums =>
   nums.reduce(
     ({ groups, lastElement }, curr) => {
       if (curr !== lastElement + 1) {
@@ -11,7 +11,7 @@ export const groupRange = nums =>
     { groups: [], lastElement: undefined }
   ).groups;
 
-export const formatRange = ranges =>
+export const formatSeatingRange = ranges =>
   ranges.map(range => {
     if (range.length === 1) {
       return String(range[0]);
@@ -20,4 +20,5 @@ export const formatRange = ranges =>
     }
   });
 
-export const formatRow = row => formatRange(groupRange(row)).join(", ");
+export const formatSeatingRow = row =>
+  formatSeatingRange(groupSeatingRange(row)).join(", ");

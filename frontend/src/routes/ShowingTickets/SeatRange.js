@@ -1,16 +1,16 @@
 import React from "react";
-import { formatRow } from "../../lib/summarizeRange";
+import { formatSeatingRow } from "../../lib/summarizeSeatingRange";
 import { SmallHeader } from "../../Header";
 
-const RangeDisplay = ({ range }) => (
+const SeatRange = ({ range }) => (
   <div>
     <SmallHeader>Våra platser:</SmallHeader>
     {range.rows.map(row => (
       <div key={row}>
-        Rad {row}: {formatRow(range.seatings[row])}
+        Rad {row}: {formatSeatingRow(range.seatings[row])}
       </div>
     ))}
   </div>
 );
 
-export default RangeDisplay;
+export default SeatRange;

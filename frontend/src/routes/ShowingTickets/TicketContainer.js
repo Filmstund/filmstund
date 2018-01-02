@@ -6,7 +6,7 @@ import TicketURLInput from "../../TicketURLInput";
 import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
-import RangeDisplay from "./RangeDisplay";
+import SeatRange from "./SeatRange";
 
 export default class TicketContainer extends Component {
   state = {
@@ -97,7 +97,7 @@ export default class TicketContainer extends Component {
           <MainButton onClick={this.handleGoBackToShowing}>
             Tillbaka till visning
           </MainButton>
-          {range && <RangeDisplay range={range} />}
+          {range && <SeatRange range={range} />}
           {tickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
           {showing.admin === me.id && this.renderAdminFields()}
         </div>
