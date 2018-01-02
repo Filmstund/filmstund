@@ -271,6 +271,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
       .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
       .antMatchers(HttpMethod.GET, BudordController.PATH).permitAll()
       .antMatchers(HttpMethod.GET, BudordController.PATH + "/random").permitAll()
+      .antMatchers(HttpMethod.HEAD, BudordController.PATH).permitAll()
+      .antMatchers(HttpMethod.HEAD, BudordController.PATH + "/random").permitAll()
       .anyRequest().authenticated()
   }
 }
