@@ -1,0 +1,25 @@
+type CurrentUser {
+    id: String!
+    name: String
+    firstName: String
+    lastName: String
+    nick: String
+    email: String!
+    sfMembershipId: String
+    phone: String
+    avatar: String
+    foretagsbiljetter: [String!]
+    lastLogin: String!
+    signupDate: String!
+}
+
+type User {
+    id: String!
+    name: String
+    firstName: String
+    lastName: String
+    nick: String
+    sfMembershipId: String
+    phone: String
+    avatar: String
+}

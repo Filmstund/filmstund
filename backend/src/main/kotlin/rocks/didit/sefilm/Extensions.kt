@@ -61,7 +61,7 @@ internal fun User.toLimitedUserInfo(): LimitedUserInfo {
 internal fun String.toImdbId() = IMDbID.valueOf(this)
 internal fun Long.toTmdbId() = TMDbID.valueOf(this)
 
-internal fun Participant.redact(): Participant {
+internal fun Participant.redact(): RedactedParticipant {
   return when (this) {
     is SwishParticipant -> RedactedParticipant(this.userId, PaymentType.Swish)
     is FtgBiljettParticipant -> RedactedParticipant(this.userId, PaymentType.Företagsbiljett)

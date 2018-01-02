@@ -1,0 +1,19 @@
+type Movie {
+    id: UUID!
+    imdbId: String!
+    sfId: String
+    sfSlug: String
+    tmdbId: String!
+    title: String!
+    synopsis: String
+    originalTitle: String
+    releaseDate: String!
+    productionYear: Int
+    runtime: String!
+    poster: String
+    genres: [String!]
+    lastModifiedDate: String!
+    popularity: Float!
+    popularityLastUpdated: String!
+    archived: Boolean!
+}

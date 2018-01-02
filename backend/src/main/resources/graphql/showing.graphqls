@@ -1,0 +1,27 @@
+type Showing {
+    id: UUID!
+    date: String
+    time: String
+    movie: Movie!
+    location: Location
+    private: Boolean!
+    price: SEK!
+    ticketsBought: Boolean!
+    admin: User!
+    payToUser: User!
+    expectedBuyDate: String
+    participants: [Participant!]
+    calendarEventId: String
+    lastModifiedDate: String!
+}
+
+type Participant {
+    user: User
+    paymentType: String!
+}
+
+type Location {
+    name: String
+    latitude: String
+    longitude: String
+}

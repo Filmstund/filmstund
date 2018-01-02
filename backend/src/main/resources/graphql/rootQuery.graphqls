@@ -1,0 +1,20 @@
+scalar UUID
+scalar SEK
+scalar LocalDate
+
+type Query {
+    ## Movies ##
+    allMovies: [Movie!]
+    movie(id: UUID!): Movie
+
+    ## Showings ##
+    showing(id: UUID): Showing
+    publicShowings(afterDate: LocalDate): [Showing!]
+    privateShowingsForCurrentUser(afterDate: LocalDate): [Showing!]
+    showingForMovie(movieId: UUID): [Showing!]
+
+
+    ## Bio Budord ##
+    allBiobudord: [BioBudord!]
+    randomBudord: BioBudord!
+}
