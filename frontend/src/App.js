@@ -6,9 +6,11 @@ import Helmet from "react-helmet";
 import asyncComponent from "./AsyncComponent";
 import TopBar from "./TopBar";
 import Footer from "./footer/Footer";
-import WelcomeModal from './WelcomeModal';
+import WelcomeModal from "./WelcomeModal";
 
-const PaddingContainer = styled.div`padding: 1em;`;
+const PaddingContainer = styled.div`
+  padding: 1em;
+`;
 
 const ScrollContainer = styled.div`
   -webkit-overflow-scrolling: touch;
@@ -22,7 +24,9 @@ const AsyncUser = asyncComponent(() => import("./routes/User"));
 const AsyncShowings = asyncComponent(() => import("./routes/Showings"));
 const AsyncNewShowing = asyncComponent(() => import("./routes/NewShowing"));
 const AsyncEditShowing = asyncComponent(() => import("./routes/EditShowing"));
-const AsyncShowingTickets = asyncComponent(() => import("./routes/ShowingTickets"));
+const AsyncShowingTickets = asyncComponent(() =>
+  import("./routes/ShowingTickets")
+);
 const AsyncSingleShowing = asyncComponent(() =>
   import("./routes/SingleShowing")
 );
@@ -31,37 +35,39 @@ class App extends Component {
   render() {
     const { me } = this.props;
 
-    return [
-      <Helmet key="title" titleTemplate="%s | itbio" />,
-      <WelcomeModal key="welcomemodal" me={me} />,
-      <TopBar key="topbar" />,
-      <ScrollContainer key="scrollcontainer">
-        <PaddingContainer>
-          <Switch>
-            <Route exact path="/" component={AsyncHome} />
-            <Route path="/user" component={AsyncUser} />
-            <Route exact path="/showings" component={AsyncShowings} />
-            <Route
-              path="/showings/new/:movieId?"
-              component={AsyncNewShowing}
-            />
-            <Route
-              path="/showings/:showingId/tickets"
-              component={AsyncShowingTickets}
-            />
-            <Route
-              path="/showings/:showingId/edit"
-              component={AsyncEditShowing}
-            />
-            <Route
-              path="/showings/:showingId"
-              component={AsyncSingleShowing}
-            />
-          </Switch>
-        </PaddingContainer>
-      </ScrollContainer>,
-      <Footer key="footer" />
-    ];
+    return (
+      <React.Fragment>
+        <Helmet titleTemplate="%s | itbio" />
+        <WelcomeModal me={me} />
+        <TopBar />
+        <ScrollContainer>
+          <PaddingContainer>
+            <Switch>
+              <Route exact path="/" component={AsyncHome} />
+              <Route path="/user" component={AsyncUser} />
+              <Route exact path="/showings" component={AsyncShowings} />
+              <Route
+                path="/showings/new/:movieId?"
+                component={AsyncNewShowing}
+              />
+              <Route
+                path="/showings/:showingId/tickets"
+                component={AsyncShowingTickets}
+              />
+              <Route
+                path="/showings/:showingId/edit"
+                component={AsyncEditShowing}
+              />
+              <Route
+                path="/showings/:showingId"
+                component={AsyncSingleShowing}
+              />
+            </Switch>
+          </PaddingContainer>
+        </ScrollContainer>
+        <Footer />
+      </React.Fragment>
+    );
   }
 }
 

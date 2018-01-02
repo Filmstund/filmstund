@@ -37,10 +37,7 @@ class PendingShowing extends Component {
     const { selectedIndex, paymentOptions } = this.state;
 
     return (
-      <Modal
-        key="modal"
-        onRequestClose={() => this.setState({ modalOpen: false })}
-      >
+      <Modal onRequestClose={() => this.setState({ modalOpen: false })}>
         <SmallHeader>Betalningsalternativ</SmallHeader>
         <select
           name="betalningsalternativ"
@@ -86,19 +83,19 @@ class PendingShowing extends Component {
     const { isParticipating, handleUnattend } = this.props;
     const { modalOpen } = this.state;
 
-    return [
-      modalOpen && this.renderModalPaymentOptions(),
-      !isParticipating && (
-        <MainButton key="attend" onClick={this.handleClickAttend}>
-          Jag hänger på!
-        </MainButton>
-      ),
-      isParticipating && (
-        <GrayButton key="unattend" onClick={handleUnattend}>
-          Avanmäl
-        </GrayButton>
-      )
-    ];
+    return (
+      <React.Fragment>
+        {modalOpen && this.renderModalPaymentOptions()}
+        {!isParticipating && (
+          <MainButton onClick={this.handleClickAttend}>
+            Jag hänger på!
+          </MainButton>
+        )}
+        {isParticipating && (
+          <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>
+        )}
+      </React.Fragment>
+    );
   }
 }
 
