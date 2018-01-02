@@ -1,9 +1,11 @@
 package rocks.didit.sefilm.domain
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpMethod
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.ResponseErrorHandler
 import rocks.didit.sefilm.ExternalProviderException
+import java.net.URI
 import java.time.Instant
 
 data class ErrorDTO(val error: Boolean = true,
@@ -18,8 +20,13 @@ internal class ExternalProviderErrorHandler : ResponseErrorHandler {
     return response.rawStatusCode >= 400
   }
 
+  override fun handleError(url: URI, method: HttpMethod, response: ClientHttpResponse) {
+    log.warn("$method $url -> ${response.statusCode}: ${response.statusText}")
+    throw ExternalProviderException("${response.statusCode}: ${response.statusText}")
+  }
+
   override fun handleError(response: ClientHttpResponse) {
-    log.error("Error when fetching movie info from external provider: ${response.statusCode}: ${response.statusText}")
+    log.warn("Error when fetching info from external provider: ${response.statusCode}: ${response.statusText}")
     throw ExternalProviderException("${response.statusCode}: ${response.statusText}")
   }
 }

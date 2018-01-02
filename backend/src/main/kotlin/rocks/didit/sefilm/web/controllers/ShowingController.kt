@@ -84,7 +84,7 @@ class ShowingController(private val repo: ShowingRepository,
     }
 
     if (body.cinemaTicketUrls.isNotEmpty()) {
-      ticketService.processTickets(body.cinemaTicketUrls, updatedShowing)
+      ticketService.processTickets(body.cinemaTicketUrls, updatedShowing.id)
     }
 
     return updatedShowing

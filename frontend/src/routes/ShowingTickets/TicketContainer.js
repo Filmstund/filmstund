@@ -5,16 +5,21 @@ import Loader from "../../ProjectorLoader";
 import TicketURLInput from "../../TicketURLInput";
 import Field from "../../Field";
 import MainButton from "../../MainButton";
-import Ticket from './Ticket'
+import Ticket from "./Ticket";
+import SeatRange from "./SeatRange";
 
 export default class TicketContainer extends Component {
   state = {
     tickets: null,
     error: null,
+    range: null,
     cinemaTicketUrls: []
   };
 
   componentWillMount() {
+    getJson(`/tickets/${this.props.showingId}/seating-range`).then(range => {
+      this.setState({ range });
+    });
     getJson(`/tickets/${this.props.showingId}`).then(
       tickets => {
         this.setState({ tickets });
@@ -31,18 +36,21 @@ export default class TicketContainer extends Component {
     const { cinemaTicketUrls } = this.state;
     const { showing } = this.props;
 
-    const nonEmptyUrls = cinemaTicketUrls.filter(line => line.trim().length !== 0);
+    const nonEmptyUrls = cinemaTicketUrls.filter(
+      line => line.trim().length !== 0
+    );
 
-    jsonRequest(withBaseURL(`/tickets/${showing.id}`), nonEmptyUrls)
-      .then((tickets) => {
+    jsonRequest(withBaseURL(`/tickets/${showing.id}`), nonEmptyUrls).then(
+      tickets => {
         this.setState({
           tickets,
           cinemaTicketUrls: []
         });
-      });
+      }
+    );
   };
 
-  setCinemaTicketUrls = (cinemaTicketUrls) => {
+  setCinemaTicketUrls = cinemaTicketUrls => {
     this.setState({
       cinemaTicketUrls
     });
@@ -51,11 +59,17 @@ export default class TicketContainer extends Component {
   renderAdminFields = () => {
     const { cinemaTicketUrls } = this.state;
 
-
-    return <Field text="Lägg till SF-biljettlänkar">
-      <TicketURLInput cinemaTicketUrls={cinemaTicketUrls} onChange={this.setCinemaTicketUrls} />
-      <MainButton onClick={this.handleSubmitCinemaTicketUrls}>Skicka</MainButton>
-    </Field>
+    return (
+      <Field text="Lägg till SF-biljettlänkar">
+        <TicketURLInput
+          cinemaTicketUrls={cinemaTicketUrls}
+          onChange={this.setCinemaTicketUrls}
+        />
+        <MainButton onClick={this.handleSubmitCinemaTicketUrls}>
+          Skicka
+        </MainButton>
+      </Field>
+    );
   };
 
   handleGoBackToShowing = () => {
@@ -63,30 +77,31 @@ export default class TicketContainer extends Component {
   };
 
   render() {
-    const { tickets, error } = this.state;
+    const { range, tickets, error } = this.state;
     const { me, showing } = this.props;
 
     if (error) {
       return (
         <div>
-          <MainButton onClick={this.handleGoBackToShowing}>Tillbaka till visning</MainButton>
-          <div>
-            {error}
-          </div>
+          <MainButton onClick={this.handleGoBackToShowing}>
+            Tillbaka till visning
+          </MainButton>
+          <div>{error}</div>
         </div>
       );
     } else if (!tickets) {
       return <Loader />;
     } else {
-      return <div>
-        <MainButton onClick={this.handleGoBackToShowing}>Tillbaka till visning</MainButton>
-        {tickets.map(ticket =>
-          <Ticket key={ticket.id} {...ticket} />
-        )}
-        {showing.admin === me.id && this.renderAdminFields()}
-      </div>
+      return (
+        <div>
+          <MainButton onClick={this.handleGoBackToShowing}>
+            Tillbaka till visning
+          </MainButton>
+          {range && <SeatRange range={range} />}
+          {tickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
+          {showing.admin === me.id && this.renderAdminFields()}
+        </div>
+      );
     }
   }
 }
-
-
