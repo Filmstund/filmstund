@@ -50,6 +50,7 @@ data class SfAttributeDTO(val alias: String, val displayName: String)
 data class SfScreenDTO(val ncgId: String, val title: String, val slug: String, val seatCount: Int, val remoteSystemAlias: String, val remoteEntityId: String)
 
 data class SfShowItemsDTO(val totalNbrOfItems: Int, val items: List<SfShowDTO>)
+data class SfLocationItemsDTO(val totalNbrOfItems: Int, val items: List<SfCinemaWithAddressDTO>)
 
 data class SfShowDTO(
   val remoteSystemAlias: String,
@@ -65,7 +66,7 @@ data class SfShowDTO(
 )
 
 data class SfCinemaWithAddressDTO(
-  val ncgId: String,
+  val ncgId: String?,
   val title: String,
   val address: SfAddressDTO,
   val slug: String,

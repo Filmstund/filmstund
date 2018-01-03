@@ -34,6 +34,8 @@ import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.domain.MovieTitleExtension
+import rocks.didit.sefilm.services.SFService
+import java.math.BigDecimal
 import java.time.Duration
 
 @SpringBootApplication
@@ -114,6 +116,7 @@ class Application {
   @Bean
   fun seedInitialData(locationsRepo: LocationRepository,
                       budordRepo: BudordRepository,
+                      sfService: SFService,
                       properties: Properties) = ApplicationRunner {
     if (!properties.tmdb.apiKeyExists()) {
       log.warn("TMDB api key not set. Some features will not work properly!")
@@ -128,8 +131,24 @@ class Application {
 
     val locationsResource = ClassPathResource("seeds/locations.json")
     val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
+
+    val cityAlias = "GB"
+    val locationsFromSF = sfService.getLocationsInCity(cityAlias)
+      .map {
+        Location(it.title,
+          it.address.city["alias"],
+          it.address.city["name"],
+          it.address.streetAddress,
+          it.address.postalCode,
+          it.address.postalAddress,
+          BigDecimal(it.address.coordinates.latitude),
+          BigDecimal(it.address.coordinates.longitude))
+      }
+
     locationsRepo.saveAll(locations)
     log.info("Seeded locations with ${locations.size} values")
+
+    log.info("Seeded ${locationsRepo.saveAll(locationsFromSF).count()} locations from SF for city: $cityAlias")
   }
 }
 
