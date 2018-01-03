@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.web.services
+package rocks.didit.sefilm.services
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value

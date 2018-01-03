@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.web.services
+package rocks.didit.sefilm.services
 
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component

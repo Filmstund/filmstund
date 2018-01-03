@@ -13,9 +13,9 @@ import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
-import rocks.didit.sefilm.web.services.FöretagsbiljettService
-import rocks.didit.sefilm.web.services.GoogleCalenderService
-import rocks.didit.sefilm.web.services.TicketService
+import rocks.didit.sefilm.services.FöretagsbiljettService
+import rocks.didit.sefilm.services.GoogleCalenderService
+import rocks.didit.sefilm.services.TicketService
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime

@@ -16,7 +16,7 @@ import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.services.UserService
-import rocks.didit.sefilm.web.services.FöretagsbiljettService
+import rocks.didit.sefilm.services.FöretagsbiljettService
 
 @RestController
 class UserController(

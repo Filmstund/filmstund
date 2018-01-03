@@ -10,7 +10,6 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
-import rocks.didit.sefilm.web.services.FöretagsbiljettService
 import java.util.*
 
 @Component
