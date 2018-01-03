@@ -3,7 +3,7 @@ package rocks.didit.sefilm.web.controllers
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import rocks.didit.sefilm.Application
-import rocks.didit.sefilm.web.services.TicketService
+import rocks.didit.sefilm.services.TicketService
 import java.util.*
 
 @RestController
