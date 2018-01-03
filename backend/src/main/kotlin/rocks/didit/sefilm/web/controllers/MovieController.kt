@@ -9,7 +9,6 @@ import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.MissingSfIdException
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.clients.ImdbClient
-import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
@@ -19,6 +18,7 @@ import rocks.didit.sefilm.domain.dto.SavedEntitiesDTO
 import rocks.didit.sefilm.domain.dto.SfShowingDTO
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import rocks.didit.sefilm.services.MovieService
+import rocks.didit.sefilm.services.SFService
 import java.time.Instant
 import java.util.*
 
@@ -27,7 +27,7 @@ class MovieController(
   private val movieService: MovieService,
   private val repo: MovieRepository,
   private val metaRepo: SfMetaRepository,
-  private val sfClient: SfClient,
+  private val sfClient: SFService,
   private val imdbClient: ImdbClient,
   private val asyncMovieUpdater: AsyncMovieUpdater,
   private val movieTitleTrimmer: MovieTitleExtension) {

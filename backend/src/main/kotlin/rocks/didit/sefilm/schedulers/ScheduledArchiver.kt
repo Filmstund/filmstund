@@ -3,7 +3,7 @@ package rocks.didit.sefilm.schedulers
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.clients.SfClient
+import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 @Component
 class ScheduledArchiver(private val movieRepository: MovieRepository,
                         showingRepository: ShowingRepository,
-                        sfClient: SfClient) {
+                        sfClient: SFService) {
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 60 * 60 * 1000L // 1 hour
@@ -51,7 +51,7 @@ class ScheduledArchiver(private val movieRepository: MovieRepository,
 }
 
 private class ReleaseDateAndShowingsRule(private val showingRepository: ShowingRepository,
-                                         private val sfClient: SfClient) : ArchiveRule {
+                                         private val sfClient: SFService) : ArchiveRule {
 
   override fun isEligibleForArchivation(movie: Movie): Boolean {
     if (movie.isOlderThan(Duration.ofDays(65))) {
