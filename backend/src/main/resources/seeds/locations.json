@@ -1,21 +1,25 @@
 [
   {
     "name": "Filmstaden Bergakungen",
+    "cityAlias": "GB",
     "latitude": 57.7022927,
     "longitude": 11.9841099
   },
   {
     "name": "Bergakungen",
+    "cityAlias": "GB",
     "latitude": 57.7022927,
     "longitude": 11.9841099
   },
   {
     "name": "Biopalatset",
+    "cityAlias": "GB",
     "latitude": 57.7034996,
     "longitude": 11.9647064
   },
   {
     "name": "Göta",
+    "cityAlias": "GB",
     "latitude": 57.6973703,
     "longitude": 11.9763771
   },

@@ -18,8 +18,11 @@ type Query {
     allBiobudord: [BioBudord!]
     randomBudord: BioBudord!
 
-
     ## User related ##
     allUsers: [User!]
     currentUser: CurrentUser!
+
+    ## Location ##
+    previousLocations: [Location!]
+    location(id: String!): Location
 }
