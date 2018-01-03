@@ -28,9 +28,12 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 class ShowingResolver(private val userRepository: UserRepository, private val movieRepository: MovieRepository) : GraphQLResolver<Showing> {
   fun admin(showing: Showing): User = userRepository.findById(showing.admin).orElseThrow { NotFoundException("admin user with id: ${showing.admin}") }
   fun payToUser(showing: Showing): User = userRepository.findById(showing.payToUser).orElseThrow { NotFoundException("payToUser with id: ${showing.payToUser}") }
-  fun movie(showing: Showing): Movie = movieRepository
-    .findById(showing.movieId ?: UUID.randomUUID())
-    .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
+  fun movie(showing: Showing): Movie {
+    val id = showing.movieId ?: UUID.randomUUID()
+    return movieRepository
+      .findById(id)
+      .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
+  }
 }
 
 @Component

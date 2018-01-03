@@ -31,7 +31,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledMovieUpdates() {
     val moviesThatRequiresUpdate = movieRepository
-      .findByArchivedFalse()
+      .findByArchivedOrderByPopularityDesc()
       .filter(this::isUpdateRequired)
     if (moviesThatRequiresUpdate.isNotEmpty()) {
       log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
