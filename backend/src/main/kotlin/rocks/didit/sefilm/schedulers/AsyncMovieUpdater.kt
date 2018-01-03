@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.clients.ImdbClient
-import rocks.didit.sefilm.clients.SfClient
+import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
@@ -18,7 +18,7 @@ import java.util.*
 
 @Component
 class AsyncMovieUpdater(private val movieRepository: MovieRepository,
-                        private val sfClient: SfClient,
+                        private val sfClient: SFService,
                         private val imdbClient: ImdbClient) {
 
   companion object {

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.UserHasNotPaidException
-import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
@@ -21,7 +20,7 @@ import rocks.didit.sefilm.domain.dto.TicketRange
 import java.util.*
 
 @Component
-class TicketService(private val sfClient: SfClient,
+class TicketService(private val sfClient: SFService,
                     private val userRepository: UserRepository,
                     private val ticketRepository: TicketRepository,
                     private val showingRepository: ShowingRepository,

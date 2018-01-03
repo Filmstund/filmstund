@@ -1,6 +1,7 @@
-package rocks.didit.sefilm.clients
+package rocks.didit.sefilm.services
 
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -16,13 +17,14 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 @Component
-class SfClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
+class SFService(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
   companion object {
     const val API_URL = "https://www.sf.se/api"
     const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
-    private val log = LoggerFactory.getLogger(SfClient::class.java)
+    private val log = LoggerFactory.getLogger(SFService::class.java)
   }
 
+  @Cacheable("sfdates")
   fun getShowingDates(sfId: String): List<SfShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
@@ -50,14 +52,14 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
 
   fun allMovies(cityAlias: String = "GB"): List<SfMovieDTO> {
     return restTemplate
-      .exchange("$API_URL/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
+      .exchange("${API_URL}/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
         httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
       .body ?: listOf()
   }
 
   // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
   fun fetchTickets(sysId: String, sfShowingId: String, ticketId: String): List<SfTicketDTO> {
-    val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
+    val url = "${API_URL}/v2/ticket/$sysId/$sfShowingId/$ticketId"
 
     log.debug("Fetching tickets from $url")
     return restTemplate
@@ -67,7 +69,7 @@ class SfClient(private val restTemplate: RestTemplate, private val httpEntity: H
 
   /** Returns base64 encoding jpeg of the ticket */
   fun fetchBarcode(ticketId: String): String {
-    val url = "$API_URL/v2/barcode/{ticketId}/128/128"
+    val url = "${API_URL}/v2/barcode/{ticketId}/128/128"
     log.debug("Fetching barcode from $url")
     return restTemplate
       .exchange(url, HttpMethod.GET, httpEntity, String::class.java, ticketId)
