@@ -2,17 +2,27 @@ package rocks.didit.sefilm.web.controllers
 
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import rocks.didit.sefilm.*
+import rocks.didit.sefilm.Application
+import rocks.didit.sefilm.DuplicateTicketException
+import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.Företagsbiljett
+import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.SfMembershipId
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
+import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.services.UserService
 import rocks.didit.sefilm.web.services.FöretagsbiljettService
 
 @RestController
-class UserController(val userRepository: UserRepository,
-                     val foretagsbiljettService: FöretagsbiljettService) {
+class UserController(
+  val userService: UserService,
+  val userRepository: UserRepository,
+  val foretagsbiljettService: FöretagsbiljettService) {
   companion object {
     private const val BASE_PATH = Application.API_BASE_PATH + "/users"
     private const val ME_PATH = BASE_PATH + "/me"
@@ -20,12 +30,7 @@ class UserController(val userRepository: UserRepository,
   }
 
   @GetMapping(ME_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun currentUser(): User {
-    val currentLoggedInUser = currentLoggedInUser()
-    return userRepository
-      .findById(currentLoggedInUser)
-      .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
-  }
+  fun currentUser() = userService.currentUser()
 
   @GetMapping(FTG_TICKET_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun getFtgTickets(): List<FöretagsbiljettDTO> {
@@ -45,7 +50,8 @@ class UserController(val userRepository: UserRepository,
   fun updateFtgTickets(@RequestBody suppliedFtgTickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
     assertNoDuplicateForetagsbiljetter(suppliedFtgTickets)
     val tickets = suppliedFtgTickets.map { Företagsbiljett.valueOf(it) }
-    val updatedUser = currentUser().copy(
+
+    val updatedUser = getCurrentUser().copy(
       foretagsbiljetter = tickets
     )
 
@@ -62,13 +68,12 @@ class UserController(val userRepository: UserRepository,
   }
 
   @GetMapping(BASE_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun findAll(): Iterable<LimitedUserInfo> = userRepository.findAll().map(User::toLimitedUserInfo)
+  fun findAll() = userService.allUsers()
 
   @GetMapping(BASE_PATH + "/{id}", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun findOne(@PathVariable id: UserID): LimitedUserInfo =
-    userRepository.findById(id)
-      .map(User::toLimitedUserInfo)
-      .orElseThrow { NotFoundException("user '$id'") }
+  fun findOne(@PathVariable id: UserID): LimitedUserDTO
+    = userService.getUser(id)
+    .orElseThrow { NotFoundException("user '$id'") }
 
   @PutMapping(ME_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
@@ -82,7 +87,7 @@ class UserController(val userRepository: UserRepository,
       else -> PhoneNumber(newDetails.phone)
     }
 
-    val updatedUser = currentUser().copy(
+    val updatedUser = getCurrentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
       sfMembershipId = newBioklubbnummer
@@ -90,6 +95,11 @@ class UserController(val userRepository: UserRepository,
 
     return userRepository.save(updatedUser)
   }
+
+  private fun getCurrentUser(): User
+    = userRepository
+    .findById(currentLoggedInUser())
+    .orElseThrow { NotFoundException("current user with id: ${currentLoggedInUser()}") }
 
   private fun assertNoDuplicateForetagsbiljetter(tickets: List<FöretagsbiljettDTO>) {
     val numDistinctTickets = tickets

@@ -8,7 +8,7 @@ type CurrentUser {
     sfMembershipId: String
     phone: String
     avatar: String
-    foretagsbiljetter: [String!]
+    foretagsbiljetter: [Foretagsbiljett!]
     lastLogin: String!
     signupDate: String!
 }
@@ -19,7 +19,19 @@ type User {
     firstName: String
     lastName: String
     nick: String
-    sfMembershipId: String
     phone: String
     avatar: String
+}
+
+type Foretagsbiljett {
+    number: String!
+    expires: String!
+    status: ForetagsbiljettStatus!
+}
+
+enum ForetagsbiljettStatus {
+    Available
+    Pending
+    Used
+    Expired
 }

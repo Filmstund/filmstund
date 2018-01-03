@@ -13,6 +13,8 @@ data class TicketNumber(@JsonValue val number: String) {
       throw IllegalArgumentException("'$number' is an invalid ticket number")
     }
   }
+
+  override fun toString() = number
 }
 
 

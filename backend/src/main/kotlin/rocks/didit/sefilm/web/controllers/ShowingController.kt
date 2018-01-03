@@ -183,7 +183,7 @@ class ShowingController(private val repo: ShowingRepository,
 
     val adminUser = userRepo
       .findById(currentLoggedInUser())
-      .map(User::toLimitedUserInfo)
+      .map(User::toLimitedUserDTO)
       .orElseThrow { NotFoundException("Current logged in user not found in db") }
 
     val savedShowing = repo.save(body.toShowing(adminUser))
@@ -237,7 +237,7 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
-  private fun ShowingDTO.toShowing(admin: LimitedUserInfo): Showing {
+  private fun ShowingDTO.toShowing(admin: LimitedUserDTO): Showing {
     if (this.location == null) {
       throw IllegalArgumentException("Location may not be null")
     }

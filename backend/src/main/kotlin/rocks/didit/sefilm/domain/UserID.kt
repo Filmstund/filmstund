@@ -10,7 +10,5 @@ data class UserID(val id: String = "N/A") {
   }
 
   @JsonValue
-  override fun toString(): String {
-    return id
-  }
+  override fun toString() = id
 }
