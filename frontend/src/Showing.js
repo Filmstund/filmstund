@@ -1,17 +1,19 @@
 import React from "react";
 import styled from "styled-components";
+import gql from "graphql-tag";
 import Helmet from "react-helmet";
 import { formatShowingDateTime } from "./lib/dateTools";
 import PosterBox from "./PosterBox";
-import withShowingLoader from "./loaders/ShowingLoader";
 
-const VerticalPaddingContainer = styled.div`padding: 1em 0;`;
+const VerticalPaddingContainer = styled.div`
+  padding: 1em 0;
+`;
 
 const Status = styled.div`
   position: absolute;
   right: 1em;
   top: 1em;
-  font-style: ${props => props.ticketsBought ? '' : 'italic'}
+  font-style: ${props => (props.ticketsBought ? "" : "italic")};
 `;
 
 const capitilized = s => s.substring(0, 1).toUpperCase() + s.substring(1);
@@ -41,26 +43,47 @@ const Showing = ({
   location,
   disabled,
   onClick
-}) =>
+}) => (
   <StyledShowing disabled={disabled}>
-    {setTitleTag &&
-      <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />}
+    {setTitleTag && (
+      <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />
+    )}
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
-      {ticketsBought !== undefined &&
+      {ticketsBought !== undefined && (
         <Status ticketsBought={ticketsBought}>
           {capitilized(getStatus(ticketsBought))}
-        </Status>}
+        </Status>
+      )}
       <VerticalPaddingContainer>
         {formatShowingDateTime(date)}
         <br />
         {location}
         <br />
       </VerticalPaddingContainer>
-      {admin &&
-        <span>
-          Skapad av {admin.nick || admin.name}
-        </span>}
+      {admin && <span>Skapad av {admin.nick || admin.name}</span>}
     </PosterBox>
-  </StyledShowing>;
+  </StyledShowing>
+);
 
-export default withShowingLoader(Showing);
+export const showingFragment = gql`
+  fragment Showing on Showing {
+    id
+    date
+    time
+    location {
+      name
+    }
+    ticketsBought
+    movie {
+      id
+      title
+      poster
+    }
+    admin {
+      name
+      nick
+    }
+  }
+`;
+
+export default Showing;

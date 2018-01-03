@@ -1,22 +1,24 @@
-import React from "react";
-import { connect } from "react-redux";
-import { values, orderBy } from "lodash";
+import React, { Component } from "react";
+import { orderBy } from "lodash";
 import moment from "moment";
 import cx from "classnames";
 import Helmet from "react-helmet";
 import styled from "styled-components";
 
-import { jsonRequest } from "../lib/fetch";
+import { jsonRequest, getJson } from "../lib/fetch";
 import { withBaseURL } from "../lib/withBaseURL";
 
 import { movies, meta } from "../store/reducers";
 
 import Header from "../Header";
-import Movie from "../Movie";
+import Movie, { movieFragment } from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
 
 import Field from "../Field";
 import Input from "../Input";
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
+import { compose } from "recompose";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -57,34 +59,40 @@ const MovieContainer = styled.div`
   justify-content: flex-start;
 `;
 
-class NewShowing extends React.Component {
+class NewShowing extends Component {
   constructor(props) {
     super(props);
     const { match: { params: { movieId } } } = props;
 
     this.state = {
+      meta: {},
       movieId,
       searchTerm: ""
     };
   }
 
   componentWillMount() {
-    this.props.dispatch(movies.actions.requestIndex());
+    this.fetchMeta();
   }
+
+  fetchMeta = () => {
+    getJson("/movies/sf/meta").then(meta => {
+      this.setState({ meta });
+    });
+  };
 
   requestSFData = () => {
     this.setState({ requestingData: true });
     jsonRequest(withBaseURL("/movies/sf/populate")).then(data => {
-      this.props.dispatch(movies.actions.requestIndex());
-      this.props.dispatch(meta.actions.requestSingle());
+      this.props.data.refetch();
+      this.fetchMeta();
       this.setState({ requestingData: false });
     });
   };
 
   renderRequestButton = () => {
-    const { requestingData } = this.state;
+    const { requestingData, meta } = this.state;
 
-    const { meta } = this.props;
     const lastUpdateMessage =
       "Senaste uppdatering: " +
       ((!meta.timestamp && "aldrig") ||
@@ -131,9 +139,7 @@ class NewShowing extends React.Component {
     return (
       <div>
         <Helmet title="Skapa besök" />
-        <FlexHeader>
-          Skapa besök {this.renderRequestButton()}
-        </FlexHeader>
+        <FlexHeader>Skapa besök {this.renderRequestButton()}</FlexHeader>
         <SearchField>
           <Input
             type="text"
@@ -145,13 +151,13 @@ class NewShowing extends React.Component {
         <MovieContainer>
           {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
             .filter(m => this.searchFilter(m))
-            .map(m =>
+            .map(m => (
               <StyledMovie
                 key={m.id}
                 movie={m}
                 onClick={() => this.setState({ movieId: m.id })}
               />
-            )}
+            ))}
         </MovieContainer>
       </div>
     );
@@ -163,7 +169,7 @@ class NewShowing extends React.Component {
 
   render() {
     const { movieId } = this.state;
-    const { movies = [] } = this.props;
+    const { data: { movies = [] } } = this.props;
 
     if (movieId) {
       return (
@@ -178,9 +184,16 @@ class NewShowing extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  movies: values(state.movies.data),
-  meta: state.meta.data
-});
+const data = graphql(gql`
+  query NewShowingQuery {
+    movies: allMovies {
+      ...Movie
+      id
+      popularity
+      releaseDate
+    }
+  }
+  ${movieFragment}
+`);
 
-export default connect(mapStateToProps)(NewShowing);
+export default compose(data)(NewShowing);

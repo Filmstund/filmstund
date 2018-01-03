@@ -2,8 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { formatShowingDate, getTodaysDate } from "./lib/dateTools";
 import PosterBox from "./PosterBox";
+import gql from "graphql-tag";
 
-const VerticalPaddingContainer = styled.div`padding: 1em 0;`;
+const VerticalPaddingContainer = styled.div`
+  padding: 1em 0;
+`;
 
 const now = getTodaysDate();
 
@@ -17,15 +20,31 @@ const renderPremiereDate = releaseDate => {
   }
 };
 
-const Movie = ({ movie: { poster, title, releaseDate }, onClick, ...props }) =>
+const Movie = ({
+  movie: { poster, title, releaseDate },
+  onClick,
+  ...props
+}) => (
   <div {...props}>
     <PosterBox headerText={title} poster={poster} onClick={onClick}>
       <VerticalPaddingContainer>
         {renderPremiereDate(releaseDate)}
       </VerticalPaddingContainer>
     </PosterBox>
-  </div>;
+  </div>
+);
+
+export const movieFragment = gql`
+  fragment Movie on Movie {
+    id
+    poster
+    title
+    releaseDate
+  }
+`;
 
 export default styled(Movie)`
-   &:not(:last-child) { margin-bottom: 1em; }
+  &:not(:last-child) {
+    margin-bottom: 1em;
+  }
 `;

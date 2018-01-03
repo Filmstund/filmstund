@@ -1,39 +1,39 @@
 import React, { Component } from "react";
-import { ConnectedRouter } from "react-router-redux";
-import { Provider, connect } from "react-redux";
-import { me, meta } from "./store/reducers";
+import { ApolloProvider } from "react-apollo";
+import { BrowserRouter as Router } from "react-router-dom";
 
-import store, { history } from "./store/reducer";
+import client from "./store/apollo";
 import Login from "./routes/Login";
 import App from "./App";
-
+import { getJson } from "./lib/fetch";
 
 class Root extends Component {
-  componentWillMount() {
-    this.props.dispatch(me.actions.requestSingle());
-    this.props.dispatch(meta.actions.requestSingle());
+  state = { me: null };
+  componentDidMount() {
+    getJson("/users/me")
+      .then(me => {
+        this.setState({ me });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   render() {
-    const { status } = this.props;
-    const signedIn = status.data.id !== undefined;
-
+    const { me } = this.state;
     return (
-      <ConnectedRouter history={history}>
-        <Login signedIn={signedIn}>
-          <App me={status.data} />
-        </Login>
-      </ConnectedRouter>
+      <Login signedIn={Boolean(me)}>
+        <App me={me} signedIn={Boolean(me)} />
+      </Login>
     );
   }
 }
 
-const ConnectedRoot = connect(state => ({
-  status: state.me
-}))(Root);
-
-const ProviderRoot = () =>
-  <Provider store={store}>
-    <ConnectedRoot />
-  </Provider>;
+const ProviderRoot = () => (
+  <ApolloProvider client={client}>
+    <Router>
+      <Root />
+    </Router>
+  </ApolloProvider>
+);
 
 export default ProviderRoot;

@@ -1,48 +1,44 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 import moment from "moment";
-import { values, orderBy } from "lodash";
+import { compose } from "recompose";
+import { orderBy } from "lodash";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
-import Showing from "../Showing";
+import Showing, { showingFragment } from "../Showing";
 import Header from "../Header";
 
 import { getTodaysDate } from "../lib/dateTools";
-
-import { showings, movies } from "../store/reducers/index";
+const showingDate = showing => showing.date + " " + showing.time;
 
 const today = getTodaysDate();
 
 class Home extends Component {
-  componentWillMount() {
-    this.props.dispatch(showings.actions.requestIndex());
-    this.props.dispatch(movies.actions.requestIndex());
-  }
-
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
   };
 
   renderShowings = showings => {
-    return orderBy(showings, ["date"], ["asc"]).map(showing =>
+    return orderBy(showings, [showingDate], ["asc"]).map(showing => (
       <Showing
         showingId={showing.id}
         onClick={() => this.navigateToShowing(showing)}
         ticketsBought={showing.ticketsBought}
-        disabled={moment(showing.date).isBefore(today)}
+        disabled={moment(showingDate(showing)).isBefore(today)}
         movieId={showing.movieId}
         key={showing.id}
-        date={showing.date}
+        date={showingDate(showing)}
         adminId={showing.admin}
         location={showing.location.name}
       />
-    );
+    ));
   };
 
   renderCreatedByMe = showings => {
     const { me } = this.props;
-    const myShowings = showings.filter(s => s.admin === me.id);
+    const myShowings = showings.filter(s => s.admin.id === me.id);
 
     return this.renderShowings(myShowings);
   };
@@ -51,8 +47,8 @@ class Home extends Component {
     const { me } = this.props;
     const myShowings = showings.filter(
       s =>
-        s.participants.some(p => p.userId === me.id) &&
-        moment(s.date).isAfter(today)
+        s.participants.some(p => p.user.id === me.id) &&
+        moment(showingDate(s)).isAfter(today)
     );
 
     return this.renderShowings(myShowings);
@@ -62,15 +58,15 @@ class Home extends Component {
     const { me } = this.props;
     const myShowings = showings.filter(
       s =>
-        s.participants.some(p => p.userId === me.id) &&
-        moment(s.date).isBefore(today)
+        s.participants.some(p => p.user.id === me.id) &&
+        moment(showingDate(s)).isBefore(today)
     );
 
     return this.renderShowings(myShowings);
   };
 
   render() {
-    const { className, showings = [] } = this.props;
+    const { className, data: { showings = [] } } = this.props;
     return (
       <div className={className}>
         <Helmet title="Mina Besök" />
@@ -86,9 +82,24 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  showings: values(state.showings.data),
-  me: state.me.data
-});
+const data = graphql(gql`
+  query HomeQuery {
+    showings: publicShowings {
+      ...Showing
+      id
+      date
+      time
+      admin {
+        id
+      }
+      participants {
+        user {
+          id
+        }
+      }
+    }
+  }
+  ${showingFragment}
+`);
 
-export default connect(mapStateToProps)(Home);
+export default compose(data)(Home);
