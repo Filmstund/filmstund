@@ -1,6 +1,8 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.domain.dto
 
-data class LimitedUserInfo(
+import rocks.didit.sefilm.domain.UserID
+
+data class LimitedUserDTO(
   val id: UserID = UserID("N/A"),
   val name: String? = null,
   val firstName: String? = null,

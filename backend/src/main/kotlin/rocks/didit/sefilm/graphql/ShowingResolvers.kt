@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.PaymentType
+import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.redact
+import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
+import rocks.didit.sefilm.services.UserService
 import java.time.LocalDate
 import java.util.*
 
@@ -25,19 +25,23 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 }
 
 @Component
-class ShowingResolver(private val userRepository: UserRepository, private val movieRepository: MovieRepository) : GraphQLResolver<Showing> {
-  fun admin(showing: Showing): User = userRepository.findById(showing.admin).orElseThrow { NotFoundException("admin user with id: ${showing.admin}") }
-  fun payToUser(showing: Showing): User = userRepository.findById(showing.payToUser).orElseThrow { NotFoundException("payToUser with id: ${showing.payToUser}") }
+class ShowingResolver(private val userService: UserService,
+                      private val movieService: MovieService) : GraphQLResolver<Showing> {
+  fun admin(showing: Showing): LimitedUserDTO = userService.getUser(showing.admin).orElseThrow { NotFoundException("admin user with id: ${showing.admin}") }
+  fun payToUser(showing: Showing): LimitedUserDTO = userService.getUser(showing.payToUser).orElseThrow { NotFoundException("payToUser with id: ${showing.payToUser}") }
   fun movie(showing: Showing): Movie {
     val id = showing.movieId ?: UUID.randomUUID()
-    return movieRepository
-      .findById(id)
+    return movieService.getMovie(id)
       .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
   }
 }
 
 @Component
-class ParticipantUserResolver(private val userRepository: UserRepository) : GraphQLResolver<Participant> {
-  fun user(participant: Participant): User = userRepository.findById(participant.extractUserId()).orElseThrow { NotFoundException("user with id: ${participant.extractUserId()}") }
+class ParticipantUserResolver(private val userService: UserService) : GraphQLResolver<Participant> {
+  fun user(participant: Participant): LimitedUserDTO
+    = userService
+    .getUser(participant.extractUserId())
+    .orElseThrow { NotFoundException("user with id: ${participant.extractUserId()}") }
+
   fun paymentType(participant: Participant): PaymentType = participant.redact().paymentType
 }

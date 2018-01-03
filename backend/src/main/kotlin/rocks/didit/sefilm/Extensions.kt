@@ -6,6 +6,7 @@ import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
@@ -54,8 +55,8 @@ internal fun TmdbMovieDetails.toMovie() =
     popularityLastUpdated = Instant.now()
   )
 
-internal fun User.toLimitedUserInfo(): LimitedUserInfo {
-  return LimitedUserInfo(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
+internal fun User.toLimitedUserInfo(): LimitedUserDTO {
+  return LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
 }
 
 internal fun String.toImdbId() = IMDbID.valueOf(this)
