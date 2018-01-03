@@ -16,4 +16,13 @@ type Movie {
     popularity: Float!
     popularityLastUpdated: String!
     archived: Boolean!
+    sfShowings(city: String, afterDate: LocalDate): [SfShowing!]
+}
+
+type SfShowing {
+    cinemaName: String,
+    screenName: String,
+    seatCount: Int,
+    timeUtc: String,
+    tags: [String!]
 }

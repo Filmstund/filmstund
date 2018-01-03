@@ -25,13 +25,13 @@ class SFService(private val restTemplate: RestTemplate, private val httpEntity: 
   }
 
   @Cacheable("sfdates")
-  fun getShowingDates(sfId: String): List<SfShowingDTO> {
+  fun getShowingDates(sfId: String, cityAlias: String = "GB"): List<SfShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
 
     val uri = UriComponentsBuilder.fromUriString(SHOW_URL)
       .queryParam("filter.countryAlias", "se")
-      .queryParam("filter.cityAlias", "GB")
+      .queryParam("filter.cityAlias", cityAlias)
       .queryParam("filter.movieNcgId", sfId)
       .queryParam("filter.timeUtc.greaterThanOrEqualTo", startTime)
       .build().toUri()
@@ -39,7 +39,7 @@ class SFService(private val restTemplate: RestTemplate, private val httpEntity: 
     val responseBody = restTemplate.getForEntity<SfShowItemsDTO>(uri)
       .body ?: throw ExternalProviderException("[SF] Response body is null")
 
-    return responseBody.items.map { SfShowingDTO.from(it) }
+    return responseBody.items.map { SfShowingDTO.from(it) }.sortedBy { it.timeUtc }
   }
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
