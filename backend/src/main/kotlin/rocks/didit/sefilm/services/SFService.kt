@@ -21,6 +21,7 @@ class SFService(private val restTemplate: RestTemplate, private val httpEntity: 
   companion object {
     const val API_URL = "https://www.sf.se/api"
     const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
+    const val CINEMA_URL = "$API_URL/v2/cinema/sv/1/200"
     private val log = LoggerFactory.getLogger(SFService::class.java)
   }
 
@@ -40,6 +41,18 @@ class SFService(private val restTemplate: RestTemplate, private val httpEntity: 
       .body ?: throw ExternalProviderException("[SF] Response body is null")
 
     return responseBody.items.map { SfShowingDTO.from(it) }.sortedBy { it.timeUtc }
+  }
+
+  fun getLocationsInCity(cityAlias: String = "GB"): List<SfCinemaWithAddressDTO> {
+    val uri = UriComponentsBuilder.fromUriString(CINEMA_URL)
+      .queryParam("filter.countryAlias", "se")
+      .queryParam("filter.cityAlias", cityAlias)
+      .build().toUri()
+
+    val responseBody = restTemplate.getForEntity<SfLocationItemsDTO>(uri)
+      .body ?: throw ExternalProviderException("[SF] Response body is null")
+
+    return responseBody.items
   }
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
