@@ -1,11 +1,13 @@
 package rocks.didit.sefilm.web.controllers
 
-import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.util.UriComponentsBuilder
-import rocks.didit.sefilm.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RestController
+import rocks.didit.sefilm.Application
+import rocks.didit.sefilm.MissingSfIdException
+import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.clients.SfClient
 import rocks.didit.sefilm.database.entities.Movie
@@ -13,37 +15,37 @@ import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.SfMetaRepository
 import rocks.didit.sefilm.domain.MovieTitleExtension
-import rocks.didit.sefilm.domain.dto.ExternalMovieIdDTO
 import rocks.didit.sefilm.domain.dto.SavedEntitiesDTO
 import rocks.didit.sefilm.domain.dto.SfShowingDTO
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
+import rocks.didit.sefilm.services.MovieService
 import java.time.Instant
 import java.util.*
 
 @RestController
-class MovieController(private val repo: MovieRepository,
-                      private val metaRepo: SfMetaRepository,
-                      private val sfClient: SfClient,
-                      private val imdbClient: ImdbClient,
-                      private val asyncMovieUpdater: AsyncMovieUpdater,
-                      private val movieTitleTrimmer: MovieTitleExtension) {
+class MovieController(
+  private val movieService: MovieService,
+  private val repo: MovieRepository,
+  private val metaRepo: SfMetaRepository,
+  private val sfClient: SfClient,
+  private val imdbClient: ImdbClient,
+  private val asyncMovieUpdater: AsyncMovieUpdater,
+  private val movieTitleTrimmer: MovieTitleExtension) {
 
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/movies"
     private const val PATH_WITH_ID = PATH + "/{id}"
   }
 
-  private val log = LoggerFactory.getLogger(MovieController::class.java)
-
   @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun findAll() = repo.findByArchivedFalse().sortedByDescending { it.popularity }
+  fun findAll() = movieService.allMovies()
 
   @GetMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findOne(@PathVariable id: UUID): Movie {
-    return repo.findById(id).orElseThrow { NotFoundException("movie '$id'") }
+    return movieService.getMovie(id).orElseThrow { NotFoundException("movie '$id'") }
   }
 
-  @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
+  /*@PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun saveMovie(@RequestBody body: ExternalMovieIdDTO, b: UriComponentsBuilder): ResponseEntity<Movie> {
     val movieInfo = when {
       body.sf != null -> sfClient.fetchExtendedInfo(body.sf)?.toMovie()
@@ -55,7 +57,7 @@ class MovieController(private val repo: MovieRepository,
     val movie = repo.save(movieInfo)
     val createdUri = b.path(PATH_WITH_ID).buildAndExpand(movie.id).toUri()
     return ResponseEntity.created(createdUri).body(movie)
-  }
+  }*/
 
   @GetMapping(PATH + "/sf/meta")
   fun sfMetaData(): SfMeta =

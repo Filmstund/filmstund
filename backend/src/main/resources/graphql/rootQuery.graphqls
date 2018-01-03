@@ -5,6 +5,7 @@ scalar LocalDate
 type Query {
     ## Movies ##
     allMovies: [Movie!]
+    archivedMovies: [Movie!]
     movie(id: UUID!): Movie
 
     ## Showings ##
