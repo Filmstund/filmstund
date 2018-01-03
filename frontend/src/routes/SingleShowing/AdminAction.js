@@ -8,10 +8,7 @@ import { showings as showingActions } from "../../store/reducers";
 import { getJson, jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 
-import MainButton, {
-  GrayButton,
-  RedButton
-} from "../../MainButton";
+import MainButton, { GrayButton, RedButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
 
 const oreToKr = price => {
@@ -94,7 +91,9 @@ class AdminAction extends Component {
     this.props
       .requestUpdate({
         id: showing.id,
-        cinemaTicketUrls: cinemaTicketUrls.filter(line => line.trim().length !== 0),
+        cinemaTicketUrls: cinemaTicketUrls.filter(
+          line => line.trim().length !== 0
+        ),
         price: ticketPrice * 100,
         ticketsBought: true
       })
@@ -153,48 +152,48 @@ class AdminAction extends Component {
       adminMessage
     } = this.state;
 
-    return [
-      showModal &&
-      <BuyModal
-        key="buymodal"
-        setPrice={this.setPrice}
-        setCinemaTicketUrls={this.setCinemaTicketUrls}
-        showing={showing}
-        handleMarkBought={this.handleMarkBought}
-        handlePaidChange={this.handlePaidChange}
-        ticketPrice={ticketPrice}
-        cinemaTicketUrls={cinemaTicketUrls}
-        buyData={buyData}
-        closeModal={() =>
-          this.setState({ showModal: false, buyData: null })}
-      />,
-      adminMessage &&
-      <div key="admMessage">
-        {adminMessage}
-      </div>,
-
-      ticketsBought
-        ? <GrayButton key="betalningsstatus" onClick={this.handleStartBooking}>
-          Visa betalningsstatus
-            </GrayButton>
-        : <MainButton key="allaarmed" onClick={this.handleStartBooking}>
-          Alla är med, nu bokar vi!
-            </MainButton>,
-      !ticketsBought && <GrayButton key="edit" onClick={this.handleEdit}>
-        Ändra besök
-          </GrayButton>,
-      ticketsBought &&
-      calendarEventId === null &&
-      <MainButton
-        key="googlecal"
-        disabled={isCreatingEvent}
-        onClick={this.handleCreateGoogleEvent}
-      >
-        Skapa Googlekalenderevent
-          </MainButton>,
-      <RedButton key="deleteshowing" onClick={this.handleDelete}>Ta bort besök</RedButton>
-
-    ];
+    return (
+      <React.Fragment>
+        {showModal && (
+          <BuyModal
+            setPrice={this.setPrice}
+            setCinemaTicketUrls={this.setCinemaTicketUrls}
+            showing={showing}
+            handleMarkBought={this.handleMarkBought}
+            handlePaidChange={this.handlePaidChange}
+            ticketPrice={ticketPrice}
+            cinemaTicketUrls={cinemaTicketUrls}
+            buyData={buyData}
+            closeModal={() =>
+              this.setState({ showModal: false, buyData: null })
+            }
+          />
+        )}
+        {adminMessage && <div>{adminMessage}</div>}
+        {ticketsBought ? (
+          <GrayButton onClick={this.handleStartBooking}>
+            Visa betalningsstatus
+          </GrayButton>
+        ) : (
+          <MainButton onClick={this.handleStartBooking}>
+            Alla är med, nu bokar vi!
+          </MainButton>
+        )}
+        {!ticketsBought && (
+          <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
+        )}
+        {ticketsBought &&
+          calendarEventId === null && (
+            <MainButton
+              disabled={isCreatingEvent}
+              onClick={this.handleCreateGoogleEvent}
+            >
+              Skapa Googlekalenderevent
+            </MainButton>
+          )}
+        <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
+      </React.Fragment>
+    );
   }
 }
 
