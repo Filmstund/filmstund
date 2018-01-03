@@ -1,23 +1,58 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import { bioord } from "../store/reducers";
 import QuoteBox from "./QuoteBox";
+import _ from "lodash";
+import { branch, compose, renderComponent } from "recompose";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 
 class Bioord extends Component {
-  componentWillMount() {
-    this.props.dispatch(bioord.actions.requestSingle());
+  state = {
+    budord: {},
+    faded: true
+  };
+
+  componentDidMount() {
+    this.interval = setInterval(this.resampleBudord, 10000);
+    this.resampleBudord();
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  resampleBudord = () => {
+    this.setState({ faded: true });
+    setTimeout(() => {
+      this.setState((state, { data }) => ({
+        budord: _.sample(data.allBiobudord),
+        faded: false
+      }));
+    }, 1000);
+  };
+
   render() {
-    const { bioord } = this.props;
+    const { budord, faded } = this.state;
+
     return (
-      <QuoteBox number={bioord.number}>
-        {bioord.phrase}
+      <QuoteBox faded={faded} number={budord.number}>
+        {budord.phrase}
       </QuoteBox>
     );
   }
 }
 
-export default connect(state => ({
-  bioord: state.bioord.data
-}))(Bioord);
+const Loader = branch(
+  ({ data: { loading } }) => loading,
+  renderComponent(() => null)
+);
+
+const data = graphql(gql`
+  query BioordQuery {
+    allBiobudord {
+      number
+      phrase
+    }
+  }
+`);
+
+export default compose(data, Loader)(Bioord);

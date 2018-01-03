@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import { NavLink as RouterLink, withRouter } from "react-router-dom";
 import styled from "styled-components";
 import { me } from "./store/reducers";
@@ -54,16 +53,15 @@ class TopBar extends Component {
         </div>
         <div>
           <Link to="/user">Profil</Link>
-          {signedIn &&
+          {signedIn && (
             <ExternalLink href="#" tabIndex="0" onClick={this.handleLogout}>
               Logga ut
-            </ExternalLink>}
+            </ExternalLink>
+          )}
         </div>
       </TopBarContainer>
     );
   }
 }
 
-export default withRouter(
-  connect(state => ({ signedIn: !!state.me.data.id }))(TopBar)
-);
+export default withRouter(TopBar);

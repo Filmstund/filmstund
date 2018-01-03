@@ -31,7 +31,7 @@ const ContentContainer = styled.div`
 `;
 
 const LoginDialog = styled.div`
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   padding: 2em;
   background-color: #fff;
   border: solid 1px #9e9e9e;
@@ -40,7 +40,7 @@ const LoginDialog = styled.div`
 `;
 
 const GoogleButton = styled.button`
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   padding: 0.5em 1em;
   font-family: Roboto, sans-serif;
   font-size: 12pt;
@@ -83,9 +83,7 @@ class Login extends Component {
     if (signedIn) {
       return (
         <Container>
-          <ContentContainer>
-            {children}
-          </ContentContainer>
+          <ContentContainer>{children}</ContentContainer>
         </Container>
       );
     }

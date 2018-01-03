@@ -43,7 +43,11 @@ class App extends Component {
         <ScrollContainer>
           <PaddingContainer>
             <Switch>
-              <Route exact path="/" component={AsyncHome} />
+              <Route
+                exact
+                path="/"
+                render={props => <AsyncHome {...props} me={me} />}
+              />
               <Route path="/user" component={AsyncUser} />
               <Route exact path="/showings" component={AsyncShowings} />
               <Route
