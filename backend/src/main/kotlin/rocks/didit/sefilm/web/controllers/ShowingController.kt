@@ -1,29 +1,29 @@
 package rocks.didit.sefilm.web.controllers
 
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import rocks.didit.sefilm.*
+import rocks.didit.sefilm.Application
+import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Location
-import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.repositories.*
+import rocks.didit.sefilm.database.repositories.LocationRepository
+import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
+import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
+import rocks.didit.sefilm.redact
 import rocks.didit.sefilm.services.AssertionService
-import rocks.didit.sefilm.services.GoogleCalenderService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
-import java.time.Duration
-import java.time.ZoneId
+import rocks.didit.sefilm.withoutSensitiveFields
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -32,19 +32,14 @@ class ShowingController(
   private val showingService: ShowingService,
   private val repo: ShowingRepository,
   private val locationRepo: LocationRepository,
-  private val movieRepo: MovieRepository,
-  private val userRepo: UserRepository,
   private val paymentInfoRepo: ParticipantPaymentInfoRepository,
   private val ticketService: TicketService,
-  private val googleCalenderService: GoogleCalenderService,
   private val assertionService: AssertionService) {
 
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/showings"
     private const val PATH_WITH_ID = PATH + "/{id}"
   }
-
-  private val log = LoggerFactory.getLogger(ShowingController::class.java)
 
   @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findAll(): List<Showing> {
@@ -107,28 +102,7 @@ class ShowingController(
 
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun createGoogleCalendarEvent(@PathVariable id: UUID): ResponseStatusDTO {
-    val showing = findShowing(id)
-    assertionService.assertLoggedInUserIsAdmin(showing)
-    if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
-    if (showing.movieId == null) throw BadRequestException("Missing movie ID for showing ${showing.id}")
-
-    val movie = movieRepo.findById(showing.movieId).orElseThrow { NotFoundException("movie '$showing.movieId'") }
-    val runtime = movie.getDurationOrDefault()
-    val participantEmails = userRepo.findAllById(showing.participants.map { it.extractUserId() }).map { it.email }
-    val zoneId = ZoneId.of("Europe/Stockholm")
-    val event = CalendarEventDTO.of(
-      summary = movie.title,
-      location = showing.location,
-      emails = participantEmails,
-      start = ZonedDateTime.of(showing.date, showing.time, zoneId).plusSeconds(1),
-      end = ZonedDateTime.of(showing.date, showing.time, zoneId).plus(runtime).plusSeconds(1)
-    )
-
-    log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
-    val createdEventId = googleCalenderService.createEvent(event)
-    val updatedShowing = showing.copy(calendarEventId = createdEventId)
-    repo.save(updatedShowing)
-
+    val createdEventId = showingService.createCalendarEvent(id).calendarEventId
     return SuccessfulStatusDTO("Event with ID=$createdEventId created")
   }
 
@@ -180,12 +154,5 @@ class ShowingController(
         }
     }
     paymentInfoRepo.saveAll(participants)
-  }
-
-  private fun Movie.getDurationOrDefault(): Duration {
-    if (this.runtime.isZero) {
-      return Duration.ofHours(2).plusMinutes(30)
-    }
-    return this.runtime
   }
 }

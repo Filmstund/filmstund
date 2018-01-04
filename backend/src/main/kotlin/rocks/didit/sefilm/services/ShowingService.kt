@@ -1,14 +1,20 @@
 package rocks.didit.sefilm.services
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.*
+import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
+import java.time.Duration
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 @Component
@@ -22,6 +28,10 @@ class ShowingService(
   private val sfService: SFService,
   private val locationService: LocationService,
   private val assertionService: AssertionService) {
+
+  companion object {
+    private val log: Logger = LoggerFactory.getLogger(ShowingService::class.java)
+  }
 
   fun getAllPublicShowings(afterDate: LocalDate = LocalDate.MIN): List<Showing>
     = showingRepo.findByPrivateOrderByDateDesc(false).toList()
@@ -65,10 +75,7 @@ class ShowingService(
       .findByShowingIdAndUserId(showingId, currentUser)
       .orElseThrow { PaymentInfoMissing(showingId) }
 
-    val movieTitle = movieService
-      .getMovie(showing.movieId)
-      ?.title
-      .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
+    val movieTitle = movieService.getMovieOrThrow(showing.movieId).title
 
     val swishTo = when {
       !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 -> constructSwishUri(showing, payeePhone, participantInfo, movieTitle)
@@ -138,6 +145,39 @@ class ShowingService(
     return getAllPublicShowings()
   }
 
+  fun createCalendarEvent(showingId: UUID): Showing {
+    val showing = getShowingOrThrow(showingId)
+    assertionService.assertLoggedInUserIsAdmin(showing)
+    if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
+    if (showing.movieId == null) throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
+
+    val movie = movieService.getMovieOrThrow(showing.movieId)
+    val runtime = movie.getDurationOrDefault2hours()
+    val participantEmails = userService.getParticipantEmailAddresses(showing.participants)
+    val zoneId = ZoneId.of("Europe/Stockholm")
+    val event = CalendarEventDTO.of(
+      summary = movie.title,
+      location = showing.location,
+      emails = participantEmails,
+      start = ZonedDateTime.of(showing.date, showing.time, zoneId).plusSeconds(1),
+      end = ZonedDateTime.of(showing.date, showing.time, zoneId).plus(runtime).plusSeconds(1)
+    )
+
+    log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
+    val createdEventId = googleCalenderService.createEvent(event)
+    val updatedShowing = showing.copy(calendarEventId = createdEventId)
+    return showingRepo.save(updatedShowing)
+  }
+
+  fun deleteCalendarEvent(showingId: UUID): Showing {
+    val showing = getShowingOrThrow(showingId)
+    assertionService.assertLoggedInUserIsAdmin(showing)
+    if (showing.calendarEventId == null) throw IllegalArgumentException("Calendar event hasn't been created")
+
+    googleCalenderService.deleteEvent(showing.calendarEventId)
+    return showingRepo.save(showing.copy(calendarEventId = null))
+  }
+
   private fun createParticipantBasedOnPaymentType(paymentOption: PaymentOption, userId: UserID): Participant
     = when (paymentOption.type) {
     PaymentType.Foretagsbiljett -> {
@@ -177,6 +217,12 @@ class ShowingService(
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,
       participants = setOf(SwishParticipant(admin.id)))
+  }
+
+  private fun Movie.getDurationOrDefault2hours()
+    = when {
+    this.runtime.isZero -> Duration.ofHours(2).plusMinutes(30)
+    else -> this.runtime
   }
 
 }
