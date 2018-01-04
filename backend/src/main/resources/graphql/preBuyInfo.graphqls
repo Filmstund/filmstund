@@ -1,0 +1,23 @@
+type PreBuyInfo {
+    sfBuyLink: String
+    sfData: [SfData!]
+    paymentInfo: [ParticipantPaymentInfo!]
+}
+
+type SfData {
+    userId: String!
+    sfMembershipId: String
+    foretagsbiljett: String
+}
+
+type ParticipantPaymentInfo {
+    id: UUID!
+    userId: String!
+    showingId: UUID!
+    hasPaid: Boolean!
+    amountOwed: SEK!
+}
+
+extend type Showing {
+    preBuyInfo: PreBuyInfo
+}

@@ -10,14 +10,21 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
+import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.*
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 @Component
-class SFService(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>) {
+class SFService(
+  private val movieRepo: MovieRepository,
+  private val restTemplate: RestTemplate,
+  private val httpEntity: HttpEntity<Void>) {
+
   companion object {
     const val API_URL = "https://www.sf.se/api"
     const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
@@ -95,6 +102,20 @@ class SFService(private val restTemplate: RestTemplate, private val httpEntity: 
     val now = ZonedDateTime.now(ZoneOffset.UTC)
     return now.truncatedTo(ChronoUnit.HOURS)
       .plusMinutes(30L * (now.minute / 30L))
+  }
+
+  fun getSfBuyLink(movieId: UUID?): String? {
+    if (movieId == null) {
+      throw IllegalArgumentException("Missing movie ID")
+    }
+    val movie = movieRepo
+      .findById(movieId)
+      .orElseThrow { NotFoundException("movie '$movieId") }
+
+    return when {
+      movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
+      else -> null
+    }
   }
 }
 

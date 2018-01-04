@@ -10,18 +10,25 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
-import java.util.*
+import rocks.didit.sefilm.orElseThrow
 
 @Component
 class UserService(private val userRepo: UserRepository,
                   private val foretagsbiljettService: FöretagsbiljettService) {
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
-  fun getUser(id: UserID): Optional<LimitedUserDTO> = userRepo.findById(id).map { it.toLimitedUserDTO() }
+  fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
+  fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
+
+  /** Get the full user with all fields. Use with care since this contains sensitive fields */
+  fun getCompleteUser(id: UserID): User?
+    = userRepo.findById(id)
+    .orElse(null)
+
   fun currentUser(): UserDTO {
-    val currentLoggedInUser = currentLoggedInUser()
-    return userRepo.findById(currentLoggedInUser)
-      .map { it.toDTO() }
-      .orElseThrow { NotFoundException("current user with id: $currentLoggedInUser") }
+    val userID = currentLoggedInUser()
+    return getCompleteUser(userID)
+      ?.toDTO()
+      .orElseThrow { NotFoundException("current user", userID) }
   }
 
   private fun User.toDTO() = UserDTO(this.id,
