@@ -1,37 +1,42 @@
 import React, { Component } from "react";
-import { ApolloProvider } from "react-apollo";
+import { ApolloProvider, graphql, compose } from "react-apollo";
+import gql from "graphql-tag";
+import { completeUserFragment } from "./fragments/currentUser";
+
 import { BrowserRouter as Router } from "react-router-dom";
 
 import client from "./store/apollo";
 import Login from "./routes/Login";
 import App from "./App";
-import { getJson } from "./lib/fetch";
 
-class Root extends Component {
-  state = { me: null };
-  componentDidMount() {
-    getJson("/users/me")
-      .then(me => {
-        this.setState({ me });
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
+class RootComponent extends Component {
   render() {
-    const { me } = this.state;
+    const { data: { me } } = this.props;
+    const signedIn = Boolean(me);
+
     return (
-      <Login signedIn={Boolean(me)}>
-        <App me={me} signedIn={Boolean(me)} />
+      <Login signedIn={signedIn}>
+        <App me={me} signedIn={signedIn} />
       </Login>
     );
   }
 }
 
+const data = graphql(gql`
+  query RootComponentQuery {
+    me: currentUser {
+      ...CompleteUser
+    }
+  }
+  ${completeUserFragment}
+`);
+
+const RootWithData = compose(data)(RootComponent);
+
 const ProviderRoot = () => (
   <ApolloProvider client={client}>
     <Router>
-      <Root />
+      <RootWithData />
     </Router>
   </ApolloProvider>
 );

@@ -33,21 +33,17 @@ const AsyncSingleShowing = asyncComponent(() =>
 
 class App extends Component {
   render() {
-    const { me } = this.props;
+    const { me, signedIn } = this.props;
 
     return (
       <React.Fragment>
         <Helmet titleTemplate="%s | itbio" />
         <WelcomeModal me={me} />
-        <TopBar />
+        <TopBar signedIn={signedIn} />
         <ScrollContainer>
           <PaddingContainer>
             <Switch>
-              <Route
-                exact
-                path="/"
-                render={props => <AsyncHome {...props} me={me} />}
-              />
+              <Route exact path="/" component={AsyncHome} />
               <Route path="/user" component={AsyncUser} />
               <Route exact path="/showings" component={AsyncShowings} />
               <Route
