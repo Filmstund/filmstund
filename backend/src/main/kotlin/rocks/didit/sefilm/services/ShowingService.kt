@@ -9,7 +9,7 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.PreBuyInfoDTO
-import rocks.didit.sefilm.domain.dto.UserToTicketMap
+import rocks.didit.sefilm.domain.dto.UserAndSfData
 import rocks.didit.sefilm.orElseThrow
 import java.time.LocalDate
 import java.util.*
@@ -45,7 +45,7 @@ class ShowingService(
     val ticketMap = showing.participants.map {
       val user = userService.getCompleteUser(it.extractUserId()).orElseThrow { NotFoundException("user", it.extractUserId(), showingId) }
       val ftgTicket = (it as? FtgBiljettParticipant)?.ticketNumber
-      UserToTicketMap(user.id, user.sfMembershipId, ftgTicket)
+      UserAndSfData(user.id, user.sfMembershipId, ftgTicket)
     }
 
     return PreBuyInfoDTO(sfService.getSfBuyLink(showing.movieId), ticketMap, paymentInfos)

@@ -5,15 +5,15 @@ type PreBuyInfo {
 }
 
 type SfData {
-    userId: String!
+    user: User!
     sfMembershipId: String
     foretagsbiljett: String
 }
 
 type ParticipantPaymentInfo {
     id: UUID!
-    userId: String!
-    showingId: UUID!
+    user: User!
+    showing: Showing!
     hasPaid: Boolean!
     amountOwed: SEK!
 }

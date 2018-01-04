@@ -6,7 +6,7 @@ import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.UserID
 
 data class PreBuyInfoDTO(val sfBuyLink: String? = null,
-                         val sfData: List<UserToTicketMap>,
+                         val sfData: List<UserAndSfData>,
                          val paymentInfo: Collection<ParticipantPaymentInfo> = emptyList())
 
-data class UserToTicketMap(val userId: UserID, val sfMembershipId: SfMembershipId?, val foretagsbiljett: TicketNumber?)
+data class UserAndSfData(val userId: UserID, val sfMembershipId: SfMembershipId?, val foretagsbiljett: TicketNumber?)
