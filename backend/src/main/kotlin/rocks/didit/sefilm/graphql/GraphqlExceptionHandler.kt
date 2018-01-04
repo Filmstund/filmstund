@@ -21,14 +21,9 @@ class GraphqlExceptionHandler : DataFetcherExceptionHandler {
     val path = handlerParameters.path
 
     val graphqlError = when (exception) {
-      is KnownException -> object : GraphQLError {
-        override fun getMessage(): String = exception.message ?: ""
-        override fun getErrorType(): ErrorType = ErrorType.DataFetchingException
-        override fun getLocations(): List<SourceLocation> = listOf()
-        override fun getExtensions(): Map<String, Any?>
-          = mapOf("offendingUser" to exception.whichUser,
-          "showing" to exception.whichShowing)
-      }
+      is KnownException -> createFetchingError(exception.message ?: "",
+        mapOf("offendingUser" to exception.whichUser, "showing" to exception.whichShowing))
+      is IllegalArgumentException -> createFetchingError(exception.message ?: "")
       else -> {
         log.warn("Exception during data fetching: ${exception.message}", exception)
         ExceptionWhileDataFetching(path, exception, sourceLocation)
@@ -36,5 +31,14 @@ class GraphqlExceptionHandler : DataFetcherExceptionHandler {
     }
     handlerParameters.executionContext.addError(graphqlError, path)
 
+  }
+
+  private fun createFetchingError(msg: String, extensions: Map<String, Any?> = mapOf()): GraphQLError {
+    return object : GraphQLError {
+      override fun getMessage(): String = msg
+      override fun getErrorType(): ErrorType = ErrorType.DataFetchingException
+      override fun getLocations(): List<SourceLocation> = listOf()
+      override fun getExtensions(): Map<String, Any?> = extensions
+    }
   }
 }
