@@ -6,7 +6,7 @@ import MainButton from "../../MainButton";
 
 import { ftgTickets as ftgTicketsActions } from "../../store/reducers";
 import { SingleDatePicker as DatePicker } from "react-dates";
-import 'react-dates/lib/css/_datepicker.css';
+import "react-dates/lib/css/_datepicker.css";
 import Field from "../../Field";
 import { SmallHeader } from "../../Header";
 import Input from "../../Input";
@@ -21,7 +21,7 @@ const ForetagsbiljettWrapper = styled.div`
   padding: 0.5em 0;
 `;
 
-const ForetagsbiljettInput = styled(Input) `
+const ForetagsbiljettInput = styled(Input)`
   max-width: 13.6em;
 `;
 
@@ -31,7 +31,7 @@ const TrashIcon = styled.span`
   cursor: pointer;
 `;
 
-const BiljettField = styled(Field) `
+const BiljettField = styled(Field)`
   padding: 0 0.5em;
 `;
 
@@ -56,36 +56,36 @@ const Foretagsbiljett = ({
   handleSetExpiresForetagsbiljett,
   handleRemoveForetagsbiljett
 }) => (
-    <ForetagsbiljettWrapper>
-      <BiljettField text="Nummer">
-        <ForetagsbiljettInput
-          type="text"
-          value={biljett.number}
-          maxLength={11}
-          onChange={v => handleChangeForetagsbiljett(index, v)}
-        />
-      </BiljettField>
-      <BiljettField text="Utgångsdatum">
-        <DatePicker
-          numberOfMonths={1}
-          focused={dateFocused}
-          onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
-          onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
-          date={moment(biljett.expires)}
-        />
-      </BiljettField>
-      <BiljettField text="Status">{biljett.status || "Available"}</BiljettField>
-      <TrashIcon>
-        <i
-          onClick={() => handleRemoveForetagsbiljett(index)}
-          className="fa fa-trash"
-          aria-hidden="true"
-        />
-      </TrashIcon>
-    </ForetagsbiljettWrapper>
-  );
+  <ForetagsbiljettWrapper>
+    <BiljettField text="Nummer">
+      <ForetagsbiljettInput
+        type="text"
+        value={biljett.number}
+        maxLength={11}
+        onChange={v => handleChangeForetagsbiljett(index, v)}
+      />
+    </BiljettField>
+    <BiljettField text="Utgångsdatum">
+      <DatePicker
+        numberOfMonths={1}
+        focused={dateFocused}
+        onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
+        onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
+        date={moment(biljett.expires)}
+      />
+    </BiljettField>
+    <BiljettField text="Status">{biljett.status || "Available"}</BiljettField>
+    <TrashIcon>
+      <i
+        onClick={() => handleRemoveForetagsbiljett(index)}
+        className="fa fa-trash"
+        aria-hidden="true"
+      />
+    </TrashIcon>
+  </ForetagsbiljettWrapper>
+);
 
-class ForetagsbiljettList extends Component {
+export default class ForetagsbiljettList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -113,8 +113,8 @@ class ForetagsbiljettList extends Component {
   handleChangeFocus = (index, focused) => {
     this.setState(state => ({
       focusedIndex: !focused ? -1 : index
-    }))
-  }
+    }));
+  };
 
   handleChangeForetagsbiljett = (index, { target: { value } }) => {
     this.updateForetagsbiljett(index, { number: value });
@@ -146,7 +146,7 @@ class ForetagsbiljettList extends Component {
       expires: formatYMD(ftg.expires)
     }));
 
-    this.props.updateTickets(tickets);
+    // this.props.updateTickets(tickets);
   };
 
   render() {
@@ -181,7 +181,3 @@ class ForetagsbiljettList extends Component {
     );
   }
 }
-
-export default connect(null, {
-  updateTickets: ftgTicketsActions.actions.requestUpdate
-})(ForetagsbiljettList);
