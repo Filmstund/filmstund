@@ -1,0 +1,7 @@
+input ShowingInput {
+    date: LocalDate!
+    time: LocalTime!
+    movieId: UUID!
+    location: String
+    expectedBuyDate: LocalDate
+}

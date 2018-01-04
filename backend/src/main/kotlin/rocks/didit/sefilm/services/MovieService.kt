@@ -22,4 +22,6 @@ class MovieService(
     if (movieId == null) return null
     return movieRepo.findById(movieId).orElse(null)
   }
+
+  fun movieExists(movieId: UUID): Boolean = movieRepo.existsById(movieId)
 }

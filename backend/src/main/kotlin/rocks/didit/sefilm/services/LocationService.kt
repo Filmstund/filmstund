@@ -21,4 +21,10 @@ class LocationService(private val locationRepo: LocationRepository) {
     val cityResource = ClassPathResource("seeds/sf-cities.json")
     return objectMapper.readValue(cityResource.inputStream)
   }
+
+  fun getOrCreateNewLocation(name: String): Location {
+    return locationRepo
+      .findById(name)
+      .orElseGet { locationRepo.save(Location(name = name)) }
+  }
 }

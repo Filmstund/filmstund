@@ -1,5 +1,0 @@
-type Mutation {
-    attendShowing(showingId: UUID!, paymentOption: PaymentOption!): Showing!
-    unattendShowing(showingId: UUID!): Showing!
-}
-
