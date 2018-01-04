@@ -10,6 +10,7 @@ import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.toImdbId
 import rocks.didit.sefilm.toTmdbId
 import java.time.Instant
@@ -18,12 +19,16 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Component
-class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
-                                 private val imdbClient: ImdbClient) {
+class ScheduledPopularityUpdater(
+  private val movieRepository: MovieRepository,
+  private val sfService: SFService,
+  private val imdbClient: ImdbClient) {
 
   companion object {
-    private const val INITIAL_UPDATE_DELAY = 10L * 60 * 1000L // 10min
+    private const val INITIAL_UPDATE_DELAY = 1000L//10L * 60 * 1000L // 10min
     private const val UPDATE_INTERVAL = 4 * 60 * 60 * 1000L // 4 hours
+
+    private const val HAS_SF_SHOWINGS_POPULARITY = 500.0
   }
 
   private val log = LoggerFactory.getLogger(ScheduledPopularityUpdater::class.java)
@@ -76,8 +81,16 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
       return
     }
 
+    val newPopularity = when (movie.hasFutureSfShowings()) {
+      true -> {
+        log.info("[Popularity] ${movie.title} has future showings at SF, increasing popularity by $HAS_SF_SHOWINGS_POPULARITY")
+        popularityAndId.popularity + HAS_SF_SHOWINGS_POPULARITY
+      }
+      false -> popularityAndId.popularity
+    }
+
     val updatedMovie = movie.copy(
-      popularity = popularityAndId.popularity,
+      popularity = newPopularity,
       popularityLastUpdated = Instant.now(),
       tmdbId = popularityAndId.tmdbId,
       imdbId = popularityAndId.imdbId
@@ -86,8 +99,14 @@ class ScheduledPopularityUpdater(private val movieRepository: MovieRepository,
     movieRepository.save(updatedMovie)
   }
 
+  private fun Movie.hasFutureSfShowings(): Boolean {
+    if (this.sfId == null || this.sfId.isBlank()) return false
+
+    return sfService.getShowingDates(this.sfId).isNotEmpty()
+  }
+
   private fun rescheduleNextPopularityUpdate(weeks: Long = 4, movie: Movie) {
-    log.warn("[Popularity] No info found for movie with ID=${movie.id}. Next check in approximately $weeks weeks")
+    log.warn("[Popularity] No info found for movie with ${movie.title} (${movie.id}). Next check in approximately $weeks weeks")
     val updatedMovie = movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(weeks).toInstant(ZoneOffset.UTC))
     movieRepository.save(updatedMovie)
   }

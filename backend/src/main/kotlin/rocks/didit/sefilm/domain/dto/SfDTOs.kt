@@ -117,6 +117,7 @@ enum class SfTag {
   `Utmärkt film`,
   `Syntolkning`,
   `Uppläst text`,
+  Klassiker,
   Classic,
   `Ej textad`,
   Textad,

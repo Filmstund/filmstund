@@ -23,7 +23,8 @@ class MovieFilterUtil {
 
     private val TITLES_TO_IGNORE = listOf(
       " (IMAX®)",
-      " i IMAX"
+      " i IMAX",
+      " VIP"
     )
   }
 
