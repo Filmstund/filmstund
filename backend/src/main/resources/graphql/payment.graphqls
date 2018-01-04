@@ -6,6 +6,17 @@ type PaymentInfo {
     swishLink: String
 }
 
+# Used for supplying how the use will pay, when attending a showing
+input PaymentOption {
+    type: PaymentType!
+    ticketNumber: String
+}
+
+enum PaymentType {
+    Swish
+    Foretagsbiljett
+}
+
 extend type Showing {
     paymentInfo: PaymentInfo
 }

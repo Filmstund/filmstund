@@ -59,7 +59,7 @@ internal fun Long.toTmdbId() = TMDbID.valueOf(this)
 internal fun Participant.redact(): RedactedParticipant {
   return when (this) {
     is SwishParticipant -> RedactedParticipant(this.userId, PaymentType.Swish)
-    is FtgBiljettParticipant -> RedactedParticipant(this.userId, PaymentType.Företagsbiljett)
+    is FtgBiljettParticipant -> RedactedParticipant(this.userId, PaymentType.Foretagsbiljett)
     is RedactedParticipant -> this
   }
 }
