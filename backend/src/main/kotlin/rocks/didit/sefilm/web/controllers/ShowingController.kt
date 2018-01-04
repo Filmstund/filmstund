@@ -57,6 +57,7 @@ class ShowingController(
 
   @PutMapping(PATH_WITH_ID, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
+    // TODO: graphql-ify
     val showing = findShowing(id)
     assertionService.assertLoggedInUserIsAdmin(showing)
     assertionService.assertUserHasPhoneNumber(showing.admin)

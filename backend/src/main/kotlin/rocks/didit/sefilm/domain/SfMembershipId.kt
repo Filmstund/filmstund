@@ -2,7 +2,7 @@ package rocks.didit.sefilm.domain
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-data class SfMembershipId(val value: String) { // TODO: add isGold()
+data class SfMembershipId(val value: String) {
   companion object {
     fun valueOf(profileId: String): SfMembershipId {
       if (profileId[3] == '-' && profileId.length == 7) {

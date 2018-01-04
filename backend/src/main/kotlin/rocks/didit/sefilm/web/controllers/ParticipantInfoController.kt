@@ -23,6 +23,7 @@ class ParticipantInfoController(private val participantInfoRepo: ParticipantPaym
 
   @PutMapping(PATH)
   fun update(@RequestBody body: ParticipantInfoDTO): ParticipantPaymentInfo {
+    // TODO: graphql-ify
     if (body.showingId == null || body.userId == null) {
       throw IllegalArgumentException("Missing showing id and/or user id")
     }
