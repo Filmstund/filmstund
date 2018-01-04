@@ -120,6 +120,10 @@ class Application {
                       budordRepo: BudordRepository,
                       sfService: SFService,
                       properties: Properties) = ApplicationRunner {
+    if (!properties.enableSeeding) {
+      log.info("Seeding not enabled, ignoring...")
+      return@ApplicationRunner
+    }
     if (!properties.tmdb.apiKeyExists()) {
       log.warn("TMDB api key not set. Some features will not work properly!")
     }
