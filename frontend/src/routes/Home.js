@@ -37,14 +37,14 @@ class Home extends Component {
   };
 
   renderCreatedByMe = showings => {
-    const { me } = this.props;
+    const { data: { me } } = this.props;
     const myShowings = showings.filter(s => s.admin.id === me.id);
 
     return this.renderShowings(myShowings);
   };
 
   renderParticipatedByMe = showings => {
-    const { me } = this.props;
+    const { data: { me } } = this.props;
     const myShowings = showings.filter(
       s =>
         s.participants.some(p => p.user.id === me.id) &&
@@ -55,7 +55,7 @@ class Home extends Component {
   };
 
   renderPrevParticipatedByMe = showings => {
-    const { me } = this.props;
+    const { data: { me } } = this.props;
     const myShowings = showings.filter(
       s =>
         s.participants.some(p => p.user.id === me.id) &&
@@ -97,6 +97,9 @@ const data = graphql(gql`
           id
         }
       }
+    }
+    me: currentUser {
+      id
     }
   }
   ${showingFragment}
