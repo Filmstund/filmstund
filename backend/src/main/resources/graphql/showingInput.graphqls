@@ -1,7 +1,16 @@
-input ShowingInput {
+input CreateShowingInput {
     date: LocalDate!
     time: LocalTime!
     movieId: UUID!
     location: String
     expectedBuyDate: LocalDate
+}
+
+input UpdateShowingInput {
+    price: SEK!
+    private: Boolean!
+    payToUser: String!
+    expectedBuyDate: LocalDate
+    location: String!
+    time: LocalTime!
 }

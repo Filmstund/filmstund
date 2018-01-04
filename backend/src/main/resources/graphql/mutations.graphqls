@@ -1,8 +1,10 @@
 type Mutation {
+    ## Showing related mutations ##
+
     attendShowing(showingId: UUID!, paymentOption: PaymentOption!): Showing!
     unattendShowing(showingId: UUID!): Showing!
 
-    createShowing(showing: ShowingInput!): Showing!
+    createShowing(showing: CreateShowingInput!): Showing!
 
     # Delete a showign and return all public showings
     deleteShowing(showingId: UUID!): [Showing!]
@@ -10,7 +12,15 @@ type Mutation {
     createCalendarEvent(showingId: UUID!): Showing!
     deleteCalendarEvent(showingId: UUID!): Showing!
 
+    markAsBought(showingId: UUID!): Showing!
+    processTicketUrls(showingId: UUID!, ticketUrls: [String!]): Showing!
+
+    updateShowing(showingId: UUID!, newValues: UpdateShowingInput): Showing!
+
+    ## // showing ###
+
     # Fetch any new movies from SF, returns the movies that were added
     fetchNewMoviesFromSf: [Movie!]
+
 }
 
