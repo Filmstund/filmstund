@@ -65,7 +65,7 @@ private class ReleaseDateAndShowingsRule(private val showingRepository: ShowingR
   }
 
   private fun Movie.hasActiveShowings(): Boolean {
-    val showingsForMovie = showingRepository.findByMovieId(this.id)
+    val showingsForMovie = showingRepository.findByMovieIdOrderByDateDesc(this.id)
     return showingsForMovie.any {
       it.date?.isAfter(LocalDate.now()) ?: false
     }
