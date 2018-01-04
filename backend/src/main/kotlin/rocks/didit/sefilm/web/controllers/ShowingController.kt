@@ -39,7 +39,7 @@ class ShowingController(private val repo: ShowingRepository,
 
   @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findAll(): List<Showing> {
-    val showings = repo.findByPrivate(false)
+    val showings = repo.findByPrivateOrderByDateDesc(false)
     val fromThisDate = ZonedDateTime.now().minusDays(7).toLocalDate()
     return showings
       .filter { it.date?.isAfter(fromThisDate) ?: false }
