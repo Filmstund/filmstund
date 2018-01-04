@@ -15,6 +15,7 @@ import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
 import java.util.*
@@ -35,7 +36,7 @@ class TicketService(private val sfClient: SFService,
   fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
     val showing = showingRepository.findById(showingId)
-      .orElseThrow { NotFoundException("showing with id $showingId") }
+      .orElseThrow { NotFoundException("showing with id $showingId", currentLoggedInUser, showingId) }
 
     if (showing.admin != currentLoggedInUser) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
@@ -106,7 +107,9 @@ class TicketService(private val sfClient: SFService,
       .distinct()
       .sorted()
 
-    val groupedSeats = allSeatsForShowing.groupBy({ it.row }, { it.number })
+    val groupedSeats = allSeatsForShowing
+      .groupBy({ it.row }, { it.number })
+      .map { SeatRange(it.key, it.value) }
     return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
   }
 
@@ -123,11 +126,11 @@ class TicketService(private val sfClient: SFService,
     val participant = paymentInfoRepository
       .findByShowingIdAndUserId(showingId, currentLoggedInUser)
       .orElseThrow {
-        throw NotFoundException("user. Not enrolled on this showing")
+        throw NotFoundException("user $currentLoggedInUser. Not enrolled on this showing", currentLoggedInUser, showingId)
       }
 
     if (!participant.hasPaid) {
-      throw UserHasNotPaidException("User has not paid for this showing")
+      throw UserHasNotPaidException("User has not paid for this showing", participant.userId, showingId)
     }
   }
 

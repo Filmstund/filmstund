@@ -158,7 +158,7 @@ class ShowingController(private val repo: ShowingRepository,
     val showing = findShowing(id)
     val payeePhone = findUser(showing.payToUser)
       .phone
-      .orElseThrow { MissingPhoneNumberException() }
+      .orElseThrow { MissingPhoneNumberException(showing.payToUser) }
 
     val currentUser = currentLoggedInUser()
     val participantInfo = paymentInfoRepo
@@ -285,7 +285,7 @@ class ShowingController(private val repo: ShowingRepository,
 
   private fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
     if (showing.participants.any { it.hasUserId(userID) }) {
-      throw UserAlreadyAttendedException()
+      throw UserAlreadyAttendedException(userID)
     }
   }
 
@@ -298,7 +298,7 @@ class ShowingController(private val repo: ShowingRepository,
   private fun assertUserHasPhoneNumber(userID: UserID) {
     val user = findUser(userID)
     if (user.phone == null || user.phone.number.isBlank()) {
-      throw MissingPhoneNumberException()
+      throw MissingPhoneNumberException(userID)
     }
   }
 

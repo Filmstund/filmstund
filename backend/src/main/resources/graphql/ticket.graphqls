@@ -1,0 +1,46 @@
+# A ticket assigned to a user that allowes access to SF
+type Ticket {
+    id: String!
+    showingId: UUID!
+    assignedToUser: User!
+    profileId: String
+    barcode: String!
+    customerType: String!
+    customerTypeDefinition: String!
+    cinema: String!
+    cinemaCity: String!
+    screen: String!
+    seat: Seat!,
+    date: LocalDate!,
+    time: String!,
+    movieName: String!
+    # 15 år, 11 år etc.
+    movieRating: String!
+    # "textad", "en" etc
+    showAttributes: [String!]
+}
+
+# The row and seat number for a ticket
+type Seat {
+    row: Int!
+    number: Int!
+}
+
+type SeatRange {
+    row: Int!
+    # All numbers for this particular row
+    numbers: [Int!]
+}
+
+# In what range is the seating assigned for each row
+type TicketRange {
+    rows: [Int!]
+    seatings: [SeatRange!]
+    # The total number of tickets for this showing
+    totalCount: Int!
+}
+
+extend type Showing {
+    myTickets: [Ticket!]
+    ticketRange: TicketRange!
+}
