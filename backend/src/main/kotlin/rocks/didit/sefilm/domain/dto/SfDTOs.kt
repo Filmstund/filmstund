@@ -118,6 +118,7 @@ enum class SfTag {
   `Ej textad`,
   Textad,
   Familj,
+  Knattebio,
   Unknown;
 
   companion object {
