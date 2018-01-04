@@ -140,24 +140,7 @@ class ShowingController(
   fun getBuyingTicketDetails(@PathVariable id: UUID): PreBuyInfoDTO = showingService.getPreBuyInfo(id)
 
   @GetMapping(PATH_WITH_ID + "/pay")
-  fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO {
-    val showing = findShowing(id)
-    val payeePhone = findUser(showing.payToUser)
-      .phone
-      .orElseThrow { MissingPhoneNumberException(showing.payToUser) }
-
-    val currentUser = currentLoggedInUser()
-    val participantInfo = paymentInfoRepo
-      .findByShowingIdAndUserId(id, currentUser)
-      .orElseThrow { PaymentInfoMissing(id) }
-
-    val swishTo = when {
-      !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 -> constructSwishUri(showing, payeePhone, participantInfo)
-      else -> null
-    }
-
-    return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, showing.payToUser, swishTo, currentUser)
-  }
+  fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO = showingService.getPaymentInfo(id)
 
   @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   @ResponseStatus(HttpStatus.CREATED)
@@ -263,47 +246,10 @@ class ShowingController(
     paymentInfoRepo.saveAll(participants)
   }
 
-  private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo): String {
-    if (showing.movieId == null) {
-      throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
-    }
-    val movieTitle = movieRepo
-      .findById(showing.movieId)
-      .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
-      .title
-
-    return SwishDataDTO(
-      payee = StringValue(payeePhone.number),
-      amount = IntValue(participantInfo.amountOwed.toKronor()),
-      message = generateSwishMessage(movieTitle, showing))
-      .generateUri()
-      .toASCIIString()
-  }
-
-  private fun generateSwishMessage(movieTitle: String, showing: Showing): StringValue {
-    val timeAndDate = " @ ${showing.date} ${showing.time}"
-    val maxSize = Math.min(movieTitle.length, 50 - timeAndDate.length)
-    val truncatedMovieTitle = movieTitle.substring(0, maxSize)
-
-    return StringValue("$truncatedMovieTitle$timeAndDate")
-  }
-
   private fun Movie.getDurationOrDefault(): Duration {
     if (this.runtime.isZero) {
       return Duration.ofHours(2).plusMinutes(30)
     }
     return this.runtime
-  }
-
-  private fun findUser(userID: UserID) =
-    userRepo
-      .findById(userID)
-      .orElseThrow { NotFoundException("user " + userID) }
-
-  private fun PhoneNumber?.orElseThrow(exceptionSupplier: () -> Exception): PhoneNumber {
-    if (this == null) {
-      throw exceptionSupplier()
-    }
-    return this
   }
 }

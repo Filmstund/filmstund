@@ -1,16 +1,16 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.PaymentDTO
 import rocks.didit.sefilm.domain.dto.PreBuyInfoDTO
 import rocks.didit.sefilm.domain.dto.UserAndSfData
-import rocks.didit.sefilm.orElseThrow
+import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
 
@@ -18,6 +18,7 @@ import java.util.*
 class ShowingService(
   private val showingRepo: ShowingRepository,
   private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+  private val movieService: MovieService,
   private val userService: UserService,
   private val sfService: SFService,
   private val assertionService: AssertionService) {
@@ -49,6 +50,30 @@ class ShowingService(
     }
 
     return PreBuyInfoDTO(sfService.getSfBuyLink(showing.movieId), ticketMap, paymentInfos)
+  }
+
+  fun getPaymentInfo(showingId: UUID): PaymentDTO {
+    val showing = getShowingOrThrow(showingId)
+    val payeePhone = userService.getCompleteUser(showing.payToUser)
+      ?.phone
+      .orElseThrow { MissingPhoneNumberException(showing.payToUser) }
+
+    val currentUser = currentLoggedInUser()
+    val participantInfo = paymentInfoRepo
+      .findByShowingIdAndUserId(showingId, currentUser)
+      .orElseThrow { PaymentInfoMissing(showingId) }
+
+    val movieTitle = movieService
+      .getMovie(showing.movieId)
+      ?.title
+      .orElseThrow { NotFoundException("movie with id " + showing.movieId) }
+
+    val swishTo = when {
+      !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 -> constructSwishUri(showing, payeePhone, participantInfo, movieTitle)
+      else -> null
+    }
+
+    return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, showing.payToUser, swishTo, currentUser)
   }
 
   private fun Showing.userIsInvolvedInThisShowing(userID: UserID): Boolean {

@@ -1,0 +1,11 @@
+type PaymentInfo {
+    hasPaid: Boolean!
+    amountOwed: SEK!
+    payTo: User!
+    payer: User!
+    swishLink: String
+}
+
+extend type Showing {
+    paymentInfo: PaymentInfo
+}

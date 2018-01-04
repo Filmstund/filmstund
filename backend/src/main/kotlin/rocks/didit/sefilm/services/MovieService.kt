@@ -15,6 +15,11 @@ class MovieService(
 
   /** All movies that aren't archived */
   fun allMovies() = movieRepo.findByArchivedOrderByPopularityDesc(false)
+
   fun archivedMovies() = movieRepo.findByArchivedOrderByPopularityDesc(true)
-  fun getMovie(movieId: UUID): Optional<Movie> = movieRepo.findById(movieId)
+
+  fun getMovie(movieId: UUID?): Movie? {
+    if (movieId == null) return null
+    return movieRepo.findById(movieId).orElse(null)
+  }
 }
