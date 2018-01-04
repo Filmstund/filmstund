@@ -28,7 +28,7 @@ class MissingAPIKeyException(service: String) : KnownException("The service $ser
 class PaymentInfoMissing(showingId: UUID) : KnownException("Payment info for $showingId is missing")
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-class TicketsAlreadyBoughtException(showingId: UUID) : KnownException("The action is not allowd since the tickets for showing $showingId is already bought")
+class TicketsAlreadyBoughtException(userID: UserID, showingId: UUID) : KnownException("The action is not allowed since the tickets for this showing is already bought", userID, showingId)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class UserAlreadyAttendedException(userID: UserID) : KnownException("The user has already attended this showing", userID)
@@ -43,7 +43,7 @@ class DuplicateTicketException(msg: String = "") : KnownException("Found duplica
 class SfTicketException(msg: String) : KnownException(msg)
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-class UserHasNotPaidException(msg: String, userID: UserID, showingId: UUID) : KnownException(msg, userID)
+class UserHasNotPaidException(msg: String, userID: UserID, showingId: UUID) : KnownException(msg, userID, showingId)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(msg: String) : KnownException(msg)

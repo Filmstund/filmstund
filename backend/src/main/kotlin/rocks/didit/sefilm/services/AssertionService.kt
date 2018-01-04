@@ -13,9 +13,9 @@ class AssertionService(
   private val userService: UserService,
   private val foretagsbiljettService: FöretagsbiljettService) {
 
-  fun assertTicketsNotBought(showing: Showing) {
+  fun assertTicketsNotBought(userID: UserID, showing: Showing) {
     if (showing.ticketsBought) {
-      throw TicketsAlreadyBoughtException(showing.id)
+      throw TicketsAlreadyBoughtException(userID, showing.id)
     }
   }
 

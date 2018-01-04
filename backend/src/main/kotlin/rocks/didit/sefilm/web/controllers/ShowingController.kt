@@ -161,49 +161,16 @@ class ShowingController(
   }
 
   @PostMapping(PATH_WITH_ID + "/attend", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant> {
-    val showing = findShowing(id)
-    val userId = currentLoggedInUser()
-    assertionService.assertTicketsNotBought(showing)
-    assertionService.assertUserNotAlreadyAttended(userId, showing)
-
-    val participant: Participant = when (body.paymentOption.type) {
-      PaymentType.Företagsbiljett -> {
-        val suppliedTicket = body.paymentOption.ticketNumber ?: throw MissingParametersException("företagsbiljett ticket number")
-        val ticketNumber = TicketNumber(suppliedTicket)
-
-        assertionService.assertForetagsbiljettIsAvailable(userId, ticketNumber)
-        FtgBiljettParticipant(userId, ticketNumber)
-      }
-      PaymentType.Swish -> SwishParticipant(userId)
-    }
-
-    val newParticipants = showing.participants.plus(participant)
-    val savedShowing = repo.save(showing.copy(participants = newParticipants))
-
-    return savedShowing.participants.map(Participant::redact)
-  }
+  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant>
+    = showingService.attendShowing(id, body.paymentOption)
+    .participants
+    .map(Participant::redact)
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun unattend(@PathVariable id: UUID): List<Participant> {
-    val showing = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
-    val userId = currentLoggedInUser()
-    assertionService.assertTicketsNotBought(showing)
-
-    val participantLst = showing.participants.filter { it.hasUserId(userId) }
-    if (participantLst.isEmpty()) {
-      return showing.participants.map(Participant::redact)
-    } else if (participantLst.size > 1) {
-      throw AssertionError("Participant $userId has participated more than one time on showing $id")
-    }
-
-    val participant = participantLst.first()
-
-    val participantsWithoutLoggedInUser = showing.participants.minus(participant)
-    val savedShowing = repo.save(showing.copy(participants = participantsWithoutLoggedInUser))
-
-    return savedShowing.participants.map(Participant::redact)
-  }
+  fun unattend(@PathVariable id: UUID): List<Participant>
+    = showingService.unattendShowing(id)
+    .participants
+    .map(Participant::redact)
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun ShowingDTO.toShowing(admin: LimitedUserDTO): Showing {
