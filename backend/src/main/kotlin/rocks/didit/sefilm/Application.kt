@@ -2,6 +2,7 @@ package rocks.didit.sefilm
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import graphql.execution.AsyncExecutionStrategy
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
@@ -34,6 +35,7 @@ import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.domain.MovieTitleExtension
+import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.services.SFService
 import java.math.BigDecimal
 import java.time.Duration
@@ -150,6 +152,9 @@ class Application {
 
     log.info("Seeded ${locationsRepo.saveAll(locationsFromSF).count()} locations from SF for city: $cityAlias")
   }
+
+  @Bean
+  fun graphqlExecutionStrategy(graphqlExceptionHandler: GraphqlExceptionHandler) = AsyncExecutionStrategy(graphqlExceptionHandler)
 }
 
 fun main(args: Array<String>) {

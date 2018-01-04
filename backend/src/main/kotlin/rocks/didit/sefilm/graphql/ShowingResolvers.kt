@@ -6,12 +6,15 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
+import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.redact
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
+import rocks.didit.sefilm.services.TicketService
 import rocks.didit.sefilm.services.UserService
 import java.time.LocalDate
 import java.util.*
@@ -26,7 +29,8 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 
 @Component
 class ShowingResolver(private val userService: UserService,
-                      private val movieService: MovieService) : GraphQLResolver<Showing> {
+                      private val movieService: MovieService,
+                      private val ticketService: TicketService) : GraphQLResolver<Showing> {
   fun admin(showing: Showing): LimitedUserDTO = userService.getUser(showing.admin).orElseThrow { NotFoundException("admin user with id: ${showing.admin}") }
   fun payToUser(showing: Showing): LimitedUserDTO = userService.getUser(showing.payToUser).orElseThrow { NotFoundException("payToUser with id: ${showing.payToUser}") }
   fun movie(showing: Showing): Movie {
@@ -34,6 +38,9 @@ class ShowingResolver(private val userService: UserService,
     return movieService.getMovie(id)
       .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
   }
+
+  fun myTickets(showing: Showing): List<Ticket> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
+  fun ticketRange(showing: Showing): TicketRange = ticketService.getTicketRange(showing.id)
 }
 
 @Component
@@ -41,7 +48,15 @@ class ParticipantUserResolver(private val userService: UserService) : GraphQLRes
   fun user(participant: Participant): LimitedUserDTO
     = userService
     .getUser(participant.extractUserId())
-    .orElseThrow { NotFoundException("user with id: ${participant.extractUserId()}") }
+    .orElseThrow { NotFoundException("user with id: ${participant.extractUserId()}", participant.extractUserId()) }
 
   fun paymentType(participant: Participant): PaymentType = participant.redact().paymentType
+}
+
+@Component
+class TicketUserResolver(private val userService: UserService) : GraphQLResolver<Ticket> {
+  fun assignedToUser(ticket: Ticket): LimitedUserDTO
+    = userService
+    .getUser(ticket.assignedToUser)
+    .orElseThrow { NotFoundException("user with id: ${ticket.assignedToUser}", ticket.assignedToUser) }
 }
