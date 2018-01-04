@@ -7,7 +7,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForEntity
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.NotFoundException
@@ -26,9 +25,10 @@ class SFService(
   private val httpEntity: HttpEntity<Void>) {
 
   companion object {
-    const val API_URL = "https://www.sf.se/api"
-    const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
-    const val CINEMA_URL = "$API_URL/v2/cinema/sv/1/200"
+    private const val API_URL = "https://www.sf.se/api"
+    private const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
+    private const val CINEMA_URL = "$API_URL/v2/cinema/sv/1/200"
+    private const val MOVIES_URL = "$API_URL/v2/movie/sv/1/1000"
     private val log = LoggerFactory.getLogger(SFService::class.java)
   }
 
@@ -44,7 +44,8 @@ class SFService(
       .queryParam("filter.timeUtc.greaterThanOrEqualTo", startTime)
       .build().toUri()
 
-    val responseBody = restTemplate.getForEntity<SfShowItemsDTO>(uri)
+    val responseBody = restTemplate
+      .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<SfShowItemsDTO>() {})
       .body ?: throw ExternalProviderException("[SF] Response body is null")
 
     return responseBody.items.map { SfShowingDTO.from(it) }.sortedBy { it.timeUtc }
@@ -56,7 +57,8 @@ class SFService(
       .queryParam("filter.cityAlias", cityAlias)
       .build().toUri()
 
-    val responseBody = restTemplate.getForEntity<SfLocationItemsDTO>(uri)
+    val responseBody = restTemplate
+      .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<SfLocationItemsDTO>() {})
       .body ?: throw ExternalProviderException("[SF] Response body is null")
 
     return responseBody.items
@@ -70,11 +72,12 @@ class SFService(
     return body
   }
 
-  fun allMovies(cityAlias: String = "GB"): List<SfMovieDTO> {
-    return restTemplate
-      .exchange("${API_URL}/v1/movies/category/All?Page=1&PageSize=1024&blockId=1592&CityAlias=$cityAlias&", HttpMethod.GET,
-        httpEntity, object : ParameterizedTypeReference<List<SfMovieDTO>>() {})
-      .body ?: listOf()
+  fun allMovies(): List<SfMovieDTO> {
+    val responseBody = restTemplate
+      .exchange(MOVIES_URL, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<SfMovieItemsDTO>() {})
+      .body ?: throw ExternalProviderException("[SF] Response body is null")
+
+    return responseBody.items
   }
 
   // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
