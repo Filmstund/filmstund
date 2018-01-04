@@ -1,9 +1,9 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.utils
 
 import org.springframework.stereotype.Component
 
 @Component
-class MovieTitleExtension {
+class MovieTitleUtil {
   companion object {
     val STUFF_TO_REMOVE = listOf(
       " - Klassiker",

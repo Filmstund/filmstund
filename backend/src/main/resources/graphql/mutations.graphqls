@@ -9,5 +9,8 @@ type Mutation {
 
     createCalendarEvent(showingId: UUID!): Showing!
     deleteCalendarEvent(showingId: UUID!): Showing!
+
+    # Fetch any new movies from SF, returns the movies that were added
+    fetchNewMoviesFromSf: [Movie!]
 }
 
