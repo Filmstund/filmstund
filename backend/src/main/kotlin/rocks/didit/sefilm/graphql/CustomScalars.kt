@@ -14,14 +14,15 @@ import java.util.*
 
 @Component
 class CustomScalarUUID : GraphQLScalarType("UUID", "UUID", object : Coercing<UUID, String> {
-  override fun parseLiteral(input: Any?): UUID? {
+  override fun parseLiteral(input: Any?): UUID {
     return when (input) {
       is StringValue -> UUID.fromString(input.value)
-      else -> null
+      is String -> UUID.fromString(input)
+      else -> throw IllegalArgumentException("Unable to parse UUID from $input")
     }
   }
 
-  override fun parseValue(input: Any?): UUID? = parseLiteral(input)
+  override fun parseValue(input: Any?): UUID = parseLiteral(input)
 
   override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
     is String -> dataFetcherResult
