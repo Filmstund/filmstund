@@ -8,3 +8,8 @@ type Location {
     postalCode: String
     postalAddress: String
 }
+
+type SfCity {
+    name: String!
+    alias: String!
+}

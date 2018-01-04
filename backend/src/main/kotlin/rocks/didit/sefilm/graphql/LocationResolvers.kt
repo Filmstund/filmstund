@@ -8,4 +8,5 @@ import rocks.didit.sefilm.services.LocationService
 class LocationResolver(private val locationService: LocationService) : GraphQLQueryResolver {
   fun previousLocations() = locationService.allLocations()
   fun location(id: String) = locationService.getLocation(id)
+  fun sfCities() = locationService.sfCities()
 }

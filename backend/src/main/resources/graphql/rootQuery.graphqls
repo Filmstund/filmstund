@@ -25,4 +25,5 @@ type Query {
     ## Location ##
     previousLocations: [Location!]
     location(id: String!): Location
+    sfCities: [SfCity!]
 }
