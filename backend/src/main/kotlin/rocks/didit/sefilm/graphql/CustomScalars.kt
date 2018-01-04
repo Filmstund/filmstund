@@ -5,7 +5,9 @@ import graphql.language.StringValue
 import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.TMDbID
 import java.time.LocalDate
 import java.util.*
 
@@ -59,6 +61,42 @@ class CustomScalarLocalDate : GraphQLScalarType("LocalDate", "Simple LocalDate, 
   override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
     is String -> dataFetcherResult
     is LocalDate -> dataFetcherResult.toString()
+    else -> null
+  }
+})
+
+@Component
+class CustomScalarIMDbID : GraphQLScalarType("IMDbID", "IMDb ID, i.e. tt2527336", object : Coercing<IMDbID, String> {
+  override fun parseLiteral(input: Any?): IMDbID {
+    return when (input) {
+      is StringValue -> IMDbID.valueOf(input.value)
+      else -> IMDbID.MISSING
+    }
+  }
+
+  override fun parseValue(input: Any?): IMDbID = parseLiteral(input)
+
+  override fun serialize(input: Any?): String? = when (input) {
+    is String -> input
+    is IMDbID -> input.value
+    else -> null
+  }
+})
+
+@Component
+class CustomScalarTMDbID : GraphQLScalarType("TMDbID", "TMDb ID", object : Coercing<TMDbID, Long> {
+  override fun parseLiteral(input: Any?): TMDbID {
+    return when (input) {
+      is IntValue -> TMDbID.valueOf(input.value.toLong())
+      else -> TMDbID.MISSING
+    }
+  }
+
+  override fun parseValue(input: Any?): TMDbID = parseLiteral(input)
+
+  override fun serialize(input: Any?): Long? = when (input) {
+    is Long -> input
+    is TMDbID -> input.value
     else -> null
   }
 })
