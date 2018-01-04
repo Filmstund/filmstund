@@ -9,10 +9,7 @@ import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.PaymentType
-import rocks.didit.sefilm.domain.dto.LimitedUserDTO
-import rocks.didit.sefilm.domain.dto.PreBuyInfoDTO
-import rocks.didit.sefilm.domain.dto.TicketRange
-import rocks.didit.sefilm.domain.dto.UserAndSfData
+import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.redact
 import rocks.didit.sefilm.services.MovieService
@@ -60,6 +57,9 @@ class ShowingResolver(
 
   fun preBuyInfo(showing: Showing): PreBuyInfoDTO
     = showingService.getPreBuyInfo(showing.id)
+
+  fun paymentInfo(showing: Showing): PaymentDTO
+    = showingService.getPaymentInfo(showing.id)
 }
 
 @Component

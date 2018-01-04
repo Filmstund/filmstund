@@ -16,6 +16,7 @@ import rocks.didit.sefilm.database.repositories.SfMetaRepository
 import rocks.didit.sefilm.domain.MovieTitleExtension
 import rocks.didit.sefilm.domain.dto.SavedEntitiesDTO
 import rocks.didit.sefilm.domain.dto.SfShowingDTO
+import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.SFService
