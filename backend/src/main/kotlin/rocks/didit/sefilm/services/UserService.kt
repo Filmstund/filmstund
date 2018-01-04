@@ -6,6 +6,7 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Företagsbiljett
+import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
@@ -29,6 +30,13 @@ class UserService(private val userRepo: UserRepository,
     return getCompleteUser(userID)
       ?.toDTO()
       .orElseThrow { NotFoundException("current user", userID) }
+  }
+
+  fun getParticipantEmailAddresses(participants: Collection<Participant>): List<String> {
+    val userIds = participants.map { it.extractUserId() }
+    return userRepo
+      .findAllById(userIds)
+      .map { it.email }
   }
 
   private fun User.toDTO() = UserDTO(this.id,
