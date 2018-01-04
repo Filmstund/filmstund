@@ -8,19 +8,15 @@ import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.MissingSfIdException
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.SfMeta
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.SfMetaRepository
-import rocks.didit.sefilm.domain.MovieTitleExtension
 import rocks.didit.sefilm.domain.dto.SavedEntitiesDTO
 import rocks.didit.sefilm.domain.dto.SfShowingDTO
 import rocks.didit.sefilm.orElseThrow
-import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.SFService
-import java.time.Instant
 import java.util.*
 
 @RestController
@@ -28,10 +24,7 @@ class MovieController(
   private val movieService: MovieService,
   private val repo: MovieRepository,
   private val metaRepo: SfMetaRepository,
-  private val sfClient: SFService,
-  private val imdbClient: ImdbClient,
-  private val asyncMovieUpdater: AsyncMovieUpdater,
-  private val movieTitleTrimmer: MovieTitleExtension) {
+  private val sfClient: SFService) {
 
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/movies"
@@ -61,6 +54,7 @@ class MovieController(
   }*/
 
   @GetMapping(PATH + "/sf/meta")
+  @Deprecated("to be removed in the future")
   fun sfMetaData(): SfMeta =
     metaRepo
       .findById("sfpopulate")
@@ -68,20 +62,8 @@ class MovieController(
 
   @PostMapping(PATH + "/sf/populate")
   fun populateFromSf(): SavedEntitiesDTO {
-    val sfMovies = sfClient.allMovies()
-
-    val ourMovies = repo.findAll()
-    val newMoviesWeHaventPreviouslySeen = sfMovies
-      .filter { (ncgId, title) -> !movieTitleTrimmer.isTitleUnwanted(title) && ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
-      .map { (ncgId, title, releaseDate, _, posterUrl) ->
-        Movie(title = movieTitleTrimmer.trimTitle(title), sfId = ncgId, releaseDate = releaseDate, poster = posterUrl)
-      }
-
-    val savedEntities = repo.saveAll(newMoviesWeHaventPreviouslySeen)
-    metaRepo.save(SfMeta("sfpopulate", Instant.now(), "Previously saved ${savedEntities.count()} new movies from SF", savedEntities.count()))
-
-    asyncMovieUpdater.extendMovieInfo(savedEntities)
-    return SavedEntitiesDTO(savedEntities.count(), "Fetched and saved new movies from SF")
+    movieService.fetchNewMoviesFromSf()
+    return SavedEntitiesDTO(message = "Fetched and saved new movies from SF")
   }
 
   @GetMapping(PATH_WITH_ID + "/sfdates")

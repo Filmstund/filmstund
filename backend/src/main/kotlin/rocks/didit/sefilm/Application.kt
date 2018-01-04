@@ -38,7 +38,7 @@ import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
-import rocks.didit.sefilm.domain.MovieTitleExtension
+import rocks.didit.sefilm.utils.MovieTitleUtil
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.services.SFService
 import java.math.BigDecimal
@@ -97,7 +97,7 @@ class Application {
   }
 
   @Bean
-  fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieTitleExtension) = ApplicationRunner {
+  fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieTitleUtil) = ApplicationRunner {
     val unwantedMovies = movieRepository
       .findAll()
       .filter { titleExtensions.isTitleUnwanted(it.title) }
@@ -106,7 +106,7 @@ class Application {
   }
 
   @Bean
-  fun trimMovieNames(movieRepository: MovieRepository, titleExtensions: MovieTitleExtension) = ApplicationRunner {
+  fun trimMovieNames(movieRepository: MovieRepository, titleExtensions: MovieTitleUtil) = ApplicationRunner {
     movieRepository.findAll()
       .filter {
         titleExtensions.titleRequiresTrimming(it.title)
