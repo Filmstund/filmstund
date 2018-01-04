@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
@@ -178,6 +179,35 @@ class ShowingService(
     return showingRepo.save(showing.copy(calendarEventId = null))
   }
 
+  fun markAsBought(showingId: UUID): Showing {
+    val showing = getShowingOrThrow(showingId)
+    assertionService.assertLoggedInUserIsAdmin(showing)
+    assertionService.assertUserHasPhoneNumber(showing.admin)
+
+    if (showing.ticketsBought) {
+      log.info("Showing $showingId is already bought")
+      return showing
+    }
+
+    createInitialPaymentInfo(showing)
+    return showingRepo.save(showing.copy(ticketsBought = true))
+  }
+
+  fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): Showing {
+    val showing = getShowingOrThrow(showingId)
+    assertionService.assertLoggedInUserIsAdmin(showing)
+
+    log.info("Updating showing ($showingId) to new values: $newValues")
+    return showingRepo.save(showing.copy(
+      price = SEK(newValues.price),
+      private = newValues.private,
+      payToUser = userService.getUserOrThrow(UserID(newValues.payToUser)).id,
+      expectedBuyDate = newValues.expectedBuyDate,
+      location = locationService.getOrCreateNewLocation(newValues.location),
+      time = newValues.time
+    ))
+  }
+
   private fun createParticipantBasedOnPaymentType(paymentOption: PaymentOption, userId: UserID): Participant
     = when (paymentOption.type) {
     PaymentType.Foretagsbiljett -> {
@@ -223,6 +253,20 @@ class ShowingService(
     = when {
     this.runtime.isZero -> Duration.ofHours(2).plusMinutes(30)
     else -> this.runtime
+  }
+
+  private fun createInitialPaymentInfo(showing: Showing) {
+    val participants = showing
+      .participants
+      .map { it ->
+        val userId = it.extractUserId()
+        val hasPaid = userId == showing.payToUser || it is FtgBiljettParticipant
+        ParticipantPaymentInfo(userId = userId,
+          showingId = showing.id,
+          hasPaid = hasPaid,
+          amountOwed = if (hasPaid || showing.price == null) SEK(0) else showing.price)
+      }
+    paymentInfoRepo.saveAll(participants)
   }
 
 }

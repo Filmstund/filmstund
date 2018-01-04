@@ -8,12 +8,9 @@ import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Location
-import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.LocationRepository
-import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
@@ -32,7 +29,6 @@ class ShowingController(
   private val showingService: ShowingService,
   private val repo: ShowingRepository,
   private val locationRepo: LocationRepository,
-  private val paymentInfoRepo: ParticipantPaymentInfoRepository,
   private val ticketService: TicketService,
   private val assertionService: AssertionService) {
 
@@ -57,7 +53,6 @@ class ShowingController(
 
   @PutMapping(PATH_WITH_ID, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
-    // TODO: graphql-ify
     val showing = findShowing(id)
     assertionService.assertLoggedInUserIsAdmin(showing)
     assertionService.assertUserHasPhoneNumber(showing.admin)
@@ -77,7 +72,6 @@ class ShowingController(
     val updateShowing = showing.copy(
       price = SEK(body.price),
       private = body.private,
-      ticketsBought = body.ticketsBought,
       expectedBuyDate = body.expectedBuyDate,
       payToUser = newPayToUser,
       time = body.time ?: showing.time,
@@ -85,7 +79,7 @@ class ShowingController(
 
     val updatedShowing = repo.save(updateShowing)
     if (body.ticketsBought) {
-      createInitialPaymentInfo(updateShowing)
+      showingService.markAsBought(id)
     }
 
     if (body.cinemaTicketUrls.isNotEmpty()) {
@@ -132,28 +126,4 @@ class ShowingController(
     = showingService.unattendShowing(id)
     .participants
     .map(Participant::redact)
-
-
-  private fun createInitialPaymentInfo(showing: Showing) {
-    val participants = showing.participants.map { participant ->
-      paymentInfoRepo.findByShowingIdAndUserId(showing.id, participant.extractUserId())
-        .map {
-          // Use existing info
-          ParticipantPaymentInfo(
-            id = it.id,
-            userId = participant.extractUserId(),
-            showingId = showing.id,
-            hasPaid = it.hasPaid || participant is FtgBiljettParticipant,
-            amountOwed = it.amountOwed)
-        }
-        .orElseGet {
-          // Create new info
-          ParticipantPaymentInfo(userId = participant.extractUserId(),
-            showingId = showing.id,
-            hasPaid = participant.extractUserId() == showing.payToUser || participant is FtgBiljettParticipant,
-            amountOwed = showing.price ?: SEK(0))
-        }
-    }
-    paymentInfoRepo.saveAll(participants)
-  }
 }
