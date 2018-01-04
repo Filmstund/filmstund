@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { graphql, compose } from "react-apollo";
+import gql from "graphql-tag";
 import styled from "styled-components";
 import Helmet from "react-helmet";
 import Field from "../../Field";
@@ -15,6 +16,7 @@ import * as fetchers from "../../lib/fetchers";
 import { trim } from "../../Utils";
 
 import ForetagsbiljettList from "./ForetagsbiljettList";
+import { completeUserFragment } from "../../fragments/currentUser";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -44,13 +46,15 @@ const UserName = styled.h3`
   padding: 0;
 `;
 
-const UserInfo = styled.div`padding: 1em;`;
+const UserInfo = styled.div`
+  padding: 1em;
+`;
 
 class User extends Component {
   constructor(props) {
     super(props);
 
-    const { me } = this.props;
+    const { data: { me } } = this.props;
 
     this.state = {
       editedUser: {
@@ -60,16 +64,6 @@ class User extends Component {
         foretagsbiljetter: me.foretagsbiljetter || []
       }
     };
-  }
-
-  componentWillMount() {
-    const { fetchMe, requestTickets } = this.props;
-    requestTickets();
-    fetchMe();
-  }
-
-  componentWillUnmount() {
-    this.props.clearViewStatus();
   }
 
   setEditedUserValue = (key, { target: { value } }) => {
@@ -89,19 +83,18 @@ class User extends Component {
       ...editedUser
     });
 
-    this.props.requestUpdateMe({
-      id: me.id,
-      ...trimmedValues
-    });
+    // this.props.requestUpdateMe({
+    //   id: me.id,
+    //   ...trimmedValues
+    // });
   };
 
   render() {
     const {
-      me,
+      data: { me },
       className,
       error,
       success,
-      ftgTickets,
       errorFtgTickets,
       successFtgTickets
     } = this.props;
@@ -150,25 +143,19 @@ class User extends Component {
         {successFtgTickets === true && (
           <StatusBox error={false}>Företagsbiljetter uppdaterades!</StatusBox>
         )}
-        <ForetagsbiljettList biljetter={ftgTickets} />
+        <ForetagsbiljettList biljetter={me.foretagsbiljetter} />
       </div>
     );
   }
 }
 
-export default connect(
-  state => ({
-    me: state.me.data,
-    ftgTickets: state.ftgTickets.data || [],
-    errorFtgTickets: state.ftgTickets.error,
-    successFtgTickets: state.ftgTickets.success,
-    error: state.me.error,
-    success: state.me.success
-  }),
-  {
-    ...fetchers,
-    requestTickets: ftgTicketsActions.actions.requestSingle,
-    requestUpdateMe: meActions.actions.requestUpdate,
-    clearViewStatus: meActions.actions.clearStatus
+const data = graphql(gql`
+  query UserProfile {
+    me: currentUser {
+      ...CompleteUser
+    }
   }
-)(User);
+  ${completeUserFragment}
+`);
+
+export default compose(data)(User);
