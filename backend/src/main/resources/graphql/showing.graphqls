@@ -5,7 +5,7 @@ type Showing {
     movie: Movie!
     location: Location
     private: Boolean!
-    price: SEK!
+    price: SEK
     ticketsBought: Boolean!
     admin: User!
     payToUser: User!
