@@ -2,10 +2,7 @@ package rocks.didit.sefilm.web.controllers
 
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import rocks.didit.sefilm.Application
-import rocks.didit.sefilm.DuplicateTicketException
-import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Företagsbiljett
@@ -15,8 +12,8 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
-import rocks.didit.sefilm.services.UserService
 import rocks.didit.sefilm.services.FöretagsbiljettService
+import rocks.didit.sefilm.services.UserService
 
 @RestController
 class UserController(
@@ -73,7 +70,7 @@ class UserController(
   @GetMapping(BASE_PATH + "/{id}", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun findOne(@PathVariable id: UserID): LimitedUserDTO
     = userService.getUser(id)
-    .orElseThrow { NotFoundException("user '$id'") }
+    .orElseThrow { NotFoundException("user", id) }
 
   @PutMapping(ME_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {

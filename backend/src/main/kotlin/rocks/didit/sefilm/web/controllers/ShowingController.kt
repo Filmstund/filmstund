@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
@@ -13,8 +12,9 @@ import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
-import rocks.didit.sefilm.services.FöretagsbiljettService
+import rocks.didit.sefilm.services.AssertionService
 import rocks.didit.sefilm.services.GoogleCalenderService
+import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
 import java.time.Duration
 import java.time.ZoneId
@@ -22,14 +22,17 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-class ShowingController(private val repo: ShowingRepository,
-                        private val locationRepo: LocationRepository,
-                        private val movieRepo: MovieRepository,
-                        private val userRepo: UserRepository,
-                        private val paymentInfoRepo: ParticipantPaymentInfoRepository,
-                        private val ticketService: TicketService,
-                        private val googleCalenderService: GoogleCalenderService,
-                        private val foretagsbiljettService: FöretagsbiljettService) {
+class ShowingController(
+  private val showingService: ShowingService,
+  private val repo: ShowingRepository,
+  private val locationRepo: LocationRepository,
+  private val movieRepo: MovieRepository,
+  private val userRepo: UserRepository,
+  private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+  private val ticketService: TicketService,
+  private val googleCalenderService: GoogleCalenderService,
+  private val assertionService: AssertionService) {
+
   companion object {
     private const val PATH = Application.API_BASE_PATH + "/showings"
     private const val PATH_WITH_ID = PATH + "/{id}"
@@ -54,8 +57,8 @@ class ShowingController(private val repo: ShowingRepository,
   @PutMapping(PATH_WITH_ID, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
     val showing = findShowing(id)
-    assertLoggedInUserIsAdmin(showing)
-    assertUserHasPhoneNumber(showing.admin)
+    assertionService.assertLoggedInUserIsAdmin(showing)
+    assertionService.assertUserHasPhoneNumber(showing.admin)
 
     val newPayToUser = when {
       body.payToUser != null -> UserID(body.payToUser)
@@ -93,7 +96,7 @@ class ShowingController(private val repo: ShowingRepository,
   @DeleteMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun deleteShowing(@PathVariable id: UUID): SuccessfulStatusDTO {
     val showing = findShowing(id)
-    assertLoggedInUserIsAdmin(showing)
+    assertionService.assertLoggedInUserIsAdmin(showing)
 
     if (showing.calendarEventId != null) {
       googleCalenderService.deleteEvent(showing.calendarEventId)
@@ -109,7 +112,7 @@ class ShowingController(private val repo: ShowingRepository,
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun createGoogleCalendarEvent(@PathVariable id: UUID): ResponseStatusDTO {
     val showing = findShowing(id)
-    assertLoggedInUserIsAdmin(showing)
+    assertionService.assertLoggedInUserIsAdmin(showing)
     if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
     if (showing.movieId == null) throw BadRequestException("Missing movie ID for showing ${showing.id}")
 
@@ -134,24 +137,7 @@ class ShowingController(private val repo: ShowingRepository,
   }
 
   @GetMapping(PATH_WITH_ID + "/buy")
-  fun getBuyingTicketDetails(@PathVariable id: UUID): BuyDTO {
-    val showing = findShowing(id)
-    assertLoggedInUserIsAdmin(showing)
-
-    // Note that this list is empty before the showing has been marked as bought
-    val paymentInfos = paymentInfoRepo.findByShowingId(showing.id)
-    val ticketMap = showing.participants.map {
-      val user = findUser(it.extractUserId())
-      val ftgTicket = when (it) {
-        is FtgBiljettParticipant -> it.ticketNumber
-        else -> null
-      }
-
-      UserToTicketMap(user.id, user.sfMembershipId, ftgTicket)
-    }
-
-    return BuyDTO(getSfBuyLink(showing), ticketMap, paymentInfos)
-  }
+  fun getBuyingTicketDetails(@PathVariable id: UUID): PreBuyInfoDTO = showingService.getPreBuyInfo(id)
 
   @GetMapping(PATH_WITH_ID + "/pay")
   fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO {
@@ -195,15 +181,15 @@ class ShowingController(private val repo: ShowingRepository,
   fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant> {
     val showing = findShowing(id)
     val userId = currentLoggedInUser()
-    assertTicketsNotBought(showing)
-    assertUserNotAlreadyAttended(userId, showing)
+    assertionService.assertTicketsNotBought(showing)
+    assertionService.assertUserNotAlreadyAttended(userId, showing)
 
     val participant: Participant = when (body.paymentOption.type) {
       PaymentType.Företagsbiljett -> {
         val suppliedTicket = body.paymentOption.ticketNumber ?: throw MissingParametersException("företagsbiljett ticket number")
         val ticketNumber = TicketNumber(suppliedTicket)
 
-        assertForetagsbiljettIsAvailable(userId, ticketNumber)
+        assertionService.assertForetagsbiljettIsAvailable(userId, ticketNumber)
         FtgBiljettParticipant(userId, ticketNumber)
       }
       PaymentType.Swish -> SwishParticipant(userId)
@@ -219,7 +205,7 @@ class ShowingController(private val repo: ShowingRepository,
   fun unattend(@PathVariable id: UUID): List<Participant> {
     val showing = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
     val userId = currentLoggedInUser()
-    assertTicketsNotBought(showing)
+    assertionService.assertTicketsNotBought(showing)
 
     val participantLst = showing.participants.filter { it.hasUserId(userId) }
     if (participantLst.isEmpty()) {
@@ -277,49 +263,6 @@ class ShowingController(private val repo: ShowingRepository,
     paymentInfoRepo.saveAll(participants)
   }
 
-  private fun assertTicketsNotBought(showing: Showing) {
-    if (showing.ticketsBought) {
-      throw TicketsAlreadyBoughtException(showing.id)
-    }
-  }
-
-  private fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
-    if (showing.participants.any { it.hasUserId(userID) }) {
-      throw UserAlreadyAttendedException(userID)
-    }
-  }
-
-  private fun assertLoggedInUserIsAdmin(showing: Showing) {
-    if (currentLoggedInUser() != showing.admin) {
-      throw AccessDeniedException("Only the showing admin is allowed to do that")
-    }
-  }
-
-  private fun assertUserHasPhoneNumber(userID: UserID) {
-    val user = findUser(userID)
-    if (user.phone == null || user.phone.number.isBlank()) {
-      throw MissingPhoneNumberException(userID)
-    }
-  }
-
-  private fun assertForetagsbiljettIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
-    val user = findUser(userId)
-    val matchingTickets = user.foretagsbiljetter.filter {
-      it.number == suppliedTicket
-    }
-
-    if (matchingTickets.isEmpty()) {
-      throw TicketNotFoundException(suppliedTicket)
-    }
-    if (matchingTickets.size > 1) {
-      throw DuplicateTicketException(": $suppliedTicket")
-    }
-
-    if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Företagsbiljett.Status.Available) {
-      throw BadRequestException("Ticket has already been used: " + suppliedTicket.number)
-    }
-  }
-
   private fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo): String {
     if (showing.movieId == null) {
       throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
@@ -356,20 +299,6 @@ class ShowingController(private val repo: ShowingRepository,
     userRepo
       .findById(userID)
       .orElseThrow { NotFoundException("user " + userID) }
-
-  private fun getSfBuyLink(showing: Showing): String? {
-    if (showing.movieId == null) {
-      throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
-    }
-    val movie = movieRepo
-      .findById(showing.movieId)
-      .orElseThrow { NotFoundException("movie '${showing.movieId}") }
-
-    return when {
-      movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
-      else -> null
-    }
-  }
 
   private fun PhoneNumber?.orElseThrow(exceptionSupplier: () -> Exception): PhoneNumber {
     if (this == null) {

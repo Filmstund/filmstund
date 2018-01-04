@@ -4,9 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.*
-import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.SfExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import java.time.Duration
@@ -55,10 +53,6 @@ internal fun TmdbMovieDetails.toMovie() =
     popularityLastUpdated = Instant.now()
   )
 
-internal fun User.toLimitedUserInfo(): LimitedUserDTO {
-  return LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
-}
-
 internal fun String.toImdbId() = IMDbID.valueOf(this)
 internal fun Long.toTmdbId() = TMDbID.valueOf(this)
 
@@ -73,3 +67,5 @@ internal fun Participant.redact(): RedactedParticipant {
 internal fun Showing.withoutSensitiveFields(): Showing {
   return this.copy(participants = participants.map(Participant::redact).toSet())
 }
+
+inline fun <reified T, E : Throwable> T?.orElseThrow(exceptionSupplier: () -> E): T = this ?: throw exceptionSupplier()
