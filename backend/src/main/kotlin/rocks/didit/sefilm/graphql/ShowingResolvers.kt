@@ -12,6 +12,7 @@ import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.PreBuyInfoDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.UserAndSfData
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.redact
 import rocks.didit.sefilm.services.MovieService
@@ -65,8 +66,7 @@ class ShowingResolver(
 class ParticipantUserResolver(private val userService: UserService) : GraphQLResolver<Participant> {
   fun user(participant: Participant): LimitedUserDTO
     = userService
-    .getUser(participant.extractUserId())
-    .orElseThrow { NotFoundException("user with id: ${participant.extractUserId()}", participant.extractUserId()) }
+    .getUserOrThrow(participant.extractUserId())
 
   fun paymentType(participant: Participant): PaymentType = participant.redact().paymentType
 }
@@ -75,6 +75,12 @@ class ParticipantUserResolver(private val userService: UserService) : GraphQLRes
 class TicketUserResolver(private val userService: UserService) : GraphQLResolver<Ticket> {
   fun assignedToUser(ticket: Ticket): LimitedUserDTO
     = userService
-    .getUser(ticket.assignedToUser)
-    .orElseThrow { NotFoundException("user with id: ${ticket.assignedToUser}", ticket.assignedToUser) }
+    .getUserOrThrow(ticket.assignedToUser)
+}
+
+@Component
+class SfDataUserResolver(private val userService: UserService) : GraphQLResolver<UserAndSfData> {
+  fun user(data: UserAndSfData): LimitedUserDTO
+    = userService
+    .getUserOrThrow(data.userId)
 }
