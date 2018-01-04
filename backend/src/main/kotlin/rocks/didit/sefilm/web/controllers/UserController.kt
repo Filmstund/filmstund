@@ -30,6 +30,7 @@ class UserController(
   fun currentUser() = userService.currentUser()
 
   @GetMapping(FTG_TICKET_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
+  @Deprecated("remove when graphql is used")
   fun getFtgTickets(): List<FöretagsbiljettDTO> {
     val currentLoggedInUser = currentLoggedInUser()
     return userRepository
@@ -45,6 +46,7 @@ class UserController(
 
   @PutMapping(FTG_TICKET_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateFtgTickets(@RequestBody suppliedFtgTickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
+    // TODO: graphql
     assertNoDuplicateForetagsbiljetter(suppliedFtgTickets)
     val tickets = suppliedFtgTickets.map { Företagsbiljett.valueOf(it) }
 
@@ -74,6 +76,7 @@ class UserController(
 
   @PutMapping(ME_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
+    // TODO: graphql
     val newBioklubbnummer = when {
       newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
       else -> SfMembershipId.valueOf(newDetails.sfMembershipId)

@@ -8,7 +8,6 @@ enum class ValueState {
   Supplied
 }
 
-//TODO add SfId class
 sealed class ExternalProviderId(val state: ValueState) {
 
   fun isMissing() = state == ValueState.Missing
