@@ -9,6 +9,7 @@ import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.TMDbID
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.*
 
 @Component
@@ -61,6 +62,24 @@ class CustomScalarLocalDate : GraphQLScalarType("LocalDate", "Simple LocalDate, 
   override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
     is String -> dataFetcherResult
     is LocalDate -> dataFetcherResult.toString()
+    else -> null
+  }
+})
+
+@Component
+class CustomScalarLocalTime : GraphQLScalarType("LocalTime", "Simple LocalTime, i.e. 19:37:21", object : Coercing<LocalTime, String> {
+  override fun parseLiteral(input: Any?): LocalTime? {
+    return when (input) {
+      is StringValue -> LocalTime.parse(input.value)
+      else -> null
+    }
+  }
+
+  override fun parseValue(input: Any?): LocalTime? = parseLiteral(input)
+
+  override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
+    is String -> dataFetcherResult
+    is LocalTime -> dataFetcherResult.toString()
     else -> null
   }
 })

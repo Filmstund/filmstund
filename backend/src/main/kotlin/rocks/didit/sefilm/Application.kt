@@ -1,8 +1,12 @@
 package rocks.didit.sefilm
 
+import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.execution.AsyncExecutionStrategy
+import graphql.servlet.ObjectMapperConfigurer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.SpringApplication
@@ -159,6 +163,30 @@ class Application {
 
   @Bean
   fun graphqlExecutionStrategy(graphqlExceptionHandler: GraphqlExceptionHandler) = AsyncExecutionStrategy(graphqlExceptionHandler)
+
+  @Bean
+  fun graphQLServletObjectMapperConfigurer(): ObjectMapperConfigurer {
+    return ObjectMapperConfigurer {
+      it.findAndRegisterModules()
+        .registerModule(JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    }
+  }
+
+  @Bean
+  fun graphQLToolsObjectMapperConfig(): com.coxautodev.graphql.tools.ObjectMapperConfigurer {
+    return com.coxautodev.graphql.tools.ObjectMapperConfigurer { mapper, context ->
+      mapper.findAndRegisterModules()
+        .registerModule(JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    }
+  }
+
+  @Bean
+  fun schemaParserOptions(objConfigurer: com.coxautodev.graphql.tools.ObjectMapperConfigurer) = SchemaParserOptions
+    .newOptions()
+    .objectMapperConfigurer(objConfigurer)
+    .build()
 }
 
 fun main(args: Array<String>) {

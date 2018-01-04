@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.PaymentOption
+import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.services.ShowingService
 import java.util.*
 
@@ -16,4 +17,10 @@ class ShowingMutationResolver(
 
   fun unattendShowing(showingId: UUID): Showing
     = showingService.unattendShowing(showingId)
+
+  fun createShowing(showing: ShowingDTO): Showing
+    = showingService.createShowing(showing)
+
+  fun deleteShowing(showingId: UUID): List<Showing>
+    = showingService.deleteShowing(showingId)
 }

@@ -7,9 +7,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.*
-import rocks.didit.sefilm.database.entities.*
+import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.*
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.FtgBiljettParticipant
+import rocks.didit.sefilm.domain.Participant
+import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
 import rocks.didit.sefilm.services.AssertionService
@@ -95,18 +101,8 @@ class ShowingController(
 
   @DeleteMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   fun deleteShowing(@PathVariable id: UUID): SuccessfulStatusDTO {
-    val showing = findShowing(id)
-    assertionService.assertLoggedInUserIsAdmin(showing)
-
-    if (showing.calendarEventId != null) {
-      googleCalenderService.deleteEvent(showing.calendarEventId)
-    }
-
-    paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
-    repo.delete(showing)
-    ticketService.deleteTickets(showing)
-
-    return SuccessfulStatusDTO("Showing with id ${showing.id} were removed successfully")
+    showingService.deleteShowing(id)
+    return SuccessfulStatusDTO("Showing with id $id were removed successfully")
   }
 
   @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
@@ -145,17 +141,7 @@ class ShowingController(
   @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   @ResponseStatus(HttpStatus.CREATED)
   fun createShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
-    if (body.date == null || body.location == null || body.movieId == null || body.time == null) throw MissingParametersException()
-    if (!movieRepo.existsById(body.movieId)) {
-      throw NotFoundException("movie '${body.movieId}'. Can't create showing for movie that does not exist")
-    }
-
-    val adminUser = userRepo
-      .findById(currentLoggedInUser())
-      .map(User::toLimitedUserDTO)
-      .orElseThrow { NotFoundException("Current logged in user not found in db") }
-
-    val savedShowing = repo.save(body.toShowing(adminUser))
+    val savedShowing = showingService.createShowing(body)
     val newLocation = b.path(PATH_WITH_ID).buildAndExpand(savedShowing.id).toUri()
     return ResponseEntity.created(newLocation).body(savedShowing)
   }
@@ -172,23 +158,6 @@ class ShowingController(
     .participants
     .map(Participant::redact)
 
-  /* Fetch location from db or create it if it does not exist before converting the showing */
-  private fun ShowingDTO.toShowing(admin: LimitedUserDTO): Showing {
-    if (this.location == null) {
-      throw IllegalArgumentException("Location may not be null")
-    }
-    val location = locationRepo
-      .findById(this.location)
-      .orElseGet { locationRepo.save(Location(name = this.location)) }
-    return Showing(date = this.date,
-      time = this.time,
-      movieId = this.movieId,
-      location = location,
-      admin = admin.id,
-      payToUser = admin.id,
-      expectedBuyDate = this.expectedBuyDate,
-      participants = setOf(SwishParticipant(admin.id)))
-  }
 
   private fun createInitialPaymentInfo(showing: Showing) {
     val participants = showing.participants.map { participant ->

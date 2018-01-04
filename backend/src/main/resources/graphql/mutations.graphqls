@@ -1,0 +1,10 @@
+type Mutation {
+    attendShowing(showingId: UUID!, paymentOption: PaymentOption!): Showing!
+    unattendShowing(showingId: UUID!): Showing!
+
+    createShowing(showing: ShowingInput!): Showing!
+
+    # Delete a showign and return all public showings
+    deleteShowing(showingId: UUID!): [Showing!]
+}
+

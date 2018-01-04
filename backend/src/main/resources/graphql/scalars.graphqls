@@ -1,0 +1,6 @@
+scalar UUID
+scalar SEK
+scalar LocalDate
+scalar LocalTime
+scalar IMDbID
+scalar TMDbID

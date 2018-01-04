@@ -1,8 +1,3 @@
-scalar UUID
-scalar SEK
-scalar LocalDate
-scalar IMDbID
-scalar TMDbID
 
 type Query {
     ## Movies ##

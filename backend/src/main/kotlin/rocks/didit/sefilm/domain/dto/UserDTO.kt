@@ -16,4 +16,6 @@ class UserDTO(
     val foretagsbiljetter: List<FöretagsbiljettDTO> = emptyList(),
     val lastLogin: Instant = Instant.ofEpochSecond(0L),
     val signupDate: Instant = Instant.ofEpochSecond(0L)
-)
+) {
+  fun toLimitedUserDTO() = LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone, this.avatar)
+}
