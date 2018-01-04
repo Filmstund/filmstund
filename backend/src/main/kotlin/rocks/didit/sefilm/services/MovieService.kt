@@ -6,16 +6,18 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.dto.SfMovieDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
-import rocks.didit.sefilm.utils.MovieTitleUtil
+import rocks.didit.sefilm.utils.MovieFilterUtil
+import java.time.Duration
 import java.util.*
 
 @Component
 class MovieService(
   private val movieRepo: MovieRepository,
   private val sfService: SFService,
-  private val movieTitleUtil: MovieTitleUtil,
+  private val filterUtil: MovieFilterUtil,
   private val asyncMovieUpdater: AsyncMovieUpdater
 ) {
 
@@ -43,15 +45,29 @@ class MovieService(
 
     val ourMovies = movieRepo.findAll()
     val newMoviesWeHaventPreviouslySeen = sfMovies
-      .filter { (ncgId, title) -> !movieTitleUtil.isTitleUnwanted(title) && ourMovies.firstOrNull { our -> our.sfId == ncgId } == null }
-      .map { (ncgId, title, releaseDate, _, posterUrl) ->
-        Movie(title = movieTitleUtil.trimTitle(title), sfId = ncgId, releaseDate = releaseDate, poster = posterUrl)
+      .filter {
+        filterUtil.isNewerThan(it)
+          && !filterUtil.isMovieUnwantedBasedOnGenre(it.genres.map { it.name })
+          && !filterUtil.isTitleUnwanted(it.title)
+          && ourMovies.isOtherMovieAlreadyKnown(it)
+      }
+      .map {
+        Movie(title = filterUtil.trimTitle(it.title),
+          sfId = it.ncgId,
+          releaseDate = it.releaseDate,
+          poster = it.posterUrl,
+          sfSlug = it.slug,
+          runtime = Duration.ofMinutes(it.length?.toLong() ?: 0L),
+          genres = it.genres.map { g -> g.name })
       }
 
     val savedEntities = movieRepo.saveAll(newMoviesWeHaventPreviouslySeen)
     log.info("Fetched ${savedEntities.count()} new movies from SF")
 
     asyncMovieUpdater.extendMovieInfo(savedEntities)
-    return savedEntities.toList()
+    return savedEntities.sortedBy { it.releaseDate }
   }
+
+  private fun Iterable<Movie>.isOtherMovieAlreadyKnown(other: SfMovieDTO) =
+    this.firstOrNull { our -> our.sfId == other.ncgId } == null
 }

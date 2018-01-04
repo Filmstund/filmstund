@@ -15,7 +15,9 @@ data class SfMovieDTO(val ncgId: String,
                       val releaseDate: LocalDate,
                       val rating: SfRatingDTO,
                       val posterUrl: String,
-                      val slug: String)
+                      val slug: String,
+                      val length: Int?,
+                      val genres: List<SfGenreDTO> = listOf())
 
 data class SfOriginalLanguageDTO(val alias: String,
                                  val englishName: String,
@@ -51,6 +53,7 @@ data class SfScreenDTO(val ncgId: String, val title: String, val slug: String, v
 
 data class SfShowItemsDTO(val totalNbrOfItems: Int, val items: List<SfShowDTO>)
 data class SfLocationItemsDTO(val totalNbrOfItems: Int, val items: List<SfCinemaWithAddressDTO>)
+data class SfMovieItemsDTO(val totalNbrOfItems: Int, val items: List<SfMovieDTO>)
 
 data class SfShowDTO(
   val remoteSystemAlias: String,
