@@ -22,5 +22,7 @@ type Mutation {
     # Fetch any new movies from SF, returns the movies that were added
     fetchNewMoviesFromSf: [Movie!]
 
+    updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInput!): ParticipantPaymentInfo!
+
 }
 
