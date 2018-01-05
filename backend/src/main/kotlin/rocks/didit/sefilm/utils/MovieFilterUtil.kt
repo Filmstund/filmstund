@@ -18,7 +18,8 @@ class MovieFilterUtil {
     private val GENRES_TO_IGNORE = listOf(
       "Opera",
       "Balett",
-      "Konsert"
+      "Konsert",
+      "Hemlig"
     )
 
     private val TITLES_TO_IGNORE = listOf(
