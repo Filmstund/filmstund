@@ -161,7 +161,8 @@ class ShowingService(
       location = showing.location,
       emails = participantEmails,
       start = ZonedDateTime.of(showing.date, showing.time, zoneId).plusSeconds(1),
-      end = ZonedDateTime.of(showing.date, showing.time, zoneId).plus(runtime).plusSeconds(1)
+      end = ZonedDateTime.of(showing.date, showing.time, zoneId).plus(runtime).plusSeconds(1),
+      sfBuyLink = sfService.getSfBuyLink(movie.id) ?: ""
     )
 
     log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
