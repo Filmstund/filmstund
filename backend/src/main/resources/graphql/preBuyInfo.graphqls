@@ -18,6 +18,14 @@ type ParticipantPaymentInfo {
     amountOwed: SEK!
 }
 
+input ParticipantPaymentInput {
+    id: UUID!
+    userId: String!
+    showingId: UUID
+    hasPaid: Boolean!
+    amountOwed: SEK!
+}
+
 extend type Showing {
     preBuyInfo: PreBuyInfo
 }
