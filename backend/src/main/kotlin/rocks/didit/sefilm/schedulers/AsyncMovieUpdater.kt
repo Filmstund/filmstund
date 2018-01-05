@@ -5,13 +5,13 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.clients.ImdbClient
-import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import rocks.didit.sefilm.services.SFService
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -46,11 +46,11 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
 
   fun synchronousExtendMovieInfo(movies: Iterable<Movie>) {
     movies.forEach {
-      log.info("Fetching extended info for '${it.title}' with id=${it.id}")
+      log.info("[MovieUpdater] Fetching extended info for ${it.log()}")
       try {
         updateInfo(it)
       } catch (e: Exception) {
-        log.warn("An error occurred when updating '${it.title}' ID=${it.id}, SF id=${it.sfId}", e)
+        log.warn("[MovieUpdater] An error occurred when updating '${it.title}' ID=${it.id}, SF id=${it.sfId}", e)
       }
       randomBackoff()
     }
@@ -78,7 +78,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun fetchExtendedInfoForMovie(movie: Movie) {
-    log.debug("Fetching extended info for movie id=${movie.id}")
+    log.debug("[MovieUpdater] Fetching extended info for ${movie.log()}")
     when {
       movie.sfId != null -> updateFromSf(movie)
       movie.tmdbId.isSupplied() -> updateFromTmdbById(movie)
@@ -88,10 +88,10 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun updateFromSf(movie: Movie): Movie {
-    log.info("[SF] Fetching extended info by SF id=${movie.sfId}")
+    log.info("[SF] Fetching extended info from SF for ${movie.log()} and sfId: ${movie.sfId}")
     val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
     if (updatedMovie == null) {
-      log.info("[SF] ${movie.sfId} not found. Removing that SF id...")
+      log.info("[SF] ${movie.log()} not found. Removing that SF id...")
       return movieRepository.save(movie.copy(sfId = null))
     }
 
@@ -105,13 +105,17 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       genres = updatedMovie.genres?.map { it.name } ?: listOf())
 
     val saved = movieRepository.save(copy)
-    log.info("[SF] Successfully updated and saved movie[${movie.id}] with SF data")
+    if (saved.needsMoreInfo()) {
+      log.info("[SF] Updated ${movie.log()} with SF data, but not all info were available")
+    } else {
+      log.info("[SF] Successfully updated ${movie.log()} with SF data")
+    }
     return saved
   }
 
   private fun updateFromTmdbById(movie: Movie) {
     if (movie.tmdbId.isNotSupplied()) {
-      log.info("[TMDb] Movie[${movie.id} is missing an TMDb ID. TMDb ID state: ${movie.tmdbId.state}")
+      log.info("[TMDb] ${movie.log()} is missing an TMDb ID. TMDb ID state: ${movie.tmdbId.state}")
       return
     }
 
@@ -122,7 +126,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
 
   private fun updateFromTmdbByImdbId(movie: Movie) {
     if (movie.imdbId.isNotSupplied()) {
-      log.info("[TMDb] The IMDb ID for movie with ID=${movie.id} is not supplied")
+      log.info("[TMDb] The IMDb ID for ${movie.log()} is not supplied")
       return
     }
 
@@ -192,4 +196,6 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       popularityLastUpdated = Instant.now(),
       imdbId = IMDbID.valueOf(movieDetails.imdb_id))
   }
+
+  private fun Movie.log() = "'${this.title}' (${this.id})"
 }
