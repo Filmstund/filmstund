@@ -100,7 +100,7 @@ class Application {
   fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner {
     val unwantedMovies = movieRepository
       .findAll()
-      .filter { titleExtensions.isMovieUnwantedBasedOnGenre(it.genres) }
+      .filter { titleExtensions.isMovieUnwantedBasedOnGenre(it.genres) || titleExtensions.isTitleUnwanted(it.title) }
     log.info("Deleting ${unwantedMovies.size} unwanted movies")
     movieRepository.deleteAll(unwantedMovies)
   }
