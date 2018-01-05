@@ -6,11 +6,10 @@ import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Företagsbiljett
-import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
+import rocks.didit.sefilm.domain.dto.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.services.FöretagsbiljettService
 import rocks.didit.sefilm.services.UserService
@@ -75,26 +74,8 @@ class UserController(
     .orElseThrow { NotFoundException("user", id) }
 
   @PutMapping(ME_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): User {
-    // TODO: graphql
-    val newBioklubbnummer = when {
-      newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
-      else -> SfMembershipId.valueOf(newDetails.sfMembershipId)
-    }
-
-    val newPhoneNumber = when {
-      newDetails.phone == null || newDetails.phone.isBlank() -> null
-      else -> PhoneNumber(newDetails.phone)
-    }
-
-    val updatedUser = getCurrentUser().copy(
-      phone = newPhoneNumber,
-      nick = newDetails.nick,
-      sfMembershipId = newBioklubbnummer
-    )
-
-    return userRepository.save(updatedUser)
-  }
+  fun updateLoggedInUser(@RequestBody newDetails: UserDetailsDTO): UserDTO
+    = userService.updateUser(newDetails)
 
   private fun getCurrentUser(): User
     = userRepository
