@@ -25,7 +25,7 @@ type User {
 
 type Foretagsbiljett {
     number: String!
-    expires: String!
+    expires: LocalDate!
     status: ForetagsbiljettStatus!
 }
 
@@ -40,4 +40,9 @@ input NewUserInfo {
     nick: String
     sfMembershipId: String
     phone: String
+}
+
+input ForetagsbiljettInput {
+    number: String!
+    expires: LocalDate
 }

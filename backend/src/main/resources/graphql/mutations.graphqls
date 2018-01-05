@@ -26,5 +26,7 @@ type Mutation {
 
     updateUser(newInfo: NewUserInfo!): CurrentUser!
 
+    addForetagsBiljetter(biljetter: [ForetagsbiljettInput!]): CurrentUser!
+    deleteForetagsBiljett(biljett: ForetagsbiljettInput!): CurrentUser!
 }
 

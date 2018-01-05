@@ -6,7 +6,7 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.*
-import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
+import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
@@ -14,7 +14,7 @@ import rocks.didit.sefilm.orElseThrow
 
 @Component
 class UserService(private val userRepo: UserRepository,
-                  private val foretagsbiljettService: FöretagsbiljettService) {
+                  private val foretagsbiljettService: ForetagsbiljettService) {
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
   fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
@@ -72,7 +72,7 @@ class UserService(private val userRepo: UserRepository,
     this.lastLogin,
     this.signupDate)
 
-  private fun Företagsbiljett.toDTO(): FöretagsbiljettDTO {
-    return FöretagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))
+  private fun Företagsbiljett.toDTO(): ForetagsbiljettDTO {
+    return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))
   }
 }

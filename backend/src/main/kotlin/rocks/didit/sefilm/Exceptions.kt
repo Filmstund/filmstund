@@ -30,6 +30,8 @@ class PaymentInfoMissing(showingId: UUID) : KnownException("Payment info for $sh
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class TicketsAlreadyBoughtException(userID: UserID, showingId: UUID) : KnownException("The action is not allowed since the tickets for this showing is already bought", userID, showingId)
 
+class TicketAlreadyInUserException(userID: UserID) : KnownException("One or more of your företagsbiljeter is already in use", userID)
+
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class UserAlreadyAttendedException(userID: UserID) : KnownException("The user has already attended this showing", userID)
 

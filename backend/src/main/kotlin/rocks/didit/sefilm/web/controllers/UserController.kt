@@ -7,18 +7,18 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Företagsbiljett
 import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
+import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
-import rocks.didit.sefilm.services.FöretagsbiljettService
+import rocks.didit.sefilm.services.ForetagsbiljettService
 import rocks.didit.sefilm.services.UserService
 
 @RestController
 class UserController(
   val userService: UserService,
   val userRepository: UserRepository,
-  val foretagsbiljettService: FöretagsbiljettService) {
+  val foretagsbiljettService: ForetagsbiljettService) {
   companion object {
     private const val BASE_PATH = Application.API_BASE_PATH + "/users"
     private const val ME_PATH = BASE_PATH + "/me"
@@ -30,22 +30,22 @@ class UserController(
 
   @GetMapping(FTG_TICKET_PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   @Deprecated("remove when graphql is used")
-  fun getFtgTickets(): List<FöretagsbiljettDTO> {
+  fun getFtgTickets(): List<ForetagsbiljettDTO> {
     val currentLoggedInUser = currentLoggedInUser()
     return userRepository
       .findById(currentLoggedInUser)
       .orElseThrow { NotFoundException("user '$currentLoggedInUser'") }
       .foretagsbiljetter
       .map {
-        FöretagsbiljettDTO(number = it.number.number,
+        ForetagsbiljettDTO(number = it.number.number,
           expires = it.expires,
           status = this.foretagsbiljettService.getStatusOfTicket(it))
       }
   }
 
   @PutMapping(FTG_TICKET_PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun updateFtgTickets(@RequestBody suppliedFtgTickets: List<FöretagsbiljettDTO>): List<FöretagsbiljettDTO> {
-    // TODO: graphql
+  @Deprecated("remove when using graphql")
+  fun updateFtgTickets(@RequestBody suppliedFtgTickets: List<ForetagsbiljettDTO>): List<ForetagsbiljettDTO> {
     assertNoDuplicateForetagsbiljetter(suppliedFtgTickets)
     val tickets = suppliedFtgTickets.map { Företagsbiljett.valueOf(it) }
 
@@ -56,7 +56,7 @@ class UserController(
     userRepository.save(updatedUser)
 
     return tickets.map { f ->
-      FöretagsbiljettDTO(
+      ForetagsbiljettDTO(
         number = f.number.number,
         expires = f.expires,
         status = this.foretagsbiljettService.getStatusOfTicket(f)
@@ -82,7 +82,7 @@ class UserController(
     .findById(currentLoggedInUser())
     .orElseThrow { NotFoundException("current user with id: ${currentLoggedInUser()}") }
 
-  private fun assertNoDuplicateForetagsbiljetter(tickets: List<FöretagsbiljettDTO>) {
+  private fun assertNoDuplicateForetagsbiljetter(tickets: List<ForetagsbiljettDTO>) {
     val numDistinctTickets = tickets
       .map { it.number }
       .distinct()
