@@ -142,7 +142,7 @@ class Application {
     val locationsResource = ClassPathResource("seeds/locations.json")
     val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
 
-    val cityAlias = "GB"
+    val cityAlias = properties.defaultCity
     val locationsFromSF = sfService.getLocationsInCity(cityAlias)
       .map {
         Location(it.title,

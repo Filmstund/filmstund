@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.*
 import java.time.ZoneOffset
@@ -22,7 +23,8 @@ import java.util.*
 class SFService(
   private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,
-  private val httpEntity: HttpEntity<Void>) {
+  private val httpEntity: HttpEntity<Void>,
+  private val properties: Properties) {
 
   companion object {
     private const val API_URL = "https://www.sf.se/api"
@@ -33,7 +35,7 @@ class SFService(
   }
 
   @Cacheable("sfdates")
-  fun getShowingDates(sfId: String, cityAlias: String = "GB"): List<SfShowingDTO> {
+  fun getShowingDates(sfId: String, cityAlias: String = properties.defaultCity): List<SfShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
 
@@ -51,7 +53,7 @@ class SFService(
     return responseBody.items.map { SfShowingDTO.from(it) }.sortedBy { it.timeUtc }
   }
 
-  fun getLocationsInCity(cityAlias: String = "GB"): List<SfCinemaWithAddressDTO> {
+  fun getLocationsInCity(cityAlias: String = properties.defaultCity): List<SfCinemaWithAddressDTO> {
     val uri = UriComponentsBuilder.fromUriString(CINEMA_URL)
       .queryParam("filter.countryAlias", "se")
       .queryParam("filter.cityAlias", cityAlias)
@@ -82,7 +84,7 @@ class SFService(
 
   // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
   fun fetchTickets(sysId: String, sfShowingId: String, ticketId: String): List<SfTicketDTO> {
-    val url = "${API_URL}/v2/ticket/$sysId/$sfShowingId/$ticketId"
+    val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
 
     log.debug("Fetching tickets from $url")
     return restTemplate

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 class Properties {
   var tmdb = Tmdb()
   var enableSeeding: Boolean = true
+  var defaultCity: String = "GB"
 
   class Tmdb {
     var apikey: String? = null

@@ -1,26 +1,26 @@
 
 type Query {
     ## Movies ##
-    allMovies: [Movie!]
-    archivedMovies: [Movie!]
+    allMovies: [Movie!]!
+    archivedMovies: [Movie!]!
     movie(id: UUID!): Movie
 
     ## Showings ##
     showing(id: UUID): Showing
-    publicShowings(afterDate: LocalDate): [Showing!]
-    privateShowingsForCurrentUser(afterDate: LocalDate): [Showing!]
-    showingForMovie(movieId: UUID): [Showing!]
+    publicShowings(afterDate: LocalDate): [Showing!]!
+    privateShowingsForCurrentUser(afterDate: LocalDate): [Showing!]!
+    showingForMovie(movieId: UUID): [Showing!]!
 
     ## Bio Budord ##
-    allBiobudord: [BioBudord!]
+    allBiobudord: [BioBudord!]!
     randomBudord: BioBudord!
 
     ## User related ##
-    allUsers: [User!]
+    allUsers: [User!]!
     currentUser: CurrentUser!
 
     ## Location ##
-    previousLocations: [Location!]
+    previousLocations: [Location!]!
     location(id: String!): Location
-    sfCities: [SfCity!]
+    sfCities: [SfCity!]!
 }
