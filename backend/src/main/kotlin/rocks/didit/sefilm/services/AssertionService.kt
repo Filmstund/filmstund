@@ -11,7 +11,7 @@ import rocks.didit.sefilm.domain.UserID
 @Component
 class AssertionService(
   private val userService: UserService,
-  private val foretagsbiljettService: FöretagsbiljettService) {
+  private val foretagsbiljettService: ForetagsbiljettService) {
 
   fun assertTicketsNotBought(userID: UserID, showing: Showing) {
     if (showing.ticketsBought) {
@@ -40,7 +40,7 @@ class AssertionService(
 
   fun assertForetagsbiljettIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
     val matchingTickets = foretagsbiljettService
-      .getFöretagsbiljetterForUser(userId)
+      .getForetagsbiljetterForUser(userId)
       .filter { it.number == suppliedTicket }
 
     if (matchingTickets.isEmpty()) {

@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.domain
 
 import com.fasterxml.jackson.annotation.JsonValue
-import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
+import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import java.time.LocalDate
 
 data class TicketNumber(@JsonValue val number: String) {
@@ -17,13 +17,11 @@ data class TicketNumber(@JsonValue val number: String) {
   override fun toString() = number
 }
 
-
-
 data class Företagsbiljett(val number: TicketNumber,
                            val expires: LocalDate = LocalDate.now().plusYears(1)) {
 
   companion object {
-    fun valueOf(dto: FöretagsbiljettDTO) = Företagsbiljett(number = TicketNumber(dto.number), expires = dto.expires)
+    fun valueOf(dto: ForetagsbiljettDTO) = Företagsbiljett(number = TicketNumber(dto.number), expires = dto.expires)
   }
 
   enum class Status {
