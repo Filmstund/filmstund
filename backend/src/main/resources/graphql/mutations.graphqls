@@ -24,5 +24,7 @@ type Mutation {
 
     updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInput!): ParticipantPaymentInfo!
 
+    updateUser(newInfo: NewUserInfo!): CurrentUser!
+
 }
 

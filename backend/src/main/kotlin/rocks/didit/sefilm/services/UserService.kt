@@ -5,12 +5,11 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.Företagsbiljett
-import rocks.didit.sefilm.domain.Participant
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.FöretagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.orElseThrow
 
 @Component
@@ -37,6 +36,27 @@ class UserService(private val userRepo: UserRepository,
     return userRepo
       .findAllById(userIds)
       .map { it.email }
+  }
+
+  fun updateUser(newDetails: UserDetailsDTO): UserDTO {
+    val newSfMembershipId = when {
+      newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
+      else -> SfMembershipId.valueOf(newDetails.sfMembershipId)
+    }
+
+    val newPhoneNumber = when {
+      newDetails.phone == null || newDetails.phone.isBlank() -> null
+      else -> PhoneNumber(newDetails.phone)
+    }
+
+    val currentUserId = currentLoggedInUser()
+    val updatedUser = getCompleteUser(currentUserId).orElseThrow { NotFoundException("current user", currentUserId) }.copy(
+      phone = newPhoneNumber,
+      nick = newDetails.nick,
+      sfMembershipId = newSfMembershipId
+    )
+
+    return userRepo.save(updatedUser).toDTO()
   }
 
   private fun User.toDTO() = UserDTO(this.id,

@@ -35,3 +35,9 @@ enum ForetagsbiljettStatus {
     Used
     Expired
 }
+
+input NewUserInfo {
+    nick: String
+    sfMembershipId: String
+    phone: String
+}
