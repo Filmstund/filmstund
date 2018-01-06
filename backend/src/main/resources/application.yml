@@ -1,0 +1,43 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+  data:
+    mongodb:
+      uri: ${SEFILM_MONGODB_URI:mongodb://localhost/sefilm}
+      enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  cache:
+    cache-names: sfdates,sfdate
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=43200s
+
+sefilm:
+  tmdb:
+    # Request API key here: https://www.themoviedb.org/documentation/api
+    apikey: ${tmdb_apikey}
+  google:
+    clientId: 692064172675-montab9pi57304e68r932c6lm7111oaf.apps.googleusercontent.com
+    clientSecret: ${google_clientSecret}
+    accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+    userAuthorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent
+    redirectUri: ${google_redirectUri:http://localhost:8080/login/google}
+  login:
+    baseRedirectUri: ${login_baseRedirectUri:http://localhost:3000}
+    defaultRedirectPath: ${login_defaultRedirectPath:user}
+
+  # Whether or not data should be seeded on application startup
+  enableSeeding: ${enableSeeding:true}
+  defaultCity: ${defaultCity:GB}
+
+graphql:
+  servlet:
+    mapping: /graphql
+    enabled: true
+    corsEnabled: false
+
+logging:
+  level:
+    org.springframework.security.oauth2: DEBUG

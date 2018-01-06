@@ -9,9 +9,9 @@ import graphql.execution.AsyncExecutionStrategy
 import graphql.servlet.ObjectMapperConfigurer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -45,7 +45,7 @@ import java.math.BigDecimal
 import java.time.Duration
 
 @SpringBootApplication
-@EnableMongoHttpSession(maxInactiveIntervalInSeconds = 43200)
+@EnableMongoHttpSession(maxInactiveIntervalInSeconds = 172800)  // 48 hours
 //@EnableMongoAuditing // TODO enable when it works together with EnableMongoHttpSession
 @EnableCaching
 @EnableWebSecurity
@@ -183,12 +183,13 @@ class Application {
   }
 
   @Bean
-  fun schemaParserOptions(objConfigurer: com.coxautodev.graphql.tools.ObjectMapperConfigurer) = SchemaParserOptions
+  fun schemaParserOptions(objConfigurer: com.coxautodev.graphql.tools.ObjectMapperConfigurer)
+    = SchemaParserOptions
     .newOptions()
     .objectMapperConfigurer(objConfigurer)
     .build()
 }
 
 fun main(args: Array<String>) {
-  SpringApplication.run(Application::class.java, *args)
+  runApplication<Application>(*args)
 }
