@@ -3,8 +3,6 @@ package rocks.didit.sefilm
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -17,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -40,66 +37,52 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.BudordController
-import java.io.IOException
 import java.time.Instant
-import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Configuration
 @EnableOAuth2Client
-class GoogleOpenIdConnectConfig {
-  @Value("\${google.clientId}")
-  private val clientId: String? = null
-
-  @Value("\${google.clientSecret}")
-  private val clientSecret: String? = null
-
-  @Value("\${google.accessTokenUri}")
-  private val accessTokenUri: String? = null
-
-  @Value("\${google.userAuthorizationUri}")
-  private val userAuthorizationUri: String? = null
-
-  @Value("\${google.redirectUri}")
-  private val redirectUri: String? = null
+class GoogleOpenIdConnectConfig(
+  private val properties: Properties) {
 
   @Bean
   fun googleOpenId(): OAuth2ProtectedResourceDetails {
     val details = AuthorizationCodeResourceDetails()
-    details.clientId = clientId
-    details.clientSecret = clientSecret
-    details.accessTokenUri = accessTokenUri
-    details.userAuthorizationUri = userAuthorizationUri
+    details.clientId = properties.google.clientId
+    details.clientSecret = properties.google.clientSecret
+    details.accessTokenUri = properties.google.accessTokenUri
+    details.userAuthorizationUri = properties.google.userAuthorizationUri
     details.scope = listOf("openid", "email", "profile", "https://www.googleapis.com/auth/calendar")
-    details.preEstablishedRedirectUri = redirectUri
+    details.preEstablishedRedirectUri = properties.google.redirectUri
     details.isUseCurrentUri = false
     return details
   }
 
   @Bean
-  fun googleOpenIdTemplate(clientContext: OAuth2ClientContext): OAuth2RestTemplate {
-    return OAuth2RestTemplate(googleOpenId(), clientContext)
+  fun googleOpenIdTemplate(clientContext: OAuth2ClientContext, googleOpenId: OAuth2ProtectedResourceDetails): OAuth2RestTemplate {
+    return OAuth2RestTemplate(googleOpenId, clientContext)
   }
 }
 
-class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
-                          userRepository: UserRepository,
-                          private val restTemplate: OAuth2RestTemplate,
-                          private val loginRedirectUri: String,
-                          private val defaultRedirectPath: String) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
+class OpenIdConnectFilter(
+  defaultFilterProcessesUrl: String,
+  userRepository: UserRepository,
+  private val restTemplate: OAuth2RestTemplate,
+  private val properties: Properties) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
+
   init {
     authenticationManager = NoopAuthenticationManager()
     setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository))
   }
 
   private fun setRedirectPathInSession(request: HttpServletRequest) {
-    val redirectPath = request.getParameter("redirect") ?: defaultRedirectPath
+    val redirectPath = request.getParameter("redirect") ?: properties.login.defaultRedirectPath
 
     val session = request.session
     val previousRedirectPath = session.getAttribute("redirectPath")
     if (previousRedirectPath == null)
-      session.setAttribute("redirectPath", "$loginRedirectUri/${cleanupRedirectPath(redirectPath)}")
+      session.setAttribute("redirectPath", "${properties.login.baseRedirectUri}/${cleanupRedirectPath(redirectPath)}")
   }
 
   private fun cleanupRedirectPath(path: String): String {
@@ -108,12 +91,11 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
       newPath = newPath.substring(1, newPath.length)
     }
     if (newPath.startsWith("http")) {
-      newPath = defaultRedirectPath
+      newPath = properties.login.defaultRedirectPath
     }
     return newPath
   }
 
-  @Throws(AuthenticationException::class, IOException::class, ServletException::class)
   override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
     setRedirectPathInSession(request)
 
@@ -129,13 +111,19 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
       val tokenDecoded = JwtHelper.decode(idToken)
 
       val authInfo: Map<String, String> = ObjectMapper().readValue(tokenDecoded.claims)
+      verifyAudienceClaim(authInfo["aud"] ?: "")
 
       val user = OpenIdConnectUserDetails(authInfo, accessToken)
       return UsernamePasswordAuthenticationToken(user, null, user.authorities)
     } catch (e: InvalidTokenException) {
       throw BadCredentialsException("Could not obtain user details from token", e)
     }
+  }
 
+  private fun verifyAudienceClaim(audClaim: String) {
+    if (audClaim != properties.google.clientId) {
+      throw BadCredentialsException("Audience claim does not match client id")
+    }
   }
 
   private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository) : SimpleUrlAuthenticationSuccessHandler() {
@@ -181,21 +169,19 @@ class OpenIdConnectFilter(defaultFilterProcessesUrl: String,
   }
 
   private class NoopAuthenticationManager : AuthenticationManager {
-    @Throws(AuthenticationException::class)
     override fun authenticate(authentication: Authentication): Authentication {
       throw UnsupportedOperationException("No authentication should be done with this AuthenticationManager")
     }
   }
 }
 
-class OpenIdConnectUserDetails(userInfo: Map<String, String>, accessToken: OAuth2AccessToken) : UserDetails {
+class OpenIdConnectUserDetails(userInfo: Map<String, String>, val accessToken: OAuth2AccessToken) : UserDetails {
 
   val userId: String = userInfo.getValue("sub")
   private val username: String? = userInfo["email"]
   val firstName: String? = userInfo["given_name"]
   val lastName: String? = userInfo["family_name"]
   val avatarUrl: String? = userInfo["picture"]
-  val accessToken: OAuth2AccessToken = accessToken
 
   override fun getUsername(): String? {
     return username
@@ -228,38 +214,29 @@ class OpenIdConnectUserDetails(userInfo: Map<String, String>, accessToken: OAuth
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig : WebSecurityConfigurerAdapter() {
-  @Autowired
-  private val restTemplate: OAuth2RestTemplate? = null
+class SecurityConfig(
+  private val restTemplate: OAuth2RestTemplate,
+  private val userRepository: UserRepository,
+  private val properties: Properties
+) : WebSecurityConfigurerAdapter() {
 
-  @Autowired
-  private val userRepository: UserRepository? = null
-
-  @Value("\${login.baseRedirectUri}")
-  private lateinit var loginRedirectUri: String
-
-  @Value("\${login.defaultRedirectPath}")
-  private lateinit var defaultRedirectPath: String
-
-  @Throws(Exception::class)
   override fun configure(web: WebSecurity) {
     web.ignoring().antMatchers("/resources/**")
   }
 
   @Bean
-  fun myFilter() =
+  fun openIdConnectFilter() =
     OpenIdConnectFilter("/login/google",
-      userRepository!!,
-      restTemplate!!,
-      loginRedirectUri,
-      defaultRedirectPath)
+      userRepository,
+      restTemplate,
+      properties)
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
     http
       .cors().and()
       .addFilterAfter(OAuth2ClientContextFilter(), AbstractPreAuthenticatedProcessingFilter::class.java)
-      .addFilterAfter(myFilter(), OAuth2ClientContextFilter::class.java)
+      .addFilterAfter(openIdConnectFilter(), OAuth2ClientContextFilter::class.java)
       .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.ACCEPTED)))
       .deleteCookies("JSESSIONID")
       .invalidateHttpSession(true)
