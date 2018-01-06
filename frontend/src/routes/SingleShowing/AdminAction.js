@@ -1,9 +1,6 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router";
-
-import { showings as showingActions } from "../../store/reducers";
 
 import { getJson, jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
@@ -201,14 +198,14 @@ AdminAction.propTypes = {
   showing: PropTypes.object.isRequired
 };
 
-const mapDispatchToProps = (dispatch, props) => {
-  const { requestUpdate, requestDelete } = showingActions.actions;
-  const { showing } = props;
+// const mapDispatchToProps = (dispatch, props) => {
+//   const { requestUpdate, requestDelete } = showingActions.actions;
+//   const { showing } = props;
 
-  return {
-    requestUpdate: obj => dispatch(requestUpdate(obj)),
-    requestDelete: () => dispatch(requestDelete(showing.id))
-  };
-};
+//   return {
+//     requestUpdate: obj => dispatch(requestUpdate(obj)),
+//     requestDelete: () => dispatch(requestDelete(showing.id))
+//   };
+// };
 
-export default withRouter(connect(null, mapDispatchToProps)(AdminAction));
+export default withRouter(AdminAction);

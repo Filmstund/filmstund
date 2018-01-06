@@ -12,6 +12,7 @@ import { trim } from "../../Utils";
 
 import ForetagsbiljettList from "./ForetagsbiljettList";
 import { completeUserFragment } from "../../fragments/currentUser";
+import { wrapMutate } from "../../store/apollo";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -82,23 +83,20 @@ class User extends Component {
     this.props
       .updateUser(trimmedValues)
       .then(success => {
-        console.log({ success });
+        this.setState({ success: true, errors: null }, () => {
+          setTimeout(() => {
+            this.setState({ success: false });
+          }, 5000);
+        });
       })
-      .catch(error => {
-        console.log({ error });
+      .catch(errors => {
+        this.setState({ success: false, errors });
       });
   };
 
   render() {
-    const {
-      me,
-      errors,
-      className,
-      success,
-      errorFtgTickets,
-      successFtgTickets
-    } = this.props;
-    console.log(this.props);
+    const { success, errors } = this.state;
+    const { me, className, errorFtgTickets, successFtgTickets } = this.props;
 
     const { phone, sfMembershipId, nick } = this.state.editedUser;
     return (
@@ -112,8 +110,10 @@ class User extends Component {
             <div>{me.email}</div>
           </UserInfo>
         </Box>
-        {errors && <StatusBox error={true}>{errors.join(", ")}</StatusBox>}
-        {success === true && <StatusBox error={false}>Uppdaterades!</StatusBox>}
+        {errors && (
+          <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>
+        )}
+        {success === true && <StatusBox>Uppdaterades!</StatusBox>}
         <Field text="Nick:">
           <Input
             type="text"
@@ -178,9 +178,8 @@ const update = graphql(
   `,
   {
     props: ({ mutate }) => ({
-      updateUser: user => mutate({ variables: { user } })
-    }),
-    options: { errorPolicy: "all" }
+      updateUser: user => wrapMutate(mutate, { user })
+    })
   }
 );
 
