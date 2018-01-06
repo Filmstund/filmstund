@@ -11,12 +11,13 @@ import Center from "../../Center";
 import Loader from "../../ProjectorLoader";
 import TicketURLInput from "../../TicketURLInput";
 import PaymentParticipantsList from "./PaymentParticipantsList";
-import withUserLoader from "../../loaders/UserLoader";
 import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
 
-const Padding = styled.div`padding: 0 1em;`;
+const Padding = styled.div`
+  padding: 0 1em;
+`;
 
 const Close = styled.div`
   position: absolute;
@@ -27,70 +28,77 @@ const Close = styled.div`
   cursor: pointer;
 `;
 
-const UserTooltip = withUserLoader(({ user, children }) =>
+const UserTooltip = ({ user, children }) => (
   <div title={`${user.firstName} '${user.nick}' ${user.lastName}`}>
     {children}
-  </div>);
+  </div>
+);
 
-const ForetagsBiljetterList = ({ tickets }) =>
+const ForetagsBiljetterList = ({ tickets }) => (
   <div>
     <SmallHeader>Företagsbiljetter</SmallHeader>
-    {tickets.map(ticket =>
+    {tickets.map(ticket => (
       <UserTooltip userId={ticket.userId} ticket={ticket}>
         <CopyValue key={ticket.foretagsbiljett} text={ticket.foretagsbiljett} />
       </UserTooltip>
-    )}
-  </div>;
+    ))}
+  </div>
+);
 
-const UserItem = withUserLoader(({ user }) =>
+const UserItem = ({ user }) => (
   <li>
     {user.firstName} '{user.nick}' {user.lastName}
   </li>
 );
 
+const renderUsersWithoutSfMembershipIds = sfData => {
+  const usersWithoutSfMembershipIds = sfData
+    .filter(({ sfMembershipId }) => sfMembershipId === null)
+    .map(({ user }) => user);
 
-const renderUsersWithoutSfMembershipIds = tickets => {
-  const userIdsWithoutSfMembershipIds = tickets
-    .filter(t => t.sfMembershipId === null)
-    .map(t => t.userId);
-
-  if (userIdsWithoutSfMembershipIds.length > 0) {
-    return <div>
-      {userIdsWithoutSfMembershipIds.length} deltagare saknar
-      SF medlemsnummer:
-      <ul>{userIdsWithoutSfMembershipIds.map(userId =>
-        <UserItem key={userId} userId={userId} />
-      )}</ul>
-    </div>
+  if (usersWithoutSfMembershipIds.length > 0) {
+    return (
+      <div>
+        {usersWithoutSfMembershipIds.length} deltagare saknar SF medlemsnummer:
+        <ul>
+          {usersWithoutSfMembershipIds.map(user => (
+            <UserItem key={user.id} user={user} />
+          ))}
+        </ul>
+      </div>
+    );
   } else {
     return null;
   }
-}
+};
 
-const SfMembershipListList = ({ tickets, participants }) =>
+const SfMembershipList = ({ sfData, participants }) => (
   <div>
     <SmallHeader>SF medlemsnummer</SmallHeader>
-    {tickets
-      .filter(t => t.sfMembershipId !== null)
-      .map(t => <UserTooltip userId={t.userId}>
-        <CopyValue key={t.userId} text={t.sfMembershipId} />
-      </UserTooltip>)}
+    {sfData
+      .filter(({ sfMembershipId }) => sfMembershipId !== null)
+      .map(({ user, sfMembershipId }) => (
+        <UserTooltip user={user} key={user.id}>
+          <CopyValue text={sfMembershipId} />
+        </UserTooltip>
+      ))}
     <hr />
-    {renderUsersWithoutSfMembershipIds(tickets)}
-  </div>;
+    {renderUsersWithoutSfMembershipIds(sfData)}
+  </div>
+);
 
 const BuyModal = ({
   ticketPrice,
   cinemaTicketUrls,
   setPrice,
   setCinemaTicketUrls,
-  buyData,
+  preBuyInfo,
   handleMarkBought,
   handlePaidChange,
   closeModal,
   showing
 }) => {
-  if (!buyData) {
+  if (!preBuyInfo) {
     return (
       <Modal>
         <Center>
@@ -100,11 +108,11 @@ const BuyModal = ({
     );
   }
 
-  const { participantInfo, sfBuyLink, tickets } = buyData;
+  const { sfBuyLink, sfData } = preBuyInfo;
   const { ticketsBought, participants } = showing;
 
-  const participantsWithForetagsbiljett = tickets.filter(
-    user => user.foretagsbiljett !== null
+  const participantsWithForetagsbiljett = sfData.filter(
+    ({ foretagsbiljett }) => foretagsbiljett !== null
   );
 
   return (
@@ -114,20 +122,22 @@ const BuyModal = ({
           <i className="fa fa-times" aria-hidden="true" />
         </Close>
         <Padding>
-          {ticketsBought &&
+          {ticketsBought && (
             <PaymentParticipantsList
               handlePaidChange={handlePaidChange}
-              participants={participantInfo}
-            />}
-          {!ticketsBought &&
+              participants={participants}
+            />
+          )}
+          {!ticketsBought && (
             <form onSubmit={handleMarkBought}>
               <Header>Boka</Header>
               {!sfBuyLink &&
                 "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
-              {sfBuyLink &&
+              {sfBuyLink && (
                 <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
                   Öppna SF länk i nytt fönster
-                </a>}
+                </a>
+              )}
               <ParticipantsList
                 participants={showing.participants}
                 showPhone={true}
@@ -135,10 +145,7 @@ const BuyModal = ({
               <ForetagsBiljetterList
                 tickets={participantsWithForetagsbiljett}
               />
-              <SfMembershipListList
-                tickets={tickets}
-                participants={participants}
-              />
+              <SfMembershipList sfData={sfData} participants={participants} />
               <Field text="Biljettpris:">
                 <Input
                   type="number"
@@ -154,7 +161,8 @@ const BuyModal = ({
                 />
               </Field>
               <MainButton>Markera som bokad</MainButton>
-            </form>}
+            </form>
+          )}
         </Padding>
       </Padding>
     </Modal>
