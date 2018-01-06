@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import moment from "moment";
 import styled from "styled-components";
 import MainButton from "../../MainButton";
 
-import { ftgTickets as ftgTicketsActions } from "../../store/reducers";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
 import Field from "../../Field";

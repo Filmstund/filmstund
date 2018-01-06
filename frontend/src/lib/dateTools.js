@@ -24,8 +24,13 @@ export const showingDateToString = (date, time = ["0", "0", "0"]) => {
 export const formatShowingDateTime = date =>
   moment(date).format(DATE_MONTH_TIME);
 
-export const formatTime = date =>
-  moment(date).format(HOUR_MINUTE);
+export const formatTime = date => moment(date).format(HOUR_MINUTE);
+
+export const formatLocalTime = date =>
+  moment
+    .utc(date)
+    .local()
+    .format(HOUR_MINUTE);
 
 export const formatShowingDate = date => moment(date).format(DATE_MONTH);
 

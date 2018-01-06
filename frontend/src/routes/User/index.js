@@ -7,11 +7,6 @@ import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Input from "../../Input";
 import alfons from "../../assets/alfons.jpg";
-import {
-  me as meActions,
-  ftgTickets as ftgTicketsActions
-} from "../../store/reducers";
-import * as fetchers from "../../lib/fetchers";
 
 import { trim } from "../../Utils";
 
@@ -54,7 +49,7 @@ class User extends Component {
   constructor(props) {
     super(props);
 
-    const { data: { me } } = this.props;
+    const { me } = this.props;
 
     this.state = {
       editedUser: {
@@ -76,28 +71,35 @@ class User extends Component {
   };
 
   handleSubmit = () => {
-    const { editedUser } = this.state;
-    const { me } = this.props;
+    const { editedUser: { nick, phone, sfMembershipId } } = this.state;
 
     const trimmedValues = trim({
-      ...editedUser
+      nick,
+      phone,
+      sfMembershipId
     });
 
-    // this.props.requestUpdateMe({
-    //   id: me.id,
-    //   ...trimmedValues
-    // });
+    this.props
+      .updateUser(trimmedValues)
+      .then(success => {
+        console.log({ success });
+      })
+      .catch(error => {
+        console.log({ error });
+      });
   };
 
   render() {
     const {
-      data: { me },
+      me,
+      errors,
       className,
-      error,
       success,
       errorFtgTickets,
       successFtgTickets
     } = this.props;
+    console.log(this.props);
+
     const { phone, sfMembershipId, nick } = this.state.editedUser;
     return (
       <div className={className}>
@@ -110,7 +112,7 @@ class User extends Component {
             <div>{me.email}</div>
           </UserInfo>
         </Box>
-        {error && <StatusBox error={true}>{error.reason}</StatusBox>}
+        {errors && <StatusBox error={true}>{errors.join(", ")}</StatusBox>}
         {success === true && <StatusBox error={false}>Uppdaterades!</StatusBox>}
         <Field text="Nick:">
           <Input
@@ -149,13 +151,37 @@ class User extends Component {
   }
 }
 
-const data = graphql(gql`
-  query UserProfile {
-    me: currentUser {
-      ...CompleteUser
+const data = graphql(
+  gql`
+    query UserProfile {
+      me: currentUser {
+        ...CompleteUser
+      }
     }
+    ${completeUserFragment}
+  `,
+  {
+    props: ({ data: { me } }) => ({
+      me
+    })
   }
-  ${completeUserFragment}
-`);
+);
 
-export default compose(data)(User);
+const update = graphql(
+  gql`
+    mutation UpdateUser($user: NewUserInfo!) {
+      updateUser(newInfo: $user) {
+        ...CompleteUser
+      }
+    }
+    ${completeUserFragment}
+  `,
+  {
+    props: ({ mutate }) => ({
+      updateUser: user => mutate({ variables: { user } })
+    }),
+    options: { errorPolicy: "all" }
+  }
+);
+
+export default compose(data, update)(User);

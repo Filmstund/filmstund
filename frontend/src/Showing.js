@@ -65,6 +65,14 @@ const Showing = ({
   </StyledShowing>
 );
 
+export const movieFragment = gql`
+  fragment ShowingMovie on Movie {
+    id
+    title
+    poster
+  }
+`;
+
 export const showingFragment = gql`
   fragment Showing on Showing {
     id
@@ -75,15 +83,15 @@ export const showingFragment = gql`
     }
     ticketsBought
     movie {
-      id
-      title
-      poster
+      ...ShowingMovie
     }
     admin {
+      id
       name
       nick
     }
   }
+  ${movieFragment}
 `;
 
 export default Showing;

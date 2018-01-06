@@ -1,25 +1,26 @@
 import React from "react";
-import { connect } from "react-redux";
+import { graphql } from "react-apollo";
+import { branch, renderComponent, compose, withState } from "recompose";
+import gql from "graphql-tag";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
 import _ from "lodash";
 import "react-dates/lib/css/_datepicker.css";
 
-import { showings } from "./store/reducers";
-
 import Header from "./Header";
-import Showing from "./Showing";
+import Showing, { movieFragment, showingFragment } from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
 import MainButton, { GrayButton } from "./MainButton";
-import { getJson } from "./lib/fetch";
-import { formatYMD } from "./lib/dateTools";
+import { formatYMD, formatLocalTime } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
 
-class NewShowing extends React.Component {
+class CreateShowingForm extends React.Component {
   constructor(props) {
     super(props);
     const now = moment();
+
+    const { data: { me }, movieId } = props;
 
     this.state = {
       dateFocused: false,
@@ -28,16 +29,11 @@ class NewShowing extends React.Component {
         time: now.format("HH:mm"),
         location: "",
         price: "",
-        movieId: this.props.movieId,
-        admin: this.props.me.id
+        movieId: movieId,
+        admin: me.id
       },
-      sfdates: {},
-      selectedDate: null
+      selectedDate: formatYMD(now)
     };
-  }
-
-  componentWillMount() {
-    this.requestDatesForMovie(this.props.movieId);
   }
 
   setShowingDate = value => {
@@ -45,41 +41,15 @@ class NewShowing extends React.Component {
     this.setState({ selectedDate: formatYMD(value) });
   };
 
-  setShowingCity = ({ target: { value } }) => {
-    this.requestSFTimes();
-    // this.setShowingValue("city", value, )
-  };
-
-  requestDatesForMovie = movieId => {
-    const url = `/movies/${movieId}/sfdates`;
-
-    getJson(url).then(dates => {
-      const datesWithLocalTime = dates.map(d => {
-        const timeUtc = moment.utc(d.timeUtc).local();
-        return {
-          ...d,
-          localDate: formatYMD(timeUtc),
-          localTime: timeUtc.format("HH:mm")
-        };
-      });
-
-      const sfdates = _.groupBy(datesWithLocalTime, "localDate");
-      this.setState({
-        sfdates,
-        selectedDate: _.keys(sfdates)[0]
-      });
-    });
-  };
-
   setShowingTime = sfTime => {
     this.setState(
-      {
+      state => ({
         showing: {
-          ...this.state.showing,
-          time: sfTime.localTime,
+          ...state.showing,
+          time: formatLocalTime(sfTime.timeUtc),
           location: sfTime.cinemaName
         }
-      },
+      }),
       this.handleSubmit
     );
   };
@@ -101,20 +71,31 @@ class NewShowing extends React.Component {
   };
 
   isDayHighlighted = date => {
-    const { sfdates } = this.state;
-    const availableDates = _.keys(sfdates);
+    const availableDates = _.keys(this.getSfDates());
 
     return availableDates.includes(formatYMD(date));
   };
 
   handleSubmit = () => {
-    const submitObject = {
-      ...this.state.showing,
-      price: parseFloat(this.state.showing.price, 10) * 100,
-      date: formatYMD(this.state.showing.date)
+    const { showing: { time, date, location } } = this.state;
+    const { movieId } = this.props;
+
+    const showing = {
+      time,
+      movieId,
+      date: formatYMD(date),
+      location
     };
 
-    this.props.dispatch(showings.actions.requestCreate(submitObject));
+    this.props
+      .createShowing(showing)
+      .then(resp => {
+        const { showing } = resp.data;
+        this.props.navigateToShowing(showing.id);
+      })
+      .catch(errors => {
+        console.log(errors);
+      });
   };
 
   renderSelectSfTime = (sfTimes, showing) => {
@@ -124,28 +105,30 @@ class NewShowing extends React.Component {
       return (
         <div>
           <Header>Välj tid från SF</Header>
-          <Field text="SF-stad (används för att hämta rätt tider):">
-            <Input
-              type="text"
-              value="Göteborg"
-              disabled={true}
-              onChange={v => this.setShowingCity(v)}
-            />
-          </Field>
           <Field text="Tid:">
-            <SelectBox
-              options={sfTimes}
-              onChange={v => this.setShowingTime(v)}
-            />
+            <SelectBox options={sfTimes} onChange={this.setShowingTime} />
           </Field>
         </div>
       );
     }
   };
 
+  getSfDates = () => {
+    const { data: { movie: { sfShowings } } } = this.props;
+
+    return _.groupBy(sfShowings, s => formatYMD(s.timeUtc));
+  };
+
   render() {
-    const { showing, sfdates, selectedDate, dateFocused } = this.state;
-    const { movieId, clearSelectedMovie } = this.props;
+    const { showing, selectedDate, dateFocused } = this.state;
+    const {
+      clearSelectedMovie,
+      data: { movie, sfCities },
+      setCity,
+      city
+    } = this.props;
+
+    const sfdates = this.getSfDates();
 
     return (
       <div>
@@ -155,8 +138,20 @@ class NewShowing extends React.Component {
             date={showing.date}
             adminId={showing.admin}
             location={showing.location}
-            movieId={movieId}
+            movie={movie}
           />
+          <Field text="SF-stad (används för att hämta rätt tider):">
+            <select
+              value={city}
+              onChange={({ target: { value } }) => setCity(value)}
+            >
+              {sfCities.map(city => (
+                <option key={city.alias} value={city.alias}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </Field>
           <Field text="Datum:">
             <DatePicker
               numberOfMonths={1}
@@ -200,6 +195,60 @@ class NewShowing extends React.Component {
   }
 }
 
-export default connect(state => ({
-  me: state.me.data
-}))(NewShowing);
+const data = graphql(
+  gql`
+    query CreateShowing($movieId: UUID!, $city: String) {
+      movie(id: $movieId) {
+        ...ShowingMovie
+        sfShowings(city: $city) {
+          cinemaName
+          screenName
+          timeUtc
+          tags
+        }
+      }
+      me: currentUser {
+        id
+        nick
+      }
+      sfCities {
+        name
+        alias
+      }
+    }
+    ${movieFragment}
+  `
+);
+
+const mutation = graphql(
+  gql`
+    mutation CreateShowing($showing: CreateShowingInput!) {
+      showing: createShowing(showing: $showing) {
+        ...Showing
+      }
+    }
+    ${showingFragment}
+  `,
+  {
+    props: ({ mutate }) => ({
+      createShowing: showing => wrapMutate(mutate, { showing })
+    })
+  }
+);
+
+const withCityState = withState("city", "setCity", "GB");
+
+const Loader = branch(({ data: { me } }) => !me, renderComponent(() => null));
+
+export default compose(withCityState, mutation, data, Loader)(
+  CreateShowingForm
+);
+
+const wrapMutate = (mutate, variables) =>
+  mutate({ variables, errorPolicy: "all" }).then(result => {
+    if (result.errors) {
+      return Promise.reject(result.errors);
+    } else {
+      return result;
+    }
+  });

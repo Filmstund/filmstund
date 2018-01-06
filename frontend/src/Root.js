@@ -11,11 +11,11 @@ import App from "./App";
 
 class RootComponent extends Component {
   render() {
-    const { data: { me } } = this.props;
+    const { data: { me, loading } } = this.props;
     const signedIn = Boolean(me);
 
     return (
-      <Login signedIn={signedIn}>
+      <Login signedIn={signedIn && !loading}>
         <App me={me} signedIn={signedIn} />
       </Login>
     );

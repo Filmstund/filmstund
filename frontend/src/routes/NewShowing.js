@@ -4,11 +4,10 @@ import moment from "moment";
 import cx from "classnames";
 import Helmet from "react-helmet";
 import styled from "styled-components";
+import { withRouter } from "react-router";
 
 import { jsonRequest, getJson } from "../lib/fetch";
 import { withBaseURL } from "../lib/withBaseURL";
-
-import { movies, meta } from "../store/reducers";
 
 import Header from "../Header";
 import Movie, { movieFragment } from "../Movie";
@@ -60,16 +59,10 @@ const MovieContainer = styled.div`
 `;
 
 class NewShowing extends Component {
-  constructor(props) {
-    super(props);
-    const { match: { params: { movieId } } } = props;
-
-    this.state = {
-      meta: {},
-      movieId,
-      searchTerm: ""
-    };
-  }
+  state = {
+    meta: {},
+    searchTerm: ""
+  };
 
   componentWillMount() {
     this.fetchMeta();
@@ -155,7 +148,7 @@ class NewShowing extends Component {
               <StyledMovie
                 key={m.id}
                 movie={m}
-                onClick={() => this.setState({ movieId: m.id })}
+                onClick={() => this.setMovie(m)}
               />
             ))}
         </MovieContainer>
@@ -163,18 +156,29 @@ class NewShowing extends Component {
     );
   };
 
+  setMovie = movie => {
+    this.props.history.push(`/showings/new/${movie.id}`);
+  };
+
+  navigateToShowing = showingId => {
+    this.props.history.push(`/showings/${showingId}`);
+  };
+
   clearSelectedMovie = () => {
-    this.setState({ movieId: null });
+    this.props.history.push(`/showings/new`);
   };
 
   render() {
-    const { movieId } = this.state;
-    const { data: { movies = [] } } = this.props;
+    const {
+      data: { movies = [] },
+      match: { params: { movieId } }
+    } = this.props;
 
     if (movieId) {
       return (
         <CreateShowingForm
           movieId={movieId}
+          navigateToShowing={this.navigateToShowing}
           clearSelectedMovie={this.clearSelectedMovie}
         />
       );
@@ -196,4 +200,4 @@ const data = graphql(gql`
   ${movieFragment}
 `);
 
-export default compose(data)(NewShowing);
+export default compose(withRouter, data)(NewShowing);
