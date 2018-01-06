@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package rocks.didit.sefilm.graphql
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
@@ -28,7 +30,7 @@ class SfShowingResolver(
 
   private val log: Logger = LoggerFactory.getLogger(SfShowingResolver::class.java)
   fun sfShowings(movie: Movie, city: String?, afterDate: LocalDate?): List<SfShowingDTO> {
-    log.info("Fetching SF showings after $afterDate in city=$city for '${movie.title}' (${movie.id})")
+    log.info("Fetching SF showings after ${afterDate ?: "EPOCH"} in city=$city for '${movie.title}' (${movie.id})")
     if (movie.sfId == null) return listOf()
     return sfService.getShowingDates(movie.sfId, city ?: properties.defaultCity)
       .filter {

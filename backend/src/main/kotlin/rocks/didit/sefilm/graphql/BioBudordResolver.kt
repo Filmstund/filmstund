@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package rocks.didit.sefilm.graphql
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
