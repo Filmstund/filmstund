@@ -25,7 +25,7 @@ class ScheduledPopularityUpdater(
   private val imdbClient: ImdbClient) {
 
   companion object {
-    private const val INITIAL_UPDATE_DELAY = 1000L//10L * 60 * 1000L // 10min
+    private const val INITIAL_UPDATE_DELAY = 10L * 60 * 1000L // 10min
     private const val UPDATE_INTERVAL = 4 * 60 * 60 * 1000L // 4 hours
 
     private const val HAS_SF_SHOWINGS_POPULARITY = 500.0

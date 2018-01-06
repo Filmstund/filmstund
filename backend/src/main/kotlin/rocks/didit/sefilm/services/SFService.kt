@@ -35,7 +35,7 @@ class SFService(
   }
 
   @Cacheable("sfdates")
-  fun getShowingDates(sfId: String, cityAlias: String = properties.defaultCity): List<SfShowingDTO> {
+  fun getShowingDates(sfId: String, cityAlias: String = "GB"): List<SfShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
 
