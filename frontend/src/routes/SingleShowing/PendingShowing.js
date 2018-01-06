@@ -48,7 +48,7 @@ class PendingShowing extends Component {
   };
 
   getPaymentOptions = () => {
-    const { data: { me: { foretagsbiljetter } }, attendShowing } = this.props;
+    const { data: { me: { foretagsbiljetter } } } = this.props;
     return createPaymentOptions(foretagsbiljetter);
   };
 
