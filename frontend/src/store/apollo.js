@@ -32,4 +32,16 @@ const client = new ApolloClient({
   cache
 });
 
+export const wrapMutate = (mutate, variables) =>
+  mutate({
+    variables,
+    errorPolicy: "all"
+  }).then(result => {
+    if (result.errors) {
+      return Promise.reject(result.errors);
+    } else {
+      return result;
+    }
+  });
+
 export default client;
