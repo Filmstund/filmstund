@@ -40,4 +40,4 @@ graphql:
 
 logging:
   level:
-    org.springframework.security.oauth2: DEBUG
+    didit.rocks: INFO
