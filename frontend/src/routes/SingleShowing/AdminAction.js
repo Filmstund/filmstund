@@ -7,6 +7,7 @@ import { withBaseURL } from "../../lib/withBaseURL";
 
 import MainButton, { GrayButton, RedButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
+import gql from "graphql-tag";
 
 const oreToKr = price => {
   if (price === null) {
@@ -145,7 +146,6 @@ class AdminAction extends Component {
       ticketPrice,
       cinemaTicketUrls,
       showModal,
-      buyData,
       adminMessage
     } = this.state;
 
@@ -160,10 +160,8 @@ class AdminAction extends Component {
             handlePaidChange={this.handlePaidChange}
             ticketPrice={ticketPrice}
             cinemaTicketUrls={cinemaTicketUrls}
-            buyData={buyData}
-            closeModal={() =>
-              this.setState({ showModal: false, buyData: null })
-            }
+            preBuyInfo={showing.preBuyInfo}
+            closeModal={() => this.setState({ showModal: false })}
           />
         )}
         {adminMessage && <div>{adminMessage}</div>}
@@ -197,6 +195,29 @@ class AdminAction extends Component {
 AdminAction.propTypes = {
   showing: PropTypes.object.isRequired
 };
+
+export const showingAdminFragment = gql`
+  fragment ShowingAdmin on Showing {
+    preBuyInfo {
+      sfBuyLink
+      sfData {
+        user {
+          id
+          nick
+          firstName
+          lastName
+        }
+        sfMembershipId
+        foretagsbiljett
+      }
+      paymentInfo {
+        user {
+          phone
+        }
+      }
+    }
+  }
+`;
 
 // const mapDispatchToProps = (dispatch, props) => {
 //   const { requestUpdate, requestDelete } = showingActions.actions;

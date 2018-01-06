@@ -7,7 +7,7 @@ import Showing, { showingFragment } from "../../Showing";
 import { ButtonContainer } from "../../MainButton";
 import BoughtShowing from "./BoughtShowing";
 import PendingShowing from "./PendingShowing";
-import AdminAction from "./AdminAction";
+import AdminAction, { showingAdminFragment } from "./AdminAction";
 import ParticipantList from "./ParticipantsList";
 import SwishModal from "./SwishModal";
 import IMDbLink from "../../IMDbLink";
@@ -102,30 +102,47 @@ const routerParamsToShowingId = ({ match }) => {
   return { showingId };
 };
 
-const data = graphql(gql`
-  query SingleShowing($showingId: UUID!) {
-    me: currentUser {
-      id
-    }
-    showing(id: $showingId) {
-      ...Showing
-      movie {
-        imdbId
+const data = graphql(
+  gql`
+    query SingleShowing($showingId: UUID!) {
+      me: currentUser {
+        id
       }
-      participants {
-        user {
-          id
-          nick
-          firstName
-          lastName
-          phone
-          avatar
+      showing(id: $showingId) {
+        ...Showing
+        ...ShowingAdmin
+        price
+        movie {
+          imdbId
+        }
+        participants {
+          user {
+            id
+            nick
+            firstName
+            lastName
+            phone
+            avatar
+          }
+        }
+        paymentInfo {
+          payTo {
+            id
+            nick
+            firstName
+            lastName
+            phone
+          }
+          hasPaid
+          amountOwed
         }
       }
     }
-  }
-  ${showingFragment}
-`);
+    ${showingFragment}
+    ${showingAdminFragment}
+  `,
+  { options: { errorPolicy: "ignore" } }
+);
 
 const Loader = branch(({ data: { me } }) => !me, renderComponent(() => null));
 
