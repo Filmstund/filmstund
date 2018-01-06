@@ -19,9 +19,3 @@ type Participant {
     user: User
     paymentType: String!
 }
-
-type Location {
-    name: String
-    latitude: String
-    longitude: String
-}
