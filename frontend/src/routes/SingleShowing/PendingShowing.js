@@ -1,7 +1,4 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
-
-import { showings as showingActions } from "../../store/reducers";
 
 import { SmallHeader } from "../../Header";
 import MainButton, { GrayButton } from "../../MainButton";
@@ -99,19 +96,19 @@ class PendingShowing extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  me: state.me.data,
-  ftgTickets: state.ftgTickets.data
-});
+// const mapStateToProps = state => ({
+//   me: state.me.data,
+//   ftgTickets: state.ftgTickets.data
+// });
 
-const mapDispatchToProps = (dispatch, props) => {
-  const { requestAttend, requestUnattend } = showingActions.actions;
-  const { showing } = props;
+// const mapDispatchToProps = (dispatch, props) => {
+//   const { requestAttend, requestUnattend } = showingActions.actions;
+//   const { showing } = props;
 
-  return {
-    handleAttend: data => dispatch(requestAttend(showing.id, data)),
-    handleUnattend: () => dispatch(requestUnattend(showing.id))
-  };
-};
+//   return {
+//     handleAttend: data => dispatch(requestAttend(showing.id, data)),
+//     handleUnattend: () => dispatch(requestUnattend(showing.id))
+//   };
+// };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PendingShowing);
+export default PendingShowing;

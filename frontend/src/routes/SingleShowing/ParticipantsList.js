@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import UserItem from "./UserItem";
-import {SmallHeader} from "../../Header";
+import { SmallHeader } from "../../Header";
 
 const ParticipantContainer = styled.div`
   display: flex;
@@ -12,16 +12,17 @@ const ParticipantContainer = styled.div`
 `;
 
 const ParticipantsList = ({ participants, showPhone }) => {
-  return (<div>
-    <SmallHeader>{participants.length} Deltagare</SmallHeader>
-    <ParticipantContainer>
-      {participants.map(p =>
-        <UserItem key={p.userId} showPhone={showPhone} userId={p.userId} />
-      )}
-  </ParticipantContainer>
-  </div>)
+  return (
+    <div>
+      <SmallHeader>{participants.length} Deltagare</SmallHeader>
+      <ParticipantContainer>
+        {participants.map(({ user }) => (
+          <UserItem key={user.id} showPhone={showPhone} user={user} />
+        ))}
+      </ParticipantContainer>
+    </div>
+  );
 };
-
 
 ParticipantsList.propTypes = {
   participants: PropTypes.array.isRequired

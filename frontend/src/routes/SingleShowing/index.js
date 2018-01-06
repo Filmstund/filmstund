@@ -1,14 +1,9 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import { withRouter } from "react-router";
 
-import { compose, withProps } from "recompose";
+import { compose, withProps, branch, renderComponent } from "recompose";
 
-import { getJson } from "../../lib/fetch";
-import { ftgTickets as ftgTicketsActions } from "../../store/reducers";
-
-import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
-import Showing from "../../Showing";
+import Showing, { showingFragment } from "../../Showing";
 import { ButtonContainer } from "../../MainButton";
 import BoughtShowing from "./BoughtShowing";
 import PendingShowing from "./PendingShowing";
@@ -16,32 +11,17 @@ import AdminAction from "./AdminAction";
 import ParticipantList from "./ParticipantsList";
 import SwishModal from "./SwishModal";
 import IMDbLink from "../../IMDbLink";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 
 class SingleShowing extends Component {
   state = {
-    payData: null,
     showModal: false
   };
 
   componentWillMount() {
-    if (this.props.showing.ticketsBought) {
-      this.requestPaymentInfo();
-    } else {
-      this.props.requestTickets();
-    }
+    this.props.data.refetch();
   }
-
-  requestPaymentInfo = () => {
-    if (!this.isParticipating()) return;
-
-    const { showing } = this.props;
-
-    getJson(`/showings/${showing.id}/pay`).then(payData => {
-      this.setState({
-        payData
-      });
-    });
-  };
 
   openSwish = swishLink => {
     this.setState({ swish: true });
@@ -49,19 +29,18 @@ class SingleShowing extends Component {
   };
 
   isParticipating = () => {
-    const { showing, me } = this.props;
+    const { data: { showing, me } } = this.props;
     return showing.participants.some(p => p.userId === me.id);
   };
 
   navigateToTickets = () => {
-    const { showing } = this.props;
+    const { data: { showing } } = this.props;
 
     this.props.history.push(`/showings/${showing.id}/tickets`);
   };
 
   renderBoughtOrPendingShowing = () => {
-    const { showing } = this.props;
-    const { payData } = this.state;
+    const { data: { showing } } = this.props;
 
     if (showing.ticketsBought) {
       if (this.isParticipating()) {
@@ -70,7 +49,7 @@ class SingleShowing extends Component {
             showing={showing}
             onClickTickets={this.navigateToTickets}
             openSwish={this.openSwish}
-            payData={payData}
+            payData={showing.paymentInfo}
           />
         );
       }
@@ -85,10 +64,10 @@ class SingleShowing extends Component {
   };
 
   render() {
-    const { className, movie, showing, me } = this.props;
+    const { className, data: { showing, me } } = this.props;
     const { swish, payData } = this.state;
 
-    const isAdmin = showing.admin === me.id;
+    const isAdmin = showing.admin.id === me.id;
 
     return (
       <div className={className}>
@@ -100,14 +79,14 @@ class SingleShowing extends Component {
         )}
         <Showing
           setTitleTag={true}
-          movieId={showing.movieId}
-          date={showing.date}
-          adminId={showing.admin}
+          movie={showing.movie}
+          date={showing.date + " " + showing.time}
+          admin={showing.admin}
           location={showing.location.name}
           ticketsBought={showing.ticketsBought}
         />
         <ButtonContainer>
-          <IMDbLink imdbId={movie.imdbId} />
+          <IMDbLink imdbId={showing.movie.imdbId} />
           {isAdmin && <AdminAction showing={showing} />}
           {this.renderBoughtOrPendingShowing()}
         </ButtonContainer>
@@ -123,11 +102,36 @@ const routerParamsToShowingId = ({ match }) => {
   return { showingId };
 };
 
+const data = graphql(gql`
+  query SingleShowing($showingId: UUID!) {
+    me: currentUser {
+      id
+    }
+    showing(id: $showingId) {
+      ...Showing
+      movie {
+        imdbId
+      }
+      participants {
+        user {
+          id
+          nick
+          firstName
+          lastName
+          phone
+          avatar
+        }
+      }
+    }
+  }
+  ${showingFragment}
+`);
+
+const Loader = branch(({ data: { me } }) => !me, renderComponent(() => null));
+
 export default compose(
-  connect(null, {
-    requestTickets: ftgTicketsActions.actions.requestSingle
-  }),
   withRouter,
   withProps(routerParamsToShowingId),
-  withShowingRouteLoader
+  data,
+  Loader
 )(SingleShowing);
