@@ -28,4 +28,5 @@ data class Showing(@Id
                    val calendarEventId: String? = null,
                    @LastModifiedDate
                    val lastModifiedDate: Instant = Instant.EPOCH) {
+  // TODO: add more auditing
 }

@@ -16,3 +16,4 @@ data class Location(
   val postalAddress: String? = null,
   val latitude: BigDecimal? = null,
   val longitude: BigDecimal? = null)
+// TODO: add auditing (@CreatedBy, etc)
