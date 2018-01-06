@@ -2,7 +2,7 @@ input CreateShowingInput {
     date: LocalDate!
     time: LocalTime!
     movieId: UUID!
-    location: String
+    location: String!
     expectedBuyDate: LocalDate
 }
 
