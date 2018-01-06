@@ -3,6 +3,7 @@ import { graphql } from "react-apollo";
 import { branch, renderComponent, compose, withState } from "recompose";
 import gql from "graphql-tag";
 import { SingleDatePicker as DatePicker } from "react-dates";
+import { wrapMutate } from "./store/apollo";
 import moment from "moment";
 import _ from "lodash";
 import "react-dates/lib/css/_datepicker.css";
@@ -243,12 +244,3 @@ const Loader = branch(({ data: { me } }) => !me, renderComponent(() => null));
 export default compose(withCityState, mutation, data, Loader)(
   CreateShowingForm
 );
-
-const wrapMutate = (mutate, variables) =>
-  mutate({ variables, errorPolicy: "all" }).then(result => {
-    if (result.errors) {
-      return Promise.reject(result.errors);
-    } else {
-      return result;
-    }
-  });
