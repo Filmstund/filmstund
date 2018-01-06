@@ -16,6 +16,9 @@ const showingDate = showing => showing.date + " " + showing.time;
 const today = getTodaysDate();
 
 class Home extends Component {
+  componentWillMount() {
+    this.props.data.refetch();
+  }
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
   };
@@ -27,7 +30,7 @@ class Home extends Component {
         onClick={() => this.navigateToShowing(showing)}
         ticketsBought={showing.ticketsBought}
         disabled={moment(showingDate(showing)).isBefore(today)}
-        movieId={showing.movieId}
+        movie={showing.movie}
         key={showing.id}
         date={showingDate(showing)}
         adminId={showing.admin}

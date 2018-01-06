@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { formatLocalTime } from "./lib/dateTools";
 
 const Option = styled.div`
   display: flex;
@@ -40,11 +41,11 @@ const SelectBox = ({ options, onChange, ...props }) => (
   <Box>
     {options.map(option => (
       <Option
-        key={option.cinemaName + option.screenName + option.localTime}
+        key={option.cinemaName + option.screenName + option.timeUtc}
         onClick={() => onChange(option)}
       >
         <Lable>
-          {option.localTime} {option.screenName},{" "}
+          {formatLocalTime(option.timeUtc)} {option.screenName},{" "}
           {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>

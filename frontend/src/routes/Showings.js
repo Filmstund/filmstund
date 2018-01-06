@@ -63,7 +63,6 @@ const data = graphql(gql`
     showings: publicShowings {
       ...Showing
       id
-      admin
       date
       time
     }
