@@ -54,6 +54,7 @@ class CustomScalarLocalDate : GraphQLScalarType("LocalDate", "Simple LocalDate, 
   override fun parseLiteral(input: Any?): LocalDate? {
     return when (input) {
       is StringValue -> LocalDate.parse(input.value)
+      is String -> LocalDate.parse(input)
       else -> null
     }
   }
@@ -72,6 +73,7 @@ class CustomScalarLocalTime : GraphQLScalarType("LocalTime", "Simple LocalTime, 
   override fun parseLiteral(input: Any?): LocalTime? {
     return when (input) {
       is StringValue -> LocalTime.parse(input.value)
+      is String -> LocalTime.parse(input)
       else -> null
     }
   }
@@ -90,6 +92,7 @@ class CustomScalarIMDbID : GraphQLScalarType("IMDbID", "IMDb ID, i.e. tt2527336"
   override fun parseLiteral(input: Any?): IMDbID {
     return when (input) {
       is StringValue -> IMDbID.valueOf(input.value)
+      is String -> IMDbID.valueOf(input)
       else -> IMDbID.MISSING
     }
   }
