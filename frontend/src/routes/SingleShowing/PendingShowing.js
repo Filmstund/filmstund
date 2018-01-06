@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+import { graphql, compose } from "react-apollo";
+import gql from "graphql-tag";
+import { wrapMutate } from "../../store/apollo";
 
 import { SmallHeader } from "../../Header";
 import MainButton, { GrayButton } from "../../MainButton";
@@ -7,21 +10,10 @@ import Modal from "../../Modal";
 import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
 
 class PendingShowing extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      modalOpen: false,
-      selectedIndex: 0,
-      paymentOptions: createPaymentOptions(props.ftgTickets || [])
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      selectedIndex: 0,
-      paymentOptions: createPaymentOptions(nextProps.ftgTickets || [])
-    });
-  }
+  state = {
+    modalOpen: false,
+    selectedIndex: 0
+  };
 
   setPaymentOption = e => {
     const { target: { value } } = e;
@@ -31,7 +23,8 @@ class PendingShowing extends Component {
   };
 
   renderModalPaymentOptions = () => {
-    const { selectedIndex, paymentOptions } = this.state;
+    const { selectedIndex } = this.state;
+    const paymentOptions = this.getPaymentOptions();
 
     return (
       <Modal onRequestClose={() => this.setState({ modalOpen: false })}>
@@ -54,30 +47,36 @@ class PendingShowing extends Component {
     );
   };
 
+  getPaymentOptions = () => {
+    const { data: { me: { foretagsbiljetter } }, attendShowing } = this.props;
+    return createPaymentOptions(foretagsbiljetter);
+  };
+
   handleClickSelectPaymentOption = () => {
-    const { selectedIndex, paymentOptions } = this.state;
-    this.props
-      .handleAttend({ paymentOption: paymentOptions[selectedIndex] })
-      .then(result => {
-        this.setState({
-          modalOpen: false
-        });
-      });
+    const { attendShowing } = this.props;
+    const paymentOptions = this.getPaymentOptions();
+    const { selectedIndex } = this.state;
+
+    attendShowing({
+      paymentOption: paymentOptions[selectedIndex]
+    }).then(result => {
+      this.setState({ modalOpen: false });
+    });
   };
 
   handleClickAttend = () => {
-    const { handleAttend } = this.props;
-    const { paymentOptions } = this.state;
+    const { attendShowing } = this.props;
+    const paymentOptions = this.getPaymentOptions();
     if (paymentOptions.length > 1) {
       this.setState({ modalOpen: true });
     } else {
       // Attend with Swish option
-      handleAttend({ paymentOption: paymentOptions[0] });
+      attendShowing({ paymentOption: paymentOptions[0] });
     }
   };
 
   render() {
-    const { isParticipating, handleUnattend } = this.props;
+    const { isParticipating, unattendShowing } = this.props;
     const { modalOpen } = this.state;
 
     return (
@@ -89,26 +88,72 @@ class PendingShowing extends Component {
           </MainButton>
         )}
         {isParticipating && (
-          <GrayButton onClick={handleUnattend}>Avanmäl</GrayButton>
+          <GrayButton onClick={unattendShowing}>Avanmäl</GrayButton>
         )}
       </React.Fragment>
     );
   }
 }
 
-// const mapStateToProps = state => ({
-//   me: state.me.data,
-//   ftgTickets: state.ftgTickets.data
-// });
+const participantsFragment = gql`
+  fragment ShowingParticipant on Showing {
+    id
+    participants {
+      paymentType
+      user {
+        id
+        nick
+        firstName
+        lastName
+        avatar
+      }
+    }
+  }
+`;
 
-// const mapDispatchToProps = (dispatch, props) => {
-//   const { requestAttend, requestUnattend } = showingActions.actions;
-//   const { showing } = props;
+const attendShowing = graphql(
+  gql`
+    mutation AttendShowing($showingId: UUID!, $paymentOption: PaymentOption!) {
+      attendShowing(showingId: $showingId, paymentOption: $paymentOption) {
+        ...ShowingParticipant
+      }
+    }
+    ${participantsFragment}
+  `,
+  {
+    props: ({ mutate, ownProps: { showingId } }) => ({
+      attendShowing: ({ paymentOption }) =>
+        wrapMutate(mutate, { showingId, paymentOption })
+    })
+  }
+);
 
-//   return {
-//     handleAttend: data => dispatch(requestAttend(showing.id, data)),
-//     handleUnattend: () => dispatch(requestUnattend(showing.id))
-//   };
-// };
+const unattendShowing = graphql(
+  gql`
+    mutation UnattendShowing($showingId: UUID!) {
+      unattendShowing(showingId: $showingId) {
+        ...ShowingParticipant
+      }
+    }
+    ${participantsFragment}
+  `,
+  {
+    props: ({ mutate, ownProps: { showingId } }) => ({
+      unattendShowing: () => wrapMutate(mutate, { showingId })
+    })
+  }
+);
 
-export default PendingShowing;
+const data = graphql(gql`
+  query PendingShowingQuery {
+    me: currentUser {
+      foretagsbiljetter {
+        expires
+        number
+        status
+      }
+    }
+  }
+`);
+
+export default compose(attendShowing, unattendShowing, data)(PendingShowing);

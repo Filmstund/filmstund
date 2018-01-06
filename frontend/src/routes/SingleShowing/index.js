@@ -30,7 +30,7 @@ class SingleShowing extends Component {
 
   isParticipating = () => {
     const { data: { showing, me } } = this.props;
-    return showing.participants.some(p => p.userId === me.id);
+    return showing.participants.some(p => p.user.id === me.id);
   };
 
   navigateToTickets = () => {
@@ -56,7 +56,7 @@ class SingleShowing extends Component {
     } else {
       return (
         <PendingShowing
-          showing={showing}
+          showingId={showing.id}
           isParticipating={this.isParticipating()}
         />
       );
