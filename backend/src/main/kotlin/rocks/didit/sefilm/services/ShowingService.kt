@@ -49,7 +49,7 @@ class ShowingService(
   }
 
   /** Info that is needed before you buy the tickets at SF */
-  fun getPreBuyInfo(showingId: UUID): PreBuyInfoDTO {
+  fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO {
     val showing = getShowingOrThrow(showingId)
     assertionService.assertLoggedInUserIsAdmin(showing)
 
@@ -61,11 +61,11 @@ class ShowingService(
       UserAndSfData(user.id, user.sfMembershipId, ftgTicket)
     }
 
-    return PreBuyInfoDTO(sfService.getSfBuyLink(showing.movieId), ticketMap, paymentInfos)
+    return AdminPaymentDetailsDTO(sfService.getSfBuyLink(showing.movieId), ticketMap, paymentInfos)
   }
 
   /** Info a user needs for paying the one who bought the tickets */
-  fun getPaymentInfo(showingId: UUID): PaymentDTO {
+  fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO {
     val showing = getShowingOrThrow(showingId)
     val payeePhone = userService.getCompleteUser(showing.payToUser)
       ?.phone
@@ -83,7 +83,7 @@ class ShowingService(
       else -> null
     }
 
-    return PaymentDTO(participantInfo.hasPaid, participantInfo.amountOwed, showing.payToUser, swishTo, currentUser)
+    return AttendeePaymentDetailsDTO(participantInfo.hasPaid, participantInfo.amountOwed, showing.payToUser, swishTo, currentUser)
   }
 
   fun attendShowing(showingId: UUID, paymentOption: PaymentOption): Showing {

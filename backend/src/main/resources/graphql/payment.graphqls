@@ -1,10 +1,39 @@
-type PaymentInfo {
+type AdminPaymentDetails {
+    sfBuyLink: String
+    sfData: [SfData!]!
+    participantPaymentInfos: [ParticipantPaymentInfo!]!
+}
+
+type AttendeePaymentDetails {
     hasPaid: Boolean!
     amountOwed: SEK!
     payTo: User!
     payer: User!
     swishLink: String
 }
+
+type SfData {
+    user: User!
+    sfMembershipId: String
+    foretagsbiljett: String
+}
+
+type ParticipantPaymentInfo {
+    id: UUID!
+    user: User!
+    showing: Showing!
+    hasPaid: Boolean!
+    amountOwed: SEK!
+}
+
+input ParticipantPaymentInput {
+    id: UUID!
+    userId: String!
+    showingId: UUID
+    hasPaid: Boolean!
+    amountOwed: SEK!
+}
+
 
 # Used for supplying how the use will pay, when attending a showing
 input PaymentOption {
@@ -18,5 +47,6 @@ enum PaymentType {
 }
 
 extend type Showing {
-    paymentInfo: PaymentInfo
+    adminPaymentDetails: AdminPaymentDetails
+    attendeePaymentDetails: AttendeePaymentDetails
 }
