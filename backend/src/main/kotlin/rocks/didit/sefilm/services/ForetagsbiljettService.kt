@@ -47,14 +47,19 @@ class ForetagsbiljettService(
   fun addForetagsbiljetterToCurrentUser(biljetter: List<ForetagsbiljettDTO>) {
     val currentUser = userRepository.findById(currentLoggedInUser())
       .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
-    val foretagsbiljetter = currentUser.foretagsbiljetter
+    val biljetterWithouthNew = currentUser
+      .foretagsbiljetter
+      .filterNot { (ticket) -> biljetter.any { ticket.number == it.number } }
 
-    assertForetagsbiljetterNotAlreadyInUse(biljetter, foretagsbiljetter)
+
+    assertForetagsbiljetterNotAlreadyInUse(biljetter, currentUser.foretagsbiljetter)
 
     val newTickets = biljetter.map { Företagsbiljett.valueOf(it) }
-    val allTickets = newTickets.plus(foretagsbiljetter).distinctBy { it.number }
+    val combinedTickets = newTickets
+      .plus(biljetterWithouthNew)
+      .sortedBy { it.expires }
 
-    userRepository.save(currentUser.copy(foretagsbiljetter = allTickets))
+    userRepository.save(currentUser.copy(foretagsbiljetter = combinedTickets))
   }
 
   fun deleteTicketFromUser(biljett: ForetagsbiljettDTO) {
