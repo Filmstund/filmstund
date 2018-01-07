@@ -145,7 +145,7 @@ class User extends Component {
         {successFtgTickets === true && (
           <StatusBox error={false}>Företagsbiljetter uppdaterades!</StatusBox>
         )}
-        <ForetagsbiljettList biljetter={me.foretagsbiljetter} />
+        <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter} />
       </div>
     );
   }
