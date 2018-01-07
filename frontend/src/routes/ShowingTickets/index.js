@@ -1,10 +1,8 @@
 import { compose, withProps } from "recompose";
-import { connect } from "react-redux";
 import { withRouter } from "react-router";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 import TicketContainer from "./TicketContainer";
-import withShowingRouteLoader from "../../loaders/ShowingRouteLoader";
-
-import { showings as showingActions } from "../../store/reducers";
 
 const routerParamsToShowingId = ({ match }) => {
   const { showingId } = match.params;
@@ -12,13 +10,37 @@ const routerParamsToShowingId = ({ match }) => {
   return { showingId };
 };
 
-export default compose(
-  connect(state => ({
-    me: state.me.data
-  }), {
-      requestUpdate: showingActions.actions.requestUpdate
-    }),
-  withRouter,
-  withProps(routerParamsToShowingId),
-  withShowingRouteLoader
-)(TicketContainer);
+const data = graphql(gql`
+  query TicketQuery($showingId: UUID!) {
+    me: currentUser {
+      id
+    }
+    showing(id: $showingId) {
+      id
+      admin {
+        id
+      }
+      myTickets {
+        id
+        barcode
+        customerType
+        customerTypeDefinition
+        cinema
+        screen
+        seat {
+          row
+          number
+        }
+        date
+        time
+        movieName
+        movieRating
+        showAttributes
+      }
+    }
+  }
+`);
+
+export default compose(withRouter, withProps(routerParamsToShowingId), data)(
+  TicketContainer
+);

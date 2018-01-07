@@ -78,7 +78,7 @@ export default class TicketContainer extends Component {
 
   render() {
     const { range, tickets, error } = this.state;
-    const { me, showing } = this.props;
+    const { data: { me, showing } } = this.props;
 
     if (error) {
       return (
@@ -99,7 +99,7 @@ export default class TicketContainer extends Component {
           </MainButton>
           {range && <SeatRange range={range} />}
           {tickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
-          {showing.admin === me.id && this.renderAdminFields()}
+          {showing.admin.id === me.id && this.renderAdminFields()}
         </div>
       );
     }
