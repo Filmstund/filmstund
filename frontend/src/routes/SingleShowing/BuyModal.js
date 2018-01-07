@@ -92,13 +92,13 @@ const BuyModal = ({
   cinemaTicketUrls,
   setPrice,
   setCinemaTicketUrls,
-  preBuyInfo,
+  adminPaymentDetails,
   handleMarkBought,
   handlePaidChange,
   closeModal,
   showing
 }) => {
-  if (!preBuyInfo) {
+  if (!adminPaymentDetails) {
     return (
       <Modal>
         <Center>
@@ -108,7 +108,7 @@ const BuyModal = ({
     );
   }
 
-  const { sfBuyLink, sfData, paymentInfo } = preBuyInfo;
+  const { sfBuyLink, sfData, participantPaymentInfos } = adminPaymentDetails;
   const { ticketsBought } = showing;
 
   const participantsWithForetagsbiljett = sfData.filter(
@@ -125,7 +125,7 @@ const BuyModal = ({
           {ticketsBought && (
             <PaymentParticipantsList
               handlePaidChange={handlePaidChange}
-              participants={paymentInfo}
+              participants={participantPaymentInfos}
             />
           )}
           {!ticketsBought && (

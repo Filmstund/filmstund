@@ -8,7 +8,11 @@ import { withBaseURL } from "../../lib/withBaseURL";
 import MainButton, { GrayButton, RedButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
 import gql from "graphql-tag";
-import { markAsBought, deleteShowing } from "../../fragments/showings";
+import {
+  markAsBought,
+  deleteShowing,
+  togglePaidChange
+} from "../../fragments/showings";
 import { compose } from "react-apollo";
 
 const oreToKr = price => {
@@ -48,23 +52,15 @@ class AdminAction extends Component {
   };
 
   handlePaidChange = info => {
-    const data = {
-      ...info,
-      hasPaid: !info.hasPaid
-    };
-    jsonRequest(withBaseURL("/participantinfo"), data, "PUT").then(newInfo => {
-      this.setState({
-        buyData: {
-          ...this.state.buyData,
-          participantInfo: this.state.buyData.participantInfo.map(info => {
-            if (info.id === newInfo.id) {
-              return newInfo;
-            } else {
-              return info;
-            }
-          })
-        }
-      });
+    const { togglePaidChange, showing } = this.props;
+    const { id, user, hasPaid, amountOwed } = info;
+
+    togglePaidChange({
+      id,
+      userId: user.id,
+      showingId: showing.id,
+      amountOwed,
+      hasPaid: !hasPaid
     });
   };
 
@@ -160,7 +156,7 @@ class AdminAction extends Component {
             handlePaidChange={this.handlePaidChange}
             ticketPrice={ticketPrice}
             cinemaTicketUrls={cinemaTicketUrls}
-            preBuyInfo={showing.preBuyInfo}
+            adminPaymentDetails={showing.adminPaymentDetails}
             closeModal={() => this.setState({ showModal: false })}
           />
         )}
@@ -198,7 +194,7 @@ AdminAction.propTypes = {
 
 export const showingAdminFragment = gql`
   fragment ShowingAdmin on Showing {
-    preBuyInfo {
+    adminPaymentDetails {
       sfBuyLink
       sfData {
         user {
@@ -210,7 +206,8 @@ export const showingAdminFragment = gql`
         sfMembershipId
         foretagsbiljett
       }
-      paymentInfo {
+      participantPaymentInfos {
+        id
         hasPaid
         amountOwed
         user {
@@ -224,4 +221,9 @@ export const showingAdminFragment = gql`
   }
 `;
 
-export default compose(withRouter, markAsBought, deleteShowing)(AdminAction);
+export default compose(
+  withRouter,
+  markAsBought,
+  deleteShowing,
+  togglePaidChange
+)(AdminAction);

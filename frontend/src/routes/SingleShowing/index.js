@@ -49,7 +49,7 @@ class SingleShowing extends Component {
             showing={showing}
             onClickTickets={this.navigateToTickets}
             openSwish={this.openSwish}
-            payData={showing.paymentInfo}
+            attendeePaymentDetails={showing.attendeePaymentDetails}
           />
         );
       }
@@ -115,6 +115,7 @@ const data = graphql(
         payToUser {
           id
         }
+        calendarEventId
         private
         movie {
           imdbId
@@ -129,7 +130,7 @@ const data = graphql(
             avatar
           }
         }
-        paymentInfo {
+        attendeePaymentDetails {
           payTo {
             id
             nick
