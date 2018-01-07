@@ -8,6 +8,7 @@ import graphql.execution.DataFetcherExceptionHandlerParameters
 import graphql.language.SourceLocation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.KnownException
 
@@ -24,6 +25,7 @@ class GraphqlExceptionHandler : DataFetcherExceptionHandler {
       is KnownException -> createFetchingError(exception.message ?: "",
         mapOf("offendingUser" to exception.whichUser, "showing" to exception.whichShowing))
       is IllegalArgumentException -> createFetchingError(exception.message ?: "")
+      is AccessDeniedException -> createFetchingError(exception.message ?: "")
       else -> {
         log.warn("Exception during data fetching: ${exception.message}", exception)
         ExceptionWhileDataFetching(path, exception, sourceLocation)
