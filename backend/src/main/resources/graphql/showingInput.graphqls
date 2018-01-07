@@ -9,7 +9,7 @@ input CreateShowingInput {
 input UpdateShowingInput {
     price: SEK!
     private: Boolean!
-    payToUser: String!
+    payToUser: ID!
     expectedBuyDate: LocalDate
     location: String!
     time: LocalTime!
