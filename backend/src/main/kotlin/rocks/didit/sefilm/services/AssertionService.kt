@@ -7,6 +7,7 @@ import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.Företagsbiljett
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.ShowingDTO
 
 @Component
 class AssertionService(
@@ -20,13 +21,14 @@ class AssertionService(
   }
 
   fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
-    if (showing.participants.any { it.hasUserId(userID) }) {
+    if (showing.participants.any { it.userId == userID }) {
       throw UserAlreadyAttendedException(userID)
     }
   }
 
-  fun assertLoggedInUserIsAdmin(showing: Showing) {
-    if (currentLoggedInUser() != showing.admin) {
+  fun assertLoggedInUserIsAdmin(showing: ShowingDTO) = assertLoggedInUserIsAdmin(showing.admin)
+  fun assertLoggedInUserIsAdmin(showingAdmin: UserID) {
+    if (currentLoggedInUser() != showingAdmin) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
   }

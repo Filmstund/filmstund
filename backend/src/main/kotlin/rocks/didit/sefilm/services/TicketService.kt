@@ -73,7 +73,7 @@ class TicketService(private val sfClient: SFService,
       ?.id
       ?: return showing.admin
 
-    if (showing.participants.any { it.hasUserId(userIdForThatMember) }) {
+    if (showing.participants.any { it.userId == userIdForThatMember }) {
       return userIdForThatMember
     }
 

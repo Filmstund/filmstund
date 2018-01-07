@@ -1,21 +1,22 @@
 package rocks.didit.sefilm.domain
 
-sealed class Participant() {
-  fun hasUserId(userId: UserID): Boolean {
-    return userId == extractUserId()
-  }
+data class ParticipantDTO(val userId: UserID, val paymentType: PaymentType)
 
-  fun extractUserId(): UserID {
-    return when (this) {
-      is SwishParticipant -> this.userId
-      is FtgBiljettParticipant -> this.userId
-      is RedactedParticipant -> this.userId
+sealed class Participant {
+  abstract val userId: UserID
+
+  fun toDto(): ParticipantDTO {
+    val paymentType = when (this) {
+      is SwishParticipant -> PaymentType.Swish
+      is FtgBiljettParticipant -> PaymentType.Foretagsbiljett
     }
+    return ParticipantDTO(this.userId, paymentType)
   }
 }
 
-data class SwishParticipant(val userId: UserID) : Participant()
-data class FtgBiljettParticipant(val userId: UserID, val ticketNumber: TicketNumber) : Participant()
+data class SwishParticipant(
+  override val userId: UserID) : Participant()
 
-/** Used when the participant is to be shown to end users and certain information is to be left out, e.g. the ticket number */
-data class RedactedParticipant(val userId: UserID, val paymentType: PaymentType) : Participant()
+data class FtgBiljettParticipant(
+  override val userId: UserID,
+  val ticketNumber: TicketNumber) : Participant()

@@ -11,16 +11,14 @@ import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.domain.Participant
+import rocks.didit.sefilm.domain.ParticipantDTO
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.domain.dto.ResponseStatusDTO.SuccessfulStatusDTO
-import rocks.didit.sefilm.redact
 import rocks.didit.sefilm.services.AssertionService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
-import rocks.didit.sefilm.withoutSensitiveFields
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -38,23 +36,23 @@ class ShowingController(
   }
 
   @GetMapping(PATH, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun findAll(): List<Showing> {
+  fun findAll(): List<ShowingDTO> {
     val showings = repo.findByPrivateOrderByDateDesc(false)
     val fromThisDate = ZonedDateTime.now().minusDays(7).toLocalDate()
     return showings
       .filter { it.date?.isAfter(fromThisDate) ?: false }
-      .map(Showing::withoutSensitiveFields)
+      .map(Showing::toDto)
   }
 
   @GetMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun findOne(@PathVariable id: UUID): Showing = repo.findById(id).map(Showing::withoutSensitiveFields).orElseThrow { NotFoundException("showing '$id") }
+  fun findOne(@PathVariable id: UUID): ShowingDTO = findShowing(id).toDto()
 
-  private fun findShowing(id: UUID) = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
+  private fun findShowing(id: UUID): Showing = repo.findById(id).orElseThrow { NotFoundException("showing '$id'") }
 
   @PutMapping(PATH_WITH_ID, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): Showing {
+  fun updateShowing(@PathVariable id: UUID, @RequestBody body: UpdateShowingDTO): ShowingDTO {
     val showing = findShowing(id)
-    assertionService.assertLoggedInUserIsAdmin(showing)
+    assertionService.assertLoggedInUserIsAdmin(showing.admin)
     assertionService.assertUserHasPhoneNumber(showing.admin)
 
     val newPayToUser = when {
@@ -86,7 +84,7 @@ class ShowingController(
       ticketService.processTickets(body.cinemaTicketUrls, updatedShowing.id)
     }
 
-    return updatedShowing
+    return updatedShowing.toDto()
   }
 
   @DeleteMapping(PATH_WITH_ID, produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
@@ -109,21 +107,21 @@ class ShowingController(
 
   @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   @ResponseStatus(HttpStatus.CREATED)
-  fun createShowing(@RequestBody body: ShowingDTO, b: UriComponentsBuilder): ResponseEntity<Showing> {
+  fun createShowing(@RequestBody body: CreateShowingDTO, b: UriComponentsBuilder): ResponseEntity<ShowingDTO> {
     val savedShowing = showingService.createShowing(body)
     val newLocation = b.path(PATH_WITH_ID).buildAndExpand(savedShowing.id).toUri()
     return ResponseEntity.created(newLocation).body(savedShowing)
   }
 
   @PostMapping(PATH_WITH_ID + "/attend", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<Participant>
+  fun attend(@PathVariable id: UUID, @RequestBody body: AttendInfoDTO): List<ParticipantDTO>
     = showingService.attendShowing(id, body.paymentOption)
     .participants
-    .map(Participant::redact)
+    .toList()
 
   @PostMapping(PATH_WITH_ID + "/unattend", produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun unattend(@PathVariable id: UUID): List<Participant>
+  fun unattend(@PathVariable id: UUID): List<ParticipantDTO>
     = showingService.unattendShowing(id)
     .participants
-    .map(Participant::redact)
+    .toList()
 }

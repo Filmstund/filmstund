@@ -6,7 +6,7 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.ParticipantInfoDTO
+import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 
 @Component
 class ParticipantPaymentInfoService(
@@ -14,7 +14,7 @@ class ParticipantPaymentInfoService(
   private val showingService: ShowingService,
   private val assertionService: AssertionService) {
 
-  fun updatePaymentInfo(participantInfo: ParticipantInfoDTO): ParticipantPaymentInfo {
+  fun updatePaymentInfo(participantInfo: ParticipantPaymentInfoDTO): ParticipantPaymentInfo {
     if (participantInfo.showingId == null || participantInfo.userId == null) {
       throw IllegalArgumentException("Missing showing id and/or user id")
     }
