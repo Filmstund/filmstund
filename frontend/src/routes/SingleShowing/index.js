@@ -130,6 +130,9 @@ const data = graphql(
             avatar
           }
         }
+        myTickets {
+          id
+        }
         attendeePaymentDetails {
           payTo {
             id

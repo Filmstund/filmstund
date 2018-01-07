@@ -24,8 +24,10 @@ const BoughtShowing = ({
   const openSwishLink = () => openSwish(swishLink);
 
   if (hasPaid) {
-    if (showing) {
+    if (showing.myTickets.length > 0) {
       return <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>;
+    } else {
+      return null;
     }
   } else {
     return (
