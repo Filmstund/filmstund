@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { NavLink as RouterLink, withRouter } from "react-router-dom";
 import styled from "styled-components";
-import { me } from "./store/reducers";
 import { signoutUser } from "./store/reducers/user";
 import fetch from "./lib/fetch";
 import { BASE_URL } from "./lib/withBaseURL";
+import { compose, withApollo } from "react-apollo";
+import { withProps } from "recompose";
 
 const TopBarContainer = styled.div`
   background-color: #b71c1c;
@@ -38,9 +39,11 @@ const Link = styled(RouterLink)`
 
 class TopBar extends Component {
   handleLogout = () => {
-    this.props.dispatch(me.actions.clearSingle());
-    this.props.dispatch(signoutUser());
-    fetch(BASE_URL + "/logout");
+    fetch(BASE_URL + "/logout").then(() => {
+      this.props.resetStore().then(() => {
+        this.props.history.push("/");
+      });
+    });
   };
   render() {
     const { signedIn } = this.props;
@@ -64,4 +67,10 @@ class TopBar extends Component {
   }
 }
 
-export default withRouter(TopBar);
+export default compose(
+  withRouter,
+  withApollo,
+  withProps(({ client }) => ({
+    resetStore: () => client.resetStore()
+  }))
+)(TopBar);

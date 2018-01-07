@@ -5,12 +5,12 @@ import QRCode from "./QRCode";
 import Loader from "../../ProjectorLoader";
 import Modal from "../../Modal";
 
-const SwishModal = ({ payData, closeSwish }) => {
-  if (!payData) {
+const SwishModal = ({ attendeePaymentDetails, closeSwish }) => {
+  if (!attendeePaymentDetails) {
     return <Loader />;
   }
 
-  const { swishLink } = payData;
+  const { swishLink } = attendeePaymentDetails;
 
   if (swishLink) {
     return (
