@@ -64,8 +64,10 @@ class SingleShowing extends Component {
   };
 
   render() {
+    const { swish } = this.state;
     const { className, data: { showing, me } } = this.props;
-    const { swish, payData } = this.state;
+
+    const { attendeePaymentDetails } = showing;
 
     const isAdmin = showing.admin.id === me.id;
 
@@ -73,7 +75,7 @@ class SingleShowing extends Component {
       <div className={className}>
         {swish && (
           <SwishModal
-            payData={payData}
+            attendeePaymentDetails={attendeePaymentDetails}
             closeSwish={() => this.setState({ swish: false })}
           />
         )}
@@ -141,6 +143,7 @@ const data = graphql(
             lastName
             phone
           }
+          swishLink
           hasPaid
           amountOwed
         }
