@@ -4,12 +4,10 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.SfTicketException
-import rocks.didit.sefilm.UserHasNotPaidException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
-import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -24,19 +22,17 @@ import java.util.*
 class TicketService(private val sfClient: SFService,
                     private val userRepository: UserRepository,
                     private val ticketRepository: TicketRepository,
-                    private val showingRepository: ShowingRepository,
-                    private val paymentInfoRepository: ParticipantPaymentInfoRepository) {
+                    private val showingRepository: ShowingRepository) {
 
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
     val user = currentLoggedInUser()
-    assertPaidAndEnrolled(showingId, user)
+    assertUserIsParticipant(showingId, user)
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, user)
   }
 
   fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
-    val showing = showingRepository.findById(showingId)
-      .orElseThrow { NotFoundException("showing with id $showingId", currentLoggedInUser, showingId) }
+    val showing = showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
 
     if (showing.admin != currentLoggedInUser) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
@@ -96,7 +92,7 @@ class TicketService(private val sfClient: SFService,
 
   fun getTicketRange(showingId: UUID): TicketRange {
     val currentLoggedInUser = currentLoggedInUser()
-    assertPaidAndEnrolled(showingId, currentLoggedInUser)
+    assertUserIsParticipant(showingId, currentLoggedInUser)
 
     val allSeatsForShowing = ticketRepository.findByShowingId(showingId)
       .map { it.seat }
@@ -115,23 +111,32 @@ class TicketService(private val sfClient: SFService,
 
   private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
     val seat = Seat(this.seat.row, this.seat.number)
-    return Ticket(id = this.id, showingId = showingId, assignedToUser = assignedToUser,
-      customerType = this.customerType, customerTypeDefinition = this.customerTypeDefinition, cinema = this.cinema.title,
-      cinemaCity = this.cinema.city.name, screen = this.screen.title, seat = seat, date = this.show.date, time = this.show.time,
-      movieName = this.movie.title, movieRating = this.movie.rating.displayName, showAttributes = this.show.attributes.map { it.displayName },
-      barcode = barcode, profileId = this.profileId)
+    return Ticket(id = this.id,
+      showingId = showingId,
+      assignedToUser = assignedToUser,
+      customerType = this.customerType,
+      customerTypeDefinition = this.customerTypeDefinition,
+      cinema = this.cinema.title,
+      cinemaCity = this.cinema.city.name,
+      screen = this.screen.title,
+      seat = seat,
+      date = this.show.date,
+      time = this.show.time,
+      movieName = this.movie.title,
+      movieRating = this.movie.rating.displayName,
+      showAttributes = this.show.attributes.map { it.displayName },
+      barcode = barcode,
+      profileId = this.profileId)
   }
 
-  private fun assertPaidAndEnrolled(showingId: UUID, currentLoggedInUser: UserID) {
-    val participant = paymentInfoRepository
-      .findByShowingIdAndUserId(showingId, currentLoggedInUser)
-      .orElseThrow {
-        throw NotFoundException("user $currentLoggedInUser. Not enrolled on this showing", currentLoggedInUser, showingId)
-      }
-
-    if (!participant.hasPaid) {
-      throw UserHasNotPaidException("User has not paid for this showing", participant.userId, showingId)
+  private fun assertUserIsParticipant(showingId: UUID, currentLoggedInUser: UserID) {
+    if (showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
+      .participants
+      .any { it.userId == currentLoggedInUser }) {
+      return
     }
+
+    throw NotFoundException("user $currentLoggedInUser. Not enrolled on this showing", currentLoggedInUser, showingId)
   }
 
   private fun validateSfTicketUrls(links: List<String>) {
