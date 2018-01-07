@@ -8,6 +8,8 @@ import { withBaseURL } from "../../lib/withBaseURL";
 import MainButton, { GrayButton, RedButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
 import gql from "graphql-tag";
+import { graphql, compose } from "react-apollo";
+import { wrapMutate } from "../../store/apollo";
 
 const oreToKr = price => {
   if (price === null) {
@@ -83,17 +85,23 @@ class AdminAction extends Component {
   handleMarkBought = event => {
     event.preventDefault();
 
-    const { showing } = this.props;
     const { cinemaTicketUrls, ticketPrice } = this.state;
 
+    const nonEmptyTicketUrls = cinemaTicketUrls.filter(
+      line => line.trim().length !== 0
+    );
+
+    const { showing } = this.props;
     this.props
-      .requestUpdate({
-        id: showing.id,
-        cinemaTicketUrls: cinemaTicketUrls.filter(
-          line => line.trim().length !== 0
-        ),
-        price: ticketPrice * 100,
-        ticketsBought: true
+      .markShowingBought({
+        showing: {
+          private: showing.private,
+          payToUser: showing.payToUser.id,
+          location: showing.location.name,
+          time: showing.time,
+          price: ticketPrice * 100
+        },
+        ticketUrls: nonEmptyTicketUrls
       })
       .then(this.handleStartBooking);
   };
@@ -102,7 +110,7 @@ class AdminAction extends Component {
     const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
     if (proceed) {
-      this.props.requestDelete();
+      this.props.deleteShowing();
     }
   };
 
@@ -219,14 +227,57 @@ export const showingAdminFragment = gql`
   }
 `;
 
-// const mapDispatchToProps = (dispatch, props) => {
-//   const { requestUpdate, requestDelete } = showingActions.actions;
-//   const { showing } = props;
+const markAsBought = graphql(
+  gql`
+    mutation MarkShowingAsBought(
+      $showingId: UUID!
+      $showing: UpdateShowingInput
+      $ticketUrls: [String!]
+    ) {
+      updateShowing(showingId: $showingId, newValues: $showing) {
+        id
+      }
 
-//   return {
-//     requestUpdate: obj => dispatch(requestUpdate(obj)),
-//     requestDelete: () => dispatch(requestDelete(showing.id))
-//   };
-// };
+      markAsBought(showingId: $showingId) {
+        id
+      }
+      processTicketUrls(showingId: $showingId, ticketUrls: $ticketUrls) {
+        id
+        ticketsBought
+        price
+        private
+        payToUser {
+          id
+        }
+        expectedBuyDate
+        time
+      }
+    }
+  `,
+  {
+    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
+      markShowingBought: ({ showing, ticketUrls }) =>
+        wrapMutate(mutate, { showing, showingId, ticketUrls })
+    })
+  }
+);
 
-export default withRouter(AdminAction);
+const deleteShowing = graphql(
+  gql`
+    mutation DeleteShowing($showingId: UUID!) {
+      deleteShowing(showingId: $showingId) {
+        id
+      }
+    }
+  `,
+  {
+    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
+      deleteShowing: () => wrapMutate(mutate, { showingId })
+    }),
+    options: {
+      refetchQueries: ["ShowingsQuery"]
+    }
+  }
+);
+
+export default compose(withRouter, markAsBought, deleteShowing)(AdminAction);

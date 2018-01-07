@@ -112,6 +112,10 @@ const data = graphql(
         ...Showing
         ...ShowingAdmin
         price
+        payToUser {
+          id
+        }
+        private
         movie {
           imdbId
         }
