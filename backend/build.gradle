@@ -68,6 +68,7 @@ dependencies {
   compile("com.googlecode.libphonenumber:libphonenumber:8.4.2")
   compile("com.google.guava:guava:23.6-jre")
   compile("net.sf.biweekly:biweekly:0.6.1")
+  compile("org.apache.httpcomponents:httpclient:4.5.4")
   testCompile("org.springframework.boot:spring-boot-starter-test:$springBootSnapshotVersion")
   testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
   testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")

@@ -20,7 +20,7 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.schedulers.popularityUpdater", name = ["enabled"], matchIfMissing = true, havingValue = "true")
+@ConditionalOnProperty(prefix = "sefilm.schedulers.enabled", name = ["popularityUpdater"], matchIfMissing = true, havingValue = "true")
 class ScheduledPopularityUpdater(
   private val movieRepository: MovieRepository,
   private val sfService: SFService,

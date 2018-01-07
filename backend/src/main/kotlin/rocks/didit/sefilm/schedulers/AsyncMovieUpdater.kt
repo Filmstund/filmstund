@@ -19,7 +19,7 @@ import java.time.Instant
 import java.util.*
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.schedulers.movieUpdater", name = ["enabled"], matchIfMissing = true, havingValue = "true")
+@ConditionalOnProperty(prefix = "sefilm.schedulers.enabled", name = ["movieUpdater"], matchIfMissing = true, havingValue = "true")
 class AsyncMovieUpdater(private val movieRepository: MovieRepository,
                         private val sfClient: SFService,
                         private val imdbClient: ImdbClient) {

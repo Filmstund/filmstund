@@ -1,0 +1,19 @@
+type NotificationProvider {
+    name: String!
+    isSubscribable: Boolean!
+}
+
+interface NotificationSettings {
+    enabled: Boolean!
+}
+
+type MailNotificationSettings implements NotificationSettings {
+    enabled: Boolean!
+    mailAddress: String
+}
+
+type PushoverNotificationSettings implements NotificationSettings {
+    enabled: Boolean!
+    userKey: String
+    device: String
+}

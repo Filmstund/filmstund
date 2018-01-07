@@ -17,7 +17,7 @@ data class ErrorDTO(val error: Boolean = true,
 internal class ExternalProviderErrorHandler : ResponseErrorHandler {
   private val log = LoggerFactory.getLogger(ExternalProviderErrorHandler::class.java)
   override fun hasError(response: ClientHttpResponse): Boolean {
-    return response.rawStatusCode >= 400
+    return response.rawStatusCode >= 401
   }
 
   override fun handleError(url: URI, method: HttpMethod, response: ClientHttpResponse) {

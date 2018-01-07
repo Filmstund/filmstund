@@ -10,6 +10,9 @@ import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
+import rocks.didit.sefilm.events.EventPublisher
+import rocks.didit.sefilm.events.UserAttendedEvent
+import rocks.didit.sefilm.events.UserUnattendedEvent
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
@@ -23,6 +26,7 @@ class ShowingService(
   private val ticketService: TicketService,
   private val sfService: SFService,
   private val locationService: LocationService,
+  private val eventPublisher: EventPublisher,
   private val assertionService: AssertionService) {
 
   companion object {
@@ -115,6 +119,9 @@ class ShowingService(
 
     val participant: Participant = createParticipantBasedOnPaymentType(paymentOption, userId)
 
+    // TODO: make it easier to fetch the user from the UserService
+    val user = userService.getCompleteUser(userId) ?: throw NotFoundException("user", userID = userId)
+    eventPublisher.publish(UserAttendedEvent(this, showing, user, paymentOption.type))
     val newParticipants = showing.participants.plus(participant)
     return showingRepo
       .save(showing.copy(participants = newParticipants))
@@ -138,6 +145,10 @@ class ShowingService(
     }
 
     val participant = participantLst.first()
+
+    // TODO: make it easier to fetch the user from the UserService
+    val user = userService.getCompleteUser(participant.userId) ?: throw NotFoundException("user", userID = participant.userId)
+    eventPublisher.publish(UserUnattendedEvent(this, showing, user))
 
     val participantsWithoutLoggedInUser = showing.participants.minus(participant)
     return showingRepo

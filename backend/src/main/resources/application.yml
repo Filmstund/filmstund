@@ -35,12 +35,19 @@ sefilm:
   enableSeeding: ${enableSeeding:true}
   defaultCity: ${defaultCity:GB}
   schedulers:
-    movieUpdater:
-      enabled: ${movieUpdaterEnabled:true}
-    archiver:
-      enabled: ${archiverEnabled:true}
-    popularityUpdater:
-      enabled: ${popularityUpdaterEnabled:true}
+    enabled:
+      movieUpdater: ${movieUpdaterEnabled:true}
+      archiver: ${archiverEnabled:true}
+      popularityUpdater: ${popularityUpdaterEnabled:true}
+  notification:
+    provider:
+      MailProvider:
+        enabled: ${mailProviderEnabled:true}
+      Pushover:
+        enabled: ${pushoverProviderEnabled:true}
+        apiToken: ${pushoverApiToken}
+        url: ${pushoverUrl:https://api.pushover.net/1/messages.json}
+
 
 graphql:
   servlet:

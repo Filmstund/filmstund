@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.services
 
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
@@ -16,12 +16,16 @@ import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.orElseThrow
 import java.util.*
 
-@Component
+@Service
 class UserService(private val userRepo: UserRepository,
                   private val foretagsbiljettService: ForetagsbiljettService) {
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
   fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
+  fun getUsersThatWantToBeNotified(): List<User> {
+    return userRepo.findAll()
+      .filter { it.notificationSettings.any { it.enabled } }
+  }
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
   fun getCompleteUser(id: UserID): User?
@@ -88,6 +92,7 @@ class UserService(private val userRepo: UserRepository,
     this.phone?.number,
     this.avatar,
     this.foretagsbiljetter.map { it.toDTO() },
+    this.notificationSettings,
     this.lastLogin,
     this.signupDate,
     this.calendarFeedId)

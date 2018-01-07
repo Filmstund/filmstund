@@ -14,6 +14,8 @@ class Properties {
   var google = Google()
   var login = Login()
 
+  var notification = Notification()
+
   class Tmdb {
     var apikey: String? = null
     fun apiKeyExists(): Boolean {
@@ -37,5 +39,19 @@ class Properties {
   class BaseUrl {
     var api: String = "N/A"
     var frontend: String = "N/A"
+  }
+
+  class Notification {
+    var provider = Provider()
+  }
+
+  class Provider {
+    var pushover = Pushover()
+  }
+
+  class Pushover {
+    var enabled: Boolean = false
+    var apiToken: String? = null
+    var url: String = ""
   }
 }

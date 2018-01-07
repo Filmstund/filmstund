@@ -13,7 +13,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.schedulers.archiver", name = ["enabled"], matchIfMissing = true, havingValue = "true")
+@ConditionalOnProperty(prefix = "sefilm.schedulers.enabled", name = ["archiver"], matchIfMissing = true, havingValue = "true")
 class ScheduledArchiver(private val movieRepository: MovieRepository,
                         showingRepository: ShowingRepository,
                         sfClient: SFService) {
