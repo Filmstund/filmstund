@@ -11,7 +11,6 @@ type Showing {
     payToUser: User!
     expectedBuyDate: String
     participants: [Participant!]
-    calendarEventId: String
     lastModifiedDate: String!
 }
 

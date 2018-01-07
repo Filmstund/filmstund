@@ -40,4 +40,4 @@ graphql:
 
 logging:
   level:
-    didit.rocks: INFO
+    rocks.didit: ${logLevel:INFO}

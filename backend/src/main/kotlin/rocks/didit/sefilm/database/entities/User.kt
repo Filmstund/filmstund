@@ -9,6 +9,7 @@ import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import java.time.Instant
+import java.util.*
 
 @Document
 data class User(
@@ -24,6 +25,7 @@ data class User(
   val phone: PhoneNumber? = null,
   val avatar: String? = null,
   val foretagsbiljetter: List<Företagsbiljett> = emptyList(),
+  val calendarFeedId: UUID? = UUID.randomUUID(),
   val lastLogin: Instant = Instant.ofEpochSecond(0L),
   val signupDate: Instant = Instant.ofEpochSecond(0L)
 ) {

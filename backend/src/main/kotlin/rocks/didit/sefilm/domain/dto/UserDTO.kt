@@ -2,6 +2,7 @@ package rocks.didit.sefilm.domain.dto
 
 import rocks.didit.sefilm.domain.UserID
 import java.time.Instant
+import java.util.*
 
 class UserDTO(
   val id: UserID = UserID("N/A"),
@@ -15,7 +16,8 @@ class UserDTO(
   val avatar: String? = null,
   val foretagsbiljetter: List<ForetagsbiljettDTO> = emptyList(),
   val lastLogin: Instant = Instant.ofEpochSecond(0L),
-  val signupDate: Instant = Instant.ofEpochSecond(0L)
+  val signupDate: Instant = Instant.ofEpochSecond(0L),
+  val calendarFeedId: UUID?
 ) {
   fun toLimitedUserDTO() = LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone, this.avatar)
 }

@@ -9,9 +9,6 @@ type Mutation {
     # Delete a showign and return all public showings
     deleteShowing(showingId: UUID!): [Showing!]
 
-    createCalendarEvent(showingId: UUID!): Showing!
-    deleteCalendarEvent(showingId: UUID!): Showing!
-
     markAsBought(showingId: UUID!): Showing!
     processTicketUrls(showingId: UUID!, ticketUrls: [String!]): Showing!
 
