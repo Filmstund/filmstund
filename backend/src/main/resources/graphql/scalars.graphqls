@@ -4,3 +4,4 @@ scalar LocalDate
 scalar LocalTime
 scalar IMDbID
 scalar TMDbID
+scalar UserID

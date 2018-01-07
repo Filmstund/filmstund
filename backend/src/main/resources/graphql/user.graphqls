@@ -1,5 +1,5 @@
 type CurrentUser {
-    id: ID!
+    id: UserID!
     name: String
     firstName: String
     lastName: String
@@ -14,7 +14,7 @@ type CurrentUser {
 }
 
 type User {
-    id: ID!
+    id: UserID!
     name: String
     firstName: String
     lastName: String

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.UserID
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -122,6 +123,25 @@ class CustomScalarTMDbID : GraphQLScalarType("TMDbID", "TMDb ID", object : Coerc
   override fun serialize(input: Any?): Long? = when (input) {
     is Long -> input
     is TMDbID -> input.value
+    else -> null
+  }
+})
+
+@Component
+class CustomScalarUserID : GraphQLScalarType("UserID", "UserID", object : Coercing<UserID, String> {
+  override fun parseLiteral(input: Any?): UserID {
+    return when (input) {
+      is StringValue -> UserID(input.value)
+      is String -> UserID(input)
+      else -> throw IllegalArgumentException("Unablet to convert '$input' to a UserID")
+    }
+  }
+
+  override fun parseValue(input: Any?): UserID = parseLiteral(input)
+
+  override fun serialize(input: Any?): String? = when (input) {
+    is String -> input
+    is UserID -> input.id
     else -> null
   }
 })
