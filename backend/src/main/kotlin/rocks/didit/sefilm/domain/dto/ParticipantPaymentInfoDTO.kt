@@ -2,7 +2,7 @@ package rocks.didit.sefilm.domain.dto
 
 import java.util.*
 
-data class ParticipantInfoDTO(
+data class ParticipantPaymentInfoDTO(
   val id: UUID = UUID.randomUUID(),
   val userId: String? = null,
   val showingId: UUID? = null,

@@ -32,7 +32,7 @@ class UserService(private val userRepo: UserRepository,
   }
 
   fun getParticipantEmailAddresses(participants: Collection<Participant>): List<String> {
-    val userIds = participants.map { it.extractUserId() }
+    val userIds = participants.map { it.userId }
     return userRepo
       .findAllById(userIds)
       .map { it.email }

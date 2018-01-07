@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.domain.dto.ParticipantInfoDTO
+import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 import rocks.didit.sefilm.services.ParticipantPaymentInfoService
 
 @RestController
@@ -16,5 +16,5 @@ class ParticipantInfoController(
   }
 
   @PutMapping(PATH)
-  fun update(@RequestBody body: ParticipantInfoDTO): ParticipantPaymentInfo = ppiService.updatePaymentInfo(body)
+  fun update(@RequestBody body: ParticipantPaymentInfoDTO): ParticipantPaymentInfo = ppiService.updatePaymentInfo(body)
 }

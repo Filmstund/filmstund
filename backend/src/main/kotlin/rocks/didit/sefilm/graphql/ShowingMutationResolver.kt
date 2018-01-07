@@ -4,8 +4,8 @@ package rocks.didit.sefilm.graphql
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.PaymentOption
+import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.services.ShowingService
@@ -17,32 +17,32 @@ class ShowingMutationResolver(
   private val showingService: ShowingService,
   private val ticketService: TicketService
 ) : GraphQLMutationResolver {
-  fun attendShowing(showingId: UUID, paymentOption: PaymentOption): Showing
+  fun attendShowing(showingId: UUID, paymentOption: PaymentOption): ShowingDTO
     = showingService.attendShowing(showingId, paymentOption)
 
-  fun unattendShowing(showingId: UUID): Showing
+  fun unattendShowing(showingId: UUID): ShowingDTO
     = showingService.unattendShowing(showingId)
 
-  fun createShowing(showing: ShowingDTO): Showing
+  fun createShowing(showing: CreateShowingDTO): ShowingDTO
     = showingService.createShowing(showing)
 
-  fun deleteShowing(showingId: UUID): List<Showing>
+  fun deleteShowing(showingId: UUID): List<ShowingDTO>
     = showingService.deleteShowing(showingId)
 
-  fun createCalendarEvent(showingId: UUID): Showing
+  fun createCalendarEvent(showingId: UUID): ShowingDTO
     = showingService.createCalendarEvent(showingId)
 
-  fun deleteCalendarEvent(showingId: UUID): Showing
+  fun deleteCalendarEvent(showingId: UUID): ShowingDTO
     = showingService.deleteCalendarEvent(showingId)
 
-  fun markAsBought(showingId: UUID): Showing
+  fun markAsBought(showingId: UUID): ShowingDTO
     = showingService.markAsBought(showingId)
 
-  fun processTicketUrls(showingId: UUID, ticketUrls: List<String>): Showing {
+  fun processTicketUrls(showingId: UUID, ticketUrls: List<String>): ShowingDTO {
     ticketService.processTickets(ticketUrls, showingId)
     return showingService.getShowingOrThrow(showingId)
   }
 
-  fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): Showing
+  fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO
     = showingService.updateShowing(showingId, newValues)
 }

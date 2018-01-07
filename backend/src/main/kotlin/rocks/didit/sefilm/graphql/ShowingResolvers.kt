@@ -7,13 +7,10 @@ import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
-import rocks.didit.sefilm.domain.Participant
-import rocks.didit.sefilm.domain.PaymentType
+import rocks.didit.sefilm.domain.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.orElseThrow
-import rocks.didit.sefilm.redact
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
@@ -25,7 +22,7 @@ import java.util.*
 class ShowingQueryResolver(private val showingService: ShowingService) : GraphQLQueryResolver {
   fun publicShowings(afterDate: LocalDate?) = showingService.getAllPublicShowings(afterDate ?: LocalDate.MIN)
   fun privateShowingsForCurrentUser(afterDate: LocalDate?) = showingService.getPrivateShowingsForCurrentUser(afterDate ?: LocalDate.MIN)
-  fun showing(id: UUID): Showing? = showingService.getShowing(id)
+  fun showing(id: UUID): ShowingDTO? = showingService.getShowing(id)
   fun showingForMovie(movieId: UUID) = showingService.getShowingByMovie(movieId)
 }
 
@@ -34,43 +31,41 @@ class ShowingResolver(
   private val showingService: ShowingService,
   private val userService: UserService,
   private val movieService: MovieService,
-  private val ticketService: TicketService) : GraphQLResolver<Showing> {
-  fun admin(showing: Showing): LimitedUserDTO
+  private val ticketService: TicketService) : GraphQLResolver<ShowingDTO> {
+  fun admin(showing: ShowingDTO): LimitedUserDTO
     = userService
     .getUser(showing.admin)
     .orElseThrow { NotFoundException("admin user", showing.admin, showing.id) }
 
-  fun payToUser(showing: Showing): LimitedUserDTO
+  fun payToUser(showing: ShowingDTO): LimitedUserDTO
     = userService
     .getUser(showing.payToUser)
     .orElseThrow { NotFoundException("payment receiver user", showing.payToUser, showing.id) }
 
-  fun movie(showing: Showing): Movie {
-    val id = showing.movieId ?: UUID.randomUUID()
+  fun movie(showing: ShowingDTO): Movie {
+    val id = showing.movieId
     return movieService.getMovie(id)
       .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
   }
 
-  fun myTickets(showing: Showing): List<Ticket>
+  fun myTickets(showing: ShowingDTO): List<Ticket>
     = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
-  fun ticketRange(showing: Showing): TicketRange
+  fun ticketRange(showing: ShowingDTO): TicketRange
     = ticketService.getTicketRange(showing.id)
 
-  fun adminPaymentDetails(showing: Showing): AdminPaymentDetailsDTO
+  fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO
     = showingService.getAdminPaymentDetails(showing.id)
 
-  fun attendeePaymentDetails(showing: Showing): AttendeePaymentDetailsDTO
+  fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO
     = showingService.getAttendeePaymentDetails(showing.id)
 }
 
 @Component
-class ParticipantUserResolver(private val userService: UserService) : GraphQLResolver<Participant> {
-  fun user(participant: Participant): LimitedUserDTO
+class ParticipantUserResolver(private val userService: UserService) : GraphQLResolver<ParticipantDTO> {
+  fun user(participant: ParticipantDTO): LimitedUserDTO
     = userService
-    .getUserOrThrow(participant.extractUserId())
-
-  fun paymentType(participant: Participant): PaymentType = participant.redact().paymentType
+    .getUserOrThrow(participant.userId)
 }
 
 @Component

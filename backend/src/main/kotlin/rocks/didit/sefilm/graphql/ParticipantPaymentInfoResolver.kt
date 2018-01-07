@@ -5,9 +5,9 @@ package rocks.didit.sefilm.graphql
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
+import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.UserService
 
@@ -20,7 +20,7 @@ class ParticipantPaymentInfoResolver(
   fun user(participantPaymentInfo: ParticipantPaymentInfo): LimitedUserDTO
     = userService.getUserOrThrow(participantPaymentInfo.userId)
 
-  fun showing(participantPaymentInfo: ParticipantPaymentInfo): Showing
+  fun showing(participantPaymentInfo: ParticipantPaymentInfo): ShowingDTO
     = showingService.getShowingOrThrow(participantPaymentInfo.showingId)
 }
 
