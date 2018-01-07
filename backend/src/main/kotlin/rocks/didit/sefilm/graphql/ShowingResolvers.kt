@@ -57,11 +57,11 @@ class ShowingResolver(
   fun ticketRange(showing: Showing): TicketRange
     = ticketService.getTicketRange(showing.id)
 
-  fun preBuyInfo(showing: Showing): PreBuyInfoDTO
-    = showingService.getPreBuyInfo(showing.id)
+  fun adminPaymentDetails(showing: Showing): AdminPaymentDetailsDTO
+    = showingService.getAdminPaymentDetails(showing.id)
 
-  fun paymentInfo(showing: Showing): PaymentDTO
-    = showingService.getPaymentInfo(showing.id)
+  fun attendeePaymentDetails(showing: Showing): AttendeePaymentDetailsDTO
+    = showingService.getAttendeePaymentDetails(showing.id)
 }
 
 @Component

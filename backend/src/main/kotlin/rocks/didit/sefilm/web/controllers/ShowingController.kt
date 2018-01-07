@@ -102,10 +102,10 @@ class ShowingController(
   }
 
   @GetMapping(PATH_WITH_ID + "/buy")
-  fun getBuyingTicketDetails(@PathVariable id: UUID): PreBuyInfoDTO = showingService.getPreBuyInfo(id)
+  fun getBuyingTicketDetails(@PathVariable id: UUID): AdminPaymentDetailsDTO = showingService.getAdminPaymentDetails(id)
 
   @GetMapping(PATH_WITH_ID + "/pay")
-  fun getAttendeePaymentInfo(@PathVariable id: UUID): PaymentDTO = showingService.getPaymentInfo(id)
+  fun getAttendeePaymentInfo(@PathVariable id: UUID): AttendeePaymentDetailsDTO = showingService.getAttendeePaymentDetails(id)
 
   @PostMapping(PATH, consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
   @ResponseStatus(HttpStatus.CREATED)

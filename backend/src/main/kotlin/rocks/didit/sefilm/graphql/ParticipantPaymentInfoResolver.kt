@@ -6,8 +6,8 @@ import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
-import rocks.didit.sefilm.domain.dto.PaymentDTO
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.UserService
 
@@ -27,11 +27,11 @@ class ParticipantPaymentInfoResolver(
 @Component
 class PaymentInfoResolver(
   private val userService: UserService
-) : GraphQLResolver<PaymentDTO> {
+) : GraphQLResolver<AttendeePaymentDetailsDTO> {
 
-  fun payTo(paymentDTO: PaymentDTO): LimitedUserDTO
+  fun payTo(paymentDTO: AttendeePaymentDetailsDTO): LimitedUserDTO
     = userService.getUserOrThrow(paymentDTO.payTo)
 
-  fun payer(paymentDTO: PaymentDTO): LimitedUserDTO
+  fun payer(paymentDTO: AttendeePaymentDetailsDTO): LimitedUserDTO
     = userService.getUserOrThrow(paymentDTO.payerUserID)
 }
