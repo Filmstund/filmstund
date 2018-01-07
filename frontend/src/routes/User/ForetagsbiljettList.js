@@ -10,6 +10,9 @@ import { SmallHeader } from "../../Header";
 import Input from "../../Input";
 
 import { formatYMD } from "../../lib/dateTools";
+import { graphql, compose } from "react-apollo";
+import gql from "graphql-tag";
+import { wrapMutate } from "../../store/apollo";
 
 const DEFAULT_DATE = moment().add(1, "years");
 
@@ -21,6 +24,7 @@ const ForetagsbiljettWrapper = styled.div`
 
 const ForetagsbiljettInput = styled(Input)`
   max-width: 13.6em;
+  background: ${props => (props.disabled ? "rgba(0, 0, 0, 0.04)" : "inherit")};
 `;
 
 const TrashIcon = styled.span`
@@ -49,6 +53,7 @@ const Foretagsbiljett = ({
   dateFocused,
   biljett,
   index,
+  editable = true,
   handleChangeFocus,
   handleChangeForetagsbiljett,
   handleSetExpiresForetagsbiljett,
@@ -56,26 +61,34 @@ const Foretagsbiljett = ({
 }) => (
   <ForetagsbiljettWrapper>
     <BiljettField text="Nummer">
-      <ForetagsbiljettInput
-        type="text"
-        value={biljett.number}
-        maxLength={11}
-        onChange={v => handleChangeForetagsbiljett(index, v)}
-      />
+      {editable ? (
+        <ForetagsbiljettInput
+          type="text"
+          value={biljett.number}
+          maxLength={11}
+          onChange={v => handleChangeForetagsbiljett(index, v)}
+        />
+      ) : (
+        <div>{biljett.number}</div>
+      )}
     </BiljettField>
     <BiljettField text="Utgångsdatum">
-      <DatePicker
-        numberOfMonths={1}
-        focused={dateFocused}
-        onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
-        onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
-        date={moment(biljett.expires)}
-      />
+      {editable ? (
+        <DatePicker
+          numberOfMonths={1}
+          focused={dateFocused}
+          onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
+          onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
+          date={moment(biljett.expires)}
+        />
+      ) : (
+        <div>{formatYMD(biljett.expires)}</div>
+      )}
     </BiljettField>
     <BiljettField text="Status">{biljett.status || "Available"}</BiljettField>
     <TrashIcon>
       <i
-        onClick={() => handleRemoveForetagsbiljett(index)}
+        onClick={() => handleRemoveForetagsbiljett(biljett, index)}
         className="fa fa-trash"
         aria-hidden="true"
       />
@@ -83,29 +96,23 @@ const Foretagsbiljett = ({
   </ForetagsbiljettWrapper>
 );
 
-export default class ForetagsbiljettList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      focusedIndex: -1,
-      biljetter: props.biljetter
-    };
-  }
+class ForetagsbiljettList extends Component {
+  state = {
+    focusedIndex: -1,
+    tempTickets: []
+  };
 
   updateForetagsbiljett = (index, biljett) => {
-    const { biljetter } = this.state;
-    const newTickets = biljetter.map((number, i) => {
-      if (index === i) {
-        return {
-          ...number,
-          ...biljett
-        };
-      } else {
-        return number;
-      }
+    this.setState(({ tempTickets }) => {
+      const newTickets = tempTickets.map((number, i) => {
+        if (index === i) {
+          return { ...number, ...biljett };
+        } else {
+          return number;
+        }
+      });
+      return { tempTickets: newTickets };
     });
-
-    this.setState({ biljetter: newTickets });
   };
 
   handleChangeFocus = (index, focused) => {
@@ -123,50 +130,68 @@ export default class ForetagsbiljettList extends Component {
 
   addForetagsbiljett = () => {
     const foretagsbiljett = { number: "", expires: DEFAULT_DATE };
-    const newTickets = [...this.state.biljetter, foretagsbiljett];
-    this.setState({ biljetter: newTickets });
+    this.setState(state => ({
+      tempTickets: [...state.tempTickets, foretagsbiljett]
+    }));
   };
 
   handleRemoveForetagsbiljett = index => {
-    const { biljetter } = this.state;
+    const { tempTickets } = this.state;
 
     const biljetterWithoutAtIndex = [
-      ...biljetter.slice(0, index),
-      ...biljetter.slice(index + 1)
+      ...tempTickets.slice(0, index),
+      ...tempTickets.slice(index + 1)
     ];
 
-    this.setState({ biljetter: biljetterWithoutAtIndex });
+    this.setState({ tempTickets: biljetterWithoutAtIndex });
   };
 
   handleSubmit = () => {
-    const tickets = this.state.biljetter.map(ftg => ({
-      number: ftg.number,
-      expires: formatYMD(ftg.expires)
+    const tickets = this.state.tempTickets.map(({ number, expires }) => ({
+      number,
+      expires: formatYMD(expires)
     }));
 
-    // this.props.updateTickets(tickets);
+    this.props.addForetagsbiljett(tickets).then(success => {
+      this.setState({
+        tempTickets: []
+      });
+    });
+  };
+
+  renderTickets = (tickets, editable, handlePressRemove) => {
+    const { focusedIndex } = this.state;
+    return tickets.map((biljett, i) => (
+      <Foretagsbiljett
+        key={i}
+        biljett={biljett}
+        index={i}
+        editable={editable}
+        dateFocused={i === focusedIndex}
+        handleChangeFocus={this.handleChangeFocus}
+        handleChangeForetagsbiljett={this.handleChangeForetagsbiljett}
+        handleSetExpiresForetagsbiljett={this.handleSetExpiresForetagsbiljett}
+        handleRemoveForetagsbiljett={handlePressRemove}
+      />
+    ));
   };
 
   render() {
-    const { biljetter, focusedIndex } = this.state;
+    const { tempTickets } = this.state;
+    const { foretagsbiljetter = [], deleteForetagsbiljett } = this.props;
 
     return (
       <div>
         <SmallHeader>Företagsbiljetter</SmallHeader>
-        {biljetter.map((biljett, i) => (
-          <Foretagsbiljett
-            key={i}
-            biljett={biljett}
-            index={i}
-            dateFocused={i === focusedIndex}
-            handleChangeFocus={this.handleChangeFocus}
-            handleChangeForetagsbiljett={this.handleChangeForetagsbiljett}
-            handleSetExpiresForetagsbiljett={
-              this.handleSetExpiresForetagsbiljett
-            }
-            handleRemoveForetagsbiljett={this.handleRemoveForetagsbiljett}
-          />
-        ))}
+        {this.renderTickets(
+          foretagsbiljetter,
+          false,
+          ({ number, expires }, index) =>
+            deleteForetagsbiljett({ number, expires: formatYMD(expires) })
+        )}
+        {this.renderTickets(tempTickets, true, (biljett, index) =>
+          this.handleRemoveForetagsbiljett(index)
+        )}
         <AddForetagsbiljettContainer onClick={this.addForetagsbiljett}>
           <AddIcon>
             <i className="fa fa-plus-circle" aria-hidden="true" />
@@ -179,3 +204,47 @@ export default class ForetagsbiljettList extends Component {
     );
   }
 }
+
+const addForetagsbiljett = graphql(
+  gql`
+    mutation AddForetagsbiljett($tickets: [ForetagsbiljettInput!]) {
+      addForetagsBiljetter(biljetter: $tickets) {
+        id
+        foretagsbiljetter {
+          number
+          expires
+          status
+        }
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      addForetagsbiljett: tickets => wrapMutate(mutate, { tickets })
+    })
+  }
+);
+
+const deleteForetagsbiljett = graphql(
+  gql`
+    mutation DeleteForetagsbiljett($ticket: ForetagsbiljettInput!) {
+      deleteForetagsBiljett(biljett: $ticket) {
+        id
+        foretagsbiljetter {
+          number
+          expires
+          status
+        }
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      deleteForetagsbiljett: ticket => wrapMutate(mutate, { ticket })
+    })
+  }
+);
+
+export default compose(addForetagsbiljett, deleteForetagsbiljett)(
+  ForetagsbiljettList
+);
