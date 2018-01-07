@@ -54,3 +54,22 @@ export const deleteShowing = graphql(
     }
   }
 );
+
+export const togglePaidChange = graphql(
+  gql`
+    mutation TogglePaidChange($paymentInfo: ParticipantPaymentInput!) {
+      updateParticipantPaymentInfo(paymentInfo: $paymentInfo) {
+        id
+        hasPaid
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      togglePaidChange: paymentInfo => wrapMutate(mutate, { paymentInfo })
+    }),
+    options: {
+      refetchQueries: ["ShowingsQuery"]
+    }
+  }
+);
