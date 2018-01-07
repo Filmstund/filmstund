@@ -36,6 +36,7 @@ class CustomScalarSEK : GraphQLScalarType("SEK", "Swedish Kronor", object : Coer
   override fun parseLiteral(input: Any?): SEK? {
     return when (input) {
       is IntValue -> SEK(input.value.toLong())
+      is Int -> SEK(input.toLong())
       else -> null
     }
   }
@@ -111,6 +112,7 @@ class CustomScalarTMDbID : GraphQLScalarType("TMDbID", "TMDb ID", object : Coerc
   override fun parseLiteral(input: Any?): TMDbID {
     return when (input) {
       is IntValue -> TMDbID.valueOf(input.value.toLong())
+      is Int -> TMDbID.valueOf(input.toLong())
       else -> TMDbID.MISSING
     }
   }
