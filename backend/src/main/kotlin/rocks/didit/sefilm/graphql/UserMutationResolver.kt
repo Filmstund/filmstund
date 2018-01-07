@@ -35,4 +35,7 @@ class UserMutationResolver(
     foretagsbiljettService.deleteTicketFromUser(biljett)
     return userService.currentUser()
   }
+
+  fun invalidateCalendarFeed() = userService.invalidateCalendarFeedId()
+  fun disableCalendarFeed() = userService.disableCalendarFeed()
 }

@@ -22,6 +22,10 @@ type Mutation {
     updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInput!): ParticipantPaymentInfo!
 
     updateUser(newInfo: NewUserInfo!): CurrentUser!
+    # Generate a new calendar feed id, invalidating the old one
+    invalidateCalendarFeed: CurrentUser!
+    # Remove the calendar feed for the current user
+    disableCalendarFeed: CurrentUser!
 
     addForetagsBiljetter(biljetter: [ForetagsbiljettInput!]): CurrentUser!
     deleteForetagsBiljett(biljett: ForetagsbiljettInput!): CurrentUser!
