@@ -6,33 +6,30 @@ import Header from "../../Header";
 
 import { groupBy } from "lodash";
 
-import withUserLoader from "../../loaders/UserLoader";
-
 const UserActiveStatus = styled.div`
   color: ${props => (props.active ? "#000" : "#ccc")};
 `;
 
-const UserWithPriceItem = withUserLoader(
-  ({ user, active, price, onPaidChange, hasPaid }) =>
-    <UserActiveStatus active={active}>
-      {user.nick || user.name}{" "}
-      <label>
-        har betalat:{" "}
-        <input type="checkbox" checked={hasPaid} onChange={onPaidChange} />
-      </label>
-    </UserActiveStatus>
+const UserWithPriceItem = ({ user, active, price, onPaidChange, hasPaid }) => (
+  <UserActiveStatus active={active}>
+    {user.nick || user.name}{" "}
+    <label>
+      har betalat:{" "}
+      <input type="checkbox" checked={hasPaid} onChange={onPaidChange} />
+    </label>
+  </UserActiveStatus>
 );
 
 const renderUserWithPriceItem = (info, handlePaidChange, active) => (
   <UserWithPriceItem
-    key={info.id}
+    key={info.user.id}
     active={active}
-    userId={info.userId}
+    user={info.user}
     onPaidChange={() => handlePaidChange(info)}
     price={info.amountOwed}
     hasPaid={info.hasPaid}
   />
-)
+);
 
 const PaymentParticipantsList = ({ handlePaidChange, participants }) => {
   const { hasPaid = [], hasNotPaid = [] } = groupBy(
@@ -44,9 +41,13 @@ const PaymentParticipantsList = ({ handlePaidChange, participants }) => {
     <div>
       <Header>Deltagare</Header>
       {hasNotPaid.length === 0 && "Alla har betalat!"}
-      {hasNotPaid.map(info => renderUserWithPriceItem(info, () => handlePaidChange(info), true))}
+      {hasNotPaid.map(info =>
+        renderUserWithPriceItem(info, () => handlePaidChange(info), true)
+      )}
       <hr />
-      {hasPaid.map(info => renderUserWithPriceItem(info, () => handlePaidChange(info), false))}
+      {hasPaid.map(info =>
+        renderUserWithPriceItem(info, () => handlePaidChange(info), false)
+      )}
     </div>
   );
 };

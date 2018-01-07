@@ -108,8 +108,8 @@ const BuyModal = ({
     );
   }
 
-  const { sfBuyLink, sfData } = preBuyInfo;
-  const { ticketsBought, participants } = showing;
+  const { sfBuyLink, sfData, paymentInfo } = preBuyInfo;
+  const { ticketsBought } = showing;
 
   const participantsWithForetagsbiljett = sfData.filter(
     ({ foretagsbiljett }) => foretagsbiljett !== null
@@ -125,7 +125,7 @@ const BuyModal = ({
           {ticketsBought && (
             <PaymentParticipantsList
               handlePaidChange={handlePaidChange}
-              participants={participants}
+              participants={paymentInfo}
             />
           )}
           {!ticketsBought && (
@@ -145,7 +145,10 @@ const BuyModal = ({
               <ForetagsBiljetterList
                 tickets={participantsWithForetagsbiljett}
               />
-              <SfMembershipList sfData={sfData} participants={participants} />
+              <SfMembershipList
+                sfData={sfData}
+                participants={showing.participants}
+              />
               <Field text="Biljettpris:">
                 <Input
                   type="number"

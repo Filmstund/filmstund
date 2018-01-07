@@ -1,0 +1,56 @@
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
+import { wrapMutate } from "../store/apollo";
+
+export const markAsBought = graphql(
+  gql`
+    mutation MarkShowingAsBought(
+      $showingId: UUID!
+      $showing: UpdateShowingInput
+      $ticketUrls: [String!]
+    ) {
+      updateShowing(showingId: $showingId, newValues: $showing) {
+        id
+      }
+
+      markAsBought(showingId: $showingId) {
+        id
+      }
+      processTicketUrls(showingId: $showingId, ticketUrls: $ticketUrls) {
+        id
+        ticketsBought
+        price
+        private
+        payToUser {
+          id
+        }
+        expectedBuyDate
+        time
+      }
+    }
+  `,
+  {
+    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
+      markShowingBought: ({ showing, ticketUrls }) =>
+        wrapMutate(mutate, { showing, showingId, ticketUrls })
+    })
+  }
+);
+
+export const deleteShowing = graphql(
+  gql`
+    mutation DeleteShowing($showingId: UUID!) {
+      deleteShowing(showingId: $showingId) {
+        id
+      }
+    }
+  `,
+  {
+    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
+      deleteShowing: () => wrapMutate(mutate, { showingId })
+    }),
+    options: {
+      refetchQueries: ["ShowingsQuery"]
+    }
+  }
+);
