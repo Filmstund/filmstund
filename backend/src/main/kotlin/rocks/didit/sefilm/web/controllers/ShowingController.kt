@@ -93,12 +93,6 @@ class ShowingController(
     return SuccessfulStatusDTO("Showing with id $id were removed successfully")
   }
 
-  @PostMapping(PATH_WITH_ID + "/invite/googlecalendar", consumes = [(MediaType.APPLICATION_JSON_UTF8_VALUE)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
-  fun createGoogleCalendarEvent(@PathVariable id: UUID): ResponseStatusDTO {
-    val createdEventId = showingService.createCalendarEvent(id).calendarEventId
-    return SuccessfulStatusDTO("Event with ID=$createdEventId created")
-  }
-
   @GetMapping(PATH_WITH_ID + "/buy")
   fun getBuyingTicketDetails(@PathVariable id: UUID): AdminPaymentDetailsDTO = showingService.getAdminPaymentDetails(id)
 

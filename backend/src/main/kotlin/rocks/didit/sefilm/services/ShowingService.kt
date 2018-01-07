@@ -4,7 +4,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.*
-import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
@@ -12,10 +11,7 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
-import java.time.Duration
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 
 @Component
@@ -25,7 +21,6 @@ class ShowingService(
   private val movieService: MovieService,
   private val userService: UserService,
   private val ticketService: TicketService,
-  private val googleCalenderService: GoogleCalenderService,
   private val sfService: SFService,
   private val locationService: LocationService,
   private val assertionService: AssertionService) {
@@ -50,6 +45,12 @@ class ShowingService(
   fun getShowingByMovie(movieId: UUID): List<ShowingDTO>
     = showingRepo
     .findByMovieIdOrderByDateDesc(movieId)
+    .map { it.toDto() }
+
+  fun getShowingByUser(user: UserID): List<ShowingDTO>
+    = showingRepo
+    .findAll()
+    .filter { it.userIsInvolvedInThisShowing(user) }
     .map { it.toDto() }
 
   fun getAllPublicShowings(afterDate: LocalDate = LocalDate.MIN): List<ShowingDTO>
@@ -158,52 +159,10 @@ class ShowingService(
     val showing = getShowingEntity(showingId)
     assertionService.assertLoggedInUserIsAdmin(showing.admin)
 
-    if (showing.calendarEventId != null) {
-      googleCalenderService.deleteEvent(showing.calendarEventId)
-    }
-
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     showingRepo.delete(showing)
     ticketService.deleteTickets(showing)
     return getAllPublicShowings()
-  }
-
-  fun createCalendarEvent(showingId: UUID): ShowingDTO {
-    val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin)
-    if (!showing.calendarEventId.isNullOrBlank()) throw BadRequestException("Calendar event already created")
-    if (showing.movieId == null) throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
-
-    val movie = movieService.getMovieOrThrow(showing.movieId)
-    val runtime = movie.getDurationOrDefault2hours()
-    val participantEmails = userService.getParticipantEmailAddresses(showing.participants)
-    val zoneId = ZoneId.of("Europe/Stockholm")
-    val event = CalendarEventDTO.of(
-      summary = movie.title,
-      location = showing.location,
-      emails = participantEmails,
-      start = ZonedDateTime.of(showing.date, showing.time, zoneId).plusSeconds(1),
-      end = ZonedDateTime.of(showing.date, showing.time, zoneId).plus(runtime).plusSeconds(1),
-      sfBuyLink = sfService.getSfBuyLink(movie.id) ?: ""
-    )
-
-    log.info("Creating calendar event for showing '${showing.id}' and ${participantEmails.size} participants")
-    val createdEventId = googleCalenderService.createEvent(event)
-    val updatedShowing = showing.copy(calendarEventId = createdEventId)
-    return showingRepo
-      .save(updatedShowing)
-      .toDto()
-  }
-
-  fun deleteCalendarEvent(showingId: UUID): ShowingDTO {
-    val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin)
-    if (showing.calendarEventId == null) throw IllegalArgumentException("Calendar event hasn't been created")
-
-    googleCalenderService.deleteEvent(showing.calendarEventId)
-    return showingRepo
-      .save(showing.copy(calendarEventId = null))
-      .toDto()
   }
 
   fun markAsBought(showingId: UUID): ShowingDTO {
@@ -277,12 +236,6 @@ class ShowingService(
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,
       participants = setOf(SwishParticipant(admin.id)))
-  }
-
-  private fun Movie.getDurationOrDefault2hours()
-    = when {
-    this.runtime.isZero -> Duration.ofHours(2).plusMinutes(30)
-    else -> this.runtime
   }
 
   private fun createInitialPaymentInfo(showing: Showing) {

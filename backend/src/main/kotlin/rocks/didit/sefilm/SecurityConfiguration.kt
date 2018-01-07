@@ -37,6 +37,7 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.BudordController
+import rocks.didit.sefilm.web.controllers.CalendarController
 import java.time.Instant
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -53,7 +54,7 @@ class GoogleOpenIdConnectConfig(
     details.clientSecret = properties.google.clientSecret
     details.accessTokenUri = properties.google.accessTokenUri
     details.userAuthorizationUri = properties.google.userAuthorizationUri
-    details.scope = listOf("openid", "email", "profile", "https://www.googleapis.com/auth/calendar")
+    details.scope = listOf("openid", "email", "profile")
     details.preEstablishedRedirectUri = properties.google.redirectUri
     details.isUseCurrentUri = false
     return details
@@ -247,9 +248,10 @@ class SecurityConfig(
       .authorizeRequests()
       .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
       .antMatchers(HttpMethod.GET, BudordController.PATH).permitAll()
-      .antMatchers(HttpMethod.GET, BudordController.PATH + "/random").permitAll()
+      .antMatchers(HttpMethod.GET, "${BudordController.PATH}/random").permitAll()
       .antMatchers(HttpMethod.HEAD, BudordController.PATH).permitAll()
-      .antMatchers(HttpMethod.HEAD, BudordController.PATH + "/random").permitAll()
+      .antMatchers(HttpMethod.HEAD, "${BudordController.PATH}/random").permitAll()
+      .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .anyRequest().authenticated()
   }
 }

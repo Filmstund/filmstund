@@ -27,7 +27,6 @@ data class Showing(@Id
                    val payToUser: UserID = admin,
                    val expectedBuyDate: LocalDate? = null,
                    val participants: Set<Participant> = setOf(),
-                   val calendarEventId: String? = null,
                    @LastModifiedDate
                    val lastModifiedDate: Instant = Instant.EPOCH) {
   // TODO: add more auditing
@@ -45,7 +44,6 @@ data class Showing(@Id
     payToUser = payToUser,
     expectedBuyDate = expectedBuyDate,
     participants = participants.map { it.toDto() },
-    calendarEventId = calendarEventId,
     lastModifiedDate = lastModifiedDate
   )
 }

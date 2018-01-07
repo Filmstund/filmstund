@@ -29,12 +29,6 @@ class ShowingMutationResolver(
   fun deleteShowing(showingId: UUID): List<ShowingDTO>
     = showingService.deleteShowing(showingId)
 
-  fun createCalendarEvent(showingId: UUID): ShowingDTO
-    = showingService.createCalendarEvent(showingId)
-
-  fun deleteCalendarEvent(showingId: UUID): ShowingDTO
-    = showingService.deleteCalendarEvent(showingId)
-
   fun markAsBought(showingId: UUID): ShowingDTO
     = showingService.markAsBought(showingId)
 

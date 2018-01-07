@@ -22,5 +22,4 @@ data class ShowingDTO(
   val payToUser: UserID,
   val expectedBuyDate: LocalDate?,
   val participants: Collection<ParticipantDTO>,
-  val calendarEventId: String?,
   val lastModifiedDate: Instant = Instant.EPOCH)

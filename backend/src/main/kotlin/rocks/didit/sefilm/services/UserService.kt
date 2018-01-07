@@ -5,12 +5,16 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.Företagsbiljett
+import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.SfMembershipId
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.orElseThrow
+import java.util.*
 
 @Component
 class UserService(private val userRepo: UserRepository,
@@ -29,13 +33,6 @@ class UserService(private val userRepo: UserRepository,
     return getCompleteUser(userID)
       ?.toDTO()
       .orElseThrow { NotFoundException("current user", userID) }
-  }
-
-  fun getParticipantEmailAddresses(participants: Collection<Participant>): List<String> {
-    val userIds = participants.map { it.userId }
-    return userRepo
-      .findAllById(userIds)
-      .map { it.email }
   }
 
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
@@ -59,6 +56,11 @@ class UserService(private val userRepo: UserRepository,
     return userRepo.save(updatedUser).toDTO()
   }
 
+  fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO?
+    = userRepo
+    .findByCalendarFeedId(calendarFeedId)
+    ?.toDTO()
+
   private fun User.toDTO() = UserDTO(this.id,
     this.name,
     this.firstName,
@@ -70,7 +72,8 @@ class UserService(private val userRepo: UserRepository,
     this.avatar,
     this.foretagsbiljetter.map { it.toDTO() },
     this.lastLogin,
-    this.signupDate)
+    this.signupDate,
+    this.calendarFeedId)
 
   private fun Företagsbiljett.toDTO(): ForetagsbiljettDTO {
     return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))

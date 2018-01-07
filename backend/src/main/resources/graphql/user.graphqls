@@ -9,6 +9,7 @@ type CurrentUser {
     phone: String
     avatar: String
     foretagsbiljetter: [Foretagsbiljett!]
+    calendarFeedId: UUID
     lastLogin: String!
     signupDate: String!
 }
