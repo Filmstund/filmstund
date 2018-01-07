@@ -35,6 +35,10 @@ class UserService(private val userRepo: UserRepository,
       .orElseThrow { NotFoundException("current user", userID) }
   }
 
+  private fun getUserEntityForCurrentUser()
+    = userRepo.findById(currentLoggedInUser())
+    .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
+
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
     val newSfMembershipId = when {
       newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
@@ -46,8 +50,7 @@ class UserService(private val userRepo: UserRepository,
       else -> PhoneNumber(newDetails.phone)
     }
 
-    val currentUserId = currentLoggedInUser()
-    val updatedUser = getCompleteUser(currentUserId).orElseThrow { NotFoundException("current user", currentUserId) }.copy(
+    val updatedUser = getUserEntityForCurrentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
       sfMembershipId = newSfMembershipId
@@ -60,6 +63,20 @@ class UserService(private val userRepo: UserRepository,
     = userRepo
     .findByCalendarFeedId(calendarFeedId)
     ?.toDTO()
+
+  fun invalidateCalendarFeedId(): UserDTO {
+    return userRepo
+      .save(getUserEntityForCurrentUser()
+        .copy(calendarFeedId = UUID.randomUUID()))
+      .toDTO()
+  }
+
+  fun disableCalendarFeed(): UserDTO {
+    return userRepo
+      .save(getUserEntityForCurrentUser()
+        .copy(calendarFeedId = null))
+      .toDTO()
+  }
 
   private fun User.toDTO() = UserDTO(this.id,
     this.name,
