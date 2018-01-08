@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { NavLink as RouterLink, withRouter } from "react-router-dom";
 import styled from "styled-components";
-import { signoutUser } from "./store/reducers/user";
 import fetch from "./lib/fetch";
 import { BASE_URL } from "./lib/withBaseURL";
 import { compose, withApollo } from "react-apollo";
