@@ -22,14 +22,19 @@ class RootComponent extends Component {
   }
 }
 
-const data = graphql(gql`
-  query RootComponentQuery {
-    me: currentUser {
-      ...CompleteUser
+const data = graphql(
+  gql`
+    query RootComponentQuery {
+      me: currentUser {
+        ...CompleteUser
+      }
     }
+    ${completeUserFragment}
+  `,
+  {
+    errorPolicy: "ignore"
   }
-  ${completeUserFragment}
-`);
+);
 
 const RootWithData = compose(data)(RootComponent);
 

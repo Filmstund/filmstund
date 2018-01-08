@@ -98,7 +98,9 @@ class AdminAction extends Component {
     const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
     if (proceed) {
-      this.props.deleteShowing();
+      this.props.deleteShowing().then(() => {
+        this.props.history.push("/showings");
+      });
     }
   };
 
