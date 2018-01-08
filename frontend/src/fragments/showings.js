@@ -65,6 +65,30 @@ export const markAsBought = graphql(
   }
 );
 
+export const updateShowing = graphql(
+  gql`
+    mutation UpdateShowing($showingId: UUID!, $showing: UpdateShowingInput!) {
+      updateShowing(showingId: $showingId, newValues: $showing) {
+        id
+        time
+        date
+        ticketsBought
+        price
+        private
+        payToUser {
+          id
+        }
+        expectedBuyDate
+      }
+    }
+  `,
+  {
+    props: ({ mutate, ownProps: { showingId } }) => ({
+      updateShowing: showing => wrapMutate(mutate, { showing, showingId })
+    })
+  }
+);
+
 export const deleteShowing = graphql(
   gql`
     mutation DeleteShowing($showingId: UUID!) {
