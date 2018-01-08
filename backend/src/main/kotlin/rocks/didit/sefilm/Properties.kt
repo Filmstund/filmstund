@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 @ConfigurationProperties("sefilm", ignoreInvalidFields = true)
 @Component
 class Properties {
+  var baseUrl = BaseUrl()
   var tmdb = Tmdb()
   var enableSeeding: Boolean = true
   var defaultCity: String = "GB"
@@ -31,5 +32,10 @@ class Properties {
   class Login {
     var baseRedirectUri: String = "http://localhost:3000"
     var defaultRedirectPath: String = "user"
+  }
+
+  class BaseUrl {
+    var api: String = "N/A"
+    var frontend: String = "N/A"
   }
 }

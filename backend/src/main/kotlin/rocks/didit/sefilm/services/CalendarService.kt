@@ -2,10 +2,12 @@ package rocks.didit.sefilm.services
 
 import biweekly.ICalendar
 import biweekly.component.VEvent
+import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.time.Duration
@@ -17,12 +19,14 @@ import java.util.*
 class CalendarService(
   private val userService: UserService,
   private val showingService: ShowingService,
-  private val movieService: MovieService
+  private val movieService: MovieService,
+  private val properties: Properties
 ) {
+
+  private val calendarDescription: String = "Dina visningar på $CALENDAR_NAME (${properties.baseUrl.frontend})"
 
   companion object {
     private const val CALENDAR_NAME = "ITBio"
-    private const val CALENDAR_DESC = "Dina visningar på ITBio (https://bio.didit.rocks)"
     private val stockholmZoneId = TimeZone.getTimeZone("Europe/Stockholm").toZoneId()
 
     private val log: Logger = LoggerFactory.getLogger(CalendarService::class.java)
@@ -49,14 +53,15 @@ class CalendarService(
     calendar.calendarScale = CalendarScale.gregorian()
     calendar.addName(CALENDAR_NAME)
     calendar.addExperimentalProperty("X-WR-CALNAME", CALENDAR_NAME)
-    calendar.addExperimentalProperty("X-WR-CALDESC", CALENDAR_DESC)
-    calendar.addDescription(CALENDAR_DESC)
+    calendar.addExperimentalProperty("X-WR-CALDESC", calendarDescription)
+    calendar.addDescription(calendarDescription)
 
     return calendar
   }
 
   private fun ShowingDTO.toVEvent(): VEvent {
     val movie = movieService.getMovie(this.movieId) ?: return VEvent()
+    val showingUrl = "${properties.baseUrl.frontend}/showing/$id"
 
     val vEvent = VEvent()
     vEvent.setSummary(movie.title).language = "en-us"
@@ -64,22 +69,26 @@ class CalendarService(
     vEvent.setDateEnd(this.getEndDate(movie))
     vEvent.setUid(this.id.toString())
     vEvent.setLocation(this.location.formatAddress())
-    vEvent.setDescription("https://bio.didit.rocks/showing/$id")
-    if (movie.poster != null) {
-      vEvent.addImage(Image("image/jpg", movie.poster))
-    }
-    vEvent.setUrl("https://bio.didit.rocks/showing/$id")
+    vEvent.setDescription(formatDescription(movie))
+    vEvent.setUrl(showingUrl)
     vEvent.addCategories(Categories("bio"))
     vEvent.addParticipants(this)
+    vEvent.status = if (this.ticketsBought) Status.confirmed() else Status.tentative()
 
     return vEvent
+  }
+
+  private fun formatDescription(movie: Movie): String {
+    return "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/${movie.imdbId.value}/" else ""}"
   }
 
   private fun VEvent.addParticipants(showingDTO: ShowingDTO) {
     showingDTO.participants.forEach {
       val user = userService.getUser(it.userId)
       if (user != null) {
-        this.addAttendee(Attendee(user.nick, ""))
+        val attendee = Attendee("${user.firstName} '${user.nick}' ${user.lastName}", "N/A")
+        attendee.participationStatus = ParticipationStatus.CONFIRMED
+        this.addAttendee(attendee)
       }
     }
   }
