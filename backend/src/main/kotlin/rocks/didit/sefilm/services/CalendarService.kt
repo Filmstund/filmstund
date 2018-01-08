@@ -7,8 +7,10 @@ import biweekly.property.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.PaymentInfoMissing
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.time.Duration
 import java.time.Instant
@@ -38,7 +40,7 @@ class CalendarService(
     val cal = setupCalendar(userFeedId)
     showingService
       .getShowingByUser(user.id)
-      .map { it.toVEvent() }
+      .map { it.toVEvent(user.id) }
       .forEach { cal.addEvent(it) }
 
     return cal
@@ -59,7 +61,7 @@ class CalendarService(
     return calendar
   }
 
-  private fun ShowingDTO.toVEvent(): VEvent {
+  private fun ShowingDTO.toVEvent(userId: UserID): VEvent {
     val movie = movieService.getMovie(this.movieId) ?: return VEvent()
     val showingUrl = "${properties.baseUrl.frontend}/showing/$id"
 
@@ -69,7 +71,7 @@ class CalendarService(
     vEvent.setDateEnd(this.getEndDate(movie))
     vEvent.setUid(this.id.toString())
     vEvent.setLocation(this.location.formatAddress())
-    vEvent.setDescription(formatDescription(movie))
+    vEvent.setDescription(formatDescription(this.id, userId, movie))
     vEvent.setUrl(showingUrl)
     vEvent.addCategories(Categories("bio"))
     vEvent.addParticipants(this)
@@ -78,8 +80,19 @@ class CalendarService(
     return vEvent
   }
 
-  private fun formatDescription(movie: Movie): String {
-    return "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/${movie.imdbId.value}/" else ""}"
+  private fun formatDescription(showingId: UUID, userId: UserID, movie: Movie): String {
+    val paymentDetails = try {
+      showingService.getAttendeePaymentDetailsForUser(userId, showingId)
+    } catch (e: PaymentInfoMissing) {
+      null
+    }
+
+    return if (paymentDetails == null || paymentDetails.hasPaid) {
+      "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/${movie.imdbId.value}/" else ""}"
+    } else {
+      val phoneNumber = userService.getUser(paymentDetails.payTo)?.phone
+      "Betala ${paymentDetails.amountOwed.toKronor()} kr till $phoneNumber"
+    }
   }
 
   private fun VEvent.addParticipants(showingDTO: ShowingDTO) {
