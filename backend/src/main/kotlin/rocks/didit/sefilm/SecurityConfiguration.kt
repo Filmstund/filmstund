@@ -252,6 +252,7 @@ class SecurityConfig(
       .antMatchers(HttpMethod.HEAD, BudordController.PATH).permitAll()
       .antMatchers(HttpMethod.HEAD, "${BudordController.PATH}/random").permitAll()
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
+      .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
       .anyRequest().authenticated()
   }
 }

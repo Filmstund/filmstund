@@ -7,4 +7,5 @@ data class AttendeePaymentDetailsDTO(val hasPaid: Boolean = false,
                                      val amountOwed: SEK = SEK(0),
                                      val payTo: UserID = UserID(),
                                      val swishLink: String? = null,
+                                     val payToPhoneNumber: String = "",
                                      val payerUserID: UserID = UserID())
