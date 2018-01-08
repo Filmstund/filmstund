@@ -117,7 +117,6 @@ const data = graphql(
         payToUser {
           id
         }
-        calendarEventId
         private
         movie {
           imdbId

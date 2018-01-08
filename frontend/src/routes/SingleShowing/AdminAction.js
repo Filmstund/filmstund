@@ -28,7 +28,6 @@ class AdminAction extends Component {
     super(props);
 
     this.state = {
-      isCreatingEvent: false,
       adminMessage: null,
       ticketPrice: oreToKr(props.showing.price),
       cinemaTicketUrls: [],
@@ -104,31 +103,6 @@ class AdminAction extends Component {
     }
   };
 
-  handleCreateGoogleEvent = () => {
-    const { showing } = this.props;
-
-    this.setState({
-      isCreatingEvent: true
-    });
-
-    jsonRequest(
-      withBaseURL(`/showings/${showing.id}/invite/googlecalendar`),
-      "" // Empty post
-    )
-      .then(resp => {
-        this.setState({
-          isCreatingEvent: false,
-          adminMessage: "Kalenderevent skapat"
-        });
-      })
-      .catch(err => {
-        this.setState({
-          isCreatingEvent: false,
-          adminMessage: "Misslyckades med att skapa kalenderevent"
-        });
-      });
-  };
-
   handleEdit = () => {
     const { showing } = this.props;
     this.props.history.push(`/showings/${showing.id}/edit`);
@@ -136,11 +110,9 @@ class AdminAction extends Component {
 
   render() {
     const { showing } = this.props;
-
-    const { ticketsBought, calendarEventId } = showing;
+    const { ticketsBought } = showing;
 
     const {
-      isCreatingEvent,
       ticketPrice,
       cinemaTicketUrls,
       showModal,
@@ -175,15 +147,6 @@ class AdminAction extends Component {
         {!ticketsBought && (
           <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
         )}
-        {ticketsBought &&
-          calendarEventId === null && (
-            <MainButton
-              disabled={isCreatingEvent}
-              onClick={this.handleCreateGoogleEvent}
-            >
-              Skapa Googlekalenderevent
-            </MainButton>
-          )}
         <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
       </React.Fragment>
     );
