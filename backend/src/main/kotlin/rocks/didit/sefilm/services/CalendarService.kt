@@ -100,8 +100,9 @@ class CalendarService(
       val user = userService.getUser(it.userId)
       if (user != null) {
         val attendee = Attendee("${user.firstName} '${user.nick}' ${user.lastName}", "N/A")
-        attendee.participationStatus = ParticipationStatus.CONFIRMED
-        this.addAttendee(attendee)
+        attendee.participationStatus = ParticipationStatus.ACCEPTED
+        this.addAttendee(attendee
+        )
       }
     }
   }
