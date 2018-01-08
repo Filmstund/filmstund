@@ -16,6 +16,7 @@ import { completeUserFragment } from "../../fragments/currentUser";
 import { wrapMutate } from "../../store/apollo";
 import { branch, renderComponent } from "recompose";
 import Loader from "../../ProjectorLoader";
+import StatusBox from "../../StatusBox";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -30,14 +31,6 @@ const AvatarImage = styled.div`
   background-position: center;
   height: 96px;
   width: 96px;
-`;
-
-const StatusBox = styled.div`
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  margin: 1em 0;
-  padding: 1em;
-  background-color: ${props => (props.error ? "#ef5353" : "#66bb6a")};
-  color: ${props => (props.error ? "white" : "black")};
 `;
 
 const UserName = styled.h3`

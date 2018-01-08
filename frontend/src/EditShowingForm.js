@@ -1,47 +1,44 @@
 import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router";
-import { compose } from "recompose";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
-import 'react-dates/lib/css/_datepicker.css';
-
-import { showings as showingActions } from "./store/reducers";
+import "react-dates/lib/css/_datepicker.css";
 
 import Header from "./Header";
 import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
 import MainButton from "./MainButton";
-import { formatTime, formatYMD } from "./lib/dateTools";
+import { formatYMD } from "./lib/dateTools";
+import StatusBox from "./StatusBox";
 
 const today = moment();
 
 class EditShowingForm extends React.Component {
   constructor(props) {
     super(props);
-    const { showing } = props;
+    const { showing } = props.data;
 
     this.state = {
+      errors: null,
       dateFocused: false,
       showing: {
-        id: showing.id,
-        expectedBuyDate: moment().add('1 weeks'),
+        expectedBuyDate: today.add("1 weeks"),
         location: showing.location.name,
-        time: formatTime(showing.date),
-        price: showing.price !== null ? showing.price : undefined
+        time: showing.time,
+        price: showing.price ? showing.price : ""
       }
     };
   }
 
   setShowingTime = sfTime => {
-    this.setState(({ showing }) => ({
-      showing: {
-        ...showing,
-        time: sfTime.localTime,
-        location: sfTime.cinema
-      }
-    }),
+    this.setState(
+      ({ showing }) => ({
+        showing: {
+          ...showing,
+          time: sfTime.localTime,
+          location: sfTime.cinemaName
+        }
+      }),
       this.handleSubmit
     );
   };
@@ -55,44 +52,62 @@ class EditShowingForm extends React.Component {
   };
 
   setShowingValue = (key, value, callback = f => f) => {
-    this.setState(({ showing }) => ({
-      showing: {
-        ...showing,
-        [key]: value
-      }
-    }),
+    this.setState(
+      ({ showing }) => ({
+        showing: {
+          ...showing,
+          [key]: value
+        }
+      }),
       callback
     );
   };
 
   handleSubmit = () => {
-    const { showing } = this.state;
+    const { showing: newValues } = this.state;
+    const { data: { showing } } = this.props;
 
-    this.props.updateShowing(showing).then(() => {
-      this.props.history.push(`/showings/${showing.id}`);
-    });
-  }
+    this.props
+      .updateShowing({
+        private: showing.private,
+        payToUser: showing.payToUser.id,
+        location: newValues.location,
+        time: newValues.time,
+        price: newValues.price || showing.price || 0
+      })
+      .then(() => {
+        this.props.navigateToShowing();
+      })
+      .catch(errors => {
+        this.setState({ errors });
+      });
+  };
 
   render() {
-    const { showing: { movieId, admin, date } } = this.props;
-    const { showing, dateFocused } = this.state;
+    const { data: { showing: { movie, admin, date } } } = this.props;
+    const { showing, dateFocused, errors } = this.state;
 
     return (
       <div>
         <Header>Redigera besök</Header>
         <div>
           <Showing
-            date={formatYMD(date) + ' ' + showing.time}
-            adminId={admin}
-            location={showing.location}
-            movieId={movieId}
+            date={formatYMD(date) + " " + showing.time}
+            admin={admin}
+            location={showing.location.name}
+            movie={movie}
           />
+          {errors && (
+            <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>
+          )}
           <Field text="Förväntat köpdatum:">
             <DatePicker
               numberOfMonths={1}
               focused={dateFocused}
               isOutsideRange={d => d.isAfter(date) || d.isBefore(today)}
-              onFocusChange={({ focused }) => this.setState({ dateFocused: focused })}
+              onFocusChange={({ focused }) =>
+                this.setState({ dateFocused: focused })
+              }
               date={showing.expectedBuyDate}
               onDateChange={this.setShowingDate}
             />
@@ -125,10 +140,4 @@ class EditShowingForm extends React.Component {
   }
 }
 
-
-export default compose(
-  connect(null, {
-    updateShowing: showingActions.actions.requestUpdate
-  }),
-  withRouter
-)(EditShowingForm);
+export default EditShowingForm;
