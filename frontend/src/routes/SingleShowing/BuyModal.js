@@ -39,7 +39,11 @@ const ForetagsBiljetterList = ({ tickets }) => (
     <SmallHeader>Företagsbiljetter</SmallHeader>
     {tickets.map(ticket => (
       <UserTooltip userId={ticket.userId} ticket={ticket}>
-        <CopyValue key={ticket.foretagsbiljett} text={ticket.foretagsbiljett} />
+        <CopyValue
+          useStricken
+          key={ticket.foretagsbiljett}
+          text={ticket.foretagsbiljett}
+        />
       </UserTooltip>
     ))}
   </div>
@@ -79,7 +83,7 @@ const SfMembershipList = ({ sfData, participants }) => (
       .filter(({ sfMembershipId }) => sfMembershipId !== null)
       .map(({ user, sfMembershipId }) => (
         <UserTooltip user={user} key={user.id}>
-          <CopyValue text={sfMembershipId} />
+          <CopyValue useStricken text={sfMembershipId} />
         </UserTooltip>
       ))}
     <hr />
