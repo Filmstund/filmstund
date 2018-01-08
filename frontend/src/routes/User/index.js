@@ -3,8 +3,9 @@ import { graphql, compose } from "react-apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import Helmet from "react-helmet";
-import Field from "../../Field";
+import Field, { FieldWithoutMaxWidth } from "../../Field";
 import MainButton from "../../MainButton";
+import CopyValue from "../../CopyValue";
 import Input from "../../Input";
 import alfons from "../../assets/alfons.jpg";
 
@@ -24,7 +25,7 @@ const Box = styled.div`
 `;
 
 const AvatarImage = styled.div`
-  background-image: url(${props => props.src});
+  background-image: url(${props => props.src}), url(${alfons});
   background-size: cover;
   background-position: center;
   height: 96px;
@@ -140,6 +141,9 @@ class User extends Component {
             onChange={v => this.setEditedUserValue("phone", v)}
           />
         </Field>
+        <FieldWithoutMaxWidth text="Kalenderlänk:">
+          <CopyValue text={me.calendarFeedUrl} />
+        </FieldWithoutMaxWidth>
         <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>
         {errorFtgTickets && (
           <StatusBox error={true}>{errorFtgTickets.reason}</StatusBox>
@@ -158,6 +162,7 @@ const data = graphql(
     query UserProfile {
       me: currentUser {
         ...CompleteUser
+        calendarFeedUrl
       }
     }
     ${completeUserFragment}
@@ -174,6 +179,7 @@ const update = graphql(
     mutation UpdateUser($user: NewUserInfo!) {
       updateUser(newInfo: $user) {
         ...CompleteUser
+        calendarFeedUrl
       }
     }
     ${completeUserFragment}

@@ -9,6 +9,7 @@ const Option = styled.div`
   padding: 1em;
   color: #8e1b1b;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 `;
 
 const Box = styled.div`
