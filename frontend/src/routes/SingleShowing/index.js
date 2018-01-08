@@ -13,6 +13,7 @@ import SwishModal from "./SwishModal";
 import IMDbLink from "../../IMDbLink";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
+import Loader from "../../ProjectorLoader";
 
 class SingleShowing extends Component {
   state = {
@@ -154,11 +155,11 @@ const data = graphql(
   { options: { errorPolicy: "ignore" } }
 );
 
-const Loader = branch(({ data: { me } }) => !me, renderComponent(() => null));
+const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
 export default compose(
   withRouter,
   withProps(routerParamsToShowingId),
   data,
-  Loader
+  isLoading
 )(SingleShowing);
