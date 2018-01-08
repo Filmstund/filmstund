@@ -17,6 +17,10 @@ const showingDate = showing => showing.date + " " + showing.time;
 const today = getTodaysDate();
 
 class Showings extends Component {
+  componentWillMount() {
+    this.props.data.refetch();
+  }
+
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
   };
