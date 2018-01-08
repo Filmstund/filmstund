@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { orderBy } from "lodash";
-import moment from "moment";
 import cx from "classnames";
 import Helmet from "react-helmet";
 import styled from "styled-components";
@@ -13,8 +12,7 @@ import CreateShowingForm from "../CreateShowingForm";
 import Field from "../Field";
 import Input from "../Input";
 import gql from "graphql-tag";
-import { graphql } from "react-apollo";
-import { compose } from "recompose";
+import { graphql, compose } from "react-apollo";
 import { fetchMovies } from "../fragments/movies";
 
 const SearchField = styled(Field)`
