@@ -16,8 +16,8 @@ spring:
 
 sefilm:
   baseUrl:
-    api: ${apiBaseUrl:htts://bio.didit.rocks}
-    frontend: ${frontendBaseUrl:htts://bio.didit.rocks}
+    api: ${apiBaseUrl:http://localhost:8080}
+    frontend: ${frontendBaseUrl:http://localhost:3000}
   tmdb:
     # Request API key here: https://www.themoviedb.org/documentation/api
     apikey: ${tmdb_apikey}
