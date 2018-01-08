@@ -47,6 +47,7 @@ data class Showing(@Id
     payToUser = payToUser,
     expectedBuyDate = expectedBuyDate,
     participants = participants.map { it.toDto() },
-    lastModifiedDate = lastModifiedDate
+    lastModifiedDate = lastModifiedDate,
+    createdDate = createdDate
   )
 }
