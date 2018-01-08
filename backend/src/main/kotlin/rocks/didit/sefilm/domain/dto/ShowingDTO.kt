@@ -22,4 +22,5 @@ data class ShowingDTO(
   val payToUser: UserID,
   val expectedBuyDate: LocalDate?,
   val participants: Collection<ParticipantDTO>,
-  val lastModifiedDate: Instant = Instant.EPOCH)
+  val lastModifiedDate: Instant = Instant.EPOCH,
+  val createdDate: Instant = Instant.EPOCH)
