@@ -6,9 +6,6 @@ import Helmet from "react-helmet";
 import styled from "styled-components";
 import { withRouter } from "react-router";
 
-import { jsonRequest, getJson } from "../lib/fetch";
-import { withBaseURL } from "../lib/withBaseURL";
-
 import Header from "../Header";
 import Movie, { movieFragment } from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
@@ -18,6 +15,7 @@ import Input from "../Input";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
+import { fetchMovies } from "../fragments/movies";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -60,42 +58,21 @@ const MovieContainer = styled.div`
 
 class NewShowing extends Component {
   state = {
-    meta: {},
     searchTerm: ""
-  };
-
-  componentWillMount() {
-    this.fetchMeta();
-  }
-
-  fetchMeta = () => {
-    getJson("/movies/sf/meta").then(meta => {
-      this.setState({ meta });
-    });
   };
 
   requestSFData = () => {
     this.setState({ requestingData: true });
-    jsonRequest(withBaseURL("/movies/sf/populate")).then(data => {
+    this.props.fetchMovies().then(() => {
       this.props.data.refetch();
-      this.fetchMeta();
       this.setState({ requestingData: false });
     });
   };
 
   renderRequestButton = () => {
-    const { requestingData, meta } = this.state;
-
-    const lastUpdateMessage =
-      "Senaste uppdatering: " +
-      ((!meta.timestamp && "aldrig") ||
-        moment(meta.timestamp).format("YYYY-MM-DD HH:mm"));
+    const { requestingData } = this.state;
     return (
-      <RefreshButton
-        role="button"
-        onClick={this.requestSFData}
-        title={"Uppdatera data från SF.\n" + lastUpdateMessage}
-      >
+      <RefreshButton role="button" onClick={this.requestSFData}>
         <i
           className={cx("fa fa-refresh", { "fa-spin": requestingData })}
           aria-hidden="true"
@@ -200,4 +177,4 @@ const data = graphql(gql`
   ${movieFragment}
 `);
 
-export default compose(withRouter, data)(NewShowing);
+export default compose(withRouter, data, fetchMovies)(NewShowing);
