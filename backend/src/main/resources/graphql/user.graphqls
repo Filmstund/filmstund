@@ -10,6 +10,7 @@ type CurrentUser {
     avatar: String
     foretagsbiljetter: [Foretagsbiljett!]
     calendarFeedId: UUID
+    calendarFeedUrl: String
     lastLogin: String!
     signupDate: String!
 }

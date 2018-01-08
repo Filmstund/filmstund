@@ -16,10 +16,11 @@ class CalendarController(private val calendarService: CalendarService) {
 
   companion object {
     const val PATH = "${Application.API_BASE_PATH}/ical"
+    const val FEED_PATH = "/{feedId}"
     private val log = LoggerFactory.getLogger(CalendarController::class.java)
   }
 
-  @GetMapping("/{feedId}", produces = ["text/calendar; charset=utf-8"])
+  @GetMapping(FEED_PATH, produces = ["text/calendar; charset=utf-8"])
   fun calendarFeedForUser(@PathVariable feedId: UUID, req: HttpServletRequest): String {
     log.debug("Calendar request from: ${req.remoteAddr}:${req.remotePort} for $feedId")
     return calendarService.getCalendarFeed(feedId).write()
