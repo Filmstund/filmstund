@@ -53,7 +53,7 @@ class User extends Component {
   constructor(props) {
     super(props);
 
-    const { me } = this.props;
+    const { me } = props.data;
 
     this.state = {
       editedUser: {
@@ -99,14 +99,14 @@ class User extends Component {
 
   render() {
     const { success, errors } = this.state;
-    const { me, className, errorFtgTickets, successFtgTickets } = this.props;
+    const { data: { me }, errorFtgTickets, successFtgTickets } = this.props;
 
     const { phone, sfMembershipId, nick } = this.state.editedUser;
     return (
-      <div className={className}>
+      <React.Fragment>
         <Helmet title="Profil" />
         <Box>
-          <AvatarImage src={me.avatar || alfons} />
+          <AvatarImage src={me.avatar} />
           <UserInfo>
             {me.nick && <UserName>{me.nick}</UserName>}
             <div>"{me.name}"</div>
@@ -149,10 +149,10 @@ class User extends Component {
           <StatusBox error={true}>{errorFtgTickets.reason}</StatusBox>
         )}
         {successFtgTickets === true && (
-          <StatusBox error={false}>Företagsbiljetter uppdaterades!</StatusBox>
+          <StatusBox>Företagsbiljetter uppdaterades!</StatusBox>
         )}
         <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter} />
-      </div>
+      </React.Fragment>
     );
   }
 }
@@ -166,12 +166,7 @@ const data = graphql(
       }
     }
     ${completeUserFragment}
-  `,
-  {
-    props: ({ data: { me } }) => ({
-      me
-    })
-  }
+  `
 );
 
 const update = graphql(
