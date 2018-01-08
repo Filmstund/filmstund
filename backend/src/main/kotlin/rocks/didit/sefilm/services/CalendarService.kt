@@ -2,7 +2,10 @@ package rocks.didit.sefilm.services
 
 import biweekly.ICalendar
 import biweekly.component.VEvent
+import biweekly.parameter.CalendarUserType
+import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
+import biweekly.parameter.Role
 import biweekly.property.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,6 +15,7 @@ import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.ShowingDTO
+import rocks.didit.sefilm.domain.dto.UserDTO
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -40,7 +44,7 @@ class CalendarService(
     val cal = setupCalendar(userFeedId)
     showingService
       .getShowingByUser(user.id)
-      .map { it.toVEvent(user.id) }
+      .map { it.toVEvent(user) }
       .forEach { cal.addEvent(it) }
 
     return cal
@@ -61,7 +65,7 @@ class CalendarService(
     return calendar
   }
 
-  private fun ShowingDTO.toVEvent(userId: UserID): VEvent {
+  private fun ShowingDTO.toVEvent(user: UserDTO): VEvent {
     val movie = movieService.getMovie(this.movieId) ?: return VEvent()
     val showingUrl = "${properties.baseUrl.frontend}/showing/$id"
 
@@ -71,11 +75,15 @@ class CalendarService(
     vEvent.setDateEnd(this.getEndDate(movie))
     vEvent.setUid(this.id.toString())
     vEvent.setLocation(this.location.formatAddress())
-    vEvent.setDescription(formatDescription(this.id, userId, movie))
+    vEvent.setDescription(formatDescription(this.id, user.id, movie) + "\n\n$showingUrl")
     vEvent.setUrl(showingUrl)
     vEvent.addCategories(Categories("bio"))
-    vEvent.addParticipants(this)
+    vEvent.addParticipants(this, user.email)
+    vEvent.setOrganizer(user.email)
     vEvent.status = if (this.ticketsBought) Status.confirmed() else Status.tentative()
+    vEvent.created = Created(Date.from(this.createdDate))
+    vEvent.lastModified = LastModified(Date.from(this.lastModifiedDate))
+    vEvent.transparency = Transparency.opaque()
 
     return vEvent
   }
@@ -95,12 +103,16 @@ class CalendarService(
     }
   }
 
-  private fun VEvent.addParticipants(showingDTO: ShowingDTO) {
+  private fun VEvent.addParticipants(showingDTO: ShowingDTO, mail: String) {
     showingDTO.participants.forEach {
       val user = userService.getUser(it.userId)
       if (user != null) {
-        val attendee = Attendee("${user.firstName} '${user.nick}' ${user.lastName}", "N/A")
+        val attendee = Attendee("${user.firstName} '${user.nick}' ${user.lastName}", mail)
+        attendee.calendarUserType = CalendarUserType.INDIVIDUAL
         attendee.participationStatus = ParticipationStatus.ACCEPTED
+        attendee.role = Role.ATTENDEE
+        attendee.participationLevel = ParticipationLevel.REQUIRED
+
         this.addAttendee(attendee
         )
       }

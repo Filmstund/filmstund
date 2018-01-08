@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.database.entities
 
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
@@ -28,7 +29,9 @@ data class Showing(@Id
                    val expectedBuyDate: LocalDate? = null,
                    val participants: Set<Participant> = setOf(),
                    @LastModifiedDate
-                   val lastModifiedDate: Instant = Instant.EPOCH) {
+                   val lastModifiedDate: Instant = Instant.EPOCH,
+                   @CreatedDate
+                   val createdDate: Instant = Instant.now()) {
   // TODO: add more auditing
 
   fun toDto() = ShowingDTO(
