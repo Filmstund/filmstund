@@ -26,6 +26,34 @@ export const markAsBought = graphql(
         }
         expectedBuyDate
         time
+        myTickets {
+          id
+        }
+        attendeePaymentDetails {
+          payTo {
+            id
+            nick
+            firstName
+            lastName
+            phone
+          }
+          swishLink
+          hasPaid
+          amountOwed
+        }
+        adminPaymentDetails {
+          participantPaymentInfos {
+            id
+            hasPaid
+            amountOwed
+            user {
+              id
+              nick
+              name
+              phone
+            }
+          }
+        }
       }
     }
   `,
