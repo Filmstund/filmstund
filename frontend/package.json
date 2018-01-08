@@ -8,6 +8,7 @@
   "dependencies": {
     "apollo-cache-persist": "^0.1.1",
     "apollo-client-preset": "^1.0.5",
+    "apollo-link-error": "^1.0.3",
     "graphql": "^0.12.3",
     "graphql-tag": "^2.6.1",
     "history": "^4.7.2",
