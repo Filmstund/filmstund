@@ -13,6 +13,8 @@ import { trim } from "../../Utils";
 import ForetagsbiljettList from "./ForetagsbiljettList";
 import { completeUserFragment } from "../../fragments/currentUser";
 import { wrapMutate } from "../../store/apollo";
+import { branch, renderComponent } from "recompose";
+import Loader from "../../ProjectorLoader";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -183,4 +185,6 @@ const update = graphql(
   }
 );
 
-export default compose(data, update)(User);
+const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
+
+export default compose(data, update, isLoading)(User);

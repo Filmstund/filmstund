@@ -15,6 +15,7 @@ import Field from "./Field";
 import MainButton, { GrayButton } from "./MainButton";
 import { formatYMD, formatLocalTime } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
+import Loader from "./ProjectorLoader";
 
 class CreateShowingForm extends React.Component {
   constructor(props) {
@@ -239,8 +240,8 @@ const mutation = graphql(
 
 const withCityState = withState("city", "setCity", "GB");
 
-const Loader = branch(({ data: { me } }) => !me, renderComponent(() => null));
+const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
-export default compose(withCityState, mutation, data, Loader)(
+export default compose(withCityState, mutation, data, isLoading)(
   CreateShowingForm
 );
