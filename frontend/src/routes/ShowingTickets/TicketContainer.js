@@ -1,36 +1,19 @@
 import React, { Component } from "react";
-import { getJson, jsonRequest } from "../../lib/fetch";
+import { jsonRequest } from "../../lib/fetch";
 import { withBaseURL } from "../../lib/withBaseURL";
 import Loader from "../../ProjectorLoader";
 import TicketURLInput from "../../TicketURLInput";
 import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
+import _ from "lodash";
 import SeatRange from "./SeatRange";
 
 export default class TicketContainer extends Component {
   state = {
-    tickets: null,
     error: null,
-    range: null,
     cinemaTicketUrls: []
   };
-
-  componentWillMount() {
-    getJson(`/tickets/${this.props.showingId}/seating-range`).then(range => {
-      this.setState({ range });
-    });
-    getJson(`/tickets/${this.props.showingId}`).then(
-      tickets => {
-        this.setState({ tickets });
-      },
-      err => {
-        this.setState({
-          error: "Ingen biljett registrerad för köpet"
-        });
-      }
-    );
-  }
 
   handleSubmitCinemaTicketUrls = () => {
     const { cinemaTicketUrls } = this.state;
@@ -73,32 +56,36 @@ export default class TicketContainer extends Component {
   };
 
   handleGoBackToShowing = () => {
-    this.props.history.goBack();
+    const { showingId } = this.props;
+    this.props.history.push(`/showings/${showingId}`);
   };
 
   render() {
-    const { range, tickets, error } = this.state;
-    const { data: { me, showing } } = this.props;
+    const { error } = this.state;
+    const { data: { me, showing, loading }, navigateToShowing } = this.props;
+
+    const { myTickets } = showing;
+    const range = _.groupBy(myTickets.map(t => t.seat), "row");
 
     if (error) {
       return (
         <div>
-          <MainButton onClick={this.handleGoBackToShowing}>
+          <MainButton onClick={navigateToShowing}>
             Tillbaka till visning
           </MainButton>
           <div>{error}</div>
         </div>
       );
-    } else if (!tickets) {
+    } else if (loading) {
       return <Loader />;
     } else {
       return (
         <div>
-          <MainButton onClick={this.handleGoBackToShowing}>
+          <MainButton onClick={navigateToShowing}>
             Tillbaka till visning
           </MainButton>
-          {range && <SeatRange range={range} />}
-          {tickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
+          <SeatRange range={range} />
+          {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
           {showing.admin.id === me.id && this.renderAdminFields()}
         </div>
       );

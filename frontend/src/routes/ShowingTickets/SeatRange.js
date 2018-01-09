@@ -1,13 +1,14 @@
 import React from "react";
 import { formatSeatingRow } from "../../lib/summarizeSeatingRange";
 import { SmallHeader } from "../../Header";
+import _ from "lodash";
 
 const SeatRange = ({ range }) => (
   <div>
     <SmallHeader>Våra platser:</SmallHeader>
-    {range.rows.map(row => (
+    {_.keys(range).map(row => (
       <div key={row}>
-        Rad {row}: {formatSeatingRow(range.seatings[row])}
+        Rad {row}: {formatSeatingRow(range[row].map(r => r.number))}
       </div>
     ))}
   </div>
