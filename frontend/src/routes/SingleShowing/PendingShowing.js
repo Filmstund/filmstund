@@ -53,25 +53,32 @@ class PendingShowing extends Component {
   };
 
   handleClickSelectPaymentOption = () => {
-    const { attendShowing } = this.props;
     const paymentOptions = this.getPaymentOptions();
     const { selectedIndex } = this.state;
 
+    this.attendWithPaymentOption(paymentOptions[selectedIndex]);
+  };
+
+  attendWithPaymentOption = paymentOption => {
+    const { attendShowing } = this.props;
+    const { type, ticketNumber } = paymentOption;
     attendShowing({
-      paymentOption: paymentOptions[selectedIndex]
+      paymentOption: {
+        type,
+        ticketNumber
+      }
     }).then(result => {
       this.setState({ modalOpen: false });
     });
   };
 
   handleClickAttend = () => {
-    const { attendShowing } = this.props;
     const paymentOptions = this.getPaymentOptions();
     if (paymentOptions.length > 1) {
       this.setState({ modalOpen: true });
     } else {
       // Attend with Swish option
-      attendShowing({ paymentOption: paymentOptions[0] });
+      this.attendWithPaymentOption(paymentOptions[0]);
     }
   };
 
