@@ -6,11 +6,12 @@ import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
 import _ from "lodash";
 import SeatRange from "./SeatRange";
-import StatusBox from "../../StatusBox";
+import StatusMessageBox from "../../StatusMessageBox";
 
 export default class TicketContainer extends Component {
   state = {
     errors: null,
+    success: false,
     cinemaTicketUrls: []
   };
 
@@ -23,9 +24,11 @@ export default class TicketContainer extends Component {
 
     this.props
       .addTickets(nonEmptyUrls)
-      .then(() => {})
+      .then(() => {
+        this.setState({ success: true, errors: null });
+      })
       .catch(errors => {
-        this.setState({ errors });
+        this.setState({ success: false, errors });
       });
   };
 
@@ -57,7 +60,7 @@ export default class TicketContainer extends Component {
   };
 
   render() {
-    const { errors } = this.state;
+    const { errors, success } = this.state;
     const { data: { me, showing, loading }, navigateToShowing } = this.props;
 
     const { myTickets } = showing;
@@ -73,9 +76,11 @@ export default class TicketContainer extends Component {
           </MainButton>
           <SeatRange range={range} />
           {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
-          {errors && (
-            <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>
-          )}
+          <StatusMessageBox
+            success={success}
+            errors={errors}
+            successMessage="Uppdaterades!"
+          />
           {showing.admin.id === me.id && this.renderAdminFields()}
         </div>
       );

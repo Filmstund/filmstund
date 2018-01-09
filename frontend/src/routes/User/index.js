@@ -16,7 +16,7 @@ import { completeUserFragment } from "../../fragments/currentUser";
 import { wrapMutate } from "../../store/apollo";
 import { branch, renderComponent } from "recompose";
 import Loader from "../../ProjectorLoader";
-import StatusBox from "../../StatusBox";
+import StatusMessageBox from "../../StatusMessageBox";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -92,7 +92,7 @@ class User extends Component {
 
   render() {
     const { success, errors } = this.state;
-    const { data: { me }, errorFtgTickets, successFtgTickets } = this.props;
+    const { data: { me } } = this.props;
 
     const { phone, sfMembershipId, nick } = this.state.editedUser;
     return (
@@ -106,10 +106,11 @@ class User extends Component {
             <div>{me.email}</div>
           </UserInfo>
         </Box>
-        {errors && (
-          <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>
-        )}
-        {success === true && <StatusBox>Uppdaterades!</StatusBox>}
+        <StatusMessageBox
+          errors={errors}
+          success={success}
+          successMessage="Uppdaterades!"
+        />
         <Field text="Nick:">
           <Input
             type="text"
@@ -138,12 +139,6 @@ class User extends Component {
           <CopyValue text={me.calendarFeedUrl} />
         </FieldWithoutMaxWidth>
         <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>
-        {errorFtgTickets && (
-          <StatusBox error={true}>{errorFtgTickets.reason}</StatusBox>
-        )}
-        {successFtgTickets === true && (
-          <StatusBox>Företagsbiljetter uppdaterades!</StatusBox>
-        )}
         <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter} />
       </React.Fragment>
     );
