@@ -78,8 +78,8 @@ class User extends Component {
 
     this.props
       .updateUser(trimmedValues)
-      .then(success => {
-        this.setState({ success: true, errors: null }, () => {
+      .then(({ data: { editedUser } }) => {
+        this.setState({ editedUser, success: true, errors: null }, () => {
           setTimeout(() => {
             this.setState({ success: false });
           }, 5000);
@@ -160,7 +160,7 @@ const data = graphql(
 const update = graphql(
   gql`
     mutation UpdateUser($user: NewUserInfo!) {
-      updateUser(newInfo: $user) {
+      editedUser: updateUser(newInfo: $user) {
         ...CompleteUser
         calendarFeedUrl
       }
