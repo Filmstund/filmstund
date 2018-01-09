@@ -8,6 +8,7 @@ import { persistCache } from "apollo-cache-persist";
 import fetch from "../lib/fetch";
 
 const cache = new InMemoryCache({
+  fragmentMatcher: [],
   dataIdFromObject: object => {
     switch (object.__typename) {
       case "BioBudord":
