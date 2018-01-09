@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { jsonRequest } from "../../lib/fetch";
-import { withBaseURL } from "../../lib/withBaseURL";
 import Loader from "../../ProjectorLoader";
 import TicketURLInput from "../../TicketURLInput";
 import Field from "../../Field";
