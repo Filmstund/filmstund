@@ -9,7 +9,7 @@ import Input from "./Input";
 import Field from "./Field";
 import MainButton from "./MainButton";
 import { formatYMD } from "./lib/dateTools";
-import StatusBox from "./StatusBox";
+import StatusMessageBox from "./StatusMessageBox";
 
 const today = moment();
 
@@ -97,9 +97,7 @@ class EditShowingForm extends React.Component {
             location={showing.location.name}
             movie={movie}
           />
-          {errors && (
-            <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>
-          )}
+          <StatusMessageBox errors={errors} />
           <Field text="Förväntat köpdatum:">
             <DatePicker
               numberOfMonths={1}

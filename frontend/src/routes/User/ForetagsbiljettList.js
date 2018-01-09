@@ -13,6 +13,7 @@ import { formatYMD } from "../../lib/dateTools";
 import { graphql, compose } from "react-apollo";
 import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
+import StatusMessageBox from "../../StatusMessageBox";
 
 const DEFAULT_DATE = moment().add(1, "years");
 
@@ -99,7 +100,9 @@ const Foretagsbiljett = ({
 class ForetagsbiljettList extends Component {
   state = {
     focusedIndex: -1,
-    tempTickets: []
+    tempTickets: [],
+    errors: null,
+    success: false
   };
 
   updateForetagsbiljett = (index, biljett) => {
@@ -147,16 +150,25 @@ class ForetagsbiljettList extends Component {
   };
 
   handleSubmit = () => {
-    const tickets = this.state.tempTickets.map(({ number, expires }) => ({
-      number,
-      expires: formatYMD(expires)
-    }));
+    const tickets = this.state.tempTickets
+      .filter(({ number }) => number && number.trim())
+      .map(({ number, expires }) => ({
+        number,
+        expires: formatYMD(expires)
+      }));
 
-    this.props.addForetagsbiljett(tickets).then(success => {
-      this.setState({
-        tempTickets: []
+    this.props
+      .addForetagsbiljett(tickets)
+      .then(success => {
+        this.setState({
+          tempTickets: [],
+          success: true,
+          errors: null
+        });
+      })
+      .catch(errors => {
+        this.setState({ errors, success: false });
       });
-    });
   };
 
   renderTickets = (tickets, editable, handlePressRemove) => {
@@ -177,12 +189,17 @@ class ForetagsbiljettList extends Component {
   };
 
   render() {
-    const { tempTickets } = this.state;
+    const { tempTickets, errors, success } = this.state;
     const { foretagsbiljetter = [], deleteForetagsbiljett } = this.props;
 
     return (
       <div>
         <SmallHeader>Företagsbiljetter</SmallHeader>
+        <StatusMessageBox
+          errors={errors}
+          success={success}
+          successMessage="Företagsbiljetter uppdaterades!"
+        />
         {this.renderTickets(
           foretagsbiljetter,
           false,
