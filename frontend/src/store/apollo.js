@@ -25,10 +25,8 @@ persistCache({
 
 const errorLink = onError(({ response, graphQLErrors, networkError }) => {
   if (graphQLErrors)
-    graphQLErrors.map(({ message, locations, path }) =>
-      console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
+    graphQLErrors.map(error =>
+      console.log(`[GraphQL error] ${error.message}`, error)
     );
 
   if (networkError && networkError.statusCode === 403) {
