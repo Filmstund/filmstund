@@ -25,7 +25,7 @@ class EditShowingForm extends React.Component {
         expectedBuyDate: today.add("1 weeks"),
         location: showing.location.name,
         time: showing.time,
-        price: showing.price ? showing.price : ""
+        price: showing.price !== null ? showing.price : ""
       }
     };
   }
@@ -73,7 +73,7 @@ class EditShowingForm extends React.Component {
         payToUser: showing.payToUser.id,
         location: newValues.location,
         time: newValues.time,
-        price: newValues.price || showing.price || 0
+        price: parseInt(newValues.price, 10) || 0
       })
       .then(() => {
         this.props.navigateToShowing();
