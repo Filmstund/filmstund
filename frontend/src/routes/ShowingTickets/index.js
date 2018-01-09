@@ -1,13 +1,16 @@
-import { compose, withProps } from "recompose";
+import { compose, withProps, branch, renderComponent } from "recompose";
 import { withRouter } from "react-router";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import TicketContainer from "./TicketContainer";
+import Loader from "../../ProjectorLoader";
 
-const routerParamsToShowingId = ({ match }) => {
+const routerParamsToShowingId = ({ match, history }) => {
   const { showingId } = match.params;
 
-  return { showingId };
+  const navigateToShowing = () => history.push(`/showings/${showingId}`);
+
+  return { showingId, navigateToShowing };
 };
 
 const data = graphql(gql`
@@ -41,6 +44,14 @@ const data = graphql(gql`
   }
 `);
 
-export default compose(withRouter, withProps(routerParamsToShowingId), data)(
-  TicketContainer
+const isLoading = branch(
+  ({ data: { showing } }) => !showing,
+  renderComponent(Loader)
 );
+
+export default compose(
+  withRouter,
+  withProps(routerParamsToShowingId),
+  data,
+  isLoading
+)(TicketContainer);
