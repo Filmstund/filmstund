@@ -10,7 +10,6 @@ import biweekly.property.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.PaymentInfoMissing
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.UserID
@@ -89,11 +88,7 @@ class CalendarService(
   }
 
   private fun formatDescription(showingId: UUID, userId: UserID, movie: Movie): String {
-    val paymentDetails = try {
-      showingService.getAttendeePaymentDetailsForUser(userId, showingId)
-    } catch (e: PaymentInfoMissing) {
-      null
-    }
+    val paymentDetails = showingService.getAttendeePaymentDetailsForUser(userId, showingId)
 
     return if (paymentDetails == null || paymentDetails.hasPaid) {
       "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/${movie.imdbId.value}/" else ""}"
