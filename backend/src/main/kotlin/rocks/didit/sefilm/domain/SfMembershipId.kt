@@ -11,6 +11,10 @@ data class SfMembershipId(val value: String) {
       if (profileId.length != 6) {
         throw IllegalArgumentException("$profileId does not look like a valid profileId as supplied by SF")
       }
+      val split = profileId.split('-', limit = 2)
+      if (split.size == 2 && (split[0].length != 3 || split[1].length != 3)) {
+        throw IllegalArgumentException("'$profileId' is an invalid membership id. Expected XXX-XXX")
+      }
 
       return SfMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}")
     }
@@ -19,10 +23,6 @@ data class SfMembershipId(val value: String) {
   init {
     if (value.length < 6 || value.length > 7) {
       throw IllegalArgumentException("The SF membership id has wrong size. Expected 6-7, got ${value.length}")
-    }
-
-    if (!value.matches(Regex("^([0-9a-zA-Z]{3}-[0-9a-zA-Z]{3}|[0-9a-zA-Z]{6})\$"))) {
-      throw IllegalArgumentException("'$value' is an invalid membership id. Expected XXX-XXX")
     }
   }
 
