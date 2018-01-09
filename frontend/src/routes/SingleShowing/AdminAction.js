@@ -18,7 +18,7 @@ class AdminAction extends Component {
 
     this.state = {
       adminMessage: null,
-      ticketPrice: props.showing.price,
+      ticketPrice: props.showing.price / 100,
       cinemaTicketUrls: [],
       buyData: null,
       showModal: false
