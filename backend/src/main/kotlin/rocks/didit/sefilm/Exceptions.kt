@@ -38,9 +38,6 @@ class DuplicateTicketException(msg: String = "") : KnownException("Found duplica
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class SfTicketException(msg: String) : KnownException(msg)
 
-@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-class UserHasNotPaidException(msg: String, userID: UserID, showingId: UUID) : KnownException(msg, userID, showingId)
-
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(msg: String) : KnownException(msg)
 

@@ -51,10 +51,10 @@ class ShowingResolver(
   fun myTickets(showing: ShowingDTO): List<Ticket>
     = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
-  fun ticketRange(showing: ShowingDTO): TicketRange
+  fun ticketRange(showing: ShowingDTO): TicketRange?
     = ticketService.getTicketRange(showing.id)
 
-  fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO
+  fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO?
     = showingService.getAdminPaymentDetails(showing.id)
 
   fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO?

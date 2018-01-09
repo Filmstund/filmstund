@@ -26,7 +26,7 @@ class TicketService(private val sfClient: SFService,
 
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
     val user = currentLoggedInUser()
-    assertUserIsParticipant(showingId, user)
+    isUserIsParticipant(showingId, user)
     return ticketRepository.findByShowingIdAndAssignedToUser(showingId, user)
   }
 
@@ -90,9 +90,11 @@ class TicketService(private val sfClient: SFService,
     ticketRepository.deleteAll(ticketsForShowing)
   }
 
-  fun getTicketRange(showingId: UUID): TicketRange {
+  fun getTicketRange(showingId: UUID): TicketRange? {
     val currentLoggedInUser = currentLoggedInUser()
-    assertUserIsParticipant(showingId, currentLoggedInUser)
+    if(!isUserIsParticipant(showingId, currentLoggedInUser)) {
+      return null
+    }
 
     val allSeatsForShowing = ticketRepository.findByShowingId(showingId)
       .map { it.seat }
@@ -129,14 +131,10 @@ class TicketService(private val sfClient: SFService,
       profileId = this.profileId)
   }
 
-  private fun assertUserIsParticipant(showingId: UUID, currentLoggedInUser: UserID) {
-    if (showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
+  private fun isUserIsParticipant(showingId: UUID, currentLoggedInUser: UserID): Boolean {
+    return showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
       .participants
-      .any { it.userId == currentLoggedInUser }) {
-      return
-    }
-
-    throw NotFoundException("user $currentLoggedInUser. Not enrolled on this showing", currentLoggedInUser, showingId)
+      .any { it.userId == currentLoggedInUser }
   }
 
   private fun validateSfTicketUrls(links: List<String>) {

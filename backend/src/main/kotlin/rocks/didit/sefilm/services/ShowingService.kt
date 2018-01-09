@@ -66,9 +66,11 @@ class ShowingService(
   }
 
   /** Info that is needed before you buy the tickets at SF */
-  fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO {
+  fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
     val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin)
+    if (showing.admin != currentLoggedInUser()) {
+      return null
+    }
 
     // Note that this list is empty before the showing has been marked as bought
     val paymentInfos = paymentInfoRepo.findByShowingId(showingId)

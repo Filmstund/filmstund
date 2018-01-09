@@ -42,5 +42,5 @@ type TicketRange {
 
 extend type Showing {
     myTickets: [Ticket!]
-    ticketRange: TicketRange!
+    ticketRange: TicketRange
 }
