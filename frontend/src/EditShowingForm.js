@@ -95,7 +95,7 @@ class EditShowingForm extends React.Component {
           <Showing
             date={formatYMD(date) + " " + showing.time}
             admin={admin}
-            location={showing.location.name}
+            location={showing.location}
             movie={movie}
           />
           <StatusMessageBox errors={errors} />
