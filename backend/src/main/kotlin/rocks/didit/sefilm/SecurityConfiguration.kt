@@ -36,7 +36,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.web.controllers.BudordController
 import rocks.didit.sefilm.web.controllers.CalendarController
 import java.time.Instant
 import javax.servlet.http.HttpServletRequest
@@ -247,10 +246,6 @@ class SecurityConfig(
       .csrf().disable()
       .authorizeRequests()
       .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-      .antMatchers(HttpMethod.GET, BudordController.PATH).permitAll()
-      .antMatchers(HttpMethod.GET, "${BudordController.PATH}/random").permitAll()
-      .antMatchers(HttpMethod.HEAD, BudordController.PATH).permitAll()
-      .antMatchers(HttpMethod.HEAD, "${BudordController.PATH}/random").permitAll()
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
       .anyRequest().authenticated()
