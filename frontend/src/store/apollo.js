@@ -5,6 +5,7 @@ import { onError } from "apollo-link-error";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { persistCache } from "apollo-cache-persist";
+import fetch from "../lib/fetch";
 
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
@@ -41,6 +42,7 @@ const errorLink = onError(({ response, graphQLErrors, networkError }) => {
 });
 const httpLink = new HttpLink({
   uri: BASE_GRAPHQL_URL,
+  fetch,
   fetchOptions: { credentials: "include" }
 });
 
