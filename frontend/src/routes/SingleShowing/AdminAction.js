@@ -12,21 +12,13 @@ import {
 } from "../../fragments/showings";
 import { compose } from "react-apollo";
 
-const oreToKr = price => {
-  if (price === null) {
-    return 0;
-  } else {
-    return Math.ceil(price / 100);
-  }
-};
-
 class AdminAction extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       adminMessage: null,
-      ticketPrice: oreToKr(props.showing.price),
+      ticketPrice: props.showing.price,
       cinemaTicketUrls: [],
       buyData: null,
       showModal: false
