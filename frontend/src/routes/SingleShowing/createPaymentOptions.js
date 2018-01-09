@@ -1,12 +1,17 @@
 import { capitalize } from "../../Utils";
 import moment from "moment";
 
-const createPaymentOption = (type, ticketNumber = null, suffix = null) => {
+const createPaymentOption = (
+  displayName,
+  type,
+  ticketNumber = null,
+  suffix = null
+) => {
   type = capitalize(type);
   if (ticketNumber) {
-    return { type, ticketNumber, suffix };
+    return { displayName, type, ticketNumber, suffix };
   }
-  return { type };
+  return { displayName, type };
 };
 
 const createForetagsbiljetter = foretagsbiljetter => {
@@ -18,20 +23,20 @@ const createForetagsbiljetter = foretagsbiljetter => {
         status === "Available" && now.isBefore(moment(expires))
     )
     .map(({ number, expires }) =>
-      createPaymentOption("företagsbiljett", number, expires)
+      createPaymentOption("Företagsbiljett", "foretagsbiljett", number, expires)
     );
 };
 
 export const stringifyOption = option => {
-  const type = capitalize(option.type);
+  const { displayName } = option;
   if (option.ticketNumber) {
-    return type + ": " + option.ticketNumber;
+    return displayName + ": " + option.ticketNumber;
   } else {
-    return type;
+    return displayName;
   }
 };
 
 export default biljetter => [
-  createPaymentOption("swish"),
+  createPaymentOption("Swish", "swish"),
   ...createForetagsbiljetter(biljetter)
 ];
