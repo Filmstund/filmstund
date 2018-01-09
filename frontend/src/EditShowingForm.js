@@ -69,6 +69,7 @@ class EditShowingForm extends React.Component {
 
     this.props
       .updateShowing({
+        expectedBuyDate: formatYMD(newValues.expectedBuyDate),
         private: showing.private,
         payToUser: showing.payToUser.id,
         location: newValues.location,
