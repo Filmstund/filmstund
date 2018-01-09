@@ -38,7 +38,7 @@ const Link = styled(RouterLink)`
 
 class TopBar extends Component {
   handleLogout = () => {
-    fetch(BASE_URL + "/logout").then(() => {
+    fetch(BASE_URL + "/logout", { credentials: "include" }).then(() => {
       this.props.resetStore().then(() => {
         this.props.history.push("/");
       });
