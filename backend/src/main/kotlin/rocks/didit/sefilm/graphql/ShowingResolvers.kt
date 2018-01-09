@@ -57,7 +57,7 @@ class ShowingResolver(
   fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO
     = showingService.getAdminPaymentDetails(showing.id)
 
-  fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO
+  fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO?
     = showingService.getAttendeePaymentDetails(showing.id)
 }
 

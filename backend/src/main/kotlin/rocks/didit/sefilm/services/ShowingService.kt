@@ -82,10 +82,10 @@ class ShowingService(
   }
 
   /** Info a user needs for paying the one who bought the tickets */
-  fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO
+  fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO?
     = getAttendeePaymentDetailsForUser(currentLoggedInUser(), showingId)
 
-  fun getAttendeePaymentDetailsForUser(userID: UserID, showingId: UUID): AttendeePaymentDetailsDTO {
+  fun getAttendeePaymentDetailsForUser(userID: UserID, showingId: UUID): AttendeePaymentDetailsDTO? {
     val showing = getShowingEntity(showingId)
     val payeePhone = userService.getCompleteUser(showing.payToUser)
       ?.phone
@@ -93,7 +93,7 @@ class ShowingService(
 
     val participantInfo = paymentInfoRepo
       .findByShowingIdAndUserId(showingId, userID)
-      .orElseThrow { PaymentInfoMissing(showingId) }
+      .orElse(null) ?: return null
 
     val movieTitle = movieService.getMovieOrThrow(showing.movieId).title
 

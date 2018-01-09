@@ -10,7 +10,7 @@ type Showing {
     admin: User!
     payToUser: User!
     expectedBuyDate: String
-    participants: [Participant!]
+    participants: [Participant!]!
     lastModifiedDate: String!
 }
 
