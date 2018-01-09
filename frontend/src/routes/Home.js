@@ -16,9 +16,6 @@ const showingDate = showing => showing.date + " " + showing.time;
 const today = getTodaysDate();
 
 class Home extends Component {
-  componentWillMount() {
-    this.props.data.refetch();
-  }
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
   };
@@ -85,27 +82,32 @@ class Home extends Component {
   }
 }
 
-const data = graphql(gql`
-  query HomeQuery {
-    showings: publicShowings {
-      ...Showing
-      id
-      date
-      time
-      admin {
+const data = graphql(
+  gql`
+    query HomeQuery {
+      showings: publicShowings {
+        ...Showing
         id
-      }
-      participants {
-        user {
+        date
+        time
+        admin {
           id
         }
+        participants {
+          user {
+            id
+          }
+        }
+      }
+      me: currentUser {
+        id
       }
     }
-    me: currentUser {
-      id
-    }
+    ${showingFragment}
+  `,
+  {
+    options: { fetchPolicy: "cache-and-network" }
   }
-  ${showingFragment}
-`);
+);
 
 export default compose(data)(Home);
