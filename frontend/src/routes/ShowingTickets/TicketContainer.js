@@ -8,29 +8,27 @@ import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
 import _ from "lodash";
 import SeatRange from "./SeatRange";
+import StatusBox from "../../StatusBox";
 
 export default class TicketContainer extends Component {
   state = {
-    error: null,
+    errors: null,
     cinemaTicketUrls: []
   };
 
   handleSubmitCinemaTicketUrls = () => {
     const { cinemaTicketUrls } = this.state;
-    const { showing } = this.props;
 
     const nonEmptyUrls = cinemaTicketUrls.filter(
       line => line.trim().length !== 0
     );
 
-    jsonRequest(withBaseURL(`/tickets/${showing.id}`), nonEmptyUrls).then(
-      tickets => {
-        this.setState({
-          tickets,
-          cinemaTicketUrls: []
-        });
-      }
-    );
+    this.props
+      .addTickets(nonEmptyUrls)
+      .then(() => {})
+      .catch(errors => {
+        this.setState({ errors });
+      });
   };
 
   setCinemaTicketUrls = cinemaTicketUrls => {
@@ -61,22 +59,13 @@ export default class TicketContainer extends Component {
   };
 
   render() {
-    const { error } = this.state;
+    const { errors } = this.state;
     const { data: { me, showing, loading }, navigateToShowing } = this.props;
 
     const { myTickets } = showing;
     const range = _.groupBy(myTickets.map(t => t.seat), "row");
 
-    if (error) {
-      return (
-        <div>
-          <MainButton onClick={navigateToShowing}>
-            Tillbaka till visning
-          </MainButton>
-          <div>{error}</div>
-        </div>
-      );
-    } else if (loading) {
+    if (loading) {
       return <Loader />;
     } else {
       return (
@@ -86,6 +75,9 @@ export default class TicketContainer extends Component {
           </MainButton>
           <SeatRange range={range} />
           {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
+          {errors && (
+            <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>
+          )}
           {showing.admin.id === me.id && this.renderAdminFields()}
         </div>
       );
