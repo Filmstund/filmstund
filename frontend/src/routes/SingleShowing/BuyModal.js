@@ -38,7 +38,7 @@ const ForetagsBiljetterList = ({ tickets }) => (
   <div>
     <SmallHeader>Företagsbiljetter</SmallHeader>
     {tickets.map(ticket => (
-      <UserTooltip userId={ticket.userId} ticket={ticket}>
+      <UserTooltip key={ticket.user.id} user={ticket.user} ticket={ticket}>
         <CopyValue
           useStricken
           key={ticket.foretagsbiljett}
