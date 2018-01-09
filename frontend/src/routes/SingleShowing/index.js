@@ -20,10 +20,6 @@ class SingleShowing extends Component {
     showModal: false
   };
 
-  componentWillMount() {
-    this.props.data.refetch();
-  }
-
   openSwish = swishLink => {
     this.setState({ swish: true });
     window.location = swishLink;
@@ -152,7 +148,7 @@ const data = graphql(
     ${showingFragment}
     ${showingAdminFragment}
   `,
-  { options: { errorPolicy: "ignore" } }
+  { options: { errorPolicy: "ignore", fetchPolicy: "cache-and-network" } }
 );
 
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));

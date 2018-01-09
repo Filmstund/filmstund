@@ -17,10 +17,6 @@ const showingDate = showing => showing.date + " " + showing.time;
 const today = getTodaysDate();
 
 class Showings extends Component {
-  componentWillMount() {
-    this.props.data.refetch();
-  }
-
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
   };
@@ -62,16 +58,21 @@ class Showings extends Component {
   }
 }
 
-const data = graphql(gql`
-  query ShowingsQuery {
-    showings: publicShowings {
-      ...Showing
-      id
-      date
-      time
+const data = graphql(
+  gql`
+    query ShowingsQuery {
+      showings: publicShowings {
+        ...Showing
+        id
+        date
+        time
+      }
     }
+    ${showingFragment}
+  `,
+  {
+    options: { fetchPolicy: "cache-and-network" }
   }
-  ${showingFragment}
-`);
+);
 
 export default compose(data)(Showings);

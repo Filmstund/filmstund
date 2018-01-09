@@ -62,7 +62,6 @@ class NewShowing extends Component {
   requestSFData = () => {
     this.setState({ requestingData: true });
     this.props.fetchMovies().then(() => {
-      this.props.data.refetch();
       this.setState({ requestingData: false });
     });
   };
