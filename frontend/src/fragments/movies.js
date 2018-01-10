@@ -18,6 +18,9 @@ export const fetchMovies = graphql(
   {
     props: ({ mutate }) => ({
       fetchMovies: () => wrapMutate(mutate)
-    })
+    }),
+    options: {
+      refetchQueries: ["NewShowingQuery"]
+    }
   }
 );
