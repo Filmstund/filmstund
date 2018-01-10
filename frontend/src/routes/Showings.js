@@ -11,10 +11,32 @@ import { getTodaysDate } from "../lib/dateTools";
 import { RedHeader } from "../RedHeader";
 import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { Link } from "../MainButton";
+import styled from "styled-components";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
 const today = getTodaysDate();
+
+const EmptyList = styled.div`
+  display: flex;
+  font-size: 15px;
+  font-family: Roboto, sans-serif;
+  justify-content: center;
+  align-items: center;
+  color: #9b9b9b;
+  height: 50px;
+`;
+
+const ShowingsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  @media (min-width: 30rem) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+  }
+`;
 
 class Showings extends Component {
   navigateToShowing = showing => {
@@ -26,21 +48,28 @@ class Showings extends Component {
   };
 
   renderShowings = (showings, disabled) => {
-    return orderBy(showings, [showingDate], ["asc"]).map(showing => (
-      <ShowingNeue
-        key={showing.id}
-        showing={showing}
-        onClick={() => this.navigateToShowing(showing)}
-        onClickTickets={() => this.navigateToTickets(showing)}
-        disabled={disabled}
-      />
-    ));
+    if (showings.length === 0) {
+      return <EmptyList>Inga besök</EmptyList>;
+    }
+    return (
+      <ShowingsWrapper>
+        {orderBy(showings, [showingDate], ["asc"]).map(showing => (
+          <ShowingNeue
+            key={showing.id}
+            showing={showing}
+            onClick={() => this.navigateToShowing(showing)}
+            onClickTickets={() => this.navigateToTickets(showing)}
+            disabled={disabled}
+          />
+        ))}
+      </ShowingsWrapper>
+    );
   };
 
   render() {
     const { className, data: { showings = [] } } = this.props;
 
-    const { previous, upcoming } = groupBy(
+    const { previous = [], upcoming = [] } = groupBy(
       showings,
       s => (moment(showingDate(s)).isBefore(today) ? "previous" : "upcoming")
     );

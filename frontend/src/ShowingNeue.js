@@ -20,6 +20,11 @@ const Box = styled.div`
   border: 1px solid #f2f2f2;
   display: flex;
   flex-direction: row;
+
+  @media (min-width: 30rem) {
+    width: 330px;
+    margin: ${largeMargin};
+  }
 `;
 
 const Poster = styled.div`
@@ -38,6 +43,7 @@ const Column = styled.div`
 
 const CenterColumn = styled(Column)`
   margin-left: ${largeMargin};
+  margin-right: ${largeMargin};
   flex: 1;
   align-items: flex-start;
 `;
@@ -59,6 +65,12 @@ const RedButton = styled.button`
   display: flex;
   border-radius: 5px;
   align-items: center;
+
+  transition: background-color 250ms ease-out;
+
+  &:hover {
+    background-color: #970213;
+  }
 `;
 
 const ButtonText = styled.div`

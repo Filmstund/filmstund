@@ -8,9 +8,10 @@ import { orderBy } from "lodash";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
+import { Jumbotron } from "./Jumbotron";
 import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { RedHeader } from "../RedHeader";
-import { getTodaysDate } from "../lib/dateTools";
+import { getTodaysDate, formatYMD } from "../lib/dateTools";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -26,6 +27,28 @@ const EmptyList = styled.div`
   height: 50px;
 `;
 
+const ItsHappeningTitle = styled.h1`
+  color: #fff;
+  font-size: 64px;
+  font-weight: 300;
+  font-family: Roboto;
+
+  @media (max-width: 30rem) {
+    display: none;
+  }
+`;
+
+const ShowingsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  @media (min-width: 30rem) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+  }
+`;
+
 class Home extends Component {
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
@@ -37,17 +60,21 @@ class Home extends Component {
 
   renderShowings = showings => {
     if (showings.length === 0) {
-      return <EmptyList>Inga visningar</EmptyList>;
+      return <EmptyList>Inga besök</EmptyList>;
     }
-    return orderBy(showings, [showingDate], ["asc"]).map(showing => (
-      <ShowingNeue
-        showing={showing}
-        onClick={() => this.navigateToShowing(showing)}
-        onClickTickets={() => this.navigateToTickets(showing)}
-        disabled={moment(showingDate(showing)).isBefore(today)}
-        key={showing.id}
-      />
-    ));
+    return (
+      <ShowingsWrapper>
+        {orderBy(showings, [showingDate], ["asc"]).map(showing => (
+          <ShowingNeue
+            showing={showing}
+            onClick={() => this.navigateToShowing(showing)}
+            onClickTickets={() => this.navigateToTickets(showing)}
+            disabled={moment(showingDate(showing)).isBefore(today)}
+            key={showing.id}
+          />
+        ))}
+      </ShowingsWrapper>
+    );
   };
 
   renderCreatedByMe = showings => {
@@ -81,11 +108,23 @@ class Home extends Component {
 
   render() {
     const { data: { showings = [] } } = this.props;
+
+    const todayShowing = showings.filter(
+      s => formatYMD(showingDate(s)) === formatYMD(today)
+    );
+
     return (
       <React.Fragment>
         <Helmet title="Mina Besök" />
+        {todayShowing.length > 0 && (
+          <Jumbotron>
+            <ShowingNeue showing={todayShowing[0]} />
+            <ItsHappeningTitle>It's happening! 😍</ItsHappeningTitle>
+          </Jumbotron>
+        )}
         <Link to="/showings/new">Skapa nytt besök</Link>
         <RedHeader>Mina kommande besök</RedHeader>
+
         {this.renderParticipatedByMe(showings)}
         <RedHeader>Mina tidigare besök</RedHeader>
         {this.renderPrevParticipatedByMe(showings)}
