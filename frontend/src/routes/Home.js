@@ -7,10 +7,10 @@ import { orderBy } from "lodash";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
-import Showing, { showingFragment } from "../Showing";
-import Header from "../Header";
-
+import { ShowingNeue, showingFragment } from "../ShowingNeue";
+import { RedHeader } from "../RedHeader";
 import { getTodaysDate } from "../lib/dateTools";
+
 const showingDate = showing => showing.date + " " + showing.time;
 
 const today = getTodaysDate();
@@ -22,16 +22,11 @@ class Home extends Component {
 
   renderShowings = showings => {
     return orderBy(showings, [showingDate], ["asc"]).map(showing => (
-      <Showing
-        showingId={showing.id}
+      <ShowingNeue
+        showing={showing}
         onClick={() => this.navigateToShowing(showing)}
-        ticketsBought={showing.ticketsBought}
         disabled={moment(showingDate(showing)).isBefore(today)}
-        movie={showing.movie}
         key={showing.id}
-        date={showingDate(showing)}
-        adminId={showing.admin}
-        location={showing.location.name}
       />
     ));
   };
@@ -66,18 +61,18 @@ class Home extends Component {
   };
 
   render() {
-    const { className, data: { showings = [] } } = this.props;
+    const { data: { showings = [] } } = this.props;
     return (
-      <div className={className}>
+      <React.Fragment>
         <Helmet title="Mina Besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
-        <Header>Mina kommande besök</Header>
+        <RedHeader>Mina kommande besök</RedHeader>
         {this.renderParticipatedByMe(showings)}
-        <Header>Mina tidigare besök</Header>
+        <RedHeader>Mina tidigare besök</RedHeader>
         {this.renderPrevParticipatedByMe(showings)}
-        <Header>Besök jag har skapat</Header>
+        <RedHeader>Besök jag har skapat</RedHeader>
         {this.renderCreatedByMe(showings)}
-      </div>
+      </React.Fragment>
     );
   }
 }

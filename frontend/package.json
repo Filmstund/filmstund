@@ -6,6 +6,9 @@
     "react-scripts": "^1.0.14"
   },
   "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.1",
+    "@fortawesome/fontawesome-free-solid": "^5.0.4",
+    "@fortawesome/react-fontawesome": "^0.0.17",
     "apollo-cache-persist": "^0.1.1",
     "apollo-client-preset": "^1.0.5",
     "apollo-link-error": "^1.0.3",
