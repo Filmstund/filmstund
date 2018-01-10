@@ -8,8 +8,8 @@ import Helmet from "react-helmet";
 
 import { getTodaysDate } from "../lib/dateTools";
 
-import Header from "../Header";
-import Showing, { showingFragment } from "../Showing";
+import { RedHeader } from "../RedHeader";
+import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { Link } from "../MainButton";
 
 const showingDate = showing => showing.date + " " + showing.time;
@@ -21,18 +21,18 @@ class Showings extends Component {
     this.props.history.push(`/showings/${showing.id}`);
   };
 
+  navigateToTickets = showing => {
+    this.props.history.push(`/showings/${showing.id}/tickets`);
+  };
+
   renderShowings = (showings, disabled) => {
     return orderBy(showings, [showingDate], ["asc"]).map(showing => (
-      <Showing
-        showingId={showing.id}
+      <ShowingNeue
         key={showing.id}
+        showing={showing}
         onClick={() => this.navigateToShowing(showing)}
-        ticketsBought={showing.ticketsBought}
-        movie={showing.movie}
+        onClickTickets={() => this.navigateToTickets(showing)}
         disabled={disabled}
-        date={showingDate(showing)}
-        adminId={showing.admin}
-        location={showing.location.name}
       />
     ));
   };
@@ -49,9 +49,9 @@ class Showings extends Component {
       <div className={className}>
         <Helmet title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
-        <Header>Aktuella besök</Header>
+        <RedHeader>Aktuella besök</RedHeader>
         {this.renderShowings(upcoming, false)}
-        <Header>Tidigare besök</Header>
+        <RedHeader>Tidigare besök</RedHeader>
         {this.renderShowings(previous, true)}
       </div>
     );
