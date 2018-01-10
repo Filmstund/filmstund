@@ -162,16 +162,23 @@ class NewShowing extends Component {
   }
 }
 
-const data = graphql(gql`
-  query NewShowingQuery {
-    movies: allMovies {
-      ...Movie
-      id
-      popularity
-      releaseDate
+const data = graphql(
+  gql`
+    query NewShowingQuery {
+      movies: allMovies {
+        ...Movie
+        id
+        popularity
+        releaseDate
+      }
+    }
+    ${movieFragment}
+  `,
+  {
+    options: {
+      fetchPolicy: "cache-and-network"
     }
   }
-  ${movieFragment}
-`);
+);
 
 export default compose(withRouter, data, fetchMovies)(NewShowing);
