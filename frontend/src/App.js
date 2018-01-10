@@ -10,7 +10,6 @@ import WelcomeModal from "./WelcomeModal";
 
 const PaddingContainer = styled.div`
   padding: 1em;
-  background-color: #f8f8f8;
 `;
 
 const ScrollContainer = styled.div`
@@ -18,6 +17,7 @@ const ScrollContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  background-color: #f8f8f8;
 `;
 
 const AsyncHome = asyncComponent(() => import("./routes/Home"));
