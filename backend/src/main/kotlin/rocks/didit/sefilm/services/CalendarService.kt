@@ -66,7 +66,7 @@ class CalendarService(
 
   private fun ShowingDTO.toVEvent(user: UserDTO): VEvent {
     val movie = movieService.getMovie(this.movieId) ?: return VEvent()
-    val showingUrl = "${properties.baseUrl.frontend}/showing/$id"
+    val showingUrl = "${properties.baseUrl.frontend}/showings/$id"
 
     val vEvent = VEvent()
     vEvent.setSummary(movie.title).language = "en-us"
