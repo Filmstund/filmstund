@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
+import styled from "styled-components";
 import moment from "moment";
 import { compose } from "recompose";
 import { orderBy } from "lodash";
@@ -15,12 +16,25 @@ const showingDate = showing => showing.date + " " + showing.time;
 
 const today = getTodaysDate();
 
+const EmptyList = styled.div`
+  display: flex;
+  font-size: 15px;
+  font-family: Roboto, sans-serif;
+  justify-content: center;
+  align-items: center;
+  color: #9b9b9b;
+  height: 50px;
+`;
+
 class Home extends Component {
   navigateToShowing = showing => {
     this.props.history.push(`/showings/${showing.id}`);
   };
 
   renderShowings = showings => {
+    if (showings.length === 0) {
+      return <EmptyList>Inga visningar</EmptyList>;
+    }
     return orderBy(showings, [showingDate], ["asc"]).map(showing => (
       <ShowingNeue
         showing={showing}
