@@ -31,6 +31,10 @@ class Home extends Component {
     this.props.history.push(`/showings/${showing.id}`);
   };
 
+  navigateToTickets = showing => {
+    this.props.history.push(`/showings/${showing.id}/tickets`);
+  };
+
   renderShowings = showings => {
     if (showings.length === 0) {
       return <EmptyList>Inga visningar</EmptyList>;
@@ -39,6 +43,7 @@ class Home extends Component {
       <ShowingNeue
         showing={showing}
         onClick={() => this.navigateToShowing(showing)}
+        onClickTickets={() => this.navigateToTickets(showing)}
         disabled={moment(showingDate(showing)).isBefore(today)}
         key={showing.id}
       />

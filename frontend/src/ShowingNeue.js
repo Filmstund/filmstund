@@ -51,6 +51,7 @@ const FaIcon = styled(FontAwesomeIcon)`
 
 const RedButton = styled.button`
   background-color: #d0021b;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 500;
   color: #fff;
@@ -144,7 +145,7 @@ const TicketInfo = ({ tickets }) => {
   );
 };
 
-export const ShowingNeue = ({ showing, onClick }) => {
+export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
   const showingHasTickets = showing.myTickets.length > 0;
 
   return (
@@ -161,7 +162,12 @@ export const ShowingNeue = ({ showing, onClick }) => {
           <TicketInfo tickets={showing.myTickets} />
         </Content>
         {showingHasTickets && (
-          <RedButton>
+          <RedButton
+            onClick={e => {
+              e.stopPropagation();
+              onClickTickets();
+            }}
+          >
             <FaIcon color="#fff" icon={faQrcode} />
             <ButtonText>Visa biljett</ButtonText>
           </RedButton>
