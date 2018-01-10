@@ -50,6 +50,21 @@ const AddForetagsbiljettContainer = styled.div`
   padding-bottom: 2em;
 `;
 
+const localizeTicketStatus = status => {
+  switch (status) {
+    case "Available":
+      return "Tillgänglig";
+    case "Pending":
+      return "Upptagen";
+    case "Used":
+      return "Använd";
+    case "Expired":
+      return "Utgången";
+    default:
+      return status;
+  }
+};
+
 const Foretagsbiljett = ({
   dateFocused,
   biljett,
@@ -86,7 +101,9 @@ const Foretagsbiljett = ({
         <div>{formatYMD(biljett.expires)}</div>
       )}
     </BiljettField>
-    <BiljettField text="Status">{biljett.status || "Available"}</BiljettField>
+    <BiljettField text="Status">
+      {localizeTicketStatus(biljett.status)}
+    </BiljettField>
     <TrashIcon>
       <i
         onClick={() => handleRemoveForetagsbiljett(biljett, index)}
