@@ -15,7 +15,9 @@ const FlexBox = styled.div`
   align-items: center;
 `;
 
-const FlexGrow = styled.div`flex: 1;`;
+const FlexGrow = styled.div`
+  flex: 1;
+`;
 
 const Footer = () => {
   return (
@@ -24,7 +26,11 @@ const Footer = () => {
         <FlexGrow>
           <Bioord />
         </FlexGrow>
-        <a href="https://github.com/cthdidit/itbio">
+        <a
+          href="https://github.com/cthdidIT/itbio"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <GitHubLogo />
         </a>
       </FlexBox>
