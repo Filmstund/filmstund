@@ -6,6 +6,7 @@
     "city": "Göteborg",
     "streetAddress": "Hörsalsvägen 9",
     "postalCode": "412 58",
-    "postalAddress": "Göteborg"
+    "postalAddress": "Göteborg",
+    "alias": ["Hubben"]
   }
 ]

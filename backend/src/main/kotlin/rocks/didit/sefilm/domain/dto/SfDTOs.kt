@@ -122,6 +122,7 @@ enum class SfTag {
   `Ej textad`,
   Textad,
   Familj,
+  Barnvagnsbio,
   Knattebio,
   Unknown;
 

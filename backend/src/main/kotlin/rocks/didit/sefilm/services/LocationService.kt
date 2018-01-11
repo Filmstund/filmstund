@@ -13,7 +13,7 @@ import java.util.*
 @Component
 class LocationService(private val locationRepo: LocationRepository) {
   fun allLocations() = locationRepo.findAll().toList()
-  fun getLocation(id: String): Optional<Location> = locationRepo.findById(id)
+  fun getLocation(name: String): Optional<Location> = locationRepo.findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
 
   fun sfCities(): List<SfCityAliasDTO> {
     val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()

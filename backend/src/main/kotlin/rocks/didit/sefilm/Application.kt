@@ -119,6 +119,8 @@ class Application {
       }
   }
 
+  private data class LocationAliasDTO(val sfId: String, val alias: List<String>)
+
   @Bean
   fun seedInitialData(locationsRepo: LocationRepository,
                       budordRepo: BudordRepository,
@@ -142,8 +144,11 @@ class Application {
     val locationsResource = ClassPathResource("seeds/locations.json")
     val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
 
-    val cityAlias = properties.defaultCity
-    val locationsFromSF = sfService.getLocationsInCity(cityAlias)
+    val locationNameAliasResource = ClassPathResource("seeds/sf-location-aliases.json")
+    val locationNameAlias: List<LocationAliasDTO> = objectMapper.readValue(locationNameAliasResource.inputStream)
+
+    val defaultCity = properties.defaultCity
+    val locationsFromSF = sfService.getLocationsInCity(properties.defaultCity)
       .map {
         Location(it.title,
           it.address.city["alias"],
@@ -152,13 +157,15 @@ class Application {
           it.address.postalCode,
           it.address.postalAddress,
           BigDecimal(it.address.coordinates.latitude),
-          BigDecimal(it.address.coordinates.longitude))
+          BigDecimal(it.address.coordinates.longitude),
+          it.ncgId,
+          alias = locationNameAlias.firstOrNull() { alias -> alias.sfId == it.ncgId }?.alias ?: listOf())
       }
 
     locationsRepo.saveAll(locations)
     log.info("Seeded locations with ${locations.size} values")
 
-    log.info("Seeded ${locationsRepo.saveAll(locationsFromSF).count()} locations from SF for city: $cityAlias")
+    log.info("Seeded ${locationsRepo.saveAll(locationsFromSF).count()} locations from SF for city: $defaultCity")
   }
 
   @Bean
