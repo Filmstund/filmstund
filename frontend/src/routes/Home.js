@@ -118,7 +118,10 @@ class Home extends Component {
         <Helmet title="Mina Besök" />
         {todayShowing.length > 0 && (
           <Jumbotron>
-            <ShowingNeue showing={todayShowing[0]} />
+            <ShowingNeue
+              showing={todayShowing[0]}
+              onClick={() => this.navigateToShowing(todayShowing[0])}
+            />
             <ItsHappeningTitle>It's happening! 😍</ItsHappeningTitle>
           </Jumbotron>
         )}
