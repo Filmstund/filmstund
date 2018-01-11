@@ -1,5 +1,7 @@
 package rocks.didit.sefilm.services
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
@@ -14,15 +16,20 @@ import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SeatRange
+import rocks.didit.sefilm.domain.dto.SfSeatMapDTO
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
 import java.util.*
 
 @Component
-class TicketService(private val sfClient: SFService,
+class TicketService(private val sfService: SFService,
                     private val userRepository: UserRepository,
                     private val ticketRepository: TicketRepository,
                     private val showingRepository: ShowingRepository) {
+
+  companion object {
+    private val log: Logger = LoggerFactory.getLogger(TicketService::class.java)
+  }
 
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
     val user = currentLoggedInUser()
@@ -48,10 +55,10 @@ class TicketService(private val sfClient: SFService,
 
   private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {
     val (sysId, sfShowingId, ticketId) = extractIdsFromUrl(userSuppliedTicketUrl)
-    val sfTickets = sfClient.fetchTickets(sysId, sfShowingId, ticketId)
+    val sfTickets = sfService.fetchTickets(sysId, sfShowingId, ticketId)
 
     val tickets = sfTickets.map {
-      val barcode = sfClient.fetchBarcode(it.id)
+      val barcode = sfService.fetchBarcode(it.id)
       if (it.profileId == null || it.profileId.isBlank()) {
         return@map it.toTicket(showing.id, showing.admin, barcode)
       }
@@ -92,7 +99,7 @@ class TicketService(private val sfClient: SFService,
 
   fun getTicketRange(showingId: UUID): TicketRange? {
     val currentLoggedInUser = currentLoggedInUser()
-    if(!isUserIsParticipant(showingId, currentLoggedInUser)) {
+    if (!isUserIsParticipant(showingId, currentLoggedInUser)) {
       return null
     }
 
@@ -109,6 +116,16 @@ class TicketService(private val sfClient: SFService,
       .groupBy({ it.row }, { it.number })
       .map { SeatRange(it.key, it.value) }
     return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
+  }
+
+  fun fetchSeatMap(showingId: UUID): List<SfSeatMapDTO> {
+    val showing = showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", showingId = showingId) }
+    if (showing.location?.sfId == null || showing.sfScreen?.sfId == null) {
+      log.debug("Showing $showingId is not at a Sf location or does not have an associated Sf screen")
+      return listOf()
+    }
+
+    return sfService.getSfSeatMap(showing.location.sfId, showing.sfScreen.sfId)
   }
 
   private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
