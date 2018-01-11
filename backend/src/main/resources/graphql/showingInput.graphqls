@@ -3,6 +3,7 @@ input CreateShowingInput {
     time: LocalTime!
     movieId: UUID!
     location: String!
+    sfScreen: SfScreen
     expectedBuyDate: LocalDate
 }
 
@@ -12,5 +13,6 @@ input UpdateShowingInput {
     payToUser: ID!
     expectedBuyDate: LocalDate
     location: String!
+    sfScreen: SfScreen
     time: LocalTime!
 }

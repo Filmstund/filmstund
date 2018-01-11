@@ -89,16 +89,17 @@ data class SfAddressDTO(
 
 data class SfCoordinatesDTO(val latitude: String, val longitude: String)
 
+data class SfLiteScreenDTO(val sfId: String, val name: String)
 data class SfShowingDTO(
   val cinemaName: String,
-  val screenName: String,
+  val screen: SfLiteScreenDTO,
   val seatCount: Int,
   val timeUtc: Instant,
   val tags: List<SfTag>
 ) {
   companion object {
     fun from(show: SfShowDTO) = SfShowingDTO(show.cinema.title,
-      show.screen.title,
+      SfLiteScreenDTO(show.screen.ncgId, show.screen.title),
       show.screen.seatCount,
       show.timeUtc,
       SfTag.convertTags(show.attributes))

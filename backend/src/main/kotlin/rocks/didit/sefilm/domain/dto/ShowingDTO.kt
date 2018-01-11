@@ -15,6 +15,7 @@ data class ShowingDTO(
   val time: LocalTime,
   val movieId: UUID,
   val location: Location,
+  val sfScreen: SfLiteScreenDTO?,
   val private: Boolean,
   val price: SEK?,
   val ticketsBought: Boolean,

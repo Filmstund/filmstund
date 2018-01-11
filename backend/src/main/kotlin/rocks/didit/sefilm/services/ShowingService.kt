@@ -196,6 +196,7 @@ class ShowingService(
       payToUser = userService.getUserOrThrow(UserID(newValues.payToUser)).id,
       expectedBuyDate = newValues.expectedBuyDate,
       location = locationService.getOrCreateNewLocation(newValues.location),
+      sfScreen = newValues.sfScreen,
       time = newValues.time
     ))
       .toDto()
@@ -236,6 +237,7 @@ class ShowingService(
       time = this.time,
       movieId = this.movieId,
       location = location,
+      sfScreen = this.sfScreen,
       admin = admin.id,
       payToUser = admin.id,
       expectedBuyDate = this.expectedBuyDate,

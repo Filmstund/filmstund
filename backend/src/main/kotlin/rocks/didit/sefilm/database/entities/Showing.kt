@@ -8,6 +8,7 @@ import rocks.didit.sefilm.MissingParametersException
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.SfLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.time.Instant
 import java.time.LocalDate
@@ -21,6 +22,7 @@ data class Showing(@Id
                    val time: LocalTime? = null,
                    val movieId: UUID? = null,
                    val location: Location? = null,
+                   val sfScreen: SfLiteScreenDTO? = null,
                    val private: Boolean = false,
                    val price: SEK? = null,
                    val ticketsBought: Boolean = false,
@@ -40,6 +42,7 @@ data class Showing(@Id
     time = time ?: throw MissingParametersException("time"),
     movieId = movieId ?: throw MissingParametersException("movieId"),
     location = location ?: throw MissingParametersException("location"),
+    sfScreen = sfScreen,
     private = private,
     price = price,
     ticketsBought = ticketsBought,

@@ -8,4 +8,5 @@ data class CreateShowingDTO(val date: LocalDate?,
                             val time: LocalTime?,
                             val movieId: UUID?,
                             val location: String?,
+                            val sfScreen: SfLiteScreenDTO?,
                             val expectedBuyDate: LocalDate?)

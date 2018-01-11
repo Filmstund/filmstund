@@ -4,6 +4,7 @@ type Showing {
     time: String
     movie: Movie!
     location: Location
+    sfScreen: SfScreen
     private: Boolean!
     price: SEK
     ticketsBought: Boolean!
@@ -17,4 +18,17 @@ type Showing {
 type Participant {
     user: User
     paymentType: String!
+}
+
+type SfScreen {
+    sfId: ID!
+    name: String!
+}
+
+type SfShowing {
+    cinemaName: String,
+    screen: SfScreen,
+    seatCount: Int,
+    timeUtc: String,
+    tags: [String!]!
 }
