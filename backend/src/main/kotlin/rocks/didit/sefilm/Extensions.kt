@@ -1,19 +1,18 @@
 package rocks.didit.sefilm
 
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.common.OAuth2AccessToken
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.UserID
 
 internal fun currentLoggedInUser(): UserID {
-  val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
-  return UserID(principal.userId)
-}
+  val authentication = SecurityContextHolder.getContext().authentication
+  if (!authentication.isAuthenticated) {
+    throw IllegalStateException("Cannot get current user if user isn't authenticated")
+  }
 
-internal fun oauthAccessToken(): OAuth2AccessToken {
-  val principal = SecurityContextHolder.getContext().authentication.principal as OpenIdConnectUserDetails
-  return principal.accessToken
+  val principal = authentication.principal as OpenIdConnectUserDetails
+  return UserID(principal.userId)
 }
 
 internal fun String.toImdbId() = IMDbID.valueOf(this)

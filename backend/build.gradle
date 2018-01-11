@@ -56,8 +56,6 @@ dependencies {
   compile("org.springframework.boot:spring-boot-starter-security:$springBootSnapshotVersion")
   compile("org.springframework.security:spring-security-jwt:1.0.9.RELEASE")
   compile("org.springframework.security.oauth:spring-security-oauth2:2.2.1.RELEASE")
-  compile("org.springframework.session:spring-session-data-mongodb:2.0.0.RC2")
-  compile("org.springframework.session:spring-session-core:2.0.0.RC2")
   compile("com.github.ben-manes.caffeine:caffeine:2.+")
   compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
   compile("org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}")

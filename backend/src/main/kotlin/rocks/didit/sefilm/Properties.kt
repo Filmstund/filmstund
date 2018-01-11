@@ -12,7 +12,6 @@ class Properties {
   var defaultCity: String = "GB"
 
   var google = Google()
-  var login = Login()
 
   class Tmdb {
     var apikey: String? = null
@@ -23,15 +22,7 @@ class Properties {
 
   class Google {
     var clientId: String = ""
-    var clientSecret: String = ""
-    var accessTokenUri: String = ""
-    var userAuthorizationUri: String = ""
-    var redirectUri: String = ""
-  }
-
-  class Login {
-    var baseRedirectUri: String = "http://localhost:3000"
-    var defaultRedirectPath: String = "user"
+    var jwkUri: String = ""
   }
 
   class BaseUrl {

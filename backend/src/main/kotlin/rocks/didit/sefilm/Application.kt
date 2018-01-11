@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
+import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -24,9 +25,6 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.session.data.mongo.AbstractMongoSessionConverter
-import org.springframework.session.data.mongo.JdkMongoSessionConverter
-import org.springframework.session.data.mongo.config.annotation.web.http.EnableMongoHttpSession
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -42,11 +40,9 @@ import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import java.math.BigDecimal
-import java.time.Duration
 
 @SpringBootApplication
-@EnableMongoHttpSession(maxInactiveIntervalInSeconds = 172800)  // 48 hours
-//@EnableMongoAuditing // TODO enable when it works together with EnableMongoHttpSession
+@EnableMongoAuditing
 @EnableCaching
 @EnableWebSecurity
 @EnableAsync
@@ -60,9 +56,6 @@ class Application {
   }
 
   @Bean
-  fun mongoSessionConverter(): AbstractMongoSessionConverter = JdkMongoSessionConverter(Duration.ofSeconds(43200))
-
-  @Bean
   fun customMongoConverters(): MongoCustomConversions {
     val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
     return MongoCustomConversions(converters)
@@ -70,9 +63,9 @@ class Application {
 
   @Bean
   @Primary
-  fun getRestClient(): RestTemplate {
+  fun getRestClient(errorHandler: ExternalProviderErrorHandler): RestTemplate {
     val restClient = RestTemplate()
-    restClient.errorHandler = ExternalProviderErrorHandler()
+    restClient.errorHandler = errorHandler
     return restClient
   }
 
