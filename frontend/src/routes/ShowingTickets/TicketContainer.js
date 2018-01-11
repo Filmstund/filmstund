@@ -4,9 +4,9 @@ import TicketURLInput from "../../TicketURLInput";
 import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
-import _ from "lodash";
 import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../StatusMessageBox";
+import { ScreenSeats } from "../../ScreenSeats";
 import { SmallHeader } from "../../Header";
 
 export default class TicketContainer extends Component {
@@ -76,6 +76,7 @@ export default class TicketContainer extends Component {
           </MainButton>
           <SmallHeader>Våra platser:</SmallHeader>
           <SeatRange ticketRange={ticketRange} />
+          <ScreenSeats ticketRange={ticketRange} />
           {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
           <StatusMessageBox
             success={success}
