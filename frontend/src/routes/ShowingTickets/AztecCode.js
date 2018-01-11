@@ -13,7 +13,9 @@ class AztecCode extends Component {
   }
   render() {
     return (
-      <canvas id="code" />
+      <div>
+        <canvas id="code" />
+      </div>
     );
   }
 }

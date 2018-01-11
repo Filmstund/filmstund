@@ -6,14 +6,16 @@ class QRCode extends Component {
     const { data } = this.props;
     bwipjs('code', {
             bcid:    'qrcode',
+            eclevel: 'L',
             text:    data,
             scale:   3,
-            eclevel: 'L',
         }, function (err, cvs) { });
   }
   render() {
     return (
-      <canvas id="code" />
+      <div>
+        <canvas id="code" />
+      </div>
     );
   }
 }
