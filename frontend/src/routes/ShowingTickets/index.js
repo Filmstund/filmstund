@@ -14,36 +14,50 @@ const routerParamsToShowingId = ({ match, history }) => {
   return { showingId, navigateToShowing };
 };
 
-const data = graphql(gql`
-  query TicketQuery($showingId: UUID!) {
-    me: currentUser {
-      id
-    }
-    showing(id: $showingId) {
-      id
-      admin {
+const data = graphql(
+  gql`
+    query TicketQuery($showingId: UUID!) {
+      me: currentUser {
         id
       }
-      myTickets {
+      showing(id: $showingId) {
         id
-        barcode
-        customerType
-        customerTypeDefinition
-        cinema
-        screen
-        seat {
-          row
-          number
+        admin {
+          id
         }
-        date
-        time
-        movieName
-        movieRating
-        showAttributes
+        ticketRange {
+          rows
+          seatings {
+            row
+            numbers
+          }
+        }
+        myTickets {
+          id
+          barcode
+          customerType
+          customerTypeDefinition
+          cinema
+          screen
+          seat {
+            row
+            number
+          }
+          date
+          time
+          movieName
+          movieRating
+          showAttributes
+        }
       }
+    }
+  `,
+  {
+    options: {
+      fetchPolicy: "cache-and-network"
     }
   }
-`);
+);
 
 const addTickets = graphql(
   gql`

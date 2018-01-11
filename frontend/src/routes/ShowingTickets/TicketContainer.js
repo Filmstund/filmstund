@@ -7,6 +7,7 @@ import Ticket from "./Ticket";
 import _ from "lodash";
 import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../StatusMessageBox";
+import { SmallHeader } from "../../Header";
 
 export default class TicketContainer extends Component {
   state = {
@@ -63,8 +64,7 @@ export default class TicketContainer extends Component {
     const { errors, success } = this.state;
     const { data: { me, showing, loading }, navigateToShowing } = this.props;
 
-    const { myTickets } = showing;
-    const range = _.groupBy(myTickets.map(t => t.seat), "row");
+    const { myTickets, ticketRange } = showing;
 
     if (loading) {
       return <Loader />;
@@ -74,7 +74,8 @@ export default class TicketContainer extends Component {
           <MainButton onClick={navigateToShowing}>
             Tillbaka till visning
           </MainButton>
-          <SeatRange range={range} />
+          <SmallHeader>Våra platser:</SmallHeader>
+          <SeatRange ticketRange={ticketRange} />
           {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
           <StatusMessageBox
             success={success}
