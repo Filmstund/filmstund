@@ -106,6 +106,27 @@ data class SfShowingDTO(
   }
 }
 
+data class SfSeatMapDTO(
+  val remoteSystemAlias: String,
+  val remoteEntityId: String,
+  val row: Int,
+  val number: Int,
+  val seatType: String,
+  val coordinates: SfSeatCoordinates,
+  val dimensions: SfSeatDimensions,
+  val languageId: String
+)
+
+data class SfSeatCoordinates(
+  val x: Float,
+  val y: Float
+)
+
+data class SfSeatDimensions(
+  val width: Int,
+  val height: Int
+)
+
 enum class SfTag {
   `18år`,
   `3D`,

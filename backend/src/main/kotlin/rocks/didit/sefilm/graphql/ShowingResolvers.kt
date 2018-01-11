@@ -59,6 +59,9 @@ class ShowingResolver(
 
   fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO?
     = showingService.getAttendeePaymentDetails(showing.id)
+
+  fun sfSeatMap(showing: ShowingDTO): List<SfSeatMapDTO>
+    = showingService.fetchSeatMap(showing.id)
 }
 
 @Component

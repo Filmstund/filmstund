@@ -10,7 +10,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
   cache:
-    cache-names: sfdates,sfdate
+    cache-names: sfdates,sfdate,sfSeatMap
     caffeine:
       spec: maximumSize=500,expireAfterWrite=43200s
 

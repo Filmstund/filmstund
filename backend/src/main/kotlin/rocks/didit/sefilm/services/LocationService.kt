@@ -24,7 +24,7 @@ class LocationService(private val locationRepo: LocationRepository) {
 
   fun getOrCreateNewLocation(name: String): Location {
     return locationRepo
-      .findById(name)
+      .findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
       .orElseGet { locationRepo.save(Location(name = name)) }
   }
 }
