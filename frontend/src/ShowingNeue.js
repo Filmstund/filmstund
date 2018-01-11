@@ -150,14 +150,18 @@ const ScreenName = ({ ticket }) => {
   );
 };
 
-const TicketInfo = ({ tickets }) => {
-  const range = _.groupBy(tickets.map(t => t.seat), "row");
+const TicketInfo = ({ ticketRange }) => {
+  if (ticketRange.rows.length === 0) {
+    return null;
+  }
+
+  const ticketRanges = _.orderBy(ticketRange.seatings, ["desc"], ["row"]);
 
   return (
     <TicketRangeContainer>
-      {_.keys(range).map(row => (
+      {ticketRanges.map(({ numbers, row }) => (
         <div key={row}>
-          Rad {row}: {formatSeatingRow(range[row].map(r => r.number))}
+          Rad {row}: {formatSeatingRow(numbers)}
         </div>
       ))}
     </TicketRangeContainer>
@@ -178,7 +182,7 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
           </Description>
           <UserHeads users={showing.participants.map(p => p.user)} />
           <ScreenName ticket={showing.myTickets[0]} />
-          <TicketInfo tickets={showing.myTickets} />
+          <TicketInfo ticketRange={showing.ticketRange} />
         </Content>
         {showingHasTickets && (
           <RedButton
@@ -209,14 +213,17 @@ export const showingFragment = gql`
       poster
       title
     }
+    ticketRange {
+      rows
+      seatings {
+        row
+        numbers
+      }
+    }
     myTickets {
       id
       cinema
       screen
-      seat {
-        row
-        number
-      }
     }
     participants {
       user {
