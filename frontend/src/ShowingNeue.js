@@ -20,10 +20,16 @@ const Box = styled.div`
   border: 1px solid #f2f2f2;
   display: flex;
   flex-direction: row;
+  cursor: pointer;
+  transition: background-color 250ms ease-out;
 
   @media (min-width: 30rem) {
     width: 330px;
     margin: ${largeMargin};
+  }
+
+  &:hover {
+    background-color: #f2f2f2;
   }
 `;
 
