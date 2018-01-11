@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import sflogo from '../../assets/sf.jpg'
+import sflogo from '../../assets/sf.jpg';
+import AztecCode from './AztecCode';
 
 
 const TicketWrapper = styled.div`
@@ -119,7 +120,7 @@ const TicketCode = ({ src, id, profileId }) => {
   return (
     <FlexRowContainer style={{ marginBottom: "1rem" }}>
       <FlexColumnContainer style={{ alignItems: "left" }}>
-        <img alt={id} src={src} />
+        <AztecCode text={id} />
         <div>
           {id} {profileId}
         </div>

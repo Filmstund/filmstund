@@ -1,14 +1,14 @@
 import React, {Component} from "react";
 import bwipjs from 'bwip-js';
 
-class QRCode extends Component {
+class AztecCode extends Component {
   componentDidMount() {
-    const { data } = this.props;
+    const { text } = this.props;
     bwipjs('code', {
-            bcid:    'qrcode',
-            text:    data,
+            bcid:    'azteccode',
+            format:  'compact',
+            text:    text,
             scale:   3,
-            eclevel: 'L',
         }, function (err, cvs) { });
   }
   render() {
@@ -18,4 +18,4 @@ class QRCode extends Component {
   }
 }
 
-export default QRCode;
+export default AztecCode;
