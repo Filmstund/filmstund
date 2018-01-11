@@ -24,6 +24,13 @@ const data = graphql(gql`
       admin {
         id
       }
+      ticketRange {
+        rows
+        seatings {
+          row
+          numbers
+        }
+      }
       myTickets {
         id
         barcode

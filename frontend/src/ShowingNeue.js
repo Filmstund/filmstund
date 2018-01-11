@@ -9,7 +9,7 @@ import faChevronRight from "@fortawesome/fontawesome-free-solid/faChevronRight";
 import { formatShowingDateTime } from "./lib/dateTools";
 import alfons from "./assets/alfons.jpg";
 import gql from "graphql-tag";
-import { formatSeatingRow } from "./lib/summarizeSeatingRange";
+import SeatRange from "./routes/ShowingTickets/SeatRange";
 
 const Box = styled.div`
   height: 220px;
@@ -156,24 +156,6 @@ const ScreenName = ({ ticket }) => {
   );
 };
 
-const TicketInfo = ({ ticketRange }) => {
-  if (ticketRange.rows.length === 0) {
-    return null;
-  }
-
-  const ticketRanges = _.orderBy(ticketRange.seatings, ["desc"], ["row"]);
-
-  return (
-    <TicketRangeContainer>
-      {ticketRanges.map(({ numbers, row }) => (
-        <div key={row}>
-          Rad {row}: {formatSeatingRow(numbers)}
-        </div>
-      ))}
-    </TicketRangeContainer>
-  );
-};
-
 export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
   const showingHasTickets = showing.myTickets.length > 0;
 
@@ -188,7 +170,9 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
           </Description>
           <UserHeads users={showing.participants.map(p => p.user)} />
           <ScreenName ticket={showing.myTickets[0]} />
-          <TicketInfo ticketRange={showing.ticketRange} />
+          <TicketRangeContainer>
+            <SeatRange ticketRange={showing.ticketRange} />
+          </TicketRangeContainer>
         </Content>
         {showingHasTickets && (
           <RedButton

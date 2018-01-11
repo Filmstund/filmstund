@@ -1,17 +1,19 @@
 import React from "react";
 import { formatSeatingRow } from "../../lib/summarizeSeatingRange";
-import { SmallHeader } from "../../Header";
 import _ from "lodash";
 
-const SeatRange = ({ range }) => (
-  <div>
-    <SmallHeader>Våra platser:</SmallHeader>
-    {_.keys(range).map(row => (
-      <div key={row}>
-        Rad {row}: {formatSeatingRow(range[row].map(r => r.number))}
-      </div>
-    ))}
-  </div>
-);
+const SeatRange = ({ ticketRange }) => {
+  if (!ticketRange) {
+    return null;
+  }
+
+  const ticketRanges = _.orderBy(ticketRange.seatings, ["desc"], ["row"]);
+
+  return ticketRanges.map(({ numbers, row }) => (
+    <div key={row}>
+      Rad {row}: {formatSeatingRow(numbers)}
+    </div>
+  ));
+};
 
 export default SeatRange;
