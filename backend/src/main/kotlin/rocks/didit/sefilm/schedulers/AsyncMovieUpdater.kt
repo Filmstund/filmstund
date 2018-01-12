@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.schedulers
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -17,6 +18,7 @@ import java.time.Instant
 import java.util.*
 
 @Component
+@ConditionalOnProperty(prefix = "sefilm.schedulers.movieUpdater", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class AsyncMovieUpdater(private val movieRepository: MovieRepository,
                         private val sfClient: SFService,
                         private val imdbClient: ImdbClient) {

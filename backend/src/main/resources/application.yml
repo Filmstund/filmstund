@@ -34,6 +34,13 @@ sefilm:
   # Whether or not data should be seeded on application startup
   enableSeeding: ${enableSeeding:true}
   defaultCity: ${defaultCity:GB}
+  schedulers:
+    movieUpdater:
+      enabled: ${movieUpdaterEnabled:true}
+    archiver:
+      enabled: ${archiverEnabled:true}
+    popularityUpdater:
+      enabled: ${popularityUpdaterEnabled:true}
 
 graphql:
   servlet:

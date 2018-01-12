@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.schedulers
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.ExternalProviderException
@@ -19,6 +20,7 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Component
+@ConditionalOnProperty(prefix = "sefilm.schedulers.popularityUpdater", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class ScheduledPopularityUpdater(
   private val movieRepository: MovieRepository,
   private val sfService: SFService,

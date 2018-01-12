@@ -1,17 +1,19 @@
 package rocks.didit.sefilm.schedulers
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.services.SFService
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component
+@ConditionalOnProperty(prefix = "sefilm.schedulers.archiver", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class ScheduledArchiver(private val movieRepository: MovieRepository,
                         showingRepository: ShowingRepository,
                         sfClient: SFService) {
