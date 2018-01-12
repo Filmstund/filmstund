@@ -18,7 +18,7 @@ class MovieService(
   private val movieRepo: MovieRepository,
   private val sfService: SFService,
   private val filterUtil: MovieFilterUtil,
-  private val asyncMovieUpdater: AsyncMovieUpdater
+  private val asyncMovieUpdater: AsyncMovieUpdater?
 ) {
 
   companion object {
@@ -64,7 +64,7 @@ class MovieService(
     val savedEntities = movieRepo.saveAll(newMoviesWeHaventPreviouslySeen)
     log.info("Fetched ${savedEntities.count()} new movies from SF")
 
-    asyncMovieUpdater.extendMovieInfo(savedEntities)
+    asyncMovieUpdater?.extendMovieInfo(savedEntities)
     return savedEntities.sortedBy { it.releaseDate }
   }
 
