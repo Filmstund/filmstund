@@ -13,6 +13,7 @@ type Showing {
     expectedBuyDate: String
     participants: [Participant!]!
     lastModifiedDate: String!
+    sfSeatMap: [SfSeatMap!]!
 }
 
 type Participant {
@@ -31,4 +32,22 @@ type SfShowing {
     seatCount: Int,
     timeUtc: String,
     tags: [String!]!
+}
+
+type SfSeatMap {
+    row: Int!
+    number: Int!
+    seatType: String!
+    coordinates: SfSeatCoordinates!
+    dimensions: SfSeatDimensions!
+}
+
+type SfSeatCoordinates {
+    x: Float!
+    y: Float!
+}
+
+type SfSeatDimensions {
+    width: Int!
+    height: Int!
 }

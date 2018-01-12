@@ -202,6 +202,16 @@ class ShowingService(
       .toDto()
   }
 
+  fun fetchSeatMap(showingId: UUID): List<SfSeatMapDTO> {
+    val showing = getShowingOrThrow(showingId)
+    if (showing.location.sfId == null || showing.sfScreen?.sfId == null) {
+      log.debug("Showing $showingId is not at a Sf location or does not have an associated Sf screen")
+      return listOf()
+    }
+
+    return sfService.getSfSeatMap(showing.location.sfId, showing.sfScreen.sfId)
+  }
+
   private fun createParticipantBasedOnPaymentType(paymentOption: PaymentOption, userId: UserID): Participant
     = when (paymentOption.type) {
     PaymentType.Foretagsbiljett -> {

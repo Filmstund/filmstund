@@ -18,7 +18,6 @@ type Ticket {
     movieRating: String!
     # "textad", "en" etc
     showAttributes: [String!]
-    sfSeatMap: [SfSeatMap!]!
 }
 
 # The row and seat number for a ticket
@@ -39,25 +38,6 @@ type TicketRange {
     seatings: [SeatRange!]
     # The total number of tickets for this showing
     totalCount: Int!
-}
-
-
-type SfSeatMap {
-    row: Int!
-    number: Int!
-    seatType: String!
-    coordinates: SfSeatCoordinates!
-    dimensions: SfSeatDimensions!
-}
-
-type SfSeatCoordinates {
-    x: Float!
-    y: Float!
-}
-
-type SfSeatDimensions {
-    width: Int!
-    height: Int!
 }
 
 extend type Showing {
