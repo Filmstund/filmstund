@@ -75,6 +75,9 @@ class AdminAction extends Component {
           payToUser: showing.payToUser.id,
           location: showing.location.name,
           time: showing.time,
+          sfScreen: showing.sfScreen
+            ? { name: showing.sfScreen.name, sfId: showing.sfScreen.sfId }
+            : null,
           price: ticketPrice * 100
         },
         ticketUrls: nonEmptyTicketUrls
@@ -148,6 +151,10 @@ AdminAction.propTypes = {
 
 export const showingAdminFragment = gql`
   fragment ShowingAdmin on Showing {
+    sfScreen {
+      sfId
+      name
+    }
     adminPaymentDetails {
       sfBuyLink
       sfData {

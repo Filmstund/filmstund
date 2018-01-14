@@ -1,5 +1,4 @@
 import React from "react";
-import seatingdata from "./seatingdata.json";
 import styled from "styled-components";
 import _ from "lodash";
 
@@ -21,20 +20,24 @@ const Screen = styled.div`
   width: ${props => props.width}px;
 `;
 
-export const ScreenSeats = ({ ticketRange }) => {
+export const ScreenSeats = ({ ticketRange, seatMap }) => {
+  if (seatMap.length === 0) {
+    return null;
+  }
+
   const maxWidth = 464;
   const maxHeight = 351;
 
-  const [{ dimensions: { width, height } }] = seatingdata;
+  const [{ dimensions: { width, height } }] = seatMap;
 
-  const minY = _.minBy(seatingdata, s => s.coordinates.y).coordinates.y;
+  const minY = _.minBy(seatMap, s => s.coordinates.y).coordinates.y;
 
-  const minX = _.minBy(seatingdata, s => s.coordinates.x).coordinates.x;
+  const minX = _.minBy(seatMap, s => s.coordinates.x).coordinates.x;
 
   const maxX =
-    _.maxBy(seatingdata, s => s.coordinates.x).coordinates.x + width - minX;
+    _.maxBy(seatMap, s => s.coordinates.x).coordinates.x + width - minX;
   const maxY =
-    _.maxBy(seatingdata, s => s.coordinates.y).coordinates.y + height - minY;
+    _.maxBy(seatMap, s => s.coordinates.y).coordinates.y + height - minY;
 
   const scaleX = maxWidth / (maxX - minX);
   const scaleY = maxHeight / maxY;
@@ -43,9 +46,9 @@ export const ScreenSeats = ({ ticketRange }) => {
 
   return (
     <Screen width={maxWidth} height={maxHeight}>
-      {seatingdata.map(data => (
+      {seatMap.map(data => (
         <Seat
-          key={data.remoteEntityId}
+          key={data.number}
           selected={numbers.includes(data.number)}
           scaleX={scaleX}
           scaleY={scaleY}

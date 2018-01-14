@@ -14,71 +14,80 @@ const routerParamsToShowingId = ({ match, history }) => {
   return { showingId, navigateToShowing };
 };
 
-const data = graphql(gql`
-  query TicketQuery($showingId: UUID!) {
-    me: currentUser {
+const ticketFragment = gql`
+  fragment Ticket on Showing {
+    id
+    admin {
       id
     }
-    showing(id: $showingId) {
+    ticketRange {
+      rows
+      seatings {
+        row
+        numbers
+      }
+    }
+    sfSeatMap {
+      row
+      number
+      seatType
+      coordinates {
+        x
+        y
+      }
+      dimensions {
+        width
+        height
+      }
+    }
+    myTickets {
       id
-      admin {
-        id
+      barcode
+      customerType
+      customerTypeDefinition
+      cinema
+      screen
+      profileId
+      seat {
+        row
+        number
       }
-      ticketRange {
-        rows
-        seatings {
-          row
-          numbers
-        }
-      }
-      myTickets {
-        id
-        barcode
-        customerType
-        customerTypeDefinition
-        cinema
-        screen
-        seat {
-          row
-          number
-        }
-        date
-        time
-        movieName
-        movieRating
-        showAttributes
-      }
+      date
+      time
+      movieName
+      movieRating
+      showAttributes
     }
   }
-`);
+`;
+
+const data = graphql(
+  gql`
+    query TicketQuery($showingId: UUID!) {
+      me: currentUser {
+        id
+      }
+      showing(id: $showingId) {
+        ...Ticket
+      }
+    }
+    ${ticketFragment}
+  `,
+  {
+    options: {
+      fetchPolicy: "cache-and-network"
+    }
+  }
+);
 
 const addTickets = graphql(
   gql`
     mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
       processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
-        id
-        admin {
-          id
-        }
-        myTickets {
-          id
-          barcode
-          customerType
-          customerTypeDefinition
-          cinema
-          screen
-          seat {
-            row
-            number
-          }
-          date
-          time
-          movieName
-          movieRating
-          showAttributes
-        }
+        ...Ticket
       }
     }
+    ${ticketFragment}
   `,
   {
     props: ({ mutate, ownProps: { showingId } }) => ({

@@ -64,7 +64,7 @@ export default class TicketContainer extends Component {
     const { errors, success } = this.state;
     const { data: { me, showing, loading }, navigateToShowing } = this.props;
 
-    const { myTickets, ticketRange } = showing;
+    const { myTickets, ticketRange, sfSeatMap } = showing;
 
     if (loading) {
       return <Loader />;
@@ -76,7 +76,7 @@ export default class TicketContainer extends Component {
           </MainButton>
           <SmallHeader>Våra platser:</SmallHeader>
           <SeatRange ticketRange={ticketRange} />
-          <ScreenSeats ticketRange={ticketRange} />
+          <ScreenSeats ticketRange={ticketRange} seatMap={sfSeatMap} />
           {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
           <StatusMessageBox
             success={success}
