@@ -2,14 +2,14 @@ import React, {PureComponent} from "react";
 import bwipjs from 'bwip-js';
 import { uniqueId } from "lodash";
 
-class QRCode extends PureComponent {
+class AztecCode extends PureComponent {
   componentWillMount() {
-    this.id = uniqueId('qr-');
+    this.id = uniqueId('aztec-');
   }
   componentDidMount() {
     bwipjs(this.id, {
-            bcid:    'qrcode',
-            eclevel: 'L',
+            bcid:    'azteccode',
+            format:  'compact',
             text:    this.props.data,
             scale:   3,
         }, function (err, cvs) { });
@@ -23,4 +23,4 @@ class QRCode extends PureComponent {
   }
 }
 
-export default QRCode;
+export default AztecCode;

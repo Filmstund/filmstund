@@ -51,13 +51,12 @@ class TicketService(private val sfClient: SFService,
     val sfTickets = sfClient.fetchTickets(sysId, sfShowingId, ticketId)
 
     val tickets = sfTickets.map {
-      val barcode = sfClient.fetchBarcode(it.id)
       if (it.profileId == null || it.profileId.isBlank()) {
-        return@map it.toTicket(showing.id, showing.admin, barcode)
+        return@map it.toTicket(showing.id, showing.admin)
       }
 
       val userIdForThatMember = getUserIdFromSfMembershipId(SfMembershipId.valueOf(it.profileId), showing)
-      it.toTicket(showing.id, userIdForThatMember, barcode)
+      it.toTicket(showing.id, userIdForThatMember)
     }
 
     ticketRepository.saveAll(tickets)
@@ -111,7 +110,7 @@ class TicketService(private val sfClient: SFService,
     return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
   }
 
-  private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
+  private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID): Ticket {
     val seat = Seat(this.seat.row, this.seat.number)
     return Ticket(id = this.id,
       showingId = showingId,
@@ -127,7 +126,6 @@ class TicketService(private val sfClient: SFService,
       movieName = this.movie.title,
       movieRating = this.movie.rating.displayName,
       showAttributes = this.show.attributes.map { it.displayName },
-      barcode = barcode,
       profileId = this.profileId)
   }
 

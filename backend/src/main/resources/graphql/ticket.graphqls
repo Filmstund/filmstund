@@ -4,7 +4,6 @@ type Ticket {
     showingId: UUID!
     assignedToUser: User!
     profileId: String
-    barcode: String!
     customerType: String!
     customerTypeDefinition: String!
     cinema: String!

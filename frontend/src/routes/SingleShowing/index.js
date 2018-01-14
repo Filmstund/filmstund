@@ -22,7 +22,9 @@ class SingleShowing extends Component {
 
   openSwish = swishLink => {
     this.setState({ swish: true });
-    window.location = swishLink;
+    if (swishLink) {
+      window.location = swishLink;
+    }
   };
 
   isParticipating = () => {
