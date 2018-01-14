@@ -30,7 +30,6 @@ class CreateShowingForm extends React.Component {
         date: now,
         time: now.format("HH:mm"),
         location: "",
-        price: "",
         sfScreen: null,
         movieId: movieId,
         admin: me.id
@@ -185,13 +184,6 @@ class CreateShowingForm extends React.Component {
               type="text"
               value={showing.location}
               onChange={v => this.setShowingValueFromEvent("location", v)}
-            />
-          </Field>
-          <Field text="Pris:">
-            <Input
-              type="text"
-              value={showing.price}
-              onChange={v => this.setShowingValueFromEvent("price", v)}
             />
           </Field>
           <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>
