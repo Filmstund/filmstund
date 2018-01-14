@@ -14,7 +14,6 @@ data class Ticket(
   val showingId: UUID,
   val assignedToUser: UserID,
   val profileId: String?,
-  val barcode: String,
   val customerType: String,
   val customerTypeDefinition: String,
   val cinema: String,
