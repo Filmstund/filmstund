@@ -31,6 +31,7 @@ class CreateShowingForm extends React.Component {
         time: now.format("HH:mm"),
         location: "",
         price: "",
+        sfScreen: null,
         movieId: movieId,
         admin: me.id
       },
@@ -44,12 +45,15 @@ class CreateShowingForm extends React.Component {
   };
 
   setShowingTime = sfTime => {
+    const { timeUtc, cinemaName, screen: { name, sfId } } = sfTime;
+
     this.setState(
       state => ({
         showing: {
           ...state.showing,
-          time: formatLocalTime(sfTime.timeUtc),
-          location: sfTime.cinemaName
+          time: formatLocalTime(timeUtc),
+          location: cinemaName,
+          sfScreen: { name, sfId }
         }
       }),
       this.handleSubmit
@@ -79,13 +83,14 @@ class CreateShowingForm extends React.Component {
   };
 
   handleSubmit = () => {
-    const { showing: { time, date, location } } = this.state;
+    const { showing: { time, date, location, sfScreen } } = this.state;
     const { movieId } = this.props;
 
     const showing = {
       time,
       movieId,
       date: formatYMD(date),
+      sfScreen,
       location
     };
 
@@ -204,7 +209,10 @@ const data = graphql(
         ...ShowingMovie
         sfShowings(city: $city) {
           cinemaName
-          screenName
+          screen {
+            sfId
+            name
+          }
           timeUtc
           tags
         }

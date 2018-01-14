@@ -42,11 +42,11 @@ const SelectBox = ({ options, onChange, ...props }) => (
   <Box>
     {options.map(option => (
       <Option
-        key={option.cinemaName + option.screenName + option.timeUtc}
+        key={option.cinemaName + option.screen.sfId + option.timeUtc}
         onClick={() => onChange(option)}
       >
         <Lable>
-          {formatLocalTime(option.timeUtc)} {option.screenName},{" "}
+          {formatLocalTime(option.timeUtc)} {option.screen.name},{" "}
           {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
