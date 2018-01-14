@@ -44,6 +44,7 @@ class SingleShowing extends Component {
         return (
           <BoughtShowing
             showing={showing}
+            isAdmin={this.isAdmin()}
             onClickTickets={this.navigateToTickets}
             openSwish={this.openSwish}
             attendeePaymentDetails={showing.attendeePaymentDetails}
@@ -60,13 +61,17 @@ class SingleShowing extends Component {
     }
   };
 
+  isAdmin = () => {
+    const { data: { showing, me } } = this.props;
+
+    return showing.admin.id === me.id;
+  };
+
   render() {
     const { swish } = this.state;
-    const { className, data: { showing, me } } = this.props;
+    const { className, data: { showing } } = this.props;
 
     const { attendeePaymentDetails } = showing;
-
-    const isAdmin = showing.admin.id === me.id;
 
     return (
       <div className={className}>
@@ -86,7 +91,7 @@ class SingleShowing extends Component {
         />
         <ButtonContainer>
           <IMDbLink imdbId={showing.movie.imdbId} />
-          {isAdmin && <AdminAction showing={showing} />}
+          {this.isAdmin() && <AdminAction showing={showing} />}
           {this.renderBoughtOrPendingShowing()}
         </ButtonContainer>
         <ParticipantList participants={showing.participants} />

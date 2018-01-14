@@ -10,6 +10,7 @@ const PayToUser = ({ user }) => (
 );
 
 const BoughtShowing = ({
+  isAdmin,
   attendeePaymentDetails,
   showing,
   onClickTickets,
@@ -23,21 +24,20 @@ const BoughtShowing = ({
 
   const openSwishLink = () => openSwish(swishLink);
 
-  if (hasPaid) {
-    if (showing.myTickets.length > 0) {
-      return <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>;
-    } else {
-      return null;
-    }
-  } else {
-    return (
-      <div>
-        Betala <strong>{amountOwed / 100} kr</strong> till{" "}
-        <PayToUser user={payTo} />
-        <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
-      </div>
-    );
-  }
+  return (
+    <React.Fragment>
+      {(isAdmin || showing.myTickets.length > 0) && (
+        <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>
+      )}
+      {!hasPaid && (
+        <div>
+          Betala <strong>{amountOwed / 100} kr</strong> till{" "}
+          <PayToUser user={payTo} />
+          <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
+        </div>
+      )}
+    </React.Fragment>
+  );
 };
 
 export default BoughtShowing;
