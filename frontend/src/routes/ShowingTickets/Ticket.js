@@ -1,55 +1,55 @@
 import React from "react";
 import styled from "styled-components";
-import sflogo from '../../assets/sf.jpg'
-
+import sflogo from "../../assets/sf.jpg";
 
 const TicketWrapper = styled.div`
-margin: 3rem 0;
-padding: 1rem;
-max-width: 24rem;
-border: .0625rem dotted #c5c5c5;
+  margin: 3rem 0;
+  padding: 1rem;
+  max-width: 24rem;
+  border: 0.0625rem dotted #c5c5c5;
 `;
 
 const FlexRowContainer = styled.div`
-display: flex;
-flex-direction: row;
+  display: flex;
+  flex-direction: row;
 `;
 
 const FlexSpaceRowContainer = styled.div`
-display: flex;
-flex-direction: row;
-justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 const FlexColumnContainer = styled.div`
-display: flex;
-flex-direction: column;
-justify-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 const HeaderText = styled.div`
-font-size: 1.375rem;
-font-weight: bold;
+  font-size: 1.375rem;
+  font-weight: bold;
 `;
 
 const LabelText = styled.div`
-font-size: 0.75rem;
-opacity: 0.54;
+  font-size: 0.75rem;
+  opacity: 0.54;
 `;
 
 const ShowAttribute = styled.span`
-display: inline-block;
-font-size: 0.625rem;
-padding: .125rem .25rem;
-color: #000;
-margin-right: 0.25rem;
-background: #d6d6d6;
+  display: inline-block;
+  font-size: 0.625rem;
+  padding: 0.125rem 0.25rem;
+  color: #000;
+  margin-right: 0.25rem;
+  background: #d6d6d6;
 `;
 
-const FlexRowPaddingContainer = styled(FlexRowContainer) `padding: 1rem`;
+const FlexRowPaddingContainer = styled(FlexRowContainer)`
+  padding: 1rem;
+`;
 
-
-const CompanyHeader = ({ cinema }) =>
+const CompanyHeader = ({ cinema }) => (
   <FlexRowContainer style={{ marginBottom: "1rem" }}>
     <img
       alt="Sf logo"
@@ -57,47 +57,41 @@ const CompanyHeader = ({ cinema }) =>
       style={{ height: "3rem", width: "auto", marginRight: "1rem" }}
     />
     <FlexColumnContainer>
-      <HeaderText style={{ fontSize: "1rem" }}>
-        {cinema}
-      </HeaderText>
+      <HeaderText style={{ fontSize: "1rem" }}>{cinema}</HeaderText>
       <LabelText>SF Bio</LabelText>
     </FlexColumnContainer>
-  </FlexRowContainer>;
+  </FlexRowContainer>
+);
 
-const TicketHeader = ({ movieName, movieRating, showAttributes }) =>
+const TicketHeader = ({ movieName, movieRating, showAttributes }) => (
   <FlexColumnContainer style={{ marginBottom: "1rem" }}>
-    <HeaderText style={{ marginBottom: "0.5rem" }}>
-      {movieName}
-    </HeaderText>
+    <HeaderText style={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
     <FlexSpaceRowContainer>
       <FlexRowContainer>
-        {showAttributes.map(attr =>
-          <ShowAttribute key={attr}>
-            {attr}
-          </ShowAttribute>
-        )}
+        {showAttributes.map(attr => (
+          <ShowAttribute key={attr}>{attr}</ShowAttribute>
+        ))}
       </FlexRowContainer>
       {movieRating}
     </FlexSpaceRowContainer>
-  </FlexColumnContainer>;
+  </FlexColumnContainer>
+);
 
-const TicketValueWithLabel = ({ label, value, style }) =>
+const TicketValueWithLabel = ({ label, value, style }) => (
   <FlexColumnContainer style={{ ...style, paddingRight: "1rem" }}>
-    <LabelText>
-      {label}
-    </LabelText>
-    <HeaderText>
-      {value}
-    </HeaderText>
-  </FlexColumnContainer>;
+    <LabelText>{label}</LabelText>
+    <HeaderText>{value}</HeaderText>
+  </FlexColumnContainer>
+);
 
-const TicketDateTime = ({ date, time }) =>
+const TicketDateTime = ({ date, time }) => (
   <FlexRowContainer style={{ marginBottom: "1rem" }}>
     <TicketValueWithLabel label="Datum" value={date} />
     <TicketValueWithLabel label="Tid" value={time.substring(0, 5)} />
-  </FlexRowContainer>;
+  </FlexRowContainer>
+);
 
-const TicketPlacement = ({ screen, seat }) =>
+const TicketPlacement = ({ screen, seat }) => (
   <FlexRowPaddingContainer
     style={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
   >
@@ -108,12 +102,14 @@ const TicketPlacement = ({ screen, seat }) =>
     />
     <TicketValueWithLabel label="Rad" value={seat.row} />
     <TicketValueWithLabel label="Stolsnr" value={seat.number} />
-  </FlexRowPaddingContainer>;
+  </FlexRowPaddingContainer>
+);
 
-const TicketCustomerType = ({ customerType }) =>
+const TicketCustomerType = ({ customerType }) => (
   <FlexRowContainer style={{ marginBottom: "1rem", fontWeight: "bold" }}>
     {customerType}
-  </FlexRowContainer>;
+  </FlexRowContainer>
+);
 
 const TicketCode = ({ src, id, profileId }) => {
   return (
@@ -142,19 +138,18 @@ const Ticket = ({
   seat,
   barcode
 }) => (
-    <TicketWrapper>
-      <CompanyHeader cinema={cinema} />
-      <TicketHeader
-        showAttributes={showAttributes}
-        movieName={movieName}
-        movieRating={movieRating}
-      />
-      <TicketDateTime date={date} time={time} />
-      <TicketPlacement screen={screen} seat={seat} />
-      <TicketCustomerType customerType={customerType} />
-      <TicketCode id={id} profileId={profileId} src={barcode} />
-    </TicketWrapper>
-  );
-
+  <TicketWrapper>
+    <CompanyHeader cinema={cinema} />
+    <TicketHeader
+      showAttributes={showAttributes}
+      movieName={movieName}
+      movieRating={movieRating}
+    />
+    <TicketDateTime date={date} time={time} />
+    <TicketPlacement screen={screen} seat={seat} />
+    <TicketCustomerType customerType={customerType} />
+    <TicketCode id={id} profileId={profileId} src={barcode} />
+  </TicketWrapper>
+);
 
 export default Ticket;
