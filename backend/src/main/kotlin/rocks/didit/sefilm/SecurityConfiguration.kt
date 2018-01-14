@@ -114,11 +114,13 @@ class ResourceServerConfig(
 
   override fun configure(http: HttpSecurity) {
     http
+      .cors().and()
       .antMatcher("/**")
       .authorizeRequests()
-      .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+      .antMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
+      .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
       .anyRequest().fullyAuthenticated()
   }
 

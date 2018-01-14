@@ -39,6 +39,7 @@ import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.services.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
+import rocks.didit.sefilm.web.controllers.CalendarController
 import java.math.BigDecimal
 
 @SpringBootApplication
@@ -78,13 +79,17 @@ class Application {
   }
 
   @Bean
-  fun corsConfigurer(): WebMvcConfigurer {
+  fun corsConfigurer(properties: Properties): WebMvcConfigurer {
     return object : WebMvcConfigurer {
       override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**")
-          .allowedOrigins("http://localhost:3000", "https://bio.didit.rocks")
-          .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-          .allowCredentials(true)
+        registry.addMapping("/graphql")
+          .allowedOrigins(properties.baseUrl.frontend, properties.baseUrl.api)
+          .allowedMethods("GET", "POST", "HEAD")
+          .allowCredentials(false)
+        registry.addMapping("${CalendarController.PATH}/**")
+          .allowedOrigins(properties.baseUrl.frontend, properties.baseUrl.api)
+          .allowedMethods("GET", "HEAD")
+          .allowCredentials(false)
       }
     }
   }
