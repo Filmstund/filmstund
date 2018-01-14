@@ -74,6 +74,16 @@ const RedButton = styled.button`
 
   transition: background-color 250ms ease-out;
 
+  &:disabled {
+    cursor: default;
+    background-color: #ccc;
+    color: #fff;
+
+    &:hover {
+      background-color: #ccc;
+    }
+  }
+
   &:hover {
     background-color: #970213;
   }
@@ -176,9 +186,12 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
         </Content>
         {showingHasTickets && (
           <RedButton
+            disabled={!onClickTickets}
             onClick={e => {
               e.stopPropagation();
-              onClickTickets();
+              if (onClickTickets) {
+                onClickTickets();
+              }
             }}
           >
             <FaIcon color="#fff" icon={faQrcode} />
