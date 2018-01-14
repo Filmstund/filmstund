@@ -39,12 +39,14 @@ export const ScreenSeats = ({ ticketRange }) => {
   const scaleX = maxWidth / (maxX - minX);
   const scaleY = maxHeight / maxY;
 
+  const numbers = _.flatMap(ticketRange.seatings, seating => seating.numbers);
+
   return (
     <Screen width={maxWidth} height={maxHeight}>
       {seatingdata.map(data => (
         <Seat
           key={data.remoteEntityId}
-          selected={seatInRange(data, ticketRange)}
+          selected={numbers.includes(data.number)}
           scaleX={scaleX}
           scaleY={scaleY}
           x={data.coordinates.x - minX}
@@ -55,14 +57,4 @@ export const ScreenSeats = ({ ticketRange }) => {
       ))}
     </Screen>
   );
-};
-
-const seatInRange = (data, ticketRange) => {
-  const row = ticketRange.seatings.find(range => range.row === data.row);
-
-  if (row) {
-    return row.numbers.includes(data.number);
-  } else {
-    return false;
-  }
 };
