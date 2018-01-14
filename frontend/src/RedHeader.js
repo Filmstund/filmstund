@@ -9,7 +9,7 @@ const Box = styled.div`
 
 export const Header = styled.h2`
   color: #4a4a4a;
-  margin: 0;
+  margin: 0 0 ${margin};
   font-size: 18px;
   font-weight: 500;
   font-family: Roboto, sans-serif;
