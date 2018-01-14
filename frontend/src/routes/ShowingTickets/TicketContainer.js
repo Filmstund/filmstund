@@ -26,7 +26,7 @@ export default class TicketContainer extends Component {
     this.props
       .addTickets(nonEmptyUrls)
       .then(() => {
-        this.setState({ success: true, errors: null });
+        this.setState({ success: true, errors: null, cinemaTicketUrls: [] });
       })
       .catch(errors => {
         this.setState({ success: false, errors });
