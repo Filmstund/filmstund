@@ -12,14 +12,12 @@ const SwishModal = ({ attendeePaymentDetails, closeSwish }) => {
 
   const { swishLink } = attendeePaymentDetails;
 
-  if (swishLink) {
-    return (
-      <Modal>
-        <button onClick={closeSwish}>Stäng</button>
-        <QRCode data={swishLink} />
-      </Modal>
-    );
-  }
+  return (
+    <Modal>
+      <button onClick={closeSwish}>Stäng</button>
+      {swishLink && <QRCode data={swishLink} />}
+    </Modal>
+  );
 };
 
 SwishModal.propTypes = {
