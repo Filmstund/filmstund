@@ -120,7 +120,7 @@ const TicketCode = ({ id, profileId }) => {
   return (
     <FlexRowContainer style={{ marginBottom: "1rem" }}>
       <FlexColumnContainer style={{ alignItems: "left" }}>
-        <AztecCode text={id} />
+        <AztecCode data={id} />
         <div>
           {id} {profileId}
         </div>

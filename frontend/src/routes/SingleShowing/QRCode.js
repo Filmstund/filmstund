@@ -1,20 +1,23 @@
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import bwipjs from 'bwip-js';
+import { uniqueId } from "lodash";
 
-class QRCode extends Component {
+class QRCode extends PureComponent {
+  componentWillMount() {
+    this.id = uniqueId('qr-');
+  }
   componentDidMount() {
-    const { data } = this.props;
-    bwipjs('code', {
+    bwipjs(this.id, {
             bcid:    'qrcode',
             eclevel: 'L',
-            text:    data,
+            text:    this.props.data,
             scale:   3,
         }, function (err, cvs) { });
   }
   render() {
     return (
       <div>
-        <canvas id="code" />
+        <canvas id={this.id} />
       </div>
     );
   }
