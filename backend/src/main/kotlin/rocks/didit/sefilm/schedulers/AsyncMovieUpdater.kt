@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
@@ -80,7 +81,6 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun fetchExtendedInfoForMovie(movie: Movie) {
-    log.debug("[MovieUpdater] Fetching extended info for ${movie.log()}")
     when {
       movie.sfId != null -> updateFromSf(movie)
       movie.tmdbId.isSupplied() -> updateFromTmdbById(movie)
@@ -103,7 +103,7 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       releaseDate = updatedMovie.releaseDate ?: movie.releaseDate,
       productionYear = updatedMovie.productionYear,
       runtime = Duration.ofMinutes(updatedMovie.length ?: 0L),
-      poster = updatedMovie.posterUrl,
+      poster = setWidthTo240(updatedMovie.posterUrl),
       genres = updatedMovie.genres?.map { it.name } ?: listOf())
 
     val saved = movieRepository.save(copy)
@@ -113,6 +113,15 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       log.info("[SF] Successfully updated ${movie.log()} with SF data")
     }
     return saved
+  }
+
+  /** The width query parameter on the poster url sometimes causes 403 errors if too large. */
+  private fun setWidthTo240(url: String?): String? {
+    if (url == null) return null
+    val toUriString = UriComponentsBuilder.fromUriString(url)
+      .replaceQueryParam("width", 240)
+      .toUriString()
+    return toUriString
   }
 
   private fun updateFromTmdbById(movie: Movie) {
