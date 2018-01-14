@@ -116,7 +116,7 @@ const TicketCustomerType = ({ customerType }) =>
     {customerType}
   </FlexRowContainer>;
 
-const TicketCode = ({ src, id, profileId }) => {
+const TicketCode = ({ id, profileId }) => {
   return (
     <FlexRowContainer style={{ marginBottom: "1rem" }}>
       <FlexColumnContainer style={{ alignItems: "left" }}>
@@ -140,8 +140,7 @@ const Ticket = ({
   customerType,
   showAttributes,
   profileId,
-  seat,
-  barcode
+  seat
 }) => (
     <TicketWrapper>
       <CompanyHeader cinema={cinema} />
@@ -153,7 +152,7 @@ const Ticket = ({
       <TicketDateTime date={date} time={time} />
       <TicketPlacement screen={screen} seat={seat} />
       <TicketCustomerType customerType={customerType} />
-      <TicketCode id={id} profileId={profileId} src={barcode} />
+      <TicketCode id={id} profileId={profileId} />
     </TicketWrapper>
   );
 

@@ -26,7 +26,6 @@ const data = graphql(gql`
       }
       myTickets {
         id
-        barcode
         customerType
         customerTypeDefinition
         cinema
@@ -55,7 +54,6 @@ const addTickets = graphql(
         }
         myTickets {
           id
-          barcode
           customerType
           customerTypeDefinition
           cinema
