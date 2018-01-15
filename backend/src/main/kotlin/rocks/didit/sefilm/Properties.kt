@@ -53,5 +53,6 @@ class Properties {
     var enabled: Boolean = false
     var apiToken: String? = null
     var url: String = ""
+    var validateUrl: String = ""
   }
 }

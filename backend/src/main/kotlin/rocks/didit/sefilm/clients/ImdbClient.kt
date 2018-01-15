@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
 import org.springframework.web.util.UriUtils
+import rocks.didit.sefilm.APIService
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.MissingAPIKeyException
 import rocks.didit.sefilm.Properties
@@ -102,7 +103,7 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
   private fun validateApiKeyExists(id: ExternalProviderId) {
     if (!properties.tmdb.apiKeyExists()) {
       log.warn("TMDb API key not set. Unable to fetch info for $id")
-      throw MissingAPIKeyException("TMDb")
+      throw MissingAPIKeyException(APIService.TMDb)
     }
   }
 

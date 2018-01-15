@@ -19,7 +19,7 @@ class ProviderHelper(
   }
 
   // TODO: i18n
-  fun constructMessageBasedOnEvent(event: NotificationEvent): Message {
+  fun constructMessageBasedOnEvent(event: NotificationEvent): NotificationMessage {
     return when (event) {
       is NewShowingEvent -> TODO()
       is UpdatedShowingEvent -> TODO()
@@ -31,15 +31,15 @@ class ProviderHelper(
     }
   }
 
-  private fun userAttendedMessage(event: UserAttendedEvent): Message {
-    return Message(title = "User attended showing",
+  private fun userAttendedMessage(event: UserAttendedEvent): NotificationMessage {
+    return NotificationMessage(title = "User attended showing",
       message = "${event.triggeredBy.nick} has attended your showing. Chosen payment type: ${event.paymentType}",
       url = formatShowingUrl(event),
       urlTitle = "View showing")
   }
 
-  private fun userUnattendedMessage(event: UserUnattendedEvent): Message {
-    return Message(title = "User unattended showing",
+  private fun userUnattendedMessage(event: UserUnattendedEvent): NotificationMessage {
+    return NotificationMessage(title = "User unattended showing",
       message = "${event.triggeredBy.nick} has chosen to unattended your showing",
       url = formatShowingUrl(event),
       urlTitle = "View showing")
@@ -48,5 +48,5 @@ class ProviderHelper(
   private fun formatShowingUrl(event: ShowingEvent) =
     "${properties.baseUrl.frontend}/showings/${event.showing.id}"
 
-  data class Message(val title: String, val message: String, val url: String, val urlTitle: String)
+  data class NotificationMessage(val title: String, val message: String, val url: String, val urlTitle: String)
 }

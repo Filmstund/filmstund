@@ -47,6 +47,7 @@ sefilm:
         enabled: ${pushoverProviderEnabled:true}
         apiToken: ${pushoverApiToken}
         url: ${pushoverUrl:https://api.pushover.net/1/messages.json}
+        validateUrl: ${pushoverValidateUrl:https://api.pushover.net/1/users/validate.json}
 
 
 graphql:
