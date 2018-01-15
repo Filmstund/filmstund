@@ -14,7 +14,7 @@ import rocks.didit.sefilm.web.controllers.CalendarController
 class UserResolver(private val userService: UserService) : GraphQLQueryResolver {
   fun allUsers() = userService.allUsers()
   /** The currently logged in user */
-  fun currentUser() = userService.currentUser()
+  fun currentUser() = userService.getCurrentUser()
 }
 
 @Component

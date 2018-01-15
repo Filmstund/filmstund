@@ -6,24 +6,26 @@ import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.events.NotificationEvent
-import rocks.didit.sefilm.notification.ProviderHelper
 import rocks.didit.sefilm.notification.MailNotificationSettings
+import rocks.didit.sefilm.notification.ProviderHelper
 
 @Component
 @ConditionalOnProperty(prefix = "sefilm.notification.provider.MailProvider", name = ["enabled"], matchIfMissing = true, havingValue = "true")
-class MailNotificationProvider(private val providerHelper: ProviderHelper) : NotificationProvider, ApplicationListener<NotificationEvent> {
+class MailNotificationProvider(private val providerHelper: ProviderHelper) : NotificationProvider<MailNotificationSettings>, ApplicationListener<NotificationEvent> {
 
   private val log = LoggerFactory.getLogger(MailNotificationProvider::class.java)
 
-  override fun getUserSettings(): List<MailNotificationSettings>
-    = providerHelper.getNotifiable(MailNotificationSettings::class)
-    .filter { it.mailAddress != null }
+  override fun getNotifiableUsers(): List<NotifiableUser<MailNotificationSettings>>
+    = providerHelper.getNotifiableUsers(MailNotificationSettings::class)
+    .filter { it.notificationSettings.mailAddress != null }
 
   @Async
   override fun onApplicationEvent(event: NotificationEvent) {
-    getUserSettings().forEach {
-      // TODO: actually send mail
-      log.debug("(Not-actually) Sending mail notification to ${it.mailAddress}")
+    getNotifiableUsers().forEach {
+      if (it.isInterestedInEvent(event)) {
+        // TODO: actually send mail
+        log.debug("(Not-actually) Sending mail notification to ${it.notificationSettings.mailAddress}")
+      }
     }
   }
 

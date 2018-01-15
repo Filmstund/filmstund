@@ -12,6 +12,7 @@ type CurrentUser {
     calendarFeedId: UUID
     calendarFeedUrl: String
     notificationSettings: [NotificationSettings!]!
+    enabledNotifications: [NotificationType!]!
     lastLogin: String!
     signupDate: String!
 }

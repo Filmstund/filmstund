@@ -26,4 +26,5 @@ type Query {
 
     ## Notifications ##
     allNotificationProviders: [NotificationProvider!]!
+    allNotificationTypes: [NotificationType!]!
 }

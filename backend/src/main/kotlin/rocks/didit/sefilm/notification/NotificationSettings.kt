@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.notification
 
-import rocks.didit.sefilm.services.external.UserKeyStatus
+import rocks.didit.sefilm.services.external.PushoverValidationStatus
 
 /** This represents user and provider specific settings */
 interface NotificationSettings {
@@ -13,7 +13,7 @@ data class MailNotificationSettings(
 
 data class PushoverNotificationSettings(
   override val enabled: Boolean = false,
-  val userKey: String = "<N/A>",
+  val userKey: String = "",
   val device: String? = null,
-  val userKeyStatus: UserKeyStatus = UserKeyStatus.UNKNOWN) : NotificationSettings
+  val userKeyStatus: PushoverValidationStatus = PushoverValidationStatus.UNKNOWN) : NotificationSettings
 

@@ -9,6 +9,7 @@ import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.notification.NotificationSettings
+import rocks.didit.sefilm.notification.NotificationType
 import java.time.Instant
 import java.util.*
 
@@ -28,6 +29,7 @@ data class User(
   val foretagsbiljetter: List<Företagsbiljett> = emptyList(),
   val calendarFeedId: UUID? = UUID.randomUUID(),
   val notificationSettings: List<NotificationSettings> = listOf(),
+  val enabledNotifications: List<NotificationType> = listOf(),
   val lastLogin: Instant = Instant.ofEpochSecond(0L),
   val signupDate: Instant = Instant.ofEpochSecond(0L)
 ) {

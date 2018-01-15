@@ -26,6 +26,7 @@ type Mutation {
     invalidateCalendarFeed: CurrentUser!
     # Remove the calendar feed for the current user
     disableCalendarFeed: CurrentUser!
+    updateNotificationSettings(notificationSettings: NotificationSettingsInput!): CurrentUser!
 
     addForetagsBiljetter(biljetter: [ForetagsbiljettInput!]): CurrentUser!
     deleteForetagsBiljett(biljett: ForetagsbiljettInput!): CurrentUser!

@@ -19,7 +19,6 @@ class EventLogger {
       is UpdatedShowingEvent -> TODO()
       is DeletedShowingEvent -> TODO()
       is TicketsBoughtEvent -> TODO()
-      is TicketsAddedEvent -> TODO()
       is UserAttendedEvent -> log.info("User ${event.triggeredBy.nick} attended showing ${event.showing.id} with payment type ${event.paymentType}")
       is UserUnattendedEvent -> log.info("User ${event.triggeredBy.nick} unattended showing ${event.showing.id}")
       is PushoverUserKeyInvalidEvent -> log.info("Got an invalid Pushover user key: ${event.userKey}")

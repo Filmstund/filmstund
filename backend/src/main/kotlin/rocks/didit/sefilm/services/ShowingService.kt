@@ -120,7 +120,6 @@ class ShowingService(
 
     val participant: Participant = createParticipantBasedOnPaymentType(paymentOption, userId)
 
-    // TODO: make it easier to fetch the user from the UserService
     val user = userService.getCompleteUser(userId)
     eventPublisher.publish(UserAttendedEvent(this, showing, user, paymentOption.type))
     val newParticipants = showing.participants.plus(participant)
@@ -147,7 +146,6 @@ class ShowingService(
 
     val participant = participantLst.first()
 
-    // TODO: make it easier to fetch the user from the UserService
     val user = userService.getCompleteUser(participant.userId)
     eventPublisher.publish(UserUnattendedEvent(this, showing, user))
 

@@ -2,6 +2,7 @@ package rocks.didit.sefilm.domain.dto
 
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.notification.NotificationSettings
+import rocks.didit.sefilm.notification.NotificationType
 import java.time.Instant
 import java.util.*
 
@@ -17,6 +18,7 @@ class UserDTO(
   val avatar: String? = null,
   val foretagsbiljetter: List<ForetagsbiljettDTO> = emptyList(),
   val notificationSettings: List<NotificationSettings> = emptyList(),
+  val enabledNotifications: List<NotificationType> = listOf(),
   val lastLogin: Instant = Instant.ofEpochSecond(0L),
   val signupDate: Instant = Instant.ofEpochSecond(0L),
   val calendarFeedId: UUID?

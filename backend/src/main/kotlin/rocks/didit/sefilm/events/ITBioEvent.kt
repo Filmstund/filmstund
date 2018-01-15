@@ -14,7 +14,6 @@ class UpdatedShowingEvent(src: Any, showing: Showing, user: User) : ShowingEvent
 class DeletedShowingEvent(src: Any, showing: Showing, user: User) : ShowingEvent(src, showing, user)
 
 class TicketsBoughtEvent(src: Any, showing: Showing, user: User) : ShowingEvent(src, showing, user)
-class TicketsAddedEvent(src: Any, showing: Showing, user: User) : ShowingEvent(src, showing, user)
 class UserAttendedEvent(src: Any, showing: Showing, user: User, val paymentType: PaymentType) : ShowingEvent(src, showing, user)
 class UserUnattendedEvent(src: Any, showing: Showing, user: User) : ShowingEvent(src, showing, user)
 

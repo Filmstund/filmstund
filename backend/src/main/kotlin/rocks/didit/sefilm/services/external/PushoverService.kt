@@ -33,25 +33,28 @@ class PushoverService(
 
     val response = postToPushover(pushoverSettings.url, payload)
     when {
-      isTokenInvalid(response) -> {
+      response.isTokenInvalid() -> {
         log.warn("Pushover token is invalid, disabling notification provider. Current token: ${pushoverSettings.apiToken}")
         pushoverSettings.enabled = false
         return
       }
-      isUserKeyInvalid(response) -> eventPublisher.publish(PushoverUserKeyInvalidEvent(this, payload.user))
+      response.isUserKeyInvalid() -> eventPublisher.publish(PushoverUserKeyInvalidEvent(this, payload.user))
       response.status != 1 -> log.warn("Unknown error occurred in Pushover: $response")
-      else -> log.debug("Successfully notified Pushover with request ${response.request}")
+      else -> log.debug("Successfully notified {} with Pushover. Request ID: {}", payload.user, response.request)
     }
   }
 
-  fun validateUserKey(userKey: String, device: String?): UserKeyStatus {
+  fun validateUserKey(userKey: String, device: String?): PushoverValidationStatus {
     val payload = payloadWithToken(userKey, device)
     val response = postToPushover(pushoverSettings.validateUrl, payload)
-    log.trace("Got validation response from Pushover: {}", response)
+    log.debug("Got validation response from Pushover: {}", response)
+
     return when {
-      response.status == 1 -> UserKeyStatus.VALID
-      response.status == 0 -> UserKeyStatus.INVALID
-      else -> UserKeyStatus.UNKNOWN
+      response.isTokenInvalid() -> PushoverValidationStatus.TOKEN_INVALID
+      !response.isUserKeyInvalid() && response.isDeviceInvalid() -> PushoverValidationStatus.USER_VALID_DEVICE_INVALID
+      !response.isUserKeyInvalid() && !response.isDeviceInvalid() -> PushoverValidationStatus.USER_AND_DEVICE_VALID
+      response.isUserKeyInvalid() -> PushoverValidationStatus.USER_INVALID
+      else -> PushoverValidationStatus.UNKNOWN
     }
   }
 
@@ -62,15 +65,18 @@ class PushoverService(
   private fun postToPushover(url: String, payload: PushoverPayload): PushoverResponse {
     val pushoverResponse = (restTemplate.postForObject<PushoverResponse>(url, payload)
       ?: throw IllegalArgumentException("Got null response when POST:ing to Pushover"))
-    log.trace("Got response from Pushover: {}", pushoverResponse)
+    log.trace("Pushover response: {}", pushoverResponse)
     return pushoverResponse
   }
 
-  private fun isUserKeyInvalid(response: PushoverResponse) =
-    response.status != 1 && response.user == "invalid"
+  private fun PushoverResponse.isUserKeyInvalid() =
+    this.status != 1 && this.user == "invalid"
 
-  private fun isTokenInvalid(response: PushoverResponse) =
-    response.status != 1 && response.token == "invalid"
+  private fun PushoverResponse.isDeviceInvalid() =
+    this.status != 1 && this.devices.isEmpty()
+
+  private fun PushoverResponse.isTokenInvalid() =
+    this.status != 1 && this.token == "invalid"
 
   fun isUsable() = pushoverSettings.apiToken != null && pushoverSettings.enabled
 }
@@ -99,8 +105,10 @@ private data class PushoverResponse(
   val group: Int? = null,
   val token: String = "valid")
 
-enum class UserKeyStatus {
-  VALID,
-  INVALID,
+enum class PushoverValidationStatus {
+  USER_AND_DEVICE_VALID,
+  USER_VALID_DEVICE_INVALID,
+  USER_INVALID,
+  TOKEN_INVALID,
   UNKNOWN
 }

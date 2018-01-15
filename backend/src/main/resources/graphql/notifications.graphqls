@@ -14,6 +14,45 @@ type MailNotificationSettings implements NotificationSettings {
 
 type PushoverNotificationSettings implements NotificationSettings {
     enabled: Boolean!
-    userKey: String
+    userKey: String!
     device: String
+    userKeyStatus: PushoverValidationStatus!
+}
+
+## Input ##
+
+input NotificationSettingsInput {
+    enabledNotifications: [NotificationType!]
+    pushover: InputPushoverSettings
+    mail: InputMailSettings
+}
+
+input InputMailSettings {
+    enabled: Boolean!
+    mailAddress: String!
+}
+
+input InputPushoverSettings{
+    enabled: Boolean!
+    userKey: String!
+    device: String
+}
+
+## Enums ##
+
+enum NotificationType {
+    UpdateShowing
+    NewShowing
+    DeletedShowing
+    TicketsBought
+    UserAttended
+    UserUnattended
+}
+
+enum PushoverValidationStatus {
+    USER_AND_DEVICE_VALID,
+    USER_VALID_DEVICE_INVALID,
+    USER_INVALID,
+    TOKEN_INVALID,
+    UNKNOWN
 }

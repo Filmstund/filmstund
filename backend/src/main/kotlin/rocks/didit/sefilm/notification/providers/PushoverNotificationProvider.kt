@@ -10,13 +10,13 @@ import rocks.didit.sefilm.events.NotificationEvent
 import rocks.didit.sefilm.notification.ProviderHelper
 import rocks.didit.sefilm.notification.PushoverNotificationSettings
 import rocks.didit.sefilm.services.external.PushoverService
-import rocks.didit.sefilm.services.external.UserKeyStatus
+import rocks.didit.sefilm.services.external.PushoverValidationStatus
 
 @Component
 @ConditionalOnProperty(prefix = "sefilm.notification.provider.Pushover", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class PushoverNotificationProvider(
   private val pushoverService: PushoverService,
-  private val providerHelper: ProviderHelper) : NotificationProvider, ApplicationListener<NotificationEvent> {
+  private val providerHelper: ProviderHelper) : NotificationProvider<PushoverNotificationSettings>, ApplicationListener<NotificationEvent> {
 
   private val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -28,18 +28,20 @@ class PushoverNotificationProvider(
   }
 
   fun sendNotification(event: NotificationEvent) {
-    getUserSettings().forEach {
-      val msg = providerHelper.constructMessageBasedOnEvent(event)
+    getNotifiableUsers().forEach {
+      if (it.isInterestedInEvent(event)) {
+        val msg = providerHelper.constructMessageBasedOnEvent(event, it)
 
-      log.trace("About to send {} to {}", msg, it)
-      pushoverService.send(msg, it.userKey, it.device)
+        log.trace("About to send {} to {}", msg, it)
+        pushoverService.send(msg, it.notificationSettings.userKey, it.notificationSettings.device)
+      }
     }
   }
 
-  override fun getUserSettings(): List<PushoverNotificationSettings> {
+  override fun getNotifiableUsers(): List<NotifiableUser<PushoverNotificationSettings>> {
     return providerHelper
-      .getNotifiable(PushoverNotificationSettings::class)
-      .filter { it.userKeyStatus == UserKeyStatus.VALID }
+      .getNotifiableUsers(PushoverNotificationSettings::class)
+      .filter { it.notificationSettings.userKeyStatus == PushoverValidationStatus.USER_AND_DEVICE_VALID }
   }
 
   override val name = "Pushover"

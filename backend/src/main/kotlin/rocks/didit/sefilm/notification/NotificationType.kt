@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.notification
 
+/** Don't forget to update the corresponding GraphQL enum */
 enum class NotificationType {
   UpdateShowing,
   NewShowing,
@@ -7,5 +8,4 @@ enum class NotificationType {
   TicketsBought,
   UserAttended,
   UserUnattended,
-  Unknown,
 }

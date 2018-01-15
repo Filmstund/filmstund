@@ -3,19 +3,29 @@ package rocks.didit.sefilm.notification
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.events.*
+import rocks.didit.sefilm.notification.providers.NotifiableUser
 import rocks.didit.sefilm.services.UserService
 import kotlin.reflect.KClass
+import kotlin.reflect.full.cast
 
 @Service
 class ProviderHelper(
   private val userService: UserService,
   private val properties: Properties) {
 
-  fun <T : NotificationSettings> getNotifiable(userSettings: KClass<T>): List<T> {
-    return userService
-      .getUsersThatWantToBeNotified()
-      .flatMap { it.notificationSettings }
-      .filterIsInstance(userSettings.java)
+  fun <T : NotificationSettings> getNotifiableUsers(wantedSettingsType: KClass<T>): List<NotifiableUser<T>> {
+    return userService.getUsersThatWantToBeNotified().mapNotNull {
+      val notificationSettings
+        = it.notificationSettings
+        .filter { it.enabled && wantedSettingsType.isInstance(it) }
+        .map { wantedSettingsType.cast(it) }
+
+      when {
+        notificationSettings.size > 1 -> throw IllegalStateException("Found ${notificationSettings.size} enabled notification settings of the same type. Expected 1, got the following '$notificationSettings'")
+        notificationSettings.isNotEmpty() -> NotifiableUser(it.toLimitedUserDTO(), notificationSettings.first(), it.enabledNotifications)
+        else -> null
+      }
+    }.filter { it.enabledNotifications.isNotEmpty() }
   }
 
   // TODO: i18n
@@ -25,7 +35,6 @@ class ProviderHelper(
       is UpdatedShowingEvent -> TODO()
       is DeletedShowingEvent -> TODO()
       is TicketsBoughtEvent -> TODO()
-      is TicketsAddedEvent -> TODO()
       is UserAttendedEvent -> userAttendedMessage(event)
       is UserUnattendedEvent -> userUnattendedMessage(event)
     }

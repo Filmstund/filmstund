@@ -127,7 +127,7 @@ class OpenIdConnectFilter(
   }
 
   private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository) : SimpleUrlAuthenticationSuccessHandler() {
-    private val log = LoggerFactory.getLogger(CreateUserOnSuccessfulAuthHandler::class.java)
+    private val log = LoggerFactory.getLogger(this.javaClass)
 
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
       val principal = authentication?.principal as OpenIdConnectUserDetails?
