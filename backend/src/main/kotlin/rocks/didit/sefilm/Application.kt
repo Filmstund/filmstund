@@ -45,7 +45,7 @@ import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.notification.MailNotificationSettings
 import rocks.didit.sefilm.notification.PushoverNotificationSettings
-import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import java.math.BigDecimal
 import java.time.Duration

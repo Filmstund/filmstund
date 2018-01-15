@@ -2,7 +2,7 @@ package rocks.didit.sefilm.services
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
@@ -13,11 +13,12 @@ import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.events.UserAttendedEvent
 import rocks.didit.sefilm.events.UserUnattendedEvent
+import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
 
-@Component
+@Service
 class ShowingService(
   private val showingRepo: ShowingRepository,
   private val paymentInfoRepo: ParticipantPaymentInfoRepository,

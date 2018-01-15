@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.services
 
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
 import rocks.didit.sefilm.currentLoggedInUser
@@ -10,7 +10,7 @@ import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import java.time.LocalDate
 
-@Component
+@Service
 class ForetagsbiljettService(
   private val showingRepository: ShowingRepository,
   private val userRepository: UserRepository) {

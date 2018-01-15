@@ -1,11 +1,11 @@
-package rocks.didit.sefilm.services
+package rocks.didit.sefilm.services.external
 
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-@Component
+@Service
 class SFService(
   private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,

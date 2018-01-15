@@ -11,7 +11,7 @@ import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.dto.SfShowingDTO
 import rocks.didit.sefilm.services.MovieService
-import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.services.external.SFService
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.*

@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.currentLoggedInUser
@@ -16,9 +16,10 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.services.external.SFService
 import java.util.*
 
-@Component
+@Service
 class TicketService(private val sfClient: SFService,
                     private val userRepository: UserRepository,
                     private val ticketRepository: TicketRepository,

@@ -11,7 +11,7 @@ import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
-import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.toImdbId
 import rocks.didit.sefilm.toTmdbId
 import java.time.Instant

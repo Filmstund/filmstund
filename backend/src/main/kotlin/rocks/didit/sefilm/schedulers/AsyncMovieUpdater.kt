@@ -13,7 +13,7 @@ import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
-import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.services.external.SFService
 import java.time.Duration
 import java.time.Instant
 import java.util.*
