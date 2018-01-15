@@ -1,4 +1,27 @@
 ### Pending migrations ###
+# Change fields to @DBRef on all showings
+db.showing.find({}).forEach(s => {
+    s.movie = {
+        $ref: "movie",
+        $id: s.movieId
+    }
+    
+    adminId = s.admin
+    payToUserId = s.payToUser
+    
+    s.admin = {
+        $ref: "user",
+        $id: adminId
+    }
+    
+    s.payToUser = {
+        $ref: "user",
+        $id: payToUserId
+    }
+    
+    db.showing.save(s);
+});
+
 
 ### Migrations already done in deployed application ###
 #

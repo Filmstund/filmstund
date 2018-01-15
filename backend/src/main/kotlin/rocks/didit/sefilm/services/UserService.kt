@@ -28,15 +28,13 @@ class UserService(private val userRepo: UserRepository,
   }
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
-  fun getCompleteUser(id: UserID): User?
+  fun getCompleteUser(id: UserID): User
     = userRepo.findById(id)
-    .orElse(null)
+    .orElseThrow { NotFoundException("user", userID = id) }
 
   fun currentUser(): UserDTO {
     val userID = currentLoggedInUser()
-    return getCompleteUser(userID)
-      ?.toDTO()
-      .orElseThrow { NotFoundException("current user", userID) }
+    return getCompleteUser(userID).toDTO()
   }
 
   private fun getUserEntityForCurrentUser()

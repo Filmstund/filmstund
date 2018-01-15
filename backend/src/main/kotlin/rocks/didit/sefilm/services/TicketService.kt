@@ -35,7 +35,7 @@ class TicketService(private val sfClient: SFService,
     val currentLoggedInUser = currentLoggedInUser()
     val showing = showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
 
-    if (showing.admin != currentLoggedInUser) {
+    if (showing.admin.id != currentLoggedInUser) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
 
@@ -54,7 +54,7 @@ class TicketService(private val sfClient: SFService,
     val tickets = sfTickets.map {
       val barcode = sfClient.fetchBarcode(it.id)
       if (it.profileId == null || it.profileId.isBlank()) {
-        return@map it.toTicket(showing.id, showing.admin, barcode)
+        return@map it.toTicket(showing.id, showing.admin.id, barcode)
       }
 
       val userIdForThatMember = getUserIdFromSfMembershipId(SfMembershipId.valueOf(it.profileId), showing)
@@ -68,13 +68,13 @@ class TicketService(private val sfClient: SFService,
     val userIdForThatMember = userRepository
       .findBySfMembershipId(sfMembershipId)
       ?.id
-      ?: return showing.admin
+      ?: return showing.admin.id
 
     if (showing.participants.any { it.userId == userIdForThatMember }) {
       return userIdForThatMember
     }
 
-    return showing.admin
+    return showing.admin.id
   }
 
   private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {
@@ -93,7 +93,7 @@ class TicketService(private val sfClient: SFService,
 
   fun getTicketRange(showingId: UUID): TicketRange? {
     val currentLoggedInUser = currentLoggedInUser()
-    if(!isUserIsParticipant(showingId, currentLoggedInUser)) {
+    if (!isUserIsParticipant(showingId, currentLoggedInUser)) {
       return null
     }
 
