@@ -11,4 +11,4 @@ data class NotificationSettingsInputDTO(
 
 data class PushoverInputDTO(val enabled: Boolean, val userKey: String, val device: String?)
 
-data class MailInputDTO(val enabled: Boolean, val mail: String)
+data class MailInputDTO(val enabled: Boolean, val mailAddress: String)

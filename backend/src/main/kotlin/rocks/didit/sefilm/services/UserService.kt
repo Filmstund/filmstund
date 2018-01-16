@@ -75,13 +75,18 @@ class UserService(private val userRepo: UserRepository,
   // TODO: listen for PushoverUserKeyInvalid and disable the key
   fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO {
     val currentUser = getCompleteCurrentUser()
-    log.trace("Update notification settings for user={} settings to={}", currentUser.id, notificationInput)
 
     val mailSettings = notificationInput.mail.let {
-      MailSettings(it?.enabled ?: false, it?.mail ?: "${currentUser.firstName?.toLowerCase()}@example.org")
+      MailSettings(it?.enabled ?: false, it?.mailAddress ?: "${currentUser.firstName?.toLowerCase()}@example.org")
     }
     val pushoverSettings = notificationInput.pushover?.let {
-      val validatedUserKeyStatus = pushoverService?.validateUserKey(it.userKey, it.device) ?: PushoverValidationStatus.UNKNOWN
+
+      val validatedUserKeyStatus =
+        when (it.enabled) {
+          true -> pushoverService?.validateUserKey(it.userKey, it.device) ?: PushoverValidationStatus.UNKNOWN
+          false -> PushoverValidationStatus.UNKNOWN
+        }
+
       PushoverSettings(it.enabled, it.userKey, it.device, validatedUserKeyStatus)
     } ?: PushoverSettings()
 
@@ -92,6 +97,8 @@ class UserService(private val userRepo: UserRepository,
         listOf(mailSettings, pushoverSettings))
     ).let {
       userRepo.save(it)
+    }.also {
+      log.trace("Update notification settings for user={} settings to={}", it.id, it.notificationSettings)
     }.toDTO()
   }
 
