@@ -43,8 +43,8 @@ import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
-import rocks.didit.sefilm.notification.MailNotificationSettings
-import rocks.didit.sefilm.notification.PushoverNotificationSettings
+import rocks.didit.sefilm.notification.MailSettings
+import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import java.math.BigDecimal
@@ -207,8 +207,8 @@ class Application {
 
   @Bean
   fun schemaDictionary() = SchemaParserDictionary()
-    .add(MailNotificationSettings::class)
-    .add(PushoverNotificationSettings::class)
+    .add(MailSettings::class)
+    .add(PushoverSettings::class)
 }
 
 fun main(args: Array<String>) {

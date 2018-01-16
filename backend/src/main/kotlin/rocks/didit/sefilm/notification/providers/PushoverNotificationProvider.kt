@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.events.NotificationEvent
 import rocks.didit.sefilm.notification.ProviderHelper
-import rocks.didit.sefilm.notification.PushoverNotificationSettings
+import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.services.external.PushoverService
 import rocks.didit.sefilm.services.external.PushoverValidationStatus
 
@@ -16,7 +16,7 @@ import rocks.didit.sefilm.services.external.PushoverValidationStatus
 @ConditionalOnProperty(prefix = "sefilm.notification.provider.Pushover", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class PushoverNotificationProvider(
   private val pushoverService: PushoverService,
-  private val providerHelper: ProviderHelper) : NotificationProvider<PushoverNotificationSettings>, ApplicationListener<NotificationEvent> {
+  private val providerHelper: ProviderHelper) : NotificationProvider<PushoverSettings>, ApplicationListener<NotificationEvent> {
 
   private val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -30,7 +30,7 @@ class PushoverNotificationProvider(
   fun sendNotification(event: NotificationEvent) {
     getNotifiableUsers().forEach {
       if (it.isInterestedInEvent(event)) {
-        val msg = providerHelper.constructMessageBasedOnEvent(event, it)
+        val msg = providerHelper.constructMessageBasedOnEvent(event)
 
         log.trace("About to send {} to {}", msg, it)
         pushoverService.send(msg, it.notificationSettings.userKey, it.notificationSettings.device)
@@ -38,9 +38,9 @@ class PushoverNotificationProvider(
     }
   }
 
-  override fun getNotifiableUsers(): List<NotifiableUser<PushoverNotificationSettings>> {
+  override fun getNotifiableUsers(): List<NotifiableUser<PushoverSettings>> {
     return providerHelper
-      .getNotifiableUsers(PushoverNotificationSettings::class)
+      .getNotifiableUsers(PushoverSettings::class)
       .filter { it.notificationSettings.userKeyStatus == PushoverValidationStatus.USER_AND_DEVICE_VALID }
   }
 

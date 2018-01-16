@@ -36,6 +36,6 @@ class UserMutationResolver(
   fun invalidateCalendarFeed() = userService.invalidateCalendarFeedId()
   fun disableCalendarFeed() = userService.disableCalendarFeed()
 
-  fun updateNotificationSettings(notificationInput: NotificationInputDTO)
+  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO)
     = userService.updateNotificationSettings(notificationInput)
 }

@@ -2,10 +2,10 @@ package rocks.didit.sefilm.notification.providers
 
 import rocks.didit.sefilm.domain.dto.LimitedUserDTO
 import rocks.didit.sefilm.events.*
-import rocks.didit.sefilm.notification.NotificationSettings
 import rocks.didit.sefilm.notification.NotificationType
+import rocks.didit.sefilm.notification.ProviderSettings
 
-interface NotificationProvider<out T : NotificationSettings> {
+interface NotificationProvider<out T : ProviderSettings> {
 
   /** Get the user settings related to this provider. I.e. the E-mail addresses we are going to notify */
   fun getNotifiableUsers(): List<NotifiableUser<T>>
@@ -28,19 +28,19 @@ data class NotificationProviderDTO(
   }
 }
 
-data class NotifiableUser<out T : NotificationSettings>(
+data class NotifiableUser<out T : ProviderSettings>(
   val user: LimitedUserDTO,
   val notificationSettings: T,
-  val enabledNotifications: List<NotificationType>) {
+  val enabledTypes: List<NotificationType>) {
 
   fun isInterestedInEvent(event: NotificationEvent): Boolean {
     return when (event) {
-      is NewShowingEvent -> this.enabledNotifications.contains(NotificationType.NewShowing)
-      is UpdatedShowingEvent -> this.enabledNotifications.contains(NotificationType.UpdateShowing)
-      is DeletedShowingEvent -> this.enabledNotifications.contains(NotificationType.DeletedShowing)
-      is TicketsBoughtEvent -> this.enabledNotifications.contains(NotificationType.TicketsBought)
-      is UserAttendedEvent -> this.enabledNotifications.contains(NotificationType.UserAttended)
-      is UserUnattendedEvent -> this.enabledNotifications.contains(NotificationType.UserUnattended)
+      is NewShowingEvent -> this.enabledTypes.contains(NotificationType.NewShowing)
+      is UpdatedShowingEvent -> this.enabledTypes.contains(NotificationType.UpdateShowing)
+      is DeletedShowingEvent -> this.enabledTypes.contains(NotificationType.DeletedShowing)
+      is TicketsBoughtEvent -> this.enabledTypes.contains(NotificationType.TicketsBought)
+      is UserAttendedEvent -> this.enabledTypes.contains(NotificationType.UserAttended)
+      is UserUnattendedEvent -> this.enabledTypes.contains(NotificationType.UserUnattended)
     }
   }
 }

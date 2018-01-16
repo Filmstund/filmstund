@@ -1,18 +1,24 @@
+type NotificationSettings {
+    notificationsEnabled: Boolean,
+    enabledTypes: [NotificationType!]!,
+    providerSettings: [ProviderSettings!]!
+}
+
 type NotificationProvider {
     name: String!
     isSubscribable: Boolean!
 }
 
-interface NotificationSettings {
+interface ProviderSettings {
     enabled: Boolean!
 }
 
-type MailNotificationSettings implements NotificationSettings {
+type MailSettings implements ProviderSettings {
     enabled: Boolean!
     mailAddress: String
 }
 
-type PushoverNotificationSettings implements NotificationSettings {
+type PushoverSettings implements ProviderSettings {
     enabled: Boolean!
     userKey: String!
     device: String
@@ -22,7 +28,8 @@ type PushoverNotificationSettings implements NotificationSettings {
 ## Input ##
 
 input NotificationSettingsInput {
-    enabledNotifications: [NotificationType!]
+    notificationsEnabled: Boolean!
+    enabledTypes: [NotificationType!]
     pushover: InputPushoverSettings
     mail: InputMailSettings
 }

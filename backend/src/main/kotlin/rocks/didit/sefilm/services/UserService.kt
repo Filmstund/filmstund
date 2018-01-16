@@ -12,8 +12,9 @@ import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.*
-import rocks.didit.sefilm.notification.MailNotificationSettings
-import rocks.didit.sefilm.notification.PushoverNotificationSettings
+import rocks.didit.sefilm.notification.MailSettings
+import rocks.didit.sefilm.notification.NotificationSettings
+import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.external.PushoverService
 import rocks.didit.sefilm.services.external.PushoverValidationStatus
@@ -31,7 +32,11 @@ class UserService(private val userRepo: UserRepository,
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
   fun getUsersThatWantToBeNotified(): List<User> {
     return userRepo.findAll()
-      .filter { it.notificationSettings.any { it.enabled } }
+      .filter {
+        it.notificationSettings.let { s ->
+          s.notificationsEnabled && s.providerSettings.any { it.enabled }
+        }
+      }
   }
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
@@ -68,21 +73,23 @@ class UserService(private val userRepo: UserRepository,
   }
 
   // TODO: listen for PushoverUserKeyInvalid and disable the key
-  fun updateNotificationSettings(notificationInput: NotificationInputDTO): UserDTO {
+  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO {
     val currentUser = getCompleteCurrentUser()
     log.trace("Update notification settings for user={} settings to={}", currentUser.id, notificationInput)
 
     val mailSettings = notificationInput.mail.let {
-      MailNotificationSettings(it?.enabled ?: false, it?.mail ?: "${currentUser.firstName?.toLowerCase()}@example.org")
+      MailSettings(it?.enabled ?: false, it?.mail ?: "${currentUser.firstName?.toLowerCase()}@example.org")
     }
     val pushoverSettings = notificationInput.pushover?.let {
       val validatedUserKeyStatus = pushoverService?.validateUserKey(it.userKey, it.device) ?: PushoverValidationStatus.UNKNOWN
-      PushoverNotificationSettings(it.enabled, it.userKey, it.device, validatedUserKeyStatus)
-    } ?: PushoverNotificationSettings()
+      PushoverSettings(it.enabled, it.userKey, it.device, validatedUserKeyStatus)
+    } ?: PushoverSettings()
 
     return currentUser.copy(
-      enabledNotifications = notificationInput.enabledNotifications,
-      notificationSettings = listOf(mailSettings, pushoverSettings)
+      notificationSettings = NotificationSettings(
+        notificationInput.notificationsEnabled,
+        notificationInput.enabledTypes,
+        listOf(mailSettings, pushoverSettings))
     ).let {
       userRepo.save(it)
     }.toDTO()
@@ -116,7 +123,6 @@ class UserService(private val userRepo: UserRepository,
     this.avatar,
     this.foretagsbiljetter.map { it.toDTO() },
     this.notificationSettings,
-    this.enabledNotifications,
     this.lastLogin,
     this.signupDate,
     this.calendarFeedId)

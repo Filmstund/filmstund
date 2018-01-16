@@ -11,8 +11,7 @@ type CurrentUser {
     foretagsbiljetter: [Foretagsbiljett!]
     calendarFeedId: UUID
     calendarFeedUrl: String
-    notificationSettings: [NotificationSettings!]!
-    enabledNotifications: [NotificationType!]!
+    notificationSettings: NotificationSettings!
     lastLogin: String!
     signupDate: String!
 }

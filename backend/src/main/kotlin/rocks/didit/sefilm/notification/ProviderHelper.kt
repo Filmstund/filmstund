@@ -13,19 +13,19 @@ class ProviderHelper(
   private val userService: UserService,
   private val properties: Properties) {
 
-  fun <T : NotificationSettings> getNotifiableUsers(wantedSettingsType: KClass<T>): List<NotifiableUser<T>> {
+  fun <T : ProviderSettings> getNotifiableUsers(wantedSettingsType: KClass<T>): List<NotifiableUser<T>> {
     return userService.getUsersThatWantToBeNotified().mapNotNull {
       val notificationSettings
-        = it.notificationSettings
+        = it.notificationSettings.providerSettings
         .filter { it.enabled && wantedSettingsType.isInstance(it) }
         .map { wantedSettingsType.cast(it) }
 
       when {
         notificationSettings.size > 1 -> throw IllegalStateException("Found ${notificationSettings.size} enabled notification settings of the same type. Expected 1, got the following '$notificationSettings'")
-        notificationSettings.isNotEmpty() -> NotifiableUser(it.toLimitedUserDTO(), notificationSettings.first(), it.enabledNotifications)
+        notificationSettings.isNotEmpty() -> NotifiableUser(it.toLimitedUserDTO(), notificationSettings.first(), it.notificationSettings.enabledTypes)
         else -> null
       }
-    }.filter { it.enabledNotifications.isNotEmpty() }
+    }.filter { it.enabledTypes.isNotEmpty() }
   }
 
   // TODO: i18n
