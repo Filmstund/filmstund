@@ -28,12 +28,12 @@ class PushoverNotificationProvider(
   }
 
   fun sendNotification(event: NotificationEvent) {
-    getNotifiableUsers().forEach {
-      if (it.isInterestedInEvent(event)) {
+    getNotifiableUsers().forEach { user ->
+      if (user.enabledTypes.contains(event.type)) {
         val msg = providerHelper.constructMessageBasedOnEvent(event)
 
-        log.trace("About to send {} to {}", msg, it)
-        pushoverService.send(msg, it.notificationSettings.userKey, it.notificationSettings.device)
+        log.trace("About to send {} to {}", msg, user)
+        pushoverService.send(msg, user.notificationSettings.userKey, user.notificationSettings.device)
       }
     }
   }

@@ -21,10 +21,10 @@ class MailNotificationProvider(private val providerHelper: ProviderHelper) : Not
 
   @Async
   override fun onApplicationEvent(event: NotificationEvent) {
-    getNotifiableUsers().forEach {
-      if (it.isInterestedInEvent(event)) {
+    getNotifiableUsers().forEach { user ->
+      if (user.enabledTypes.contains(event.type)) {
         // TODO: actually send mail
-        log.debug("(Not-actually) Sending mail notification to ${it.notificationSettings.mailAddress}")
+        log.debug("(Not-actually) Sending mail notification to ${user.notificationSettings.mailAddress}")
       }
     }
   }
