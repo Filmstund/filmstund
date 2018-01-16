@@ -58,7 +58,7 @@ class ProviderHelper(
 
   private fun ticketsBoughtMessage(event: TicketsBoughtEvent): NotificationMessage {
     return formatMsg(title = "Tickets bought for ${event.showing.movie.title}",
-      msg = "Price ${event.showing.price} SEK. Pay to ${event.showing.payToUser.phone}", event = event)
+      msg = "Price ${event.showing.price?.toKronor()} SEK. Pay to ${event.showing.payToUser.phone}", event = event)
   }
 
   private fun userAttendedMessage(event: UserAttendedEvent): NotificationMessage {
