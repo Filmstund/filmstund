@@ -2,6 +2,7 @@ package rocks.didit.sefilm.notification
 
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.events.*
 import rocks.didit.sefilm.notification.providers.NotifiableUser
 import rocks.didit.sefilm.services.UserService
@@ -13,8 +14,8 @@ class ProviderHelper(
   private val userService: UserService,
   private val properties: Properties) {
 
-  fun <T : ProviderSettings> getNotifiableUsers(wantedSettingsType: KClass<T>): List<NotifiableUser<T>> {
-    return userService.getUsersThatWantToBeNotified().mapNotNull {
+  fun <T : ProviderSettings> getNotifiableUsers(knownRecipients: List<UserID>, wantedSettingsType: KClass<T>): List<NotifiableUser<T>> {
+    return userService.getUsersThatWantToBeNotified(knownRecipients).mapNotNull {
       val notificationSettings
         = it.notificationSettings.providerSettings
         .filter { it.enabled && wantedSettingsType.isInstance(it) }

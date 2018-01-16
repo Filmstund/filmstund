@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.events.NotificationEvent
 import rocks.didit.sefilm.notification.MailSettings
 import rocks.didit.sefilm.notification.ProviderHelper
@@ -15,13 +16,13 @@ class MailNotificationProvider(private val providerHelper: ProviderHelper) : Not
 
   private val log = LoggerFactory.getLogger(MailNotificationProvider::class.java)
 
-  override fun getNotifiableUsers(): List<NotifiableUser<MailSettings>>
-    = providerHelper.getNotifiableUsers(MailSettings::class)
+  override fun getNotifiableUsers(knownRecipients: List<UserID>): List<NotifiableUser<MailSettings>>
+    = providerHelper.getNotifiableUsers(knownRecipients, MailSettings::class)
     .filter { it.notificationSettings.mailAddress != null }
 
   @Async
   override fun onApplicationEvent(event: NotificationEvent) {
-    getNotifiableUsers().forEach { user ->
+    getNotifiableUsers(event.potentialRecipients).forEach { user ->
       if (user.enabledTypes.contains(event.type)) {
         // TODO: actually send mail
         log.debug("(Not-actually) Sending mail notification to ${user.notificationSettings.mailAddress}")

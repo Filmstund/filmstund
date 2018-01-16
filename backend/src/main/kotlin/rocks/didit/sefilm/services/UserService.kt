@@ -30,13 +30,17 @@ class UserService(private val userRepo: UserRepository,
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
   fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
-  fun getUsersThatWantToBeNotified(): List<User> {
-    return userRepo.findAll()
-      .filter {
-        it.notificationSettings.let { s ->
-          s.notificationsEnabled && s.providerSettings.any { it.enabled }
-        }
+  fun getUsersThatWantToBeNotified(knownRecipients: List<UserID>): List<User> {
+    return knownRecipients.let {
+      when (it.isEmpty()) {
+        true -> userRepo.findAll()
+        false -> userRepo.findAllById(it)
       }
+    }.filter {
+      it.notificationSettings.let { s ->
+        s.notificationsEnabled && s.providerSettings.any { it.enabled }
+      }
+    }
   }
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
