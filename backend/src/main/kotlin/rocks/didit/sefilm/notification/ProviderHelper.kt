@@ -31,25 +31,48 @@ class ProviderHelper(
   // TODO: i18n
   fun constructMessageBasedOnEvent(event: NotificationEvent): NotificationMessage {
     return when (event) {
-      is NewShowingEvent -> TODO()
-      is UpdatedShowingEvent -> TODO()
-      is DeletedShowingEvent -> TODO()
-      is TicketsBoughtEvent -> TODO()
+      is NewShowingEvent -> newShowingMessage(event)
+      is UpdatedShowingEvent -> updatedShowingMessage(event)
+      is DeletedShowingEvent -> deletedShowingMessage(event)
+      is TicketsBoughtEvent -> ticketsBoughtMessage(event)
       is UserAttendedEvent -> userAttendedMessage(event)
       is UserUnattendedEvent -> userUnattendedMessage(event)
     }
   }
 
+  private fun newShowingMessage(event: NewShowingEvent): NotificationMessage {
+    return formatMsg(title = "A showing for ${event.showing.movie.title} has been created",
+      msg = "Time: ${event.showing.date} ${event.showing.time}.\nLocation: ${event.showing.location?.name}", event = event)
+  }
+
+  private fun updatedShowingMessage(event: UpdatedShowingEvent): NotificationMessage {
+    return formatMsg(title = "The showing for ${event.showing.movie.title} has been updated",
+      msg = "Time: ${event.showing.time}.\nLocation: ${event.showing.location?.name}", event = event)
+  }
+
+  private fun deletedShowingMessage(event: DeletedShowingEvent): NotificationMessage {
+    return formatMsg(title = "The showing for ${event.showing.movie.title} has been removed",
+      msg = "Sad panda :(", event = event)
+  }
+
+  private fun ticketsBoughtMessage(event: TicketsBoughtEvent): NotificationMessage {
+    return formatMsg(title = "Tickets bought for ${event.showing.movie.title}",
+      msg = "Price ${event.showing.price} SEK. Pay to ${event.showing.payToUser.phone}", event = event)
+  }
+
   private fun userAttendedMessage(event: UserAttendedEvent): NotificationMessage {
-    return NotificationMessage(title = "User attended showing",
-      message = "${event.triggeredBy.nick} has attended your showing. Chosen payment type: ${event.paymentType}",
-      url = formatShowingUrl(event),
-      urlTitle = "View showing")
+    return formatMsg(title = "${event.triggeredBy.nick} attended showing",
+      msg = "${event.triggeredBy.nick} has attended your showing. Chosen payment type: ${event.paymentType}", event = event)
   }
 
   private fun userUnattendedMessage(event: UserUnattendedEvent): NotificationMessage {
-    return NotificationMessage(title = "User unattended showing",
-      message = "${event.triggeredBy.nick} has chosen to unattended your showing",
+    return formatMsg(title = "User unattended showing",
+      msg = "${event.triggeredBy.nick} has chosen to unattended your showing", event = event)
+  }
+
+  private fun formatMsg(title: String, msg: String, event: ShowingEvent): NotificationMessage {
+    return NotificationMessage(title = title,
+      message = msg,
       url = formatShowingUrl(event),
       urlTitle = "View showing")
   }

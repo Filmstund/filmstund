@@ -21,4 +21,6 @@ class UserAttendedEvent(src: Any, showing: Showing, user: User, val paymentType:
 
 class UserUnattendedEvent(src: Any, showing: Showing, user: User) : ShowingEvent(src, showing, user, NotificationType.UserUnattended)
 
+// TODO: class SfTicketsAvailableEvent(src: Any, showing: Showing, user: User): ShowingEvent(src, showing, user, NotificationType.SfTicketsAvailable)
+
 class PushoverUserKeyInvalidEvent(src: Any, val userKey: String) : ITBioEvent(src)

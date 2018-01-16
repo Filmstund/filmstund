@@ -11,9 +11,7 @@ import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
-import rocks.didit.sefilm.events.EventPublisher
-import rocks.didit.sefilm.events.UserAttendedEvent
-import rocks.didit.sefilm.events.UserUnattendedEvent
+import rocks.didit.sefilm.events.*
 import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
@@ -120,11 +118,13 @@ class ShowingService(
 
     val participant: Participant = createParticipantBasedOnPaymentType(paymentOption, userId)
 
-    val user = userService.getCompleteUser(userId)
-    eventPublisher.publish(UserAttendedEvent(this, showing, user, paymentOption.type))
     val newParticipants = showing.participants.plus(participant)
     return showingRepo
       .save(showing.copy(participants = newParticipants))
+      .also {
+        val user = userService.getCompleteUser(userId)
+        eventPublisher.publish(UserAttendedEvent(this, it, user, paymentOption.type))
+      }
       .toDto()
 
   }
@@ -145,15 +145,14 @@ class ShowingService(
     }
 
     val participant = participantLst.first()
-
-    val user = userService.getCompleteUser(participant.userId)
-    eventPublisher.publish(UserUnattendedEvent(this, showing, user))
-
     val participantsWithoutLoggedInUser = showing.participants.minus(participant)
     return showingRepo
       .save(showing.copy(participants = participantsWithoutLoggedInUser))
+      .also {
+        val user = userService.getCompleteUser(participant.userId)
+        eventPublisher.publish(UserUnattendedEvent(this, it, user))
+      }
       .toDto()
-
   }
 
   fun createShowing(data: CreateShowingDTO): ShowingDTO {
@@ -165,6 +164,9 @@ class ShowingService(
     val adminUser = userService.getCompleteUser(currentLoggedInUser())
     return showingRepo
       .save(data.toShowing(adminUser))
+      .also {
+        eventPublisher.publish(NewShowingEvent(this, it, adminUser))
+      }
       .toDto()
   }
 
@@ -174,8 +176,10 @@ class ShowingService(
     assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
 
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
-    showingRepo.delete(showing)
     ticketService.deleteTickets(showing)
+    showingRepo.delete(showing)
+
+    eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
     return getAllPublicShowings()
   }
 
@@ -192,6 +196,9 @@ class ShowingService(
     createInitialPaymentInfo(showing)
     return showingRepo
       .save(showing.copy(ticketsBought = true))
+      .also {
+        eventPublisher.publish(TicketsBoughtEvent(this, it, it.admin))
+      }
       .toDto()
   }
 
@@ -208,6 +215,9 @@ class ShowingService(
       location = locationService.getOrCreateNewLocation(newValues.location),
       time = newValues.time
     ))
+      .also {
+        eventPublisher.publish(UpdatedShowingEvent(this, it, it.admin))
+      }
       .toDto()
   }
 
