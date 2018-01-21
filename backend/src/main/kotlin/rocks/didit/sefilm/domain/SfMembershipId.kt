@@ -16,7 +16,7 @@ data class SfMembershipId(val value: String) {
         throw IllegalArgumentException("'$profileId' is an invalid membership id. Expected XXX-XXX")
       }
 
-      return SfMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}")
+      return SfMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}".toUpperCase())
     }
   }
 

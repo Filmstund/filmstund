@@ -65,7 +65,7 @@ class TicketService(private val sfClient: SFService,
 
   private fun getUserIdFromSfMembershipId(sfMembershipId: SfMembershipId, showing: Showing): UserID {
     val userIdForThatMember = userRepository
-      .findBySfMembershipId(sfMembershipId)
+      .findBySfMembershipIdIgnoreCase(sfMembershipId)
       ?.id
       ?: return showing.admin
 
