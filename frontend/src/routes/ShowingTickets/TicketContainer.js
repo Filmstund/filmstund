@@ -4,7 +4,6 @@ import TicketURLInput from "../../TicketURLInput";
 import Field from "../../Field";
 import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
-import _ from "lodash";
 import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../StatusMessageBox";
 import { SmallHeader } from "../../Header";
