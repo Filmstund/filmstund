@@ -24,25 +24,35 @@ persistCache({
   storage: window.localStorage
 });
 
-const errorLink = onError(({ response, graphQLErrors, networkError }) => {
+const errorLink = onError(args => {
+  const { graphQLErrors, networkError } = args;
   if (graphQLErrors)
     graphQLErrors.map(error =>
       console.log(`[GraphQL error] ${error.message}`, error)
     );
 
-  if (networkError && networkError.statusCode === 403) {
-    const { pathname, search } = window.location;
-    const returnUrl = pathname + search;
+  if (networkError) {
+    if (networkError.noTokenError) {
+      args.networkError.response = null;
+      // User signing out => ignore error.
+      return;
+    } else if (
+      networkError.statusCode === 403 ||
+      networkError.statusCode === 401
+    ) {
+      const { pathname, search } = window.location;
+      const returnUrl = pathname + search;
 
-    if (pathname !== "/login" && returnUrl.indexOf("/login") !== 0) {
-      window.location = `/login?return_to=${encodeURIComponent(returnUrl)}`;
+      if (pathname !== "/login" && returnUrl.indexOf("/login") !== 0) {
+        window.location = `/login?return_to=${encodeURIComponent(returnUrl)}`;
+      }
     }
   }
 });
+
 const httpLink = new HttpLink({
   uri: BASE_GRAPHQL_URL,
-  fetch,
-  fetchOptions: { credentials: "include" }
+  fetch
 });
 
 const link = ApolloLink.from([errorLink, httpLink]);
