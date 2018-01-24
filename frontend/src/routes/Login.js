@@ -2,10 +2,15 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { GoogleLogin } from "../GoogleLogin";
 import background from "../assets/body_background.jpg";
 import googleIcon from "../assets/google-logo.svg";
-import { setUserInfo, getToken, clearSession, hasToken } from "../lib/session";
+import {
+  setUserInfo,
+  clearSession,
+  getGoogleId,
+  hasToken
+} from "../lib/session";
+import { provideGoogleLogin } from "../GoogleLoginProvider";
 
 const LoginContainer = styled.div`
   min-height: 100%;
@@ -41,7 +46,7 @@ const LoginDialog = styled.div`
   text-align: center;
 `;
 
-const GoogleButton = styled(GoogleLogin)`
+const GoogleButton = styled.button`
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   padding: 0.5em 1em;
   font-family: Roboto, sans-serif;
@@ -66,35 +71,57 @@ const GoogleLogo = styled.img`
 
 class Login extends Component {
   state = {
-    signedIn: false
+    signedIn: hasToken()
   };
 
-  onSuccess = () => {
+  componentDidMount() {
+    this.props
+      .initGoogleAuth({
+        loginHint: getGoogleId(),
+        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID
+      })
+      .then(this.googleUserChanged);
+  }
+
+  googleAuthSuccess = user => {
     if (this.props.location.pathname === "/login") {
       this.props.history.push("/");
     }
   };
 
-  googleUserChanged = user => {
-    setUserInfo(user);
+  googleUserChanged = response => {
+    if (response.user_id) {
+      setUserInfo(response);
 
-    this.setState({
-      signedIn: true
-    });
+      this.setState({
+        signedIn: true
+      });
+    } else {
+      clearSession();
+      this.setState({
+        signedIn: false
+      });
+    }
+
+    return response;
+  };
+
+  signin = () => {
+    this.props
+      .signIn()
+      .then(this.googleUserChanged)
+      .then(this.googleAuthSuccess);
   };
 
   signout = () => {
     clearSession();
+    this.props.signOut();
 
     this.setState({
       signedIn: false
     });
 
     this.props.history.push("/login");
-  };
-
-  onFailure = response => {
-    this.signout();
   };
 
   render() {
@@ -111,8 +138,6 @@ class Login extends Component {
       );
     }
 
-    const googleId = getToken();
-
     return (
       <Container>
         <LoginContainer>
@@ -123,14 +148,7 @@ class Login extends Component {
               alt="IT-bio logga"
             />
             <h3>Logga in för att boka biobesök!</h3>
-            <GoogleButton
-              loginHint={googleId}
-              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-              onUserChanged={this.googleUserChanged}
-              onSuccess={this.onSuccess}
-              onFailure={this.onFailure}
-              signedIn={hasToken()}
-            >
+            <GoogleButton onClick={this.signin}>
               <GoogleLogo src={googleIcon} /> Logga in via Google
             </GoogleButton>
           </LoginDialog>
@@ -140,4 +158,4 @@ class Login extends Component {
   }
 }
 
-export default compose(withRouter)(Login);
+export default compose(withRouter, provideGoogleLogin)(Login);
