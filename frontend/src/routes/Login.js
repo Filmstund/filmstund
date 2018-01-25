@@ -84,7 +84,7 @@ class Login extends Component {
   }
 
   googleAuthSuccess = user => {
-    if (this.props.location.pathname === "/login") {
+    if (this.props.location.pathname.indexOf("/login") === 0) {
       this.props.history.push("/");
     }
   };
