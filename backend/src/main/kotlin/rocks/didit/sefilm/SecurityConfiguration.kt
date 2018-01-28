@@ -95,8 +95,8 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
         avatar = principal.avatarUrl,
         lastLogin = Instant.now()
       )
-      val savedUser = userRepository.save(updatedUser)
-      if (savedUser != updatedUser || log.isDebugEnabled) {
+      if (maybeUser != updatedUser) {
+        val savedUser = userRepository.save(updatedUser)
         log.info("Updated user ${savedUser.name} (${savedUser.id})")
       }
     }
