@@ -175,6 +175,7 @@ class ShowingService(
   fun deleteShowing(showingId: UUID): List<ShowingDTO> {
     val showing = getShowingEntity(showingId)
     assertionService.assertLoggedInUserIsAdmin(showing.admin)
+    assertionService.assertTicketsNotBought(showing.admin, showing)
 
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
     showingRepo.delete(showing)
