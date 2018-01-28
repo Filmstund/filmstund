@@ -30,7 +30,7 @@ const createForetagsbiljetter = foretagsbiljetter => {
 export const stringifyOption = option => {
   const { displayName } = option;
   if (option.ticketNumber) {
-    return displayName + ": " + option.ticketNumber;
+    return `${displayName}: ${option.ticketNumber} (${option.suffix})`;
   } else {
     return displayName;
   }

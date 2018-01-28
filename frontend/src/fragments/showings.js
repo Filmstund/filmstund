@@ -79,8 +79,9 @@ export const updateShowing = graphql(
     }
   `,
   {
-    props: ({ mutate, ownProps: { showingId } }) => ({
-      updateShowing: showing => wrapMutate(mutate, { showing, showingId })
+    props: ({ mutate }) => ({
+      updateShowing: (showingId, showing) =>
+        wrapMutate(mutate, { showing, showingId })
     })
   }
 );
