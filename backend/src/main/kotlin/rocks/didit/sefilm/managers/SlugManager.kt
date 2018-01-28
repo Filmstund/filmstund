@@ -38,7 +38,7 @@ class SlugManager(private val movieRepository: MovieRepository) {
   }
 
   private fun String.trimToLength(length: Int): String {
-    if (this.length <= MAX_LENGTH) {
+    if (this.length <= length) {
       return this
     }
     return this.substring(0, SlugManager.MAX_LENGTH)
