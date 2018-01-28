@@ -8,6 +8,7 @@ import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../StatusMessageBox";
 import { ScreenSeats } from "../../ScreenSeats";
 import { SmallHeader } from "../../Header";
+import { navigateToShowing } from "../../navigators/index";
 
 export default class TicketContainer extends Component {
   state = {
@@ -56,13 +57,13 @@ export default class TicketContainer extends Component {
   };
 
   handleGoBackToShowing = () => {
-    const { showingId } = this.props;
-    this.props.history.push(`/showings/${showingId}`);
+    const { history, data: { showing } } = this.props;
+    navigateToShowing(history, showing);
   };
 
   render() {
     const { errors, success } = this.state;
-    const { data: { me, showing, loading }, navigateToShowing } = this.props;
+    const { data: { me, showing, loading } } = this.props;
 
     const { myTickets, ticketRange, sfSeatMap } = showing;
 
@@ -71,7 +72,7 @@ export default class TicketContainer extends Component {
     } else {
       return (
         <div>
-          <MainButton onClick={navigateToShowing}>
+          <MainButton onClick={this.handleGoBackToShowing}>
             Tillbaka till visning
           </MainButton>
           <SmallHeader>Våra platser:</SmallHeader>

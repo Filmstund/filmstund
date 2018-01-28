@@ -7,16 +7,16 @@ import Loader from "../../ProjectorLoader";
 import { wrapMutate } from "../../store/apollo";
 
 const routerParamsToShowingId = ({ match, history }) => {
-  const { showingId } = match.params;
+  const { webId } = match.params;
 
-  const navigateToShowing = () => history.push(`/showings/${showingId}`);
-
-  return { showingId, navigateToShowing };
+  return { webId };
 };
 
 const ticketFragment = gql`
   fragment Ticket on Showing {
     id
+    webId
+    slug
     admin {
       id
     }
@@ -63,11 +63,11 @@ const ticketFragment = gql`
 
 const data = graphql(
   gql`
-    query TicketQuery($showingId: UUID!) {
+    query TicketQuery($webId: Base64ID!) {
       me: currentUser {
         id
       }
-      showing(id: $showingId) {
+      showing(webId: $webId) {
         ...Ticket
       }
     }

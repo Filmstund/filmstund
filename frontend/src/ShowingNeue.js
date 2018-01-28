@@ -209,6 +209,8 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
 export const showingFragment = gql`
   fragment Showing on Showing {
     id
+    webId
+    slug
     date
     time
     movie {

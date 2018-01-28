@@ -97,7 +97,7 @@ class CreateShowingForm extends React.Component {
       .createShowing(showing)
       .then(resp => {
         const { showing } = resp.data;
-        this.props.navigateToShowing(showing.id);
+        this.props.navigateToShowing(showing);
       })
       .catch(errors => {
         console.log(errors);

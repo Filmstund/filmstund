@@ -76,6 +76,8 @@ export const movieFragment = gql`
 export const showingFragment = gql`
   fragment Showing on Showing {
     id
+    webId
+    slug
     date
     time
     location {

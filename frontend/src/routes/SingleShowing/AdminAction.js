@@ -11,6 +11,7 @@ import {
   togglePaidChange
 } from "../../fragments/showings";
 import { compose } from "react-apollo";
+import { navigateToEditShowing } from "../../navigators/index";
 
 class AdminAction extends Component {
   constructor(props) {
@@ -96,8 +97,8 @@ class AdminAction extends Component {
   };
 
   handleEdit = () => {
-    const { showing } = this.props;
-    this.props.history.push(`/showings/${showing.id}/edit`);
+    const { history, showing } = this.props;
+    navigateToEditShowing(history, showing);
   };
 
   render() {

@@ -12,6 +12,10 @@ import { RedHeader } from "../RedHeader";
 import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { Link } from "../MainButton";
 import styled from "styled-components";
+import {
+  navigateToShowing,
+  navigateToShowingTickets
+} from "../navigators/index";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -40,11 +44,11 @@ const ShowingsWrapper = styled.div`
 
 class Showings extends Component {
   navigateToShowing = showing => {
-    this.props.history.push(`/showings/${showing.webId}/${showing.slug}`);
+    navigateToShowing(this.props.history, showing);
   };
 
   navigateToTickets = showing => {
-    this.props.history.push(`/showings/${showing.id}/tickets`);
+    navigateToShowingTickets(this.props.history, showing);
   };
 
   renderShowings = (showings, disabled) => {

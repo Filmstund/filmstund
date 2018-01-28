@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import { graphql } from "react-apollo";
 import { compose, branch, renderComponent } from "recompose";
 import gql from "graphql-tag";
@@ -12,6 +12,7 @@ import Footer from "./footer/Footer";
 import WelcomeModal from "./WelcomeModal";
 import { completeUserFragment } from "./fragments/currentUser";
 import Loader from "./ProjectorLoader";
+import { UUIDToWebId } from "./UUIDToWebId";
 
 const PaddingContainer = styled.div`
   padding: 1em;
@@ -50,14 +51,24 @@ const App = ({ data: { me }, signout }) => (
           <Route exact path="/showings" component={AsyncShowings} />
           <Route path="/showings/new/:movieId?" component={AsyncNewShowing} />
           <Route
-            path="/showings/:showingId/tickets"
+            path="/showings/:webId/:slug/tickets"
             component={AsyncShowingTickets}
           />
           <Route
-            path="/showings/:showingId/edit"
+            path="/showings/:webId/:slug/edit"
             component={AsyncEditShowing}
           />
-          <Route path="/showings/:showingId" component={AsyncSingleShowing} />
+          <Route path="/showings/:webId/:slug" component={AsyncSingleShowing} />
+          <Route
+            path="/showings/:showingId/:rest?"
+            render={props => (
+              <UUIDToWebId {...props.match.params}>
+                {({ webId, slug }) => (
+                  <Redirect to={`/showings/${webId}/${slug}`} />
+                )}
+              </UUIDToWebId>
+            )}
+          />
         </Switch>
       </PaddingContainer>
     </ScrollContainer>

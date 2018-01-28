@@ -12,6 +12,10 @@ import { Jumbotron } from "./Jumbotron";
 import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { RedHeader } from "../RedHeader";
 import { getTodaysDate, formatYMD } from "../lib/dateTools";
+import {
+  navigateToShowing,
+  navigateToShowingTickets
+} from "../navigators/index";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -51,11 +55,11 @@ const ShowingsWrapper = styled.div`
 
 class Home extends Component {
   navigateToShowing = showing => {
-    this.props.history.push(`/showings/${showing.webId}/${showing.slug}`);
+    navigateToShowing(this.props.history, showing);
   };
 
   navigateToTickets = showing => {
-    this.props.history.push(`/showings/${showing.id}/tickets`);
+    navigateToShowingTickets(this.props.history, showing);
   };
 
   renderShowings = showings => {
@@ -144,6 +148,8 @@ const data = graphql(
       showings: publicShowings {
         ...Showing
         id
+        webId
+        slug
         date
         time
         admin {
