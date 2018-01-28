@@ -4,6 +4,8 @@ import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import background from "../assets/body_background.jpg";
 import googleIcon from "../assets/google-logo.svg";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faCircleNotch from "@fortawesome/fontawesome-free-solid/faCircleNotch";
 import {
   setUserInfo,
   clearSession,
@@ -15,6 +17,7 @@ import { provideGoogleLogin } from "../GoogleLoginProvider";
 const LoginContainer = styled.div`
   min-height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
@@ -26,6 +29,15 @@ const Container = styled.div`
   background-repeat: no-repeat;
   background-color: black;
   justify-content: center;
+`;
+
+const ErrorBox = styled.div`
+  text-align: center;
+  max-width: 500px;
+  padding: 1em;
+  background-color: #ef5353;
+  color: white;
+  margin: 0 0 2rem;
 `;
 
 const ContentContainer = styled.div`
@@ -71,16 +83,32 @@ const GoogleLogo = styled.img`
 
 class Login extends Component {
   state = {
-    signedIn: hasToken()
+    signedIn: hasToken(),
+    loaded: false,
+    cookiesBlocked: false
   };
 
   componentDidMount() {
-    this.props
+    return this.props
       .initGoogleAuth({
         loginHint: getGoogleId(),
         clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID
       })
-      .then(this.googleUserChanged);
+      .then(this.googleUserChanged)
+      .catch(e => {
+        if (e.error === "idpiframe_initialization_failed") {
+          this.setState({
+            cookiesBlocked: true
+          });
+        } else {
+          throw e;
+        }
+      })
+      .then(() => {
+        this.setState({
+          loaded: true
+        });
+      });
   }
 
   googleAuthSuccess = user => {
@@ -125,7 +153,7 @@ class Login extends Component {
   };
 
   render() {
-    const { signedIn } = this.state;
+    const { signedIn, cookiesBlocked, loaded } = this.state;
     const { children } = this.props;
 
     if (signedIn) {
@@ -141,6 +169,12 @@ class Login extends Component {
     return (
       <Container>
         <LoginContainer>
+          {cookiesBlocked && (
+            <ErrorBox>
+              Du verkar ha blockerat tredjepartskakor, vänligen vitlista kakor
+              från "accounts.google.com" för att kunna logga in!
+            </ErrorBox>
+          )}
           <LoginDialog>
             <img
               src={require("../assets/logo.png")}
@@ -148,9 +182,20 @@ class Login extends Component {
               alt="IT-bio logga"
             />
             <h3>Logga in för att boka biobesök!</h3>
-            <GoogleButton onClick={this.signin}>
-              <GoogleLogo src={googleIcon} /> Logga in via Google
-            </GoogleButton>
+            {loaded ? (
+              !cookiesBlocked && (
+                <GoogleButton onClick={this.signin}>
+                  <GoogleLogo src={googleIcon} /> Logga in via Google
+                </GoogleButton>
+              )
+            ) : (
+              <FontAwesomeIcon
+                color="#d0021b"
+                size="3x"
+                icon={faCircleNotch}
+                spin
+              />
+            )}
           </LoginDialog>
         </LoginContainer>
       </Container>
