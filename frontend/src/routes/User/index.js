@@ -154,7 +154,10 @@ const data = graphql(
       }
     }
     ${completeUserFragment}
-  `
+  `,
+  {
+    options: { fetchPolicy: "cache-and-network" }
+  }
 );
 
 const update = graphql(

@@ -13,7 +13,11 @@ import { formatYMD } from "../../lib/dateTools";
 import { graphql, compose } from "react-apollo";
 import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
+import { margin } from "../../lib/style-vars";
 import StatusMessageBox from "../../StatusMessageBox";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
+import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
 
 const DEFAULT_DATE = moment().add(1, "years");
 
@@ -28,9 +32,8 @@ const ForetagsbiljettInput = styled(Input)`
   background: ${props => (props.disabled ? "rgba(0, 0, 0, 0.04)" : "inherit")};
 `;
 
-const TrashIcon = styled.span`
-  font-size: 1.5em;
-  padding-left: 0.5em;
+const IconButton = styled(FontAwesomeIcon)`
+  padding-left: ${margin};
   cursor: pointer;
 `;
 
@@ -38,15 +41,9 @@ const BiljettField = styled(Field)`
   padding: 0 0.5em;
 `;
 
-const AddIcon = styled.span`
-  font-size: 1.5em;
-  cursor: pointer;
-`;
-
 const AddForetagsbiljettContainer = styled.div`
   max-width: 15em;
   display: flex;
-  justify-content: center;
   padding-bottom: 2em;
 `;
 
@@ -104,13 +101,12 @@ const Foretagsbiljett = ({
     <BiljettField text="Status">
       {localizeTicketStatus(biljett.status)}
     </BiljettField>
-    <TrashIcon>
-      <i
-        onClick={() => handleRemoveForetagsbiljett(biljett, index)}
-        className="fa fa-trash"
-        aria-hidden="true"
-      />
-    </TrashIcon>
+
+    <IconButton
+      size="2x"
+      icon={faTrash}
+      onClick={() => handleRemoveForetagsbiljett(biljett, index)}
+    />
   </ForetagsbiljettWrapper>
 );
 
@@ -205,9 +201,28 @@ class ForetagsbiljettList extends Component {
     ));
   };
 
+  handleDeleteForetagsBiljett = ({ status, number, expires }) => {
+    switch (status) {
+      case "Available":
+        if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
+          this.props.deleteForetagsbiljett({ number, expires });
+        }
+        break;
+      case "Pending":
+        window.alert("Biljetten används på en visning som ej har bokats ännu");
+        break;
+      case "Used":
+      case "Expired":
+        this.props.deleteForetagsbiljett({ number, expires });
+        break;
+      default:
+        throw new Error(`Invalid status ${status}`);
+    }
+  };
+
   render() {
     const { tempTickets, errors, success } = this.state;
-    const { foretagsbiljetter = [], deleteForetagsbiljett } = this.props;
+    const { foretagsbiljetter = [] } = this.props;
 
     return (
       <div>
@@ -217,19 +232,14 @@ class ForetagsbiljettList extends Component {
           success={success}
           successMessage="Företagsbiljetter uppdaterades!"
         />
-        {this.renderTickets(
-          foretagsbiljetter,
-          false,
-          ({ number, expires }, index) =>
-            deleteForetagsbiljett({ number, expires: formatYMD(expires) })
+        {this.renderTickets(foretagsbiljetter, false, (ticket, index) =>
+          this.handleDeleteForetagsBiljett(ticket)
         )}
         {this.renderTickets(tempTickets, true, (biljett, index) =>
           this.handleRemoveForetagsbiljett(index)
         )}
         <AddForetagsbiljettContainer onClick={this.addForetagsbiljett}>
-          <AddIcon>
-            <i className="fa fa-plus-circle" aria-hidden="true" />
-          </AddIcon>
+          <IconButton size="2x" icon={faPlusCircle} />
         </AddForetagsbiljettContainer>
         <MainButton onClick={this.handleSubmit}>
           Spara företagsbiljetter

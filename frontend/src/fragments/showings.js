@@ -94,8 +94,8 @@ export const deleteShowing = graphql(
     }
   `,
   {
-    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
-      deleteShowing: () => wrapMutate(mutate, { showingId })
+    props: ({ mutate }) => ({
+      deleteShowing: showingId => wrapMutate(mutate, { showingId })
     }),
     options: {
       refetchQueries: ["ShowingsQuery"]
