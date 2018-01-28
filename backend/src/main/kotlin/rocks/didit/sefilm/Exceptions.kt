@@ -11,7 +11,8 @@ class NotFoundException(what: String, userID: UserID? = null, showingId: UUID? =
   KnownException("Could not find $what", userID, showingId)
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-class MissingPhoneNumberException(userID: UserID) : KnownException("User is missing a phone number", userID)
+class MissingPhoneNumberException(userID: UserID) :
+  KnownException("You are missing a phone number.", userID)
 
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class MissingParametersException(what: String = "") : KnownException("Some required parameters were missing: " + what)
