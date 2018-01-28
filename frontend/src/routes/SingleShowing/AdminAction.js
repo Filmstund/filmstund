@@ -2,14 +2,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router";
 
-import MainButton, { GrayButton, RedButton } from "../../MainButton";
+import MainButton, { GrayButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
 import gql from "graphql-tag";
-import {
-  markAsBought,
-  deleteShowing,
-  togglePaidChange
-} from "../../fragments/showings";
+import { markAsBought, togglePaidChange } from "../../fragments/showings";
 import { compose } from "react-apollo";
 import { navigateToEditShowing } from "../../navigators/index";
 import { addTickets } from "../../fragments/tickets";
@@ -93,16 +89,6 @@ class AdminAction extends Component {
       });
   };
 
-  handleDelete = () => {
-    const proceed = window.confirm("Är du säker? Går ej att ångra!");
-
-    if (proceed) {
-      this.props.deleteShowing().then(() => {
-        this.props.history.push("/showings");
-      });
-    }
-  };
-
   handleEdit = () => {
     const { history, showing } = this.props;
     navigateToEditShowing(history, showing);
@@ -146,10 +132,7 @@ class AdminAction extends Component {
             Alla är med, nu bokar vi!
           </MainButton>
         )}
-        {!ticketsBought && (
-          <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
-        )}
-        <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
+        <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
       </React.Fragment>
     );
   }
@@ -192,10 +175,6 @@ export const showingAdminFragment = gql`
   }
 `;
 
-export default compose(
-  withRouter,
-  markAsBought,
-  deleteShowing,
-  addTickets,
-  togglePaidChange
-)(AdminAction);
+export default compose(withRouter, markAsBought, addTickets, togglePaidChange)(
+  AdminAction
+);

@@ -7,12 +7,21 @@ import Header from "./Header";
 import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
-import MainButton from "./MainButton";
+import MainButton, { RedButton } from "./MainButton";
 import { formatYMD } from "./lib/dateTools";
 import StatusMessageBox from "./StatusMessageBox";
 import { navigateToShowing } from "./navigators/index";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
+import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
+import styled from "styled-components";
+import { margin } from "./lib/style-vars";
 
 const today = moment();
+
+const FaIcon = styled(FontAwesomeIcon)`
+  margin-right: ${margin};
+`;
 
 class EditShowingForm extends Component {
   constructor(props) {
@@ -88,8 +97,21 @@ class EditShowingForm extends Component {
       });
   };
 
+  handleDelete = () => {
+    const proceed = window.confirm("Är du säker? Går ej att ångra!");
+    const { data: { showing } } = this.props;
+
+    if (proceed) {
+      this.props.deleteShowing(showing.id).then(() => {
+        this.props.history.push("/showings");
+      });
+    }
+  };
+
   render() {
-    const { data: { showing: { movie, admin, date } } } = this.props;
+    const {
+      data: { showing: { movie, admin, date, ticketsBought } }
+    } = this.props;
     const { showing, dateFocused, errors } = this.state;
 
     return (
@@ -136,7 +158,14 @@ class EditShowingForm extends Component {
               onChange={v => this.setShowingValueFromEvent("price", v)}
             />
           </Field>
-          <MainButton onClick={this.handleSubmit}>Uppdatera besök</MainButton>
+          {!ticketsBought && (
+            <RedButton onClick={this.handleDelete}>
+              <FaIcon icon={faTrash} /> Ta bort besök
+            </RedButton>
+          )}
+          <MainButton onClick={this.handleSubmit}>
+            <FaIcon icon={faEdit} /> Uppdatera besök
+          </MainButton>
         </div>
       </div>
     );
