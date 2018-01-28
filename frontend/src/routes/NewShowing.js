@@ -14,6 +14,7 @@ import Input from "../Input";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
 import { fetchMovies } from "../fragments/movies";
+import { navigateToShowing } from "../navigators/index";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -134,8 +135,8 @@ class NewShowing extends Component {
     this.props.history.push(`/showings/new/${movie.id}`);
   };
 
-  navigateToShowing = showingId => {
-    this.props.history.push(`/showings/${showingId}`);
+  navigateToShowing = showing => {
+    navigateToShowing(this.props.history, showing);
   };
 
   clearSelectedMovie = () => {

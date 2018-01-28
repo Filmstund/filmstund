@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
 import "react-dates/lib/css/_datepicker.css";
@@ -10,10 +10,11 @@ import Field from "./Field";
 import MainButton from "./MainButton";
 import { formatYMD } from "./lib/dateTools";
 import StatusMessageBox from "./StatusMessageBox";
+import { navigateToShowing } from "./navigators/index";
 
 const today = moment();
 
-class EditShowingForm extends React.Component {
+class EditShowingForm extends Component {
   constructor(props) {
     super(props);
     const { showing } = props.data;
@@ -63,12 +64,17 @@ class EditShowingForm extends React.Component {
     );
   };
 
+  navigateToShowing = () => {
+    const { history, data: { showing } } = this.props;
+    navigateToShowing(history, showing);
+  };
+
   handleSubmit = () => {
     const { showing: newValues } = this.state;
     const { data: { showing } } = this.props;
 
     this.props
-      .updateShowing({
+      .updateShowing(showing.id, {
         expectedBuyDate: formatYMD(newValues.expectedBuyDate),
         private: showing.private,
         payToUser: showing.payToUser.id,
@@ -76,9 +82,7 @@ class EditShowingForm extends React.Component {
         time: newValues.time,
         price: (parseInt(newValues.price, 10) || 0) * 100
       })
-      .then(() => {
-        this.props.navigateToShowing();
-      })
+      .then(this.navigateToShowing)
       .catch(errors => {
         this.setState({ errors });
       });
