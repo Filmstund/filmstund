@@ -91,7 +91,7 @@ class CalendarService(
     val paymentDetails = showingService.getAttendeePaymentDetailsForUser(userId, showingId)
 
     return if (paymentDetails == null || paymentDetails.hasPaid) {
-      "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/${movie.imdbId.value}/" else ""}"
+      "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/title/${movie.imdbId.value}/" else ""}"
     } else {
       val phoneNumber = userService.getUser(paymentDetails.payTo)?.phone
       "Betala ${paymentDetails.amountOwed.toKronor()} kr till $phoneNumber"
