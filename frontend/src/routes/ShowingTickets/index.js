@@ -4,62 +4,13 @@ import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import TicketContainer from "./TicketContainer";
 import Loader from "../../ProjectorLoader";
-import { wrapMutate } from "../../store/apollo";
+import { ticketFragment, addTickets } from "../../fragments/tickets";
 
 const routerParamsToShowingId = ({ match, history }) => {
   const { webId } = match.params;
 
   return { webId };
 };
-
-const ticketFragment = gql`
-  fragment Ticket on Showing {
-    id
-    webId
-    slug
-    admin {
-      id
-    }
-    ticketRange {
-      rows
-      seatings {
-        row
-        numbers
-      }
-    }
-    sfSeatMap {
-      row
-      number
-      seatType
-      coordinates {
-        x
-        y
-      }
-      dimensions {
-        width
-        height
-      }
-    }
-    myTickets {
-      id
-      barcode
-      customerType
-      customerTypeDefinition
-      cinema
-      screen
-      profileId
-      seat {
-        row
-        number
-      }
-      date
-      time
-      movieName
-      movieRating
-      showAttributes
-    }
-  }
-`;
 
 const data = graphql(
   gql`
@@ -77,22 +28,6 @@ const data = graphql(
     options: {
       fetchPolicy: "cache-and-network"
     }
-  }
-);
-
-const addTickets = graphql(
-  gql`
-    mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
-      processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
-        ...Ticket
-      }
-    }
-    ${ticketFragment}
-  `,
-  {
-    props: ({ mutate, ownProps: { showingId } }) => ({
-      addTickets: tickets => wrapMutate(mutate, { showingId, tickets })
-    })
   }
 );
 

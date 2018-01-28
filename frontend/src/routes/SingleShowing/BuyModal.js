@@ -14,6 +14,7 @@ import PaymentParticipantsList from "./PaymentParticipantsList";
 import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
+import StatusMessageBox from "../../StatusMessageBox";
 
 const Padding = styled.div`
   padding: 0 1em;
@@ -92,6 +93,7 @@ const SfMembershipList = ({ sfData, participants }) => (
 );
 
 const BuyModal = ({
+  errors,
   ticketPrice,
   cinemaTicketUrls,
   setPrice,
@@ -153,6 +155,7 @@ const BuyModal = ({
                 sfData={sfData}
                 participants={showing.participants}
               />
+              <StatusMessageBox errors={errors} />
               <Field text="Biljettpris:">
                 <Input
                   type="number"

@@ -19,13 +19,14 @@ export default class TicketContainer extends Component {
 
   handleSubmitCinemaTicketUrls = () => {
     const { cinemaTicketUrls } = this.state;
+    const { data: { showing } } = this.props;
 
     const nonEmptyUrls = cinemaTicketUrls.filter(
       line => line.trim().length !== 0
     );
 
     this.props
-      .addTickets(nonEmptyUrls)
+      .addTickets(showing.id, nonEmptyUrls)
       .then(() => {
         this.setState({ success: true, errors: null, cinemaTicketUrls: [] });
       })
