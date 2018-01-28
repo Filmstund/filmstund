@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { withProps, renderComponent, branch } from "recompose";
 import EditShowingForm from "../EditShowingForm";
 import { showingFragment } from "../Showing";
-import { updateShowing } from "../fragments/showings";
+import { updateShowing, deleteShowing } from "../fragments/showings";
 import Loader from "../ProjectorLoader";
 
 const routerParamsToShowingId = ({ match, history }) => {
@@ -41,5 +41,6 @@ export default compose(
   withProps(routerParamsToShowingId),
   data,
   updateShowing,
+  deleteShowing,
   isLoading
 )(EditShowingForm);
