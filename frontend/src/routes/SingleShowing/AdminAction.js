@@ -12,6 +12,7 @@ import {
 } from "../../fragments/showings";
 import { compose } from "react-apollo";
 import { navigateToEditShowing } from "../../navigators/index";
+import { addTickets } from "../../fragments/tickets";
 
 class AdminAction extends Component {
   constructor(props) {
@@ -55,7 +56,8 @@ class AdminAction extends Component {
 
   handleStartBooking = () => {
     this.setState({
-      showModal: true
+      showModal: true,
+      errors: null
     });
   };
 
@@ -70,20 +72,25 @@ class AdminAction extends Component {
 
     const { showing } = this.props;
     this.props
-      .markShowingBought({
-        showing: {
-          private: showing.private,
-          payToUser: showing.payToUser.id,
-          location: showing.location.name,
-          time: showing.time,
-          sfScreen: showing.sfScreen
-            ? { name: showing.sfScreen.name, sfId: showing.sfScreen.sfId }
-            : null,
-          price: ticketPrice * 100
-        },
-        ticketUrls: nonEmptyTicketUrls
-      })
-      .then(this.handleStartBooking);
+      .addTickets(showing.id, nonEmptyTicketUrls)
+      .then(() =>
+        this.props.markShowingBought(showing.id, {
+          showing: {
+            private: showing.private,
+            payToUser: showing.payToUser.id,
+            location: showing.location.name,
+            time: showing.time,
+            sfScreen: showing.sfScreen
+              ? { name: showing.sfScreen.name, sfId: showing.sfScreen.sfId }
+              : null,
+            price: ticketPrice * 100
+          }
+        })
+      )
+      .then(this.handleStartBooking)
+      .catch(errors => {
+        this.setState({ errors });
+      });
   };
 
   handleDelete = () => {
@@ -106,6 +113,7 @@ class AdminAction extends Component {
     const { ticketsBought } = showing;
 
     const {
+      errors,
       ticketPrice,
       cinemaTicketUrls,
       showModal,
@@ -116,6 +124,7 @@ class AdminAction extends Component {
       <React.Fragment>
         {showModal && (
           <BuyModal
+            errors={errors}
             setPrice={this.setPrice}
             setCinemaTicketUrls={this.setCinemaTicketUrls}
             showing={showing}
@@ -187,5 +196,6 @@ export default compose(
   withRouter,
   markAsBought,
   deleteShowing,
+  addTickets,
   togglePaidChange
 )(AdminAction);
