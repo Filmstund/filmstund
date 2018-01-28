@@ -11,7 +11,6 @@ import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
-import rocks.didit.sefilm.managers.SlugManager
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
@@ -23,7 +22,7 @@ class ShowingService(
   private val movieService: MovieService,
   private val userService: UserService,
   private val ticketService: TicketService,
-  private val slugManager: SlugManager,
+  private val slugService: SlugService,
   private val sfService: SFService,
   private val locationService: LocationService,
   private val assertionService: AssertionService
@@ -258,7 +257,7 @@ class ShowingService(
     val location = locationService.getOrCreateNewLocation(this.location)
     return Showing(
       webId = Base64ID.random(),
-      slug = slugManager.generateSlugFor(movie),
+      slug = slugService.generateSlugFor(movie),
       date = this.date,
       time = this.time,
       movieId = this.movieId,

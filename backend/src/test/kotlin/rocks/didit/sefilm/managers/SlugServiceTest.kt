@@ -10,16 +10,17 @@ import org.mockito.junit.MockitoJUnitRunner
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.services.SlugService
 import java.util.*
 
 @RunWith(MockitoJUnitRunner.StrictStubs::class)
-class SlugManagerTest {
+class SlugServiceTest {
 
   @Mock
   private lateinit var movieRepoMock: MovieRepository
 
   @InjectMocks
-  private lateinit var slugManager: SlugManager
+  private lateinit var slugService: SlugService
 
   @Test
   fun testGenerateSlugForShowing() {
@@ -208,7 +209,7 @@ class SlugManagerTest {
 
     Mockito.`when`(movieRepoMock.findById(Mockito.any() ?: UUID.randomUUID())).thenReturn(Optional.of(movie))
 
-    val generatedSlug = slugManager.generateSlugFor(showing)
+    val generatedSlug = slugService.generateSlugFor(showing)
     Assert.assertEquals("Expected slug to be $expectedSlug for $movieName", expectedSlug, generatedSlug)
   }
 

@@ -1,12 +1,11 @@
-package rocks.didit.sefilm.managers
+package rocks.didit.sefilm.services
 
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.services.MovieService
 
-@Component
-class SlugManager(private val movieService: MovieService) {
+@Service
+class SlugService(private val movieService: MovieService) {
   companion object {
     const val MAX_LENGTH = 45
   }
@@ -42,6 +41,6 @@ class SlugManager(private val movieService: MovieService) {
     if (this.length <= length) {
       return this
     }
-    return this.substring(0, SlugManager.MAX_LENGTH)
+    return this.substring(0, MAX_LENGTH)
   }
 }

@@ -39,8 +39,8 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
-import rocks.didit.sefilm.managers.SlugManager
 import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.services.SlugService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import rocks.didit.sefilm.web.controllers.CalendarController
 import java.math.BigDecimal
@@ -110,7 +110,7 @@ class Application {
   }
 
   @Bean
-  fun createSlugsAndWebIds(showingRepository: ShowingRepository, slugManager: SlugManager) = ApplicationRunner {
+  fun createSlugsAndWebIds(showingRepository: ShowingRepository, slugService: SlugService) = ApplicationRunner {
     val showingsWithMissingWebId = showingRepository
       .findAll()
       .filter {
@@ -118,7 +118,7 @@ class Application {
       }
 
     val updatedShowings = showingsWithMissingWebId.map {
-      it.copy(webId = Base64ID.random(), slug = slugManager.generateSlugFor(it))
+      it.copy(webId = Base64ID.random(), slug = slugService.generateSlugFor(it))
     }
     showingRepository.saveAll(updatedShowings)
   }
