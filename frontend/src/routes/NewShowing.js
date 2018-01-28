@@ -8,6 +8,8 @@ import { withRouter } from "react-router";
 import Header from "../Header";
 import Movie, { movieFragment } from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faSync from "@fortawesome/fontawesome-free-solid/faSyncAlt";
 
 import Field from "../Field";
 import Input from "../Input";
@@ -67,18 +69,6 @@ class NewShowing extends Component {
     });
   };
 
-  renderRequestButton = () => {
-    const { requestingData } = this.state;
-    return (
-      <RefreshButton role="button" onClick={this.requestSFData}>
-        <i
-          className={cx("fa fa-refresh", { "fa-spin": requestingData })}
-          aria-hidden="true"
-        />
-      </RefreshButton>
-    );
-  };
-
   setSearchTerm = term => {
     this.setState({
       searchTerm: term.target.value
@@ -102,12 +92,17 @@ class NewShowing extends Component {
   }
 
   renderSelectMovie = movies => {
-    const { searchTerm } = this.state;
+    const { searchTerm, requestingData } = this.state;
 
     return (
       <div>
         <Helmet title="Skapa besök" />
-        <FlexHeader>Skapa besök {this.renderRequestButton()}</FlexHeader>
+        <FlexHeader>
+          <RefreshButton role="button" onClick={this.requestSFData}>
+            <FontAwesomeIcon icon={faSync} spin={requestingData} />
+          </RefreshButton>
+          Skapa besök
+        </FlexHeader>
         <SearchField>
           <Input
             type="text"
