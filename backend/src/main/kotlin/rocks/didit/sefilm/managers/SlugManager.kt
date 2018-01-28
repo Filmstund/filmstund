@@ -1,25 +1,23 @@
 package rocks.didit.sefilm.managers
 
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.services.MovieService
 
 @Component
-class SlugManager(private val movieRepository: MovieRepository) {
+class SlugManager(private val movieService: MovieService) {
   companion object {
     const val MAX_LENGTH = 45
   }
 
-  fun generateSlugFor(movie: Movie): String = sluggifyString(movie.title)
+  fun generateSlugFor(movie: Movie): String = sluggifyString(movie.originalTitle ?: movie.title)
 
   fun generateSlugFor(showing: Showing): String {
     if (showing.movieId == null) {
       throw IllegalArgumentException("Movie ID is null for showing ${showing.id}")
     }
-    val movie = movieRepository.findById(showing.movieId)
-      .orElseThrow { NotFoundException("movie ${showing.movieId}") }
+    val movie = movieService.getMovieOrThrow(showing.movieId)
 
     return sluggifyString(movie.originalTitle ?: movie.title)
   }
