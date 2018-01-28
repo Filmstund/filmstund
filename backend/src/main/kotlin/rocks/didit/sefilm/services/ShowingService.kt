@@ -4,12 +4,14 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.*
+import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
+import rocks.didit.sefilm.managers.SlugManager
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
@@ -21,6 +23,7 @@ class ShowingService(
   private val movieService: MovieService,
   private val userService: UserService,
   private val ticketService: TicketService,
+  private val slugManager: SlugManager,
   private val sfService: SFService,
   private val locationService: LocationService,
   private val assertionService: AssertionService
@@ -162,13 +165,10 @@ class ShowingService(
 
   fun createShowing(data: CreateShowingDTO): ShowingDTO {
     if (data.date == null || data.location == null || data.movieId == null || data.time == null) throw MissingParametersException()
-    if (!movieService.movieExists(data.movieId)) {
-      throw NotFoundException("movie '${data.movieId}'. Can't create showing for movie that does not exist")
-    }
 
     val adminUser = userService.currentUser().toLimitedUserDTO()
     return showingRepo
-      .save(data.toShowing(adminUser))
+      .save(data.toShowing(adminUser, movieService.getMovieOrThrow(data.movieId)))
       .toDto()
   }
 
@@ -251,12 +251,14 @@ class ShowingService(
   private fun Showing.isParticipantInShowing(userID: UserID): Boolean = this.participants.any { it.userId == userID }
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
-  private fun CreateShowingDTO.toShowing(admin: LimitedUserDTO): Showing {
+  private fun CreateShowingDTO.toShowing(admin: LimitedUserDTO, movie: Movie): Showing {
     if (this.location == null) {
       throw IllegalArgumentException("Location may not be null")
     }
     val location = locationService.getOrCreateNewLocation(this.location)
     return Showing(
+      webId = Base64ID.random(),
+      slug = slugManager.generateSlugFor(movie),
       date = this.date,
       time = this.time,
       movieId = this.movieId,

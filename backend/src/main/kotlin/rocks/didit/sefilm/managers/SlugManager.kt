@@ -2,6 +2,7 @@ package rocks.didit.sefilm.managers
 
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.repositories.MovieRepository
 
@@ -10,6 +11,8 @@ class SlugManager(private val movieRepository: MovieRepository) {
   companion object {
     const val MAX_LENGTH = 45
   }
+
+  fun generateSlugFor(movie: Movie): String = sluggifyString(movie.title)
 
   fun generateSlugFor(showing: Showing): String {
     if (showing.movieId == null) {
