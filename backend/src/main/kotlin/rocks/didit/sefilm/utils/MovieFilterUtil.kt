@@ -12,7 +12,8 @@ class MovieFilterUtil {
       " - Bollywood",
       " (Director´s cut)",
       " 70 mm",
-      " - Exklusiv smygpremiär"
+      " - Exklusiv smygpremiär",
+      " - Smygpremiär"
     )
 
     private val GENRES_TO_IGNORE = listOf(
