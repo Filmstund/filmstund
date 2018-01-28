@@ -39,7 +39,6 @@ data class Showing(
   @CreatedDate
   val createdDate: Instant = Instant.now()
 ) {
-  // TODO: add more auditing
 
   fun toDto() = ShowingDTO(
     id = id,

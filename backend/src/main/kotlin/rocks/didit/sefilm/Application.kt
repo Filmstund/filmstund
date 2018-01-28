@@ -16,8 +16,6 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
-import org.springframework.data.mongodb.config.EnableMongoAuditing
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -28,8 +26,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import rocks.didit.sefilm.database.ImdbIdConverter
-import rocks.didit.sefilm.database.TmdbIdConverter
 import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.BudordRepository
@@ -46,7 +42,6 @@ import rocks.didit.sefilm.web.controllers.CalendarController
 import java.math.BigDecimal
 
 @SpringBootApplication
-@EnableMongoAuditing
 @EnableCaching
 @EnableWebSecurity
 @EnableAsync
@@ -57,12 +52,6 @@ class Application {
 
   companion object {
     const val API_BASE_PATH = "/api"
-  }
-
-  @Bean
-  fun customMongoConverters(): MongoCustomConversions {
-    val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
-    return MongoCustomConversions(converters)
   }
 
   @Bean
@@ -170,7 +159,8 @@ class Application {
     val defaultCity = properties.defaultCity
     val locationsFromSF = sfService.getLocationsInCity(properties.defaultCity)
       .map {
-        Location(it.title,
+        Location(
+          it.title,
           it.address.city["alias"],
           it.address.city["name"],
           it.address.streetAddress,

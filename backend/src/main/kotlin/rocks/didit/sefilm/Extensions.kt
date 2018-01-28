@@ -1,13 +1,14 @@
 package rocks.didit.sefilm
 
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.UserID
 
 internal fun currentLoggedInUser(): UserID {
-  val authentication = SecurityContextHolder.getContext().authentication
-  if (!authentication.isAuthenticated) {
+  val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+  if (authentication?.isAuthenticated != true) {
     throw IllegalStateException("Cannot get current user if user isn't authenticated")
   }
 

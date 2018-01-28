@@ -1,7 +1,10 @@
 package rocks.didit.sefilm.services
 
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -34,6 +37,16 @@ class UserService(
     return getCompleteUser(userID)
       ?.toDTO()
       .orElseThrow { NotFoundException("current user", userID) }
+  }
+
+  fun currentUserOrNull(): User? {
+    val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+    if (authentication?.isAuthenticated != false) {
+      return null
+    }
+
+    val principal = authentication.principal as OpenIdConnectUserDetails
+    return getCompleteUser(UserID(principal.userId))
   }
 
   private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUser())

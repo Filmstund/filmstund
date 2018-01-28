@@ -19,7 +19,6 @@ data class Location(
   val sfId: String? = null,
   val alias: List<String> = listOf()
 ) {
-  // TODO: add auditing (@CreatedBy, etc)
 
   fun isSfLocation() = sfId != null
 
