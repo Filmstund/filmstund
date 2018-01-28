@@ -17,7 +17,8 @@ data class Location(
   val latitude: BigDecimal? = null,
   val longitude: BigDecimal? = null,
   val sfId: String? = null,
-  val alias: List<String> = listOf()) {
+  val alias: List<String> = listOf()
+) {
   // TODO: add auditing (@CreatedBy, etc)
 
   fun isSfLocation() = sfId != null

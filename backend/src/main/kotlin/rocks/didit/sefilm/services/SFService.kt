@@ -24,7 +24,8 @@ class SFService(
   private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,
   private val httpEntity: HttpEntity<Void>,
-  private val properties: Properties) {
+  private val properties: Properties
+) {
 
   companion object {
     private const val API_URL = "https://www.sf.se/api"
@@ -68,7 +69,13 @@ class SFService(
   }
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
-    val body = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId).body
+    val body = restTemplate.exchange(
+      API_URL + "/v1/movies/{sfId}",
+      HttpMethod.GET,
+      httpEntity,
+      SfExtendedMovieDTO::class.java,
+      sfId
+    ).body
     if (body?.ncgId == null) {
       return null
     }
@@ -128,7 +135,14 @@ class SFService(
   fun getSfSeatMap(cinemaId: String, screenId: String): List<SfSeatMapDTO> {
     log.debug("Fetching seat map from $SEAT_MAP_URL with cinemaId=$cinemaId, screenId=$screenId")
     return restTemplate
-      .exchange(SEAT_MAP_URL, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<SfSeatMapDTO>>() {}, cinemaId, screenId)
+      .exchange(
+        SEAT_MAP_URL,
+        HttpMethod.GET,
+        httpEntity,
+        object : ParameterizedTypeReference<List<SfSeatMapDTO>>() {},
+        cinemaId,
+        screenId
+      )
       .body ?: listOf()
   }
 }

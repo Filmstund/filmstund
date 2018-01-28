@@ -1,12 +1,14 @@
 [
   {
     "name": "Hubben 2.1",
-    "latitude":57.6882996,
+    "latitude": 57.6882996,
     "longitude": 11.9770396,
     "city": "Göteborg",
     "streetAddress": "Hörsalsvägen 9",
     "postalCode": "412 58",
     "postalAddress": "Göteborg",
-    "alias": ["Hubben"]
+    "alias": [
+      "Hubben"
+    ]
   }
 ]

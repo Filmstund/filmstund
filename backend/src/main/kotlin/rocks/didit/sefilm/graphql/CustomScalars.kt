@@ -52,42 +52,44 @@ class CustomScalarSEK : GraphQLScalarType("SEK", "Swedish Kronor", object : Coer
 })
 
 @Component
-class CustomScalarLocalDate : GraphQLScalarType("LocalDate", "Simple LocalDate, i.e. 2017-12-01", object : Coercing<LocalDate, String> {
-  override fun parseLiteral(input: Any?): LocalDate? {
-    return when (input) {
-      is StringValue -> LocalDate.parse(input.value)
-      is String -> LocalDate.parse(input)
+class CustomScalarLocalDate :
+  GraphQLScalarType("LocalDate", "Simple LocalDate, i.e. 2017-12-01", object : Coercing<LocalDate, String> {
+    override fun parseLiteral(input: Any?): LocalDate? {
+      return when (input) {
+        is StringValue -> LocalDate.parse(input.value)
+        is String -> LocalDate.parse(input)
+        else -> null
+      }
+    }
+
+    override fun parseValue(input: Any?): LocalDate? = parseLiteral(input)
+
+    override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
+      is String -> dataFetcherResult
+      is LocalDate -> dataFetcherResult.toString()
       else -> null
     }
-  }
-
-  override fun parseValue(input: Any?): LocalDate? = parseLiteral(input)
-
-  override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
-    is String -> dataFetcherResult
-    is LocalDate -> dataFetcherResult.toString()
-    else -> null
-  }
-})
+  })
 
 @Component
-class CustomScalarLocalTime : GraphQLScalarType("LocalTime", "Simple LocalTime, i.e. 19:37:21", object : Coercing<LocalTime, String> {
-  override fun parseLiteral(input: Any?): LocalTime? {
-    return when (input) {
-      is StringValue -> LocalTime.parse(input.value)
-      is String -> LocalTime.parse(input)
+class CustomScalarLocalTime :
+  GraphQLScalarType("LocalTime", "Simple LocalTime, i.e. 19:37:21", object : Coercing<LocalTime, String> {
+    override fun parseLiteral(input: Any?): LocalTime? {
+      return when (input) {
+        is StringValue -> LocalTime.parse(input.value)
+        is String -> LocalTime.parse(input)
+        else -> null
+      }
+    }
+
+    override fun parseValue(input: Any?): LocalTime? = parseLiteral(input)
+
+    override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
+      is String -> dataFetcherResult
+      is LocalTime -> dataFetcherResult.toString()
       else -> null
     }
-  }
-
-  override fun parseValue(input: Any?): LocalTime? = parseLiteral(input)
-
-  override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
-    is String -> dataFetcherResult
-    is LocalTime -> dataFetcherResult.toString()
-    else -> null
-  }
-})
+  })
 
 @Component
 class CustomScalarIMDbID : GraphQLScalarType("IMDbID", "IMDb ID, i.e. tt2527336", object : Coercing<IMDbID, String> {

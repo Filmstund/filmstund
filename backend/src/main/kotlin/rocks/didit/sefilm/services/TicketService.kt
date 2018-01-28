@@ -19,10 +19,12 @@ import rocks.didit.sefilm.domain.dto.TicketRange
 import java.util.*
 
 @Component
-class TicketService(private val sfClient: SFService,
-                    private val userRepository: UserRepository,
-                    private val ticketRepository: TicketRepository,
-                    private val showingRepository: ShowingRepository) {
+class TicketService(
+  private val sfClient: SFService,
+  private val userRepository: UserRepository,
+  private val ticketRepository: TicketRepository,
+  private val showingRepository: ShowingRepository
+) {
 
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
     val user = currentLoggedInUser()
@@ -32,7 +34,8 @@ class TicketService(private val sfClient: SFService,
 
   fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
     val currentLoggedInUser = currentLoggedInUser()
-    val showing = showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
+    val showing =
+      showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
 
     if (showing.admin != currentLoggedInUser) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
@@ -92,7 +95,7 @@ class TicketService(private val sfClient: SFService,
 
   fun getTicketRange(showingId: UUID): TicketRange? {
     val currentLoggedInUser = currentLoggedInUser()
-    if(!isUserIsParticipant(showingId, currentLoggedInUser)) {
+    if (!isUserIsParticipant(showingId, currentLoggedInUser)) {
       return null
     }
 
@@ -113,7 +116,8 @@ class TicketService(private val sfClient: SFService,
 
   private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
     val seat = Seat(this.seat.row, this.seat.number)
-    return Ticket(id = this.id,
+    return Ticket(
+      id = this.id,
       showingId = showingId,
       assignedToUser = assignedToUser,
       customerType = this.customerType,
@@ -128,11 +132,13 @@ class TicketService(private val sfClient: SFService,
       movieRating = this.movie.rating.displayName,
       showAttributes = this.show.attributes.map { it.displayName },
       barcode = barcode,
-      profileId = this.profileId)
+      profileId = this.profileId
+    )
   }
 
   private fun isUserIsParticipant(showingId: UUID, currentLoggedInUser: UserID): Boolean {
-    return showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
+    return showingRepository.findById(showingId)
+      .orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
       .participants
       .any { it.userId == currentLoggedInUser }
   }

@@ -74,7 +74,8 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
 
     val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
     if (maybeUser == null) {
-      val newUser = User(id = UserID(principal.userId),
+      val newUser = User(
+        id = UserID(principal.userId),
         name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
         firstName = principal.firstName,
         lastName = principal.lastName,
@@ -87,11 +88,13 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
       userRepository.save(newUser)
       log.info("Created new user ${newUser.name} (${newUser.id})")
     } else {
-      val updatedUser = maybeUser.copy(name = "${principal.firstName} ${principal.lastName}",
+      val updatedUser = maybeUser.copy(
+        name = "${principal.firstName} ${principal.lastName}",
         firstName = principal.firstName,
         lastName = principal.lastName,
         avatar = principal.avatarUrl,
-        lastLogin = Instant.now())
+        lastLogin = Instant.now()
+      )
       val savedUser = userRepository.save(updatedUser)
       if (savedUser != updatedUser || log.isDebugEnabled) {
         log.info("Updated user ${savedUser.name} (${savedUser.id})")
@@ -104,7 +107,8 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
 @EnableWebSecurity
 @EnableResourceServer
 class ResourceServerConfig(
-  private val properties: Properties) : ResourceServerConfigurerAdapter() {
+  private val properties: Properties
+) : ResourceServerConfigurerAdapter() {
 
   override fun configure(resources: ResourceServerSecurityConfigurer) {
     resources

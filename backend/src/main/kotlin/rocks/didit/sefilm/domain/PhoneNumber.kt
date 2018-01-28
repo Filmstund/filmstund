@@ -13,7 +13,7 @@ data class PhoneNumber(var number: String = "") {
       val parsedPhoneNumber: Phonenumber.PhoneNumber
       try {
         parsedPhoneNumber = phoneUtil.parse(number, "SE")
-      } catch(e: NumberParseException) {
+      } catch (e: NumberParseException) {
         throw IllegalArgumentException("'$number' is not a valid Swedish phone number")
       }
 

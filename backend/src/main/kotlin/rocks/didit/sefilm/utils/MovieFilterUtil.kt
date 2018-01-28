@@ -55,6 +55,6 @@ class MovieFilterUtil {
     return trimmedTitle.trim()
   }
 
-  fun isNewerThan(movie: SfMovieDTO, thisDate: LocalDate = LocalDate.now().minusMonths(1))
-    = movie.releaseDate.isAfter(thisDate)
+  fun isNewerThan(movie: SfMovieDTO, thisDate: LocalDate = LocalDate.now().minusMonths(1)) =
+    movie.releaseDate.isAfter(thisDate)
 }

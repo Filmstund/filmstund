@@ -32,5 +32,6 @@ data class User(
   @LastModifiedDate
   val lastModifiedDate: Instant = Instant.ofEpochSecond(0L)
 ) {
-  fun toLimitedUserDTO() = LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
+  fun toLimitedUserDTO() =
+    LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
 }

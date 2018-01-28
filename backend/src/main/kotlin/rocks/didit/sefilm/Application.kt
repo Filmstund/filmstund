@@ -74,7 +74,10 @@ class Application {
   fun getHttpEntityWithJsonAcceptHeader(): HttpEntity<Void> {
     val httpHeaders = HttpHeaders()
     httpHeaders.accept = listOf(MediaType.APPLICATION_JSON_UTF8)
-    httpHeaders.put("User-Agent", listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"))
+    httpHeaders.put(
+      "User-Agent",
+      listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
+    )
     return HttpEntity(httpHeaders)
   }
 
@@ -120,10 +123,12 @@ class Application {
   private data class LocationAliasDTO(val sfId: String, val alias: List<String>)
 
   @Bean
-  fun seedInitialData(locationsRepo: LocationRepository,
-                      budordRepo: BudordRepository,
-                      sfService: SFService,
-                      properties: Properties) = ApplicationRunner {
+  fun seedInitialData(
+    locationsRepo: LocationRepository,
+    budordRepo: BudordRepository,
+    sfService: SFService,
+    properties: Properties
+  ) = ApplicationRunner {
     if (!properties.enableSeeding) {
       log.info("Seeding not enabled, ignoring...")
       return@ApplicationRunner
@@ -157,7 +162,8 @@ class Application {
           BigDecimal(it.address.coordinates.latitude),
           BigDecimal(it.address.coordinates.longitude),
           it.ncgId,
-          alias = locationNameAlias.firstOrNull() { alias -> alias.sfId == it.ncgId }?.alias ?: listOf())
+          alias = locationNameAlias.firstOrNull() { alias -> alias.sfId == it.ncgId }?.alias ?: listOf()
+        )
       }
 
     locationsRepo.saveAll(locations)
@@ -167,7 +173,8 @@ class Application {
   }
 
   @Bean
-  fun graphqlExecutionStrategy(graphqlExceptionHandler: GraphqlExceptionHandler) = AsyncExecutionStrategy(graphqlExceptionHandler)
+  fun graphqlExecutionStrategy(graphqlExceptionHandler: GraphqlExceptionHandler) =
+    AsyncExecutionStrategy(graphqlExceptionHandler)
 
   @Bean
   fun graphQLServletObjectMapperConfigurer(): ObjectMapperConfigurer {
@@ -188,8 +195,7 @@ class Application {
   }
 
   @Bean
-  fun schemaParserOptions(objConfigurer: com.coxautodev.graphql.tools.ObjectMapperConfigurer)
-    = SchemaParserOptions
+  fun schemaParserOptions(objConfigurer: com.coxautodev.graphql.tools.ObjectMapperConfigurer) = SchemaParserOptions
     .newOptions()
     .objectMapperConfigurer(objConfigurer)
     .build()

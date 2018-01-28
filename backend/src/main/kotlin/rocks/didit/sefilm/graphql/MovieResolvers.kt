@@ -26,7 +26,8 @@ class MovieQueryResolver(private val movieService: MovieService) : GraphQLQueryR
 @Component
 class SfShowingResolver(
   private val sfService: SFService,
-  private val properties: Properties) : GraphQLResolver<Movie> {
+  private val properties: Properties
+) : GraphQLResolver<Movie> {
 
   private val log: Logger = LoggerFactory.getLogger(SfShowingResolver::class.java)
   fun sfShowings(movie: Movie, city: String?, afterDate: LocalDate?): List<SfShowingDTO> {

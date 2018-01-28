@@ -22,10 +22,12 @@ class ErrorController(private val errorAttributes: ErrorAttributes) : ErrorContr
       ?: exception?.message
       ?: errorAttribs["message"] as String
 
-    return ErrorDTO(reason = reason,
+    return ErrorDTO(
+      reason = reason,
       status_code = errorAttribs["status"] as Int,
       status_text = errorAttribs["error"] as String,
-      timestamp = (errorAttribs["timestamp"] as Date).toInstant())
+      timestamp = (errorAttribs["timestamp"] as Date).toInstant()
+    )
   }
 
   override fun getErrorPath(): String {

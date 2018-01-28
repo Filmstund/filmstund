@@ -4,17 +4,21 @@ import rocks.didit.sefilm.database.entities.Location
 import java.io.Serializable
 import java.time.ZonedDateTime
 
-data class CalendarEventDTO(val summary: String,
-                            val location: String? = null,
-                            val attendees: List<Map<String, String>>,
-                            val start: Map<String, Serializable>,
-                            val end: Map<String, Serializable>,
-                            val source: Map<String, String>,
-                            val description: String) {
+data class CalendarEventDTO(
+  val summary: String,
+  val location: String? = null,
+  val attendees: List<Map<String, String>>,
+  val start: Map<String, Serializable>,
+  val end: Map<String, Serializable>,
+  val source: Map<String, String>,
+  val description: String
+) {
 
   companion object Factory {
-    fun of(summary: String, location: Location?, emails: Collection<String>, start: ZonedDateTime, end: ZonedDateTime,
-           sfBuyLink: String = "https://www.sf.se", description: String = "$summary @ ${location?.name}\n$sfBuyLink"): CalendarEventDTO {
+    fun of(
+      summary: String, location: Location?, emails: Collection<String>, start: ZonedDateTime, end: ZonedDateTime,
+      sfBuyLink: String = "https://www.sf.se", description: String = "$summary @ ${location?.name}\n$sfBuyLink"
+    ): CalendarEventDTO {
 
       return CalendarEventDTO(
         summary = summary,

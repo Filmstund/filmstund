@@ -12,7 +12,8 @@ import rocks.didit.sefilm.domain.dto.ShowingDTO
 @Component
 class AssertionService(
   private val userService: UserService,
-  private val foretagsbiljettService: ForetagsbiljettService) {
+  private val foretagsbiljettService: ForetagsbiljettService
+) {
 
   fun assertTicketsNotBought(userID: UserID, showing: Showing) {
     if (showing.ticketsBought) {

@@ -9,11 +9,13 @@ import rocks.didit.sefilm.ExternalProviderException
 import java.net.URI
 import java.time.Instant
 
-data class ErrorDTO(val error: Boolean = true,
-                    val timestamp: Instant = Instant.now(),
-                    val status_code: Int = 500,
-                    val status_text: String? = null,
-                    val reason: String? = null)
+data class ErrorDTO(
+  val error: Boolean = true,
+  val timestamp: Instant = Instant.now(),
+  val status_code: Int = 500,
+  val status_text: String? = null,
+  val reason: String? = null
+)
 
 @Component
 class ExternalProviderErrorHandler : ResponseErrorHandler {

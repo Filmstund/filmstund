@@ -16,24 +16,26 @@ import java.time.LocalTime
 import java.util.*
 
 @Document
-data class Showing(@Id
-                   val id: UUID = UUID.randomUUID(),
-                   val date: LocalDate? = null,
-                   val time: LocalTime? = null,
-                   val movieId: UUID? = null,
-                   val location: Location? = null,
-                   val sfScreen: SfLiteScreenDTO? = null,
-                   val private: Boolean = false,
-                   val price: SEK? = null,
-                   val ticketsBought: Boolean = false,
-                   val admin: UserID = UserID(),
-                   val payToUser: UserID = admin,
-                   val expectedBuyDate: LocalDate? = null,
-                   val participants: Set<Participant> = setOf(),
-                   @LastModifiedDate
-                   val lastModifiedDate: Instant = Instant.EPOCH,
-                   @CreatedDate
-                   val createdDate: Instant = Instant.now()) {
+data class Showing(
+  @Id
+  val id: UUID = UUID.randomUUID(),
+  val date: LocalDate? = null,
+  val time: LocalTime? = null,
+  val movieId: UUID? = null,
+  val location: Location? = null,
+  val sfScreen: SfLiteScreenDTO? = null,
+  val private: Boolean = false,
+  val price: SEK? = null,
+  val ticketsBought: Boolean = false,
+  val admin: UserID = UserID(),
+  val payToUser: UserID = admin,
+  val expectedBuyDate: LocalDate? = null,
+  val participants: Set<Participant> = setOf(),
+  @LastModifiedDate
+  val lastModifiedDate: Instant = Instant.EPOCH,
+  @CreatedDate
+  val createdDate: Instant = Instant.now()
+) {
   // TODO: add more auditing
 
   fun toDto() = ShowingDTO(

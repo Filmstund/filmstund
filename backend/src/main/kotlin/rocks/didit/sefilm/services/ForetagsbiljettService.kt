@@ -13,7 +13,8 @@ import java.time.LocalDate
 @Component
 class ForetagsbiljettService(
   private val showingRepository: ShowingRepository,
-  private val userRepository: UserRepository) {
+  private val userRepository: UserRepository
+) {
 
   fun getStatusOfTicket(ticket: Företagsbiljett): Företagsbiljett.Status {
     if (ticket.expires < LocalDate.now()) {
@@ -38,8 +39,7 @@ class ForetagsbiljettService(
     }
   }
 
-  fun getForetagsbiljetterForUser(userID: UserID): List<Företagsbiljett>
-    = userRepository
+  fun getForetagsbiljetterForUser(userID: UserID): List<Företagsbiljett> = userRepository
     .findById(userID)
     .map { it.foretagsbiljetter }
     .orElseGet { listOf() }
@@ -72,7 +72,10 @@ class ForetagsbiljettService(
   }
 
   /** The tickets are allowed to be in use by the current user. */
-  private fun assertForetagsbiljetterNotAlreadyInUse(biljetter: List<ForetagsbiljettDTO>, userBiljetter: List<Företagsbiljett>) {
+  private fun assertForetagsbiljetterNotAlreadyInUse(
+    biljetter: List<ForetagsbiljettDTO>,
+    userBiljetter: List<Företagsbiljett>
+  ) {
     biljetter.forEach {
       val ticketNumber = TicketNumber(it.number)
       if (!userBiljetter.any { it.number == ticketNumber }

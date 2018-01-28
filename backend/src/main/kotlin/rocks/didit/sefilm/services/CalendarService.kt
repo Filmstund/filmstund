@@ -108,7 +108,8 @@ class CalendarService(
         attendee.role = Role.ATTENDEE
         attendee.participationLevel = ParticipationLevel.REQUIRED
 
-        this.addAttendee(attendee
+        this.addAttendee(
+          attendee
         )
       }
     }
@@ -126,8 +127,7 @@ class CalendarService(
     return Date.from(end)
   }
 
-  private fun Movie.getDurationOrDefault2hours()
-    = when {
+  private fun Movie.getDurationOrDefault2hours() = when {
     this.runtime.isZero -> Duration.ofHours(2).plusMinutes(30)
     else -> this.runtime
   }

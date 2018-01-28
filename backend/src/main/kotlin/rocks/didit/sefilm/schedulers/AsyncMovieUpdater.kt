@@ -19,10 +19,17 @@ import java.time.Instant
 import java.util.*
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.schedulers.movieUpdater", name = ["enabled"], matchIfMissing = true, havingValue = "true")
-class AsyncMovieUpdater(private val movieRepository: MovieRepository,
-                        private val sfClient: SFService,
-                        private val imdbClient: ImdbClient) {
+@ConditionalOnProperty(
+  prefix = "sefilm.schedulers.movieUpdater",
+  name = ["enabled"],
+  matchIfMissing = true,
+  havingValue = "true"
+)
+class AsyncMovieUpdater(
+  private val movieRepository: MovieRepository,
+  private val sfClient: SFService,
+  private val imdbClient: ImdbClient
+) {
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 5 * 60 * 1000L
@@ -196,7 +203,8 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
   }
 
   private fun Movie.copyDetails(movieDetails: TmdbMovieDetails): Movie {
-    return this.copy(title = movieDetails.title,
+    return this.copy(
+      title = movieDetails.title,
       originalTitle = movieDetails.original_title,
       synopsis = movieDetails.overview,
       productionYear = movieDetails.release_date?.year,
@@ -205,7 +213,8 @@ class AsyncMovieUpdater(private val movieRepository: MovieRepository,
       tmdbId = TMDbID.valueOf(movieDetails.id),
       popularity = movieDetails.popularity,
       popularityLastUpdated = Instant.now(),
-      imdbId = IMDbID.valueOf(movieDetails.imdb_id))
+      imdbId = IMDbID.valueOf(movieDetails.imdb_id)
+    )
   }
 
   private fun Movie.log() = "'${this.title}' (${this.id})"
