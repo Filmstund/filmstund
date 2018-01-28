@@ -126,7 +126,12 @@ class Home extends Component {
               showing={todayShowing[0]}
               onClick={() => this.navigateToShowing(todayShowing[0])}
             />
-            <ItsHappeningTitle>It's happening! 😍</ItsHappeningTitle>
+            <ItsHappeningTitle>
+              It's happening!{" "}
+              <span role="img" aria-label="heart eyes emoji">
+                😍
+              </span>
+            </ItsHappeningTitle>
           </Jumbotron>
         )}
         <Link to="/showings/new">Skapa nytt besök</Link>
