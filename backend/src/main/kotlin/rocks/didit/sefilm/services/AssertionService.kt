@@ -41,7 +41,7 @@ class AssertionService(
     }
   }
 
-  fun assertForetagsbiljettIsAvailable(userId: UserID, suppliedTicket: TicketNumber) {
+  fun assertForetagsbiljettIsUsable(userId: UserID, suppliedTicket: TicketNumber, showing: Showing) {
     val matchingTickets = foretagsbiljettService
       .getForetagsbiljetterForUser(userId)
       .filter { it.number == suppliedTicket }
@@ -54,8 +54,11 @@ class AssertionService(
     }
 
     if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Företagsbiljett.Status.Available) {
-      throw BadRequestException("Ticket has already been used: " + suppliedTicket.number)
+      throw TicketAlreadyUsedException(suppliedTicket)
+    }
+
+    if (matchingTickets.first().expires.isBefore(showing.expectedBuyDate ?: showing.date)) {
+      throw TicketExpiredException(suppliedTicket)
     }
   }
-
 }

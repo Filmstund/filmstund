@@ -129,7 +129,7 @@ class ShowingService(
     assertionService.assertTicketsNotBought(userId, showing)
     assertionService.assertUserNotAlreadyAttended(userId, showing)
 
-    val participant: Participant = createParticipantBasedOnPaymentType(paymentOption, userId)
+    val participant: Participant = createParticipantBasedOnPaymentType(paymentOption, userId, showing)
 
     val newParticipants = showing.participants.plus(participant)
     return showingRepo
@@ -228,14 +228,14 @@ class ShowingService(
     return sfService.getSfSeatMap(showing.location.sfId, showing.sfScreen.sfId)
   }
 
-  private fun createParticipantBasedOnPaymentType(paymentOption: PaymentOption, userId: UserID): Participant =
+  private fun createParticipantBasedOnPaymentType(paymentOption: PaymentOption, userId: UserID, showing: Showing): Participant =
     when (paymentOption.type) {
       PaymentType.Foretagsbiljett -> {
         val suppliedTicket = paymentOption.ticketNumber
           ?: throw MissingParametersException("User chose to pay with a företagsbiljett, but no ticket number were supplied")
         val ticketNumber = TicketNumber(suppliedTicket)
 
-        assertionService.assertForetagsbiljettIsAvailable(userId, ticketNumber)
+        assertionService.assertForetagsbiljettIsUsable(userId, ticketNumber, showing)
         FtgBiljettParticipant(userId, ticketNumber)
       }
       PaymentType.Swish -> SwishParticipant(userId)

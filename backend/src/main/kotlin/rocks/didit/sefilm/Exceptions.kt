@@ -41,11 +41,14 @@ class TicketNotFoundException(ticketNumber: TicketNumber) : KnownException("Tick
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class DuplicateTicketException(msg: String = "") : KnownException("Found duplicate tickets" + msg)
 
+class TicketAlreadyUsedException(whichTicket: TicketNumber) :
+  KnownException("The ticket $whichTicket has already been used")
+
+class TicketExpiredException(whichTicket: TicketNumber) :
+  KnownException("The ticket $whichTicket has expired or will expire before the showing will be bought")
+
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class SfTicketException(msg: String) : KnownException(msg)
-
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class BadRequestException(msg: String) : KnownException(msg)
 
 open class KnownException(
   msg: String,
