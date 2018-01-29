@@ -47,6 +47,9 @@ class TicketAlreadyUsedException(whichTicket: TicketNumber) :
 class TicketExpiredException(whichTicket: TicketNumber) :
   KnownException("The ticket $whichTicket has expired or will expire before the showing will be bought")
 
+class TicketInUseException(whichTicket: TicketNumber) :
+  KnownException("The ticket $whichTicket is already in use on a showing and cannot be removed")
+
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 class SfTicketException(msg: String) : KnownException(msg)
 

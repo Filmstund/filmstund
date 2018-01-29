@@ -3,6 +3,7 @@ package rocks.didit.sefilm.services
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
+import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -67,6 +68,10 @@ class ForetagsbiljettService(
       .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
 
     val ticketNumber = TicketNumber(biljett.number)
+    val ticket = currentUser.foretagsbiljetter.find { it.number == ticketNumber }
+      ?: throw NotFoundException("företagsbiljett with number $ticketNumber")
+    assertTicketIsntPending(ticket)
+
     val ticketsWithoutDeleted = currentUser.foretagsbiljetter.filterNot { it.number == ticketNumber }
     userRepository.save(currentUser.copy(foretagsbiljetter = ticketsWithoutDeleted))
   }
@@ -82,6 +87,12 @@ class ForetagsbiljettService(
         && userRepository.existsByForetagsbiljetterNumber(TicketNumber(it.number))) {
         throw TicketAlreadyInUserException(currentLoggedInUser())
       }
+    }
+  }
+
+  private fun assertTicketIsntPending(ticket: Företagsbiljett) {
+    if (getStatusOfTicket(ticket) == Företagsbiljett.Status.Pending) {
+      throw TicketInUseException(ticket.number)
     }
   }
 
