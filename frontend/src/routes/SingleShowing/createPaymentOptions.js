@@ -1,5 +1,6 @@
 import { capitalize } from "../../Utils";
 import moment from "moment";
+import { formatYMD } from "../../lib/dateTools";
 
 const createPaymentOption = (
   displayName,
@@ -15,12 +16,12 @@ const createPaymentOption = (
 };
 
 const createForetagsbiljetter = foretagsbiljetter => {
-  const now = moment();
+  const now = formatYMD(moment());
 
   return foretagsbiljetter
     .filter(
       ({ status, expires }) =>
-        status === "Available" && now.isBefore(moment(expires))
+        status === "Available" && moment(expires).isSameOrAfter(now)
     )
     .map(({ number, expires }) =>
       createPaymentOption("Företagsbiljett", "foretagsbiljett", number, expires)
