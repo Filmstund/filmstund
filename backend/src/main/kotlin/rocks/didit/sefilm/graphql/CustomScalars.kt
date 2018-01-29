@@ -52,6 +52,7 @@ class CustomScalarBase64ID : GraphQLScalarType("Base64ID", "Base64ID", object : 
 class CustomScalarSEK : GraphQLScalarType("SEK", "Swedish Kronor", object : Coercing<SEK, Long> {
   override fun parseLiteral(input: Any?): SEK? {
     return when (input) {
+      is Long -> SEK(input)
       is IntValue -> SEK(input.value.toLong())
       is Int -> SEK(input.toLong())
       else -> null
