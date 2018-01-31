@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import background from "../assets/body_background.jpg";
 import googleIcon from "../assets/google-logo.svg";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faCircleNotch from "@fortawesome/fontawesome-free-solid/faCircleNotch";
@@ -25,7 +24,6 @@ const LoginContainer = styled.div`
 const Container = styled.div`
   display: flex;
   min-height: 100%;
-  background-image: url(${background});
   background-repeat: no-repeat;
   background-color: black;
   justify-content: center;
@@ -46,7 +44,6 @@ const ContentContainer = styled.div`
   min-height: 100%;
   flex-direction: column;
   background: white;
-  max-width: 60em;
 `;
 
 const LoginDialog = styled.div`
