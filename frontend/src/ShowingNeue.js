@@ -13,7 +13,6 @@ import SeatRange from "./routes/ShowingTickets/SeatRange";
 
 const Box = styled.div`
   height: 220px;
-  /* margin: ${largeMargin} 0; */
   padding: ${largeMargin};
   border-radius: 5px;
   background-color: #ffffff;
@@ -22,11 +21,6 @@ const Box = styled.div`
   flex-direction: row;
   cursor: pointer;
   transition: background-color 250ms ease-out;
-
-  @media (min-width: 30rem) {
-    /* width: 330px; */
-    /* margin: ${largeMargin}; */
-  }
 
   &:hover {
     background-color: #f2f2f2;
