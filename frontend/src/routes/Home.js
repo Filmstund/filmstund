@@ -8,7 +8,7 @@ import { orderBy } from "lodash";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
-import { Jumbotron } from "./Jumbotron";
+import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { RedHeader } from "../RedHeader";
 import { getTodaysDate, formatYMD } from "../lib/dateTools";
@@ -16,6 +16,7 @@ import {
   navigateToShowing,
   navigateToShowingTickets
 } from "../navigators/index";
+import { PageWidthWrapper } from "../PageWidthWrapper";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -37,19 +38,24 @@ const ItsHappeningTitle = styled.h1`
   font-weight: 300;
   font-family: Roboto;
 
+  @media (max-width: 50rem) {
+    font-size: 40px;
+  }
   @media (max-width: 30rem) {
     display: none;
   }
 `;
 
 const ShowingsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  @media (min-width: 30rem) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-gap: 10px;
+
+  @media (min-width: 40rem) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 60rem) {
+    grid-template-columns: repeat(3, 1fr);
   }
 `;
 
@@ -121,27 +127,33 @@ class Home extends Component {
       <React.Fragment>
         <Helmet title="Mina Besök" />
         {todayShowing.length > 0 && (
-          <Jumbotron>
-            <ShowingNeue
-              showing={todayShowing[0]}
-              onClick={() => this.navigateToShowing(todayShowing[0])}
-            />
-            <ItsHappeningTitle>
-              It's happening!{" "}
-              <span role="img" aria-label="heart eyes emoji">
-                😍
-              </span>
-            </ItsHappeningTitle>
-          </Jumbotron>
+          <JumbotronBackground>
+            <PageWidthWrapper>
+              <Jumbotron>
+                <ShowingNeue
+                  showing={todayShowing[0]}
+                  onClick={() => this.navigateToShowing(todayShowing[0])}
+                />
+                <ItsHappeningTitle>
+                  It's happening!{" "}
+                  <span role="img" aria-label="heart eyes emoji">
+                    😍
+                  </span>
+                </ItsHappeningTitle>
+              </Jumbotron>
+            </PageWidthWrapper>
+          </JumbotronBackground>
         )}
-        <Link to="/showings/new">Skapa nytt besök</Link>
-        <RedHeader>Mina kommande besök</RedHeader>
+        <PageWidthWrapper>
+          <Link to="/showings/new">Skapa nytt besök</Link>
+          <RedHeader>Mina kommande besök</RedHeader>
 
-        {this.renderParticipatedByMe(showings)}
-        <RedHeader>Mina tidigare besök</RedHeader>
-        {this.renderPrevParticipatedByMe(showings)}
-        <RedHeader>Besök jag har skapat</RedHeader>
-        {this.renderCreatedByMe(showings)}
+          {this.renderParticipatedByMe(showings)}
+          <RedHeader>Mina tidigare besök</RedHeader>
+          {this.renderPrevParticipatedByMe(showings)}
+          <RedHeader>Besök jag har skapat</RedHeader>
+          {this.renderCreatedByMe(showings)}
+        </PageWidthWrapper>
       </React.Fragment>
     );
   }
