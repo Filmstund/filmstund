@@ -17,6 +17,7 @@ import { wrapMutate } from "../../store/apollo";
 import { branch, renderComponent } from "recompose";
 import Loader from "../../ProjectorLoader";
 import StatusMessageBox from "../../StatusMessageBox";
+import { PageWidthWrapper } from "../../PageWidthWrapper";
 
 const Box = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -96,7 +97,7 @@ class User extends Component {
 
     const { phone, sfMembershipId, nick } = this.state.editedUser;
     return (
-      <React.Fragment>
+      <PageWidthWrapper>
         <Helmet title="Profil" />
         <Box>
           <AvatarImage src={me.avatar} />
@@ -140,7 +141,7 @@ class User extends Component {
         </FieldWithoutMaxWidth>
         <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>
         <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter} />
-      </React.Fragment>
+      </PageWidthWrapper>
     );
   }
 }
