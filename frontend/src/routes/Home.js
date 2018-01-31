@@ -17,6 +17,7 @@ import {
   navigateToShowingTickets
 } from "../navigators/index";
 import { PageWidthWrapper } from "../PageWidthWrapper";
+import { ShowingsGrid } from "../ShowingsGrid";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -46,19 +47,6 @@ const ItsHappeningTitle = styled.h1`
   }
 `;
 
-const ShowingsWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-gap: 10px;
-
-  @media (min-width: 40rem) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (min-width: 60rem) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-`;
-
 class Home extends Component {
   navigateToShowing = showing => {
     navigateToShowing(this.props.history, showing);
@@ -73,7 +61,7 @@ class Home extends Component {
       return <EmptyList>Inga besök</EmptyList>;
     }
     return (
-      <ShowingsWrapper>
+      <ShowingsGrid>
         {orderBy(showings, [showingDate], ["asc"]).map(showing => (
           <ShowingNeue
             showing={showing}
@@ -83,7 +71,7 @@ class Home extends Component {
             key={showing.id}
           />
         ))}
-      </ShowingsWrapper>
+      </ShowingsGrid>
     );
   };
 
