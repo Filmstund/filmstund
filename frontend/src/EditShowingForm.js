@@ -10,6 +10,7 @@ import Field from "./Field";
 import MainButton, { RedButton } from "./MainButton";
 import { formatYMD } from "./lib/dateTools";
 import StatusMessageBox from "./StatusMessageBox";
+import { PageWidthWrapper } from "./PageWidthWrapper";
 import { navigateToShowing } from "./navigators/index";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
@@ -115,7 +116,7 @@ class EditShowingForm extends Component {
     const { showing, dateFocused, errors } = this.state;
 
     return (
-      <div>
+      <PageWidthWrapper>
         <Header>Redigera besök</Header>
         <div>
           <Showing
@@ -167,7 +168,7 @@ class EditShowingForm extends Component {
             <FaIcon icon={faEdit} /> Uppdatera besök
           </MainButton>
         </div>
-      </div>
+      </PageWidthWrapper>
     );
   }
 }

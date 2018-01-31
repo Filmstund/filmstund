@@ -6,6 +6,7 @@ import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
 import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../StatusMessageBox";
+import { PageWidthWrapper } from "../../PageWidthWrapper";
 import { ScreenSeats } from "../../ScreenSeats";
 import { SmallHeader } from "../../Header";
 import { navigateToShowing } from "../../navigators/index";
@@ -72,7 +73,7 @@ export default class TicketContainer extends Component {
       return <Loader />;
     } else {
       return (
-        <div>
+        <PageWidthWrapper>
           <MainButton onClick={this.handleGoBackToShowing}>
             Tillbaka till visning
           </MainButton>
@@ -86,7 +87,7 @@ export default class TicketContainer extends Component {
             successMessage="Uppdaterades!"
           />
           {showing.admin.id === me.id && this.renderAdminFields()}
-        </div>
+        </PageWidthWrapper>
       );
     }
   }
