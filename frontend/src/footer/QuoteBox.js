@@ -3,17 +3,14 @@ import styled from "styled-components";
 
 const QuoteBox = styled.div`
   padding: 0.5em 0;
+  font-size: 14px;
+  color: #9b9b9b;
+  font-weight: normal;
   opacity: ${props => (props.faded ? 0 : 1)};
   transition: 1s opacity;
 
   > blockquote {
     margin: 0;
-    > span {
-      font-style: italic;
-    }
-  }
-  small {
-    font-style: italic;
   }
 `;
 

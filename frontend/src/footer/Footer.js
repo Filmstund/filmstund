@@ -5,8 +5,8 @@ import Bioord from "./Bioord";
 import { PageWidthWrapper } from "../PageWidthWrapper";
 
 const BottomContainer = styled.div`
-  background-color: #212121;
-  color: #fafafa;
+  background-color: #e3e3e3;
+  color: #9b9b9b;
   padding: 1em;
   font-weight: 100;
 `;
