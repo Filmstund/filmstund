@@ -15,6 +15,7 @@ import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import Loader from "../../ProjectorLoader";
 import { navigateToShowingTickets } from "../../navigators/index";
+import { PageWidthWrapper } from "../../PageWidthWrapper";
 
 class SingleShowing extends Component {
   state = {
@@ -70,12 +71,12 @@ class SingleShowing extends Component {
 
   render() {
     const { swish } = this.state;
-    const { className, data: { showing } } = this.props;
+    const { data: { showing } } = this.props;
 
     const { attendeePaymentDetails } = showing;
 
     return (
-      <div className={className}>
+      <PageWidthWrapper>
         {swish && (
           <SwishModal
             attendeePaymentDetails={attendeePaymentDetails}
@@ -96,7 +97,7 @@ class SingleShowing extends Component {
           {this.renderBoughtOrPendingShowing()}
         </ButtonContainer>
         <ParticipantList participants={showing.participants} />
-      </div>
+      </PageWidthWrapper>
     );
   }
 }
