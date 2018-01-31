@@ -16,6 +16,7 @@ import MainButton, { GrayButton } from "./MainButton";
 import { formatYMD, formatLocalTime } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
 import Loader from "./ProjectorLoader";
+import { PageWidthWrapper } from "./PageWidthWrapper";
 
 class CreateShowingForm extends React.Component {
   constructor(props) {
@@ -137,7 +138,7 @@ class CreateShowingForm extends React.Component {
     const sfdates = this.getSfDates();
 
     return (
-      <div>
+      <PageWidthWrapper>
         <Header>Skapa besök</Header>
         <div>
           <Showing
@@ -189,7 +190,7 @@ class CreateShowingForm extends React.Component {
           <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>
           <MainButton onClick={this.handleSubmit}>Skapa besök</MainButton>
         </div>
-      </div>
+      </PageWidthWrapper>
     );
   }
 }
