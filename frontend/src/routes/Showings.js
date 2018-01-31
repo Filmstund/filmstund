@@ -16,6 +16,8 @@ import {
   navigateToShowing,
   navigateToShowingTickets
 } from "../navigators/index";
+import { PageWidthWrapper } from "../PageWidthWrapper";
+import { ShowingsGrid } from "../ShowingsGrid";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -29,17 +31,6 @@ const EmptyList = styled.div`
   align-items: center;
   color: #9b9b9b;
   height: 50px;
-`;
-
-const ShowingsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  @media (min-width: 30rem) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-content: flex-start;
-  }
 `;
 
 class Showings extends Component {
@@ -56,7 +47,7 @@ class Showings extends Component {
       return <EmptyList>Inga besök</EmptyList>;
     }
     return (
-      <ShowingsWrapper>
+      <ShowingsGrid>
         {orderBy(showings, [showingDate], ["asc"]).map(showing => (
           <ShowingNeue
             key={showing.id}
@@ -66,12 +57,12 @@ class Showings extends Component {
             disabled={disabled}
           />
         ))}
-      </ShowingsWrapper>
+      </ShowingsGrid>
     );
   };
 
   render() {
-    const { className, data: { showings = [] } } = this.props;
+    const { data: { showings = [] } } = this.props;
 
     const { previous = [], upcoming = [] } = groupBy(
       showings,
@@ -79,14 +70,14 @@ class Showings extends Component {
     );
 
     return (
-      <div className={className}>
+      <PageWidthWrapper>
         <Helmet title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
         <RedHeader>Aktuella besök</RedHeader>
         {this.renderShowings(upcoming, false)}
         <RedHeader>Tidigare besök</RedHeader>
         {this.renderShowings(previous, true)}
-      </div>
+      </PageWidthWrapper>
     );
   }
 }
