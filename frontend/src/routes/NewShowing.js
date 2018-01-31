@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { withRouter } from "react-router";
 
 import Header from "../Header";
+import { ShowingsGrid } from "../ShowingsGrid";
 import Movie, { movieFragment } from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
@@ -16,6 +17,7 @@ import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
 import { fetchMovies } from "../fragments/movies";
 import { navigateToShowing } from "../navigators/index";
+import { PageWidthWrapper } from "../PageWidthWrapper";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -48,12 +50,6 @@ const StyledMovie = styled(Movie)`
   @media (min-width: 910px) {
     max-width: 18em;
   }
-`;
-
-const MovieContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
 `;
 
 class NewShowing extends Component {
@@ -94,7 +90,7 @@ class NewShowing extends Component {
     const { searchTerm, requestingData } = this.state;
 
     return (
-      <div>
+      <PageWidthWrapper>
         <Helmet title="Skapa besök" />
         <FlexHeader>
           <RefreshButton role="button" onClick={this.requestSFData}>
@@ -110,7 +106,7 @@ class NewShowing extends Component {
             value={searchTerm}
           />
         </SearchField>
-        <MovieContainer>
+        <ShowingsGrid>
           {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
             .filter(m => this.searchFilter(m))
             .map(m => (
@@ -120,8 +116,8 @@ class NewShowing extends Component {
                 onClick={() => this.setMovie(m)}
               />
             ))}
-        </MovieContainer>
-      </div>
+        </ShowingsGrid>
+      </PageWidthWrapper>
     );
   };
 
