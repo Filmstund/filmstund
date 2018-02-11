@@ -9,22 +9,22 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.SlugService
-import java.util.*
 
 @RunWith(MockitoJUnitRunner.StrictStubs::class)
 class SlugServiceTest {
 
   @Mock
-  private lateinit var movieRepoMock: MovieRepository
+  private lateinit var movieServiceoMock: MovieService
 
   @InjectMocks
   private lateinit var slugService: SlugService
 
   @Test
   fun testGenerateSlugForShowing() {
-    val expectedSlugs = listOf(Pair("Atomic Blonde", "atomic-blonde"),
+    val expectedSlugs = listOf(
+      Pair("Atomic Blonde", "atomic-blonde"),
       Pair("A United Kingdom", "a-united-kingdom"),
       Pair("Alien", "alien"),
       Pair("Alien: Covenant", "alien-covenant"),
@@ -193,7 +193,8 @@ class SlugServiceTest {
       Pair("L'empereur", "lempereur"),
       Pair("Éternité", "eternite"),
       Pair("Teströl és lélekröl", "testrol-es-lelekrol"),
-      Pair("Winnerbäck - Ett slags liv", "winnerback--ett-slags-liv"))
+      Pair("Winnerbäck - Ett slags liv", "winnerback--ett-slags-liv")
+    )
 
     expectedSlugs.forEach {
       val (movieName, expectedSlug) = it
@@ -207,7 +208,7 @@ class SlugServiceTest {
     val movie = Movie(title = movieName)
     val showing = Showing(movieId = movie.id)
 
-    Mockito.`when`(movieRepoMock.findById(Mockito.any() ?: UUID.randomUUID())).thenReturn(Optional.of(movie))
+    Mockito.`when`(movieServiceoMock.getMovieOrThrow(Mockito.any())).thenReturn(movie)
 
     val generatedSlug = slugService.generateSlugFor(showing)
     Assert.assertEquals("Expected slug to be $expectedSlug for $movieName", expectedSlug, generatedSlug)
