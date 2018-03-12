@@ -23,7 +23,7 @@ data class SfTicketDTO(
 
 data class SfCinemaDTO(val city: SfCityDTO, val title: String, val company: Map<String, Any?>)
 
-data class SfCityDTO(val name: String)
+data class SfCityDTO(val name: String?)
 
 data class SfTicketScreenDTO(val title: String)
 

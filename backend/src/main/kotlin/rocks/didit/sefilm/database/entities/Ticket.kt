@@ -18,7 +18,7 @@ data class Ticket(
   val customerType: String,
   val customerTypeDefinition: String,
   val cinema: String,
-  val cinemaCity: String,
+  val cinemaCity: String?,
   val screen: String,
   val seat: Seat,
   val date: LocalDate,
