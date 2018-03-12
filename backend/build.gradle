@@ -2,19 +2,17 @@ import java.time.ZonedDateTime
 
 buildscript {
   ext {
-    kotlinVersion = '1.2.10'
-    springBootSnapshotVersion = '2.0.0.M7'
+    kotlinVersion = '1.2.30'
+    springBootVersion = '2.0.0.RELEASE'
     junitJupiterVersion = '5.0.2'
   }
 
   repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/milestone" }
-    maven { url "https://repo.spring.io/snapshot" }
   }
 
   dependencies {
-    classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootSnapshotVersion")
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
   }
@@ -41,23 +39,21 @@ compileTestKotlin {
 
 repositories {
   mavenCentral()
-  maven { url "https://repo.spring.io/milestone" }
-  maven { url "https://repo.spring.io/snapshot" }
 }
 
 dependencies {
   compile("com.graphql-java:graphql-spring-boot-starter:4.0.0.M1")
   compile("com.graphql-java:graphiql-spring-boot-starter:3.10.0")
   compile("com.graphql-java:graphql-java-tools:4.3.0")
-  compile("org.springframework.boot:spring-boot-starter-web-services:$springBootSnapshotVersion")
-  compile("org.springframework.boot:spring-boot-starter-logging:$springBootSnapshotVersion")
-  compile("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootSnapshotVersion")
-  compile("org.springframework.boot:spring-boot-starter-cache:$springBootSnapshotVersion")
-  compile("org.springframework.boot:spring-boot-starter-security:$springBootSnapshotVersion")
+  compile("org.springframework.boot:spring-boot-starter-web-services:$springBootVersion")
+  compile("org.springframework.boot:spring-boot-starter-logging:$springBootVersion")
+  compile("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
+  compile("org.springframework.boot:spring-boot-starter-cache:$springBootVersion")
+  compile("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
   compile("org.springframework.security:spring-security-jwt:1.0.9.RELEASE")
   compile("org.springframework.security.oauth:spring-security-oauth2:2.2.1.RELEASE")
-  compile("org.springframework.session:spring-session-data-mongodb:2.0.0.RC2")
-  compile("org.springframework.session:spring-session-core:2.0.0.RC2")
+  compile("org.springframework.session:spring-session-data-mongodb:2.0.2.RELEASE")
+  compile("org.springframework.session:spring-session-core:2.0.2.RELEASE")
   compile("com.github.ben-manes.caffeine:caffeine:2.+")
   compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
   compile("org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}")
@@ -68,7 +64,7 @@ dependencies {
   compile("com.googlecode.libphonenumber:libphonenumber:8.4.2")
   compile("com.google.guava:guava:23.6-jre")
   compile("net.sf.biweekly:biweekly:0.6.1")
-  testCompile("org.springframework.boot:spring-boot-starter-test:$springBootSnapshotVersion")
+  testCompile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
   testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
   testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
 }
