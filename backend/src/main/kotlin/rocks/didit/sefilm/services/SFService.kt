@@ -67,7 +67,7 @@ class SFService(
   }
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
-    val body = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId).body
+    val body = restTemplate.exchange(API_URL + "/v2/movie/sv/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId).body
     if (body?.ncgId == null) {
       return null
     }
