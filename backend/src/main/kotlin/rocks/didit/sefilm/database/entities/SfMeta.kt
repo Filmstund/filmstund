@@ -12,4 +12,5 @@ class SfMeta(
   val key: String = "sfpopulate",
   val timestamp: Instant? = null,
   val description: String = "N/A",
-  val value: Any? = null)
+  val value: Any? = null
+)

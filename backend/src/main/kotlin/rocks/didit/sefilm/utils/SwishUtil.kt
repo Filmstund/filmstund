@@ -9,7 +9,12 @@ import rocks.didit.sefilm.domain.SwishDataDTO
 
 class SwishUtil {
   companion object {
-    fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo, movieTitle: String): String {
+    fun constructSwishUri(
+      showing: Showing,
+      payeePhone: PhoneNumber,
+      participantInfo: ParticipantPaymentInfo,
+      movieTitle: String
+    ): String {
       if (showing.movieId == null) {
         throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
       }
@@ -17,7 +22,8 @@ class SwishUtil {
       return SwishDataDTO(
         payee = StringValue(payeePhone.number),
         amount = IntValue(participantInfo.amountOwed.toKronor()),
-        message = generateSwishMessage(movieTitle, showing))
+        message = generateSwishMessage(movieTitle, showing)
+      )
         .generateUri()
         .toASCIIString()
     }

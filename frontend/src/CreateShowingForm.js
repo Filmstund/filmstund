@@ -16,6 +16,7 @@ import MainButton, { GrayButton } from "./MainButton";
 import { formatYMD, formatLocalTime } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
 import Loader from "./ProjectorLoader";
+import { PageWidthWrapper } from "./PageWidthWrapper";
 
 class CreateShowingForm extends React.Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class CreateShowingForm extends React.Component {
         date: now,
         time: now.format("HH:mm"),
         location: "",
-        price: "",
+        sfScreen: null,
         movieId: movieId,
         admin: me.id
       },
@@ -44,12 +45,15 @@ class CreateShowingForm extends React.Component {
   };
 
   setShowingTime = sfTime => {
+    const { timeUtc, cinemaName, screen: { name, sfId } } = sfTime;
+
     this.setState(
       state => ({
         showing: {
           ...state.showing,
-          time: formatLocalTime(sfTime.timeUtc),
-          location: sfTime.cinemaName
+          time: formatLocalTime(timeUtc),
+          location: cinemaName,
+          sfScreen: { name, sfId }
         }
       }),
       this.handleSubmit
@@ -79,13 +83,14 @@ class CreateShowingForm extends React.Component {
   };
 
   handleSubmit = () => {
-    const { showing: { time, date, location } } = this.state;
+    const { showing: { time, date, location, sfScreen } } = this.state;
     const { movieId } = this.props;
 
     const showing = {
       time,
       movieId,
       date: formatYMD(date),
+      sfScreen,
       location
     };
 
@@ -93,7 +98,7 @@ class CreateShowingForm extends React.Component {
       .createShowing(showing)
       .then(resp => {
         const { showing } = resp.data;
-        this.props.navigateToShowing(showing.id);
+        this.props.navigateToShowing(showing);
       })
       .catch(errors => {
         console.log(errors);
@@ -133,7 +138,7 @@ class CreateShowingForm extends React.Component {
     const sfdates = this.getSfDates();
 
     return (
-      <div>
+      <PageWidthWrapper>
         <Header>Skapa besök</Header>
         <div>
           <Showing
@@ -182,17 +187,10 @@ class CreateShowingForm extends React.Component {
               onChange={v => this.setShowingValueFromEvent("location", v)}
             />
           </Field>
-          <Field text="Pris:">
-            <Input
-              type="text"
-              value={showing.price}
-              onChange={v => this.setShowingValueFromEvent("price", v)}
-            />
-          </Field>
           <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>
           <MainButton onClick={this.handleSubmit}>Skapa besök</MainButton>
         </div>
-      </div>
+      </PageWidthWrapper>
     );
   }
 }
@@ -204,7 +202,10 @@ const data = graphql(
         ...ShowingMovie
         sfShowings(city: $city) {
           cinemaName
-          screenName
+          screen {
+            sfId
+            name
+          }
           timeUtc
           tags
         }

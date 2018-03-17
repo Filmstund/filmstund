@@ -38,7 +38,8 @@ data class Movie(
 ) {
 
   /** Should we do an extended query to find more information about this movie? */
-  fun needsMoreInfo() = synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
+  fun needsMoreInfo() =
+    synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
 
   fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 2
 

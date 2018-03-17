@@ -1,19 +1,23 @@
 import React, { Component } from "react";
 import { orderBy } from "lodash";
-import cx from "classnames";
 import Helmet from "react-helmet";
 import styled from "styled-components";
 import { withRouter } from "react-router";
 
 import Header from "../Header";
+import { ShowingsGrid } from "../ShowingsGrid";
 import Movie, { movieFragment } from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faSync from "@fortawesome/fontawesome-free-solid/faSyncAlt";
 
 import Field from "../Field";
 import Input from "../Input";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
 import { fetchMovies } from "../fragments/movies";
+import { navigateToShowing } from "../navigators/index";
+import { PageWidthWrapper } from "../PageWidthWrapper";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -48,12 +52,6 @@ const StyledMovie = styled(Movie)`
   }
 `;
 
-const MovieContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-`;
-
 class NewShowing extends Component {
   state = {
     searchTerm: ""
@@ -64,18 +62,6 @@ class NewShowing extends Component {
     this.props.fetchMovies().then(() => {
       this.setState({ requestingData: false });
     });
-  };
-
-  renderRequestButton = () => {
-    const { requestingData } = this.state;
-    return (
-      <RefreshButton role="button" onClick={this.requestSFData}>
-        <i
-          className={cx("fa fa-refresh", { "fa-spin": requestingData })}
-          aria-hidden="true"
-        />
-      </RefreshButton>
-    );
   };
 
   setSearchTerm = term => {
@@ -101,12 +87,17 @@ class NewShowing extends Component {
   }
 
   renderSelectMovie = movies => {
-    const { searchTerm } = this.state;
+    const { searchTerm, requestingData } = this.state;
 
     return (
-      <div>
+      <PageWidthWrapper>
         <Helmet title="Skapa besök" />
-        <FlexHeader>Skapa besök {this.renderRequestButton()}</FlexHeader>
+        <FlexHeader>
+          <RefreshButton role="button" onClick={this.requestSFData}>
+            <FontAwesomeIcon icon={faSync} spin={requestingData} />
+          </RefreshButton>
+          Skapa besök
+        </FlexHeader>
         <SearchField>
           <Input
             type="text"
@@ -115,7 +106,7 @@ class NewShowing extends Component {
             value={searchTerm}
           />
         </SearchField>
-        <MovieContainer>
+        <ShowingsGrid>
           {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
             .filter(m => this.searchFilter(m))
             .map(m => (
@@ -125,8 +116,8 @@ class NewShowing extends Component {
                 onClick={() => this.setMovie(m)}
               />
             ))}
-        </MovieContainer>
-      </div>
+        </ShowingsGrid>
+      </PageWidthWrapper>
     );
   };
 
@@ -134,8 +125,8 @@ class NewShowing extends Component {
     this.props.history.push(`/showings/new/${movie.id}`);
   };
 
-  navigateToShowing = showingId => {
-    this.props.history.push(`/showings/${showingId}`);
+  navigateToShowing = showing => {
+    navigateToShowing(this.props.history, showing);
   };
 
   clearSelectedMovie = () => {

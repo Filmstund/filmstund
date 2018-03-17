@@ -3,6 +3,7 @@ package rocks.didit.sefilm.services
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
+import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -13,7 +14,8 @@ import java.time.LocalDate
 @Component
 class ForetagsbiljettService(
   private val showingRepository: ShowingRepository,
-  private val userRepository: UserRepository) {
+  private val userRepository: UserRepository
+) {
 
   fun getStatusOfTicket(ticket: Företagsbiljett): Företagsbiljett.Status {
     if (ticket.expires < LocalDate.now()) {
@@ -38,8 +40,7 @@ class ForetagsbiljettService(
     }
   }
 
-  fun getForetagsbiljetterForUser(userID: UserID): List<Företagsbiljett>
-    = userRepository
+  fun getForetagsbiljetterForUser(userID: UserID): List<Företagsbiljett> = userRepository
     .findById(userID)
     .map { it.foretagsbiljetter }
     .orElseGet { listOf() }
@@ -67,18 +68,31 @@ class ForetagsbiljettService(
       .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
 
     val ticketNumber = TicketNumber(biljett.number)
+    val ticket = currentUser.foretagsbiljetter.find { it.number == ticketNumber }
+      ?: throw NotFoundException("företagsbiljett with number $ticketNumber")
+    assertTicketIsntPending(ticket)
+
     val ticketsWithoutDeleted = currentUser.foretagsbiljetter.filterNot { it.number == ticketNumber }
     userRepository.save(currentUser.copy(foretagsbiljetter = ticketsWithoutDeleted))
   }
 
   /** The tickets are allowed to be in use by the current user. */
-  private fun assertForetagsbiljetterNotAlreadyInUse(biljetter: List<ForetagsbiljettDTO>, userBiljetter: List<Företagsbiljett>) {
+  private fun assertForetagsbiljetterNotAlreadyInUse(
+    biljetter: List<ForetagsbiljettDTO>,
+    userBiljetter: List<Företagsbiljett>
+  ) {
     biljetter.forEach {
       val ticketNumber = TicketNumber(it.number)
       if (!userBiljetter.any { it.number == ticketNumber }
         && userRepository.existsByForetagsbiljetterNumber(TicketNumber(it.number))) {
         throw TicketAlreadyInUserException(currentLoggedInUser())
       }
+    }
+  }
+
+  private fun assertTicketIsntPending(ticket: Företagsbiljett) {
+    if (getStatusOfTicket(ticket) == Företagsbiljett.Status.Pending) {
+      throw TicketInUseException(ticket.number)
     }
   }
 

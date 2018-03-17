@@ -10,7 +10,7 @@ const MainButtonStyles = css`
   color: black;
   border: 0;
   height: 3em;
-  margin: 0.25em 0;
+  margin: 0.4rem 0 1.6rem 0;
   font-size: 1.1em;
   font-weight: 400;
   width: 100%;
@@ -19,7 +19,7 @@ const MainButtonStyles = css`
   @media (min-width: 30rem) {
     max-width: 12rem;
   }
-  &:hover { 
+  &:hover {
     cursor: pointer;
     background-color: #ffeb3b;
   }
@@ -36,14 +36,14 @@ const MainButton = styled.button(MainButtonStyles);
 export const GrayButton = styled(MainButton)`
   background-color: #bdbdbd;
   color: rgba(0, 0, 0, 0.87);
-  &:hover { 
+  &:hover {
     background-color: #9e9e9e;
   }
 `;
 export const RedButton = styled(MainButton)`
   background-color: #e53935;
   color: rgba(255, 255, 255, 0.87);
-  &:hover { 
+  &:hover {
     background-color: #f44336;
   }
 `;

@@ -22,11 +22,18 @@ import rocks.didit.sefilm.domain.dto.TmdbFindExternalResults
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 
 @Component
-class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity: HttpEntity<Void>, private val properties: Properties) {
+class ImdbClient(
+  private val restTemplate: RestTemplate,
+  private val httpEntity: HttpEntity<Void>,
+  private val properties: Properties
+) {
   companion object {
-    private const val TMDB_EXTERNAL_SEARCH_URL = "https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id"
+    private const val TMDB_EXTERNAL_SEARCH_URL =
+      "https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id"
     private const val TMDB_INFO_URL = "https://api.themoviedb.org/3/movie/%d?api_key=%s&language=en-US"
-    private const val SEARCH_URL = "https://v2.sg.media-imdb.com/suggests/%s/%s.json" // Spaces should be replaced with _
+    private const val SEARCH_URL =
+      "https://v2.sg.media-imdb.com/suggests/%s/%s.json" // Spaces should be replaced with _
+
     private fun getSearchUrl(query: String): String {
       if (query.isBlank()) throw IllegalArgumentException("Query cannot be blank")
 
@@ -53,7 +60,12 @@ class ImdbClient(private val restTemplate: RestTemplate, private val httpEntity:
     validateProviderId(imdbId)
     validateApiKeyExists(imdbId)
     val url = TMDB_EXTERNAL_SEARCH_URL.format(imdbId.value, properties.tmdb.apikey)
-    val results = restTemplate.exchange<TmdbFindExternalResults>(url, HttpMethod.GET, httpEntity, TmdbFindExternalResults::class.java::class).body
+    val results = restTemplate.exchange<TmdbFindExternalResults>(
+      url,
+      HttpMethod.GET,
+      httpEntity,
+      TmdbFindExternalResults::class.java::class
+    ).body
 
     val movieResults = results?.movie_results ?: listOf()
     if (movieResults.isEmpty()) {

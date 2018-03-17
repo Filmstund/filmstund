@@ -1,253 +1,145 @@
 package rocks.didit.sefilm
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.jwt.JwtHelper
-import org.springframework.security.oauth2.client.OAuth2ClientContext
-import org.springframework.security.oauth2.client.OAuth2RestTemplate
-import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails
-import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails
-import org.springframework.security.oauth2.common.OAuth2AccessToken
-import org.springframework.security.oauth2.common.exceptions.InvalidTokenException
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter
+import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
+import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import java.time.Instant
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
-@Configuration
-@EnableOAuth2Client
-class GoogleOpenIdConnectConfig(
-  private val properties: Properties) {
+class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
 
-  @Bean
-  fun googleOpenId(): OAuth2ProtectedResourceDetails {
-    val details = AuthorizationCodeResourceDetails()
-    details.clientId = properties.google.clientId
-    details.clientSecret = properties.google.clientSecret
-    details.accessTokenUri = properties.google.accessTokenUri
-    details.userAuthorizationUri = properties.google.userAuthorizationUri
-    details.scope = listOf("openid", "email", "profile")
-    details.preEstablishedRedirectUri = properties.google.redirectUri
-    details.isUseCurrentUri = false
-    return details
-  }
+  val userId: String = userInfo.getValue("sub") as String
+  private val username: String? = userInfo["email"] as String
+  val firstName: String? = userInfo["given_name"] as String
+  val lastName: String? = userInfo["family_name"] as String
+  val avatarUrl: String? = userInfo["picture"] as String
 
-  @Bean
-  fun googleOpenIdTemplate(clientContext: OAuth2ClientContext, googleOpenId: OAuth2ProtectedResourceDetails): OAuth2RestTemplate {
-    return OAuth2RestTemplate(googleOpenId, clientContext)
+  override fun getUsername(): String? = username
+  fun getName(): String? = "$firstName $lastName"
+  override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_USER"))
+  override fun getPassword(): String? = null
+  override fun isAccountNonExpired(): Boolean = true
+  override fun isAccountNonLocked(): Boolean = true
+  override fun isCredentialsNonExpired(): Boolean = true
+  override fun isEnabled(): Boolean = true
+
+  override fun toString(): String {
+    return "OpenIdConnectUserDetails(userId='$userId', username=$username, firstName=$firstName, lastName=$lastName, avatarUrl=$avatarUrl)"
   }
 }
 
-class OpenIdConnectFilter(
-  defaultFilterProcessesUrl: String,
-  userRepository: UserRepository,
-  private val restTemplate: OAuth2RestTemplate,
-  private val properties: Properties) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
-
-  init {
-    authenticationManager = NoopAuthenticationManager()
-    setAuthenticationSuccessHandler(CreateUserOnSuccessfulAuthHandler(userRepository))
+class OpenidUserAuthConverter : UserAuthenticationConverter {
+  override fun extractAuthentication(map: Map<String, *>): Authentication? {
+    val user = OpenIdConnectUserDetails(map)
+    return UsernamePasswordAuthenticationToken(user, "N/A", user.authorities)
   }
 
-  private fun setRedirectPathInSession(request: HttpServletRequest) {
-    val redirectPath = request.getParameter("redirect") ?: properties.login.defaultRedirectPath
+  override fun convertUserAuthentication(userAuthentication: Authentication) =
+    throw UnsupportedOperationException("This operation is not supported")
+}
 
-    val session = request.session
-    val previousRedirectPath = session.getAttribute("redirectPath")
-    if (previousRedirectPath == null)
-      session.setAttribute("redirectPath", "${properties.login.baseRedirectUri}/${cleanupRedirectPath(redirectPath)}")
+@Component
+class LoginListener(private val userRepository: UserRepository) : ApplicationListener<AuthenticationSuccessEvent> {
+  private val log = LoggerFactory.getLogger(LoginListener::class.java)
+
+  override fun onApplicationEvent(event: AuthenticationSuccessEvent) {
+    createOrUpdateUser(event.authentication)
   }
 
-  private fun cleanupRedirectPath(path: String): String {
-    var newPath = path
-    if (newPath.startsWith("/")) {
-      newPath = newPath.substring(1, newPath.length)
-    }
-    if (newPath.startsWith("http")) {
-      newPath = properties.login.defaultRedirectPath
-    }
-    return newPath
-  }
+  private fun createOrUpdateUser(authentication: Authentication) {
+    val principal = authentication.principal as OpenIdConnectUserDetails?
+      ?: throw IllegalStateException("Successful authentication without a principal")
 
-  override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
-    setRedirectPathInSession(request)
+    log.debug("User logged in: ${principal.getName()} (${principal.userId})")
 
-    val accessToken: OAuth2AccessToken
-    try {
-      accessToken = restTemplate.accessToken
-    } catch (e: OAuth2Exception) {
-      throw BadCredentialsException("Could not obtain access token", e)
-    }
-
-    try {
-      val idToken = accessToken.additionalInformation["id_token"].toString()
-      val tokenDecoded = JwtHelper.decode(idToken)
-
-      val authInfo: Map<String, String> = ObjectMapper().readValue(tokenDecoded.claims)
-      verifyAudienceClaim(authInfo["aud"] ?: "")
-
-      val user = OpenIdConnectUserDetails(authInfo, accessToken)
-      return UsernamePasswordAuthenticationToken(user, null, user.authorities)
-    } catch (e: InvalidTokenException) {
-      throw BadCredentialsException("Could not obtain user details from token", e)
-    }
-  }
-
-  private fun verifyAudienceClaim(audClaim: String) {
-    if (audClaim != properties.google.clientId) {
-      throw BadCredentialsException("Audience claim does not match client id")
-    }
-  }
-
-  private class CreateUserOnSuccessfulAuthHandler(private val userRepository: UserRepository) : SimpleUrlAuthenticationSuccessHandler() {
-    private val log = LoggerFactory.getLogger(CreateUserOnSuccessfulAuthHandler::class.java)
-
-    override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
-      val principal = authentication?.principal as OpenIdConnectUserDetails?
-        ?: throw BadCredentialsException("Successful authentication without a given principal")
-
-      val maybeUser = userRepository.findById(UserID(principal.userId))
-      if (!maybeUser.isPresent) {
-        val newUser = User(id = UserID(principal.userId),
-          name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
-          firstName = principal.firstName,
-          lastName = principal.lastName,
-          nick = principal.firstName ?: "Houdini",
-          email = principal.username ?: "",
-          avatar = principal.avatarUrl,
-          lastLogin = Instant.now(),
-          signupDate = Instant.now()
-        )
-        userRepository.save(newUser)
-        log.info("Created new user ${newUser.id}")
-      } else {
-        val updatedUser = maybeUser.map {
-          it.copy(name = "${principal.firstName} ${principal.lastName}",
-            firstName = principal.firstName,
-            lastName = principal.lastName,
-            avatar = principal.avatarUrl,
-            lastLogin = Instant.now())
-        }.get()
+    val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
+    if (maybeUser == null) {
+      val newUser = User(
+        id = UserID(principal.userId),
+        name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
+        firstName = principal.firstName,
+        lastName = principal.lastName,
+        nick = principal.firstName ?: "Houdini",
+        email = principal.username ?: "",
+        avatar = principal.avatarUrl,
+        lastLogin = Instant.now(),
+        signupDate = Instant.now()
+      )
+      userRepository.save(newUser)
+      log.info("Created new user ${newUser.name} (${newUser.id})")
+    } else {
+      val updatedUser = maybeUser.copy(
+        name = "${principal.firstName} ${principal.lastName}",
+        firstName = principal.firstName,
+        lastName = principal.lastName,
+        avatar = principal.avatarUrl,
+        lastLogin = Instant.now()
+      )
+      if (maybeUser != updatedUser) {
         val savedUser = userRepository.save(updatedUser)
-        if (savedUser != updatedUser) {
-          log.info("Updated user ${savedUser.id}")
-        }
+        log.info("Updated user ${savedUser.name} (${savedUser.id})")
       }
-
-      val redirectPath = request.session.getAttribute("redirectPath").toString()
-      request.session.setAttribute("redirectPath", null)
-      defaultTargetUrl = redirectPath
-      super.onAuthenticationSuccess(request, response, authentication)
     }
-  }
-
-  private class NoopAuthenticationManager : AuthenticationManager {
-    override fun authenticate(authentication: Authentication): Authentication {
-      throw UnsupportedOperationException("No authentication should be done with this AuthenticationManager")
-    }
-  }
-}
-
-class OpenIdConnectUserDetails(userInfo: Map<String, String>, val accessToken: OAuth2AccessToken) : UserDetails {
-
-  val userId: String = userInfo.getValue("sub")
-  private val username: String? = userInfo["email"]
-  val firstName: String? = userInfo["given_name"]
-  val lastName: String? = userInfo["family_name"]
-  val avatarUrl: String? = userInfo["picture"]
-
-  override fun getUsername(): String? {
-    return username
-  }
-
-  override fun getAuthorities(): Collection<GrantedAuthority> {
-    return listOf(SimpleGrantedAuthority("ROLE_USER"))
-  }
-
-  override fun getPassword(): String? {
-    return null
-  }
-
-  override fun isAccountNonExpired(): Boolean {
-    return true
-  }
-
-  override fun isAccountNonLocked(): Boolean {
-    return true
-  }
-
-  override fun isCredentialsNonExpired(): Boolean {
-    return true
-  }
-
-  override fun isEnabled(): Boolean {
-    return true
   }
 }
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(
-  private val restTemplate: OAuth2RestTemplate,
-  private val userRepository: UserRepository,
+@EnableResourceServer
+class ResourceServerConfig(
   private val properties: Properties
-) : WebSecurityConfigurerAdapter() {
+) : ResourceServerConfigurerAdapter() {
 
-  override fun configure(web: WebSecurity) {
-    web.ignoring().antMatchers("/resources/**")
+  override fun configure(resources: ResourceServerSecurityConfigurer) {
+    resources
+      .resourceId(properties.google.clientId)
+      .stateless(true)
   }
 
-  @Bean
-  fun openIdConnectFilter() =
-    OpenIdConnectFilter("/login/google",
-      userRepository,
-      restTemplate,
-      properties)
-
-  @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
     http
       .cors().and()
-      .addFilterAfter(OAuth2ClientContextFilter(), AbstractPreAuthenticatedProcessingFilter::class.java)
-      .addFilterAfter(openIdConnectFilter(), OAuth2ClientContextFilter::class.java)
-      .logout().logoutSuccessHandler((HttpStatusReturningLogoutSuccessHandler(HttpStatus.ACCEPTED)))
-      .deleteCookies("JSESSIONID")
-      .invalidateHttpSession(true)
-      .clearAuthentication(true)
-      .logoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
-      .and()
-      .csrf().disable()
+      .antMatcher("/**")
       .authorizeRequests()
-      .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+      .antMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
-      .anyRequest().authenticated()
+      .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
+      .anyRequest().fullyAuthenticated()
   }
+
+  @Bean
+  fun jwkTokenStore(accessTokenConverter: AccessTokenConverter): JwkTokenStore {
+    return JwkTokenStore(properties.google.jwkUri, accessTokenConverter)
+  }
+
+  @Bean
+  fun accessTokenConverter(userAuthenticationConverter: UserAuthenticationConverter): AccessTokenConverter {
+    val default = DefaultAccessTokenConverter()
+    default.setUserTokenConverter(userAuthenticationConverter)
+    return default
+  }
+
+  @Bean
+  fun userAuthenticationConverter() = OpenidUserAuthConverter()
 }

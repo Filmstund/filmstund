@@ -2,10 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import GitHubLogo from "./GithubLogo";
 import Bioord from "./Bioord";
+import { PageWidthWrapper } from "../PageWidthWrapper";
 
 const BottomContainer = styled.div`
-  background-color: #212121;
-  color: #fafafa;
+  background-color: #e3e3e3;
+  color: #9b9b9b;
   padding: 1em;
   font-weight: 100;
 `;
@@ -22,18 +23,20 @@ const FlexGrow = styled.div`
 const Footer = () => {
   return (
     <BottomContainer>
-      <FlexBox>
-        <FlexGrow>
-          <Bioord />
-        </FlexGrow>
-        <a
-          href="https://github.com/cthdidIT/itbio"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <GitHubLogo />
-        </a>
-      </FlexBox>
+      <PageWidthWrapper>
+        <FlexBox>
+          <FlexGrow>
+            <Bioord />
+          </FlexGrow>
+          <a
+            href="https://github.com/cthdidIT/itbio"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <GitHubLogo />
+          </a>
+        </FlexBox>
+      </PageWidthWrapper>
     </BottomContainer>
   );
 };

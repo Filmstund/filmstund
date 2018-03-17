@@ -6,7 +6,10 @@ import MainButton from "../../MainButton";
 import Ticket from "./Ticket";
 import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../StatusMessageBox";
+import { PageWidthWrapper } from "../../PageWidthWrapper";
+import { ScreenSeats } from "../../ScreenSeats";
 import { SmallHeader } from "../../Header";
+import { navigateToShowing } from "../../navigators/index";
 
 export default class TicketContainer extends Component {
   state = {
@@ -17,15 +20,16 @@ export default class TicketContainer extends Component {
 
   handleSubmitCinemaTicketUrls = () => {
     const { cinemaTicketUrls } = this.state;
+    const { data: { showing } } = this.props;
 
     const nonEmptyUrls = cinemaTicketUrls.filter(
       line => line.trim().length !== 0
     );
 
     this.props
-      .addTickets(nonEmptyUrls)
+      .addTickets(showing.id, nonEmptyUrls)
       .then(() => {
-        this.setState({ success: true, errors: null });
+        this.setState({ success: true, errors: null, cinemaTicketUrls: [] });
       })
       .catch(errors => {
         this.setState({ success: false, errors });
@@ -55,26 +59,27 @@ export default class TicketContainer extends Component {
   };
 
   handleGoBackToShowing = () => {
-    const { showingId } = this.props;
-    this.props.history.push(`/showings/${showingId}`);
+    const { history, data: { showing } } = this.props;
+    navigateToShowing(history, showing);
   };
 
   render() {
     const { errors, success } = this.state;
-    const { data: { me, showing, loading }, navigateToShowing } = this.props;
+    const { data: { me, showing, loading } } = this.props;
 
-    const { myTickets, ticketRange } = showing;
+    const { myTickets, ticketRange, sfSeatMap } = showing;
 
     if (loading) {
       return <Loader />;
     } else {
       return (
-        <div>
-          <MainButton onClick={navigateToShowing}>
+        <PageWidthWrapper>
+          <MainButton onClick={this.handleGoBackToShowing}>
             Tillbaka till visning
           </MainButton>
           <SmallHeader>Våra platser:</SmallHeader>
           <SeatRange ticketRange={ticketRange} />
+          <ScreenSeats ticketRange={ticketRange} seatMap={sfSeatMap} />
           {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
           <StatusMessageBox
             success={success}
@@ -82,7 +87,7 @@ export default class TicketContainer extends Component {
             successMessage="Uppdaterades!"
           />
           {showing.admin.id === me.id && this.renderAdminFields()}
-        </div>
+        </PageWidthWrapper>
       );
     }
   }

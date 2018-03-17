@@ -7,16 +7,12 @@ export const markAsBought = graphql(
     mutation MarkShowingAsBought(
       $showingId: UUID!
       $showing: UpdateShowingInput
-      $ticketUrls: [String!]
     ) {
       updateShowing(showingId: $showingId, newValues: $showing) {
         id
       }
 
       markAsBought(showingId: $showingId) {
-        id
-      }
-      processTicketUrls(showingId: $showingId, ticketUrls: $ticketUrls) {
         id
         ticketsBought
         price
@@ -58,9 +54,9 @@ export const markAsBought = graphql(
     }
   `,
   {
-    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
-      markShowingBought: ({ showing, ticketUrls }) =>
-        wrapMutate(mutate, { showing, showingId, ticketUrls })
+    props: ({ mutate }) => ({
+      markShowingBought: (showingId, { showing }) =>
+        wrapMutate(mutate, { showing, showingId })
     })
   }
 );
@@ -83,8 +79,9 @@ export const updateShowing = graphql(
     }
   `,
   {
-    props: ({ mutate, ownProps: { showingId } }) => ({
-      updateShowing: showing => wrapMutate(mutate, { showing, showingId })
+    props: ({ mutate }) => ({
+      updateShowing: (showingId, showing) =>
+        wrapMutate(mutate, { showing, showingId })
     })
   }
 );
@@ -98,8 +95,8 @@ export const deleteShowing = graphql(
     }
   `,
   {
-    props: ({ mutate, ownProps: { showing: { id: showingId } } }) => ({
-      deleteShowing: () => wrapMutate(mutate, { showingId })
+    props: ({ mutate }) => ({
+      deleteShowing: showingId => wrapMutate(mutate, { showingId })
     }),
     options: {
       refetchQueries: ["ShowingsQuery"]

@@ -15,8 +15,10 @@ sealed class Participant {
 }
 
 data class SwishParticipant(
-  override val userId: UserID) : Participant()
+  override val userId: UserID
+) : Participant()
 
 data class FtgBiljettParticipant(
   override val userId: UserID,
-  val ticketNumber: TicketNumber) : Participant()
+  val ticketNumber: TicketNumber
+) : Participant()

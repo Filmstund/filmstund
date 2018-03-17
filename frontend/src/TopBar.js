@@ -1,22 +1,22 @@
 import React, { Component } from "react";
-import { NavLink as RouterLink, withRouter } from "react-router-dom";
+import { NavLink as RouterLink } from "react-router-dom";
 import styled from "styled-components";
-import fetch from "./lib/fetch";
-import { BASE_URL } from "./lib/withBaseURL";
-import { compose, withApollo } from "react-apollo";
-import { withProps } from "recompose";
+import { PageWidthWrapper } from "./PageWidthWrapper";
 
-const TopBarContainer = styled.div`
+const TopBarBackground = styled.div`
   background-color: #b71c1c;
-  padding: 1rem 0;
-  display: flex;
-  justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 1;
 `;
 
-const ExternalLink = styled.a`
+const TopBarLinksContainer = styled.div`
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const GoogleLogoutLink = styled.a`
   padding: 0.8rem;
   color: white;
   text-decoration: none;
@@ -37,39 +37,25 @@ const Link = styled(RouterLink)`
 `;
 
 class TopBar extends Component {
-  handleLogout = () => {
-    fetch(BASE_URL + "/logout", { credentials: "include" }).then(() => {
-      this.props.resetStore().then(() => {
-        this.props.history.push("/");
-      });
-    });
-  };
   render() {
-    const { signedIn } = this.props;
-
+    const { signout } = this.props;
     return (
-      <TopBarContainer>
-        <div>
-          <Link to="/">Mina besök</Link>
-          <Link to="/showings">Alla besök</Link>
-        </div>
-        <div>
-          <Link to="/user">Profil</Link>
-          {signedIn && (
-            <ExternalLink href="#" tabIndex="0" onClick={this.handleLogout}>
-              Logga ut
-            </ExternalLink>
-          )}
-        </div>
-      </TopBarContainer>
+      <TopBarBackground>
+        <PageWidthWrapper>
+          <TopBarLinksContainer>
+            <div>
+              <Link to="/">Mina besök</Link>
+              <Link to="/showings">Alla besök</Link>
+            </div>
+            <div>
+              <Link to="/user">Profil</Link>
+              <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
+            </div>
+          </TopBarLinksContainer>
+        </PageWidthWrapper>
+      </TopBarBackground>
     );
   }
 }
 
-export default compose(
-  withRouter,
-  withApollo,
-  withProps(({ client }) => ({
-    resetStore: () => client.resetStore()
-  }))
-)(TopBar);
+export default TopBar;

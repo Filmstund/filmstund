@@ -13,10 +13,17 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.schedulers.archiver", name = ["enabled"], matchIfMissing = true, havingValue = "true")
-class ScheduledArchiver(private val movieRepository: MovieRepository,
-                        showingRepository: ShowingRepository,
-                        sfClient: SFService) {
+@ConditionalOnProperty(
+  prefix = "sefilm.schedulers.archiver",
+  name = ["enabled"],
+  matchIfMissing = true,
+  havingValue = "true"
+)
+class ScheduledArchiver(
+  private val movieRepository: MovieRepository,
+  showingRepository: ShowingRepository,
+  sfClient: SFService
+) {
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 60 * 60 * 1000L // 1 hour
@@ -52,8 +59,10 @@ class ScheduledArchiver(private val movieRepository: MovieRepository,
   }
 }
 
-private class ReleaseDateAndShowingsRule(private val showingRepository: ShowingRepository,
-                                         private val sfClient: SFService) : ArchiveRule {
+private class ReleaseDateAndShowingsRule(
+  private val showingRepository: ShowingRepository,
+  private val sfClient: SFService
+) : ArchiveRule {
 
   override fun isEligibleForArchivation(movie: Movie): Boolean {
     if (movie.isOlderThan(Duration.ofDays(65))) {
@@ -73,8 +82,8 @@ private class ReleaseDateAndShowingsRule(private val showingRepository: ShowingR
     }
   }
 
-  private fun Movie.isOlderThan(maxAge: Duration)
-    = Duration.between(this.releaseDate.atTime(0, 0), LocalDateTime.now()) > maxAge
+  private fun Movie.isOlderThan(maxAge: Duration) =
+    Duration.between(this.releaseDate.atTime(0, 0), LocalDateTime.now()) > maxAge
 
   private fun Movie.hasActiveShowingsOnSF(): Boolean {
     if (this.sfId == null) {

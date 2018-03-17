@@ -91,7 +91,7 @@ class CalendarService(
     val paymentDetails = showingService.getAttendeePaymentDetailsForUser(userId, showingId)
 
     return if (paymentDetails == null || paymentDetails.hasPaid) {
-      "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/${movie.imdbId.value}/" else ""}"
+      "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/title/${movie.imdbId.value}/" else ""}"
     } else {
       val phoneNumber = userService.getUser(paymentDetails.payTo)?.phone
       "Betala ${paymentDetails.amountOwed.toKronor()} kr till $phoneNumber"
@@ -108,7 +108,8 @@ class CalendarService(
         attendee.role = Role.ATTENDEE
         attendee.participationLevel = ParticipationLevel.REQUIRED
 
-        this.addAttendee(attendee
+        this.addAttendee(
+          attendee
         )
       }
     }
@@ -126,8 +127,7 @@ class CalendarService(
     return Date.from(end)
   }
 
-  private fun Movie.getDurationOrDefault2hours()
-    = when {
+  private fun Movie.getDurationOrDefault2hours() = when {
     this.runtime.isZero -> Duration.ofHours(2).plusMinutes(30)
     else -> this.runtime
   }

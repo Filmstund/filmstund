@@ -4,93 +4,30 @@ import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import TicketContainer from "./TicketContainer";
 import Loader from "../../ProjectorLoader";
-import { wrapMutate } from "../../store/apollo";
+import { ticketFragment, addTickets } from "../../fragments/tickets";
 
 const routerParamsToShowingId = ({ match, history }) => {
-  const { showingId } = match.params;
+  const { webId } = match.params;
 
-  const navigateToShowing = () => history.push(`/showings/${showingId}`);
-
-  return { showingId, navigateToShowing };
+  return { webId };
 };
 
 const data = graphql(
   gql`
-    query TicketQuery($showingId: UUID!) {
+    query TicketQuery($webId: Base64ID!) {
       me: currentUser {
         id
       }
-      showing(id: $showingId) {
-        id
-        admin {
-          id
-        }
-        ticketRange {
-          rows
-          seatings {
-            row
-            numbers
-          }
-        }
-        myTickets {
-          id
-          barcode
-          customerType
-          customerTypeDefinition
-          cinema
-          screen
-          seat {
-            row
-            number
-          }
-          date
-          time
-          movieName
-          movieRating
-          showAttributes
-        }
+      showing(webId: $webId) {
+        ...Ticket
       }
     }
+    ${ticketFragment}
   `,
   {
     options: {
       fetchPolicy: "cache-and-network"
     }
-  }
-);
-
-const addTickets = graphql(
-  gql`
-    mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
-      processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
-        id
-        admin {
-          id
-        }
-        myTickets {
-          id
-          barcode
-          customerType
-          customerTypeDefinition
-          cinema
-          screen
-          seat {
-            row
-            number
-          }
-          date
-          time
-          movieName
-          movieRating
-          showAttributes
-        }
-      }
-    }
-  `,
-  {
-    props: ({ mutate, ownProps: { showingId } }) => ({
-      addTickets: tickets => wrapMutate(mutate, { showingId, tickets })
-    })
   }
 );
 

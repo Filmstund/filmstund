@@ -14,6 +14,8 @@ import IMDbLink from "../../IMDbLink";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import Loader from "../../ProjectorLoader";
+import { navigateToShowingTickets } from "../../navigators/index";
+import { PageWidthWrapper } from "../../PageWidthWrapper";
 
 class SingleShowing extends Component {
   state = {
@@ -31,9 +33,9 @@ class SingleShowing extends Component {
   };
 
   navigateToTickets = () => {
-    const { data: { showing } } = this.props;
+    const { history, data: { showing } } = this.props;
 
-    this.props.history.push(`/showings/${showing.id}/tickets`);
+    navigateToShowingTickets(history, showing);
   };
 
   renderBoughtOrPendingShowing = () => {
@@ -44,6 +46,7 @@ class SingleShowing extends Component {
         return (
           <BoughtShowing
             showing={showing}
+            isAdmin={this.isAdmin()}
             onClickTickets={this.navigateToTickets}
             openSwish={this.openSwish}
             attendeePaymentDetails={showing.attendeePaymentDetails}
@@ -60,16 +63,20 @@ class SingleShowing extends Component {
     }
   };
 
+  isAdmin = () => {
+    const { data: { showing, me } } = this.props;
+
+    return showing.admin.id === me.id;
+  };
+
   render() {
     const { swish } = this.state;
-    const { className, data: { showing, me } } = this.props;
+    const { data: { showing } } = this.props;
 
     const { attendeePaymentDetails } = showing;
 
-    const isAdmin = showing.admin.id === me.id;
-
     return (
-      <div className={className}>
+      <PageWidthWrapper>
         {swish && (
           <SwishModal
             attendeePaymentDetails={attendeePaymentDetails}
@@ -86,28 +93,28 @@ class SingleShowing extends Component {
         />
         <ButtonContainer>
           <IMDbLink imdbId={showing.movie.imdbId} />
-          {isAdmin && <AdminAction showing={showing} />}
+          {this.isAdmin() && <AdminAction showing={showing} />}
           {this.renderBoughtOrPendingShowing()}
         </ButtonContainer>
         <ParticipantList participants={showing.participants} />
-      </div>
+      </PageWidthWrapper>
     );
   }
 }
 
 const routerParamsToShowingId = ({ match }) => {
-  const { showingId } = match.params;
+  const { webId } = match.params;
 
-  return { showingId };
+  return { webId };
 };
 
 const data = graphql(
   gql`
-    query SingleShowing($showingId: UUID!) {
+    query SingleShowing($webId: Base64ID!) {
       me: currentUser {
         id
       }
-      showing(id: $showingId) {
+      showing(webId: $webId) {
         ...Showing
         ...ShowingAdmin
         price

@@ -1,7 +1,10 @@
 package rocks.didit.sefilm.services
 
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -17,15 +20,16 @@ import rocks.didit.sefilm.orElseThrow
 import java.util.*
 
 @Component
-class UserService(private val userRepo: UserRepository,
-                  private val foretagsbiljettService: ForetagsbiljettService) {
+class UserService(
+  private val userRepo: UserRepository,
+  private val foretagsbiljettService: ForetagsbiljettService
+) {
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
   fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
-  fun getCompleteUser(id: UserID): User?
-    = userRepo.findById(id)
+  fun getCompleteUser(id: UserID): User? = userRepo.findById(id)
     .orElse(null)
 
   fun currentUser(): UserDTO {
@@ -35,8 +39,17 @@ class UserService(private val userRepo: UserRepository,
       .orElseThrow { NotFoundException("current user", userID) }
   }
 
-  private fun getUserEntityForCurrentUser()
-    = userRepo.findById(currentLoggedInUser())
+  fun currentUserOrNull(): User? {
+    val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+    if (authentication?.isAuthenticated != false) {
+      return null
+    }
+
+    val principal = authentication.principal as OpenIdConnectUserDetails
+    return getCompleteUser(UserID(principal.userId))
+  }
+
+  private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUser())
     .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
 
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
@@ -59,26 +72,30 @@ class UserService(private val userRepo: UserRepository,
     return userRepo.save(updatedUser).toDTO()
   }
 
-  fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO?
-    = userRepo
+  fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO? = userRepo
     .findByCalendarFeedId(calendarFeedId)
     ?.toDTO()
 
   fun invalidateCalendarFeedId(): UserDTO {
     return userRepo
-      .save(getUserEntityForCurrentUser()
-        .copy(calendarFeedId = UUID.randomUUID()))
+      .save(
+        getUserEntityForCurrentUser()
+          .copy(calendarFeedId = UUID.randomUUID())
+      )
       .toDTO()
   }
 
   fun disableCalendarFeed(): UserDTO {
     return userRepo
-      .save(getUserEntityForCurrentUser()
-        .copy(calendarFeedId = null))
+      .save(
+        getUserEntityForCurrentUser()
+          .copy(calendarFeedId = null)
+      )
       .toDTO()
   }
 
-  private fun User.toDTO() = UserDTO(this.id,
+  private fun User.toDTO() = UserDTO(
+    this.id,
     this.name,
     this.firstName,
     this.lastName,
@@ -90,7 +107,8 @@ class UserService(private val userRepo: UserRepository,
     this.foretagsbiljetter.map { it.toDTO() },
     this.lastLogin,
     this.signupDate,
-    this.calendarFeedId)
+    this.calendarFeedId
+  )
 
   private fun Företagsbiljett.toDTO(): ForetagsbiljettDTO {
     return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))

@@ -40,6 +40,7 @@ const UserItem = ({ className, showPhone, user, children }) => (
 );
 
 export default styled(UserItem)`
+  background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   display: flex;
   height: 96px;

@@ -12,7 +12,8 @@ import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 class ParticipantPaymentInfoService(
   private val participantInfoRepo: ParticipantPaymentInfoRepository,
   private val showingService: ShowingService,
-  private val assertionService: AssertionService) {
+  private val assertionService: AssertionService
+) {
 
   fun updatePaymentInfo(participantInfo: ParticipantPaymentInfoDTO): ParticipantPaymentInfo {
     if (participantInfo.showingId == null || participantInfo.userId == null) {
@@ -22,7 +23,12 @@ class ParticipantPaymentInfoService(
 
     val paymentInfo = participantInfoRepo
       .findById(participantInfo.id)
-      .orElseThrow { NotFoundException("participant info '${participantInfo.id}'", showingId = participantInfo.showingId) }
+      .orElseThrow {
+        NotFoundException(
+          "participant info '${participantInfo.id}'",
+          showingId = participantInfo.showingId
+        )
+      }
 
     if (paymentInfo.showingId != participantInfo.showingId) {
       throw AccessDeniedException("Oh no you didn't!")

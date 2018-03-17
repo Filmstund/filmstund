@@ -8,52 +8,76 @@ import Helmet from "react-helmet";
 
 import { getTodaysDate } from "../lib/dateTools";
 
-import Header from "../Header";
-import Showing, { showingFragment } from "../Showing";
+import { RedHeader } from "../RedHeader";
+import { ShowingNeue, showingFragment } from "../ShowingNeue";
 import { Link } from "../MainButton";
+import styled from "styled-components";
+import {
+  navigateToShowing,
+  navigateToShowingTickets
+} from "../navigators/index";
+import { PageWidthWrapper } from "../PageWidthWrapper";
+import { ShowingsGrid } from "../ShowingsGrid";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
 const today = getTodaysDate();
 
+const EmptyList = styled.div`
+  display: flex;
+  font-size: 15px;
+  font-family: Roboto, sans-serif;
+  justify-content: center;
+  align-items: center;
+  color: #9b9b9b;
+  height: 50px;
+`;
+
 class Showings extends Component {
   navigateToShowing = showing => {
-    this.props.history.push(`/showings/${showing.id}`);
+    navigateToShowing(this.props.history, showing);
+  };
+
+  navigateToTickets = showing => {
+    navigateToShowingTickets(this.props.history, showing);
   };
 
   renderShowings = (showings, disabled) => {
-    return orderBy(showings, [showingDate], ["asc"]).map(showing => (
-      <Showing
-        showingId={showing.id}
-        key={showing.id}
-        onClick={() => this.navigateToShowing(showing)}
-        ticketsBought={showing.ticketsBought}
-        movie={showing.movie}
-        disabled={disabled}
-        date={showingDate(showing)}
-        adminId={showing.admin}
-        location={showing.location.name}
-      />
-    ));
+    if (showings.length === 0) {
+      return <EmptyList>Inga besök</EmptyList>;
+    }
+    return (
+      <ShowingsGrid>
+        {orderBy(showings, [showingDate], ["asc"]).map(showing => (
+          <ShowingNeue
+            key={showing.id}
+            showing={showing}
+            onClick={() => this.navigateToShowing(showing)}
+            onClickTickets={() => this.navigateToTickets(showing)}
+            disabled={disabled}
+          />
+        ))}
+      </ShowingsGrid>
+    );
   };
 
   render() {
-    const { className, data: { showings = [] } } = this.props;
+    const { data: { showings = [] } } = this.props;
 
-    const { previous, upcoming } = groupBy(
+    const { previous = [], upcoming = [] } = groupBy(
       showings,
       s => (moment(showingDate(s)).isBefore(today) ? "previous" : "upcoming")
     );
 
     return (
-      <div className={className}>
+      <PageWidthWrapper>
         <Helmet title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
-        <Header>Aktuella besök</Header>
+        <RedHeader>Aktuella besök</RedHeader>
         {this.renderShowings(upcoming, false)}
-        <Header>Tidigare besök</Header>
+        <RedHeader>Tidigare besök</RedHeader>
         {this.renderShowings(previous, true)}
-      </div>
+      </PageWidthWrapper>
     );
   }
 }

@@ -1,22 +1,24 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router';
-import Modal from './Modal';
+import React, { Component } from "react";
+import { withRouter } from "react-router";
+import Modal from "./Modal";
 
-import Header from './Header'
-import MainButton, { ButtonContainer } from './MainButton'
-
+import Header from "./Header";
+import MainButton, { ButtonContainer } from "./MainButton";
 
 class WelcomeModal extends Component {
   state = {
     modalOpen: true
-  }
+  };
 
   navigateToProfile = () => {
-    this.setState({
-      modalOpen: false
-    }, () => {
-      this.props.history.push('/user');
-    });
+    this.setState(
+      {
+        modalOpen: false
+      },
+      () => {
+        this.props.history.push("/user");
+      }
+    );
   };
 
   render() {
@@ -24,19 +26,24 @@ class WelcomeModal extends Component {
     const { modalOpen } = this.state;
 
     if (sfMembershipId) {
-      return null
+      return null;
     } else {
-      return <Modal isOpen={modalOpen}>
-        <Header>Välkommen!</Header>
+      return (
+        <Modal isOpen={modalOpen}>
+          <Header>Välkommen!</Header>
 
-        <p>SF har bytt bioklubbsnummer till ett annat format, och det heter numera medlemsnummer.</p>
-        <p>Var god uppdatera ditt registrerade nummer under profilsidan!</p>
-        <ButtonContainer>
-          <MainButton onClick={this.navigateToProfile}>
-            Gå till profilsidan
-          </MainButton>
-        </ButtonContainer>
-      </Modal>
+          <p>
+            SF har bytt bioklubbsnummer till ett annat format, och det heter
+            numera medlemsnummer.
+          </p>
+          <p>Var god uppdatera ditt registrerade nummer under profilsidan!</p>
+          <ButtonContainer>
+            <MainButton onClick={this.navigateToProfile}>
+              Gå till profilsidan
+            </MainButton>
+          </ButtonContainer>
+        </Modal>
+      );
     }
   }
 }

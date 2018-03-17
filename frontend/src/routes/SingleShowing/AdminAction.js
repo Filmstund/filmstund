@@ -2,15 +2,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router";
 
-import MainButton, { GrayButton, RedButton } from "../../MainButton";
+import MainButton, { GrayButton } from "../../MainButton";
 import BuyModal from "./BuyModal";
 import gql from "graphql-tag";
-import {
-  markAsBought,
-  deleteShowing,
-  togglePaidChange
-} from "../../fragments/showings";
+import { markAsBought, togglePaidChange } from "../../fragments/showings";
 import { compose } from "react-apollo";
+import { navigateToEditShowing } from "../../navigators/index";
+import { addTickets } from "../../fragments/tickets";
 
 class AdminAction extends Component {
   constructor(props) {
@@ -54,7 +52,8 @@ class AdminAction extends Component {
 
   handleStartBooking = () => {
     this.setState({
-      showModal: true
+      showModal: true,
+      errors: null
     });
   };
 
@@ -69,32 +68,30 @@ class AdminAction extends Component {
 
     const { showing } = this.props;
     this.props
-      .markShowingBought({
-        showing: {
-          private: showing.private,
-          payToUser: showing.payToUser.id,
-          location: showing.location.name,
-          time: showing.time,
-          price: ticketPrice * 100
-        },
-        ticketUrls: nonEmptyTicketUrls
-      })
-      .then(this.handleStartBooking);
-  };
-
-  handleDelete = () => {
-    const proceed = window.confirm("Är du säker? Går ej att ångra!");
-
-    if (proceed) {
-      this.props.deleteShowing().then(() => {
-        this.props.history.push("/showings");
+      .addTickets(showing.id, nonEmptyTicketUrls)
+      .then(() =>
+        this.props.markShowingBought(showing.id, {
+          showing: {
+            private: showing.private,
+            payToUser: showing.payToUser.id,
+            location: showing.location.name,
+            time: showing.time,
+            sfScreen: showing.sfScreen
+              ? { name: showing.sfScreen.name, sfId: showing.sfScreen.sfId }
+              : null,
+            price: ticketPrice * 100
+          }
+        })
+      )
+      .then(this.handleStartBooking)
+      .catch(errors => {
+        this.setState({ errors });
       });
-    }
   };
 
   handleEdit = () => {
-    const { showing } = this.props;
-    this.props.history.push(`/showings/${showing.id}/edit`);
+    const { history, showing } = this.props;
+    navigateToEditShowing(history, showing);
   };
 
   render() {
@@ -102,6 +99,7 @@ class AdminAction extends Component {
     const { ticketsBought } = showing;
 
     const {
+      errors,
       ticketPrice,
       cinemaTicketUrls,
       showModal,
@@ -112,6 +110,7 @@ class AdminAction extends Component {
       <React.Fragment>
         {showModal && (
           <BuyModal
+            errors={errors}
             setPrice={this.setPrice}
             setCinemaTicketUrls={this.setCinemaTicketUrls}
             showing={showing}
@@ -133,10 +132,7 @@ class AdminAction extends Component {
             Alla är med, nu bokar vi!
           </MainButton>
         )}
-        {!ticketsBought && (
-          <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
-        )}
-        <RedButton onClick={this.handleDelete}>Ta bort besök</RedButton>
+        <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
       </React.Fragment>
     );
   }
@@ -148,6 +144,10 @@ AdminAction.propTypes = {
 
 export const showingAdminFragment = gql`
   fragment ShowingAdmin on Showing {
+    sfScreen {
+      sfId
+      name
+    }
     adminPaymentDetails {
       sfBuyLink
       sfData {
@@ -175,9 +175,6 @@ export const showingAdminFragment = gql`
   }
 `;
 
-export default compose(
-  withRouter,
-  markAsBought,
-  deleteShowing,
-  togglePaidChange
-)(AdminAction);
+export default compose(withRouter, markAsBought, addTickets, togglePaidChange)(
+  AdminAction
+);

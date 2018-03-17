@@ -17,8 +17,10 @@ data class TicketNumber(@JsonValue val number: String) {
   override fun toString() = number
 }
 
-data class Företagsbiljett(val number: TicketNumber,
-                           val expires: LocalDate = LocalDate.now().plusYears(1)) {
+data class Företagsbiljett(
+  val number: TicketNumber,
+  val expires: LocalDate = LocalDate.now().plusYears(1)
+) {
 
   companion object {
     fun valueOf(dto: ForetagsbiljettDTO) = Företagsbiljett(number = TicketNumber(dto.number), expires = dto.expires)

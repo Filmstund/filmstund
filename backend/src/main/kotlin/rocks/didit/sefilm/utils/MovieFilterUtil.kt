@@ -12,7 +12,8 @@ class MovieFilterUtil {
       " - Bollywood",
       " (Director´s cut)",
       " 70 mm",
-      " - Exklusiv smygpremiär"
+      " - Exklusiv smygpremiär",
+      " - Smygpremiär"
     )
 
     private val GENRES_TO_IGNORE = listOf(
@@ -55,6 +56,6 @@ class MovieFilterUtil {
     return trimmedTitle.trim()
   }
 
-  fun isNewerThan(movie: SfMovieDTO, thisDate: LocalDate = LocalDate.now().minusMonths(1))
-    = movie.releaseDate.isAfter(thisDate)
+  fun isNewerThan(movie: SfMovieDTO, thisDate: LocalDate = LocalDate.now().minusMonths(1)) =
+    movie.releaseDate.isAfter(thisDate)
 }

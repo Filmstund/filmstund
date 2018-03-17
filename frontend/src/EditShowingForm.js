@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { SingleDatePicker as DatePicker } from "react-dates";
 import moment from "moment";
 import "react-dates/lib/css/_datepicker.css";
@@ -7,13 +7,24 @@ import Header from "./Header";
 import Showing from "./Showing";
 import Input from "./Input";
 import Field from "./Field";
-import MainButton from "./MainButton";
+import MainButton, { RedButton } from "./MainButton";
 import { formatYMD } from "./lib/dateTools";
 import StatusMessageBox from "./StatusMessageBox";
+import { PageWidthWrapper } from "./PageWidthWrapper";
+import { navigateToShowing } from "./navigators/index";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
+import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
+import styled from "styled-components";
+import { margin } from "./lib/style-vars";
 
 const today = moment();
 
-class EditShowingForm extends React.Component {
+const FaIcon = styled(FontAwesomeIcon)`
+  margin-right: ${margin};
+`;
+
+class EditShowingForm extends Component {
   constructor(props) {
     super(props);
     const { showing } = props.data;
@@ -63,12 +74,17 @@ class EditShowingForm extends React.Component {
     );
   };
 
+  navigateToShowing = () => {
+    const { history, data: { showing } } = this.props;
+    navigateToShowing(history, showing);
+  };
+
   handleSubmit = () => {
     const { showing: newValues } = this.state;
     const { data: { showing } } = this.props;
 
     this.props
-      .updateShowing({
+      .updateShowing(showing.id, {
         expectedBuyDate: formatYMD(newValues.expectedBuyDate),
         private: showing.private,
         payToUser: showing.payToUser.id,
@@ -76,20 +92,31 @@ class EditShowingForm extends React.Component {
         time: newValues.time,
         price: (parseInt(newValues.price, 10) || 0) * 100
       })
-      .then(() => {
-        this.props.navigateToShowing();
-      })
+      .then(this.navigateToShowing)
       .catch(errors => {
         this.setState({ errors });
       });
   };
 
+  handleDelete = () => {
+    const proceed = window.confirm("Är du säker? Går ej att ångra!");
+    const { data: { showing } } = this.props;
+
+    if (proceed) {
+      this.props.deleteShowing(showing.id).then(() => {
+        this.props.history.push("/showings");
+      });
+    }
+  };
+
   render() {
-    const { data: { showing: { movie, admin, date } } } = this.props;
+    const {
+      data: { showing: { movie, admin, date, ticketsBought } }
+    } = this.props;
     const { showing, dateFocused, errors } = this.state;
 
     return (
-      <div>
+      <PageWidthWrapper>
         <Header>Redigera besök</Header>
         <div>
           <Showing
@@ -132,9 +159,16 @@ class EditShowingForm extends React.Component {
               onChange={v => this.setShowingValueFromEvent("price", v)}
             />
           </Field>
-          <MainButton onClick={this.handleSubmit}>Uppdatera besök</MainButton>
+          {!ticketsBought && (
+            <RedButton onClick={this.handleDelete}>
+              <FaIcon icon={faTrash} /> Ta bort besök
+            </RedButton>
+          )}
+          <MainButton onClick={this.handleSubmit}>
+            <FaIcon icon={faEdit} /> Uppdatera besök
+          </MainButton>
         </div>
-      </div>
+      </PageWidthWrapper>
     );
   }
 }

@@ -12,6 +12,5 @@ class MovieMutationResolver(
   private val movieService: MovieService
 ) : GraphQLMutationResolver {
 
-  fun fetchNewMoviesFromSf(): List<Movie>
-    = movieService.fetchNewMoviesFromSf()
+  fun fetchNewMoviesFromSf(): List<Movie> = movieService.fetchNewMoviesFromSf()
 }

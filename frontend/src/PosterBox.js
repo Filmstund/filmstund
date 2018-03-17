@@ -1,11 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 import alfons from "./assets/alfons.jpg";
+import { Header } from "./RedHeader";
 
 const pointerHover = `
   &:hover {
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 1);    
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
   }
 `;
 
@@ -21,20 +22,13 @@ const Poster = styled.div`
   width: 100px;
 `;
 
-const Header = styled.h3`
-  font-weight: 300;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-`;
-
 const filterEnterKey = (event, callback) => {
   if (event.which === 13) {
     callback && callback();
   }
 };
 
-const PosterBox = ({ className, poster, onClick, headerText, children }) =>
+const PosterBox = ({ className, poster, onClick, headerText, children }) => (
   <div
     tabIndex={onClick ? "0" : "-1"}
     className={className}
@@ -43,17 +37,17 @@ const PosterBox = ({ className, poster, onClick, headerText, children }) =>
   >
     <Poster src={poster} />
     <PaddingContainer>
-      <Header>
-        {headerText}
-      </Header>
+      <Header>{headerText}</Header>
       {children}
     </PaddingContainer>
-  </div>;
+  </div>
+);
 
 export default styled(PosterBox)`
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    display: flex;
-    height: 150px;
-    width: 100%;
-    ${props => props.onClick && pointerHover}
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  display: flex;
+  height: 150px;
+  width: 100%;
+  background: #fff;
+  ${props => props.onClick && pointerHover};
 `;
