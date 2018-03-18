@@ -70,8 +70,6 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
     val principal = authentication.principal as OpenIdConnectUserDetails?
       ?: throw IllegalStateException("Successful authentication without a principal")
 
-    log.debug("User logged in: ${principal.getName()} (${principal.userId})")
-
     val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
     if (maybeUser == null) {
       val newUser = User(
@@ -96,8 +94,7 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
         lastLogin = Instant.now()
       )
       if (maybeUser != updatedUser) {
-        val savedUser = userRepository.save(updatedUser)
-        log.info("Updated user ${savedUser.name} (${savedUser.id})")
+        userRepository.save(updatedUser)
       }
     }
   }
