@@ -42,13 +42,13 @@ class Showings extends Component {
     navigateToShowingTickets(this.props.history, showing);
   };
 
-  renderShowings = (showings, disabled) => {
+  renderShowings = (showings, order, disabled) => {
     if (showings.length === 0) {
       return <EmptyList>Inga besök</EmptyList>;
     }
     return (
       <ShowingsGrid>
-        {orderBy(showings, [showingDate], ["asc"]).map(showing => (
+        {orderBy(showings, [showingDate], [order]).map(showing => (
           <ShowingNeue
             key={showing.id}
             showing={showing}
@@ -74,9 +74,9 @@ class Showings extends Component {
         <Helmet title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
         <RedHeader>Aktuella besök</RedHeader>
-        {this.renderShowings(upcoming, false)}
+        {this.renderShowings(upcoming, 'asc', false)}
         <RedHeader>Tidigare besök</RedHeader>
-        {this.renderShowings(previous, true)}
+        {this.renderShowings(previous, 'desc', true)}
       </PageWidthWrapper>
     );
   }

@@ -56,13 +56,13 @@ class Home extends Component {
     navigateToShowingTickets(this.props.history, showing);
   };
 
-  renderShowings = showings => {
+  renderShowings = (showings, order) => {
     if (showings.length === 0) {
       return <EmptyList>Inga besök</EmptyList>;
     }
     return (
       <ShowingsGrid>
-        {orderBy(showings, [showingDate], ["asc"]).map(showing => (
+        {orderBy(showings, [showingDate], [order]).map(showing => (
           <ShowingNeue
             showing={showing}
             onClick={() => this.navigateToShowing(showing)}
@@ -79,7 +79,7 @@ class Home extends Component {
     const { data: { me } } = this.props;
     const myShowings = showings.filter(s => s.admin.id === me.id);
 
-    return this.renderShowings(myShowings);
+    return this.renderShowings(myShowings, "desc");
   };
 
   renderParticipatedByMe = showings => {
@@ -90,7 +90,7 @@ class Home extends Component {
         moment(showingDate(s)).isAfter(today)
     );
 
-    return this.renderShowings(myShowings);
+    return this.renderShowings(myShowings, "asc");
   };
 
   renderPrevParticipatedByMe = showings => {
@@ -101,7 +101,7 @@ class Home extends Component {
         moment(showingDate(s)).isBefore(today)
     );
 
-    return this.renderShowings(myShowings);
+    return this.renderShowings(myShowings, "desc");
   };
 
   render() {
