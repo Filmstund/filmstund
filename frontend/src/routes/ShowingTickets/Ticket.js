@@ -115,7 +115,7 @@ const TicketCode = ({ src, id, profileId }) => {
   return (
     <FlexRowContainer style={{ marginBottom: "1rem" }}>
       <FlexColumnContainer style={{ alignItems: "left" }}>
-        <img alt={id} src={src} />
+        <img alt={id} src={src} style={{ width: "128px", height: "128px" }} />
         <div>
           {id} {profileId}
         </div>
