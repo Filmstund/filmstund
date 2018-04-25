@@ -17,7 +17,7 @@ const Seat = styled.div.attrs({
 const Screen = styled.div`
   position: relative;
   height: ${props => props.height}px;
-  width: ${props => props.width}px;
+  overflow: scroll;
 `;
 
 export const ScreenSeats = ({ ticketRange, seatMap }) => {
@@ -28,7 +28,11 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
   const maxWidth = 464;
   const maxHeight = 351;
 
-  const [{ dimensions: { width, height } }] = seatMap;
+  const [
+    {
+      dimensions: { width, height }
+    }
+  ] = seatMap;
 
   const minY = _.minBy(seatMap, s => s.coordinates.y).coordinates.y;
 
@@ -45,7 +49,7 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
   const numbers = _.flatMap(ticketRange.seatings, seating => seating.numbers);
 
   return (
-    <Screen width={maxWidth} height={maxHeight}>
+    <Screen height={maxHeight}>
       {seatMap.map(data => (
         <Seat
           key={data.number}
