@@ -19,7 +19,7 @@ buildscript {
 }
 
 plugins {
-  id("org.ajoberstar.grgit") version "2.1.0"
+  id("org.ajoberstar.grgit") version "2.3.0"
   id("net.researchgate.release") version "2.6.0"
 }
 
