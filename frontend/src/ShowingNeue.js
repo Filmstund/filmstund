@@ -130,8 +130,7 @@ const UserHeads = ({ users, maxCount = 5 }) => {
   return (
     <UsersContainer>
       {rest > 0 && <PlusUsers>+{rest}</PlusUsers>}
-      {_
-        .take(sortedHeads, maxCount)
+      {_.take(sortedHeads, maxCount)
         .reverse()
         .map((user, index, list) => (
           <UserHead
