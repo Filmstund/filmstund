@@ -8,7 +8,7 @@ import Header from "../Header";
 import { ShowingsGrid } from "../ShowingsGrid";
 import Movie, { movieFragment } from "../Movie";
 import CreateShowingForm from "../CreateShowingForm";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faSync from "@fortawesome/fontawesome-free-solid/faSyncAlt";
 
 import Field from "../Field";
@@ -136,7 +136,9 @@ class NewShowing extends Component {
   render() {
     const {
       data: { movies = [] },
-      match: { params: { movieId } }
+      match: {
+        params: { movieId }
+      }
     } = this.props;
 
     if (movieId) {
@@ -172,4 +174,8 @@ const data = graphql(
   }
 );
 
-export default compose(withRouter, data, fetchMovies)(NewShowing);
+export default compose(
+  withRouter,
+  data,
+  fetchMovies
+)(NewShowing);

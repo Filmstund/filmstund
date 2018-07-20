@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import googleIcon from "../assets/google-logo.svg";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faCircleNotch from "@fortawesome/fontawesome-free-solid/faCircleNotch";
 import {
   setUserInfo,
@@ -200,4 +200,7 @@ class Login extends Component {
   }
 }
 
-export default compose(withRouter, provideGoogleLogin)(Login);
+export default compose(
+  withRouter,
+  provideGoogleLogin
+)(Login);

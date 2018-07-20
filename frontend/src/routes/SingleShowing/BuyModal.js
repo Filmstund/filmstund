@@ -15,7 +15,7 @@ import ParticipantsList from "./ParticipantsList";
 
 import MainButton from "../../MainButton";
 import StatusMessageBox from "../../StatusMessageBox";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faTimes from "@fortawesome/fontawesome-free-solid/faTimes";
 
 const Padding = styled.div`

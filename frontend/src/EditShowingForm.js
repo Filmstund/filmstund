@@ -12,7 +12,7 @@ import { formatYMD } from "./lib/dateTools";
 import StatusMessageBox from "./StatusMessageBox";
 import { PageWidthWrapper } from "./PageWidthWrapper";
 import { navigateToShowing } from "./navigators/index";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import styled from "styled-components";
@@ -75,13 +75,18 @@ class EditShowingForm extends Component {
   };
 
   navigateToShowing = () => {
-    const { history, data: { showing } } = this.props;
+    const {
+      history,
+      data: { showing }
+    } = this.props;
     navigateToShowing(history, showing);
   };
 
   handleSubmit = () => {
     const { showing: newValues } = this.state;
-    const { data: { showing } } = this.props;
+    const {
+      data: { showing }
+    } = this.props;
 
     this.props
       .updateShowing(showing.id, {
@@ -100,7 +105,9 @@ class EditShowingForm extends Component {
 
   handleDelete = () => {
     const proceed = window.confirm("Är du säker? Går ej att ångra!");
-    const { data: { showing } } = this.props;
+    const {
+      data: { showing }
+    } = this.props;
 
     if (proceed) {
       this.props.deleteShowing(showing.id).then(() => {
@@ -111,7 +118,9 @@ class EditShowingForm extends Component {
 
   render() {
     const {
-      data: { showing: { movie, admin, date, ticketsBought } }
+      data: {
+        showing: { movie, admin, date, ticketsBought }
+      }
     } = this.props;
     const { showing, dateFocused, errors } = this.state;
 
