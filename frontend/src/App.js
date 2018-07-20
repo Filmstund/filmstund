@@ -87,4 +87,7 @@ const data = graphql(gql`
 
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
-export default compose(data, isLoading)(App);
+export default compose(
+  data,
+  isLoading
+)(App);

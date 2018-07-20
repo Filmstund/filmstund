@@ -25,4 +25,7 @@ const data = graphql(
 const callChildrenWithProps = ({ children, ...props }) => children(props);
 const isLoading = branch(({ webId }) => !webId, renderComponent(() => null));
 
-export const UUIDToWebId = compose(data, isLoading)(callChildrenWithProps);
+export const UUIDToWebId = compose(
+  data,
+  isLoading
+)(callChildrenWithProps);

@@ -22,7 +22,9 @@ class WelcomeModal extends Component {
   };
 
   render() {
-    const { me: { sfMembershipId } } = this.props;
+    const {
+      me: { sfMembershipId }
+    } = this.props;
     const { modalOpen } = this.state;
 
     if (sfMembershipId) {

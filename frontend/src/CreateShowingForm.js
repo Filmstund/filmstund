@@ -23,7 +23,10 @@ class CreateShowingForm extends React.Component {
     super(props);
     const now = moment();
 
-    const { data: { me }, movieId } = props;
+    const {
+      data: { me },
+      movieId
+    } = props;
 
     this.state = {
       dateFocused: false,
@@ -45,7 +48,11 @@ class CreateShowingForm extends React.Component {
   };
 
   setShowingTime = sfTime => {
-    const { timeUtc, cinemaName, screen: { name, sfId } } = sfTime;
+    const {
+      timeUtc,
+      cinemaName,
+      screen: { name, sfId }
+    } = sfTime;
 
     this.setState(
       state => ({
@@ -83,7 +90,9 @@ class CreateShowingForm extends React.Component {
   };
 
   handleSubmit = () => {
-    const { showing: { time, date, location, sfScreen } } = this.state;
+    const {
+      showing: { time, date, location, sfScreen }
+    } = this.state;
     const { movieId } = this.props;
 
     const showing = {
@@ -121,7 +130,11 @@ class CreateShowingForm extends React.Component {
   };
 
   getSfDates = () => {
-    const { data: { movie: { sfShowings } } } = this.props;
+    const {
+      data: {
+        movie: { sfShowings }
+      }
+    } = this.props;
 
     return _.groupBy(sfShowings, s => formatYMD(s.timeUtc));
   };
@@ -243,6 +256,9 @@ const withCityState = withState("city", "setCity", "GB");
 
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
-export default compose(withCityState, mutation, data, isLoading)(
-  CreateShowingForm
-);
+export default compose(
+  withCityState,
+  mutation,
+  data,
+  isLoading
+)(CreateShowingForm);
