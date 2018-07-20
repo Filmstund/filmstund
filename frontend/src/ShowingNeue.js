@@ -3,7 +3,7 @@ import styled from "styled-components";
 import _ from "lodash";
 import { margin, largeMargin } from "./lib/style-vars";
 import { Header } from "./RedHeader";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faQrcode from "@fortawesome/fontawesome-free-solid/faQrcode";
 import faChevronRight from "@fortawesome/fontawesome-free-solid/faChevronRight";
 import { formatShowingDateTime } from "./lib/dateTools";
@@ -130,7 +130,8 @@ const UserHeads = ({ users, maxCount = 5 }) => {
   return (
     <UsersContainer>
       {rest > 0 && <PlusUsers>+{rest}</PlusUsers>}
-      {_.take(sortedHeads, maxCount)
+      {_
+        .take(sortedHeads, maxCount)
         .reverse()
         .map((user, index, list) => (
           <UserHead

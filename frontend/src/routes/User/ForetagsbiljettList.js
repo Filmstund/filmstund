@@ -15,7 +15,7 @@ import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
 import { margin } from "../../lib/style-vars";
 import StatusMessageBox from "../../StatusMessageBox";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
 
@@ -289,6 +289,7 @@ const deleteForetagsbiljett = graphql(
   }
 );
 
-export default compose(addForetagsbiljett, deleteForetagsbiljett)(
-  ForetagsbiljettList
-);
+export default compose(
+  addForetagsbiljett,
+  deleteForetagsbiljett
+)(ForetagsbiljettList);
