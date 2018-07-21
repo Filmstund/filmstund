@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
-import { orderBy, groupBy } from "lodash";
+import orderBy from "lodash-es/orderBy";
+import groupBy from "lodash-es/groupBy";
 import { compose } from "recompose";
-import moment from "moment";
 import Helmet from "react-helmet";
 
 import { getTodaysDate } from "../lib/dateTools";
@@ -18,6 +18,7 @@ import {
 } from "../navigators/index";
 import { PageWidthWrapper } from "../PageWidthWrapper";
 import { ShowingsGrid } from "../ShowingsGrid";
+import isBefore from "date-fns/is_before";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -62,11 +63,13 @@ class Showings extends Component {
   };
 
   render() {
-    const { data: { showings = [] } } = this.props;
+    const {
+      data: { showings = [] }
+    } = this.props;
 
     const { previous = [], upcoming = [] } = groupBy(
       showings,
-      s => (moment(showingDate(s)).isBefore(today) ? "previous" : "upcoming")
+      s => (isBefore(showingDate(s), today) ? "previous" : "upcoming")
     );
 
     return (
@@ -74,9 +77,9 @@ class Showings extends Component {
         <Helmet title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
         <RedHeader>Aktuella besök</RedHeader>
-        {this.renderShowings(upcoming, 'asc', false)}
+        {this.renderShowings(upcoming, "asc", false)}
         <RedHeader>Tidigare besök</RedHeader>
-        {this.renderShowings(previous, 'desc', true)}
+        {this.renderShowings(previous, "desc", true)}
       </PageWidthWrapper>
     );
   }

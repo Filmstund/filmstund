@@ -1,10 +1,7 @@
 import React, { Component } from "react";
-import moment from "moment";
 import styled from "styled-components";
 import MainButton from "../../MainButton";
 
-import { SingleDatePicker as DatePicker } from "react-dates";
-import "react-dates/lib/css/_datepicker.css";
 import Field from "../../Field";
 import { SmallHeader } from "../../Header";
 import Input from "../../Input";
@@ -19,7 +16,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
 
-const DEFAULT_DATE = moment().add(1, "years");
+import addYears from "date-fns/add_years";
+import { DatePicker } from "../../DatePicker";
+
+const DEFAULT_DATE = addYears(new Date(), 1);
 
 const ForetagsbiljettWrapper = styled.div`
   display: flex;
@@ -88,11 +88,8 @@ const Foretagsbiljett = ({
     <BiljettField text="Utgångsdatum">
       {editable ? (
         <DatePicker
-          numberOfMonths={1}
-          focused={dateFocused}
-          onFocusChange={({ focused }) => handleChangeFocus(index, focused)}
-          onDateChange={v => handleSetExpiresForetagsbiljett(index, v)}
-          date={moment(biljett.expires)}
+          value={biljett.expires}
+          onChange={v => handleSetExpiresForetagsbiljett(index, v)}
         />
       ) : (
         <div>{formatYMD(biljett.expires)}</div>

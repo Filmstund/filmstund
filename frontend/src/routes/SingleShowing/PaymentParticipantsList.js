@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import Header from "../../Header";
 
-import { groupBy } from "lodash";
+import groupBy from "lodash-es/groupBy";
 
 const UserActiveStatus = styled.div`
   color: ${props => (props.active ? "#000" : "#ccc")};

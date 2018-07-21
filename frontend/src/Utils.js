@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import mapValues from "lodash-es/mapValues";
 
 export const trim = v => {
   if (v === null) return v;

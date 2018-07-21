@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { orderBy } from "lodash";
+import orderBy from "lodash-es/orderBy";
 import Helmet from "react-helmet";
 import styled from "styled-components";
 import { withRouter } from "react-router";

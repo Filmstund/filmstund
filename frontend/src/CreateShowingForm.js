@@ -2,11 +2,9 @@ import React from "react";
 import { graphql } from "react-apollo";
 import { branch, renderComponent, compose, withState } from "recompose";
 import gql from "graphql-tag";
-import { SingleDatePicker as DatePicker } from "react-dates";
 import { wrapMutate } from "./store/apollo";
-import moment from "moment";
-import _ from "lodash";
-import "react-dates/lib/css/_datepicker.css";
+import keys from "lodash-es/keys";
+import groupBy from "lodash-es/groupBy";
 
 import Header from "./Header";
 import Showing, { movieFragment, showingFragment } from "./Showing";
@@ -17,11 +15,13 @@ import { formatYMD, formatLocalTime } from "./lib/dateTools";
 import SelectBox from "./SelectBox";
 import Loader from "./ProjectorLoader";
 import { PageWidthWrapper } from "./PageWidthWrapper";
+import format from "date-fns/format";
+import { DatePicker } from "./DatePicker";
 
 class CreateShowingForm extends React.Component {
   constructor(props) {
     super(props);
-    const now = moment();
+    const now = new Date();
 
     const {
       data: { me },
@@ -29,10 +29,9 @@ class CreateShowingForm extends React.Component {
     } = props;
 
     this.state = {
-      dateFocused: false,
       showing: {
         date: now,
-        time: now.format("HH:mm"),
+        time: format(now, "HH:mm"),
         location: "",
         sfScreen: null,
         movieId: movieId,
@@ -84,7 +83,7 @@ class CreateShowingForm extends React.Component {
   };
 
   isDayHighlighted = date => {
-    const availableDates = _.keys(this.getSfDates());
+    const availableDates = keys(this.getSfDates());
 
     return availableDates.includes(formatYMD(date));
   };
@@ -136,11 +135,11 @@ class CreateShowingForm extends React.Component {
       }
     } = this.props;
 
-    return _.groupBy(sfShowings, s => formatYMD(s.timeUtc));
+    return groupBy(sfShowings, s => formatYMD(s.timeUtc));
   };
 
   render() {
-    const { showing, selectedDate, dateFocused } = this.state;
+    const { showing, selectedDate } = this.state;
     const {
       clearSelectedMovie,
       data: { movie, sfCities },
@@ -173,16 +172,7 @@ class CreateShowingForm extends React.Component {
             </select>
           </Field>
           <Field text="Datum:">
-            <DatePicker
-              numberOfMonths={1}
-              focused={dateFocused}
-              isDayHighlighted={this.isDayHighlighted}
-              onFocusChange={({ focused }) =>
-                this.setState({ dateFocused: focused })
-              }
-              date={showing.date}
-              onDateChange={this.setShowingDate}
-            />
+            <DatePicker value={showing.date} onChange={this.setShowingDate} />
           </Field>
           {this.renderSelectSfTime(sfdates[selectedDate], showing)}
           <Header>...eller skapa egen tid</Header>

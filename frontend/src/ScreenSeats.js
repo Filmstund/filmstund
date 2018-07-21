@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import _ from "lodash";
+import minBy from "lodash-es/minBy";
+import maxBy from "lodash-es/maxBy";
+import flatMap from "lodash-es/flatMap";
 
 const Seat = styled.div.attrs({
   style: ({ x, y, scaleX, scaleY, height, width }) => ({
@@ -34,19 +36,19 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
     }
   ] = seatMap;
 
-  const minY = _.minBy(seatMap, s => s.coordinates.y).coordinates.y;
+  const minY = minBy(seatMap, s => s.coordinates.y).coordinates.y;
 
-  const minX = _.minBy(seatMap, s => s.coordinates.x).coordinates.x;
+  const minX = minBy(seatMap, s => s.coordinates.x).coordinates.x;
 
   const maxX =
-    _.maxBy(seatMap, s => s.coordinates.x).coordinates.x + width - minX;
+    maxBy(seatMap, s => s.coordinates.x).coordinates.x + width - minX;
   const maxY =
-    _.maxBy(seatMap, s => s.coordinates.y).coordinates.y + height - minY;
+    maxBy(seatMap, s => s.coordinates.y).coordinates.y + height - minY;
 
   const scaleX = maxWidth / (maxX - minX);
   const scaleY = maxHeight / maxY;
 
-  const numbers = _.flatMap(ticketRange.seatings, seating => seating.numbers);
+  const numbers = flatMap(ticketRange.seatings, seating => seating.numbers);
 
   return (
     <Screen height={maxHeight}>

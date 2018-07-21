@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import QuoteBox from "./QuoteBox";
-import _ from "lodash";
+import sample from "lodash-es/sample";
 import { branch, compose, renderComponent } from "recompose";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
@@ -24,7 +24,7 @@ class Bioord extends Component {
     this.setState({ faded: true });
     setTimeout(() => {
       this.setState((state, { data }) => ({
-        budord: _.sample(data.allBiobudord),
+        budord: sample(data.allBiobudord),
         faded: false
       }));
     }, 1000);
@@ -55,4 +55,7 @@ const data = graphql(gql`
   }
 `);
 
-export default compose(data, Loader)(Bioord);
+export default compose(
+  data,
+  Loader
+)(Bioord);
