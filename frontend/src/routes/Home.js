@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
-import moment from "moment";
+import isAfter from "date-fns/is_after";
+import isBefore from "date-fns/is_before";
 import { compose } from "recompose";
-import { orderBy } from "lodash";
+import orderBy from "lodash-es/orderBy";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
@@ -67,7 +68,7 @@ class Home extends Component {
             showing={showing}
             onClick={() => this.navigateToShowing(showing)}
             onClickTickets={() => this.navigateToTickets(showing)}
-            disabled={moment(showingDate(showing)).isBefore(today)}
+            disabled={isBefore(showingDate(showing), today)}
             key={showing.id}
           />
         ))}
@@ -76,36 +77,44 @@ class Home extends Component {
   };
 
   renderCreatedByMe = showings => {
-    const { data: { me } } = this.props;
+    const {
+      data: { me }
+    } = this.props;
     const myShowings = showings.filter(s => s.admin.id === me.id);
 
     return this.renderShowings(myShowings, "desc");
   };
 
   renderParticipatedByMe = showings => {
-    const { data: { me } } = this.props;
+    const {
+      data: { me }
+    } = this.props;
     const myShowings = showings.filter(
       s =>
         s.participants.some(p => p.user.id === me.id) &&
-        moment(showingDate(s)).isAfter(today)
+        isAfter(showingDate(s), today)
     );
 
     return this.renderShowings(myShowings, "asc");
   };
 
   renderPrevParticipatedByMe = showings => {
-    const { data: { me } } = this.props;
+    const {
+      data: { me }
+    } = this.props;
     const myShowings = showings.filter(
       s =>
         s.participants.some(p => p.user.id === me.id) &&
-        moment(showingDate(s)).isBefore(today)
+        isBefore(showingDate(s), today)
     );
 
     return this.renderShowings(myShowings, "desc");
   };
 
   render() {
-    const { data: { showings = [] } } = this.props;
+    const {
+      data: { showings = [] }
+    } = this.props;
 
     const todayShowing = showings.filter(
       s => formatYMD(showingDate(s)) === formatYMD(today)

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import _ from "lodash";
+import orderBy from "lodash-es/orderBy";
+import take from "lodash-es/take";
 import { margin, largeMargin } from "./lib/style-vars";
 import { Header } from "./RedHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -125,12 +126,12 @@ const UserHeads = ({ users, maxCount = 5 }) => {
 
   // Hack to shift people with default Google avatar to the end
   // For some reason the url of default avatars are longer
-  const sortedHeads = _.orderBy(users, [u => u.avatar.length], ["asc"]);
+  const sortedHeads = orderBy(users, [u => u.avatar.length], ["asc"]);
 
   return (
     <UsersContainer>
       {rest > 0 && <PlusUsers>+{rest}</PlusUsers>}
-      {_.take(sortedHeads, maxCount)
+      {take(sortedHeads, maxCount)
         .reverse()
         .map((user, index, list) => (
           <UserHead

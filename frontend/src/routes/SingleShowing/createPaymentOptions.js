@@ -1,6 +1,7 @@
 import { capitalize } from "../../Utils";
-import moment from "moment";
 import { formatYMD } from "../../lib/dateTools";
+import isSameDay from "date-fns/is_same_day";
+import isAfter from "date-fns/is_after";
 
 const createPaymentOption = (
   displayName,
@@ -16,12 +17,13 @@ const createPaymentOption = (
 };
 
 const createForetagsbiljetter = foretagsbiljetter => {
-  const now = formatYMD(moment());
+  const now = formatYMD(new Date());
 
   return foretagsbiljetter
     .filter(
       ({ status, expires }) =>
-        status === "Available" && moment(expires).isSameOrAfter(now)
+        status === "Available" &&
+        (isSameDay(expires, now) || isAfter(expires, now))
     )
     .map(({ number, expires }) =>
       createPaymentOption("Företagsbiljett", "foretagsbiljett", number, expires)

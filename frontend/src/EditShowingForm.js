@@ -1,7 +1,4 @@
 import React, { Component } from "react";
-import { SingleDatePicker as DatePicker } from "react-dates";
-import moment from "moment";
-import "react-dates/lib/css/_datepicker.css";
 
 import Header from "./Header";
 import Showing from "./Showing";
@@ -17,8 +14,10 @@ import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import styled from "styled-components";
 import { margin } from "./lib/style-vars";
+import addDays from "date-fns/add_days";
+import { DatePicker } from "./DatePicker";
 
-const today = moment();
+const today = new Date();
 
 const FaIcon = styled(FontAwesomeIcon)`
   margin-right: ${margin};
@@ -33,7 +32,7 @@ class EditShowingForm extends Component {
       errors: null,
       dateFocused: false,
       showing: {
-        expectedBuyDate: today.add("1 weeks"),
+        expectedBuyDate: addDays(today, 7),
         location: showing.location.name,
         time: showing.time,
         price: showing.price !== null ? showing.price / 100 : ""
@@ -122,7 +121,7 @@ class EditShowingForm extends Component {
         showing: { movie, admin, date, ticketsBought }
       }
     } = this.props;
-    const { showing, dateFocused, errors } = this.state;
+    const { showing, errors } = this.state;
 
     return (
       <PageWidthWrapper>
@@ -137,14 +136,16 @@ class EditShowingForm extends Component {
           <StatusMessageBox errors={errors} />
           <Field text="Förväntat köpdatum:">
             <DatePicker
-              numberOfMonths={1}
-              focused={dateFocused}
-              isOutsideRange={d => d.isAfter(date) || d.isBefore(today)}
-              onFocusChange={({ focused }) =>
-                this.setState({ dateFocused: focused })
-              }
-              date={showing.expectedBuyDate}
-              onDateChange={this.setShowingDate}
+              value={showing.expectedBuyDate}
+              onChange={this.setShowingDate}
+              dayPickerProps={{
+                disabledDays: [
+                  {
+                    before: today,
+                    after: date
+                  }
+                ]
+              }}
             />
           </Field>
           <Field text="Visningstid:">
