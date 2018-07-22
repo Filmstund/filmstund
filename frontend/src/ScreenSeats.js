@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import minBy from "lodash-es/minBy";
-import maxBy from "lodash-es/maxBy";
-import flatMap from "lodash-es/flatMap";
+import minBy from "lodash/minBy";
+import maxBy from "lodash/maxBy";
+import flatMap from "lodash/flatMap";
 
 const Seat = styled.div.attrs({
   style: ({ x, y, scaleX, scaleY, height, width }) => ({

@@ -15,7 +15,11 @@ import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import styled from "styled-components";
 import { margin } from "./lib/style-vars";
 import addDays from "date-fns/add_days";
-import { DatePicker } from "./DatePicker";
+import Loadable from "react-loadable";
+
+const DatePicker = Loadable({
+  loader: () => import("./DatePicker")
+});
 
 const today = new Date();
 

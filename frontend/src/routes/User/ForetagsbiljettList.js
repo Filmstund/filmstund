@@ -17,7 +17,11 @@ import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
 
 import addYears from "date-fns/add_years";
-import { DatePicker } from "../../DatePicker";
+import Loadable from "react-loadable";
+
+const DatePicker = Loadable({
+  loader: () => import("../../DatePicker")
+});
 
 const DEFAULT_DATE = addYears(new Date(), 1);
 

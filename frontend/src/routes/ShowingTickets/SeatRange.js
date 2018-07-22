@@ -1,6 +1,6 @@
 import React from "react";
 import { formatSeatingRow } from "../../lib/summarizeSeatingRange";
-import orderBy from "lodash-es/orderBy";
+import orderBy from "lodash/orderBy";
 
 const SeatRange = ({ ticketRange }) => {
   if (!ticketRange) {

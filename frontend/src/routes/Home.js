@@ -5,7 +5,7 @@ import styled from "styled-components";
 import isAfter from "date-fns/is_after";
 import isBefore from "date-fns/is_before";
 import { compose } from "recompose";
-import orderBy from "lodash-es/orderBy";
+import orderBy from "lodash/orderBy";
 import Helmet from "react-helmet";
 
 import { Link } from "../MainButton";
