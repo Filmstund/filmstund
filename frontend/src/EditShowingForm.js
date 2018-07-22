@@ -18,7 +18,8 @@ import addDays from "date-fns/add_days";
 import Loadable from "react-loadable";
 
 const DatePicker = Loadable({
-  loader: () => import("./DatePicker")
+  loader: () => import("./DatePicker"),
+  loading: () => null
 });
 
 const today = new Date();

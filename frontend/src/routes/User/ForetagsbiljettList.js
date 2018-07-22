@@ -20,7 +20,8 @@ import addYears from "date-fns/add_years";
 import Loadable from "react-loadable";
 
 const DatePicker = Loadable({
-  loader: () => import("../../DatePicker")
+  loader: () => import("../../DatePicker"),
+  loading: () => null
 });
 
 const DEFAULT_DATE = addYears(new Date(), 1);

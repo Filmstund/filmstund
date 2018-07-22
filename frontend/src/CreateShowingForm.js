@@ -19,7 +19,8 @@ import format from "date-fns/format";
 import Loadable from "react-loadable";
 
 const DatePicker = Loadable({
-  loader: () => import("./DatePicker")
+  loader: () => import("./DatePicker"),
+  loading: () => null
 });
 
 class CreateShowingForm extends React.Component {
