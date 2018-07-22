@@ -147,7 +147,7 @@ class EditShowingForm extends Component {
                 disabledDays: [
                   {
                     before: today,
-                    after: date
+                    after: new Date(date)
                   }
                 ]
               }}
