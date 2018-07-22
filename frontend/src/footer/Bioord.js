@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import QuoteBox from "./QuoteBox";
-import sample from "lodash-es/sample";
+import sample from "lodash/sample";
 import { branch, compose, renderComponent } from "recompose";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";

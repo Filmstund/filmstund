@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import orderBy from "lodash-es/orderBy";
-import take from "lodash-es/take";
+import orderBy from "lodash/orderBy";
+import take from "lodash/take";
 import { margin, largeMargin } from "./lib/style-vars";
 import { Header } from "./RedHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -145,7 +145,7 @@ const UserHeads = ({ users, maxCount = 5 }) => {
 };
 
 const TicketRangeContainer = styled.div`
-  margin-top: {margin};
+  margin-top: ${margin};
   font-size: 14px;
 `;
 

@@ -3,8 +3,8 @@ import { graphql } from "react-apollo";
 import { branch, renderComponent, compose, withState } from "recompose";
 import gql from "graphql-tag";
 import { wrapMutate } from "./store/apollo";
-import keys from "lodash-es/keys";
-import groupBy from "lodash-es/groupBy";
+import keys from "lodash/keys";
+import groupBy from "lodash/groupBy";
 
 import Header from "./Header";
 import Showing, { movieFragment, showingFragment } from "./Showing";
@@ -16,7 +16,11 @@ import SelectBox from "./SelectBox";
 import Loader from "./ProjectorLoader";
 import { PageWidthWrapper } from "./PageWidthWrapper";
 import format from "date-fns/format";
-import { DatePicker } from "./DatePicker";
+import Loadable from "react-loadable";
+
+const DatePicker = Loadable({
+  loader: () => import("./DatePicker")
+});
 
 class CreateShowingForm extends React.Component {
   constructor(props) {
