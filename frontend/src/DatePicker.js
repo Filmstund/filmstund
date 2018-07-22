@@ -5,12 +5,7 @@ import "react-day-picker/lib/style.css";
 
 import { formatYMD } from "./lib/dateTools";
 
-export const DatePicker = ({
-  value,
-  onChange,
-  dayPickerProps = {},
-  ...props
-}) => (
+const DatePicker = ({ value, onChange, dayPickerProps = {}, ...props }) => (
   <DayPickerInput
     value={value}
     onDayChange={onChange}
@@ -22,3 +17,5 @@ export const DatePicker = ({
     {...props}
   />
 );
+
+export default DatePicker;
