@@ -1,9 +1,9 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import alfons from "./assets/alfons.jpg";
 import { Header } from "./RedHeader";
 
-const pointerHover = `
+const pointerHover = css`
   &:hover {
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
