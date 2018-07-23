@@ -13,7 +13,8 @@ class MovieFilterUtil {
       " (Director´s cut)",
       " 70 mm",
       " - Exklusiv smygpremiär",
-      " - Smygpremiär"
+      " - Smygpremiär",
+      " - på Filmstaden Råsunda"
     )
 
     private val GENRES_TO_IGNORE = listOf(
