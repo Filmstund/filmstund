@@ -17,6 +17,7 @@ import Loader from "./ProjectorLoader";
 import { PageWidthWrapper } from "./PageWidthWrapper";
 import format from "date-fns/format";
 import Loadable from "react-loadable";
+import { isAfter } from "date-fns";
 
 const DatePicker = Loadable({
   loader: () => import("./DatePicker"),
@@ -29,20 +30,26 @@ class CreateShowingForm extends React.Component {
     const now = new Date();
 
     const {
-      data: { me },
+      data: { me, movie },
       movieId
     } = props;
 
+    let date = now;
+
+    if (isAfter(movie.releaseDate, now)) {
+      date = new Date(movie.releaseDate);
+    }
+
     this.state = {
       showing: {
-        date: now,
+        date,
         time: format(now, "HH:mm"),
         location: "",
         sfScreen: null,
         movieId: movieId,
         admin: me.id
       },
-      selectedDate: formatYMD(now)
+      selectedDate: formatYMD(date)
     };
   }
 
@@ -208,6 +215,7 @@ const data = graphql(
     query CreateShowing($movieId: UUID!, $city: String) {
       movie(id: $movieId) {
         ...ShowingMovie
+        releaseDate
         sfShowings(city: $city) {
           cinemaName
           screen {
