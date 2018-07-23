@@ -18,7 +18,7 @@ import addDays from "date-fns/add_days";
 import Loadable from "react-loadable";
 
 const DatePicker = Loadable({
-  loader: () => import("./DatePicker"),
+  loader: () => import("./date-picker/DatePicker"),
   loading: () => null
 });
 
@@ -143,14 +143,12 @@ class EditShowingForm extends Component {
             <DatePicker
               value={showing.expectedBuyDate}
               onChange={this.setShowingDate}
-              dayPickerProps={{
-                disabledDays: [
-                  {
-                    before: today,
-                    after: new Date(date)
-                  }
-                ]
-              }}
+              disabledDays={[
+                {
+                  before: today,
+                  after: new Date(date)
+                }
+              ]}
             />
           </Field>
           <Field text="Visningstid:">

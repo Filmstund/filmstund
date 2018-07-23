@@ -19,8 +19,8 @@ import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
 import addYears from "date-fns/add_years";
 import Loadable from "react-loadable";
 
-const DatePicker = Loadable({
-  loader: () => import("../../DatePicker"),
+const DatePickerInput = Loadable({
+  loader: () => import("../../date-picker/DatePickerInput"),
   loading: () => null
 });
 
@@ -92,7 +92,7 @@ const Foretagsbiljett = ({
     </BiljettField>
     <BiljettField text="Utgångsdatum">
       {editable ? (
-        <DatePicker
+        <DatePickerInput
           value={biljett.expires}
           onChange={v => handleSetExpiresForetagsbiljett(index, v)}
         />

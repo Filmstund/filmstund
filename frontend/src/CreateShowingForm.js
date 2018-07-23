@@ -20,14 +20,15 @@ import Loadable from "react-loadable";
 import { isAfter } from "date-fns";
 
 const DatePicker = Loadable({
-  loader: () => import("./DatePicker"),
+  loader: () => import("./date-picker/DatePicker"),
   loading: () => null
 });
+
+const now = new Date();
 
 class CreateShowingForm extends React.Component {
   constructor(props) {
     super(props);
-    const now = new Date();
 
     const {
       data: { me, movie },
@@ -92,12 +93,6 @@ class CreateShowingForm extends React.Component {
       },
       callback
     );
-  };
-
-  isDayHighlighted = date => {
-    const availableDates = keys(this.getSfDates());
-
-    return availableDates.includes(formatYMD(date));
   };
 
   handleSubmit = () => {
@@ -184,7 +179,23 @@ class CreateShowingForm extends React.Component {
             </select>
           </Field>
           <Field text="Datum:">
-            <DatePicker value={showing.date} onChange={this.setShowingDate} />
+            <DatePicker
+              value={showing.date}
+              onChange={this.setShowingDate}
+              disabledDays={{
+                before: now
+              }}
+              modifiers={{
+                sfdays: keys(sfdates).map(s => new Date(s))
+              }}
+              modifiersStyles={{
+                sfdays: {
+                  backgroundColor: "#fff",
+                  borderColor: "#d0021b",
+                  color: "#d0021b"
+                }
+              }}
+            />
           </Field>
           {this.renderSelectSfTime(sfdates[selectedDate], showing)}
           <Header>...eller skapa egen tid</Header>
