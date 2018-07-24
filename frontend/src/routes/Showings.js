@@ -89,7 +89,7 @@ const data = graphql(
   gql`
     query ShowingsQuery {
       showings: publicShowings {
-        ...Showing
+        ...ShowingNeue
         id
         date
         time

@@ -202,7 +202,7 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
 };
 
 export const showingFragment = gql`
-  fragment Showing on Showing {
+  fragment ShowingNeue on Showing {
     id
     webId
     slug

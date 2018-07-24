@@ -74,7 +74,7 @@ export const movieFragment = gql`
 `;
 
 export const showingFragment = gql`
-  fragment Showing on Showing {
+  fragment OldShowing on Showing {
     id
     webId
     slug

@@ -19,7 +19,7 @@ const data = graphql(
         id
       }
       showing(webId: $webId) {
-        ...Showing
+        ...OldShowing
         price
         private
         payToUser {

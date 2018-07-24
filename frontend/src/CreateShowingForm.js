@@ -254,7 +254,7 @@ const mutation = graphql(
   gql`
     mutation CreateShowing($showing: CreateShowingInput!) {
       showing: createShowing(showing: $showing) {
-        ...Showing
+        ...OldShowing
       }
     }
     ${showingFragment}

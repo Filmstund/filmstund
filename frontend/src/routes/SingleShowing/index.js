@@ -28,18 +28,25 @@ class SingleShowing extends Component {
   };
 
   isParticipating = () => {
-    const { data: { showing, me } } = this.props;
+    const {
+      data: { showing, me }
+    } = this.props;
     return showing.participants.some(p => p.user.id === me.id);
   };
 
   navigateToTickets = () => {
-    const { history, data: { showing } } = this.props;
+    const {
+      history,
+      data: { showing }
+    } = this.props;
 
     navigateToShowingTickets(history, showing);
   };
 
   renderBoughtOrPendingShowing = () => {
-    const { data: { showing } } = this.props;
+    const {
+      data: { showing }
+    } = this.props;
 
     if (showing.ticketsBought) {
       if (this.isParticipating()) {
@@ -64,14 +71,18 @@ class SingleShowing extends Component {
   };
 
   isAdmin = () => {
-    const { data: { showing, me } } = this.props;
+    const {
+      data: { showing, me }
+    } = this.props;
 
     return showing.admin.id === me.id;
   };
 
   render() {
     const { swish } = this.state;
-    const { data: { showing } } = this.props;
+    const {
+      data: { showing }
+    } = this.props;
 
     const { attendeePaymentDetails } = showing;
 
@@ -115,7 +126,7 @@ const data = graphql(
         id
       }
       showing(webId: $webId) {
-        ...Showing
+        ...OldShowing
         ...ShowingAdmin
         price
         payToUser {
@@ -155,7 +166,13 @@ const data = graphql(
     ${showingFragment}
     ${showingAdminFragment}
   `,
-  { options: { errorPolicy: "ignore", fetchPolicy: "cache-and-network" } }
+  {
+    options: ({ webId }) => ({
+      errorPolicy: "ignore",
+      fetchPolicy: "cache-and-network",
+      variables: { webId }
+    })
+  }
 );
 
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));

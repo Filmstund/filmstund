@@ -160,7 +160,7 @@ const data = graphql(
   gql`
     query HomeQuery {
       showings: publicShowings {
-        ...Showing
+        ...ShowingNeue
         id
         webId
         slug
