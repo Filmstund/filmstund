@@ -4,7 +4,7 @@ import { ApolloProvider } from "react-apollo";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import client from "./store/apollo";
-import Login from "./routes/Login";
+import Login from "./use-cases/login/containers/Login";
 import App from "./App";
 
 const Root = () => (
