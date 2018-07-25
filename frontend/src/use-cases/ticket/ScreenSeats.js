@@ -27,8 +27,10 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
     return null;
   }
 
-  const maxWidth = 464;
-  const maxHeight = 351;
+  const heightRatio = 351 / 464;
+
+  const maxWidth = Math.min(window.innerWidth - 80, 464);
+  const maxHeight = maxWidth * heightRatio;
 
   const [
     {
@@ -40,13 +42,11 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
 
   const minX = minBy(seatMap, s => s.coordinates.x).coordinates.x;
 
-  const maxX =
-    maxBy(seatMap, s => s.coordinates.x).coordinates.x + width - minX;
-  const maxY =
-    maxBy(seatMap, s => s.coordinates.y).coordinates.y + height - minY;
+  const maxX = maxBy(seatMap, s => s.coordinates.x).coordinates.x + width;
+  const maxY = maxBy(seatMap, s => s.coordinates.y).coordinates.y + height;
 
   const scaleX = maxWidth / (maxX - minX);
-  const scaleY = maxHeight / maxY;
+  const scaleY = maxHeight / (maxY - minY);
 
   const numbers = flatMap(ticketRange.seatings, seating => seating.numbers);
 

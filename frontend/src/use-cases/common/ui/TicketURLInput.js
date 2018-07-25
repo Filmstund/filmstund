@@ -1,8 +1,13 @@
 import React from "react";
+import styled from "styled-components";
+
+const Textarea = styled.textarea`
+  width: 100%;
+  max-width: 600px;
+`;
 
 const TicketURLInput = ({ cinemaTicketUrls, onChange }) => (
-  <textarea
-    cols={90}
+  <Textarea
     rows={5}
     value={cinemaTicketUrls.join("\n")}
     onChange={event => onChange(event.target.value.split("\n"))}

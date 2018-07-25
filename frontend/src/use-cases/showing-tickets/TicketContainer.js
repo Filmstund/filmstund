@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
-import Field from "../../use-cases/common/ui/Field";
 import MainButton from "../../use-cases/common/ui/MainButton";
 import Ticket from "./Ticket";
 import SeatRange from "./SeatRange";
@@ -10,6 +9,8 @@ import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
 import { ScreenSeats } from "../../use-cases/ticket/ScreenSeats";
 import { SmallHeader } from "../../use-cases/common/ui/Header";
 import { navigateToShowing } from "../common/navigators/index";
+
+import { FieldWithoutMaxWidth } from "../common/ui/Field";
 
 export default class TicketContainer extends Component {
   state = {
@@ -48,7 +49,7 @@ export default class TicketContainer extends Component {
     const { cinemaTicketUrls } = this.state;
 
     return (
-      <Field text="Lägg till SF-biljettlänkar">
+      <FieldWithoutMaxWidth text="Lägg till SF-bokningslänkar">
         <TicketURLInput
           cinemaTicketUrls={cinemaTicketUrls}
           onChange={this.setCinemaTicketUrls}
@@ -56,7 +57,7 @@ export default class TicketContainer extends Component {
         <MainButton onClick={this.handleSubmitCinemaTicketUrls}>
           Skicka
         </MainButton>
-      </Field>
+      </FieldWithoutMaxWidth>
     );
   };
 
