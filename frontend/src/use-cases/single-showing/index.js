@@ -18,6 +18,7 @@ import gql from "graphql-tag";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { navigateToShowingTickets } from "../common/navigators/index";
 import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
+import { promoteToAdmin } from "../../apollo/mutations/showings";
 
 class SingleShowing extends Component {
   state = {
@@ -83,7 +84,8 @@ class SingleShowing extends Component {
   render() {
     const { swish } = this.state;
     const {
-      data: { showing }
+      promoteToAdmin,
+      data: { me, showing }
     } = this.props;
 
     const { attendeePaymentDetails } = showing;
@@ -109,7 +111,12 @@ class SingleShowing extends Component {
           {this.isAdmin() && <AdminAction showing={showing} />}
           {this.renderBoughtOrPendingShowing()}
         </ButtonContainer>
-        <ParticipantList participants={showing.participants} />
+        <ParticipantList
+          meId={me.id}
+          isAdmin={this.isAdmin()}
+          participants={showing.participants}
+          onClickItem={userId => promoteToAdmin(showing.id, userId)}
+        />
       </PageWidthWrapper>
     );
   }
@@ -183,5 +190,6 @@ export default compose(
   withRouter,
   withProps(routerParamsToShowingId),
   data,
+  promoteToAdmin,
   isLoading
 )(SingleShowing);

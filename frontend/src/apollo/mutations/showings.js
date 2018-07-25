@@ -122,3 +122,36 @@ export const togglePaidChange = graphql(
     }
   }
 );
+
+export const promoteToAdmin = graphql(
+  gql`
+    mutation PromoteToAdmin($showingId: UUID!, $userId: UserID!) {
+      promoteToAdmin(showingId: $showingId, userToPromote: $userId) {
+        admin {
+          id
+        }
+        payToUser {
+          id
+        }
+        attendeePaymentDetails {
+          payTo {
+            id
+            nick
+            firstName
+            lastName
+            phone
+          }
+          swishLink
+          hasPaid
+          amountOwed
+        }
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      promoteToAdmin: (showingId, userId) =>
+        wrapMutate(mutate, { showingId, userId })
+    })
+  }
+);
