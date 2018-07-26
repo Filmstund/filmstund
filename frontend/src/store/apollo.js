@@ -34,7 +34,7 @@ const errorLink = onError(args => {
   if (networkError) {
     if (networkError.noTokenError) {
       args.networkError.response = null;
-      // User signing out => ignore error.
+      // user signing out => ignore error.
       return;
     } else if (
       networkError.statusCode === 403 ||
