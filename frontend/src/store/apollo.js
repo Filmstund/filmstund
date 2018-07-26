@@ -43,9 +43,9 @@ const errorLink = onError(args => {
       const { pathname, search } = window.location;
       const returnUrl = pathname + search;
 
-      if (pathname !== "/login" && returnUrl.indexOf("/login") !== 0) {
-        window.location = `/login?return_to=${encodeURIComponent(returnUrl)}`;
-      }
+      //if (pathname !== "/login" && returnUrl.indexOf("/login") !== 0) {
+      //  window.location = `/login?return_to=${encodeURIComponent(returnUrl)}`;
+      //}
     }
   }
 });
