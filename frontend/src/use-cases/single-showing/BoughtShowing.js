@@ -1,6 +1,7 @@
 import React from "react";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import MainButton from "../../use-cases/common/ui/MainButton";
+import gql from "graphql-tag";
 
 const PayToUser = ({ user }) => (
   <span>
@@ -12,7 +13,7 @@ const PayToUser = ({ user }) => (
 const BoughtShowing = ({
   isAdmin,
   attendeePaymentDetails,
-  showing,
+  myTickets,
   onClickTickets,
   openSwish
 }) => {
@@ -26,7 +27,7 @@ const BoughtShowing = ({
 
   return (
     <React.Fragment>
-      {(isAdmin || showing.myTickets.length > 0) && (
+      {(isAdmin || myTickets.length > 0) && (
         <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>
       )}
       {!hasPaid && (
@@ -38,6 +39,27 @@ const BoughtShowing = ({
       )}
     </React.Fragment>
   );
+};
+
+BoughtShowing.fragment = {
+  showing: gql`
+    fragment BoughtShowing on Showing {
+      myTickets {
+        id
+      }
+      attendeePaymentDetails {
+        amountOwed
+        swishLink
+        hasPaid
+        payTo {
+          phone
+          firstName
+          nick
+          lastName
+        }
+      }
+    }
+  `
 };
 
 export default BoughtShowing;

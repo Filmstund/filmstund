@@ -7,7 +7,9 @@ import { SmallHeader } from "../../use-cases/common/ui/Header";
 import MainButton, { GrayButton } from "../../use-cases/common/ui/MainButton";
 import Modal from "../../use-cases/common/ui/Modal";
 
-import createPaymentOptions, { stringifyOption } from "./createPaymentOptions";
+import createPaymentOptions, {
+  stringifyOption
+} from "./utils/createPaymentOptions";
 
 class PendingShowing extends Component {
   state = {

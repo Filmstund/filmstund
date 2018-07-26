@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import UserItem from "./UserItem";
-import { SmallHeader } from "../../use-cases/common/ui/Header";
+import { SmallHeader } from "../../common/ui/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faUserTie from "@fortawesome/fontawesome-free-solid/faUserTie";
 

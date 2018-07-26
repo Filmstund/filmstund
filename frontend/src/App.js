@@ -41,7 +41,7 @@ const AsyncShowingTickets = asyncComponent(() =>
   import("./use-cases/showing-tickets/index")
 );
 const AsyncSingleShowing = asyncComponent(() =>
-  import("./use-cases/single-showing/index")
+  import("./use-cases/single-showing/screen/SingleShowingScreen")
 );
 
 const App = ({ data: { me }, signout }) => (

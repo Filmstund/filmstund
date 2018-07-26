@@ -10,8 +10,8 @@ import CopyValue from "../../use-cases/common/utils/CopyValue";
 import Center from "../../use-cases/common/ui/Center";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
-import PaymentParticipantsList from "./PaymentParticipantsList";
-import ParticipantsList from "./ParticipantsList";
+import PaymentParticipantsList from "./components/PaymentParticipantsList";
+import ParticipantsList from "./components/ParticipantsList";
 
 import MainButton from "../../use-cases/common/ui/MainButton";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
@@ -79,7 +79,7 @@ const renderUsersWithoutSfMembershipIds = sfData => {
   }
 };
 
-const SfMembershipList = ({ sfData, participants }) => (
+const SfMembershipList = ({ sfData }) => (
   <div>
     <SmallHeader>SF medlemsnummer</SmallHeader>
     {sfData
@@ -153,10 +153,7 @@ const BuyModal = ({
               <ForetagsBiljetterList
                 tickets={participantsWithForetagsbiljett}
               />
-              <SfMembershipList
-                sfData={sfData}
-                participants={showing.participants}
-              />
+              <SfMembershipList sfData={sfData} />
               <StatusMessageBox errors={errors} />
               <Field text="Biljettpris:">
                 <Input

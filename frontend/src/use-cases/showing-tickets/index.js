@@ -6,7 +6,7 @@ import TicketContainer from "./TicketContainer";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { ticketFragment, addTickets } from "../../apollo/mutations/tickets";
 
-const routerParamsToShowingId = ({ match, history }) => {
+const routerParamsToShowingId = ({ match }) => {
   const { webId } = match.params;
 
   return { webId };

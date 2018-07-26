@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import QRCode from "./QRCode";
-import Loader from "../../use-cases/common/utils/ProjectorLoader";
-import Modal from "../../use-cases/common/ui/Modal";
+import Loader from "../../common/utils/ProjectorLoader";
+import Modal from "../../common/ui/Modal";
 
 const SwishModal = ({ attendeePaymentDetails, closeSwish }) => {
   if (!attendeePaymentDetails) {

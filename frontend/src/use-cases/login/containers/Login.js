@@ -52,7 +52,6 @@ class Login extends Component {
       });
   }
 
-
   googleUserChanged = response => {
     if (response.user_id) {
       setUserInfo(response);
@@ -71,9 +70,7 @@ class Login extends Component {
   };
 
   signin = () => {
-    this.props
-      .signIn()
-      .then(this.googleUserChanged);
+    this.props.signIn().then(this.googleUserChanged);
   };
 
   signout = () => {
