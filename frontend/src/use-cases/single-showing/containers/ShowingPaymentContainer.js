@@ -15,11 +15,13 @@ const ShowingPaymentContainer = ({
         <BoughtShowing
           myTickets={showing.myTickets}
           isAdmin={isAdmin}
-          onClickTickets={this.navigateToTickets}
-          openSwish={this.openSwish}
+          onClickTickets={onClickTickets}
+          openSwish={openSwish}
           attendeePaymentDetails={showing.attendeePaymentDetails}
         />
       );
+    } else {
+      return null;
     }
   } else {
     return (

@@ -94,6 +94,8 @@ const data = graphql(
         id
       }
       showing(webId: $webId) {
+        webId
+        slug
         ...OldShowing
         ...ShowingAdmin
         ...BoughtShowing
