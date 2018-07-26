@@ -108,11 +108,6 @@ class Login extends Component {
       });
   }
 
-  googleAuthSuccess = user => {
-    if (this.props.location.pathname.indexOf("/login") === 0) {
-      this.props.history.push("/");
-    }
-  };
 
   googleUserChanged = response => {
     if (response.user_id) {
@@ -134,8 +129,7 @@ class Login extends Component {
   signin = () => {
     this.props
       .signIn()
-      .then(this.googleUserChanged)
-      .then(this.googleAuthSuccess);
+      .then(this.googleUserChanged);
   };
 
   signout = () => {
@@ -146,7 +140,7 @@ class Login extends Component {
       signedIn: false
     });
 
-    this.props.history.push("/login");
+    this.props.history.push("/");
   };
 
   render() {
