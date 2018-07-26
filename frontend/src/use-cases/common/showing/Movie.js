@@ -43,8 +43,4 @@ export const movieFragment = gql`
   }
 `;
 
-export default styled(Movie)`
-  &:not(:last-child) {
-    margin-bottom: 1em;
-  }
-`;
+export default Movie;

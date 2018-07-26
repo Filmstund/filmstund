@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import { NavLink as RouterLink } from "react-router-dom";
 import styled from "styled-components";
-import { PageWidthWrapper } from "./PageWidthWrapper";
 
 const TopBarBackground = styled.div`
   background-color: #b71c1c;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  grid-area: top;
 `;
 
 const TopBarLinksContainer = styled.div`
@@ -41,18 +38,16 @@ class TopBar extends Component {
     const { signout } = this.props;
     return (
       <TopBarBackground>
-        <PageWidthWrapper>
-          <TopBarLinksContainer>
-            <div>
-              <Link to="/">Mina besök</Link>
-              <Link to="/showings">Alla besök</Link>
-            </div>
-            <div>
-              <Link to="/user">Profil</Link>
-              <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
-            </div>
-          </TopBarLinksContainer>
-        </PageWidthWrapper>
+        <TopBarLinksContainer>
+          <div>
+            <Link to="/">Mina besök</Link>
+            <Link to="/showings">Alla besök</Link>
+          </div>
+          <div>
+            <Link to="/user">Profil</Link>
+            <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
+          </div>
+        </TopBarLinksContainer>
       </TopBarBackground>
     );
   }
