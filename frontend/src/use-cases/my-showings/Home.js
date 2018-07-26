@@ -97,16 +97,19 @@ class Home extends Component {
       s => formatYMD(showingDate(s)) === formatYMD(today)
     );
 
+    const featuredShowing = todayShowing[0];
+
     return (
       <React.Fragment>
         <Helmet title="Mina Besök" />
-        {todayShowing.length > 0 && (
+        {featuredShowing && (
           <JumbotronBackground>
             <PageWidthWrapper>
               <Jumbotron>
                 <ShowingNeue
-                  showing={todayShowing[0]}
-                  onClick={() => this.navigateToShowing(todayShowing[0])}
+                  showing={featuredShowing}
+                  onClick={() => this.navigateToShowing(featuredShowing)}
+                  onClickTickets={() => this.navigateToTickets(featuredShowing)}
                 />
                 <ItsHappeningTitle>
                   It's happening!{" "}
