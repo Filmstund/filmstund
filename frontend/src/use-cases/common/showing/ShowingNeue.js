@@ -4,7 +4,6 @@ import faQrcode from "@fortawesome/fontawesome-free-solid/faQrcode";
 import faChevronRight from "@fortawesome/fontawesome-free-solid/faChevronRight";
 import { formatShowingDateTime } from "../../../lib/dateTools";
 import gql from "graphql-tag";
-import SeatRange from "../../showing-tickets/SeatRange";
 import {
   Box,
   ButtonText,
@@ -14,11 +13,9 @@ import {
   Description,
   FaIcon,
   Poster,
-  RedButton,
-  TicketRangeContainer
+  RedButton
 } from "./style";
 import { UserHeads } from "./UserHeads";
-import { ScreenName } from "./ScreenName";
 
 export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
   const showingHasTickets = showing.myTickets.length > 0;

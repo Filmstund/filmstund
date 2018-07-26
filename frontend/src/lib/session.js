@@ -1,6 +1,8 @@
 export const getToken = () => window.localStorage.getItem("idToken");
 export const hasToken = () => !!getToken();
 export const getGoogleId = () => window.localStorage.getItem("googleId");
+export const getExpiresAt = () =>
+  parseInt(window.localStorage.getItem("expiresAt"), 10);
 
 export const setUserInfo = response => {
   const { id_token, user_id, expires_at } = response;
