@@ -41,15 +41,6 @@ const FlexHeader = styled(Header)`
 
 const StyledMovie = styled(Movie)`
   padding: 0.5em;
-  width: 100%;
-
-  @media (min-width: 610px) {
-    max-width: 50%;
-  }
-
-  @media (min-width: 910px) {
-    max-width: 18em;
-  }
 `;
 
 class NewShowing extends Component {

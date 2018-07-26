@@ -271,7 +271,7 @@ const mutation = graphql(
 
 const withCityState = withState("city", "setCity", "GB");
 
-const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
+const isLoading = branch(({ data: { me } }) => true, renderComponent(Loader));
 
 export default compose(
   withCityState,

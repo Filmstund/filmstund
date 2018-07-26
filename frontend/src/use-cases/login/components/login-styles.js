@@ -1,19 +1,20 @@
 import styled from "styled-components";
 
-export const LoginContainer = styled.div`
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+export const Container = styled.div`
+  display: grid;
+  background-color: black;
 `;
 
-export const Container = styled.div`
-  display: flex;
-  min-height: 100%;
-  background-repeat: no-repeat;
-  background-color: black;
+export const ContentContainer = styled.div`
+  display: grid;
+  background: white;
+`;
+
+export const LoginContainer = styled.div`
+  height: 100vh;
+  display: grid;
   justify-content: center;
+  align-items: center;
 `;
 
 export const ErrorBox = styled.div`
@@ -23,14 +24,6 @@ export const ErrorBox = styled.div`
   background-color: #ef5353;
   color: white;
   margin: 0 0 2rem;
-`;
-
-export const ContentContainer = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 100%;
-  flex-direction: column;
-  background: white;
 `;
 
 export const LoginDialog = styled.div`

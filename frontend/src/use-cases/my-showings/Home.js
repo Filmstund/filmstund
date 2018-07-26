@@ -16,7 +16,10 @@ import {
   navigateToShowing,
   navigateToShowingTickets
 } from "../common/navigators/index";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import {
+  FullWidthWrapper,
+  PageWidthWrapper
+} from "../common/ui/PageWidthWrapper";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import { ItsHappeningTitle } from "./ItsHappeningTitle";
 import { EmptyList } from "../common/ui/EmptyList";
@@ -103,8 +106,8 @@ class Home extends Component {
       <React.Fragment>
         <Helmet title="Mina Besök" />
         {featuredShowing && (
-          <JumbotronBackground>
-            <PageWidthWrapper>
+          <FullWidthWrapper>
+            <JumbotronBackground>
               <Jumbotron>
                 <ShowingNeue
                   showing={featuredShowing}
@@ -118,8 +121,8 @@ class Home extends Component {
                   </span>
                 </ItsHappeningTitle>
               </Jumbotron>
-            </PageWidthWrapper>
-          </JumbotronBackground>
+            </JumbotronBackground>
+          </FullWidthWrapper>
         )}
         <PageWidthWrapper>
           <Link to="/showings/new">Skapa nytt besök</Link>

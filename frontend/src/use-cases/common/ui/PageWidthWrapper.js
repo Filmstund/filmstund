@@ -1,16 +1,11 @@
 import styled from "styled-components";
-import { nest } from "recompose";
 
-const ContentWrapper = styled.div`
-  max-width: 960px;
-  width: 100%;
+export const FullWidthWrapper = styled.div`
+  grid-area: jumbo;
 `;
 
-const OuterWrapper = styled.div`
-  display: flex;
-  height: 100%;
-  flex-direction: row;
-  justify-content: center;
+export const PageWidthWrapper = styled.div`
+  grid-area: center;
+  align-self: stretch;
+  padding: 1rem 0;
 `;
-
-export const PageWidthWrapper = nest(OuterWrapper, ContentWrapper);
