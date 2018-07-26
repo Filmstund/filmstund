@@ -33,10 +33,6 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
             {formatShowingDateTime(showing.date + " " + showing.time)}
           </Description>
           <UserHeads users={showing.participants.map(p => p.user)} />
-          <ScreenName ticket={showing.myTickets[0]} />
-          <TicketRangeContainer>
-            <SeatRange ticketRange={showing.ticketRange} />
-          </TicketRangeContainer>
         </Content>
         {showingHasTickets && (
           <RedButton
@@ -72,17 +68,8 @@ export const showingFragment = gql`
       poster
       title
     }
-    ticketRange {
-      rows
-      seatings {
-        row
-        numbers
-      }
-    }
     myTickets {
       id
-      cinema
-      screen
     }
     participants {
       user {
