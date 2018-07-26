@@ -154,6 +154,9 @@ export const showingAdminFragment = gql`
       sfId
       name
     }
+    payToUser {
+      id
+    }
     adminPaymentDetails {
       sfBuyLink
       sfData {

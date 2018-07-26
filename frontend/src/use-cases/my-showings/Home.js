@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
-import isAfter from "date-fns/is_after";
-import isBefore from "date-fns/is_before";
 import { compose } from "recompose";
 import orderBy from "lodash/orderBy";
 import Helmet from "react-helmet";
@@ -11,7 +9,8 @@ import { Link } from "../common/ui/MainButton";
 import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import { showingFragment, ShowingNeue } from "../common/showing/ShowingNeue";
 import { RedHeader } from "../common/ui/RedHeader";
-import { formatYMD, getTodaysDate } from "../../lib/dateTools";
+import { getTodaysDate } from "../../lib/dateTools";
+import { isAfter, isBefore, isSameDay, subMinutes } from "date-fns";
 import {
   navigateToShowing,
   navigateToShowingTickets
@@ -96,11 +95,15 @@ class Home extends Component {
       data: { showings = [] }
     } = this.props;
 
-    const todayShowing = showings.filter(
-      s => formatYMD(showingDate(s)) === formatYMD(today)
+    const compareTime = subMinutes(today, 30);
+
+    const todayShowings = showings.filter(
+      s =>
+        isBefore(compareTime, showingDate(s)) &&
+        isSameDay(compareTime, showingDate(s))
     );
 
-    const featuredShowing = todayShowing[0];
+    const featuredShowing = orderBy(todayShowings, [showingDate], ["asc"])[0];
 
     return (
       <React.Fragment>
