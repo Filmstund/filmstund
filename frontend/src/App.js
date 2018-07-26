@@ -17,7 +17,7 @@ import { UUIDToWebId } from "./use-cases/common/utils/UUIDToWebId";
 const ScrollContainer = styled.div`
   display: grid;
   height: 100vh;
-  grid-template-rows: fit-content(100px) auto;
+  grid-template-rows: min-content auto;
   grid-template-areas:
     "top"
     "content";
@@ -28,7 +28,6 @@ const MainGridContainer = styled.div`
   grid-area: content;
   display: grid;
   grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(1rem, 1fr);
-  grid-template-rows: fit-content(100px) auto fit-content(100px);
   grid-template-areas:
     "jumbo jumbo jumbo"
     ". center ."
