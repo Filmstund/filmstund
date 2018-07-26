@@ -42,7 +42,9 @@ const errorLink = onError(args => {
     ) {
       const { pathname, search } = window.location;
       const returnUrl = pathname + search;
-      console.log("Not signed in or signed out due to cookie expiry", { returnUrl });
+      console.log("Not signed in or signed out due to cookie expiry", {
+        returnUrl
+      });
     }
   }
 });

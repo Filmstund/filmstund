@@ -147,6 +147,9 @@ AdminAction.propTypes = {
 
 export const showingAdminFragment = gql`
   fragment ShowingAdmin on Showing {
+    id
+    price
+    private
     sfScreen {
       sfId
       name

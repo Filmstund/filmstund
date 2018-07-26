@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
-import Header from "../../use-cases/common/ui/Header";
+import Header from "../../common/ui/Header";
 
 import groupBy from "lodash/groupBy";
 
