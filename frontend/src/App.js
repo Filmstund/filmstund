@@ -14,23 +14,29 @@ import { completeUserFragment } from "./apollo/queries/currentUser";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
 import { UUIDToWebId } from "./use-cases/common/utils/UUIDToWebId";
 
-const MainGridContainer = styled.div`
+const ScrollContainer = styled.div`
   display: grid;
-  min-height: 100vh;
-  grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(
-      1rem,
-      1fr
-    );
-  grid-template-rows: fit-content(100px) fit-content(100px) auto fit-content(
-      100px
-    );
+  height: 100vh;
+  grid-template-rows: fit-content(100px) auto;
   grid-template-areas:
-    "top top top"
+    "top"
+    "content";
+  -webkit-overflow-scrolling: touch;
+`;
+
+const MainGridContainer = styled.div`
+  grid-area: content;
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(1rem, 1fr);
+  grid-template-rows: fit-content(100px) auto fit-content(100px);
+  grid-template-areas:
     "jumbo jumbo jumbo"
     ". center ."
     "footer footer footer";
   background-color: #f8f8f8;
   align-items: start;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const AsyncHome = asyncComponent(() => import("./use-cases/my-showings/Home"));
@@ -55,35 +61,37 @@ const App = ({ data: { me }, signout }) => (
   <React.Fragment>
     <Helmet titleTemplate="%s | itbio" />
     <WelcomeModal me={me} />
-    <MainGridContainer>
+    <ScrollContainer>
       <TopBar signout={signout} />
-      <Switch>
-        <Route exact path="/" component={AsyncHome} />
-        <Route path="/user" component={AsyncUser} />
-        <Route exact path="/showings" component={AsyncShowings} />
-        <Route path="/showings/new/:movieId?" component={AsyncNewShowing} />
-        <Route
-          path="/showings/:webId/:slug/tickets"
-          component={AsyncShowingTickets}
-        />
-        <Route
-          path="/showings/:webId/:slug/edit"
-          component={AsyncEditShowing}
-        />
-        <Route path="/showings/:webId/:slug" component={AsyncSingleShowing} />
-        <Route
-          path="/showings/:showingId/:rest?"
-          render={props => (
-            <UUIDToWebId {...props.match.params}>
-              {({ webId, slug }) => (
-                <Redirect to={`/showings/${webId}/${slug}`} />
-              )}
-            </UUIDToWebId>
-          )}
-        />
-      </Switch>
-      <Footer />
-    </MainGridContainer>
+      <MainGridContainer>
+        <Switch>
+          <Route exact path="/" component={AsyncHome} />
+          <Route path="/user" component={AsyncUser} />
+          <Route exact path="/showings" component={AsyncShowings} />
+          <Route path="/showings/new/:movieId?" component={AsyncNewShowing} />
+          <Route
+            path="/showings/:webId/:slug/tickets"
+            component={AsyncShowingTickets}
+          />
+          <Route
+            path="/showings/:webId/:slug/edit"
+            component={AsyncEditShowing}
+          />
+          <Route path="/showings/:webId/:slug" component={AsyncSingleShowing} />
+          <Route
+            path="/showings/:showingId/:rest?"
+            render={props => (
+              <UUIDToWebId {...props.match.params}>
+                {({ webId, slug }) => (
+                  <Redirect to={`/showings/${webId}/${slug}`} />
+                )}
+              </UUIDToWebId>
+            )}
+          />
+        </Switch>
+        <Footer />
+      </MainGridContainer>
+    </ScrollContainer>
   </React.Fragment>
 );
 
