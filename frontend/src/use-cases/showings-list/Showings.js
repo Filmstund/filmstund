@@ -9,7 +9,7 @@ import Helmet from "react-helmet";
 import { getTodaysDate } from "../../lib/dateTools";
 
 import { RedHeader } from "../common/ui/RedHeader";
-import { showingFragment, ShowingNeue } from "../common/showing/ShowingNeue";
+import { ShowingNeue } from "../common/showing/ShowingNeue";
 import { Link } from "../common/ui/MainButton";
 import {
   navigateToShowing,
@@ -81,11 +81,13 @@ const data = graphql(
       showings: publicShowings {
         ...ShowingNeue
         id
+        webId
+        slug
         date
         time
       }
     }
-    ${showingFragment}
+    ${ShowingNeue.fragments.showing}
   `,
   {
     options: { fetchPolicy: "cache-and-network" }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { graphql, compose } from "react-apollo";
+import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import Helmet from "react-helmet";
@@ -13,11 +13,11 @@ import { trim } from "../../lib/Utils";
 
 import ForetagsbiljettList from "./ForetagsbiljettList";
 import { completeUserFragment } from "../../apollo/queries/currentUser";
-import { wrapMutate } from "../../store/apollo";
 import { branch, renderComponent } from "recompose";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
+import { updateUser } from "../../apollo/mutations/user";
 
 const Box = styled.div`
   background: #fff;
@@ -166,27 +166,10 @@ const data = graphql(
   }
 );
 
-const update = graphql(
-  gql`
-    mutation UpdateUser($user: NewUserInfo!) {
-      editedUser: updateUser(newInfo: $user) {
-        ...CompleteUser
-        calendarFeedUrl
-      }
-    }
-    ${completeUserFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      updateUser: user => wrapMutate(mutate, { user })
-    })
-  }
-);
-
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
 export default compose(
   data,
-  update,
+  updateUser,
   isLoading
 )(User);
