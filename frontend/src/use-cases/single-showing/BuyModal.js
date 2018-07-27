@@ -95,6 +95,7 @@ const SfMembershipList = ({ sfData }) => (
 );
 
 const BuyModal = ({
+  loading,
   errors,
   ticketPrice,
   cinemaTicketUrls,
@@ -106,7 +107,7 @@ const BuyModal = ({
   closeModal,
   showing
 }) => {
-  if (!adminPaymentDetails) {
+  if (loading || !adminPaymentDetails) {
     return (
       <Modal>
         <Center>
