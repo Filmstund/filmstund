@@ -27,7 +27,10 @@ const ScrollContainer = styled.div`
 const MainGridContainer = styled.div`
   grid-area: content;
   display: grid;
-  grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(1rem, 1fr);
+  grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(
+      1rem,
+      1fr
+    );
   grid-template-rows: min-content auto min-content;
   grid-template-areas:
     "jumbo jumbo jumbo"

@@ -73,6 +73,7 @@ class SingleShowingContainer extends Component {
           <ShowingPaymentContainer
             showing={showing}
             isAdmin={isAdmin}
+            foretagsbiljetter={me.foretagsbiljetter}
             isParticipating={isParticipating}
             onClickTickets={this.navigateToTickets}
             openSwish={this.openSwish}
@@ -93,14 +94,15 @@ const data = graphql(
   gql`
     query SingleShowing($webId: Base64ID!) {
       me: currentUser {
+        ...PendingShowing
         id
       }
       showing(webId: $webId) {
-        webId
-        slug
         ...OldShowing
         ...ShowingAdmin
         ...BoughtShowing
+        webId
+        slug
         price
         private
         movie {
@@ -111,7 +113,8 @@ const data = graphql(
         }
       }
     }
-    ${BoughtShowing.fragments.showing}
+    ${ShowingPaymentContainer.fragments.showing}
+    ${ShowingPaymentContainer.fragments.currentUser}
     ${showingFragment}
     ${AdminAction.fragments.showing}
     ${ParticipantList.fragments.participant}

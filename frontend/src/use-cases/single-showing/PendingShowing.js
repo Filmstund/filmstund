@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { graphql, compose } from "react-apollo";
+import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
-import { wrapMutate } from "../../store/apollo";
 
 import { SmallHeader } from "../../use-cases/common/ui/Header";
 import MainButton, { GrayButton } from "../../use-cases/common/ui/MainButton";
@@ -10,6 +9,10 @@ import Modal from "../../use-cases/common/ui/Modal";
 import createPaymentOptions, {
   stringifyOption
 } from "./utils/createPaymentOptions";
+import {
+  attendShowing,
+  unattendShowing
+} from "../../apollo/mutations/showings";
 
 class PendingShowing extends Component {
   state = {
@@ -52,11 +55,7 @@ class PendingShowing extends Component {
   };
 
   getPaymentOptions = () => {
-    const {
-      data: {
-        me: { foretagsbiljetter }
-      }
-    } = this.props;
+    const { foretagsbiljetter } = this.props;
     return createPaymentOptions(foretagsbiljetter);
   };
 
@@ -110,69 +109,19 @@ class PendingShowing extends Component {
   }
 }
 
-const participantsFragment = gql`
-  fragment ShowingParticipant on Showing {
-    id
-    participants {
-      paymentType
-      user {
-        id
-        nick
-        firstName
-        lastName
-        avatar
-      }
-    }
-  }
-`;
-
-const attendShowing = graphql(
-  gql`
-    mutation AttendShowing($showingId: UUID!, $paymentOption: PaymentOption!) {
-      attendShowing(showingId: $showingId, paymentOption: $paymentOption) {
-        ...ShowingParticipant
-      }
-    }
-    ${participantsFragment}
-  `,
-  {
-    props: ({ mutate, ownProps: { showingId } }) => ({
-      attendShowing: ({ paymentOption }) =>
-        wrapMutate(mutate, { showingId, paymentOption })
-    })
-  }
-);
-
-const unattendShowing = graphql(
-  gql`
-    mutation UnattendShowing($showingId: UUID!) {
-      unattendShowing(showingId: $showingId) {
-        ...ShowingParticipant
-      }
-    }
-    ${participantsFragment}
-  `,
-  {
-    props: ({ mutate, ownProps: { showingId } }) => ({
-      unattendShowing: () => wrapMutate(mutate, { showingId })
-    })
-  }
-);
-
-const data = graphql(gql`
-  query PendingShowingQuery {
-    me: currentUser {
+PendingShowing.fragments = {
+  currentUser: gql`
+    fragment PendingShowing on CurrentUser {
       foretagsbiljetter {
         expires
         number
         status
       }
     }
-  }
-`);
+  `
+};
 
 export default compose(
   attendShowing,
-  unattendShowing,
-  data
+  unattendShowing
 )(PendingShowing);
