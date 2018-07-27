@@ -7,7 +7,7 @@ import Helmet from "react-helmet";
 
 import { Link } from "../common/ui/MainButton";
 import { Jumbotron, JumbotronBackground } from "./Jumbotron";
-import { showingFragment, ShowingNeue } from "../common/showing/ShowingNeue";
+import { ShowingNeue } from "../common/showing/ShowingNeue";
 import { RedHeader } from "../common/ui/RedHeader";
 import { getTodaysDate } from "../../lib/dateTools";
 import { isAfter, isBefore, isSameDay, subMinutes } from "date-fns";
@@ -165,7 +165,7 @@ const data = graphql(
         id
       }
     }
-    ${showingFragment}
+    ${ShowingNeue.fragments.showing}
   `,
   {
     options: { fetchPolicy: "cache-and-network" }

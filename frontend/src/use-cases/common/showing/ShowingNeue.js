@@ -53,29 +53,25 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
   );
 };
 
-export const showingFragment = gql`
-  fragment ShowingNeue on Showing {
-    id
-    webId
-    slug
-    date
-    time
-    movie {
-      id
-      poster
-      title
-    }
-    myTickets {
-      id
-    }
-    participants {
-      user {
+ShowingNeue.fragments = {
+  showing: gql`
+    fragment ShowingNeue on Showing {
+      date
+      time
+      movie {
         id
-        avatar
+        poster
+        title
+      }
+      myTickets {
+        id
+      }
+      participants {
+        user {
+          id
+          avatar
+        }
       }
     }
-    location {
-      name
-    }
-  }
-`;
+  `
+};
