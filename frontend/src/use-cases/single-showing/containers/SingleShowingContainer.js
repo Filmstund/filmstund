@@ -5,7 +5,7 @@ import { branch, compose, renderComponent } from "recompose";
 import Showing, { showingFragment } from "../../common/showing/Showing";
 import { ButtonContainer } from "../../common/ui/MainButton";
 import BoughtShowing from "../BoughtShowing";
-import AdminAction, { showingAdminFragment } from "../AdminAction";
+import AdminAction from "../AdminAction";
 import ParticipantList from "../components/ParticipantsList";
 import SwishModal from "../components/SwishModal";
 import IMDbLink from "../../common/ui/IMDbLink";
@@ -41,7 +41,7 @@ class SingleShowingContainer extends Component {
     const { swish } = this.state;
     const {
       promoteToAdmin,
-      data: { me, showing }
+      data: { me, showing, refetch }
     } = this.props;
 
     const isAdmin = userIsAdmin(showing, me);
@@ -67,7 +67,9 @@ class SingleShowingContainer extends Component {
         />
         <ButtonContainer>
           <IMDbLink imdbId={showing.movie.imdbId} />
-          {isAdmin && <AdminAction showing={showing} />}
+          {isAdmin && (
+            <AdminAction onBeforeOpenBuyModal={refetch} showing={showing} />
+          )}
           <ShowingPaymentContainer
             showing={showing}
             isAdmin={isAdmin}

@@ -22,6 +22,7 @@ class AdminAction extends Component {
       ticketPrice: props.showing.price / 100,
       cinemaTicketUrls: [],
       buyData: null,
+      loadingModal: false,
       showModal: false
     };
   }
@@ -53,10 +54,17 @@ class AdminAction extends Component {
     });
   };
 
-  handleStartBooking = () => {
+  handleStartBooking = async () => {
     this.setState({
       showModal: true,
+      loadingModal: true,
       errors: null
+    });
+
+    await this.props.onBeforeOpenBuyModal();
+
+    this.setState({
+      loadingModal: false
     });
   };
 
@@ -106,6 +114,7 @@ class AdminAction extends Component {
       ticketPrice,
       cinemaTicketUrls,
       showModal,
+      loadingModal,
       adminMessage
     } = this.state;
 
@@ -114,6 +123,7 @@ class AdminAction extends Component {
         {showModal && (
           <BuyModal
             errors={errors}
+            loading={loadingModal}
             setPrice={this.setPrice}
             setCinemaTicketUrls={this.setCinemaTicketUrls}
             showing={showing}
