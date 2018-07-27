@@ -155,3 +155,49 @@ export const promoteToAdmin = graphql(
     })
   }
 );
+const participantsFragment = gql`
+  fragment ShowingParticipant on Showing {
+    id
+    participants {
+      paymentType
+      user {
+        id
+        nick
+        firstName
+        lastName
+        avatar
+      }
+    }
+  }
+`;
+export const attendShowing = graphql(
+  gql`
+    mutation AttendShowing($showingId: UUID!, $paymentOption: PaymentOption!) {
+      attendShowing(showingId: $showingId, paymentOption: $paymentOption) {
+        ...ShowingParticipant
+      }
+    }
+    ${participantsFragment}
+  `,
+  {
+    props: ({ mutate, ownProps: { showingId } }) => ({
+      attendShowing: ({ paymentOption }) =>
+        wrapMutate(mutate, { showingId, paymentOption })
+    })
+  }
+);
+export const unattendShowing = graphql(
+  gql`
+    mutation UnattendShowing($showingId: UUID!) {
+      unattendShowing(showingId: $showingId) {
+        ...ShowingParticipant
+      }
+    }
+    ${participantsFragment}
+  `,
+  {
+    props: ({ mutate, ownProps: { showingId } }) => ({
+      unattendShowing: () => wrapMutate(mutate, { showingId })
+    })
+  }
+);

@@ -3,6 +3,7 @@ import BoughtShowing from "../BoughtShowing";
 import PendingShowing from "../PendingShowing";
 
 const ShowingPaymentContainer = ({
+  foretagsbiljetter,
   showing,
   isAdmin,
   onClickTickets,
@@ -27,10 +28,16 @@ const ShowingPaymentContainer = ({
     return (
       <PendingShowing
         showingId={showing.id}
+        foretagsbiljetter={foretagsbiljetter}
         isParticipating={isParticipating}
       />
     );
   }
+};
+
+ShowingPaymentContainer.fragments = {
+  showing: BoughtShowing.fragments.showing,
+  currentUser: PendingShowing.fragments.currentUser
 };
 
 export default ShowingPaymentContainer;
