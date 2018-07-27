@@ -10,6 +10,10 @@ export const StatusBox = styled.div`
 `;
 
 const StatusMessageBox = ({ errors, success, successMessage }) => {
+    if (errors) {
+        console.log(errors);
+    }
+
   if (success) {
     return <StatusBox>{successMessage}</StatusBox>;
   } else if (errors) {

@@ -145,44 +145,46 @@ AdminAction.propTypes = {
   showing: PropTypes.object.isRequired
 };
 
-export const showingAdminFragment = gql`
-  fragment ShowingAdmin on Showing {
-    id
-    price
-    private
-    sfScreen {
-      sfId
-      name
-    }
-    payToUser {
+AdminAction.fragments = {
+  showing: gql`
+    fragment ShowingAdmin on Showing {
       id
-    }
-    adminPaymentDetails {
-      sfBuyLink
-      sfData {
-        user {
-          id
-          nick
-          firstName
-          lastName
-        }
-        sfMembershipId
-        foretagsbiljett
+      price
+      private
+      sfScreen {
+        sfId
+        name
       }
-      participantPaymentInfos {
+      payToUser {
         id
-        hasPaid
-        amountOwed
-        user {
+      }
+      adminPaymentDetails {
+        sfBuyLink
+        sfData {
+          user {
+            id
+            nick
+            firstName
+            lastName
+          }
+          sfMembershipId
+          foretagsbiljett
+        }
+        participantPaymentInfos {
           id
-          nick
-          name
-          phone
+          hasPaid
+          amountOwed
+          user {
+            id
+            nick
+            name
+            phone
+          }
         }
       }
     }
-  }
-`;
+  `
+};
 
 export default compose(
   withRouter,

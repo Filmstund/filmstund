@@ -41,7 +41,7 @@ const BoughtShowing = ({
   );
 };
 
-BoughtShowing.fragment = {
+BoughtShowing.fragments = {
   showing: gql`
     fragment BoughtShowing on Showing {
       myTickets {
