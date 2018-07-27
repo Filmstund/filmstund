@@ -52,7 +52,7 @@ const ForetagsBiljetterList = ({ tickets }) => (
   </div>
 );
 
-const UserItem = ({ user }) => (
+const UserListItem = ({ user }) => (
   <li>
     {user.firstName} '{user.nick}' {user.lastName}
   </li>
@@ -69,7 +69,7 @@ const renderUsersWithoutSfMembershipIds = sfData => {
         {usersWithoutSfMembershipIds.length} deltagare saknar SF medlemsnummer:
         <ul>
           {usersWithoutSfMembershipIds.map(user => (
-            <UserItem key={user.id} user={user} />
+            <UserListItem key={user.id} user={user} />
           ))}
         </ul>
       </div>
