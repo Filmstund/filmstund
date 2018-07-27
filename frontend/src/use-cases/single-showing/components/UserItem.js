@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import gql from "graphql-tag";
 
 const pointerHover = `
   &:hover {
@@ -38,6 +39,18 @@ const UserItem = ({ className, showPhone, user, children }) => (
     </PaddingContainer>
   </div>
 );
+
+UserItem.fragments = {
+  user: gql`
+    fragment UserItem on User {
+      avatar
+      firstName
+      nick
+      lastName
+      phone
+    }
+  `
+};
 
 export default styled(UserItem)`
   background: #fff;

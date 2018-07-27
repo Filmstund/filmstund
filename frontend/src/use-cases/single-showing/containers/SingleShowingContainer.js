@@ -105,20 +105,14 @@ const data = graphql(
           imdbId
         }
         participants {
-          user {
-            id
-            nick
-            firstName
-            lastName
-            phone
-            avatar
-          }
+          ...ParticipantsList
         }
       }
     }
-    ${BoughtShowing.fragment.showing}
+    ${BoughtShowing.fragments.showing}
     ${showingFragment}
-    ${showingAdminFragment}
+    ${AdminAction.fragments.showing}
+    ${ParticipantList.fragments.participant}
   `,
   {
     options: ({ webId }) => ({

@@ -6,6 +6,7 @@ import UserItem from "./UserItem";
 import { SmallHeader } from "../../common/ui/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faUserTie from "@fortawesome/fontawesome-free-solid/faUserTie";
+import gql from "graphql-tag";
 
 const ParticipantContainer = styled.div`
   display: flex;
@@ -51,8 +52,18 @@ const ParticipantsList = ({
   );
 };
 
-ParticipantsList.propTypes = {
-  participants: PropTypes.array.isRequired
+ParticipantsList.fragments = {
+  participant: gql`
+    fragment ParticipantsList on Participant {
+      user {
+        ...UserItem
+        id
+        nick
+        firstName
+      }
+    }
+    ${UserItem.fragments.user}
+  `
 };
 
 export default ParticipantsList;
