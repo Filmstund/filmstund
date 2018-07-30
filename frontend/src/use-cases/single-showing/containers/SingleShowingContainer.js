@@ -4,7 +4,6 @@ import { branch, compose, renderComponent } from "recompose";
 
 import Showing, { showingFragment } from "../../common/showing/Showing";
 import { ButtonContainer } from "../../common/ui/MainButton";
-import BoughtShowing from "../BoughtShowing";
 import AdminAction from "../AdminAction";
 import ParticipantList from "../components/ParticipantsList";
 import SwishModal from "../components/SwishModal";
