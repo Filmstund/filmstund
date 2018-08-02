@@ -94,7 +94,9 @@ class AdminAction extends Component {
           }
         })
       )
-      .then(this.handleStartBooking)
+      .then(() => {
+        this.setState({ showModal: false })
+      })
       .catch(errors => {
         this.setState({ errors });
       });
