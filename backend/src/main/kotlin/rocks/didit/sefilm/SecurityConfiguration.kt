@@ -24,6 +24,7 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
+import rocks.didit.sefilm.web.controllers.MetaController
 import java.time.Instant
 
 class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
@@ -122,6 +123,7 @@ class ResourceServerConfig(
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
+      .antMatchers(HttpMethod.GET, "${MetaController.PATH}/**").permitAll()
       .anyRequest().fullyAuthenticated()
   }
 

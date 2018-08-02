@@ -2,8 +2,8 @@ import java.time.ZonedDateTime
 
 buildscript {
   ext {
-    kotlinVersion = '1.2.30'
-    springBootVersion = '2.0.0.RELEASE'
+    kotlinVersion = '1.2.60'
+    springBootVersion = '2.0.4.RELEASE'
     junitJupiterVersion = '5.0.2'
   }
 
@@ -51,8 +51,11 @@ dependencies {
   compile("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
   compile("org.springframework.boot:spring-boot-starter-cache:$springBootVersion")
   compile("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
+  compile("org.springframework.boot:spring-boot-starter-mustache:$springBootVersion")
   compile("org.springframework.security:spring-security-jwt:1.0.9.RELEASE")
   compile("org.springframework.security.oauth:spring-security-oauth2:2.2.1.RELEASE")
+  compile("org.springframework.boot:spring-boot-devtools:$springBootVersion")
+
 
   /* The below is fix for kotlin-reflect in 1.2.20 */
   compile("org.springframework.data:spring-data-mongodb:2.0.3.RELEASE")
