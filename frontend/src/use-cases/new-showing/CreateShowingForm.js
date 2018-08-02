@@ -20,7 +20,7 @@ import Loader from "../common/utils/ProjectorLoader";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import format from "date-fns/format";
 import Loadable from "react-loadable";
-import { isAfter } from "date-fns";
+import isAfter from "date-fns/is_after";
 
 const DatePicker = Loadable({
   loader: () => import("../common/ui/date-picker/DatePicker"),
@@ -271,7 +271,7 @@ const mutation = graphql(
 
 const withCityState = withState("city", "setCity", "GB");
 
-const isLoading = branch(({ data: { me } }) => true, renderComponent(Loader));
+const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
 export default compose(
   withCityState,

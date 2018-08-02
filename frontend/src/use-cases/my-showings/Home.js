@@ -10,7 +10,10 @@ import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import { ShowingNeue } from "../common/showing/ShowingNeue";
 import { RedHeader } from "../common/ui/RedHeader";
 import { getTodaysDate } from "../../lib/dateTools";
-import { isAfter, isBefore, isSameDay, subMinutes } from "date-fns";
+import isAfter from "date-fns/is_after";
+import isBefore from "date-fns/is_before";
+import isSameDay from "date-fns/is_same_day";
+import subMinutes from "date-fns/sub_minutes";
 import {
   navigateToShowing,
   navigateToShowingTickets
