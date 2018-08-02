@@ -5,7 +5,6 @@ import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
 import keys from "lodash/keys";
 import groupBy from "lodash/groupBy";
-import CreatableSelect from "react-select/lib/Creatable";
 
 import Header from "../common/ui/Header";
 import Showing, {
@@ -22,6 +21,7 @@ import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import format from "date-fns/format";
 import Loadable from "react-loadable";
 import isAfter from "date-fns/is_after";
+import { LocationSelect } from "../common/ui/LocationSelect";
 
 const DatePicker = Loadable({
   loader: () => import("../common/ui/date-picker/DatePicker"),
@@ -209,19 +209,10 @@ class CreateShowingForm extends React.Component {
             />
           </Field>
           <Field text="Plats:">
-            <CreatableSelect
-              options={previousLocations.map(({ name }) => ({
-                value: name,
-                label: name,
-              }))}
-              formatCreateLabel={label => `Skapa '${label}'`}
-              value={{ value: locationName, label: locationName }}
-              onChange={(option, { action }) => {
-                if (action === "pop-value") {
-                  return;
-                }
-                this.setShowingValue("location", option.value);
-              }}
+            <LocationSelect
+              previousLocations={previousLocations}
+              value={locationName}
+              onChange={value => this.setShowingValue("location", value)}
             />
           </Field>
           <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>

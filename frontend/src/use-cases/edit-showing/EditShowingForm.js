@@ -16,6 +16,7 @@ import styled from "styled-components";
 import { margin } from "../../lib/style-vars";
 import addDays from "date-fns/add_days";
 import Loadable from "react-loadable";
+import { LocationSelect } from "../common/ui/LocationSelect";
 
 const DatePicker = Loadable({
   loader: () => import("../common/ui/date-picker/DatePicker"),
@@ -123,7 +124,8 @@ class EditShowingForm extends Component {
   render() {
     const {
       data: {
-        showing: { movie, admin, date, ticketsBought }
+        showing: { movie, admin, date, ticketsBought },
+        previousLocations
       }
     } = this.props;
     const { showing, errors } = this.state;
@@ -159,10 +161,10 @@ class EditShowingForm extends Component {
             />
           </Field>
           <Field text="Plats:">
-            <Input
-              type="text"
+            <LocationSelect
+              previousLocations={previousLocations}
               value={showing.location}
-              onChange={v => this.setShowingValueFromEvent("location", v)}
+              onChange={value => this.setShowingValue("location", value)}
             />
           </Field>
           <Field text="Pris:">
