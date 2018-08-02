@@ -18,6 +18,9 @@ export const errorLink = onError(async args => {
     ) {
       // User is not signed in ???
       console.log("This should never happen...");
+    } else {
+      args.networkError.response = null;
+      console.error(networkError);
     }
   }
 });
