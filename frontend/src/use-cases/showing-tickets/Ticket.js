@@ -28,7 +28,7 @@ const FlexColumnContainer = styled.div`
 
 const HeaderText = styled.div`
   font-size: 1.375rem;
-  font-weight: bold;
+  font-weight: 500;
 `;
 
 const LabelText = styled.div`
@@ -106,7 +106,7 @@ const TicketPlacement = ({ screen, seat }) => (
 );
 
 const TicketCustomerType = ({ customerType }) => (
-  <FlexRowContainer style={{ marginBottom: "1rem", fontWeight: "bold" }}>
+  <FlexRowContainer style={{ marginBottom: "1rem", fontWeight: "500" }}>
     {customerType}
   </FlexRowContainer>
 );
