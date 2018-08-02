@@ -7,6 +7,7 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
 
@@ -28,4 +29,8 @@ data class ShowingDTO(
   val participants: Collection<ParticipantDTO>,
   val lastModifiedDate: Instant = Instant.EPOCH,
   val createdDate: Instant = Instant.EPOCH
-)
+) {
+  fun fullDate(): LocalDateTime {
+    return LocalDateTime.of(date, time)
+  }
+}

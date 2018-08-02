@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{movieTitle}} - {{date}}</title>
+    <meta property="og:title" content="{{movieTitle}}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SeFilm">
+    <meta property="og:url" content="https://sefilm.bio/showings/{{webId}}/{{slug}}">
+    {{#hasPoster}}
+        <meta property="og:image" content="{{posterUrl}}">
+    {{/hasPoster}}
+    <meta property="og:description" content="{{movieDescription}}">
+    <meta name="twitter:card" value="summary"/>
+    <meta name="twitter:label1" value="When?"/>
+    <meta name="twitter:data1" value="{{date}}"/>
+
+</head>
+<body>
+<h3>Come watch {{movieTitle}} with us on {{date}}</h3>
+<a href="/showings/{{webId}}/{{slug}}">Click here to join</a>
+</body>
+</html>
