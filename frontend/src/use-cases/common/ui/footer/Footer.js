@@ -8,7 +8,7 @@ const BottomContainer = styled.div`
   background-color: #e3e3e3;
   color: #9b9b9b;
   padding: 1em;
-  font-weight: 100;
+  font-weight: 300;
 `;
 
 const FlexBox = styled.div`
