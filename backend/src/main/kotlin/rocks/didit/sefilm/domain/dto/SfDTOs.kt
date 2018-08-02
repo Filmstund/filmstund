@@ -5,51 +5,66 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
-data class SfRatingDTO(val age: Int,
-                       val ageAccompanied: Int,
-                       val alias: String,
-                       val displayName: String)
+data class SfRatingDTO(
+  val age: Int,
+  val ageAccompanied: Int,
+  val alias: String,
+  val displayName: String
+)
 
-data class SfMovieDTO(val ncgId: String,
-                      val title: String,
-                      val releaseDate: LocalDate,
-                      val rating: SfRatingDTO,
-                      val posterUrl: String,
-                      val slug: String,
-                      val length: Int?,
-                      val genres: List<SfGenreDTO> = listOf())
+data class SfMovieDTO(
+  val ncgId: String,
+  val title: String,
+  val releaseDate: LocalDate,
+  val rating: SfRatingDTO,
+  val posterUrl: String,
+  val slug: String,
+  val length: Int?,
+  val genres: List<SfGenreDTO> = listOf()
+)
 
-data class SfOriginalLanguageDTO(val alias: String,
-                                 val englishName: String,
-                                 val nativeName: String,
-                                 val displayName: String)
+data class SfOriginalLanguageDTO(
+  val alias: String,
+  val englishName: String,
+  val nativeName: String,
+  val displayName: String
+)
 
 data class SfPersonDTO(val displayName: String?, val firstName: String?, val lastName: String?)
 
 data class SfGenreDTO(val name: String)
 
-data class SfExtendedMovieDTO(val ncgId: String?,
-                              val languageId: String?,
-                              val originalLanguage: String?,
-                              val originalLanguages: Collection<SfOriginalLanguageDTO>?,
-                              val productionYear: Int?,
-                              val producers: Collection<SfPersonDTO>?,
-                              val genres: Collection<SfGenreDTO>?,
-                              val title: String?,
-                              val originalTitle: String?,
-                              val shortDescription: String?,
-                              val longDescription: String?,
-                              val releaseDate: LocalDate?,
-                              val actors: Collection<SfPersonDTO>?,
-                              val directors: Collection<SfPersonDTO>?,
-                              val rating: SfRatingDTO?,
-                              val length: Long?,
-                              val posterUrl: String?,
-                              val slug: String?)
+data class SfExtendedMovieDTO(
+  val ncgId: String?,
+  val languageId: String?,
+  val originalLanguage: String?,
+  val originalLanguages: Collection<SfOriginalLanguageDTO>?,
+  val productionYear: Int?,
+  val producers: Collection<SfPersonDTO>?,
+  val genres: Collection<SfGenreDTO>?,
+  val title: String?,
+  val originalTitle: String?,
+  val shortDescription: String?,
+  val longDescription: String?,
+  val releaseDate: LocalDate?,
+  val actors: Collection<SfPersonDTO>?,
+  val directors: Collection<SfPersonDTO>?,
+  val rating: SfRatingDTO?,
+  val length: Long?,
+  val posterUrl: String?,
+  val slug: String?
+)
 
 data class SfAttributeDTO(val alias: String, val displayName: String)
 
-data class SfScreenDTO(val ncgId: String, val title: String, val slug: String, val seatCount: Int, val remoteSystemAlias: String, val remoteEntityId: String)
+data class SfScreenDTO(
+  val ncgId: String,
+  val title: String,
+  val slug: String,
+  val seatCount: Int,
+  val remoteSystemAlias: String,
+  val remoteEntityId: String
+)
 
 data class SfShowItemsDTO(val totalNbrOfItems: Int, val items: List<SfShowDTO>)
 data class SfLocationItemsDTO(val totalNbrOfItems: Int, val items: List<SfCinemaWithAddressDTO>)
@@ -89,21 +104,45 @@ data class SfAddressDTO(
 
 data class SfCoordinatesDTO(val latitude: String, val longitude: String)
 
+data class SfLiteScreenDTO(val sfId: String, val name: String)
 data class SfShowingDTO(
   val cinemaName: String,
-  val screenName: String,
+  val screen: SfLiteScreenDTO,
   val seatCount: Int,
   val timeUtc: Instant,
   val tags: List<SfTag>
 ) {
   companion object {
-    fun from(show: SfShowDTO) = SfShowingDTO(show.cinema.title,
-      show.screen.title,
+    fun from(show: SfShowDTO) = SfShowingDTO(
+      show.cinema.title,
+      SfLiteScreenDTO(show.screen.ncgId, show.screen.title),
       show.screen.seatCount,
       show.timeUtc,
-      SfTag.convertTags(show.attributes))
+      SfTag.convertTags(show.attributes)
+    )
   }
 }
+
+data class SfSeatMapDTO(
+  val remoteSystemAlias: String,
+  val remoteEntityId: String,
+  val row: Int,
+  val number: Int,
+  val seatType: String,
+  val coordinates: SfSeatCoordinates,
+  val dimensions: SfSeatDimensions,
+  val languageId: String
+)
+
+data class SfSeatCoordinates(
+  val x: Float,
+  val y: Float
+)
+
+data class SfSeatDimensions(
+  val width: Int,
+  val height: Int
+)
 
 enum class SfTag {
   `18år`,
@@ -122,6 +161,7 @@ enum class SfTag {
   `Ej textad`,
   Textad,
   Familj,
+  Barnvagnsbio,
   Knattebio,
   Unknown;
 

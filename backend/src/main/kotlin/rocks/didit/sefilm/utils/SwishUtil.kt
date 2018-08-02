@@ -9,11 +9,17 @@ import rocks.didit.sefilm.domain.SwishDataDTO
 
 class SwishUtil {
   companion object {
-    fun constructSwishUri(showing: Showing, payeePhone: PhoneNumber, participantInfo: ParticipantPaymentInfo, movieTitle: String): String {
+    fun constructSwishUri(
+      showing: Showing,
+      payeePhone: PhoneNumber,
+      participantInfo: ParticipantPaymentInfo,
+      movieTitle: String
+    ): String {
       return SwishDataDTO(
         payee = StringValue(payeePhone.number),
         amount = IntValue(participantInfo.amountOwed.toKronor()),
-        message = generateSwishMessage(movieTitle, showing))
+        message = generateSwishMessage(movieTitle, showing)
+      )
         .generateUri()
         .toASCIIString()
     }

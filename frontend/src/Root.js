@@ -1,49 +1,42 @@
 import React, { Component } from "react";
-import { ApolloProvider, graphql, compose } from "react-apollo";
-import gql from "graphql-tag";
-import { completeUserFragment } from "./fragments/currentUser";
+import { ApolloProvider } from "react-apollo";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
 import client from "./store/apollo";
-import Login from "./routes/Login";
-import App from "./App";
+import Login from "./use-cases/login/containers/Login";
+import asyncComponent from "./use-cases/common/utils/AsyncComponent";
+import { rollbar } from "./lib/error-reporting";
 
-class RootComponent extends Component {
+const AsyncApp = asyncComponent(() => import("./App"));
+
+class Root extends Component {
+  state = {
+    hasError: false
+  };
+
+  componentDidCatch(error, info) {
+    rollbar.error("Root didCatch", error, info);
+    this.setState({
+      hasError: true
+    });
+  }
+
   render() {
-    const { data: { me, loading } } = this.props;
-    const signedIn = Boolean(me);
+    const { hasError } = this.state;
+
+    if (hasError) {
+      return "Something went wrong!";
+    }
 
     return (
-      <Login signedIn={signedIn && !loading}>
-        <App me={me} signedIn={signedIn} />
-      </Login>
+      <ApolloProvider client={client}>
+        <Router>
+          <Login>{props => <AsyncApp {...props} />}</Login>
+        </Router>
+      </ApolloProvider>
     );
   }
 }
 
-const data = graphql(
-  gql`
-    query RootComponentQuery {
-      me: currentUser {
-        ...CompleteUser
-      }
-    }
-    ${completeUserFragment}
-  `,
-  {
-    errorPolicy: "ignore"
-  }
-);
-
-const RootWithData = compose(data)(RootComponent);
-
-const ProviderRoot = () => (
-  <ApolloProvider client={client}>
-    <Router>
-      <RootWithData />
-    </Router>
-  </ApolloProvider>
-);
-
-export default ProviderRoot;
+export default Root;

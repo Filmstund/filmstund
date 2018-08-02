@@ -15,8 +15,14 @@ data class Location(
   val postalCode: String? = null,
   val postalAddress: String? = null,
   val latitude: BigDecimal? = null,
-  val longitude: BigDecimal? = null) {
-  // TODO: add auditing (@CreatedBy, etc)
+  val longitude: BigDecimal? = null,
+  val sfId: String? = null,
+  val alias: List<String> = listOf()
+) {
+
+  fun isSfLocation() = sfId != null
+
+  fun hasAlias(other: String) = alias.contains(other)
 
   fun formatAddress(): String {
     if (name == null) {

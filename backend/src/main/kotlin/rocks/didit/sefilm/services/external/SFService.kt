@@ -24,13 +24,15 @@ class SFService(
   private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,
   private val httpEntity: HttpEntity<Void>,
-  private val properties: Properties) {
+  private val properties: Properties
+) {
 
   companion object {
     private const val API_URL = "https://www.sf.se/api"
     private const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
     private const val CINEMA_URL = "$API_URL/v2/cinema/sv/1/200"
     private const val MOVIES_URL = "$API_URL/v2/movie/sv/1/1000"
+    private const val SEAT_MAP_URL = "$API_URL/v2/show/seats/sv/{cinemaId}/{screenId}"
     private val log = LoggerFactory.getLogger(SFService::class.java)
   }
 
@@ -67,7 +69,13 @@ class SFService(
   }
 
   fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
-    val body = restTemplate.exchange(API_URL + "/v1/movies/{sfId}", HttpMethod.GET, httpEntity, SfExtendedMovieDTO::class.java, sfId).body
+    val body = restTemplate.exchange(
+      API_URL + "/v2/movie/sv/{sfId}",
+      HttpMethod.GET,
+      httpEntity,
+      SfExtendedMovieDTO::class.java,
+      sfId
+    ).body
     if (body?.ncgId == null) {
       return null
     }
@@ -103,7 +111,7 @@ class SFService(
       ?: ""
   }
 
-  fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
+  private fun currentDateTimeTruncatedToNearestHalfHour(): ZonedDateTime {
     val now = ZonedDateTime.now(ZoneOffset.UTC)
     return now.truncatedTo(ChronoUnit.HOURS)
       .plusMinutes(30L * (now.minute / 30L))
@@ -121,6 +129,21 @@ class SFService(
       movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
       else -> null
     }
+  }
+
+  @Cacheable("sfSeatMap")
+  fun getSfSeatMap(cinemaId: String, screenId: String): List<SfSeatMapDTO> {
+    log.debug("Fetching seat map from $SEAT_MAP_URL with cinemaId=$cinemaId, screenId=$screenId")
+    return restTemplate
+      .exchange(
+        SEAT_MAP_URL,
+        HttpMethod.GET,
+        httpEntity,
+        object : ParameterizedTypeReference<List<SfSeatMapDTO>>() {},
+        cinemaId,
+        screenId
+      )
+      .body ?: listOf()
   }
 }
 

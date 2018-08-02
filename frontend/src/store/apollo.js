@@ -1,11 +1,12 @@
 import { ApolloClient } from "apollo-client";
 import { ApolloLink } from "apollo-link";
 import { HttpLink } from "apollo-link-http";
-import { onError } from "apollo-link-error";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { persistCache } from "apollo-cache-persist";
 import fetch from "../lib/fetch";
+import { tokenRefresh } from "./tokenRefreshLink";
+import { errorLink } from "./errorLink";
 
 const cache = new InMemoryCache({
   fragmentMatcher: [],
@@ -24,28 +25,12 @@ persistCache({
   storage: window.localStorage
 });
 
-const errorLink = onError(({ response, graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.map(error =>
-      console.log(`[GraphQL error] ${error.message}`, error)
-    );
-
-  if (networkError && networkError.statusCode === 403) {
-    const { pathname, search } = window.location;
-    const returnUrl = pathname + search;
-
-    if (pathname !== "/login" && returnUrl.indexOf("/login") !== 0) {
-      window.location = `/login?return_to=${encodeURIComponent(returnUrl)}`;
-    }
-  }
-});
 const httpLink = new HttpLink({
   uri: BASE_GRAPHQL_URL,
-  fetch,
-  fetchOptions: { credentials: "include" }
+  fetch
 });
 
-const link = ApolloLink.from([errorLink, httpLink]);
+const link = ApolloLink.from([tokenRefresh, errorLink, httpLink]);
 
 const client = new ApolloClient({
   // By default, this client will send queries to the

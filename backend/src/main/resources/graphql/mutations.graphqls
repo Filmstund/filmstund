@@ -14,6 +14,8 @@ type Mutation {
 
     updateShowing(showingId: UUID!, newValues: UpdateShowingInput): Showing!
 
+    promoteToAdmin(showingId: UUID!, userToPromote: UserID!): Showing!
+
     ## // showing ###
 
     # Fetch any new movies from SF, returns the movies that were added

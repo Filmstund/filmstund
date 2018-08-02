@@ -18,7 +18,8 @@ data class SwishDataDTO(
   val version: Int = 1,
   val payee: StringValue,
   val amount: IntValue,
-  val message: StringValue) {
+  val message: StringValue
+) {
 
   fun generateUri(): URI {
     val asString = jacksonObjectMapper().writeValueAsString(this)

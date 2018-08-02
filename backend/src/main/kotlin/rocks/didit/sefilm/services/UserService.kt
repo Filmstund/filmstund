@@ -2,8 +2,11 @@ package rocks.didit.sefilm.services
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
@@ -21,12 +24,13 @@ import rocks.didit.sefilm.services.external.PushoverValidationStatus
 import java.util.*
 
 @Service
-class UserService(private val userRepo: UserRepository,
+class UserService(
+  private val userRepo: UserRepository,
                   private val pushoverService: PushoverService?,
-                  private val foretagsbiljettService: ForetagsbiljettService) {
+  private val foretagsbiljettService: ForetagsbiljettService
+) {
 
   private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
   fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
@@ -36,8 +40,8 @@ class UserService(private val userRepo: UserRepository,
         true -> userRepo.findAll()
         false -> userRepo.findAllById(it)
       }
-    }.filter {
-      it.notificationSettings.let { s ->
+    }.filter {user ->
+      user.notificationSettings.let { s ->
         s.notificationsEnabled && s.providerSettings.any { it.enabled }
       }
     }
@@ -54,7 +58,18 @@ class UserService(private val userRepo: UserRepository,
     }
   }
 
-  fun getCompleteCurrentUser(): User = getCompleteUser(currentLoggedInUser())
+  fun currentUserOrNull(): User? {
+    val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+    if (authentication?.isAuthenticated != false) {
+      return null
+    }
+
+    val principal = authentication.principal as OpenIdConnectUserDetails
+    return getCompleteUser(UserID(principal.userId))
+  }
+
+  private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUser())
+    .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
 
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
     val newSfMembershipId = when {
@@ -67,7 +82,7 @@ class UserService(private val userRepo: UserRepository,
       else -> PhoneNumber(newDetails.phone)
     }
 
-    val updatedUser = getCompleteCurrentUser().copy(
+    val updatedUser = getUserEntityForCurrentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
       sfMembershipId = newSfMembershipId
@@ -78,7 +93,7 @@ class UserService(private val userRepo: UserRepository,
 
   // TODO: listen for PushoverUserKeyInvalid and disable the key
   fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO {
-    val currentUser = getCompleteCurrentUser()
+    val currentUser = getUserEntityForCurrentUser()
 
     val mailSettings = notificationInput.mail.let {
       MailSettings(it?.enabled ?: false, it?.mailAddress ?: "${currentUser.firstName?.toLowerCase()}@example.org")
@@ -106,24 +121,24 @@ class UserService(private val userRepo: UserRepository,
     }.toDTO()
   }
 
-  fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO?
-    = userRepo
+  fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO? = userRepo
     .findByCalendarFeedId(calendarFeedId)
     ?.toDTO()
 
   fun invalidateCalendarFeedId(): UserDTO {
-    return getCompleteCurrentUser()
+    return getUserEntityForCurrentUser()
       .copy(calendarFeedId = UUID.randomUUID())
       .let { userRepo.save(it) }.toDTO()
   }
 
   fun disableCalendarFeed(): UserDTO {
-    return getCompleteCurrentUser()
+    return getUserEntityForCurrentUser()
       .copy(calendarFeedId = null)
       .let { userRepo.save(it) }.toDTO()
   }
 
-  fun User.toDTO() = UserDTO(this.id,
+  fun User.toDTO() = UserDTO(
+    this.id,
     this.name,
     this.firstName,
     this.lastName,
@@ -136,7 +151,8 @@ class UserService(private val userRepo: UserRepository,
     this.notificationSettings,
     this.lastLogin,
     this.signupDate,
-    this.calendarFeedId)
+    this.calendarFeedId
+  )
 
   private fun Företagsbiljett.toDTO(): ForetagsbiljettDTO {
     return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))

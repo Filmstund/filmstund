@@ -20,11 +20,16 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.schedulers.enabled", name = ["popularityUpdater"], matchIfMissing = true, havingValue = "true")
+@ConditionalOnProperty(
+  prefix = "sefilm.schedulers.enabled", name = ["popularityUpdater"],
+  matchIfMissing = true,
+  havingValue = "true"
+)
 class ScheduledPopularityUpdater(
   private val movieRepository: MovieRepository,
   private val sfService: SFService,
-  private val imdbClient: ImdbClient) {
+  private val imdbClient: ImdbClient
+) {
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 10L * 60 * 1000L // 10min
@@ -109,7 +114,8 @@ class ScheduledPopularityUpdater(
 
   private fun rescheduleNextPopularityUpdate(weeks: Long = 4, movie: Movie) {
     log.warn("[Popularity] No info found for movie with ${movie.title} (${movie.id}). Next check in approximately $weeks weeks")
-    val updatedMovie = movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(weeks).toInstant(ZoneOffset.UTC))
+    val updatedMovie =
+      movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(weeks).toInstant(ZoneOffset.UTC))
     movieRepository.save(updatedMovie)
   }
 

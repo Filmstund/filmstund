@@ -4,20 +4,22 @@ import java.time.LocalDate
 
 data class TmdbFindExternalResults(val movie_results: List<TmdbMovieResult>)
 
-data class TmdbMovieResult(val adult: Boolean,
-                           val backdrop_path: String?,
-                           val genre_ids: List<Int>,
-                           val id: Long,
-                           val original_language: String,
-                           val original_title: String,
-                           val overview: String?,
-                           val release_date: LocalDate?,
-                           val poster_path: String?,
-                           val popularity: Double,
-                           val title: String,
-                           val video: Boolean,
-                           val vote_average: Double,
-                           val vote_count: Long)
+data class TmdbMovieResult(
+  val adult: Boolean,
+  val backdrop_path: String?,
+  val genre_ids: List<Int>,
+  val id: Long,
+  val original_language: String,
+  val original_title: String,
+  val overview: String?,
+  val release_date: LocalDate?,
+  val poster_path: String?,
+  val popularity: Double,
+  val title: String,
+  val video: Boolean,
+  val vote_average: Double,
+  val vote_count: Long
+)
 
 data class TmdbMovieDetails(
   val adult: Boolean,

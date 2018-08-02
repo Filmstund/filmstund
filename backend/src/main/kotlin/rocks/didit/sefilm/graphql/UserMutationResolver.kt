@@ -17,11 +17,10 @@ class UserMutationResolver(
   private val foretagsbiljettService: ForetagsbiljettService
 ) : GraphQLMutationResolver {
 
-  fun updateUser(newInfo: UserDetailsDTO): UserDTO
-    = userService.updateUser(newInfo)
+  fun updateUser(newInfo: UserDetailsDTO): UserDTO = userService.updateUser(newInfo)
 
-  fun updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInfoDTO): ParticipantPaymentInfo
-    = participantPaymentInfoService.updatePaymentInfo(paymentInfo)
+  fun updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInfoDTO): ParticipantPaymentInfo =
+    participantPaymentInfoService.updatePaymentInfo(paymentInfo)
 
   fun addForetagsBiljetter(biljetter: List<ForetagsbiljettDTO>): UserDTO {
     foretagsbiljettService.addForetagsbiljetterToCurrentUser(biljetter)

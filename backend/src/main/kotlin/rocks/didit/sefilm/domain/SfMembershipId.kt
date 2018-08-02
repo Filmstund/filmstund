@@ -6,7 +6,7 @@ data class SfMembershipId(val value: String) {
   companion object {
     fun valueOf(profileId: String): SfMembershipId {
       if (profileId[3] == '-' && profileId.length == 7) {
-        return SfMembershipId(profileId)
+        return SfMembershipId(profileId.toUpperCase())
       }
       if (profileId.length != 6) {
         throw IllegalArgumentException("$profileId does not look like a valid profileId as supplied by SF")
@@ -16,7 +16,7 @@ data class SfMembershipId(val value: String) {
         throw IllegalArgumentException("'$profileId' is an invalid membership id. Expected XXX-XXX")
       }
 
-      return SfMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}")
+      return SfMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}".toUpperCase())
     }
   }
 

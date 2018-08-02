@@ -19,10 +19,3 @@ type Movie {
     sfShowings(city: String = "GB", afterDate: LocalDate): [SfShowing!]!
 }
 
-type SfShowing {
-    cinemaName: String,
-    screenName: String,
-    seatCount: Int,
-    timeUtc: String,
-    tags: [String!]!
-}

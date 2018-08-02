@@ -39,9 +39,11 @@ sealed class ExternalProviderId(val state: ValueState) {
   }
 }
 
-class IMDbID(@JsonValue
-             val value: String? = null,
-             state: ValueState = ValueState.Missing) : ExternalProviderId(state) {
+class IMDbID(
+  @JsonValue
+  val value: String? = null,
+  state: ValueState = ValueState.Missing
+) : ExternalProviderId(state) {
 
   companion object {
     fun valueOf(imdbId: String) = IMDbID(imdbId, ValueState.Supplied)
@@ -82,9 +84,11 @@ class IMDbID(@JsonValue
   }
 }
 
-class TMDbID(@JsonValue
-             val value: Long? = null,
-             state: ValueState = ValueState.Missing) : ExternalProviderId(state) {
+class TMDbID(
+  @JsonValue
+  val value: Long? = null,
+  state: ValueState = ValueState.Missing
+) : ExternalProviderId(state) {
 
   companion object {
     fun valueOf(tmdbId: Long) = TMDbID(tmdbId, ValueState.Supplied)

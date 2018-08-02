@@ -36,7 +36,8 @@ class MovieService(
     return movieRepo.findById(movieId).orElse(null)
   }
 
-  fun getMovieOrThrow(movieId: UUID?): Movie = getMovie(movieId).orElseThrow { NotFoundException("movie with id: $movieId") }
+  fun getMovieOrThrow(movieId: UUID?): Movie =
+    getMovie(movieId).orElseThrow { NotFoundException("movie with id: $movieId") }
 
   fun movieExists(movieId: UUID): Boolean = movieRepo.existsById(movieId)
 

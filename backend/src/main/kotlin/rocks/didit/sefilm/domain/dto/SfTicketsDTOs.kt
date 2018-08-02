@@ -23,7 +23,7 @@ data class SfTicketDTO(
 
 data class SfCinemaDTO(val city: SfCityDTO, val title: String, val company: Map<String, Any?>)
 
-data class SfCityDTO(val name: String)
+data class SfCityDTO(val name: String?)
 
 data class SfTicketScreenDTO(val title: String)
 
@@ -33,4 +33,9 @@ data class SfDisplayNameDTO(val displayName: String)
 
 data class SfSeatDTO(val number: Int, val row: Int, val section: String, val type: String, val unnumberedText: String?)
 
-data class SfTicketShowDTO(val attributes: List<SfDisplayNameDTO>, val date: LocalDate, val time: LocalTime, val unnumbered: Boolean)
+data class SfTicketShowDTO(
+  val attributes: List<SfDisplayNameDTO>,
+  val date: LocalDate,
+  val time: LocalTime,
+  val unnumbered: Boolean
+)

@@ -8,7 +8,7 @@ type Ticket {
     customerType: String!
     customerTypeDefinition: String!
     cinema: String!
-    cinemaCity: String!
+    cinemaCity: String
     screen: String!
     seat: Seat!,
     date: LocalDate!,

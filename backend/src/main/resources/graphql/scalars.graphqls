@@ -1,4 +1,5 @@
 scalar UUID
+scalar Base64ID
 scalar SEK
 scalar LocalDate
 scalar LocalTime

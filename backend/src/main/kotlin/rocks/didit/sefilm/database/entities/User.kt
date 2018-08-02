@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.database.entities
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import rocks.didit.sefilm.domain.Företagsbiljett
@@ -29,7 +30,10 @@ data class User(
   val calendarFeedId: UUID? = UUID.randomUUID(),
   val notificationSettings: NotificationSettings = NotificationSettings(false, listOf(), listOf()),
   val lastLogin: Instant = Instant.ofEpochSecond(0L),
-  val signupDate: Instant = Instant.ofEpochSecond(0L)
+  val signupDate: Instant = Instant.ofEpochSecond(0L),
+  @LastModifiedDate
+  val lastModifiedDate: Instant = Instant.ofEpochSecond(0L)
 ) {
-  fun toLimitedUserDTO() = LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
+  fun toLimitedUserDTO() =
+    LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone?.number, this.avatar)
 }

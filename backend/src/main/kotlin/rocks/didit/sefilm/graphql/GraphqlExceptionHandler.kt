@@ -22,8 +22,10 @@ class GraphqlExceptionHandler : DataFetcherExceptionHandler {
     val path = handlerParameters.path
 
     val graphqlError = when (exception) {
-      is KnownException -> createFetchingError(exception.message ?: "",
-        mapOf("offendingUser" to exception.whichUser, "showing" to exception.whichShowing))
+      is KnownException -> createFetchingError(
+        exception.message ?: "",
+        mapOf("offendingUser" to exception.whichUser, "showing" to exception.whichShowing)
+      )
       is IllegalArgumentException -> createFetchingError(exception.message ?: "")
       is AccessDeniedException -> createFetchingError(exception.message ?: "")
       else -> {
