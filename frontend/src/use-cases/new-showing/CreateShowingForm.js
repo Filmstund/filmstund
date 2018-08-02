@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
 import keys from "lodash/keys";
 import groupBy from "lodash/groupBy";
+import CreatableSelect from "react-select/lib/Creatable";
 
 import Header from "../common/ui/Header";
 import Showing, {
@@ -152,12 +153,14 @@ class CreateShowingForm extends React.Component {
     const { showing, selectedDate } = this.state;
     const {
       clearSelectedMovie,
-      data: { movie, sfCities },
+      data: { movie, sfCities, previousLocations },
       setCity,
       city
     } = this.props;
 
     const sfdates = this.getSfDates();
+
+    const locationName = showing.location;
 
     return (
       <PageWidthWrapper>
@@ -166,7 +169,7 @@ class CreateShowingForm extends React.Component {
           <Showing
             date={showing.date}
             adminId={showing.admin}
-            location={showing.location}
+            location={locationName}
             movie={movie}
           />
           <Field text="SF-stad (används för att hämta rätt tider):">
@@ -185,12 +188,8 @@ class CreateShowingForm extends React.Component {
             <DatePicker
               value={showing.date}
               onChange={this.setShowingDate}
-              disabledDays={{
-                before: now
-              }}
-              modifiers={{
-                sfdays: keys(sfdates).map(s => new Date(s))
-              }}
+              disabledDays={{ before: now }}
+              modifiers={{ sfdays: keys(sfdates).map(s => new Date(s)) }}
               modifiersStyles={{
                 sfdays: {
                   backgroundColor: "#fff",
@@ -210,10 +209,19 @@ class CreateShowingForm extends React.Component {
             />
           </Field>
           <Field text="Plats:">
-            <Input
-              type="text"
-              value={showing.location}
-              onChange={v => this.setShowingValueFromEvent("location", v)}
+            <CreatableSelect
+              options={previousLocations.map(({ name }) => ({
+                value: name,
+                label: name,
+              }))}
+              formatCreateLabel={label => `Skapa '${label}'`}
+              value={{ value: locationName, label: locationName }}
+              onChange={(option, { action }) => {
+                if (action === "pop-value") {
+                  return;
+                }
+                this.setShowingValue("location", option.value);
+              }}
             />
           </Field>
           <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>
@@ -244,13 +252,21 @@ const data = graphql(
         id
         nick
       }
+      previousLocations {
+        name
+      }
       sfCities {
         name
         alias
       }
     }
     ${movieFragment}
-  `
+  `,
+  {
+    options: {
+      fetchPolicy: "cache-and-network"
+    }
+  }
 );
 
 const mutation = graphql(
