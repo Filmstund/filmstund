@@ -95,7 +95,7 @@ class AdminAction extends Component {
         })
       )
       .then(() => {
-        this.setState({ showModal: false })
+        this.setState({ showModal: false });
       })
       .catch(errors => {
         this.setState({ errors });

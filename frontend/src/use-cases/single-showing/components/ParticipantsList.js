@@ -37,7 +37,8 @@ const ParticipantsList = ({
                   }}
                   onClick={() =>
                     window.confirm(
-                      `Vill du ge admin till ${user.nick || user.firstName}? (Detta går ej att ångra!)`
+                      `Vill du ge admin till ${user.nick ||
+                        user.firstName}? (Detta går ej att ångra!)`
                     ) && onClickItem(user.id)
                   }
                 >
