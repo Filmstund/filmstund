@@ -4,7 +4,10 @@ import styled from "styled-components";
 
 const TopBarBackground = styled.div`
   background-color: #b71c1c;
-  grid-area: top;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
 `;
 
 const TopBarLinksContainer = styled.div`
