@@ -3,6 +3,7 @@ import { Header } from "../ui/RedHeader";
 import faQrcode from "@fortawesome/fontawesome-free-solid/faQrcode";
 import faChevronRight from "@fortawesome/fontawesome-free-solid/faChevronRight";
 import { formatShowingDateTime } from "../../../lib/dateTools";
+import LazyLoad from "react-lazyload";
 import gql from "graphql-tag";
 import {
   Box,
@@ -22,14 +23,26 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
 
   return (
     <Box onClick={onClick}>
-      <Poster src={showing.movie.poster} />
+      <LazyLoad
+        offset={window.innerHeight / 2}
+        overflow
+        placeholder={<Poster src={null} />}
+      >
+        <Poster src={showing.movie.poster} />
+      </LazyLoad>
       <CenterColumn>
         <Content>
           <Header>{showing.movie.title}</Header>
           <Description>
             {formatShowingDateTime(showing.date + " " + showing.time)}
           </Description>
-          <UserHeads users={showing.participants.map(p => p.user)} />
+          <LazyLoad
+            offset={window.innerHeight / 2}
+            overflow
+            placeholder={<UserHeads users={[]} />}
+          >
+            <UserHeads users={showing.participants.map(p => p.user)} />
+          </LazyLoad>
         </Content>
         {showingHasTickets && (
           <RedButton
