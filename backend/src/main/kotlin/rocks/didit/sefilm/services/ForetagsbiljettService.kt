@@ -17,9 +17,9 @@ class ForetagsbiljettService(
   private val userRepository: UserRepository
 ) {
 
-  fun getStatusOfTicket(ticket: Företagsbiljett): Företagsbiljett.Status {
+  fun getStatusOfTicket(ticket: Foretagsbiljett): Foretagsbiljett.Status {
     if (ticket.expires < LocalDate.now()) {
-      return Företagsbiljett.Status.Expired
+      return Foretagsbiljett.Status.Expired
     }
 
     val showings = showingRepository.findAll()
@@ -30,17 +30,17 @@ class ForetagsbiljettService(
     }
 
     if (showings.isEmpty()) {
-      return Företagsbiljett.Status.Available
+      return Foretagsbiljett.Status.Available
     }
 
     return if (showings.first().ticketsBought) {
-      Företagsbiljett.Status.Used
+      Foretagsbiljett.Status.Used
     } else {
-      Företagsbiljett.Status.Pending
+      Foretagsbiljett.Status.Pending
     }
   }
 
-  fun getForetagsbiljetterForUser(userID: UserID): List<Företagsbiljett> = userRepository
+  fun getForetagsbiljetterForUser(userID: UserID): List<Foretagsbiljett> = userRepository
     .findById(userID)
     .map { it.foretagsbiljetter }
     .orElseGet { listOf() }
@@ -55,7 +55,7 @@ class ForetagsbiljettService(
 
     assertForetagsbiljetterNotAlreadyInUse(biljetter, currentUser.foretagsbiljetter)
 
-    val newTickets = biljetter.map { Företagsbiljett.valueOf(it) }
+    val newTickets = biljetter.map { Foretagsbiljett.valueOf(it) }
     val combinedTickets = newTickets
       .plus(biljetterWithouthNew)
       .sortedBy { it.expires }
@@ -79,7 +79,7 @@ class ForetagsbiljettService(
   /** The tickets are allowed to be in use by the current user. */
   private fun assertForetagsbiljetterNotAlreadyInUse(
     biljetter: List<ForetagsbiljettDTO>,
-    userBiljetter: List<Företagsbiljett>
+    userBiljetter: List<Foretagsbiljett>
   ) {
     biljetter.forEach {
       val ticketNumber = TicketNumber(it.number)
@@ -90,13 +90,13 @@ class ForetagsbiljettService(
     }
   }
 
-  private fun assertTicketIsntPending(ticket: Företagsbiljett) {
-    if (getStatusOfTicket(ticket) == Företagsbiljett.Status.Pending) {
+  private fun assertTicketIsntPending(ticket: Foretagsbiljett) {
+    if (getStatusOfTicket(ticket) == Foretagsbiljett.Status.Pending) {
       throw TicketInUseException(ticket.number)
     }
   }
 
-  private fun hasTicket(p: Participant, ticket: Företagsbiljett): Boolean {
+  private fun hasTicket(p: Participant, ticket: Foretagsbiljett): Boolean {
     return when (p) {
       is FtgBiljettParticipant -> p.ticketNumber == ticket.number
       else -> false

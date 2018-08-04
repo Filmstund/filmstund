@@ -19,8 +19,9 @@ buildscript {
 }
 
 plugins {
-  id("org.ajoberstar.grgit") version "2.3.0"
-  id("net.researchgate.release") version "2.6.0"
+  id("org.ajoberstar.grgit") version '2.3.0'
+  id("net.researchgate.release") version '2.6.0'
+  id('com.google.cloud.tools.jib') version '0.9.8'
 }
 
 apply plugin: "kotlin"
@@ -126,3 +127,9 @@ release {
   newVersionCommitMessage = '[Release] - Preparing next dev release: '
 }
 
+jib {
+    container {
+        jvmFlags = ['-Duser.language=sv-SE', '-Dfile.encoding=UTF-8']
+        ports = ['8080']
+    }
+}

@@ -8,7 +8,7 @@ import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.Företagsbiljett
+import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
@@ -110,7 +110,7 @@ class UserService(
     this.calendarFeedId
   )
 
-  private fun Företagsbiljett.toDTO(): ForetagsbiljettDTO {
+  private fun Foretagsbiljett.toDTO(): ForetagsbiljettDTO {
     return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))
   }
 }
