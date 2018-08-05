@@ -14,7 +14,7 @@ export const tokenRefresh = setContext(async (req, { headers }) => {
     setUserInfo(response);
 
     console.log("Refreshed token!");
-  } else {
-    console.log("Reuse token!");
   }
+
+  // else reuse token!
 });

@@ -15,31 +15,27 @@ import Loader from "./use-cases/common/utils/ProjectorLoader";
 import { UUIDToWebId } from "./use-cases/common/utils/UUIDToWebId";
 
 const ScrollContainer = styled.div`
-  display: grid;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  grid-template-rows: min-content auto;
-  grid-template-areas:
-    "top"
-    "content";
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 `;
 
 const MainGridContainer = styled.div`
+  flex: 1;
   grid-area: content;
   display: grid;
   grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(
       1rem,
       1fr
     );
-  grid-template-rows: min-content auto min-content;
+  grid-template-rows: min-content auto;
   grid-template-areas:
     "jumbo jumbo jumbo"
-    ". center ."
-    "footer footer footer";
+    ". center .";
   background-color: #f8f8f8;
   align-items: start;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
 `;
 
 const AsyncHome = asyncComponent(() => import("./use-cases/my-showings/Home"));
@@ -92,8 +88,8 @@ const App = ({ data: { me }, signout }) => (
             )}
           />
         </Switch>
-        <Footer />
       </MainGridContainer>
+      <Footer />
     </ScrollContainer>
   </React.Fragment>
 );

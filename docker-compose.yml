@@ -1,0 +1,39 @@
+version: '3'
+services:
+    backend:
+        container_name: 'sefilm-backend'
+        image: cthdidit/sefilm-backend:latest
+        restart: always
+        environment:
+            - SEFILM_MONGODB_URI=mongodb://mongodb/sefilm
+            - defaultCity=GB
+            - apiBaseUrl=http://localhost:3000
+            - frontendBaseUrl=http://localhost:3000
+        env_file: backend.env
+        ports:
+            - 8080:8080
+        depends_on: 
+            - mongodb
+
+    frontend:
+        container_name: 'sefilm-frontend'
+        image: cthdidit/sefilm-frontend:latest
+        restart: always
+        ports:
+            - 3000:80
+        depends_on:
+            - backend
+
+    mongodb:
+        container_name: 'sefilm-mongodb'
+        image: mongo:4
+        restart: always
+        volumes:
+            - mongo-data:/data/db
+            - mongo-config:/data/configdb
+        ports:
+            - 27016:27017
+
+volumes:
+    mongo-data:
+    mongo-config:

@@ -57,7 +57,10 @@ export const markAsBought = graphql(
     props: ({ mutate }) => ({
       markShowingBought: (showingId, { showing }) =>
         wrapMutate(mutate, { showing, showingId })
-    })
+    }),
+    options: {
+      refetchQueries: ["ShowingsQuery"]
+    }
   }
 );
 
@@ -149,6 +152,9 @@ export const promoteToAdmin = graphql(
     }
   `,
   {
+    options: {
+      refetchQueries: ["SingleShowing"]
+    },
     props: ({ mutate }) => ({
       promoteToAdmin: (showingId, userId) =>
         wrapMutate(mutate, { showingId, userId })

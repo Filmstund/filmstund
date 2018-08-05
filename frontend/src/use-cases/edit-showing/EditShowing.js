@@ -26,10 +26,13 @@ const data = graphql(
           id
         }
       }
+      previousLocations {
+        name
+      }
     }
     ${showingFragment}
   `,
-  { options: { errorPolicy: "ignore" } }
+  { options: { errorPolicy: "ignore", fetchPolicy: "cache-and-network" } }
 );
 
 const isLoading = branch(
