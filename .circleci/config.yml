@@ -1,30 +1,38 @@
 version: 2
+
+defaults: &defaults
+  working_directory: ~/itbio
+
 jobs:
   test-backend:
-    working_directory: ~/itbio/backend
+    <<: *defaults
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
-      - run: ./gradlew check
+      - run: |
+          cd backend
+          ./gradlew check
   test-frontend:
-    working_directory: ~/itbio/frontend
+    <<: *defaults
     docker:
       - image: circleci/node:8.1.2
     steps:
       - checkout
       - restore_cache:
           name: Restoring node_modules
-          key: v1-node_modules-{{ checksum "yarn.lock" }}
+          key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
       - run: yarn
       - save_cache:
           name: Caching node_modules
-          key: v1-node_modules-{{ checksum "yarn.lock" }}
+          key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
           paths:
-            - node_modules
-      - run: yarn run test
+            - frontend/node_modules
+      - run: | 
+          cd frontend
+          yarn run test
   build-docker:
-    working_directory: ~/itbio
+    <<: *defaults
     machine: true
     steps:
       - checkout
@@ -37,7 +45,7 @@ jobs:
           paths:
             - docker-cache/*
   push-docker:
-    working_directory: ~/itbio
+    <<: *defaults
     machine: true
     steps:
       - attach_workspace: 
