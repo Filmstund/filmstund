@@ -10,9 +10,15 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
+      - restore_cache:
+          key: gradle-{{ checksum "backend/build.gradle" }}
       - run: |
           cd backend
           ./gradlew check
+      - save_cache:
+          key: gradle-{{ checksum "backend/build.gradle" }}
+          paths:
+            - ~/.gradle
   test-frontend:
     <<: *defaults
     docker:
@@ -24,7 +30,7 @@ jobs:
           key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
       - run: |
           cd frontend
-          yarn
+          yarn --pure-lockfile
       - save_cache:
           name: Caching node_modules
           key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
