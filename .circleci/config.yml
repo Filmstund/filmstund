@@ -22,7 +22,9 @@ jobs:
       - restore_cache:
           name: Restoring node_modules
           key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
-      - run: yarn
+      - run: |
+          cd frontend
+          yarn
       - save_cache:
           name: Caching node_modules
           key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
