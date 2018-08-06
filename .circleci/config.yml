@@ -55,15 +55,15 @@ workflows:
       - test-backend
       - test-frontend
       - build-docker:
-        requires:
-          - test-frontend
-          - test-backend
+          requires:
+            - test-frontend
+            - test-backend
       - push-docker:
-        requires:
-          - build-docker
-        filters:
-          branches:
-            only:
-              - develop
-              - master
+          requires:
+            - build-docker
+          filters:
+            branches:
+              only:
+                - master
+                - circle-ci
 
