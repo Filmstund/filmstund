@@ -61,7 +61,7 @@ workflows:
       - push-docker:
         requires:
           - build-docker
-        filter:
+        filters:
           branches:
             only:
               - develop
