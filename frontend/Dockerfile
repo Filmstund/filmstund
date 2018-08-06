@@ -2,8 +2,8 @@ FROM node:alpine as builder
 LABEL stage=intermediate
 RUN mkdir -p /srv/http
 WORKDIR /srv/http
-COPY package.json /srv/http
-RUN yarn
+COPY package.json yarn.lock /srv/http/
+RUN yarn --pure-lockfile
 COPY . /srv/http
 RUN yarn build
 
