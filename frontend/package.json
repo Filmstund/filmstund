@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "^1.1.4",
+    "react-scripts": "^2.0.4",
     "webpack-bundle-analyzer": "^2.13.1"
   },
   "dependencies": {
@@ -21,7 +21,7 @@
     "date-fns": "^1.29.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
-    "lodash": "^4.17.10",
+    "lodash-es": "^4.17.11",
     "prop-types": "^15.6.0",
     "react": "^16.4.1",
     "react-apollo": "^2.0.4",
@@ -42,7 +42,13 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import { compose } from "recompose";
-import orderBy from "lodash/orderBy";
+import { orderBy } from "lodash-es";
 import Helmet from "react-helmet";
 
 import { Link } from "../common/ui/MainButton";

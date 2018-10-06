@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
-import orderBy from "lodash/orderBy";
-import groupBy from "lodash/groupBy";
+import { orderBy, groupBy } from "lodash-es";
 import { compose } from "recompose";
 import Helmet from "react-helmet";
 
