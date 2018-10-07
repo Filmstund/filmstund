@@ -34,6 +34,7 @@ class SlugService(private val movieService: MovieService) {
       .replace(",", "")
       .replace("ó", "o")
       .replace("é", "e")
+      .replace("®", "")
       .trimToLength(MAX_LENGTH)
   }
 
