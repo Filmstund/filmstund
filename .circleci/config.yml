@@ -22,7 +22,7 @@ jobs:
   test-frontend:
     <<: *defaults
     docker:
-      - image: circleci/node:8.1.2
+      - image: circleci/node:10
     steps:
       - checkout
       - restore_cache:
@@ -36,7 +36,7 @@ jobs:
           key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
           paths:
             - frontend/node_modules
-      - run: | 
+      - run: |
           cd frontend
           yarn run test
   build-docker:
@@ -56,14 +56,14 @@ jobs:
     <<: *defaults
     machine: true
     steps:
-      - attach_workspace: 
+      - attach_workspace:
           at: ~/itbio
       - run: |
           docker load -i docker-cache/images.tar
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker push cthdidit/sefilm-frontend
           docker push cthdidit/sefilm-backend
-          
+
 workflows:
   version: 2
   build:
