@@ -3,8 +3,7 @@ import { graphql } from "react-apollo";
 import { branch, renderComponent, compose, withState } from "recompose";
 import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
-import keys from "lodash/keys";
-import groupBy from "lodash/groupBy";
+import { keys, groupBy } from "lodash-es";
 
 import Header from "../common/ui/Header";
 import Showing, {
