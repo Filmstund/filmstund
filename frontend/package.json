@@ -9,7 +9,7 @@
   "dependencies": {
     "@fortawesome/fontawesome": "1.1.8",
     "@fortawesome/fontawesome-free-solid": "5.0.13",
-    "@fortawesome/fontawesome-svg-core": "1.2.1",
+    "@fortawesome/fontawesome-svg-core": "1.2.6",
     "@fortawesome/react-fontawesome": "0.1.0",
     "apollo-cache-inmemory": "1.2.5",
     "apollo-cache-persist": "0.1.1",
