@@ -38,7 +38,7 @@
     "recompose": "0.30.0",
     "rollbar": "2.4.4",
     "styled-components": "3.3.3",
-    "whatwg-fetch": "2.0.4"
+    "whatwg-fetch": "3.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
