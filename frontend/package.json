@@ -19,7 +19,7 @@
     "apollo-link-error": "1.1.1",
     "apollo-link-http": "1.5.5",
     "date-fns": "1.29.0",
-    "graphql": "0.13.2",
+    "graphql": "14.0.2",
     "graphql-tag": "2.10.0",
     "lodash-es": "4.17.11",
     "prop-types": "15.6.2",
