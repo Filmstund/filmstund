@@ -9085,10 +9085,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rollbar@2.4.4:
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.4.4.tgz#ad1ddff08fd6739fdcdabdf22476de4e1c51de9f"
-  integrity sha512-22DOE8sAkMmmjYOZNcqHJGhmJzq5Jp6zgMfu6x2IH9xnuYveEDyHba46TtCKwYPuY92A+pRCL/d0RKPmazk5Fg==
+rollbar@2.4.7:
+  version "2.4.7"
+  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.4.7.tgz#9b1de1a0fab6b6e63fcfcd322c26081a1d8242e8"
+  integrity sha512-EkcaCRWiiroE7xscrhCkiZXvZPIDYz5yxN04EpNWv//zHYjE8m2nRggnclgvN3dzma2OjJK8hL/ZfmcOKBZsxQ==
   dependencies:
     async "~1.2.1"
     console-polyfill "0.3.0"
