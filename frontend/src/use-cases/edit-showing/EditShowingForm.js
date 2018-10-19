@@ -159,18 +159,22 @@ class EditShowingForm extends Component {
             variables={{ movieId: movie.id, city: location.cityAlias }}
           >
             {({
-              data: {
-                movie: { sfShowings }
+              data
+            }) => {
+              if (data.loading || !data.movie) { 
+                return null; 
               }
-            }) => (
-              <SfShowingSelector
-                sfShowings={sfShowings}
-                onChangeTime={this.setShowingTime}
-                onChangeDate={this.setShowingDate}
-                showing={showing}
-                selectedDate={showing.date}
-              />
-            )}
+              const { movie: { sfShowings } } = data;
+                return (
+                    <SfShowingSelector
+                        sfShowings={sfShowings}
+                        onChangeTime={this.setShowingTime}
+                        onChangeDate={this.setShowingDate}
+                        showing={showing}
+                        selectedDate={showing.date}
+                    />
+                );
+            }}
           </Query>
           <Field text="Visningstid:">
             <Input
