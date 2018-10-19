@@ -50,7 +50,9 @@ const SelectBox = ({ options, onChange, ...props }) => (
           {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          {option.tags.map(tag => (
+            <Tag key={tag}>{tag}</Tag>
+          ))}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>

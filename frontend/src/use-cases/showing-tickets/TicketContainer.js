@@ -88,7 +88,9 @@ export default class TicketContainer extends Component {
           <SmallHeader>Våra platser:</SmallHeader>
           <SeatRange ticketRange={ticketRange} />
           <ScreenSeats ticketRange={ticketRange} seatMap={sfSeatMap} />
-          {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
+          {myTickets.map(ticket => (
+            <Ticket key={ticket.id} {...ticket} />
+          ))}
           <StatusMessageBox
             success={success}
             errors={errors}

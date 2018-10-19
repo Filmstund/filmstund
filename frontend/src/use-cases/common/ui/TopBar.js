@@ -8,6 +8,7 @@ const TopBarBackground = styled.div`
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 100;
 `;
 
 const TopBarLinksContainer = styled.div`

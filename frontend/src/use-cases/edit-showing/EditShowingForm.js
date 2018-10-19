@@ -5,8 +5,8 @@ import Showing from "../common/showing/Showing";
 import Input from "../common/ui/Input";
 import Field from "../common/ui/Field";
 import MainButton, { RedButton } from "../common/ui/MainButton";
-import { formatYMD } from "../../lib/dateTools";
-import StatusMessageBox from "../common/utils/StatusMessageBox";
+import { formatLocalTime, formatYMD } from "../../lib/dateTools";
+import StatusMessageBox, { StatusBox } from "../common/utils/StatusMessageBox";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { navigateToShowing } from "../common/navigators/index";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,11 +15,15 @@ import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import styled from "styled-components";
 import { margin } from "../../lib/style-vars";
 import addDays from "date-fns/add_days";
+import parse from "date-fns/parse";
 import Loadable from "react-loadable";
 import { LocationSelect } from "../common/ui/LocationSelect";
+import { SfShowingSelector } from "../common/showing/SfShowingSelector";
+import { Query } from "react-apollo";
+import { fetchSfShowings } from "../../apollo/queries/sfShowings";
 
-const DatePicker = Loadable({
-  loader: () => import("../common/ui/date-picker/DatePicker"),
+const DatePickerInput = Loadable({
+  loader: () => import("../common/ui/date-picker/DatePickerInput"),
   loading: () => null
 });
 
@@ -39,6 +43,7 @@ class EditShowingForm extends Component {
       dateFocused: false,
       showing: {
         expectedBuyDate: addDays(today, 7),
+        date: parse(showing.date),
         location: showing.location.name,
         time: showing.time,
         price: showing.price !== null ? showing.price / 100 : ""
@@ -47,19 +52,20 @@ class EditShowingForm extends Component {
   }
 
   setShowingTime = sfTime => {
-    this.setState(
-      ({ showing }) => ({
-        showing: {
-          ...showing,
-          time: sfTime.localTime,
-          location: sfTime.cinemaName
-        }
-      }),
-      this.handleSubmit
-    );
+    this.setState(({ showing }) => ({
+      showing: {
+        ...showing,
+        time: formatLocalTime(sfTime.timeUtc),
+        location: sfTime.cinemaName
+      }
+    }));
   };
 
   setShowingDate = value => {
+    this.setShowingValue("date", value);
+  };
+
+  setExpectedShowingDate = value => {
     this.setShowingValue("expectedBuyDate", value);
   };
 
@@ -95,6 +101,7 @@ class EditShowingForm extends Component {
 
     this.props
       .updateShowing(showing.id, {
+        date: showing.date,
         expectedBuyDate: formatYMD(newValues.expectedBuyDate),
         private: showing.private,
         payToUser: showing.payToUser.id,
@@ -124,7 +131,7 @@ class EditShowingForm extends Component {
   render() {
     const {
       data: {
-        showing: { movie, admin, date, ticketsBought },
+        showing: { movie, admin, date, ticketsBought, location },
         previousLocations
       }
     } = this.props;
@@ -135,29 +142,53 @@ class EditShowingForm extends Component {
         <Header>Redigera besök</Header>
         <div>
           <Showing
-            date={formatYMD(date) + " " + showing.time}
+            date={formatYMD(showing.date) + " " + showing.time}
             admin={admin}
             location={showing.location}
             movie={movie}
           />
           <StatusMessageBox errors={errors} />
-          <Field text="Förväntat köpdatum:">
-            <DatePicker
-              value={showing.expectedBuyDate}
-              onChange={this.setShowingDate}
-              disabledDays={[
-                {
-                  before: today,
-                  after: new Date(date)
-                }
-              ]}
-            />
-          </Field>
+          {date !== formatYMD(showing.date) && (
+            <StatusBox>
+              Du har ändrat datum! Om du sparar denna ändring kommer alla
+              anmälda meddelas.
+            </StatusBox>
+          )}
+          <Query
+            query={fetchSfShowings}
+            variables={{ movieId: movie.id, city: location.cityAlias }}
+          >
+            {({
+              data: {
+                movie: { sfShowings }
+              }
+            }) => (
+              <SfShowingSelector
+                sfShowings={sfShowings}
+                onChangeTime={this.setShowingTime}
+                onChangeDate={this.setShowingDate}
+                showing={showing}
+                selectedDate={showing.date}
+              />
+            )}
+          </Query>
           <Field text="Visningstid:">
             <Input
               type="time"
               value={showing.time}
               onChange={v => this.setShowingValueFromEvent("time", v)}
+            />
+          </Field>
+          <Field text="Förväntat köpdatum:">
+            <DatePickerInput
+              value={showing.expectedBuyDate}
+              onChange={this.setExpectedShowingDate}
+              disabledDays={[
+                {
+                  before: today,
+                  after: parse(showing.date)
+                }
+              ]}
             />
           </Field>
           <Field text="Plats:">

@@ -22,6 +22,10 @@ const data = graphql(
         ...OldShowing
         price
         private
+        location {
+          city
+          cityAlias
+        }
         payToUser {
           id
         }
