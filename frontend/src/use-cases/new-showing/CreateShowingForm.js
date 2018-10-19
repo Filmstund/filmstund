@@ -1,10 +1,8 @@
 import React from "react";
 import { graphql } from "react-apollo";
-import { branch, renderComponent, compose, withState } from "recompose";
+import { branch, compose, renderComponent, withState } from "recompose";
 import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
-import { keys, groupBy } from "lodash-es";
-
 import Header from "../common/ui/Header";
 import Showing, {
   movieFragment,
@@ -13,19 +11,13 @@ import Showing, {
 import Input from "../common/ui/Input";
 import Field from "../common/ui/Field";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
-import { formatYMD, formatLocalTime } from "../../lib/dateTools";
-import SelectBox from "../common/ui/SelectBox";
+import { formatLocalTime, formatYMD } from "../../lib/dateTools";
 import Loader from "../common/utils/ProjectorLoader";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import format from "date-fns/format";
-import Loadable from "react-loadable";
 import isAfter from "date-fns/is_after";
 import { LocationSelect } from "../common/ui/LocationSelect";
-
-const DatePicker = Loadable({
-  loader: () => import("../common/ui/date-picker/DatePicker"),
-  loading: () => null
-});
+import { SfShowingSelector } from "../common/showing/SfShowingSelector";
 
 const now = new Date();
 
@@ -123,31 +115,6 @@ class CreateShowingForm extends React.Component {
       });
   };
 
-  renderSelectSfTime = (sfTimes, showing) => {
-    if (!sfTimes || sfTimes.length === 0) {
-      return <div>Inga tider från SF för {formatYMD(showing.date)}</div>;
-    } else {
-      return (
-        <div>
-          <Header>Välj tid från SF</Header>
-          <Field text="Tid:">
-            <SelectBox options={sfTimes} onChange={this.setShowingTime} />
-          </Field>
-        </div>
-      );
-    }
-  };
-
-  getSfDates = () => {
-    const {
-      data: {
-        movie: { sfShowings }
-      }
-    } = this.props;
-
-    return groupBy(sfShowings, s => formatYMD(s.timeUtc));
-  };
-
   render() {
     const { showing, selectedDate } = this.state;
     const {
@@ -157,7 +124,7 @@ class CreateShowingForm extends React.Component {
       city
     } = this.props;
 
-    const sfdates = this.getSfDates();
+    const { sfShowings } = movie;
 
     const locationName = showing.location;
 
@@ -183,22 +150,13 @@ class CreateShowingForm extends React.Component {
               ))}
             </select>
           </Field>
-          <Field text="Datum:">
-            <DatePicker
-              value={showing.date}
-              onChange={this.setShowingDate}
-              disabledDays={{ before: now }}
-              modifiers={{ sfdays: keys(sfdates).map(s => new Date(s)) }}
-              modifiersStyles={{
-                sfdays: {
-                  backgroundColor: "#fff",
-                  borderColor: "#d0021b",
-                  color: "#d0021b"
-                }
-              }}
-            />
-          </Field>
-          {this.renderSelectSfTime(sfdates[selectedDate], showing)}
+          <SfShowingSelector
+            showing={showing}
+            onChangeDate={this.setShowingDate}
+            onChangeTime={this.setShowingTime}
+            sfShowings={sfShowings}
+            selectedDate={selectedDate}
+          />
           <Header>...eller skapa egen tid</Header>
           <Field text="Tid:">
             <Input

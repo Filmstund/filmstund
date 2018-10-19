@@ -19,13 +19,22 @@ const DatePickerInput = ({
   <DayPickerInput
     value={value}
     onDayChange={onChange}
+    inputProps={{
+      style: {
+        borderRadius: 4,
+        border: "1px solid gray",
+        fontSize: "1.1em",
+        padding: "0.5em 1em",
+        width: "100%"
+      }
+    }}
     formatDate={formatYMD}
     dayPickerProps={{
       localeUtils,
       selectedDays: value,
-      ...dayPickerProps
+      ...props
     }}
-    {...props}
+    {...dayPickerProps}
   />
 );
 
