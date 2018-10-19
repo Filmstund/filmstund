@@ -21,6 +21,7 @@ const data = graphql(
       showing(webId: $webId) {
         ...OldShowing
         price
+        expectedBuyDate
         private
         location {
           city
