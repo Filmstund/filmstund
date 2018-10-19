@@ -101,7 +101,7 @@ class EditShowingForm extends Component {
 
     this.props
       .updateShowing(showing.id, {
-        date: showing.date,
+        date: formatYMD(newValues.date),
         expectedBuyDate: formatYMD(newValues.expectedBuyDate),
         private: showing.private,
         payToUser: showing.payToUser.id,
