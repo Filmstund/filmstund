@@ -229,7 +229,8 @@ class ShowingService(
         expectedBuyDate = newValues.expectedBuyDate,
         location = locationService.getOrCreateNewLocation(newValues.location),
         sfScreen = newValues.sfScreen,
-        time = newValues.time
+        time = newValues.time,
+        date = newValues.date
       )
     )
       .also {

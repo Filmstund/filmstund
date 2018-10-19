@@ -10,5 +10,6 @@ data class UpdateShowingDTO(
   val expectedBuyDate: LocalDate? = null,
   val location: String = "Filmstaden Bergakungen",
   val sfScreen: SfLiteScreenDTO? = null,
-  val time: LocalTime = LocalTime.NOON
+  val time: LocalTime = LocalTime.NOON,
+  val date: LocalDate = LocalDate.now()
 )
