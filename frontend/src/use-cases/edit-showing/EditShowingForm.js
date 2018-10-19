@@ -42,7 +42,7 @@ class EditShowingForm extends Component {
       errors: null,
       dateFocused: false,
       showing: {
-        expectedBuyDate: addDays(today, 7),
+        expectedBuyDate: showing.expectedBuyDate ? parse(showing.expectedBuyDate) : addDays(today, 7),
         date: parse(showing.date),
         location: showing.location.name,
         time: showing.time,
