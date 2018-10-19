@@ -1,40 +1,84 @@
 version: 2
+
+defaults: &defaults
+  working_directory: ~/itbio
+
 jobs:
-  build-backend:
-    working_directory: ~/itbio/backend
+  test-backend:
+    <<: *defaults
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:11-browsers-legacy
     steps:
-      - checkout:
-          path: ~/itbio
-      - run: ./gradlew clean build
-      - store_artifacts:
-          path: build/libs/
-          destination: backend
-  build-frontend:
-    working_directory: ~/itbio/frontend
+      - checkout
+      - restore_cache:
+          key: gradle-{{ checksum "backend/build.gradle" }}
+      - run: |
+          cd backend
+          ./gradlew check
+      - save_cache:
+          key: gradle-{{ checksum "backend/build.gradle" }}
+          paths:
+            - ~/.gradle
+  test-frontend:
+    <<: *defaults
     docker:
-      - image: circleci/node:8.1.2
+      - image: circleci/node:10
     steps:
-      - checkout:
-          path: ~/itbio
+      - checkout
       - restore_cache:
           name: Restoring node_modules
-          key: v1-node_modules-{{ checksum "yarn.lock" }}
-      - run: yarn
+          key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
+      - run: |
+          cd frontend
+          yarn --pure-lockfile
       - save_cache:
           name: Caching node_modules
-          key: v1-node_modules-{{ checksum "yarn.lock" }}
+          key: v1-node_modules-{{ checksum "frontend/yarn.lock" }}
           paths:
-            - node_modules
-      - run: yarn run build
-      - run: yarn run test
-      - run: tar -czvf build.tar.gz build/*
-      - store_artifacts:
-          path: build.tar.gz
+            - frontend/node_modules
+      - run: |
+          cd frontend
+          yarn run test
+  build-docker:
+    <<: *defaults
+    machine: true
+    steps:
+      - checkout
+      - run: |
+          make docker
+          mkdir docker-cache
+          docker save -o docker-cache/images.tar cthdidit/sefilm-frontend cthdidit/sefilm-backend
+      - persist_to_workspace:
+          root: ~/itbio
+          paths:
+            - docker-cache/*
+  push-docker:
+    <<: *defaults
+    machine: true
+    steps:
+      - attach_workspace:
+          at: ~/itbio
+      - run: |
+          docker load -i docker-cache/images.tar
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker push cthdidit/sefilm-frontend
+          docker push cthdidit/sefilm-backend
+
 workflows:
   version: 2
   build:
     jobs:
-      - build-backend
-      - build-frontend
+      - test-backend
+      - test-frontend
+      - build-docker:
+          requires:
+            - test-frontend
+            - test-backend
+      - push-docker:
+          requires:
+            - build-docker
+          filters:
+            branches:
+              only:
+                - master
+

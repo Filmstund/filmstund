@@ -1,5 +1,4 @@
-import padStart from "lodash/padStart";
-import take from "lodash/take";
+import { padStart, take } from "lodash-es";
 
 import format from "date-fns/format";
 

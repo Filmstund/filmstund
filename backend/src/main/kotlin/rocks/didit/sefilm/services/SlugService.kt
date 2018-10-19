@@ -30,6 +30,7 @@ class SlugService {
       .replace(",", "")
       .replace("ó", "o")
       .replace("é", "e")
+      .replace("®", "")
       .trimToLength(MAX_LENGTH)
   }
 

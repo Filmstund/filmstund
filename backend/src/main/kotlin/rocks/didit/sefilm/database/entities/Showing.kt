@@ -13,6 +13,7 @@ import rocks.didit.sefilm.domain.dto.SfLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
 

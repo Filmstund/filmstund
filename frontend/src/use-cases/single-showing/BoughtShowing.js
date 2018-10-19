@@ -52,6 +52,7 @@ BoughtShowing.fragments = {
         swishLink
         hasPaid
         payTo {
+          id
           phone
           firstName
           nick
