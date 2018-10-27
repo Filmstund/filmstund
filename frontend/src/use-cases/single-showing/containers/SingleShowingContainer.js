@@ -16,6 +16,7 @@ import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
 import { promoteToAdmin } from "../../../apollo/mutations/showings";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
+import { MissingShowing } from "../../common/showing/MissingShowing";
 
 class SingleShowingContainer extends Component {
   state = {
@@ -129,8 +130,14 @@ const data = graphql(
 
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
+const is404 = branch(
+  ({ data: { showing } }) => !showing,
+  renderComponent(MissingShowing)
+);
+
 export default compose(
   data,
   promoteToAdmin,
-  isLoading
+  isLoading,
+  is404
 )(SingleShowingContainer);

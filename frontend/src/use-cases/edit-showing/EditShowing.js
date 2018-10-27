@@ -1,4 +1,5 @@
 import { graphql, compose } from "react-apollo";
+import { withRouter } from "react-router";
 import gql from "graphql-tag";
 import { withProps, renderComponent, branch } from "recompose";
 import EditShowingForm from "./EditShowingForm";
@@ -6,7 +7,7 @@ import { showingFragment } from "../common/showing/Showing";
 import { updateShowing, deleteShowing } from "../../apollo/mutations/showings";
 import Loader from "../common/utils/ProjectorLoader";
 
-const routerParamsToShowingId = ({ match, history }) => {
+const routerParamsToShowingId = ({ match }) => {
   const { webId } = match.params;
 
   return { webId };
@@ -41,6 +42,7 @@ const isLoading = branch(
 );
 
 export default compose(
+  withRouter,
   withProps(routerParamsToShowingId),
   data,
   updateShowing,

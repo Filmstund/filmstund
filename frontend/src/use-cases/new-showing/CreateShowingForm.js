@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import { graphql } from "react-apollo";
 import { branch, renderComponent, compose, withState } from "recompose";
 import gql from "graphql-tag";
@@ -18,14 +18,10 @@ import SelectBox from "../common/ui/SelectBox";
 import Loader from "../common/utils/ProjectorLoader";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import format from "date-fns/format";
-import Loadable from "react-loadable";
 import isAfter from "date-fns/is_after";
 import { LocationSelect } from "../common/ui/LocationSelect";
 
-const DatePicker = Loadable({
-  loader: () => import("../common/ui/date-picker/DatePicker"),
-  loading: () => null
-});
+const DatePicker = lazy(() => import("../common/ui/date-picker/DatePicker"));
 
 const now = new Date();
 

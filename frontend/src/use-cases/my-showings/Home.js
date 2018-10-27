@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { graphql } from "react-apollo";
+import { withRouter } from "react-router";
 import gql from "graphql-tag";
 import { compose } from "recompose";
 import { orderBy } from "lodash-es";
@@ -175,4 +176,7 @@ const data = graphql(
   }
 );
 
-export default compose(data)(Home);
+export default compose(
+  data,
+  withRouter
+)(Home);

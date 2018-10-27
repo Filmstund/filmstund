@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, lazy } from "react";
 
 import Header from "../common/ui/Header";
 import Showing from "../common/showing/Showing";
@@ -15,13 +15,9 @@ import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import styled from "styled-components";
 import { margin } from "../../lib/style-vars";
 import addDays from "date-fns/add_days";
-import Loadable from "react-loadable";
 import { LocationSelect } from "../common/ui/LocationSelect";
 
-const DatePicker = Loadable({
-  loader: () => import("../common/ui/date-picker/DatePicker"),
-  loading: () => null
-});
+const DatePicker = lazy(() => import("../common/ui/date-picker/DatePicker"));
 
 const today = new Date();
 
