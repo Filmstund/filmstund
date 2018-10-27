@@ -31,67 +31,29 @@ const Close = styled.div`
   cursor: pointer;
 `;
 
-const UserTooltip = ({ user, children }) => (
-  <div title={`${user.firstName} '${user.nick}' ${user.lastName}`}>
-    {children}
-  </div>
-);
-
-const ForetagsBiljetterList = ({ tickets }) => (
+const TicketList = ({ tickets }) => (
   <div>
-    <SmallHeader>Företagsbiljetter</SmallHeader>
+    <SmallHeader>Deltagare</SmallHeader>
     {tickets.map(ticket => (
-      <UserTooltip key={ticket.user.id} user={ticket.user} ticket={ticket}>
-        <CopyValue
-          useStricken
-          key={ticket.foretagsbiljett}
-          text={ticket.foretagsbiljett}
-        />
-      </UserTooltip>
+      <div key={ticket.user.id} style={{ display: "flex" }}>
+        <div>
+          <UserFullName user={ticket.user} />
+        </div>
+        <div style={{ flex: 1, paddingLeft: "1rem" }}>
+          <CopyValue useStricken text={ticket.foretagsbiljett} />
+        </div>
+        <div style={{ flex: 1, paddingLeft: "1rem" }}>
+          <CopyValue useStricken text={ticket.sfMembershipId} />
+        </div>
+      </div>
     ))}
   </div>
 );
 
-const UserListItem = ({ user }) => (
-  <li>
+const UserFullName = ({ user }) => (
+  <span>
     {user.firstName} '{user.nick}' {user.lastName}
-  </li>
-);
-
-const renderUsersWithoutSfMembershipIds = sfData => {
-  const usersWithoutSfMembershipIds = sfData
-    .filter(({ sfMembershipId }) => sfMembershipId === null)
-    .map(({ user }) => user);
-
-  if (usersWithoutSfMembershipIds.length > 0) {
-    return (
-      <div>
-        {usersWithoutSfMembershipIds.length} deltagare saknar SF medlemsnummer:
-        <ul>
-          {usersWithoutSfMembershipIds.map(user => (
-            <UserListItem key={user.id} user={user} />
-          ))}
-        </ul>
-      </div>
-    );
-  } else {
-    return null;
-  }
-};
-
-const SfMembershipList = ({ sfData }) => (
-  <div>
-    <SmallHeader>SF medlemsnummer</SmallHeader>
-    {sfData
-      .filter(({ sfMembershipId }) => sfMembershipId !== null)
-      .map(({ user, sfMembershipId }) => (
-        <UserTooltip user={user} key={user.id}>
-          <CopyValue useStricken text={sfMembershipId} />
-        </UserTooltip>
-      ))}
-    <hr />
-    {renderUsersWithoutSfMembershipIds(sfData)}
-  </div>
+  </span>
 );
 
 const BuyModal = ({
@@ -120,10 +82,6 @@ const BuyModal = ({
   const { sfBuyLink, sfData, participantPaymentInfos } = adminPaymentDetails;
   const { ticketsBought } = showing;
 
-  const participantsWithForetagsbiljett = sfData.filter(
-    ({ foretagsbiljett }) => foretagsbiljett !== null
-  );
-
   return (
     <Modal>
       <Padding>
@@ -151,10 +109,7 @@ const BuyModal = ({
                 participants={showing.participants}
                 showPhone={true}
               />
-              <ForetagsBiljetterList
-                tickets={participantsWithForetagsbiljett}
-              />
-              <SfMembershipList sfData={sfData} />
+              <TicketList tickets={sfData} />
               <StatusMessageBox errors={errors} />
               <Field text="Biljettpris:">
                 <Input
