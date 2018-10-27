@@ -1,13 +1,15 @@
-import React, { Component } from "react";
+import React, { Component, lazy, Suspense } from "react";
 import { ApolloProvider } from "react-apollo";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
 import client from "./store/apollo";
 import Login from "./use-cases/login/containers/Login";
-import asyncComponent from "./use-cases/common/utils/AsyncComponent";
 import { rollbar } from "./lib/error-reporting";
 import { createGlobalStyle } from "styled-components";
+import Loader from "./use-cases/common/utils/ProjectorLoader";
+
+const AsyncApp = lazy(() => import("./App"));
 
 const GlobalStyles = createGlobalStyle`
   html {
@@ -28,18 +30,19 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const AsyncApp = asyncComponent(() => import("./App"));
-
 class Root extends Component {
   state = {
     hasError: false
   };
 
-  componentDidCatch(error, info) {
-    rollbar.error("Root didCatch", error, info);
-    this.setState({
+  static getDerivedStateFromError(error) {
+    return {
       hasError: true
-    });
+    };
+  }
+
+  componentDidCatch(error, info) {
+    rollbar.error("Root didCatch", error, info.componentStack);
   }
 
   render() {
@@ -52,7 +55,9 @@ class Root extends Component {
     return (
       <ApolloProvider client={client}>
         <Router>
-          <Login>{props => <AsyncApp {...props} />}</Login>
+          <Suspense fallback={<Loader />}>
+            <Login>{props => <AsyncApp {...props} />}</Login>
+          </Suspense>
         </Router>
         <GlobalStyles />
       </ApolloProvider>

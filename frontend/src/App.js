@@ -1,18 +1,17 @@
-import React from "react";
-import { Route, Switch, Redirect } from "react-router-dom";
+import React, { Suspense, lazy } from "react";
+import { Route, Switch } from "react-router-dom";
 import { graphql } from "react-apollo";
 import { compose, branch, renderComponent } from "recompose";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import Helmet from "react-helmet";
 
-import asyncComponent from "./use-cases/common/utils/AsyncComponent";
 import TopBar from "./use-cases/common/ui/TopBar";
 import Footer from "./use-cases/common/ui/footer/Footer";
 import WelcomeModal from "./use-cases/common/utils/WelcomeModal";
 import { completeUserFragment } from "./apollo/queries/currentUser";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
-import { UUIDToWebId } from "./use-cases/common/utils/UUIDToWebId";
+import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -38,21 +37,19 @@ const MainGridContainer = styled.div`
   align-items: start;
 `;
 
-const AsyncHome = asyncComponent(() => import("./use-cases/my-showings/Home"));
-const AsyncUser = asyncComponent(() => import("./use-cases/user/index"));
-const AsyncShowings = asyncComponent(() =>
-  import("./use-cases/showings-list/Showings")
-);
-const AsyncNewShowing = asyncComponent(() =>
+const AsyncHome = lazy(() => import("./use-cases/my-showings/Home"));
+const AsyncUser = lazy(() => import("./use-cases/user/index"));
+const AsyncShowings = lazy(() => import("./use-cases/showings-list/Showings"));
+const AsyncNewShowing = lazy(() =>
   import("./use-cases/new-showing/NewShowing")
 );
-const AsyncEditShowing = asyncComponent(() =>
+const AsyncEditShowing = lazy(() =>
   import("./use-cases/edit-showing/EditShowing")
 );
-const AsyncShowingTickets = asyncComponent(() =>
+const AsyncShowingTickets = lazy(() =>
   import("./use-cases/showing-tickets/index")
 );
-const AsyncSingleShowing = asyncComponent(() =>
+const AsyncSingleShowing = lazy(() =>
   import("./use-cases/single-showing/screen/SingleShowingScreen")
 );
 
@@ -63,31 +60,30 @@ const App = ({ data: { me }, signout }) => (
     <ScrollContainer>
       <TopBar signout={signout} />
       <MainGridContainer>
-        <Switch>
-          <Route exact path="/" component={AsyncHome} />
-          <Route path="/user" component={AsyncUser} />
-          <Route exact path="/showings" component={AsyncShowings} />
-          <Route path="/showings/new/:movieId?" component={AsyncNewShowing} />
-          <Route
-            path="/showings/:webId/:slug/tickets"
-            component={AsyncShowingTickets}
-          />
-          <Route
-            path="/showings/:webId/:slug/edit"
-            component={AsyncEditShowing}
-          />
-          <Route path="/showings/:webId/:slug" component={AsyncSingleShowing} />
-          <Route
-            path="/showings/:showingId/:rest?"
-            render={props => (
-              <UUIDToWebId {...props.match.params}>
-                {({ webId, slug }) => (
-                  <Redirect to={`/showings/${webId}/${slug}`} />
-                )}
-              </UUIDToWebId>
-            )}
-          />
-        </Switch>
+        <Suspense fallback={<Loader />}>
+          <Switch>
+            <Route exact path="/" children={<AsyncHome />} />
+            <Route path="/user" children={<AsyncUser />} />
+            <Route exact path="/showings" children={<AsyncShowings />} />
+            <Route
+              path="/showings/new/:movieId?"
+              children={<AsyncNewShowing />}
+            />
+            <Route
+              path="/showings/:webId/:slug/tickets"
+              children={<AsyncShowingTickets />}
+            />
+            <Route
+              path="/showings/:webId/:slug/edit"
+              children={<AsyncEditShowing />}
+            />
+            <Route
+              path="/showings/:webId/:slug"
+              children={<AsyncSingleShowing />}
+            />
+            <Route children={<MissingShowing />} />
+          </Switch>
+        </Suspense>
       </MainGridContainer>
       <Footer />
     </ScrollContainer>

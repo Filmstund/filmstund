@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, lazy } from "react";
 import styled from "styled-components";
 import MainButton from "../../use-cases/common/ui/MainButton";
 
@@ -17,12 +17,10 @@ import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
 
 import addYears from "date-fns/add_years";
-import Loadable from "react-loadable";
 
-const DatePickerInput = Loadable({
-  loader: () => import("../../use-cases/common/ui/date-picker/DatePickerInput"),
-  loading: () => null
-});
+const DatePickerInput = lazy(() =>
+  import("../../use-cases/common/ui/date-picker/DatePickerInput")
+);
 
 const DEFAULT_DATE = addYears(new Date(), 1);
 
