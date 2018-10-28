@@ -3,33 +3,33 @@
 exports[`<TicketContainer /> renders without crashing 1`] = `
 <div>
   <div
-    class="sc-cSHVUG vOcKi"
+    class="sc-jzJRlG jltfoM"
   >
     <button
-      class="sc-bxivhb khhjfE"
+      class="sc-htpNat eTZpTS"
     >
       Tillbaka till visning
     </button>
     <h3
-      class="sc-kGXeez jXWMiY"
+      class="sc-kgoBCf fSkEwE"
     >
       Våra platser:
     </h3>
     <div
-      class="sc-dxgOiQ fjAaav"
+      class="sc-kpOJdX kwGIAS"
     >
       <label
-        class="sc-kpOJdX fHAACF"
+        class="sc-kGXeez fnbPCT"
       >
         Lägg till SF-bokningslänkar
       </label>
       <br />
       <textarea
-        class="sc-bwzfXH SXjuS"
+        class="sc-bdVaJa iQFFzu"
         rows="5"
       />
       <button
-        class="sc-bxivhb khhjfE"
+        class="sc-htpNat eTZpTS"
       >
         Skicka
       </button>
