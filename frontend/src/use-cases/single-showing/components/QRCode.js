@@ -1,20 +1,19 @@
-import React, { Component } from "react";
+import React, { useMemo } from "react";
 
-import qrcodegen from "../../../lib/qrcode";
+import QRC from "../../../lib/qrcode";
 
-const QRC = qrcodegen.QrCode;
+const QRCode = ({ value, width, height }) => {
+  const svgString = useMemo(
+    () => QRC.encodeText(value, QRC.Ecc.MEDIUM).toSvgString(5),
+    [value]
+  );
 
-class QRCode extends Component {
-  render() {
-    const { value, width, height } = this.props;
-    const encodedValue = QRC.encodeText(value, QRC.Ecc.MEDIUM);
-    return (
-      <div
-        style={{ width, height }}
-        dangerouslySetInnerHTML={{ __html: encodedValue.toSvgString(5) }}
-      />
-    );
-  }
-}
+  return (
+    <div
+      style={{ width, height }}
+      dangerouslySetInnerHTML={{ __html: svgString }}
+    />
+  );
+};
 
 export default QRCode;

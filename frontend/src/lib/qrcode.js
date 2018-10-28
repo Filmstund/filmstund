@@ -1433,4 +1433,4 @@ var qrcodegen = new function() {
   }
 }();
 
-export default qrcodegen;
+export default qrcodegen.QrCode;
