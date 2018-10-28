@@ -19,7 +19,7 @@ const NavBar = ({ children, number, faded }) => (
     <blockquote>
       "<span>{children}</span>"
     </blockquote>
-    <small>- de bio budorden {number}</small>
+    <small>— de bio budorden {number}</small>
   </QuoteBox>
 );
 
