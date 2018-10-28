@@ -94,7 +94,7 @@ class PendingShowing extends Component {
     const { modalOpen } = this.state;
 
     return (
-      <React.Fragment>
+      <>
         {modalOpen && this.renderModalPaymentOptions()}
         {!isParticipating && (
           <MainButton onClick={this.handleClickAttend}>
@@ -104,7 +104,7 @@ class PendingShowing extends Component {
         {isParticipating && (
           <GrayButton onClick={unattendShowing}>Avanmäl</GrayButton>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }
