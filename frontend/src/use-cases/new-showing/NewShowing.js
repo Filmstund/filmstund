@@ -1,150 +1,55 @@
-import React, { Component } from "react";
-import { orderBy } from "lodash-es";
-import Helmet from "react-helmet";
-import styled from "styled-components";
+import React, { useCallback } from "react";
 import { withRouter } from "react-router";
 
-import Header from "../common/ui/Header";
-import { ShowingsGrid } from "../common/ui/ShowingsGrid";
-import Movie, { movieFragment } from "../common/showing/Movie";
+import { movieFragment } from "../common/showing/Movie";
 import CreateShowingForm from "./CreateShowingForm";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import faSync from "@fortawesome/fontawesome-free-solid/faSyncAlt";
 
-import Field from "../common/ui/Field";
-import Input from "../common/ui/Input";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
 import { fetchMovies } from "../../apollo/queries/movies";
 import { navigateToShowing } from "../common/navigators/index";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import MovieSelector from "./MovieSelector";
 
-const SearchField = styled(Field)`
-  max-width: 100%;
-`;
+const NewShowing = props => {
+  const {
+    data: { movies = [] },
+    match: {
+      params: { movieId }
+    },
+    fetchMovies,
+    history
+  } = props;
 
-const RefreshButton = styled.button`
-  -webkit-appearance: none;
-  background: none;
-  border: 0;
-  color: #b71c1c;
-  font-size: 16pt;
-  padding: 0 0.5em;
-  cursor: pointer;
-`;
+  const handleNavigateToShowing = useCallback(showing => {
+    navigateToShowing(history, showing);
+  });
 
-const FlexHeader = styled(Header)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+  const clearSelectedMovie = useCallback(() => {
+    history.push("/showings/new");
+  });
 
-const StyledMovie = styled(Movie)`
-  padding: 0.5em;
-`;
+  const setMovie = useCallback(movie => {
+    history.push(`/showings/new/${movie.id}`);
+  });
 
-class NewShowing extends Component {
-  state = {
-    searchTerm: ""
-  };
-
-  requestSFData = () => {
-    this.setState({ requestingData: true });
-    this.props.fetchMovies().then(() => {
-      this.setState({ requestingData: false });
-    });
-  };
-
-  setSearchTerm = term => {
-    this.setState({
-      searchTerm: term.target.value
-    });
-  };
-
-  searchFilter(m) {
-    const { searchTerm } = this.state;
-
-    const lowerCaseTerm = searchTerm.toLowerCase();
-
-    if (searchTerm && searchTerm.length > 0) {
-      if (m.title.toLowerCase().search(lowerCaseTerm) > -1) {
-        return true;
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
-  renderSelectMovie = movies => {
-    const { searchTerm, requestingData } = this.state;
-
+  if (movieId) {
     return (
-      <PageWidthWrapper>
-        <Helmet title="Skapa besök" />
-        <FlexHeader>
-          <RefreshButton role="button" onClick={this.requestSFData}>
-            <FontAwesomeIcon icon={faSync} spin={requestingData} />
-          </RefreshButton>
-          Skapa besök
-        </FlexHeader>
-        <SearchField>
-          <Input
-            type="text"
-            onChange={this.setSearchTerm}
-            placeholder="Vilken film vill du se?"
-            value={searchTerm}
-          />
-        </SearchField>
-        <ShowingsGrid>
-          {orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"])
-            .filter(m => this.searchFilter(m))
-            .map(m => (
-              <StyledMovie
-                key={m.id}
-                movie={m}
-                onClick={() => this.setMovie(m)}
-              />
-            ))}
-        </ShowingsGrid>
-      </PageWidthWrapper>
+      <CreateShowingForm
+        movieId={movieId}
+        navigateToShowing={handleNavigateToShowing}
+        clearSelectedMovie={clearSelectedMovie}
+      />
     );
-  };
-
-  setMovie = movie => {
-    this.props.history.push(`/showings/new/${movie.id}`);
-  };
-
-  navigateToShowing = showing => {
-    navigateToShowing(this.props.history, showing);
-  };
-
-  clearSelectedMovie = () => {
-    this.props.history.push(`/showings/new`);
-  };
-
-  render() {
-    const {
-      data: { movies = [] },
-      match: {
-        params: { movieId }
-      }
-    } = this.props;
-
-    if (movieId) {
-      return (
-        <CreateShowingForm
-          movieId={movieId}
-          navigateToShowing={this.navigateToShowing}
-          clearSelectedMovie={this.clearSelectedMovie}
-        />
-      );
-    } else {
-      return this.renderSelectMovie(movies);
-    }
+  } else {
+    return (
+      <MovieSelector
+        fetchMovies={fetchMovies}
+        setMovie={setMovie}
+        movies={movies}
+      />
+    );
   }
-}
+};
 
 const data = graphql(
   gql`
