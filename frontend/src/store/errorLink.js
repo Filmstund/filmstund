@@ -1,6 +1,6 @@
 import { onError } from "apollo-link-error";
 
-export const errorLink = onError(async args => {
+export const errorLink = onError(args => {
   const { graphQLErrors, networkError } = args;
   if (graphQLErrors)
     graphQLErrors.map(error =>
