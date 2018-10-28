@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { NavLink as RouterLink } from "react-router-dom";
 import styled from "styled-components";
 
@@ -36,24 +36,21 @@ const Link = styled(RouterLink)`
   }
 `;
 
-class NavBar extends Component {
-  render() {
-    const { signout } = this.props;
-    return (
-      <NavBarBackground>
-        <NavBarLinksContainer>
-          <div>
-            <Link to="/">Mina besök</Link>
-            <Link to="/showings">Alla besök</Link>
-          </div>
-          <div>
-            <Link to="/user">Profil</Link>
-            <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
-          </div>
-        </NavBarLinksContainer>
-      </NavBarBackground>
-    );
-  }
-}
+const NavBar = ({ signout }) => {
+  return (
+    <NavBarBackground>
+      <NavBarLinksContainer>
+        <div>
+          <Link to="/">Mina besök</Link>
+          <Link to="/showings">Alla besök</Link>
+        </div>
+        <div>
+          <Link to="/user">Profil</Link>
+          <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
+        </div>
+      </NavBarLinksContainer>
+    </NavBarBackground>
+  );
+};
 
 export default NavBar;
