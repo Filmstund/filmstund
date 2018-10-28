@@ -76,11 +76,6 @@ const EditableForetagsbiljettList = props => {
 
   return (
     <>
-      <StatusMessageBox
-        errors={errors}
-        success={success}
-        successMessage="Företagsbiljetter uppdaterades!"
-      />
       {tickets.map((biljett, index) => (
         <Foretagsbiljett
           key={index}
@@ -95,6 +90,11 @@ const EditableForetagsbiljettList = props => {
         <IconButton size="2x" icon={faPlusCircle} />
       </AddForetagsbiljettContainer>
       <MainButton onClick={onClickSubmit}>Spara företagsbiljetter</MainButton>
+      <StatusMessageBox
+        errors={errors}
+        success={success}
+        successMessage="Företagsbiljetter uppdaterades!"
+      />
     </>
   );
 };
