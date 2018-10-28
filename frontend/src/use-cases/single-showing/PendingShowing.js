@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { compose } from "react-apollo";
 import gql from "graphql-tag";
 
@@ -13,101 +13,89 @@ import {
   attendShowing,
   unattendShowing
 } from "../../apollo/mutations/showings";
+import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
 
-class PendingShowing extends Component {
-  state = {
-    modalOpen: false,
-    selectedIndex: 0
-  };
+const PendingShowing = ({
+  isParticipating,
+  foretagsbiljetter,
+  attendShowing,
+  unattendShowing
+}) => {
+  const [selectedIndex, handleSelectIndex] = useStateWithHandleChange(0);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  setPaymentOption = e => {
-    const {
-      target: { value }
-    } = e;
-    this.setState({
-      selectedIndex: value
-    });
-  };
+  const paymentOptions = useMemo(
+    () => createPaymentOptions(foretagsbiljetter),
+    [foretagsbiljetter]
+  );
 
-  renderModalPaymentOptions = () => {
-    const { selectedIndex } = this.state;
-    const paymentOptions = this.getPaymentOptions();
-
-    return (
-      <Modal onRequestClose={() => this.setState({ modalOpen: false })}>
-        <SmallHeader>Betalningsalternativ</SmallHeader>
-        <select
-          name="betalningsalternativ"
-          value={selectedIndex}
-          onChange={this.setPaymentOption}
-        >
-          {paymentOptions.map((option, index) => (
-            <option key={index} value={index}>
-              {stringifyOption(option)}
-            </option>
-          ))}
-        </select>
-        <MainButton onClick={this.handleClickSelectPaymentOption}>
-          Jag hänger på!
-        </MainButton>
-      </Modal>
-    );
-  };
-
-  getPaymentOptions = () => {
-    const { foretagsbiljetter } = this.props;
-    return createPaymentOptions(foretagsbiljetter);
-  };
-
-  handleClickSelectPaymentOption = () => {
-    const paymentOptions = this.getPaymentOptions();
-    const { selectedIndex } = this.state;
-
-    this.attendWithPaymentOption(paymentOptions[selectedIndex]);
-  };
-
-  attendWithPaymentOption = paymentOption => {
-    const { attendShowing } = this.props;
+  const attendWithPaymentOption = useCallback(paymentOption => {
     const { type, ticketNumber } = paymentOption;
-    attendShowing({
-      paymentOption: {
-        type,
-        ticketNumber
-      }
-    }).then(result => {
-      this.setState({ modalOpen: false });
-    });
-  };
 
-  handleClickAttend = () => {
-    const paymentOptions = this.getPaymentOptions();
+    attendShowing({ paymentOption: { type, ticketNumber } }).then(() =>
+      setModalOpen(false)
+    );
+  });
+
+  const handleClickSelectPaymentOption = useCallback(() => {
+    attendWithPaymentOption(paymentOptions[selectedIndex]);
+  });
+
+  const handleClickAttend = useCallback(() => {
     if (paymentOptions.length > 1) {
-      this.setState({ modalOpen: true });
+      setModalOpen(true);
     } else {
       // Attend with Swish option
-      this.attendWithPaymentOption(paymentOptions[0]);
+      attendWithPaymentOption(paymentOptions[0]);
     }
-  };
+  });
 
-  render() {
-    const { isParticipating, unattendShowing } = this.props;
-    const { modalOpen } = this.state;
+  return (
+    <>
+      {modalOpen && (
+        <ModalPaymentOptions
+          setPaymentOption={handleSelectIndex}
+          paymentOptions={paymentOptions}
+          setModalOpen={setModalOpen}
+          handleClickSelectPaymentOption={handleClickSelectPaymentOption}
+        />
+      )}
+      {isParticipating ? (
+        <GrayButton onClick={unattendShowing}>Avanmäl</GrayButton>
+      ) : (
+        <MainButton onClick={handleClickAttend}>Jag hänger på!</MainButton>
+      )}
+    </>
+  );
+};
 
-    return (
-      <>
-        {modalOpen && this.renderModalPaymentOptions()}
-        {!isParticipating && (
-          <MainButton onClick={this.handleClickAttend}>
-            Jag hänger på!
-          </MainButton>
-        )}
-        {isParticipating && (
-          <GrayButton onClick={unattendShowing}>Avanmäl</GrayButton>
-        )}
-      </>
-    );
-  }
-}
+const ModalPaymentOptions = ({
+  selectedIndex,
+  paymentOptions,
+  setModalOpen,
+  handleClickSelectPaymentOption,
+  setPaymentOption
+}) => {
+  return (
+    <Modal onRequestClose={() => setModalOpen(false)}>
+      <SmallHeader>Betalningsalternativ</SmallHeader>
+      <select
+        name="betalningsalternativ"
+        value={selectedIndex}
+        onChange={setPaymentOption}
+      >
+        {paymentOptions.map((option, index) => (
+          <option key={index} value={index}>
+            {stringifyOption(option)}
+          </option>
+        ))}
+      </select>
+      <MainButton onClick={handleClickSelectPaymentOption}>
+        Jag hänger på!
+      </MainButton>
+    </Modal>
+  );
+};
 
 PendingShowing.fragments = {
   currentUser: gql`
