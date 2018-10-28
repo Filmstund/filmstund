@@ -1,45 +1,47 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import QuoteBox from "./QuoteBox";
 import { sample } from "lodash-es";
 import { branch, compose, renderComponent } from "recompose";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 
-class Bioord extends Component {
-  state = {
-    budord: {},
-    faded: true
-  };
+const Bioord = ({ data }) => {
+  const { faded, value: budord } = useFadeBetweenValues(
+    data.allBiobudord,
+    sample
+  );
 
-  componentDidMount() {
-    this.interval = setInterval(this.resampleBudord, 10000);
-    this.resampleBudord();
-  }
+  return (
+    <QuoteBox faded={faded} number={budord.number}>
+      {budord.phrase}
+    </QuoteBox>
+  );
+};
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
+const useFadeBetweenValues = (values, getNextValue) => {
+  const [{ faded, value }, setState] = useState({
+    faded: false,
+    value: getNextValue(values)
+  });
 
-  resampleBudord = () => {
-    this.setState({ faded: true });
-    setTimeout(() => {
-      this.setState((state, { data }) => ({
-        budord: sample(data.allBiobudord),
-        faded: false
-      }));
-    }, 1000);
-  };
+  useEffect(
+    () => {
+      const id = setInterval(() => {
+        setState(state => ({ ...state, faded: true }));
+        setTimeout(() => {
+          setState({ faded: false, value: getNextValue(values) });
+        }, 1000);
+      }, 10000);
 
-  render() {
-    const { budord, faded } = this.state;
+      return () => {
+        clearInterval(id);
+      };
+    },
+    [values]
+  );
 
-    return (
-      <QuoteBox faded={faded} number={budord.number}>
-        {budord.phrase}
-      </QuoteBox>
-    );
-  }
-}
+  return { faded, value };
+};
 
 const Loader = branch(
   ({ data: { loading } }) => loading,
