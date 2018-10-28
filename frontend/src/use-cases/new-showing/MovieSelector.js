@@ -13,6 +13,8 @@ import faSync from "@fortawesome/fontawesome-free-solid/faSyncAlt";
 import Field from "../common/ui/Field";
 import Input from "../common/ui/Input";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
+import { useFetchingStatus } from "../common/utils/useFetchingStatus";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -85,29 +87,6 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
       </ShowingsGrid>
     </PageWidthWrapper>
   );
-};
-
-const useStateWithHandleChange = initialValue => {
-  const [value, setValue] = useState(initialValue);
-  const handleChange = useCallback(event => {
-    setValue(event.target.value);
-  }, []);
-
-  return [value, handleChange, setValue];
-};
-
-const useFetchingStatus = perform => {
-  const [fetching, setFetching] = useState(false);
-
-  const requestData = useCallback((...args) => {
-    setFetching(true);
-    return perform(...args).then(result => {
-      setFetching(false);
-      return result;
-    });
-  });
-
-  return [fetching, requestData];
 };
 
 export default MovieSelector;
