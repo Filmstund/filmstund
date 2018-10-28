@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import gql from "graphql-tag";
-import Helmet from "react-helmet";
 import { formatShowingDateTime } from "../../../lib/dateTools";
 import PosterBox from "../ui/PosterBox";
+import { PageTitle } from "../utils/PageTitle";
 
 const VerticalPaddingContainer = styled.div`
   padding: 1em 0;
@@ -46,7 +46,7 @@ const Showing = ({
 }) => (
   <StyledShowing disabled={disabled}>
     {setTitleTag && (
-      <Helmet title={`${movie.title} ${formatShowingDateTime(date)}`} />
+      <PageTitle title={`${movie.title} ${formatShowingDateTime(date)}`} />
     )}
     <PosterBox headerText={movie.title} poster={movie.poster} onClick={onClick}>
       {ticketsBought !== undefined && (

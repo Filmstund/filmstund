@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import styled from "styled-components";
-import Helmet from "react-helmet";
 import Field, { FieldWithoutMaxWidth } from "../../use-cases/common/ui/Field";
 import MainButton from "../../use-cases/common/ui/MainButton";
 import CopyValue from "../../use-cases/common/utils/CopyValue";
@@ -13,6 +12,7 @@ import ForetagsbiljettListContainer from "./ForetagsbiljettListContainer";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
 import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
+import { PageTitle } from "../common/utils/PageTitle";
 
 const Box = styled.div`
   background: #fff;
@@ -69,7 +69,7 @@ const Profile = ({ data: { me }, updateUser }) => {
 
   return (
     <PageWidthWrapper>
-      <Helmet title="Profil" />
+      <PageTitle title="Profil" />
       <Box>
         <AvatarImage src={me.avatar} />
         <UserInfo>
