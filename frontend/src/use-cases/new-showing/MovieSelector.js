@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 
 import { orderBy } from "lodash-es";
-import Helmet from "react-helmet";
 import Header from "../common/ui/Header";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import Movie from "../common/showing/Movie";
@@ -15,6 +14,7 @@ import Input from "../common/ui/Input";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
 import { useFetchingStatus } from "../common/utils/useFetchingStatus";
+import { PageTitle } from "../common/utils/PageTitle";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -65,7 +65,7 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
 
   return (
     <PageWidthWrapper>
-      <Helmet title="Skapa besök" />
+      <PageTitle title="Skapa besök" />
       <FlexHeader>
         <RefreshButton role="button" onClick={requestData}>
           <FontAwesomeIcon icon={faSync} spin={fetching} />

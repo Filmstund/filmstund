@@ -4,7 +4,6 @@ import { graphql } from "react-apollo";
 import { compose, branch, renderComponent } from "recompose";
 import gql from "graphql-tag";
 import styled from "styled-components";
-import Helmet from "react-helmet";
 
 import NavBar from "./use-cases/common/ui/NavBar";
 import Footer from "./use-cases/common/ui/footer/Footer";
@@ -12,6 +11,7 @@ import WelcomeModal from "./use-cases/common/utils/WelcomeModal";
 import { completeUserFragment } from "./apollo/queries/currentUser";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
 import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
+import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -54,40 +54,41 @@ const AsyncSingleShowing = lazy(() =>
 );
 
 const App = ({ data: { me }, signout }) => (
-  <React.Fragment>
-    <Helmet titleTemplate="%s | itbio" />
-    <WelcomeModal me={me} />
-    <ScrollContainer>
-      <NavBar signout={signout} />
-      <MainGridContainer>
-        <Suspense fallback={<Loader />}>
-          <Switch>
-            <Route exact path="/" children={<AsyncHome />} />
-            <Route path="/user" children={<AsyncUser />} />
-            <Route exact path="/showings" children={<AsyncShowings />} />
-            <Route
-              path="/showings/new/:movieId?"
-              children={<AsyncNewShowing />}
-            />
-            <Route
-              path="/showings/:webId/:slug/tickets"
-              children={<AsyncShowingTickets />}
-            />
-            <Route
-              path="/showings/:webId/:slug/edit"
-              children={<AsyncEditShowing />}
-            />
-            <Route
-              path="/showings/:webId/:slug"
-              children={<AsyncSingleShowing />}
-            />
-            <Route children={<MissingShowing />} />
-          </Switch>
-        </Suspense>
-      </MainGridContainer>
-      <Footer />
-    </ScrollContainer>
-  </React.Fragment>
+  <>
+    <PageTitleTemplate titleTemplate="%s | sefilm">
+      <WelcomeModal me={me} />
+      <ScrollContainer>
+        <NavBar signout={signout} />
+        <MainGridContainer>
+          <Suspense fallback={<Loader />}>
+            <Switch>
+              <Route exact path="/" children={<AsyncHome />} />
+              <Route path="/user" children={<AsyncUser />} />
+              <Route exact path="/showings" children={<AsyncShowings />} />
+              <Route
+                path="/showings/new/:movieId?"
+                children={<AsyncNewShowing />}
+              />
+              <Route
+                path="/showings/:webId/:slug/tickets"
+                children={<AsyncShowingTickets />}
+              />
+              <Route
+                path="/showings/:webId/:slug/edit"
+                children={<AsyncEditShowing />}
+              />
+              <Route
+                path="/showings/:webId/:slug"
+                children={<AsyncSingleShowing />}
+              />
+              <Route children={<MissingShowing />} />
+            </Switch>
+          </Suspense>
+        </MainGridContainer>
+        <Footer />
+      </ScrollContainer>
+    </PageTitleTemplate>
+  </>
 );
 
 const data = graphql(gql`

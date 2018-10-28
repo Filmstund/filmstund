@@ -4,7 +4,6 @@ import { withRouter } from "react-router";
 import gql from "graphql-tag";
 import { compose } from "recompose";
 import { orderBy } from "lodash-es";
-import Helmet from "react-helmet";
 
 import { Link } from "../common/ui/MainButton";
 import { Jumbotron, JumbotronBackground } from "./Jumbotron";
@@ -26,6 +25,7 @@ import {
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import { ItsHappeningTitle } from "./ItsHappeningTitle";
 import { EmptyList } from "../common/ui/EmptyList";
+import { PageTitle } from "../common/utils/PageTitle";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -110,8 +110,8 @@ class Home extends Component {
     const featuredShowing = orderBy(todayShowings, [showingDate], ["asc"])[0];
 
     return (
-      <React.Fragment>
-        <Helmet title="Mina Besök" />
+      <>
+        <PageTitle title="Mina Besök" />
         {featuredShowing && (
           <FullWidthWrapper>
             <JumbotronBackground>
@@ -141,7 +141,7 @@ class Home extends Component {
           <RedHeader>Besök jag har skapat</RedHeader>
           {this.renderCreatedByMe(showings)}
         </PageWidthWrapper>
-      </React.Fragment>
+      </>
     );
   }
 }

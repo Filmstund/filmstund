@@ -4,7 +4,6 @@ import { withRouter } from "react-router";
 import gql from "graphql-tag";
 import { orderBy, groupBy } from "lodash-es";
 import { compose } from "recompose";
-import Helmet from "react-helmet";
 
 import { getTodaysDate } from "../../lib/dateTools";
 
@@ -19,6 +18,7 @@ import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import isBefore from "date-fns/is_before";
 import { EmptyList } from "../common/ui/EmptyList";
+import { PageTitle } from "../common/utils/PageTitle";
 
 const showingDate = showing => showing.date + " " + showing.time;
 
@@ -64,7 +64,7 @@ class Showings extends Component {
 
     return (
       <PageWidthWrapper>
-        <Helmet title="Alla besök" />
+        <PageTitle title="Alla besök" />
         <Link to="/showings/new">Skapa nytt besök</Link>
         <RedHeader>Aktuella besök</RedHeader>
         {this.renderShowings(upcoming, "asc", false)}
