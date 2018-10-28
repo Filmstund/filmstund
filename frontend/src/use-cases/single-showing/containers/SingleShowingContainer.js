@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useCallback, useState } from "react";
 
 import { branch, compose, renderComponent } from "recompose";
 
@@ -18,77 +18,68 @@ import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
 import { MissingShowing } from "../../common/showing/MissingShowing";
 
-class SingleShowingContainer extends Component {
-  state = {
-    showModal: false
-  };
+const SingleShowingContainer = ({
+  promoteToAdmin,
+  data: { me, showing, refetch },
+  history
+}) => {
+  const [openModal, setOpenModal] = useState(false);
 
-  openSwish = swishLink => {
-    this.setState({ swish: true });
-    window.location = swishLink;
-  };
-
-  navigateToTickets = () => {
-    const {
-      history,
-      data: { showing }
-    } = this.props;
-
+  const navigateToTickets = useCallback(() => {
     navigateToShowingTickets(history, showing);
-  };
+  });
 
-  render() {
-    const { swish } = this.state;
-    const {
-      promoteToAdmin,
-      data: { me, showing, refetch }
-    } = this.props;
+  const openSwish = useCallback(swishLink => {
+    setOpenModal(true);
+    if (swishLink) {
+      window.location = swishLink;
+    }
+  });
 
-    const isAdmin = userIsAdmin(showing, me);
-    const isParticipating = userIsParticipating(showing.participants, me);
+  const isAdmin = userIsAdmin(showing, me);
+  const isParticipating = userIsParticipating(showing.participants, me);
 
-    const { attendeePaymentDetails } = showing;
+  const { attendeePaymentDetails } = showing;
 
-    return (
-      <PageWidthWrapper>
-        {swish && (
-          <SwishModal
-            attendeePaymentDetails={attendeePaymentDetails}
-            closeSwish={() => this.setState({ swish: false })}
-          />
+  return (
+    <PageWidthWrapper>
+      {openModal && (
+        <SwishModal
+          attendeePaymentDetails={attendeePaymentDetails}
+          closeSwish={() => setOpenModal(false)}
+        />
+      )}
+      <Showing
+        setTitleTag={true}
+        movie={showing.movie}
+        date={showing.date + " " + showing.time}
+        admin={showing.admin}
+        location={showing.location.name}
+        ticketsBought={showing.ticketsBought}
+      />
+      <ButtonContainer>
+        <IMDbLink imdbId={showing.movie.imdbId} />
+        {isAdmin && (
+          <AdminAction onBeforeOpenBuyModal={refetch} showing={showing} />
         )}
-        <Showing
-          setTitleTag={true}
-          movie={showing.movie}
-          date={showing.date + " " + showing.time}
-          admin={showing.admin}
-          location={showing.location.name}
-          ticketsBought={showing.ticketsBought}
-        />
-        <ButtonContainer>
-          <IMDbLink imdbId={showing.movie.imdbId} />
-          {isAdmin && (
-            <AdminAction onBeforeOpenBuyModal={refetch} showing={showing} />
-          )}
-          <ShowingPaymentContainer
-            showing={showing}
-            isAdmin={isAdmin}
-            foretagsbiljetter={me.foretagsbiljetter}
-            isParticipating={isParticipating}
-            onClickTickets={this.navigateToTickets}
-            openSwish={this.openSwish}
-          />
-        </ButtonContainer>
-        <ParticipantList
-          meId={me.id}
+        <ShowingPaymentContainer
+          showing={showing}
           isAdmin={isAdmin}
-          participants={showing.participants}
-          onClickItem={userId => promoteToAdmin(showing.id, userId)}
+          foretagsbiljetter={me.foretagsbiljetter}
+          isParticipating={isParticipating}
+          onClickTickets={navigateToTickets}
+          openSwish={openSwish}
         />
-      </PageWidthWrapper>
-    );
-  }
-}
+      </ButtonContainer>
+      <ParticipantList
+        meId={me.id}
+        isAdmin={isAdmin}
+        participants={showing.participants}
+        onClickItem={userId => promoteToAdmin(showing.id, userId)}
+      />
+    </PageWidthWrapper>
+  );
+};
 
 const data = graphql(
   gql`
