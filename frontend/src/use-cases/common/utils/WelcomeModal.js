@@ -1,53 +1,38 @@
-import React, { Component } from "react";
+import React, { useState, useCallback } from "react";
 import { withRouter } from "react-router";
 import Modal from "../ui/Modal";
 
 import Header from "../ui/Header";
 import MainButton, { ButtonContainer } from "../ui/MainButton";
 
-class WelcomeModal extends Component {
-  state = {
-    modalOpen: true
-  };
+const WelcomeModal = ({ me: { sfMembershipId }, history }) => {
+  const [modalOpen, setModalOpen] = useState(true);
 
-  navigateToProfile = () => {
-    this.setState(
-      {
-        modalOpen: false
-      },
-      () => {
-        this.props.history.push("/user");
-      }
+  const navigateToProfile = useCallback(() => {
+    setModalOpen(false);
+    history.push("/user");
+  });
+
+  if (sfMembershipId) {
+    return null;
+  } else {
+    return (
+      <Modal isOpen={modalOpen}>
+        <Header>Välkommen!</Header>
+
+        <p>
+          SF har bytt bioklubbsnummer till ett annat format, och det heter
+          numera medlemsnummer.
+        </p>
+        <p>Var god uppdatera ditt registrerade nummer under profilsidan!</p>
+        <ButtonContainer>
+          <MainButton onClick={navigateToProfile}>
+            Gå till profilsidan
+          </MainButton>
+        </ButtonContainer>
+      </Modal>
     );
-  };
-
-  render() {
-    const {
-      me: { sfMembershipId }
-    } = this.props;
-    const { modalOpen } = this.state;
-
-    if (sfMembershipId) {
-      return null;
-    } else {
-      return (
-        <Modal isOpen={modalOpen}>
-          <Header>Välkommen!</Header>
-
-          <p>
-            SF har bytt bioklubbsnummer till ett annat format, och det heter
-            numera medlemsnummer.
-          </p>
-          <p>Var god uppdatera ditt registrerade nummer under profilsidan!</p>
-          <ButtonContainer>
-            <MainButton onClick={this.navigateToProfile}>
-              Gå till profilsidan
-            </MainButton>
-          </ButtonContainer>
-        </Modal>
-      );
-    }
   }
-}
+};
 
 export default withRouter(WelcomeModal);
