@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useCallback } from "react";
 import styled from "styled-components";
 import Helmet from "react-helmet";
 import Field, { FieldWithoutMaxWidth } from "../../use-cases/common/ui/Field";
@@ -12,6 +12,7 @@ import { trim } from "../../lib/Utils";
 import ForetagsbiljettListContainer from "./ForetagsbiljettListContainer";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
+import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 
 const Box = styled.div`
   background: #fff;
@@ -38,113 +39,91 @@ const UserInfo = styled.div`
   padding: 1em;
 `;
 
-class Profile extends Component {
-  constructor(props) {
-    super(props);
+const Profile = ({ data: { me }, updateUser }) => {
+  const { success, errors, clearState, mutate } = useApolloMutationResult(
+    updateUser
+  );
 
-    const { me } = props.data;
+  const [
+    { phone, sfMembershipId, nick },
+    handleChange,
+    setEditedUser
+  ] = useStateWithHandleChangeName({
+    nick: me.nick || "",
+    phone: me.phone || "",
+    sfMembershipId: me.sfMembershipId || ""
+  });
 
-    this.state = {
-      editedUser: {
-        nick: me.nick || "",
-        phone: me.phone || "",
-        sfMembershipId: me.sfMembershipId || "",
-        foretagsbiljetter: me.foretagsbiljetter || []
-      }
-    };
-  }
-
-  setEditedUserValue = (key, { target: { value } }) => {
-    this.setState(state => ({
-      editedUser: {
-        ...state.editedUser,
-        [key]: value
-      }
-    }));
-  };
-
-  handleSubmit = () => {
-    const {
-      editedUser: { nick, phone, sfMembershipId }
-    } = this.state;
-
+  const handleSubmit = useCallback(() => {
     const trimmedValues = trim({
       nick,
       phone,
       sfMembershipId
     });
 
-    this.props
-      .updateUser(trimmedValues)
-      .then(({ data: { editedUser } }) => {
-        this.setState({ editedUser, success: true, errors: null }, () => {
-          setTimeout(() => {
-            this.setState({ success: false });
-          }, 5000);
-        });
-      })
-      .catch(errors => {
-        this.setState({ success: false, errors });
-      });
-  };
+    mutate(trimmedValues).then(({ data: { editedUser } }) => {
+      setEditedUser(editedUser);
+      setTimeout(clearState, 5000);
+    });
+  });
 
-  render() {
-    const { success, errors } = this.state;
-    const {
-      data: { me }
-    } = this.props;
+  return (
+    <PageWidthWrapper>
+      <Helmet title="Profil" />
+      <Box>
+        <AvatarImage src={me.avatar} />
+        <UserInfo>
+          {me.nick && <UserName>{me.nick}</UserName>}
+          <div>"{me.name}"</div>
+          <div>{me.email}</div>
+        </UserInfo>
+      </Box>
+      <StatusMessageBox
+        errors={errors}
+        success={success}
+        successMessage="Uppdaterades!"
+      />
+      <Field text="Nick:">
+        <Input type="text" name="nick" value={nick} onChange={handleChange} />
+      </Field>
+      <Field text="SF medlemsnummer:">
+        <Input
+          type="text"
+          value={sfMembershipId}
+          name="sfMembershipId"
+          placeholder="XXX-XXX"
+          maxLength={7}
+          onChange={handleChange}
+        />
+      </Field>
+      <Field text="Telefonnummer:">
+        <Input
+          type="phone"
+          name="phone"
+          value={phone}
+          placeholder={"07x-000 00 00"}
+          onChange={handleChange}
+        />
+      </Field>
+      <FieldWithoutMaxWidth text="Kalenderlänk:">
+        <CopyValue text={me.calendarFeedUrl} />
+      </FieldWithoutMaxWidth>
+      <MainButton onClick={handleSubmit}>Spara användare</MainButton>
+      <ForetagsbiljettListContainer foretagsbiljetter={me.foretagsbiljetter} />
+    </PageWidthWrapper>
+  );
+};
 
-    const { phone, sfMembershipId, nick } = this.state.editedUser;
-    return (
-      <PageWidthWrapper>
-        <Helmet title="Profil" />
-        <Box>
-          <AvatarImage src={me.avatar} />
-          <UserInfo>
-            {me.nick && <UserName>{me.nick}</UserName>}
-            <div>"{me.name}"</div>
-            <div>{me.email}</div>
-          </UserInfo>
-        </Box>
-        <StatusMessageBox
-          errors={errors}
-          success={success}
-          successMessage="Uppdaterades!"
-        />
-        <Field text="Nick:">
-          <Input
-            type="text"
-            value={nick}
-            onChange={v => this.setEditedUserValue("nick", v)}
-          />
-        </Field>
-        <Field text="SF medlemsnummer:">
-          <Input
-            type="text"
-            value={sfMembershipId}
-            placeholder="XXX-XXX"
-            maxLength={7}
-            onChange={v => this.setEditedUserValue("sfMembershipId", v)}
-          />
-        </Field>
-        <Field text="Telefonnummer:">
-          <Input
-            type="phone"
-            value={phone}
-            placeholder={"07x-000 00 00"}
-            onChange={v => this.setEditedUserValue("phone", v)}
-          />
-        </Field>
-        <FieldWithoutMaxWidth text="Kalenderlänk:">
-          <CopyValue text={me.calendarFeedUrl} />
-        </FieldWithoutMaxWidth>
-        <MainButton onClick={this.handleSubmit}>Spara användare</MainButton>
-        <ForetagsbiljettListContainer
-          foretagsbiljetter={me.foretagsbiljetter}
-        />
-      </PageWidthWrapper>
-    );
-  }
-}
+const useStateWithHandleChangeName = initialValue => {
+  const [state, setState] = useState(initialValue);
+
+  const handleChange = useCallback(event => {
+    const { name, value } = event.target;
+
+    setState(state => ({ ...state, [name]: value }));
+  }, []);
+
+  return [state, handleChange, setState];
+};
 
 export default Profile;
