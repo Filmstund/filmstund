@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useCallback } from "react";
 import styled from "styled-components";
 
 import copy from "../../../lib/copy";
@@ -17,28 +17,24 @@ const Hover = styled.span`
   text-decoration: ${props => (props.strikethrough ? "line-through" : "none")};
 `;
 
-class CopyValue extends Component {
-  state = { isStricken: false };
+const CopyValue = props => {
+  const [isStricken, setIsStricken] = useState(false);
 
-  onClick = () => {
-    const { useStricken = false } = this.props;
-    copy(this.props.text);
+  const onClick = useCallback(() => {
+    copy(props.text);
 
-    if (useStricken) {
-      this.setState(state => ({ isStricken: !state.isStricken }));
+    if (props.useStricken) {
+      setIsStricken(!isStricken);
     }
-  };
+  });
 
-  render() {
-    const { isStricken } = this.state;
-    return (
-      <div>
-        <Hover onClick={this.onClick} strikethrough={isStricken}>
-          {this.props.text}
-        </Hover>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Hover onClick={onClick} strikethrough={isStricken}>
+        {props.text}
+      </Hover>
+    </div>
+  );
+};
 
 export default CopyValue;
