@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useCallback } from "react";
 
 import DayPicker, { LocaleUtils } from "react-day-picker";
 import "./date-picker.css";
@@ -9,30 +9,25 @@ const localeUtils = {
   getFirstDayOfWeek: () => 1
 };
 
-class DatePicker extends Component {
-  handleClick = (day, modifiers) => {
+const DatePicker = ({ value, onChange, ...props }) => {
+  const handleClick = useCallback((day, modifiers) => {
     if (modifiers.disabled) {
       return;
     }
-    const { onChange } = this.props;
     onChange(day);
-  };
+  });
 
-  render() {
-    const { value, onChange, ...props } = this.props;
-
-    return (
-      <DayPicker
-        value={value}
-        onDayClick={this.handleClick}
-        formatDate={formatYMD}
-        localeUtils={localeUtils}
-        selectedDays={value}
-        showOutsideDays
-        {...props}
-      />
-    );
-  }
-}
+  return (
+    <DayPicker
+      value={value}
+      onDayClick={handleClick}
+      formatDate={formatYMD}
+      localeUtils={localeUtils}
+      selectedDays={value}
+      showOutsideDays
+      {...props}
+    />
+  );
+};
 
 export default DatePicker;
