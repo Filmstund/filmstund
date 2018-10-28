@@ -14,13 +14,19 @@ export const useApolloMutationResult = mutate => {
       },
       errors => {
         setResult({ success: false, errors });
+        throw errors;
       }
     );
+  });
+
+  const clearState = useCallback(() => {
+    setResult({ errors: null, success: false });
   });
 
   return {
     errors,
     success,
+    clearState,
     mutate: wrappedMutate
   };
 };
