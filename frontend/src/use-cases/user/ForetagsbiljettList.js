@@ -7,6 +7,7 @@ import EditableForetagsbiljettList from "./EditableForetagsbiljettList";
 
 const ForetagsbiljettList = ({
   addForetagsbiljett,
+  deleteForetagsbiljett,
   foretagsbiljetter = []
 }) => {
   const handleDeleteForetagsBiljett = useCallback(
@@ -14,7 +15,7 @@ const ForetagsbiljettList = ({
       switch (status) {
         case "Available":
           if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
-            this.props.deleteForetagsbiljett({ number, expires });
+            deleteForetagsbiljett({ number, expires });
           }
           break;
         case "Pending":
@@ -24,7 +25,7 @@ const ForetagsbiljettList = ({
           break;
         case "Used":
         case "Expired":
-          this.props.deleteForetagsbiljett({ number, expires });
+          deleteForetagsbiljett({ number, expires });
           break;
         default:
           throw new Error(`Invalid status ${status}`);
