@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import styled from "styled-components";
+import { uniqueId } from "lodash-es";
 
 import MainButton from "../../use-cases/common/ui/MainButton";
 import { formatYMD } from "../../lib/dateTools";
@@ -51,41 +52,56 @@ const EditableForetagsbiljettList = props => {
   );
 
   const addForetagsbiljett = useCallback(() => {
-    const foretagsbiljett = { number: "", expires: DEFAULT_DATE };
+    const foretagsbiljett = {
+      id: uniqueId("ftg-"),
+      number: "",
+      expires: DEFAULT_DATE
+    };
     setTickets(tickets => [...tickets, foretagsbiljett]);
   });
 
-  const handleChange = useCallback((index, value) => {
+  const handleChange = useCallback((id, event) => {
+    const { value } = event.target;
     setTickets(tickets => {
-      tickets[index].number = value;
-      return tickets;
+      return tickets.map(t => (t.id === id ? { ...t, number: value } : t));
     });
   });
-  const handleSetExpires = useCallback((index, value) => {
+  const handleSetExpires = useCallback((id, value) => {
     setTickets(tickets => {
-      tickets[index].expires = value;
-      return tickets;
+      return tickets.map(t => (t.id === id ? { ...t, expires: value } : t));
     });
   });
-  const handlePressRemove = useCallback(index => {
-    setTickets(tickets => [
-      ...tickets.slice(0, index),
-      ...tickets.slice(index + 1)
-    ]);
+  const handlePressRemove = useCallback(id => {
+    setTickets(tickets => {
+      console.log(id, tickets);
+
+      return tickets.filter(t => t.id !== id);
+    });
   });
+
+  useEffect(
+    () => {
+      console.log(tickets);
+    },
+    [tickets]
+  );
 
   return (
     <>
-      {tickets.map((biljett, index) => (
-        <Foretagsbiljett
-          key={index}
-          biljett={biljett}
-          editable={true}
-          handleChangeForetagsbiljett={v => handleChange(index, v)}
-          handleSetExpiresForetagsbiljett={v => handleSetExpires(index, v)}
-          handleRemoveForetagsbiljett={() => handlePressRemove(index)}
-        />
-      ))}
+      <div>
+        {tickets.map(biljett => (
+          <Foretagsbiljett
+            key={biljett.id}
+            biljett={biljett}
+            editable={true}
+            handleChangeForetagsbiljett={v => handleChange(biljett.id, v)}
+            handleSetExpiresForetagsbiljett={v =>
+              handleSetExpires(biljett.id, v)
+            }
+            handleRemoveForetagsbiljett={() => handlePressRemove(biljett.id)}
+          />
+        ))}
+      </div>
       <AddForetagsbiljettContainer onClick={addForetagsbiljett}>
         <IconButton size="2x" icon={faPlusCircle} />
       </AddForetagsbiljettContainer>
