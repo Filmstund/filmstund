@@ -36,9 +36,9 @@ const ForetagsbiljettList = ({
   return (
     <div>
       <SmallHeader>Företagsbiljetter</SmallHeader>
-      {foretagsbiljetter.map((biljett, index) => (
+      {foretagsbiljetter.map(biljett => (
         <Foretagsbiljett
-          key={index}
+          key={biljett.number}
           biljett={biljett}
           editable={false}
           handleRemoveForetagsbiljett={() =>

@@ -50,7 +50,6 @@ const localizeTicketStatus = status => {
 
 const Foretagsbiljett = ({
   biljett,
-  index,
   editable = true,
   handleChangeForetagsbiljett,
   handleSetExpiresForetagsbiljett,
@@ -63,7 +62,7 @@ const Foretagsbiljett = ({
           type="text"
           value={biljett.number}
           maxLength={11}
-          onChange={v => handleChangeForetagsbiljett(index, v)}
+          onChange={handleChangeForetagsbiljett}
         />
       ) : (
         <div>{biljett.number}</div>
@@ -73,7 +72,7 @@ const Foretagsbiljett = ({
       {editable ? (
         <DatePickerInput
           value={biljett.expires}
-          onChange={v => handleSetExpiresForetagsbiljett(index, v)}
+          onChange={handleSetExpiresForetagsbiljett}
         />
       ) : (
         <div>{formatYMD(biljett.expires)}</div>
@@ -86,7 +85,7 @@ const Foretagsbiljett = ({
     <IconButton
       size="2x"
       icon={faTrash}
-      onClick={() => handleRemoveForetagsbiljett(biljett, index)}
+      onClick={handleRemoveForetagsbiljett}
     />
   </ForetagsbiljettWrapper>
 );
