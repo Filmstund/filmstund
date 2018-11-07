@@ -17,6 +17,7 @@ import { promoteToAdmin } from "../../../apollo/mutations/showings";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
 import { MissingShowing } from "../../common/showing/MissingShowing";
+import { useScrollToTop } from "../../common/utils/useScrollToTop";
 
 const SingleShowingContainer = ({
   promoteToAdmin,
@@ -24,6 +25,8 @@ const SingleShowingContainer = ({
   history
 }) => {
   const [openModal, setOpenModal] = useState(false);
+
+  useScrollToTop();
 
   const navigateToTickets = useCallback(() => {
     navigateToShowingTickets(history, showing);
