@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import styled from "styled-components";
 
 import copy from "../../../lib/copy";
+import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
 const Hover = styled.span`
   &:hover {
@@ -11,7 +12,7 @@ const Hover = styled.span`
       padding-left: 1em;
       color: #222;
       content: "(Kopiera)";
-      font-size: 0.8em;
+      font-size: ${SMALL_FONT_SIZE};
     }
   }
   text-decoration: ${props => (props.strikethrough ? "line-through" : "none")};

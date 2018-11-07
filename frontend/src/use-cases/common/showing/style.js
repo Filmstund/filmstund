@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { largeMargin, margin } from "../../../lib/style-vars";
+import { largeMargin, margin, SMALL_FONT_SIZE } from "../../../lib/style-vars";
 import alfons from "../../../assets/alfons.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -50,7 +50,7 @@ export const FaIcon = styled(FontAwesomeIcon)`
 export const RedButton = styled.button`
   background-color: #d0021b;
   cursor: pointer;
-  font-size: 14px;
+  font-size: ${SMALL_FONT_SIZE};
   font-weight: 500;
   color: #fff;
   padding: ${largeMargin};
@@ -114,5 +114,5 @@ export const UserHead = styled.div`
 
 export const TicketRangeContainer = styled.div`
   margin-top: ${margin};
-  font-size: 14px;
+  font-size: ${SMALL_FONT_SIZE};
 `;

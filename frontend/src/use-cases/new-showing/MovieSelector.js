@@ -15,6 +15,7 @@ import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
 import { useFetchingStatus } from "../common/utils/useFetchingStatus";
 import { PageTitle } from "../common/utils/PageTitle";
+import { MEDIUM_FONT_SIZE } from "../../lib/style-vars";
 
 const SearchField = styled(Field)`
   max-width: 100%;
@@ -25,7 +26,7 @@ const RefreshButton = styled.button`
   background: none;
   border: 0;
   color: #b71c1c;
-  font-size: 16pt;
+  font-size: ${MEDIUM_FONT_SIZE};
   padding: 0 0.5em;
   cursor: pointer;
 `;
