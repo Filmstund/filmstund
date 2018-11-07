@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 
 export const Container = styled.div`
   height: 100%;
@@ -41,7 +42,7 @@ export const GoogleButton = styled.button`
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   padding: 0.5em 1em;
   font-family: Roboto, sans-serif;
-  font-size: 12pt;
+  font-size: ${MEDIUM_FONT_SIZE};
   background-color: #fff;
   color: #212121;
   cursor: pointer;

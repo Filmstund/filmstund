@@ -5,7 +5,7 @@ import gql from "graphql-tag";
 import { wrapMutate } from "../../store/apollo";
 import { keys, groupBy } from "lodash-es";
 
-import Header from "../common/ui/Header";
+import Header, { SmallHeader } from "../common/ui/Header";
 import Showing, {
   movieFragment,
   showingFragment
@@ -125,7 +125,7 @@ class CreateShowingForm extends React.Component {
     } else {
       return (
         <div>
-          <Header>Välj tid från SF</Header>
+          <SmallHeader>Välj tid från SF</SmallHeader>
           <Field text="Tid:">
             <SelectBox options={sfTimes} onChange={this.setShowingTime} />
           </Field>
@@ -195,7 +195,7 @@ class CreateShowingForm extends React.Component {
             />
           </Field>
           {this.renderSelectSfTime(sfdates[selectedDate], showing)}
-          <Header>...eller skapa egen tid</Header>
+          <SmallHeader>...eller skapa egen tid</SmallHeader>
           <Field text="Tid:">
             <Input
               type="time"

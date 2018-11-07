@@ -1,9 +1,10 @@
 import React from "react";
 import styled from "styled-components";
+import { MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 
 const EmptyListStyling = styled.div`
   display: flex;
-  font-size: 15px;
+  font-size: ${MEDIUM_FONT_SIZE};
   font-family: Roboto, sans-serif;
   justify-content: center;
   align-items: center;

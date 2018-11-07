@@ -1,7 +1,8 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { Link as RouterLink } from "react-router-dom";
+import { MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 
-const MainButtonStyles = css`
+const MainButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,7 +12,7 @@ const MainButtonStyles = css`
   border: 0;
   height: 3em;
   margin: 0.4rem 0 1.6rem 0;
-  font-size: 1.1em;
+  font-size: ${MEDIUM_FONT_SIZE};
   font-weight: 400;
   width: 100%;
   font-family: "Roboto", sans-serif;
@@ -29,9 +30,7 @@ const MainButtonStyles = css`
   }
 `;
 
-export const Link = styled(RouterLink)(MainButtonStyles);
-
-const MainButton = styled.button(MainButtonStyles);
+export const Link = MainButton.withComponent(RouterLink);
 
 export const GrayButton = styled(MainButton)`
   background-color: #bdbdbd;

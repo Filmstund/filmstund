@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { formatLocalTime } from "../../../lib/dateTools";
+import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
 const Option = styled.div`
   display: flex;
@@ -20,7 +21,7 @@ const Box = styled.div`
 const Lable = styled.div`
   display: inline-block;
   font-style: italic;
-  font-size: 0.9em;
+  font-size: ${SMALL_FONT_SIZE};
 `;
 
 const Tag = styled.div`
@@ -28,7 +29,7 @@ const Tag = styled.div`
   border-radius: 1.4em;
   background-color: #9b9b9b;
   color: white;
-  font-size: 0.7em;
+  font-size: ${SMALL_FONT_SIZE};
   padding: 0.4em;
   margin: 0 0.2em;
 `;
@@ -50,7 +51,9 @@ const SelectBox = ({ options, onChange, ...props }) => (
           {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          {option.tags.map(tag => (
+            <Tag key={tag}>{tag}</Tag>
+          ))}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>

@@ -1,10 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
 const Label = styled.label`
   display: inline-block;
   border-radius: 3px;
-  font-size: 1.1em;
+  font-size: ${SMALL_FONT_SIZE};
   padding: 0.5em 0;
 `;
 
@@ -25,7 +26,7 @@ export const FieldWithoutMaxWidth = styled(UnstyledField)`
   select {
     border-radius: 4px;
     border: 1px solid gray;
-    font-size: 1.1em;
+    font-size: ${SMALL_FONT_SIZE};
     padding: 0.5em 1em;
     width: 100%;
   }
