@@ -6,7 +6,7 @@ import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 
 import Field from "../../use-cases/common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
-import { margin } from "../../lib/style-vars";
+import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 import { formatYMD } from "../../lib/dateTools";
 
 const DatePickerInput = lazy(() =>
@@ -48,6 +48,9 @@ const localizeTicketStatus = status => {
   }
 };
 
+const ValueField = styled.div`
+  font-size: ${SMALL_FONT_SIZE};
+`;
 const Foretagsbiljett = ({
   biljett,
   editable = true,
@@ -65,17 +68,17 @@ const Foretagsbiljett = ({
           onChange={handleChangeForetagsbiljett}
         />
       ) : (
-        <div>{biljett.number}</div>
+        <ValueField>{biljett.number}</ValueField>
       )}
     </BiljettField>
     <BiljettField text="Utgångsdatum">
       {editable ? (
-        <DatePickerInput
+        <DateInput
           value={biljett.expires}
           onChange={handleSetExpiresForetagsbiljett}
         />
       ) : (
-        <div>{formatYMD(biljett.expires)}</div>
+        <ValueField>{formatYMD(biljett.expires)}</ValueField>
       )}
     </BiljettField>
     <BiljettField text="Status">
