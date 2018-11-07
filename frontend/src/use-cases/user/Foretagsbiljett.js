@@ -8,6 +8,7 @@ import Field from "../../use-cases/common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 import { formatYMD } from "../../lib/dateTools";
+import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
 
 const DatePickerInput = lazy(() =>
   import("../../use-cases/common/ui/date-picker/DatePickerInput")
@@ -51,6 +52,19 @@ const localizeTicketStatus = status => {
 const ValueField = styled.div`
   font-size: ${SMALL_FONT_SIZE};
 `;
+
+const isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+
+const DateInput = ({ onChange, ...props }) => {
+  const handleChange = useHandleChangeEvent(onChange);
+
+  if (isIOS) {
+    return <Input type="date" onChange={handleChange} {...props} />;
+  } else {
+    return <DatePickerInput onChange={onChange} {...props} />;
+  }
+};
+
 const Foretagsbiljett = ({
   biljett,
   editable = true,
@@ -81,9 +95,11 @@ const Foretagsbiljett = ({
         <ValueField>{formatYMD(biljett.expires)}</ValueField>
       )}
     </BiljettField>
-    <BiljettField text="Status">
-      {localizeTicketStatus(biljett.status)}
-    </BiljettField>
+    {biljett.status && (
+      <BiljettField text="Status">
+        <ValueField>{localizeTicketStatus(biljett.status)}</ValueField>
+      </BiljettField>
+    )}
 
     <IconButton
       size="2x"
