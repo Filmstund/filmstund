@@ -1,12 +1,14 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
+  height: 100%;
   display: grid;
   background-color: black;
 `;
 
 export const ContentContainer = styled.div`
-  display: grid;
+  display: flex;
+  flex-direction: column;
   background: white;
 `;
 
