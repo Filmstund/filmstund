@@ -19,6 +19,7 @@ const DatePicker = ({ value, onChange, ...props }) => {
 
   return (
     <DayPicker
+      initialMonth={value}
       value={value}
       onDayClick={handleClick}
       formatDate={formatYMD}
