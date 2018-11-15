@@ -162,7 +162,7 @@ class CreateShowingForm extends React.Component {
         <Header>Skapa besök</Header>
         <div>
           <Showing
-            date={showing.date}
+            date={formatYMD(showing.date) + " " + showing.time}
             adminId={showing.admin}
             location={locationName}
             movie={movie}
