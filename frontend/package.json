@@ -35,8 +35,8 @@
     "react-select": "2.1.2",
     "react-testing-library": "5.3.1",
     "recompose": "0.30.0",
-    "rollbar": "2.4.7",
-    "styled-components": "4.0.2",
+    "rollbar": "2.5.1",
+    "styled-components": "4.1.2",
     "whatwg-fetch": "3.0.0"
   },
   "scripts": {
