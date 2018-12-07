@@ -14,7 +14,7 @@ const QuoteBox = styled.div`
   }
 `;
 
-const TopBar = ({ children, number, faded }) => (
+const NavBar = ({ children, number, faded }) => (
   <QuoteBox faded={faded}>
     <blockquote>
       "<span>{children}</span>"
@@ -23,4 +23,4 @@ const TopBar = ({ children, number, faded }) => (
   </QuoteBox>
 );
 
-export default TopBar;
+export default NavBar;

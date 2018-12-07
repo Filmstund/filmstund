@@ -6,7 +6,7 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import Helmet from "react-helmet";
 
-import TopBar from "./use-cases/common/ui/TopBar";
+import NavBar from "./use-cases/common/ui/NavBar";
 import Footer from "./use-cases/common/ui/footer/Footer";
 import WelcomeModal from "./use-cases/common/utils/WelcomeModal";
 import { completeUserFragment } from "./apollo/queries/currentUser";
@@ -58,7 +58,7 @@ const App = ({ data: { me }, signout }) => (
     <Helmet titleTemplate="%s | itbio" />
     <WelcomeModal me={me} />
     <ScrollContainer>
-      <TopBar signout={signout} />
+      <NavBar signout={signout} />
       <MainGridContainer>
         <Suspense fallback={<Loader />}>
           <Switch>

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { NavLink as RouterLink } from "react-router-dom";
 import styled from "styled-components";
 
-const TopBarBackground = styled.div`
+const NavBarBackground = styled.div`
   background-color: #b71c1c;
   position: sticky;
   top: 0;
@@ -10,7 +10,7 @@ const TopBarBackground = styled.div`
   width: 100%;
 `;
 
-const TopBarLinksContainer = styled.div`
+const NavBarLinksContainer = styled.div`
   padding: 1rem 0;
   display: flex;
   justify-content: space-between;
@@ -36,12 +36,12 @@ const Link = styled(RouterLink)`
   }
 `;
 
-class TopBar extends Component {
+class NavBar extends Component {
   render() {
     const { signout } = this.props;
     return (
-      <TopBarBackground>
-        <TopBarLinksContainer>
+      <NavBarBackground>
+        <NavBarLinksContainer>
           <div>
             <Link to="/">Mina besök</Link>
             <Link to="/showings">Alla besök</Link>
@@ -50,10 +50,10 @@ class TopBar extends Component {
             <Link to="/user">Profil</Link>
             <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
           </div>
-        </TopBarLinksContainer>
-      </TopBarBackground>
+        </NavBarLinksContainer>
+      </NavBarBackground>
     );
   }
 }
 
-export default TopBar;
+export default NavBar;
