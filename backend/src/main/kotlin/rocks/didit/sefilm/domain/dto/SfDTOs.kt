@@ -17,7 +17,7 @@ data class SfMovieDTO(
   val title: String,
   val releaseDate: LocalDate,
   val rating: SfRatingDTO,
-  val posterUrl: String,
+  val posterUrl: String?,
   val slug: String,
   val length: Int?,
   val genres: List<SfGenreDTO> = listOf()

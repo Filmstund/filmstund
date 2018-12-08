@@ -28,7 +28,7 @@ class SFService(
 ) {
 
   companion object {
-    private const val API_URL = "https://www.sf.se/api"
+    private const val API_URL = "https://www.filmstaden.se/api"
     private const val SHOW_URL = "$API_URL/v2/show/sv/1/200"
     private const val CINEMA_URL = "$API_URL/v2/cinema/sv/1/200"
     private const val MOVIES_URL = "$API_URL/v2/movie/sv/1/1000"
