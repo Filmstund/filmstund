@@ -1,7 +1,6 @@
 import React from "react";
 import { Header } from "../ui/RedHeader";
-import faQrcode from "@fortawesome/fontawesome-free-solid/faQrcode";
-import faChevronRight from "@fortawesome/fontawesome-free-solid/faChevronRight";
+import { faQrcode, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { formatShowingDateTime } from "../../../lib/dateTools";
 import LazyLoad from "react-lazyload";
 import gql from "graphql-tag";

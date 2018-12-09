@@ -7,7 +7,7 @@ import Movie from "../common/showing/Movie";
 import styled from "styled-components";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import faSync from "@fortawesome/fontawesome-free-solid/faSyncAlt";
+import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 
 import Field from "../common/ui/Field";
 import Input from "../common/ui/Input";
@@ -69,7 +69,7 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
       <PageTitle title="Skapa besök" />
       <FlexHeader>
         <RefreshButton role="button" onClick={requestData}>
-          <FontAwesomeIcon icon={faSync} spin={fetching} />
+          <FontAwesomeIcon icon={faSyncAlt} spin={fetching} />
         </RefreshButton>
         Skapa besök
       </FlexHeader>

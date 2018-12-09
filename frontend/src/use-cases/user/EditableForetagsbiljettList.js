@@ -6,7 +6,7 @@ import { uniqueId } from "lodash-es";
 import MainButton from "../../use-cases/common/ui/MainButton";
 import { formatYMD } from "../../lib/dateTools";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
-import faPlusCircle from "@fortawesome/fontawesome-free-solid/faPlusCircle";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 
 import { margin } from "../../lib/style-vars";
