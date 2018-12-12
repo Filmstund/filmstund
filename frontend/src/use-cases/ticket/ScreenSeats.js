@@ -2,14 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import { minBy, maxBy, flatMap } from "lodash-es";
 
-const Seat = styled.div.attrs({
-  style: ({ x, y, scaleX, scaleY, height, width }) => ({
+const Seat = styled.div.attrs(({ x, y, scaleX, scaleY, height, width }) => ({
+  style: {
     top: y * scaleY,
     left: x * scaleX,
     height: height * scaleY,
     width: width * scaleX
-  })
-})`
+  }
+}))`
   position: absolute;
   background-color: ${props => (props.selected ? "#d0021b" : "#9b9b9b")};
 `;

@@ -6,20 +6,20 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
     class="sc-jzJRlG jltfoM"
   >
     <button
-      class="sc-htpNat eTZpTS"
+      class="sc-bwzfXH dwVoQl"
     >
       Tillbaka till visning
     </button>
     <h3
-      class="sc-kgoBCf fSkEwE"
+      class="sc-kgoBCf dUYGXL"
     >
       Våra platser:
     </h3>
     <div
-      class="sc-kpOJdX kwGIAS"
+      class="sc-kpOJdX lrjBj"
     >
       <label
-        class="sc-kGXeez fnbPCT"
+        class="sc-kGXeez gniceC"
       >
         Lägg till SF-bokningslänkar
       </label>
@@ -29,7 +29,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         rows="5"
       />
       <button
-        class="sc-htpNat eTZpTS"
+        class="sc-bwzfXH dwVoQl"
       >
         Skicka
       </button>
