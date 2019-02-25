@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 
 import styled from "styled-components";
 import { uniqueId } from "lodash-es";
@@ -37,19 +37,16 @@ const EditableForetagsbiljettList = props => {
     mutate: saveForetagsBiljetter
   } = useApolloMutationResult(props.addForetagsbiljett);
 
-  const onClickSubmit = useCallback(
-    () => {
-      const ticketsToSubmit = tickets
-        .filter(({ number }) => number && number.trim())
-        .map(({ number, expires }) => ({
-          number,
-          expires: formatYMD(expires)
-        }));
+  const onClickSubmit = useCallback(() => {
+    const ticketsToSubmit = tickets
+      .filter(({ number }) => number && number.trim())
+      .map(({ number, expires }) => ({
+        number,
+        expires: formatYMD(expires)
+      }));
 
-      return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
-    },
-    [tickets]
-  );
+    return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
+  }, [tickets]);
 
   const addForetagsbiljett = useCallback(() => {
     const foretagsbiljett = {
@@ -73,18 +70,9 @@ const EditableForetagsbiljettList = props => {
   });
   const handlePressRemove = useCallback(id => {
     setTickets(tickets => {
-      console.log(id, tickets);
-
       return tickets.filter(t => t.id !== id);
     });
   });
-
-  useEffect(
-    () => {
-      console.log(tickets);
-    },
-    [tickets]
-  );
 
   return (
     <>
