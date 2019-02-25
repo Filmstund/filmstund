@@ -61,7 +61,7 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
       orderBy(movies, ["popularity", "releaseDate"], ["desc", "asc"]).filter(
         filterFn
       ),
-    [movies, searchTerm]
+    [filterFn, movies]
   );
 
   return (

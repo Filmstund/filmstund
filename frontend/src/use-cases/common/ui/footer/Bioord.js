@@ -37,7 +37,7 @@ const useFadeBetweenValues = (values, getNextValue) => {
         clearInterval(id);
       };
     },
-    [values]
+    [getNextValue, values]
   );
 
   return { faded, value };

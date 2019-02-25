@@ -37,16 +37,19 @@ const EditableForetagsbiljettList = props => {
     mutate: saveForetagsBiljetter
   } = useApolloMutationResult(props.addForetagsbiljett);
 
-  const onClickSubmit = useCallback(() => {
-    const ticketsToSubmit = tickets
-      .filter(({ number }) => number && number.trim())
-      .map(({ number, expires }) => ({
-        number,
-        expires: formatYMD(expires)
-      }));
+  const onClickSubmit = useCallback(
+    () => {
+      const ticketsToSubmit = tickets
+        .filter(({ number }) => number && number.trim())
+        .map(({ number, expires }) => ({
+          number,
+          expires: formatYMD(expires)
+        }));
 
-    return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
-  }, [tickets]);
+      return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
+    },
+    [saveForetagsBiljetter, tickets]
+  );
 
   const addForetagsbiljett = useCallback(() => {
     const foretagsbiljett = {

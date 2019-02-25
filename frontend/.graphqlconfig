@@ -1,0 +1,13 @@
+{
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "dev": {
+        "url": "http://localhost:8080/graphql",
+        "headers": {
+            "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjcyOGY0MDE2NjUyMDc5YjllZDk5ODYxYmIwOWJhZmM1YTQ1YmFhODYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNjkyMDY0MTcyNjc1LW1vbnRhYjlwaTU3MzA0ZTY4cjkzMmM2bG03MTExb2FmLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNjkyMDY0MTcyNjc1LW1vbnRhYjlwaTU3MzA0ZTY4cjkzMmM2bG03MTExb2FmLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTEwNTczNTc0MzExNDI0NTgwMTE3IiwiZW1haWwiOiJqb2hhbi5saW5kc2tvZ2VuQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoicjNUUEtDcEEzSlJrX21OREtjWk1WUSIsIm5hbWUiOiJKb2hhbiBMaW5kc2tvZ2VuIiwicGljdHVyZSI6Imh0dHBzOi8vbGg1Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tZ1pGNGdDQjBxcUEvQUFBQUFBQUFBQUkvQUFBQUFBQUFKS2svMnJWckNDRl93QlEvczk2LWMvcGhvdG8uanBnIiwiZ2l2ZW5fbmFtZSI6IkpvaGFuIiwiZmFtaWx5X25hbWUiOiJMaW5kc2tvZ2VuIiwibG9jYWxlIjoic3YiLCJpYXQiOjE1Mzk5NjY1MzksImV4cCI6MTUzOTk3MDEzOSwianRpIjoiOGFiYTc0ZjBjYWE4NmY5M2JhMTA1NDU1YjE3YjgwNTQ5MDQ5ZWIxMCJ9.WShGH8Sg2zjCbv9f7AxZdAPIalHJBgbLNuWHJJ56Sm0uM5FI9v7nA1ipQIEAxba5rNSA5GOV3HkhPOMRNrDfjWyexWo4dZGHlg4d6jiwiKgDYCntypaPyXIxBavp9dx5UMZP5YzIzH-QJQxm9olcLkbkaKMeJNkYkhvwS2sEooQUxslJ8dLWVeW8fu_sZIfJJS3WmQ7iTaCg6VTkzdTo1xHR7HWQL0PuLkrqgJs8dVFNKa63kCoLhhbzZIPaRUNxc_dPE7gZBmRpowB-r9U7gWi1DYyQVIRzBuYAqY5SSifo296oKVw24rywlE1qlrrGkqy9k95k6N11l0uS93Bjrw"
+        }
+      }
+    }
+  }
+}

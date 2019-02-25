@@ -32,24 +32,33 @@ const GlobalStyles = createGlobalStyle`
 
 class Root extends Component {
   state = {
+    error: null,
     hasError: false
   };
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error, info) {
     return {
+      error,
       hasError: true
     };
   }
 
   componentDidCatch(error, info) {
+    console.log(error, info.componentStack);
+
     rollbar.error("Root didCatch", error, info.componentStack);
   }
 
   render() {
-    const { hasError } = this.state;
+    const { hasError, error } = this.state;
 
     if (hasError) {
-      return "Something went wrong!";
+      return (
+        <div>
+          <div>Something went wrong:</div>
+          <pre>{error.stack}</pre>
+        </div>
+      );
     }
 
     return (
