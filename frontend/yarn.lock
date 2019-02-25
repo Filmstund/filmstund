@@ -8786,10 +8786,10 @@ react-select@2.1.2:
     react-input-autosize "^2.2.1"
     react-transition-group "^2.2.1"
 
-react-testing-library@5.5.4:
-  version "5.5.4"
-  resolved "https://registry.yarnpkg.com/react-testing-library/-/react-testing-library-5.5.4.tgz#25321f78c41c7ec882a9e858f0e20d71a66a5338"
-  integrity sha512-uXt1iQMY2kU756KbjsNkWtn+uZy8ZSpCmd8bDJZXavZoczhCUndk1LdBCaR/07tHnbTqc8c0ziEMJiaGxU+Xpw==
+react-testing-library@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/react-testing-library/-/react-testing-library-6.0.0.tgz#81edfcfae8a795525f48685be9bf561df45bb35d"
+  integrity sha512-h0h+YLe4KWptK6HxOMnoNN4ngu3W8isrwDmHjPC5gxc+nOZOCurOvbKVYCvvuAw91jdO7VZSm/5KR7TxKnz0qA==
   dependencies:
     "@babel/runtime" "^7.3.1"
     dom-testing-library "^3.13.1"
