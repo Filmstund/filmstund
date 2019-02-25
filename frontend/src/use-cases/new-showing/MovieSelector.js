@@ -4,7 +4,7 @@ import { orderBy } from "lodash-es";
 import Header from "../common/ui/Header";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import Movie from "../common/showing/Movie";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";

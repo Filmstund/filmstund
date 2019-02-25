@@ -11,7 +11,7 @@ import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { navigateToShowing } from "../common/navigators/index";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { margin } from "../../lib/style-vars";
 import addDays from "date-fns/add_days";
 import { LocationSelect } from "../common/ui/LocationSelect";

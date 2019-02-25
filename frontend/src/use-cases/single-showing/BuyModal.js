@@ -1,6 +1,7 @@
-import React from "react";
+/** @jsx jsx */
+import { jsx } from "@emotion/core";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 import Modal from "../../use-cases/common/ui/Modal";
 import Field from "../../use-cases/common/ui/Field";
@@ -35,14 +36,14 @@ const TicketList = ({ tickets }) => (
   <div>
     <SmallHeader>Deltagare</SmallHeader>
     {tickets.map(ticket => (
-      <div key={ticket.user.id} style={{ display: "flex" }}>
+      <div key={ticket.user.id} css={{ display: "flex" }}>
         <div>
           <UserFullName user={ticket.user} />
         </div>
-        <div style={{ flex: 1, paddingLeft: "1rem" }}>
+        <div css={{ flex: 1, paddingLeft: "1rem" }}>
           <CopyValue useStricken text={ticket.foretagsbiljett} />
         </div>
-        <div style={{ flex: 1, paddingLeft: "1rem" }}>
+        <div css={{ flex: 1, paddingLeft: "1rem" }}>
           <CopyValue useStricken text={ticket.sfMembershipId} />
         </div>
       </div>

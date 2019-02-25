@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { largeMargin, margin, SMALL_FONT_SIZE } from "../../../lib/style-vars";
 import alfons from "../../../assets/alfons.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

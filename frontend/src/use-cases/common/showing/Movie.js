@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { formatShowingDate, getTodaysDate } from "../../../lib/dateTools";
 import PosterBox from "../ui/PosterBox";
 import gql from "graphql-tag";

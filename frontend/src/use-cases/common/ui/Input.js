@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
 const Input = styled.input`

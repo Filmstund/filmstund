@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 export const StatusBox = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);

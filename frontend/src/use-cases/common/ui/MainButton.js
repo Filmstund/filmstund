@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { Link as RouterLink } from "react-router-dom";
 import { MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 

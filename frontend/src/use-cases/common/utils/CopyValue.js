@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 import copy from "../../../lib/copy";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";

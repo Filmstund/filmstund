@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { margin, MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 
 const Box = styled.div`

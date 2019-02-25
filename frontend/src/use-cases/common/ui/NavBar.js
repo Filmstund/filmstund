@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink as RouterLink } from "react-router-dom";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 const NavBarBackground = styled.div`
   background-color: #b71c1c;

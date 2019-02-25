@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import Field, { FieldWithoutMaxWidth } from "../../use-cases/common/ui/Field";
 import MainButton from "../../use-cases/common/ui/MainButton";
 import CopyValue from "../../use-cases/common/utils/CopyValue";

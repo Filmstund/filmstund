@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import gql from "graphql-tag";
 import { formatShowingDateTime } from "../../../lib/dateTools";
 import PosterBox from "../ui/PosterBox";

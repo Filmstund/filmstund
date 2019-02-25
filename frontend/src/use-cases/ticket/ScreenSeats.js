@@ -1,18 +1,11 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { minBy, maxBy, flatMap } from "lodash-es";
 
-const Seat = styled.div.attrs(({ x, y, scaleX, scaleY, height, width }) => ({
-  style: {
-    top: y * scaleY,
-    left: x * scaleX,
-    height: height * scaleY,
-    width: width * scaleX
-  }
-}))`
-  position: absolute;
-  background-color: ${props => (props.selected ? "#d0021b" : "#9b9b9b")};
-`;
+const Seat = styled.div(({ selected }) => ({
+  backgroundColor: selected ? "#d0021b" : "#9b9b9b",
+  position: "absolute"
+}));
 
 const Screen = styled.div`
   position: relative;
@@ -52,14 +45,14 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
     <Screen height={maxHeight}>
       {seatMap.map(data => (
         <Seat
+          style={{
+            top: parseInt((data.coordinates.y - minY) * scaleY, 10),
+            left: parseInt((data.coordinates.x - minX) * scaleX, 10),
+            height: parseInt(height * scaleY, 10),
+            width: parseInt(width * scaleX, 10)
+          }}
           key={data.number}
           selected={numbers.includes(data.number)}
-          scaleX={scaleX}
-          scaleY={scaleY}
-          x={data.coordinates.x - minX}
-          y={data.coordinates.y - minY}
-          width={width}
-          height={height}
         />
       ))}
     </Screen>

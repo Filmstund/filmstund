@@ -8,6 +8,8 @@
     "webpack-bundle-analyzer": "3.0.4"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.7",
+    "@emotion/styled": "^10.0.7",
     "@fortawesome/fontawesome-free": "5.6.0",
     "@fortawesome/fontawesome-svg-core": "1.2.9",
     "@fortawesome/free-solid-svg-icons": "5.6.0",
@@ -36,7 +38,6 @@
     "react-testing-library": "6.0.0",
     "recompose": "0.30.0",
     "rollbar": "2.5.1",
-    "styled-components": "4.1.2",
     "whatwg-fetch": "3.0.0"
   },
   "scripts": {

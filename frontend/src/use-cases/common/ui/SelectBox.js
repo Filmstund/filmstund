@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 

@@ -1,28 +1,16 @@
-import styled, { css } from "styled-components";
+import styled from "@emotion/styled";
 
-const FlexComponent = styled.div`
-  display: flex;
-  ${props =>
-    props.flex === true &&
-    css`
-      flex: 1;
-    `};
-  ${props =>
-    props.justifyContent &&
-    css`
-      justify-content: ${props.justifyContent};
-    `};
-  ${props =>
-    props.alignItems &&
-    css`
-      align-items: ${props.alignItems};
-    `};
-`;
+const FlexComponent = styled.div({
+  display: "flex",
+  flex: props => props.flex && 1,
+  justifyContent: props => props.justifyContent && props.justifyContent,
+  alignItems: props => props.alignItems && props.alignItems
+});
 
-export const Row = FlexComponent.extend`
-  flex-direction: row;
-`;
+export const Row = styled(FlexComponent)({
+  flexDirection: "row"
+});
 
-export const Column = FlexComponent.extend`
-  flex-direction: column;
-`;
+export const Column = styled(FlexComponent)({
+  flexDirection: "column"
+});

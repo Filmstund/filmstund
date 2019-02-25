@@ -3,7 +3,7 @@ import { Route, Switch } from "react-router-dom";
 import { graphql } from "react-apollo";
 import { compose, branch, renderComponent } from "recompose";
 import gql from "graphql-tag";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 import NavBar from "./use-cases/common/ui/NavBar";
 import Footer from "./use-cases/common/ui/footer/Footer";

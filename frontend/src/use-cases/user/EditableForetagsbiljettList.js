@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { uniqueId } from "lodash-es";
 
 import MainButton from "../../use-cases/common/ui/MainButton";

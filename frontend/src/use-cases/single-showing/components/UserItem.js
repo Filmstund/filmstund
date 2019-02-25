@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import gql from "graphql-tag";
 
 const pointerHover = `
@@ -40,7 +40,7 @@ const UserItem = ({ className, showPhone, user, children }) => (
   </div>
 );
 
-UserItem.fragments = {
+export const fragments = {
   user: gql`
     fragment UserItem on User {
       avatar

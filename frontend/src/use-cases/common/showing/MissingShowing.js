@@ -1,4 +1,5 @@
-import React from "react";
+/** @jsx jsx */
+import { jsx } from "@emotion/core";
 import { PageWidthWrapper } from "../ui/PageWidthWrapper";
 
 import alfons from "../../../assets/alfons.jpg";
@@ -6,9 +7,9 @@ import Header, { SmallHeader } from "../ui/Header";
 
 export const MissingShowing = () => (
   <PageWidthWrapper>
-    <div style={{ backgroundColor: "#fff" }}>
+    <div css={{ backgroundColor: "#fff" }}>
       <div
-        style={{
+        css={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center"
@@ -17,7 +18,7 @@ export const MissingShowing = () => (
         <Header>Det finns ingen sådan visning</Header>
       </div>
       <div
-        style={{
+        css={{
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "center",
@@ -26,7 +27,7 @@ export const MissingShowing = () => (
       >
         <SmallHeader>Kanske någon har raderat den...?</SmallHeader>
         <div
-          style={{
+          css={{
             alignSelf: "flex-end",
             backgroundImage: `url(${alfons})`,
             height: 50,
