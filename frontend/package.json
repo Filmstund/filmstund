@@ -41,6 +41,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "lint": "eslint src",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
     "eject": "react-scripts eject"

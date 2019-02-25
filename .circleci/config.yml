@@ -38,7 +38,10 @@ jobs:
             - frontend/node_modules
       - run: |
           cd frontend
-          yarn run test
+          yarn lint
+      - run: |
+          cd frontend
+          yarn test
   build-docker:
     <<: *defaults
     machine: true
@@ -81,4 +84,3 @@ workflows:
             branches:
               only:
                 - master
-
