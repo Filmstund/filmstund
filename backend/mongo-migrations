@@ -1,4 +1,7 @@
 ### Pending migrations ###
+N/A
+
+### Migrations already done in deployed application ###
 # Change fields to @DBRef on all showings
 db.showing.find({}).forEach(s => {
     s.movie = {
@@ -22,8 +25,6 @@ db.showing.find({}).forEach(s => {
     db.showing.save(s);
 });
 
-
-### Migrations already done in deployed application ###
 #
 # Add archived flag
 db.movie.update({}, {$set: {"archived": false}}, {upsert: false, multi:true})
