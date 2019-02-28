@@ -24,6 +24,7 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
+import rocks.didit.sefilm.web.controllers.MetaController
 import java.time.Instant
 
 class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
@@ -70,8 +71,6 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
     val principal = authentication.principal as OpenIdConnectUserDetails?
       ?: throw IllegalStateException("Successful authentication without a principal")
 
-    log.debug("User logged in: ${principal.getName()} (${principal.userId})")
-
     val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
     if (maybeUser == null) {
       val newUser = User(
@@ -96,8 +95,7 @@ class LoginListener(private val userRepository: UserRepository) : ApplicationLis
         lastLogin = Instant.now()
       )
       if (maybeUser != updatedUser) {
-        val savedUser = userRepository.save(updatedUser)
-        log.info("Updated user ${savedUser.name} (${savedUser.id})")
+        userRepository.save(updatedUser)
       }
     }
   }
@@ -125,6 +123,7 @@ class ResourceServerConfig(
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
+      .antMatchers(HttpMethod.GET, "${MetaController.PATH}/**").permitAll()
       .anyRequest().fullyAuthenticated()
   }
 

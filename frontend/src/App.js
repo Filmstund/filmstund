@@ -1,79 +1,84 @@
-import React from "react";
-import { Route, Switch, Redirect } from "react-router-dom";
+import React, { Suspense, lazy } from "react";
+import { Route, Switch } from "react-router-dom";
 import { graphql } from "react-apollo";
 import { compose, branch, renderComponent } from "recompose";
 import gql from "graphql-tag";
-import styled from "styled-components";
-import Helmet from "react-helmet";
+import styled from "@emotion/styled";
 
-import asyncComponent from "./AsyncComponent";
-import TopBar from "./TopBar";
-import Footer from "./footer/Footer";
-import WelcomeModal from "./WelcomeModal";
-import { completeUserFragment } from "./fragments/currentUser";
-import Loader from "./ProjectorLoader";
-import { UUIDToWebId } from "./UUIDToWebId";
+import NavBar from "./use-cases/common/ui/NavBar";
+import Footer from "./use-cases/common/ui/footer/Footer";
+import WelcomeModal from "./use-cases/common/utils/WelcomeModal";
+import { completeUserFragment } from "./apollo/queries/currentUser";
+import Loader from "./use-cases/common/utils/ProjectorLoader";
+import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
+import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
 
-const PaddingContainer = styled.div`
-  padding: 1em;
-`;
-
-const ScrollContainer = styled.div`
-  -webkit-overflow-scrolling: touch;
-  display: flex;
+const MainGridContainer = styled.div`
   flex: 1;
-  flex-direction: column;
+  grid-area: content;
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(
+      1rem,
+      1fr
+    );
+  grid-template-rows: min-content auto;
+  grid-template-areas:
+    "jumbo jumbo jumbo"
+    ". center .";
   background-color: #f8f8f8;
+  align-items: start;
 `;
 
-const AsyncHome = asyncComponent(() => import("./routes/Home"));
-const AsyncUser = asyncComponent(() => import("./routes/User"));
-const AsyncShowings = asyncComponent(() => import("./routes/Showings"));
-const AsyncNewShowing = asyncComponent(() => import("./routes/NewShowing"));
-const AsyncEditShowing = asyncComponent(() => import("./routes/EditShowing"));
-const AsyncShowingTickets = asyncComponent(() =>
-  import("./routes/ShowingTickets")
+const AsyncHome = lazy(() => import("./use-cases/my-showings/Home"));
+const AsyncUser = lazy(() => import("./use-cases/user/index"));
+const AsyncShowings = lazy(() => import("./use-cases/showings-list/Showings"));
+const AsyncNewShowing = lazy(() =>
+  import("./use-cases/new-showing/NewShowing")
 );
-const AsyncSingleShowing = asyncComponent(() =>
-  import("./routes/SingleShowing")
+const AsyncEditShowing = lazy(() =>
+  import("./use-cases/edit-showing/EditShowing")
+);
+const AsyncShowingTickets = lazy(() =>
+  import("./use-cases/showing-tickets/index")
+);
+const AsyncSingleShowing = lazy(() =>
+  import("./use-cases/single-showing/screen/SingleShowingScreen")
 );
 
 const App = ({ data: { me }, signout }) => (
-  <React.Fragment>
-    <Helmet titleTemplate="%s | itbio" />
-    <WelcomeModal me={me} />
-    <TopBar signout={signout} />
-    <ScrollContainer>
-      <PaddingContainer>
-        <Switch>
-          <Route exact path="/" component={AsyncHome} />
-          <Route path="/user" component={AsyncUser} />
-          <Route exact path="/showings" component={AsyncShowings} />
-          <Route path="/showings/new/:movieId?" component={AsyncNewShowing} />
-          <Route
-            path="/showings/:webId/:slug/tickets"
-            component={AsyncShowingTickets}
-          />
-          <Route
-            path="/showings/:webId/:slug/edit"
-            component={AsyncEditShowing}
-          />
-          <Route path="/showings/:webId/:slug" component={AsyncSingleShowing} />
-          <Route
-            path="/showings/:showingId/:rest?"
-            render={props => (
-              <UUIDToWebId {...props.match.params}>
-                {({ webId, slug }) => (
-                  <Redirect to={`/showings/${webId}/${slug}`} />
-                )}
-              </UUIDToWebId>
-            )}
-          />
-        </Switch>
-      </PaddingContainer>
-    </ScrollContainer>
-    <Footer />
-  </React.Fragment>
+  <>
+    <PageTitleTemplate titleTemplate="%s | sefilm">
+      <WelcomeModal me={me} />
+      <NavBar signout={signout} />
+      <MainGridContainer>
+        <Suspense fallback={<Loader />}>
+          <Switch>
+            <Route exact path="/" children={<AsyncHome />} />
+            <Route path="/user" children={<AsyncUser />} />
+            <Route exact path="/showings" children={<AsyncShowings />} />
+            <Route
+              path="/showings/new/:movieId?"
+              children={<AsyncNewShowing />}
+            />
+            <Route
+              path="/showings/:webId/:slug/tickets"
+              children={<AsyncShowingTickets />}
+            />
+            <Route
+              path="/showings/:webId/:slug/edit"
+              children={<AsyncEditShowing />}
+            />
+            <Route
+              path="/showings/:webId/:slug"
+              children={<AsyncSingleShowing />}
+            />
+            <Route children={<MissingShowing />} />
+          </Switch>
+        </Suspense>
+      </MainGridContainer>
+      <Footer />
+    </PageTitleTemplate>
+  </>
 );
 
 const data = graphql(gql`
@@ -87,4 +92,7 @@ const data = graphql(gql`
 
 const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
-export default compose(data, isLoading)(App);
+export default compose(
+  data,
+  isLoading
+)(App);

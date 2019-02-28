@@ -7,15 +7,14 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.services.external.SFService
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component
 @ConditionalOnProperty(
-  prefix = "sefilm.schedulers.archiver",
-  name = ["enabled"],
+  prefix = "sefilm.schedulers.enabled", name = ["archiver"],
   matchIfMissing = true,
   havingValue = "true"
 )

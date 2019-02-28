@@ -1,42 +1,61 @@
 package rocks.didit.sefilm.services
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.Företagsbiljett
+import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SfMembershipId
 import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
-import rocks.didit.sefilm.domain.dto.LimitedUserDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
-import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.domain.dto.*
+import rocks.didit.sefilm.notification.MailSettings
+import rocks.didit.sefilm.notification.NotificationSettings
+import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.orElseThrow
+import rocks.didit.sefilm.services.external.PushoverService
+import rocks.didit.sefilm.services.external.PushoverValidationStatus
 import java.util.*
 
-@Component
+@Service
 class UserService(
   private val userRepo: UserRepository,
+                  private val pushoverService: PushoverService?,
   private val foretagsbiljettService: ForetagsbiljettService
 ) {
+
+  private val log: Logger = LoggerFactory.getLogger(this.javaClass)
   fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
   fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
   fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
+  fun getUsersThatWantToBeNotified(knownRecipients: List<UserID>): List<User> {
+    return knownRecipients.let {
+      when (it.isEmpty()) {
+        true -> userRepo.findAll()
+        false -> userRepo.findAllById(it)
+      }
+    }.filter {user ->
+      user.notificationSettings.let { s ->
+        s.notificationsEnabled && s.providerSettings.any { it.enabled }
+      }
+    }
+  }
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
-  fun getCompleteUser(id: UserID): User? = userRepo.findById(id)
-    .orElse(null)
+  fun getCompleteUser(id: UserID): User
+    = userRepo.findById(id)
+    .orElseThrow { NotFoundException("user", userID = id) }
 
-  fun currentUser(): UserDTO {
-    val userID = currentLoggedInUser()
-    return getCompleteUser(userID)
-      ?.toDTO()
-      .orElseThrow { NotFoundException("current user", userID) }
+  fun getCurrentUser(): UserDTO {
+    return currentLoggedInUser().let {
+      getCompleteUser(it).toDTO()
+    }
   }
 
   fun currentUserOrNull(): User? {
@@ -72,29 +91,53 @@ class UserService(
     return userRepo.save(updatedUser).toDTO()
   }
 
+  // TODO: listen for PushoverUserKeyInvalid and disable the key
+  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO {
+    val currentUser = getUserEntityForCurrentUser()
+
+    val mailSettings = notificationInput.mail.let {
+      MailSettings(it?.enabled ?: false, it?.mailAddress ?: "${currentUser.firstName?.toLowerCase()}@example.org")
+    }
+    val pushoverSettings = notificationInput.pushover?.let {
+
+      val validatedUserKeyStatus =
+        when (it.enabled) {
+          true -> pushoverService?.validateUserKey(it.userKey, it.device) ?: PushoverValidationStatus.UNKNOWN
+          false -> PushoverValidationStatus.UNKNOWN
+        }
+
+      PushoverSettings(it.enabled, it.userKey, it.device, validatedUserKeyStatus)
+    } ?: PushoverSettings()
+
+    return currentUser.copy(
+      notificationSettings = NotificationSettings(
+        notificationInput.notificationsEnabled,
+        notificationInput.enabledTypes,
+        listOf(mailSettings, pushoverSettings))
+    ).let {
+      userRepo.save(it)
+    }.also {
+      log.trace("Update notification settings for user={} settings to={}", it.id, it.notificationSettings)
+    }.toDTO()
+  }
+
   fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO? = userRepo
     .findByCalendarFeedId(calendarFeedId)
     ?.toDTO()
 
   fun invalidateCalendarFeedId(): UserDTO {
-    return userRepo
-      .save(
-        getUserEntityForCurrentUser()
-          .copy(calendarFeedId = UUID.randomUUID())
-      )
-      .toDTO()
+    return getUserEntityForCurrentUser()
+      .copy(calendarFeedId = UUID.randomUUID())
+      .let { userRepo.save(it) }.toDTO()
   }
 
   fun disableCalendarFeed(): UserDTO {
-    return userRepo
-      .save(
-        getUserEntityForCurrentUser()
-          .copy(calendarFeedId = null)
-      )
-      .toDTO()
+    return getUserEntityForCurrentUser()
+      .copy(calendarFeedId = null)
+      .let { userRepo.save(it) }.toDTO()
   }
 
-  private fun User.toDTO() = UserDTO(
+  fun User.toDTO() = UserDTO(
     this.id,
     this.name,
     this.firstName,
@@ -105,12 +148,13 @@ class UserService(
     this.phone?.number,
     this.avatar,
     this.foretagsbiljetter.map { it.toDTO() },
+    this.notificationSettings,
     this.lastLogin,
     this.signupDate,
     this.calendarFeedId
   )
 
-  private fun Företagsbiljett.toDTO(): ForetagsbiljettDTO {
+  private fun Foretagsbiljett.toDTO(): ForetagsbiljettDTO {
     return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))
   }
 }

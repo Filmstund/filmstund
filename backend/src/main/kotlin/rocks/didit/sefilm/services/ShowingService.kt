@@ -2,20 +2,23 @@ package rocks.didit.sefilm.services
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
+import rocks.didit.sefilm.events.*
+import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
 
-@Component
+@Service
 class ShowingService(
   private val showingRepo: ShowingRepository,
   private val paymentInfoRepo: ParticipantPaymentInfoRepository,
@@ -25,6 +28,7 @@ class ShowingService(
   private val slugService: SlugService,
   private val sfService: SFService,
   private val locationService: LocationService,
+  private val eventPublisher: EventPublisher,
   private val assertionService: AssertionService
 ) {
 
@@ -72,7 +76,7 @@ class ShowingService(
   /** Info that is needed before you buy the tickets at SF */
   fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
     val showing = getShowingEntity(showingId)
-    if (showing.admin != currentLoggedInUser()) {
+    if (showing.admin.id != currentLoggedInUser()) {
       return null
     }
 
@@ -84,7 +88,7 @@ class ShowingService(
       UserAndSfData(user.id, user.sfMembershipId, ftgTicket)
     }
 
-    return AdminPaymentDetailsDTO(sfService.getSfBuyLink(showing.movieId), ticketMap, paymentInfos)
+    return AdminPaymentDetailsDTO(sfService.getSfBuyLink(showing.movie.id), ticketMap, paymentInfos)
   }
 
   /** Info a user needs for paying the one who bought the tickets */
@@ -93,15 +97,14 @@ class ShowingService(
 
   fun getAttendeePaymentDetailsForUser(userID: UserID, showingId: UUID): AttendeePaymentDetailsDTO? {
     val showing = getShowingEntity(showingId)
-    val payeePhone = userService.getCompleteUser(showing.payToUser)
-      ?.phone
-      .orElseThrow { MissingPhoneNumberException(showing.payToUser) }
+    val payeePhone = showing.payToUser.phone
+      .orElseThrow { MissingPhoneNumberException(showing.payToUser.id) }
 
     val participantInfo = paymentInfoRepo
       .findByShowingIdAndUserId(showingId, userID)
       .orElse(null) ?: return null
 
-    val movieTitle = movieService.getMovieOrThrow(showing.movieId).title
+    val movieTitle = movieService.getMovieOrThrow(showing.movie.id).title
 
     val swishTo = when {
       !participantInfo.hasPaid && participantInfo.amountOwed.ören > 0 -> constructSwishUri(
@@ -116,7 +119,7 @@ class ShowingService(
     return AttendeePaymentDetailsDTO(
       participantInfo.hasPaid,
       participantInfo.amountOwed,
-      showing.payToUser,
+      showing.payToUser.id,
       swishTo,
       payeePhone.number,
       userID
@@ -134,6 +137,10 @@ class ShowingService(
     val newParticipants = showing.participants.plus(participant)
     return showingRepo
       .save(showing.copy(participants = newParticipants))
+      .also {
+        val user = userService.getCompleteUser(userId)
+        eventPublisher.publish(UserAttendedEvent(this, it, user, paymentOption.type))
+      }
       .toDto()
 
   }
@@ -154,39 +161,46 @@ class ShowingService(
     }
 
     val participant = participantLst.first()
-
     val participantsWithoutLoggedInUser = showing.participants.minus(participant)
     return showingRepo
       .save(showing.copy(participants = participantsWithoutLoggedInUser))
+      .also {
+        val user = userService.getCompleteUser(participant.userId)
+        eventPublisher.publish(UserUnattendedEvent(this, it, user))
+      }
       .toDto()
-
   }
 
   fun createShowing(data: CreateShowingDTO): ShowingDTO {
     if (data.date == null || data.location == null || data.movieId == null || data.time == null) throw MissingParametersException()
 
-    val adminUser = userService.currentUser().toLimitedUserDTO()
+    val adminUser = userService.getCompleteUser(currentLoggedInUser())
     return showingRepo
       .save(data.toShowing(adminUser, movieService.getMovieOrThrow(data.movieId)))
+      .also {
+        eventPublisher.publish(NewShowingEvent(this, it, adminUser))
+      }
       .toDto()
   }
 
   /** Delete the selected showing and return all public showings */
   fun deleteShowing(showingId: UUID): List<ShowingDTO> {
     val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin)
-    assertionService.assertTicketsNotBought(showing.admin, showing)
+    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
+    assertionService.assertTicketsNotBought(showing.admin.id, showing)
 
     paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
-    showingRepo.delete(showing)
     ticketService.deleteTickets(showing)
+    showingRepo.delete(showing)
+
+    eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
     return getAllPublicShowings()
   }
 
   fun markAsBought(showingId: UUID): ShowingDTO {
     val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin)
-    assertionService.assertUserHasPhoneNumber(showing.admin)
+    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
+    assertionService.assertUserHasPhoneNumber(showing.admin.id)
 
     if (showing.ticketsBought) {
       log.info("Showing $showingId is already bought")
@@ -196,25 +210,31 @@ class ShowingService(
     createInitialPaymentInfo(showing)
     return showingRepo
       .save(showing.copy(ticketsBought = true))
+      .also {
+        eventPublisher.publish(TicketsBoughtEvent(this, it, it.admin))
+      }
       .toDto()
   }
 
   fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO {
     val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin)
+    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
 
     log.info("Updating showing ($showingId) to new values: $newValues")
     return showingRepo.save(
       showing.copy(
         price = SEK(newValues.price),
         private = newValues.private,
-        payToUser = userService.getUserOrThrow(UserID(newValues.payToUser)).id,
+        payToUser = userService.getCompleteUser(UserID(newValues.payToUser)),
         expectedBuyDate = newValues.expectedBuyDate,
         location = locationService.getOrCreateNewLocation(newValues.location),
         sfScreen = newValues.sfScreen,
         time = newValues.time
       )
     )
+      .also {
+        eventPublisher.publish(UpdatedShowingEvent(this, it, it.admin))
+      }
       .toDto()
   }
 
@@ -243,15 +263,15 @@ class ShowingService(
 
   private fun Showing.userIsInvolvedInThisShowing(userID: UserID): Boolean {
     return this.isAdmin(userID) || this.isParticipantInShowing(userID)
-      || this.payToUser == userID
+      || this.payToUser.id == userID
   }
 
-  private fun Showing.isAdmin(userID: UserID): Boolean = this.admin == userID
+  private fun Showing.isAdmin(userID: UserID): Boolean = this.admin.id == userID
 
   private fun Showing.isParticipantInShowing(userID: UserID): Boolean = this.participants.any { it.userId == userID }
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
-  private fun CreateShowingDTO.toShowing(admin: LimitedUserDTO, movie: Movie): Showing {
+  private fun CreateShowingDTO.toShowing(admin: User, movie: Movie): Showing {
     if (this.location == null) {
       throw IllegalArgumentException("Location may not be null")
     }
@@ -261,11 +281,11 @@ class ShowingService(
       slug = slugService.generateSlugFor(movie),
       date = this.date,
       time = this.time,
-      movieId = this.movieId,
+      movie = movieService.getMovieOrThrow(this.movieId),
       location = location,
       sfScreen = this.sfScreen,
-      admin = admin.id,
-      payToUser = admin.id,
+      admin = admin,
+      payToUser = admin,
       expectedBuyDate = this.expectedBuyDate,
       participants = setOf(SwishParticipant(admin.id))
     )
@@ -275,7 +295,7 @@ class ShowingService(
     val participants = showing
       .participants
       .map { it ->
-        val hasPaid = it.userId == showing.payToUser || it is FtgBiljettParticipant
+        val hasPaid = it.userId == showing.payToUser.id || it is FtgBiljettParticipant
         ParticipantPaymentInfo(
           userId = it.userId,
           showingId = showing.id,

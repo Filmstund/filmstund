@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.SfTicketException
 import rocks.didit.sefilm.currentLoggedInUser
@@ -16,9 +16,10 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.SfTicketDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.services.external.SFService
 import java.util.*
 
-@Component
+@Service
 class TicketService(
   private val sfClient: SFService,
   private val userRepository: UserRepository,
@@ -37,7 +38,7 @@ class TicketService(
     val showing =
       showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
 
-    if (showing.admin != currentLoggedInUser) {
+    if (showing.admin.id != currentLoggedInUser) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
 
@@ -56,7 +57,7 @@ class TicketService(
     val tickets = sfTickets.map {
       val barcode = sfClient.fetchBarcode(it.id)
       if (it.profileId == null || it.profileId.isBlank()) {
-        return@map it.toTicket(showing.id, showing.admin, barcode)
+        return@map it.toTicket(showing.id, showing.admin.id, barcode)
       }
 
       val userIdForThatMember = getUserIdFromSfMembershipId(SfMembershipId.valueOf(it.profileId), showing)
@@ -70,13 +71,13 @@ class TicketService(
     val userIdForThatMember = userRepository
       .findBySfMembershipId(sfMembershipId)
       ?.id
-      ?: return showing.admin
+      ?: return showing.admin.id
 
     if (showing.participants.any { it.userId == userIdForThatMember }) {
       return userIdForThatMember
     }
 
-    return showing.admin
+    return showing.admin.id
   }
 
   private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {

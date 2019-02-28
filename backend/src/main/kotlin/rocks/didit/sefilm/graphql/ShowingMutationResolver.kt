@@ -5,9 +5,11 @@ package rocks.didit.sefilm.graphql
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.PaymentOption
+import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.services.AdminService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
 import java.util.*
@@ -15,6 +17,7 @@ import java.util.*
 @Component
 class ShowingMutationResolver(
   private val showingService: ShowingService,
+  private val adminService: AdminService,
   private val ticketService: TicketService
 ) : GraphQLMutationResolver {
   fun attendShowing(showingId: UUID, paymentOption: PaymentOption): ShowingDTO =
@@ -35,4 +38,7 @@ class ShowingMutationResolver(
 
   fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO =
     showingService.updateShowing(showingId, newValues)
+
+  fun promoteToAdmin(showingId: UUID, userToPromote: UserID): ShowingDTO =
+    adminService.promoteToAdmin(showingId, userToPromote)
 }

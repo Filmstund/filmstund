@@ -249,7 +249,8 @@ var qrcodegen = new function() {
             (i == 0 && j == numAlign - 1) ||
             (i == numAlign - 1 && j == 0)
           )
-            continue; // Skip the three finder corners
+            continue;
+          // Skip the three finder corners
           else drawAlignmentPattern(alignPatPos[i], alignPatPos[j]);
         }
       }
@@ -301,7 +302,7 @@ var qrcodegen = new function() {
       // Draw two copies
       for (var i = 0; i < 18; i++) {
         var bit = ((data >>> i) & 1) != 0;
-        var a = size - 11 + i % 3,
+        var a = size - 11 + (i % 3),
           b = Math.floor(i / 3);
         setFunctionModule(a, b, bit);
         setFunctionModule(b, a, bit);
@@ -357,7 +358,7 @@ var qrcodegen = new function() {
       var blockEccLen = Math.floor(totalEcc / numBlocks);
       var numShortBlocks =
         numBlocks -
-        Math.floor(QrCode.getNumRawDataModules(version) / 8) % numBlocks;
+        (Math.floor(QrCode.getNumRawDataModules(version) / 8) % numBlocks);
       var shortBlockLen = Math.floor(
         QrCode.getNumRawDataModules(version) / (numBlocks * 8)
       );
@@ -447,13 +448,13 @@ var qrcodegen = new function() {
               invert = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 == 0;
               break;
             case 5:
-              invert = x * y % 2 + x * y % 3 == 0;
+              invert = ((x * y) % 2) + ((x * y) % 3) == 0;
               break;
             case 6:
-              invert = (x * y % 2 + x * y % 3) % 2 == 0;
+              invert = (((x * y) % 2) + ((x * y) % 3)) % 2 == 0;
               break;
             case 7:
-              invert = ((x + y) % 2 + x * y % 3) % 2 == 0;
+              invert = (((x + y) % 2) + ((x * y) % 3)) % 2 == 0;
               break;
             default:
               throw "Assertion error";
@@ -636,7 +637,7 @@ var qrcodegen = new function() {
 
     // Add terminator and pad up to a byte if applicable
     bb.appendBits(0, Math.min(4, dataCapacityBits - bb.bitLength()));
-    bb.appendBits(0, (8 - bb.bitLength() % 8) % 8);
+    bb.appendBits(0, (8 - (bb.bitLength() % 8)) % 8);
 
     // Pad with alternate bytes until data capacity is reached
     for (
@@ -665,8 +666,8 @@ var qrcodegen = new function() {
       var size = ver * 4 + 17;
       var numAlign = Math.floor(ver / 7) + 2;
       var step;
-      if (ver != 32)
-        step = Math.ceil((size - 13) / (2 * numAlign - 2)) * 2; // C-C-C-Combo breaker!
+      if (ver != 32) step = Math.ceil((size - 13) / (2 * numAlign - 2)) * 2;
+      // C-C-C-Combo breaker!
       else step = 26;
 
       var result = [6];
@@ -1432,4 +1433,4 @@ var qrcodegen = new function() {
   }
 }();
 
-export default qrcodegen;
+export default qrcodegen.QrCode;

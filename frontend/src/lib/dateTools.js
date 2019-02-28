@@ -1,8 +1,6 @@
-import moment from "moment";
-import "moment/locale/sv";
-import { padStart, take } from "lodash";
+import { padStart, take } from "lodash-es";
 
-moment.locale("sv");
+import format from "date-fns/format";
 
 const DATE_MONTH_TIME = "D MMM HH:mm";
 const HOUR_MINUTE = "HH:mm";
@@ -13,7 +11,7 @@ const padWithZero = s => padStart(s, 2, "0");
 
 const padAndJoinWith = (elems, joiner) => elems.map(padWithZero).join(joiner);
 
-export const getTodaysDate = () => moment().format();
+export const getTodaysDate = () => format(new Date());
 
 export const showingDateToString = (date, time = ["0", "0", "0"]) => {
   const dateString = padAndJoinWith(date, "-");
@@ -21,17 +19,12 @@ export const showingDateToString = (date, time = ["0", "0", "0"]) => {
   return dateString + " " + timeString;
 };
 
-export const formatShowingDateTime = date =>
-  moment(date).format(DATE_MONTH_TIME);
+export const formatShowingDateTime = date => format(date, DATE_MONTH_TIME);
 
-export const formatTime = date => moment(date).format(HOUR_MINUTE);
+export const formatTime = date => format(date, HOUR_MINUTE);
 
-export const formatLocalTime = date =>
-  moment
-    .utc(date)
-    .local()
-    .format(HOUR_MINUTE);
+export const formatLocalTime = date => format(new Date(date), HOUR_MINUTE);
 
-export const formatShowingDate = date => moment(date).format(DATE_MONTH);
+export const formatShowingDate = date => format(date, DATE_MONTH);
 
-export const formatYMD = date => moment(date).format(YMD);
+export const formatYMD = date => format(date, YMD);

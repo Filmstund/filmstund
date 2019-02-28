@@ -5,7 +5,7 @@ import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 
 @Service
-class SlugService(private val movieService: MovieService) {
+class SlugService {
   companion object {
     const val MAX_LENGTH = 45
   }
@@ -13,11 +13,7 @@ class SlugService(private val movieService: MovieService) {
   fun generateSlugFor(movie: Movie): String = sluggifyString(movie.originalTitle ?: movie.title)
 
   fun generateSlugFor(showing: Showing): String {
-    if (showing.movieId == null) {
-      throw IllegalArgumentException("Movie ID is null for showing ${showing.id}")
-    }
-    val movie = movieService.getMovieOrThrow(showing.movieId)
-
+    val movie = showing.movie
     return sluggifyString(movie.originalTitle ?: movie.title)
   }
 
@@ -34,6 +30,7 @@ class SlugService(private val movieService: MovieService) {
       .replace(",", "")
       .replace("ó", "o")
       .replace("é", "e")
+      .replace("®", "")
       .trimToLength(MAX_LENGTH)
   }
 

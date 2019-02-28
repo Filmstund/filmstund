@@ -15,10 +15,6 @@ class SwishUtil {
       participantInfo: ParticipantPaymentInfo,
       movieTitle: String
     ): String {
-      if (showing.movieId == null) {
-        throw IllegalArgumentException("Missing movie ID for showing ${showing.id}")
-      }
-
       return SwishDataDTO(
         payee = StringValue(payeePhone.number),
         amount = IntValue(participantInfo.amountOwed.toKronor()),

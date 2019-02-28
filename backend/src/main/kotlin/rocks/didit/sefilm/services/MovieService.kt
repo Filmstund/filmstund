@@ -2,18 +2,19 @@ package rocks.didit.sefilm.services
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.SfMovieDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
+import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import java.time.Duration
 import java.util.*
 
-@Component
+@Service
 class MovieService(
   private val movieRepo: MovieRepository,
   private val sfService: SFService,

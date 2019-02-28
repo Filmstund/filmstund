@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TicketContainer /> renders without crashing 1`] = `
+<div>
+  <div
+    class="css-pac1zl"
+  >
+    <button
+      class="css-gcz4q9"
+    >
+      Tillbaka till visning
+    </button>
+    <h3
+      class="css-1llnadu"
+    >
+      Våra platser:
+    </h3>
+    <div
+      class="css-1dhwn8t"
+    >
+      <label
+        class="css-1vtr8wv"
+      >
+        Lägg till SF-bokningslänkar
+      </label>
+      <br />
+      <textarea
+        class="css-1tvymxn"
+        rows="5"
+      />
+      <button
+        class="css-gcz4q9"
+      >
+        Skicka
+      </button>
+    </div>
+  </div>
+</div>
+`;

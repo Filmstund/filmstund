@@ -1,15 +1,15 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.domain.Företagsbiljett
+import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 
-@Component
+@Service
 class AssertionService(
   private val userService: UserService,
   private val foretagsbiljettService: ForetagsbiljettService
@@ -53,7 +53,7 @@ class AssertionService(
       throw DuplicateTicketException(": $suppliedTicket")
     }
 
-    if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Företagsbiljett.Status.Available) {
+    if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Foretagsbiljett.Status.Available) {
       throw TicketAlreadyUsedException(suppliedTicket)
     }
 

@@ -9,7 +9,7 @@ import biweekly.parameter.Role
 import biweekly.property.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.UserID
@@ -20,7 +20,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
-@Component
+@Service
 class CalendarService(
   private val userService: UserService,
   private val showingService: ShowingService,

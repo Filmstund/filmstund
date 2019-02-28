@@ -206,7 +206,7 @@ class SlugServiceTest {
   @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
   private fun testGenerateSlugForShowing(movieName: String, expectedSlug: String) {
     val movie = Movie(title = movieName)
-    val showing = Showing(movieId = movie.id)
+    val showing = Showing(movie = movie)
 
     Mockito.`when`(movieServiceoMock.getMovieOrThrow(Mockito.any())).thenReturn(movie)
 

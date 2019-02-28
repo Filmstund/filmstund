@@ -22,4 +22,8 @@ type Query {
     previousLocations: [Location!]!
     location(id: String!): Location
     sfCities: [SfCity!]!
+
+    ## Notifications ##
+    allNotificationProviders: [NotificationProvider!]!
+    allNotificationTypes: [NotificationType!]!
 }

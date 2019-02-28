@@ -1,0 +1,65 @@
+type NotificationSettings {
+    notificationsEnabled: Boolean,
+    enabledTypes: [NotificationType!]!,
+    providerSettings: [ProviderSettings!]!
+}
+
+type NotificationProvider {
+    name: String!
+    isSubscribable: Boolean!
+}
+
+interface ProviderSettings {
+    enabled: Boolean!
+}
+
+type MailSettings implements ProviderSettings {
+    enabled: Boolean!
+    mailAddress: String
+}
+
+type PushoverSettings implements ProviderSettings {
+    enabled: Boolean!
+    userKey: String!
+    device: String
+    userKeyStatus: PushoverValidationStatus!
+}
+
+## Input ##
+
+input NotificationSettingsInput {
+    notificationsEnabled: Boolean!
+    enabledTypes: [NotificationType!]
+    pushover: InputPushoverSettings
+    mail: InputMailSettings
+}
+
+input InputMailSettings {
+    enabled: Boolean!
+    mailAddress: String!
+}
+
+input InputPushoverSettings{
+    enabled: Boolean!
+    userKey: String!
+    device: String
+}
+
+## Enums ##
+
+enum NotificationType {
+    UpdateShowing
+    NewShowing
+    DeletedShowing
+    TicketsBought
+    UserAttended
+    UserUnattended
+}
+
+enum PushoverValidationStatus {
+    USER_AND_DEVICE_VALID,
+    USER_VALID_DEVICE_INVALID,
+    USER_INVALID,
+    TOKEN_INVALID,
+    UNKNOWN
+}

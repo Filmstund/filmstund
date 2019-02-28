@@ -1,5 +1,6 @@
 package rocks.didit.sefilm
 
+import com.coxautodev.graphql.tools.SchemaParserDictionary
 import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -7,6 +8,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.execution.AsyncExecutionStrategy
 import graphql.servlet.ObjectMapperConfigurer
+import org.apache.http.client.HttpClient
+import org.apache.http.impl.client.HttpClientBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -16,9 +19,11 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -26,6 +31,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import rocks.didit.sefilm.database.ImdbIdConverter
+import rocks.didit.sefilm.database.TmdbIdConverter
 import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.BudordRepository
@@ -35,8 +42,10 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
-import rocks.didit.sefilm.services.SFService
+import rocks.didit.sefilm.notification.MailSettings
+import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.services.SlugService
+import rocks.didit.sefilm.services.external.SFService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import rocks.didit.sefilm.web.controllers.CalendarController
 import java.math.BigDecimal
@@ -55,10 +64,26 @@ class Application {
   }
 
   @Bean
+  fun customMongoConverters(): MongoCustomConversions {
+    val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
+    return MongoCustomConversions(converters)
+  }
+
+  @Bean
+  fun httpClient(): HttpClient {
+    return HttpClientBuilder.create()
+      .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0")
+      .build()
+  }
+
+  @Bean
+  fun httpRequestFactory(httpClient: HttpClient) = HttpComponentsClientHttpRequestFactory(httpClient)
+
+  @Bean
   @Primary
-  fun getRestClient(errorHandler: ExternalProviderErrorHandler): RestTemplate {
-    val restClient = RestTemplate()
-    restClient.errorHandler = errorHandler
+  fun getRestClient(requestFactory: HttpComponentsClientHttpRequestFactory): RestTemplate {
+    val restClient = RestTemplate(requestFactory)
+    restClient.errorHandler = ExternalProviderErrorHandler()
     return restClient
   }
 
@@ -66,10 +91,7 @@ class Application {
   fun getHttpEntityWithJsonAcceptHeader(): HttpEntity<Void> {
     val httpHeaders = HttpHeaders()
     httpHeaders.accept = listOf(MediaType.APPLICATION_JSON_UTF8)
-    httpHeaders.put(
-      "User-Agent",
-      listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
-    )
+    httpHeaders["User-Agent"] = listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     return HttpEntity(httpHeaders)
   }
 
@@ -90,7 +112,7 @@ class Application {
   }
 
   @Bean
-  fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner {
+  fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner { _ ->
     val unwantedMovies = movieRepository
       .findAll()
       .filter { titleExtensions.isMovieUnwantedBasedOnGenre(it.genres) || titleExtensions.isTitleUnwanted(it.title) }
@@ -99,7 +121,7 @@ class Application {
   }
 
   @Bean
-  fun createSlugsAndWebIds(showingRepository: ShowingRepository, slugService: SlugService) = ApplicationRunner {
+  fun createSlugsAndWebIds(showingRepository: ShowingRepository, slugService: SlugService) = ApplicationRunner { _ ->
     val showingsWithMissingWebId = showingRepository
       .findAll()
       .filter {
@@ -113,7 +135,7 @@ class Application {
   }
 
   @Bean
-  fun trimMovieNames(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner {
+  fun trimMovieNames(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner { _ ->
     movieRepository.findAll()
       .filter {
         titleExtensions.titleRequiresTrimming(it.title)
@@ -134,7 +156,7 @@ class Application {
     budordRepo: BudordRepository,
     sfService: SFService,
     properties: Properties
-  ) = ApplicationRunner {
+  ) = ApplicationRunner { _ ->
     if (!properties.enableSeeding) {
       log.info("Seeding not enabled, ignoring...")
       return@ApplicationRunner
@@ -169,7 +191,7 @@ class Application {
           BigDecimal(it.address.coordinates.latitude),
           BigDecimal(it.address.coordinates.longitude),
           it.ncgId,
-          alias = locationNameAlias.firstOrNull() { alias -> alias.sfId == it.ncgId }?.alias ?: listOf()
+          alias = locationNameAlias.firstOrNull { alias -> alias.sfId == it.ncgId }?.alias ?: listOf()
         )
       }
 
@@ -206,6 +228,11 @@ class Application {
     .newOptions()
     .objectMapperConfigurer(objConfigurer)
     .build()
+
+  @Bean
+  fun schemaDictionary() = SchemaParserDictionary()
+    .add(MailSettings::class)
+    .add(PushoverSettings::class)
 }
 
 fun main(args: Array<String>) {
