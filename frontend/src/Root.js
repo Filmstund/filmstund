@@ -6,33 +6,10 @@ import { BrowserRouter as Router } from "react-router-dom";
 import client from "./store/apollo";
 import Login from "./use-cases/login/containers/Login";
 import { rollbar } from "./lib/error-reporting";
-import { Global, css } from "@emotion/core";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
+import { GlobalStyles } from "./GlobalStyles";
 
 const AsyncApp = lazy(() => import("./App"));
-
-const globalStyles = css`
-  html {
-    background: black;
-  }
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: "Roboto", sans-serif;
-    background: white;
-    color: #212121;
-  }
-  html,
-  body,
-  #root {
-    height: 100%;
-  }
-  *,
-  *:before,
-  *:after {
-    box-sizing: border-box;
-  }
-`;
 
 class Root extends Component {
   state = {
@@ -72,7 +49,7 @@ class Root extends Component {
             <Login>{props => <AsyncApp {...props} />}</Login>
           </Suspense>
         </Router>
-        <Global styles={globalStyles} />
+        <GlobalStyles />
       </ApolloProvider>
     );
   }
