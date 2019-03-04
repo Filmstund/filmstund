@@ -1,13 +1,14 @@
 /** @jsx jsx */
 import { jsx } from "@emotion/core";
 import styled from "@emotion/styled";
-import sflogo from "../../assets/sf.jpg";
+import fslogo from "../../assets/fslogo.png";
 
 const TicketWrapper = styled.div`
   margin: 3rem 0;
   padding: 1rem;
   max-width: 24rem;
   border: 0.0625rem dotted #c5c5c5;
+  font-family: "SF-Sans";
 `;
 
 const FlexRowContainer = styled.div`
@@ -29,7 +30,7 @@ const FlexColumnContainer = styled.div`
 
 const HeaderText = styled.div`
   font-size: 1.375rem;
-  font-weight: 500;
+  font-weight: 700;
 `;
 
 const LabelText = styled.div`
@@ -39,11 +40,13 @@ const LabelText = styled.div`
 
 const ShowAttribute = styled.span`
   display: inline-block;
-  font-size: 0.625rem;
-  padding: 0.125rem 0.25rem;
-  color: #000;
+  font-size: 0.75rem;
+  line-height: 1.125rem;
+  border-radius: 0.625rem;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.5);
+  padding: 0 0.5rem;
+  color: rgba(0, 0, 0, 0.5);
   margin-right: 0.25rem;
-  background: #d6d6d6;
 `;
 
 const FlexRowPaddingContainer = styled(FlexRowContainer)`
@@ -53,13 +56,13 @@ const FlexRowPaddingContainer = styled(FlexRowContainer)`
 const CompanyHeader = ({ cinema }) => (
   <FlexRowContainer css={{ marginBottom: "1rem" }}>
     <img
-      alt="Sf logo"
-      src={sflogo}
+      alt="FS logo"
+      src={fslogo}
       css={{ height: "3rem", width: "auto", marginRight: "1rem" }}
     />
     <FlexColumnContainer>
       <HeaderText css={{ fontSize: "1rem" }}>{cinema}</HeaderText>
-      <LabelText>SF Bio</LabelText>
+      <LabelText>Filmstaden</LabelText>
     </FlexColumnContainer>
   </FlexRowContainer>
 );

@@ -1,43 +1,12 @@
 import React from "react";
-import { render } from "react-testing-library";
+import { render, cleanup } from "react-testing-library";
 
 import TicketContainer from "./TicketContainer";
+import { createMockTicket, createMockSeat } from "./__mocks__/ticket";
 
 const mockUserData = {
   id: "this-is-mock-user-id"
 };
-
-const createMockSeat = (row, number) => ({
-  row,
-  number,
-  coordinates: {
-    x: 1,
-    y: 0
-  },
-  dimensions: {
-    width: 10,
-    height: 10
-  }
-});
-
-const createMockTicket = (id, row, number) => ({
-  id,
-  barcode: "this-is-barcode",
-  customerType: "mock-customer-type",
-  customerTypeDefinition: "mock-customer-type-definition",
-  cinema: "mock-cinema",
-  screen: "mock-screen",
-  profileId: "mock-profile-id",
-  seat: {
-    row,
-    number
-  },
-  date: "2018-10-10",
-  time: "20:00",
-  movieName: "mock-movie-name",
-  movieRating: "R",
-  showAttributes: ["3D"]
-});
 
 const minimalMockData = {
   me: mockUserData,
@@ -49,7 +18,7 @@ const minimalMockData = {
       seatings: []
     },
     sfSeatMap: [],
-    myTickets: []
+    myTickets: [createMockTicket(1, 2, 3)]
   }
 };
 
@@ -86,6 +55,8 @@ const mockData = {
   }
 };
 
+afterEach(cleanup);
+
 describe("<TicketContainer />", () => {
   it("renders without crashing", () => {
     const { container } = render(<TicketContainer data={minimalMockData} />);
@@ -93,7 +64,7 @@ describe("<TicketContainer />", () => {
   });
 
   it("renders the correct amount of tickets", () => {
-    const { getAllByText } = render(<TicketContainer data={mockData} />);
-    expect(getAllByText("mock-cinema")).toHaveLength(4);
+    const { queryAllByText } = render(<TicketContainer data={mockData} />);
+    expect(queryAllByText("mock-cinema")).toHaveLength(4);
   });
 });
