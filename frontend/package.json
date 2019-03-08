@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "eslint-plugin-react-hooks": "1.4.0",
+    "eslint-plugin-react-hooks": "1.5.0",
     "react-scripts": "2.1.5",
     "webpack-bundle-analyzer": "3.0.4"
   },

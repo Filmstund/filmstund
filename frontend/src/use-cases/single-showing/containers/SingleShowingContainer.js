@@ -30,14 +30,14 @@ const SingleShowingContainer = ({
 
   const navigateToTickets = useCallback(() => {
     navigateToShowingTickets(history, showing);
-  });
+  }, [history, showing]);
 
   const openSwish = useCallback(swishLink => {
     setOpenModal(true);
     if (swishLink) {
       window.location = swishLink;
     }
-  });
+  }, []);
 
   const isAdmin = userIsAdmin(showing, me);
   const isParticipating = userIsParticipating(showing.participants, me);

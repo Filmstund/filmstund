@@ -25,7 +25,7 @@ const TicketContainer = props => {
 
   const handleGoBackToShowing = useCallback(() => {
     navigateToShowing(history, showing);
-  });
+  }, [history, showing]);
 
   const handleSubmitCinemaTicketUrls = useCallback(() => {
     const nonEmptyUrls = cinemaTicketUrls.filter(
@@ -33,7 +33,7 @@ const TicketContainer = props => {
     );
 
     addTickets(showing.id, nonEmptyUrls).then(() => setCinemaTicketUrls([]));
-  });
+  }, [addTickets, cinemaTicketUrls, showing.id]);
 
   const { myTickets, ticketRange, sfSeatMap } = showing;
   return (
