@@ -11,7 +11,7 @@ const WelcomeModal = ({ me: { sfMembershipId }, history }) => {
   const navigateToProfile = useCallback(() => {
     setModalOpen(false);
     history.push("/user");
-  });
+  }, [history]);
 
   if (sfMembershipId) {
     return null;

@@ -27,7 +27,7 @@ const CopyValue = props => {
     if (props.useStricken) {
       setIsStricken(!isStricken);
     }
-  });
+  }, [isStricken, props.text, props.useStricken]);
 
   return (
     <div>

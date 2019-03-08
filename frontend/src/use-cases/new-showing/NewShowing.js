@@ -20,17 +20,23 @@ const NewShowing = props => {
     history
   } = props;
 
-  const handleNavigateToShowing = useCallback(showing => {
-    navigateToShowing(history, showing);
-  });
+  const handleNavigateToShowing = useCallback(
+    showing => {
+      navigateToShowing(history, showing);
+    },
+    [history]
+  );
 
   const clearSelectedMovie = useCallback(() => {
     history.push("/showings/new");
-  });
+  }, [history]);
 
-  const setMovie = useCallback(movie => {
-    history.push(`/showings/new/${movie.id}`);
-  });
+  const setMovie = useCallback(
+    movie => {
+      history.push(`/showings/new/${movie.id}`);
+    },
+    [history]
+  );
 
   if (movieId) {
     return (

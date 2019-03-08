@@ -6,22 +6,25 @@ export const useApolloMutationResult = mutate => {
     success: false
   });
 
-  const wrappedMutate = useCallback((...args) => {
-    return mutate(...args).then(
-      res => {
-        setResult({ success: true, errors: null });
-        return res;
-      },
-      errors => {
-        setResult({ success: false, errors });
-        throw errors;
-      }
-    );
-  });
+  const wrappedMutate = useCallback(
+    (...args) => {
+      return mutate(...args).then(
+        res => {
+          setResult({ success: true, errors: null });
+          return res;
+        },
+        errors => {
+          setResult({ success: false, errors });
+          throw errors;
+        }
+      );
+    },
+    [mutate]
+  );
 
   const clearState = useCallback(() => {
     setResult({ errors: null, success: false });
-  });
+  }, []);
 
   return {
     errors,

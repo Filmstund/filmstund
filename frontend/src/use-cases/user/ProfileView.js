@@ -65,7 +65,7 @@ const Profile = ({ data: { me }, updateUser }) => {
       setEditedUser(editedUser);
       setTimeout(clearState, 5000);
     });
-  });
+  }, [clearState, mutate, nick, phone, setEditedUser, sfMembershipId]);
 
   return (
     <PageWidthWrapper>

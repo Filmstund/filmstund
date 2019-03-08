@@ -30,7 +30,8 @@ const ForetagsbiljettList = ({
         default:
           throw new Error(`Invalid status ${status}`);
       }
-    }
+    },
+    [deleteForetagsbiljett]
   );
 
   return (

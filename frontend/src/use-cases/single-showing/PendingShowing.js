@@ -29,17 +29,20 @@ const PendingShowing = ({
     [foretagsbiljetter]
   );
 
-  const attendWithPaymentOption = useCallback(paymentOption => {
-    const { type, ticketNumber } = paymentOption;
+  const attendWithPaymentOption = useCallback(
+    paymentOption => {
+      const { type, ticketNumber } = paymentOption;
 
-    attendShowing({ paymentOption: { type, ticketNumber } }).then(() =>
-      setModalOpen(false)
-    );
-  });
+      attendShowing({ paymentOption: { type, ticketNumber } }).then(() =>
+        setModalOpen(false)
+      );
+    },
+    [attendShowing]
+  );
 
   const handleClickSelectPaymentOption = useCallback(() => {
     attendWithPaymentOption(paymentOptions[selectedIndex]);
-  });
+  }, [attendWithPaymentOption, paymentOptions, selectedIndex]);
 
   const handleClickAttend = useCallback(() => {
     if (paymentOptions.length > 1) {
@@ -48,7 +51,7 @@ const PendingShowing = ({
       // Attend with Swish option
       attendWithPaymentOption(paymentOptions[0]);
     }
-  });
+  }, [attendWithPaymentOption, paymentOptions]);
 
   return (
     <>

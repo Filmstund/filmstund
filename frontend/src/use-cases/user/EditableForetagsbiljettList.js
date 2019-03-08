@@ -37,19 +37,16 @@ const EditableForetagsbiljettList = props => {
     mutate: saveForetagsBiljetter
   } = useApolloMutationResult(props.addForetagsbiljett);
 
-  const onClickSubmit = useCallback(
-    () => {
-      const ticketsToSubmit = tickets
-        .filter(({ number }) => number && number.trim())
-        .map(({ number, expires }) => ({
-          number,
-          expires: formatYMD(expires)
-        }));
+  const onClickSubmit = useCallback(() => {
+    const ticketsToSubmit = tickets
+      .filter(({ number }) => number && number.trim())
+      .map(({ number, expires }) => ({
+        number,
+        expires: formatYMD(expires)
+      }));
 
-      return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
-    },
-    [saveForetagsBiljetter, tickets]
-  );
+    return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
+  }, [saveForetagsBiljetter, tickets]);
 
   const addForetagsbiljett = useCallback(() => {
     const foretagsbiljett = {
@@ -58,24 +55,24 @@ const EditableForetagsbiljettList = props => {
       expires: DEFAULT_DATE
     };
     setTickets(tickets => [...tickets, foretagsbiljett]);
-  });
+  }, []);
 
   const handleChange = useCallback((id, event) => {
     const { value } = event.target;
     setTickets(tickets => {
       return tickets.map(t => (t.id === id ? { ...t, number: value } : t));
     });
-  });
+  }, []);
   const handleSetExpires = useCallback((id, value) => {
     setTickets(tickets => {
       return tickets.map(t => (t.id === id ? { ...t, expires: value } : t));
     });
-  });
+  }, []);
   const handlePressRemove = useCallback(id => {
     setTickets(tickets => {
       return tickets.filter(t => t.id !== id);
     });
-  });
+  }, []);
 
   return (
     <>

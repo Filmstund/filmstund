@@ -10,12 +10,15 @@ const localeUtils = {
 };
 
 const DatePicker = ({ value, onChange, ...props }) => {
-  const handleClick = useCallback((day, modifiers) => {
-    if (modifiers.disabled) {
-      return;
-    }
-    onChange(day);
-  });
+  const handleClick = useCallback(
+    (day, modifiers) => {
+      if (modifiers.disabled) {
+        return;
+      }
+      onChange(day);
+    },
+    [onChange]
+  );
 
   return (
     <DayPicker
