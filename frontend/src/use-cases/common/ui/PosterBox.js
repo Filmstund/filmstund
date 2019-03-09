@@ -3,7 +3,6 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/core";
 import alfons from "../../../assets/alfons.jpg";
 import { Header } from "./RedHeader";
-import LazyLoad from "react-lazyload";
 
 const pointerHover = css`
   &:hover {
@@ -37,13 +36,7 @@ const PosterBox = ({ className, poster, onClick, headerText, children }) => (
     onClick={onClick}
     onKeyDown={e => filterEnterKey(e, onClick)}
   >
-    <LazyLoad
-      offset={window.innerHeight / 2}
-      overflow
-      placeholder={<Poster src={null} />}
-    >
-      <Poster src={poster} />
-    </LazyLoad>
+    <Poster src={poster} />
     <PaddingContainer>
       <Header>{headerText}</Header>
       {children}
