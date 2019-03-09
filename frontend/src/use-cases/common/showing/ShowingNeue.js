@@ -2,7 +2,6 @@ import React from "react";
 import { Header } from "../ui/RedHeader";
 import { faQrcode, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { formatShowingDateTime } from "../../../lib/dateTools";
-import LazyLoad from "react-lazyload";
 import gql from "graphql-tag";
 import {
   Box,
@@ -22,26 +21,14 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
 
   return (
     <Box onClick={onClick}>
-      <LazyLoad
-        offset={window.innerHeight / 2}
-        overflow
-        placeholder={<Poster src={null} />}
-      >
-        <Poster src={showing.movie.poster} />
-      </LazyLoad>
+      <Poster src={showing.movie.poster} />
       <CenterColumn>
         <Content>
           <Header>{showing.movie.title}</Header>
           <Description>
             {formatShowingDateTime(showing.date + " " + showing.time)}
           </Description>
-          <LazyLoad
-            offset={window.innerHeight / 2}
-            overflow
-            placeholder={<UserHeads users={[]} />}
-          >
-            <UserHeads users={showing.participants.map(p => p.user)} />
-          </LazyLoad>
+          <UserHeads users={showing.participants.map(p => p.user)} />
         </Content>
         {showingHasTickets && (
           <RedButton
