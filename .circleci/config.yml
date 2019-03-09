@@ -42,6 +42,9 @@ jobs:
       - run: |
           cd frontend
           yarn test
+      - run: |
+          cd frontend
+          yarn packtracker
   build-docker:
     <<: *defaults
     machine: true
