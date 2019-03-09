@@ -5,12 +5,13 @@ import styled from "@emotion/styled";
 
 import NavBar from "./use-cases/common/ui/NavBar";
 import Footer from "./use-cases/common/ui/footer/Footer";
-import WelcomeModal from "./use-cases/common/utils/WelcomeModal";
+import { WelcomeModal } from "./use-cases/common/utils/WelcomeModal";
 import { completeUserFragment } from "./apollo/queries/currentUser";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
 import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
 import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
 import { useQuery } from "react-apollo-hooks";
+import { AppQuery } from "./__generated__/AppQuery";
 
 const MainGridContainer = styled.div`
   flex: 1;
@@ -53,10 +54,14 @@ const appQuery = gql`
   ${completeUserFragment}
 `;
 
-const App = ({ signout }: { signout: Function }) => {
+interface Props {
+  signout: () => void;
+}
+
+const App: React.FC<Props> = ({ signout }) => {
   const {
     data: { me }
-  } = useQuery(appQuery, { suspend: true })!;
+  } = useQuery<AppQuery>(appQuery, { suspend: true })!;
 
   return (
     <>

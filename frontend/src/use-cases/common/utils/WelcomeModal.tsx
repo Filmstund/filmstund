@@ -4,8 +4,13 @@ import Modal from "../ui/Modal";
 import Header from "../ui/Header";
 import MainButton, { ButtonContainer } from "../ui/MainButton";
 import { useRouter } from "../../../lib/useRouter";
+import { AppQuery_me } from "../../../__generated__/AppQuery";
 
-const WelcomeModal = ({ me: { sfMembershipId } }) => {
+interface Props {
+  me: AppQuery_me;
+}
+
+export const WelcomeModal: React.FC<Props> = ({ me: { sfMembershipId } }) => {
   const { history } = useRouter();
 
   const [modalOpen, setModalOpen] = useState(true);
@@ -36,5 +41,3 @@ const WelcomeModal = ({ me: { sfMembershipId } }) => {
     );
   }
 };
-
-export default WelcomeModal;
