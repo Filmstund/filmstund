@@ -1,11 +1,13 @@
 import React, { useState, useCallback } from "react";
-import { withRouter } from "react-router";
 import Modal from "../ui/Modal";
 
 import Header from "../ui/Header";
 import MainButton, { ButtonContainer } from "../ui/MainButton";
+import { useRouter } from "../../../lib/useRouter";
 
-const WelcomeModal = ({ me: { sfMembershipId }, history }) => {
+const WelcomeModal = ({ me: { sfMembershipId } }) => {
+  const { history } = useRouter();
+
   const [modalOpen, setModalOpen] = useState(true);
 
   const navigateToProfile = useCallback(() => {
@@ -35,4 +37,4 @@ const WelcomeModal = ({ me: { sfMembershipId }, history }) => {
   }
 };
 
-export default withRouter(WelcomeModal);
+export default WelcomeModal;

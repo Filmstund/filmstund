@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { withRouter } from "react-router";
 
 import { movieFragment } from "../common/showing/Movie";
 import CreateShowingForm from "./CreateShowingForm";
@@ -9,15 +8,16 @@ import { graphql, compose } from "react-apollo";
 import { fetchMovies } from "../../apollo/queries/movies";
 import { navigateToShowing } from "../common/navigators/index";
 import MovieSelector from "./MovieSelector";
+import { useRouter } from "../../lib/useRouter";
 
 const NewShowing = props => {
+  const { history } = useRouter();
   const {
     data: { movies = [] },
     match: {
       params: { movieId }
     },
-    fetchMovies,
-    history
+    fetchMovies
   } = props;
 
   const handleNavigateToShowing = useCallback(
@@ -77,7 +77,6 @@ const data = graphql(
 );
 
 export default compose(
-  withRouter,
   data,
   fetchMovies
 )(NewShowing);

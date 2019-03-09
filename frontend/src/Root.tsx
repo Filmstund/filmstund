@@ -1,5 +1,6 @@
-import React, { Component, lazy, Suspense } from "react";
+import React, { Component, lazy, Suspense, ErrorInfo } from "react";
 import { ApolloProvider } from "react-apollo";
+import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -11,20 +12,25 @@ import { GlobalStyles } from "./GlobalStyles";
 
 const AsyncApp = lazy(() => import("./App"));
 
-class Root extends Component {
-  state = {
+interface State {
+  error: Error | null;
+  hasError: boolean;
+}
+
+export class Root extends Component<{}, State> {
+  state: State = {
     error: null,
     hasError: false
   };
 
-  static getDerivedStateFromError(error, info) {
+  static getDerivedStateFromError(error: Error) {
     return {
       error,
       hasError: true
     };
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
     console.log(error, info.componentStack);
 
     rollbar.error("Root didCatch", error, info.componentStack);
@@ -37,22 +43,22 @@ class Root extends Component {
       return (
         <div>
           <div>Something went wrong:</div>
-          <pre>{error.stack}</pre>
+          <pre>{error!.stack}</pre>
         </div>
       );
     }
 
     return (
       <ApolloProvider client={client}>
-        <Router>
-          <Suspense fallback={<Loader />}>
-            <Login>{props => <AsyncApp {...props} />}</Login>
-          </Suspense>
-        </Router>
-        <GlobalStyles />
+        <ApolloHooksProvider client={client}>
+          <Router>
+            <Suspense fallback={<Loader />}>
+              <Login>{(props: any) => <AsyncApp {...props} />}</Login>
+            </Suspense>
+          </Router>
+          <GlobalStyles />
+        </ApolloHooksProvider>
       </ApolloProvider>
     );
   }
 }
-
-export default Root;
