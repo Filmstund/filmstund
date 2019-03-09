@@ -1177,7 +1177,7 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.2.tgz#54c5a964462be3d4d78af631363c18d6fa91ac26"
   integrity sha512-yprFYuno9FtNsSHVlSWd+nRlmGoAbqbeCwOryP6sC/zoCjhpArcRMYp19EvpSUSizJAlsXEwJv+wcWS9XaXdMw==
 
-"@packtracker/webpack-plugin@^2.0.0":
+"@packtracker/webpack-plugin@2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@packtracker/webpack-plugin/-/webpack-plugin-2.0.0.tgz#c3e27e7986baa05135337d680460eb5bf2c2a910"
   integrity sha512-sl02dU1qyd/dIIbUaaSi7cU44COAwelP8yqtgZzxrdrTYxwWTj/be6iRaBpO0oj/Rx5l5+pU0XeupKJjqLMQhA==
