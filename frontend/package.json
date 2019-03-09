@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@packtracker/webpack-plugin": "^2.0.0",
     "eslint-plugin-react-hooks": "1.5.0",
     "react-scripts": "2.1.8",
     "webpack-bundle-analyzer": "3.0.4"
@@ -44,6 +45,7 @@
     "start": "react-scripts start",
     "lint": "eslint src",
     "build": "react-scripts build",
+    "packtracker": "react-scripts build --stats && packtracker-upload --stats=build/bundle-stats.json",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
     "eject": "react-scripts eject"
   },
