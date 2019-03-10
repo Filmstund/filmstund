@@ -59,9 +59,8 @@ interface Props {
 }
 
 const App: React.FC<Props> = ({ signout }) => {
-  const {
-    data: { me }
-  } = useQuery<AppQuery>(appQuery, { suspend: true })!;
+  const { data } = useQuery<AppQuery>(appQuery, { suspend: true });
+  const me = data!.me;
 
   return (
     <>

@@ -6,7 +6,12 @@ const Textarea = styled.textarea`
   max-width: 600px;
 `;
 
-const TicketURLInput = ({ cinemaTicketUrls, onChange }) => (
+interface Props {
+  cinemaTicketUrls: string[];
+  onChange: (s: string[]) => void;
+}
+
+const TicketURLInput: React.FC<Props> = ({ cinemaTicketUrls, onChange }) => (
   <Textarea
     rows={5}
     value={cinemaTicketUrls.join("\n")}

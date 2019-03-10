@@ -3,7 +3,6 @@ import gql from "graphql-tag";
 import { completeUserFragment } from "../../apollo/queries/currentUser";
 import { branch, renderComponent } from "recompose";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
-import { updateUser } from "../../apollo/mutations/user";
 import Profile from "./ProfileView";
 
 const data = graphql(
@@ -25,6 +24,5 @@ const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
 
 export default compose(
   data,
-  updateUser,
   isLoading
 )(Profile);

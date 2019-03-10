@@ -2,7 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import loading from "../../../assets/loading.gif";
 
-const LoadingImage = styled.div`
+const LoadingImage = styled.div<{ src: string }>`
   grid-area: center;
   background-image: url(${props => props.src});
   background-repeat: no-repeat;
