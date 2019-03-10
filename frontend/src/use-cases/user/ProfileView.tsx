@@ -1,18 +1,21 @@
 import React, { useState, useCallback } from "react";
 import styled from "@emotion/styled";
-import Field, { FieldWithoutMaxWidth } from "../../use-cases/common/ui/Field";
-import MainButton from "../../use-cases/common/ui/MainButton";
-import CopyValue from "../../use-cases/common/utils/CopyValue";
-import Input from "../../use-cases/common/ui/Input";
+import Field, { FieldWithoutMaxWidth } from "../common/ui/Field";
+import MainButton from "../common/ui/MainButton";
+import CopyValue from "../common/utils/CopyValue";
+import Input from "../common/ui/Input";
 import alfons from "../../assets/alfons.jpg";
 
 import { trim } from "../../lib/Utils";
 
 import ForetagsbiljettListContainer from "./ForetagsbiljettListContainer";
-import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
-import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
+import StatusMessageBox from "../common/utils/StatusMessageBox";
+import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 import { PageTitle } from "../common/utils/PageTitle";
+import { DataProps } from "react-apollo";
+import { UserProfile } from "./__generated__/UserProfile";
+import { useUpdateUserMutation } from "../../apollo/mutations/user";
 
 const Box = styled.div`
   background: #fff;
@@ -22,7 +25,7 @@ const Box = styled.div`
   height: 96px;
 `;
 
-const AvatarImage = styled.div`
+const AvatarImage = styled.div<{ src: string | null }>`
   background-image: url(${props => props.src}), url(${alfons});
   background-size: cover;
   background-position: center;
@@ -39,7 +42,13 @@ const UserInfo = styled.div`
   padding: 1em;
 `;
 
-const Profile = ({ data: { me }, updateUser }) => {
+interface Props extends DataProps<UserProfile> {}
+
+const Profile: React.FC<Props> = ({ data }) => {
+  const me = data.me!;
+
+  const updateUser = useUpdateUserMutation();
+
   const { success, errors, clearState, mutate } = useApolloMutationResult(
     updateUser
   );
@@ -61,7 +70,8 @@ const Profile = ({ data: { me }, updateUser }) => {
       sfMembershipId
     });
 
-    mutate(trimmedValues).then(({ data: { editedUser } }) => {
+    mutate(trimmedValues).then(({ data }) => {
+      const editedUser = data!.editedUser;
       setEditedUser(editedUser);
       setTimeout(clearState, 5000);
     });
@@ -106,7 +116,7 @@ const Profile = ({ data: { me }, updateUser }) => {
         />
       </Field>
       <FieldWithoutMaxWidth text="Kalenderlänk:">
-        <CopyValue text={me.calendarFeedUrl} />
+        {me.calendarFeedUrl && <CopyValue text={me.calendarFeedUrl} />}
       </FieldWithoutMaxWidth>
       <MainButton onClick={handleSubmit}>Spara användare</MainButton>
       <ForetagsbiljettListContainer foretagsbiljetter={me.foretagsbiljetter} />
@@ -114,14 +124,23 @@ const Profile = ({ data: { me }, updateUser }) => {
   );
 };
 
-const useStateWithHandleChangeName = initialValue => {
-  const [state, setState] = useState(initialValue);
+const useStateWithHandleChangeName = <T extends object>(
+  initialValue: T
+): [
+  T,
+  (event: React.ChangeEvent<HTMLInputElement>) => void,
+  React.Dispatch<React.SetStateAction<T>>
+] => {
+  const [state, setState] = useState<T>(initialValue);
 
-  const handleChange = useCallback(event => {
-    const { name, value } = event.target;
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = event.target;
 
-    setState(state => ({ ...state, [name]: value }));
-  }, []);
+      setState(state => ({ ...state, [name]: value }));
+    },
+    []
+  );
 
   return [state, handleChange, setState];
 };

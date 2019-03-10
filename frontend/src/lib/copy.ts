@@ -1,4 +1,4 @@
-const copy = string => {
+const copy = (string: string): void => {
   var aux = document.createElement("input");
   aux.value = string;
   document.body.appendChild(aux);

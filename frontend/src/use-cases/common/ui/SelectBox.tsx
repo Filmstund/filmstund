@@ -2,6 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
+import { CreateShowingQuery_movie_sfShowings } from "../../new-showing/__generated__/CreateShowingQuery";
 
 const Option = styled.div`
   display: flex;
@@ -39,7 +40,12 @@ const RightArrow = styled.div`
   margin-left: 0.4em;
 `;
 
-const SelectBox = ({ options, onChange, ...props }) => (
+interface Props {
+  options: CreateShowingQuery_movie_sfShowings[];
+  onChange: (v: CreateShowingQuery_movie_sfShowings) => void;
+}
+
+const SelectBox: React.FC<Props> = ({ options, onChange }) => (
   <Box>
     {options.map(option => (
       <Option
@@ -51,7 +57,9 @@ const SelectBox = ({ options, onChange, ...props }) => (
           {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          {option.tags.map(tag => (
+            <Tag key={tag}>{tag}</Tag>
+          ))}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>

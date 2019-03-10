@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import copy from "../../../lib/copy";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
-const Hover = styled.span`
+const Hover = styled.span<{ strikethrough: boolean }>`
   &:hover {
     cursor: pointer;
     color: gray;
@@ -18,7 +18,12 @@ const Hover = styled.span`
   text-decoration: ${props => (props.strikethrough ? "line-through" : "none")};
 `;
 
-const CopyValue = props => {
+interface Props {
+  text: string;
+  useStricken?: boolean;
+}
+
+const CopyValue: React.FC<Props> = props => {
   const [isStricken, setIsStricken] = useState(false);
 
   const onClick = useCallback(() => {
