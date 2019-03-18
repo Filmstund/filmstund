@@ -16,4 +16,5 @@ export function trim(v: any): any {
   }
 }
 
-export const capitalize = s => s[0].toUpperCase() + s.substring(1);
+export const capitalize = (s: string): string =>
+  s[0].toUpperCase() + s.substring(1);

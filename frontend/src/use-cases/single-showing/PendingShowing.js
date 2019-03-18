@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { compose } from "react-apollo";
 import gql from "graphql-tag";
 
 import { SmallHeader } from "../../use-cases/common/ui/Header";
@@ -9,18 +8,13 @@ import Modal from "../../use-cases/common/ui/Modal";
 import createPaymentOptions, {
   stringifyOption
 } from "./utils/createPaymentOptions";
-import {
-  attendShowing,
-  unattendShowing
-} from "../../apollo/mutations/showings";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
+import {
+  useAttendShowing,
+  useUnattendShowing
+} from "../../apollo/mutations/showings/useAttendShowing";
 
-const PendingShowing = ({
-  isParticipating,
-  foretagsbiljetter,
-  attendShowing,
-  unattendShowing
-}) => {
+export const PendingShowing = ({ isParticipating, foretagsbiljetter }) => {
   const [selectedIndex, handleSelectIndex] = useStateWithHandleChange(0);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -28,6 +22,9 @@ const PendingShowing = ({
     () => createPaymentOptions(foretagsbiljetter),
     [foretagsbiljetter]
   );
+
+  const attendShowing = useAttendShowing();
+  const unattendShowing = useUnattendShowing();
 
   const attendWithPaymentOption = useCallback(
     paymentOption => {
@@ -111,8 +108,3 @@ PendingShowing.fragments = {
     }
   `
 };
-
-export default compose(
-  attendShowing,
-  unattendShowing
-)(PendingShowing);

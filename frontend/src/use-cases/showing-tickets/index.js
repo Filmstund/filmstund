@@ -4,7 +4,7 @@ import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import TicketContainer from "./TicketContainer";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
-import { ticketFragment, addTickets } from "../../apollo/mutations/tickets";
+import { ticketFragment } from "../../apollo/mutations/useAddTickets";
 
 const routerParamsToShowingId = ({ match }) => {
   const { webId } = match.params;
@@ -40,6 +40,5 @@ export default compose(
   withRouter,
   withProps(routerParamsToShowingId),
   data,
-  addTickets,
   isLoading
 )(TicketContainer);

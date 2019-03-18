@@ -49,12 +49,17 @@ const SelectBox: React.FC<Props> = ({ options, onChange }) => (
   <Box>
     {options.map(option => (
       <Option
-        key={option.cinemaName + option.screen.sfId + option.timeUtc}
+        key={
+          option.cinemaName +
+          (option.screen ? option.screen.sfId : "") +
+          option.timeUtc
+        }
         onClick={() => onChange(option)}
       >
         <Lable>
-          {formatLocalTime(option.timeUtc)} {option.screen.name},{" "}
-          {option.cinemaName.replace(/ ?Filmstaden ?/, "")}
+          {option.timeUtc && formatLocalTime(option.timeUtc)}{" "}
+          {option.screen && option.screen.name},{" "}
+          {option.cinemaName && option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
           {option.tags.map(tag => (

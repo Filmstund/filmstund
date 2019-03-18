@@ -11,8 +11,8 @@ export const StatusBox = styled.div<{ error?: boolean }>`
 
 interface Props {
   errors?: Error[] | null | undefined;
-  success: boolean;
-  successMessage: string;
+  success?: boolean;
+  successMessage?: string;
 }
 
 const StatusMessageBox: React.FC<Props> = ({

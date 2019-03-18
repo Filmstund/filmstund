@@ -4,7 +4,6 @@ import gql from "graphql-tag";
 import { withProps, renderComponent, branch } from "recompose";
 import EditShowingForm from "./EditShowingForm";
 import { showingFragment } from "../common/showing/Showing";
-import { updateShowing, deleteShowing } from "../../apollo/mutations/showings";
 import Loader from "../common/utils/ProjectorLoader";
 
 const routerParamsToShowingId = ({ match }) => {
@@ -45,7 +44,5 @@ export default compose(
   withRouter,
   withProps(routerParamsToShowingId),
   data,
-  updateShowing,
-  deleteShowing,
   isLoading
 )(EditShowingForm);
