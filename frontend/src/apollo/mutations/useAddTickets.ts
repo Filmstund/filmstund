@@ -1,6 +1,7 @@
-import { graphql } from "react-apollo";
 import gql from "graphql-tag";
-import { wrapMutate } from "../../store/apollo";
+import { useMutation } from "react-apollo-hooks";
+
+import { AddTickets, AddTicketsVariables } from "./__generated__/AddTickets";
 
 export const ticketFragment = gql`
   fragment Ticket on Showing {
@@ -51,19 +52,20 @@ export const ticketFragment = gql`
   }
 `;
 
-export const addTickets = graphql(
-  gql`
-    mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
-      processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
-        ...Ticket
-      }
+const addTicketsMutation = gql`
+  mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
+    processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
+      ...Ticket
     }
-    ${ticketFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      addTickets: (showingId, tickets) =>
-        wrapMutate(mutate, { showingId, tickets })
-    })
   }
-);
+  ${ticketFragment}
+`;
+
+export const useAddTickets = () => {
+  const mutate = useMutation<AddTickets, AddTicketsVariables>(
+    addTicketsMutation
+  );
+
+  return (showingId: string, tickets: string[]) =>
+    mutate({ variables: { showingId, tickets } });
+};

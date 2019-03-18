@@ -10,7 +10,7 @@ const PayToUser = ({ user }) => (
   </span>
 );
 
-const BoughtShowing = ({
+export const BoughtShowing = ({
   isAdmin,
   attendeePaymentDetails,
   myTickets,
@@ -62,5 +62,3 @@ BoughtShowing.fragments = {
     }
   `
 };
-
-export default BoughtShowing;

@@ -3,8 +3,13 @@ export const getToken = (): string | null =>
 export const hasToken = (): boolean => !!getToken();
 export const getGoogleId = (): string | null =>
   window.localStorage.getItem("googleId");
-export const getExpiresAt = (): number | null =>
-  parseInt(window.localStorage.getItem("expiresAt"), 10);
+export const getExpiresAt = (): number | null => {
+  const value = window.localStorage.getItem("expiresAt");
+  if (!value) {
+    return null;
+  }
+  return parseInt(value, 10);
+};
 
 interface GoogleAuthResponse {
   id_token: string;

@@ -29,7 +29,13 @@ const filterEnterKey = (event, callback) => {
   }
 };
 
-const PosterBox = ({ className, poster, onClick, headerText, children }) => (
+const PosterBox = ({
+  className = "",
+  poster,
+  onClick,
+  headerText,
+  children
+}) => (
   <div
     tabIndex={onClick ? "0" : "-1"}
     className={className}

@@ -1,17 +1,15 @@
-import React, { Component } from "react";
+import gql from "graphql-tag";
 import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { compose } from "react-apollo";
 import { withRouter } from "react-router";
 
+import { useMarkAsBought } from "../../apollo/mutations/showings/useMarkAsBought";
+import { useTogglePaidChange } from "../../apollo/mutations/showings/useTogglePaidChange";
+import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 import MainButton, { GrayButton } from "../../use-cases/common/ui/MainButton";
+import { navigateToEditShowing } from "../common/navigators";
 import BuyModal from "./BuyModal";
-import gql from "graphql-tag";
-import {
-  markAsBought,
-  togglePaidChange
-} from "../../apollo/mutations/showings";
-import { compose } from "react-apollo";
-import { navigateToEditShowing } from "../common/navigators/index";
-import { addTickets } from "../../apollo/mutations/tickets";
 
 class AdminAction extends Component {
   constructor(props) {
@@ -121,7 +119,7 @@ class AdminAction extends Component {
     } = this.state;
 
     return (
-      <React.Fragment>
+      <>
         {showModal && (
           <BuyModal
             errors={errors}
@@ -148,7 +146,7 @@ class AdminAction extends Component {
           </MainButton>
         )}
         <GrayButton onClick={this.handleEdit}>Ändra besök</GrayButton>
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -157,7 +155,22 @@ AdminAction.propTypes = {
   showing: PropTypes.object.isRequired
 };
 
-AdminAction.fragments = {
+const AdminActionComponent = compose(withRouter)(props => {
+  const addTickets = useAddTickets();
+  const togglePaidChange = useTogglePaidChange();
+  const markAsBought = useMarkAsBought();
+
+  return (
+    <AdminAction
+      {...props}
+      addTickets={addTickets}
+      togglePaidChange={togglePaidChange}
+      markAsBought={markAsBought}
+    />
+  );
+});
+
+AdminActionComponent.fragments = {
   showing: gql`
     fragment ShowingAdmin on Showing {
       id
@@ -198,9 +211,4 @@ AdminAction.fragments = {
   `
 };
 
-export default compose(
-  withRouter,
-  markAsBought,
-  addTickets,
-  togglePaidChange
-)(AdminAction);
+export default AdminActionComponent;

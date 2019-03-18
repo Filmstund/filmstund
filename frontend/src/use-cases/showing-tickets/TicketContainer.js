@@ -11,6 +11,7 @@ import { navigateToShowing } from "../common/navigators/index";
 
 import { FieldWithoutMaxWidth } from "../common/ui/Field";
 import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
+import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 
 const TicketContainer = props => {
   const {
@@ -20,7 +21,7 @@ const TicketContainer = props => {
 
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState([]);
   const { errors, success, mutate: addTickets } = useApolloMutationResult(
-    props.addTickets
+    useAddTickets()
   );
 
   const handleGoBackToShowing = useCallback(() => {
