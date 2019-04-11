@@ -6,7 +6,7 @@
     "@packtracker/webpack-plugin": "2.0.0",
     "eslint-plugin-react-hooks": "1.5.0",
     "react-scripts": "2.1.8",
-    "webpack-bundle-analyzer": "3.0.4"
+    "webpack-bundle-analyzer": "3.3.2"
   },
   "dependencies": {
     "@emotion/core": "10.0.7",
