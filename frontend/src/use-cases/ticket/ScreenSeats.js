@@ -23,11 +23,8 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
   const maxWidth = Math.min(window.innerWidth - 80, 464);
   const maxHeight = maxWidth * heightRatio;
 
-  const [
-    {
-      dimensions: { width, height }
-    }
-  ] = seatMap;
+  const width = 10;
+  const height = 10;
 
   const minY = minBy(seatMap, s => s.coordinates.y).coordinates.y;
 
