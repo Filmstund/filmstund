@@ -45,8 +45,8 @@ export const ScreenSeats = ({ ticketRange, seatMap }) => {
           style={{
             top: parseInt((data.coordinates.y - minY) * scaleY, 10),
             left: parseInt((data.coordinates.x - minX) * scaleX, 10),
-            height: parseInt(height * scaleY, 10),
-            width: parseInt(width * scaleX, 10)
+            height: parseInt(height, 10),
+            width: parseInt(width, 10)
           }}
           key={data.number}
           selected={numbers.includes(data.number)}
