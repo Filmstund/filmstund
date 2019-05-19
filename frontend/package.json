@@ -35,7 +35,7 @@
     "react-router": "4.3.1",
     "react-router-dom": "4.3.1",
     "react-select": "2.1.2",
-    "react-testing-library": "6.0.0",
+    "react-testing-library": "7.0.1",
     "recompose": "0.30.0",
     "rollbar": "2.5.1",
     "whatwg-fetch": "3.0.0"
