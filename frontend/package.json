@@ -5,7 +5,7 @@
   "devDependencies": {
     "@packtracker/webpack-plugin": "2.0.0",
     "eslint-plugin-react-hooks": "1.5.0",
-    "react-scripts": "2.1.8",
+    "react-scripts": "3.1.0",
     "webpack-bundle-analyzer": "3.0.4"
   },
   "dependencies": {
