@@ -1,7 +1,8 @@
 import ForetagsbiljettList from "./ForetagsbiljettList";
 import { wrapMutate } from "../../store/apollo";
-import { graphql, compose } from "react-apollo";
+import { graphql } from "react-apollo";
 import gql from "graphql-tag";
+import { compose } from "recompose";
 
 const addForetagsbiljett = graphql(
   gql`

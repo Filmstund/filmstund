@@ -1,24 +1,27 @@
+import gql from "graphql-tag";
 import React, { useCallback } from "react";
+import { useQuery } from "react-apollo";
+import { useFetchMovies } from "../../apollo/queries/movies";
+import { useRouter } from "../../lib/useRouter";
+import { navigateToShowing } from "../common/navigators";
 
 import { movieFragment } from "../common/showing/Movie";
+import { NewShowingQuery } from "./__generated__/NewShowingQuery";
 import CreateShowingForm from "./CreateShowingForm";
-
-import gql from "graphql-tag";
-import { graphql, compose } from "react-apollo";
-import { fetchMovies } from "../../apollo/queries/movies";
-import { navigateToShowing } from "../common/navigators/index";
 import MovieSelector from "./MovieSelector";
-import { useRouter } from "../../lib/useRouter";
 
-const NewShowing = props => {
-  const { history } = useRouter();
+const NewShowing = () => {
   const {
-    data: { movies = [] },
+    history,
     match: {
       params: { movieId }
-    },
-    fetchMovies
-  } = props;
+    }
+  } = useRouter();
+
+  const { data } = useAllMovies();
+  const [fetchMovies] = useFetchMovies();
+
+  const movies = data ? data.movies : [];
 
   const handleNavigateToShowing = useCallback(
     showing => {
@@ -27,9 +30,12 @@ const NewShowing = props => {
     [history]
   );
 
-  const clearSelectedMovie = useCallback(() => {
-    history.push("/showings/new");
-  }, [history]);
+  const clearSelectedMovie = useCallback(
+    () => {
+      history.push("/showings/new");
+    },
+    [history]
+  );
 
   const setMovie = useCallback(
     movie => {
@@ -57,26 +63,22 @@ const NewShowing = props => {
   }
 };
 
-const data = graphql(
-  gql`
-    query NewShowingQuery {
-      movies: allMovies {
-        ...Movie
-        id
-        popularity
-        releaseDate
+const useAllMovies = () =>
+  useQuery<NewShowingQuery>(
+    gql`
+      query NewShowingQuery {
+        movies: allMovies {
+          ...Movie
+          id
+          popularity
+          releaseDate
+        }
       }
-    }
-    ${movieFragment}
-  `,
-  {
-    options: {
+      ${movieFragment}
+    `,
+    {
       fetchPolicy: "cache-and-network"
     }
-  }
-);
+  );
 
-export default compose(
-  data,
-  fetchMovies
-)(NewShowing);
+export default NewShowing;
