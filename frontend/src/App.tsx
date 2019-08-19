@@ -1,17 +1,17 @@
-import React, { Suspense, lazy } from "react";
-import { Route, Switch } from "react-router";
-import gql from "graphql-tag";
 import styled from "@emotion/styled";
+import gql from "graphql-tag";
+import React, { lazy, Suspense } from "react";
+import { useQuery } from "react-apollo";
+import { Route, Switch } from "react-router";
+import { AppQuery } from "./__generated__/AppQuery";
+import { completeUserFragment } from "./apollo/queries/currentUser";
+import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
+import Footer from "./use-cases/common/ui/footer/Footer";
 
 import NavBar from "./use-cases/common/ui/NavBar";
-import Footer from "./use-cases/common/ui/footer/Footer";
-import { WelcomeModal } from "./use-cases/common/utils/WelcomeModal";
-import { completeUserFragment } from "./apollo/queries/currentUser";
-import Loader from "./use-cases/common/utils/ProjectorLoader";
-import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
 import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
-import { useQuery } from "react-apollo-hooks";
-import { AppQuery } from "./__generated__/AppQuery";
+import Loader from "./use-cases/common/utils/ProjectorLoader";
+import { WelcomeModal } from "./use-cases/common/utils/WelcomeModal";
 
 const MainGridContainer = styled.div`
   flex: 1;
@@ -59,8 +59,13 @@ interface Props {
 }
 
 const App: React.FC<Props> = ({ signout }) => {
-  const { data } = useQuery<AppQuery>(appQuery, { suspend: true });
-  const me = data!.me;
+  const { data } = useQuery<AppQuery>(appQuery);
+
+  if (!data) {
+    return <Loader />;
+  }
+
+  const me = data.me;
 
   return (
     <>

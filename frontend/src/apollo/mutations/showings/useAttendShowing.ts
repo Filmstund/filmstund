@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 import {
   AttendShowing,
   AttendShowingVariables
@@ -45,7 +45,7 @@ const unattendShowingMutation = gql`
 `;
 
 export const useAttendShowing = () => {
-  const mutate = useMutation<AttendShowing, AttendShowingVariables>(
+  const [mutate] = useMutation<AttendShowing, AttendShowingVariables>(
     attendShowingMutation
   );
 
@@ -54,7 +54,7 @@ export const useAttendShowing = () => {
 };
 
 export const useUnattendShowing = () => {
-  const mutate = useMutation<UnattendShowing, UnattendShowingVariables>(
+  const [mutate] = useMutation<UnattendShowing, UnattendShowingVariables>(
     unattendShowingMutation
   );
 

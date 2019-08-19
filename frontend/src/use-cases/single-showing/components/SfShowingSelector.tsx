@@ -1,4 +1,4 @@
-import { useQuery } from "react-apollo-hooks";
+import { useQuery } from "react-apollo";
 import gql from "graphql-tag";
 import {
   SfShowings,

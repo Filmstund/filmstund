@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 import {
   TogglePaidChange,
   TogglePaidChangeVariables
@@ -16,7 +16,7 @@ const togglePaidChangeMutation = gql`
 `;
 
 export const useTogglePaidChange = () => {
-  const mutate = useMutation<TogglePaidChange, TogglePaidChangeVariables>(
+  const [mutate] = useMutation<TogglePaidChange, TogglePaidChangeVariables>(
     togglePaidChangeMutation
   );
 

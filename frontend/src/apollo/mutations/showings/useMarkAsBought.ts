@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 import {
   MarkShowingAsBought,
   MarkShowingAsBoughtVariables
@@ -58,7 +58,7 @@ const markAsBoughtMutation = gql`
 `;
 
 export const useMarkAsBought = () => {
-  const mutate = useMutation<MarkShowingAsBought, MarkShowingAsBoughtVariables>(
+  const [mutate] = useMutation<MarkShowingAsBought, MarkShowingAsBoughtVariables>(
     markAsBoughtMutation
   );
 
