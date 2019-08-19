@@ -74,6 +74,7 @@ jobs:
           docker push cthdidit/sefilm-backend
 
 workflows:
+  version: 2
   packtracker:
     jobs:
       - packtracker/report
