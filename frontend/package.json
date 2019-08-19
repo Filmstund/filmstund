@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@packtracker/webpack-plugin": "2.0.0",
     "@types/lodash-es": "^4.17.3",
     "@types/react-router-dom": "^4.3.1",
     "apollo": "^2.6.0",
@@ -51,7 +50,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "packtracker": "react-scripts build --stats && packtracker-upload --stats=build/bundle-stats.json",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
     "eject": "react-scripts eject"
   },

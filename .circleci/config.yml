@@ -1,4 +1,7 @@
-version: 2
+version: 2.1
+
+orbs:
+  packtracker: packtracker/report@2.2.0
 
 defaults: &defaults
   working_directory: ~/itbio
@@ -71,7 +74,10 @@ jobs:
           docker push cthdidit/sefilm-backend
 
 workflows:
-  version: 2
+  packtracker:
+    jobs:
+      - packtracker/report
+        project_root: "./frontend"
   build:
     jobs:
       - test-backend
