@@ -1,5 +1,6 @@
 ### Pending migrations ###
-N/A
+db.movie.update({}, {$rename:{"sfId":"filmstadenId"}}, false, true);
+db.movie.update({}, {$rename:{"sfSlug":"filmstadenSlug"}}, false, true);
 
 ### Migrations already done in deployed application ###
 # Change fields to @DBRef on all showings
