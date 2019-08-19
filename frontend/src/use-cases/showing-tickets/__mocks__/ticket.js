@@ -1,9 +1,9 @@
-export const createMockSeat = (row, number) => ({
+export const createMockSeat = (row, number, x, y) => ({
   row,
   number,
   coordinates: {
-    x: 1,
-    y: 0
+    x,
+    y
   },
   dimensions: {
     width: 10,

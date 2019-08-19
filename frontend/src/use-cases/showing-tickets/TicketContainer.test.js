@@ -41,10 +41,10 @@ const mockData = {
       ]
     },
     sfSeatMap: [
-      createMockSeat(2, 3),
-      createMockSeat(2, 4),
-      createMockSeat(3, 5),
-      createMockSeat(3, 6)
+      createMockSeat(2, 3, 5, 0),
+      createMockSeat(2, 4, 10, 0),
+      createMockSeat(3, 5, 5, 5),
+      createMockSeat(3, 6, 10, 5)
     ],
     myTickets: [
       createMockTicket(1, 2, 3),

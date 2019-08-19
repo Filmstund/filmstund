@@ -16,6 +16,9 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
       Våra platser:
     </h3>
     <div
+      style="display: flex; justify-content: center;"
+    />
+    <div
       class="css-qzkjqk"
     >
       <div
