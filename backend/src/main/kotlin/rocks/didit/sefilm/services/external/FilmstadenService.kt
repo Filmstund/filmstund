@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
-class SFService(
+class FilmstadenService(
   private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,
   private val httpEntity: HttpEntity<Void>,
@@ -33,48 +33,48 @@ class SFService(
     private const val CINEMA_URL = "$API_URL/v2/cinema/sv/1/200"
     private const val MOVIES_URL = "$API_URL/v2/movie/sv/1/1000"
     private const val SEAT_MAP_URL = "$API_URL/v2/show/seats/sv/{cinemaId}/{screenId}"
-    private val log = LoggerFactory.getLogger(SFService::class.java)
+    private val log = LoggerFactory.getLogger(FilmstadenService::class.java)
   }
 
-  @Cacheable("sfdates")
-  fun getShowingDates(sfId: String, cityAlias: String = "GB"): List<SfShowingDTO> {
+  @Cacheable("filmstadenDates")
+  fun getShowingDates(filmstadenId: String, cityAlias: String = "GB"): List<FilmstadenShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
 
     val uri = UriComponentsBuilder.fromUriString(SHOW_URL)
       .queryParam("filter.countryAlias", "se")
       .queryParam("filter.cityAlias", cityAlias)
-      .queryParam("filter.movieNcgId", sfId)
+      .queryParam("filter.movieNcgId", filmstadenId)
       .queryParam("filter.timeUtc.greaterThanOrEqualTo", startTime)
       .build().toUri()
 
     val responseBody = restTemplate
-      .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<SfShowItemsDTO>() {})
-      .body ?: throw ExternalProviderException("[SF] Response body is null")
+      .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<FilmstadenShowItemsDTO>() {})
+      .body ?: throw ExternalProviderException("[Filmstaden] Response body is null")
 
-    return responseBody.items.map { SfShowingDTO.from(it) }.sortedBy { it.timeUtc }
+    return responseBody.items.map { FilmstadenShowingDTO.from(it) }.sortedBy { it.timeUtc }
   }
 
-  fun getLocationsInCity(cityAlias: String = properties.defaultCity): List<SfCinemaWithAddressDTO> {
+  fun getLocationsInCity(cityAlias: String = properties.defaultCity): List<FilmstadenCinemaWithAddressDTO> {
     val uri = UriComponentsBuilder.fromUriString(CINEMA_URL)
       .queryParam("filter.countryAlias", "se")
       .queryParam("filter.cityAlias", cityAlias)
       .build().toUri()
 
     val responseBody = restTemplate
-      .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<SfLocationItemsDTO>() {})
-      .body ?: throw ExternalProviderException("[SF] Response body is null")
+      .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<FilmstadenLocationItemsDTO>() {})
+      .body ?: throw ExternalProviderException("[Filmstaden] Response body is null")
 
     return responseBody.items
   }
 
-  fun fetchExtendedInfo(sfId: String): SfExtendedMovieDTO? {
+  fun fetchExtendedInfo(filmstadenId: String): FilmstadenExtendedMovieDTO? {
     val body = restTemplate.exchange(
-      API_URL + "/v2/movie/sv/{sfId}",
+      API_URL + "/v2/movie/sv/{filmstadenId}",
       HttpMethod.GET,
       httpEntity,
-      SfExtendedMovieDTO::class.java,
-      sfId
+      FilmstadenExtendedMovieDTO::class.java,
+      filmstadenId
     ).body
     if (body?.ncgId == null) {
       return null
@@ -82,21 +82,21 @@ class SFService(
     return body
   }
 
-  fun allMovies(): List<SfMovieDTO> {
+  fun allMovies(): List<FilmstadenMovieDTO> {
     val responseBody = restTemplate
-      .exchange(MOVIES_URL, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<SfMovieItemsDTO>() {})
-      .body ?: throw ExternalProviderException("[SF] Response body is null")
+      .exchange(MOVIES_URL, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<FilmstadenMovieItemsDTO>() {})
+      .body ?: throw ExternalProviderException("[Filmstaden] Response body is null")
 
     return responseBody.items
   }
 
-  // https://www.sf.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
-  fun fetchTickets(sysId: String, sfShowingId: String, ticketId: String): List<SfTicketDTO> {
-    val url = "$API_URL/v2/ticket/$sysId/$sfShowingId/$ticketId"
+  // https://www.filmstaden.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
+  fun fetchTickets(sysId: String, filmstadenShowingId: String, ticketId: String): List<FilmstadenTicketDTO> {
+    val url = "$API_URL/v2/ticket/$sysId/$filmstadenShowingId/$ticketId"
 
     log.debug("Fetching tickets from $url")
     return restTemplate
-      .exchange(url, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<SfTicketDTO>>() {})
+      .exchange(url, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<List<FilmstadenTicketDTO>>() {})
       .body ?: listOf()
   }
 
@@ -117,7 +117,7 @@ class SFService(
       .plusMinutes(30L * (now.minute / 30L))
   }
 
-  fun getSfBuyLink(movieId: UUID?): String? {
+  fun getFilmstadenBuyLink(movieId: UUID?): String? {
     if (movieId == null) {
       throw IllegalArgumentException("Missing movie ID")
     }
@@ -126,20 +126,20 @@ class SFService(
       .orElseThrow { NotFoundException("movie '$movieId") }
 
     return when {
-      movie.sfId != null && movie.sfSlug != null -> "https://www.sf.se/film/${movie.sfId}/${movie.sfSlug}"
+      movie.filmstadenId != null && movie.filmstadenSlug != null -> "https://www.filmstaden.se/film/${movie.filmstadenId}/${movie.filmstadenSlug}"
       else -> null
     }
   }
 
-  @Cacheable("sfSeatMap")
-  fun getSfSeatMap(cinemaId: String, screenId: String): List<SfSeatMapDTO> {
+  @Cacheable("filmstadenSeatMap")
+  fun getFilmstadenSeatMap(cinemaId: String, screenId: String): List<FilmstadenSeatMapDTO> {
     log.debug("Fetching seat map from $SEAT_MAP_URL with cinemaId=$cinemaId, screenId=$screenId")
     return restTemplate
       .exchange(
         SEAT_MAP_URL,
         HttpMethod.GET,
         httpEntity,
-        object : ParameterizedTypeReference<List<SfSeatMapDTO>>() {},
+        object : ParameterizedTypeReference<List<FilmstadenSeatMapDTO>>() {},
         cinemaId,
         screenId
       )

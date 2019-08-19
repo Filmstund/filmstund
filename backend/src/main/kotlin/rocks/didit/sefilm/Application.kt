@@ -45,7 +45,7 @@ import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.notification.MailSettings
 import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.services.SlugService
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import rocks.didit.sefilm.web.controllers.CalendarController
 import java.math.BigDecimal
@@ -148,14 +148,14 @@ class Application {
       }
   }
 
-  private data class LocationAliasDTO(val sfId: String, val alias: List<String>)
+  private data class LocationAliasDTO(val filmstadenId: String, val alias: List<String>)
 
   @Bean
   fun seedInitialData(
-    locationsRepo: LocationRepository,
-    budordRepo: BudordRepository,
-    sfService: SFService,
-    properties: Properties
+          locationsRepo: LocationRepository,
+          budordRepo: BudordRepository,
+          filmstadenService: FilmstadenService,
+          properties: Properties
   ) = ApplicationRunner { _ ->
     if (!properties.enableSeeding) {
       log.info("Seeding not enabled, ignoring...")
@@ -175,11 +175,11 @@ class Application {
     val locationsResource = ClassPathResource("seeds/locations.json")
     val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
 
-    val locationNameAliasResource = ClassPathResource("seeds/sf-location-aliases.json")
+    val locationNameAliasResource = ClassPathResource("seeds/filmstaden-location-aliases.json")
     val locationNameAlias: List<LocationAliasDTO> = objectMapper.readValue(locationNameAliasResource.inputStream)
 
     val defaultCity = properties.defaultCity
-    val locationsFromSF = sfService.getLocationsInCity(properties.defaultCity)
+    val locationsFromFilmstaden = filmstadenService.getLocationsInCity(properties.defaultCity)
       .map {
         Location(
           it.title,
@@ -191,14 +191,14 @@ class Application {
           BigDecimal(it.address.coordinates.latitude),
           BigDecimal(it.address.coordinates.longitude),
           it.ncgId,
-          alias = locationNameAlias.firstOrNull { alias -> alias.sfId == it.ncgId }?.alias ?: listOf()
+          alias = locationNameAlias.firstOrNull { alias -> alias.filmstadenId == it.ncgId }?.alias ?: listOf()
         )
       }
 
     locationsRepo.saveAll(locations)
     log.info("Seeded locations with ${locations.size} values")
 
-    log.info("Seeded ${locationsRepo.saveAll(locationsFromSF).count()} locations from SF for city: $defaultCity")
+    log.info("Seeded ${locationsRepo.saveAll(locationsFromFilmstaden).count()} locations from Filmstaden for city: $defaultCity")
   }
 
   @Bean

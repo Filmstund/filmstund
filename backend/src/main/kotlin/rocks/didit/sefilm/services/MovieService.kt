@@ -6,20 +6,20 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.domain.dto.SfMovieDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenMovieDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import java.time.Duration
 import java.util.*
 
 @Service
 class MovieService(
-  private val movieRepo: MovieRepository,
-  private val sfService: SFService,
-  private val filterUtil: MovieFilterUtil,
-  private val asyncMovieUpdater: AsyncMovieUpdater?
+        private val movieRepo: MovieRepository,
+        private val filmstadenService: FilmstadenService,
+        private val filterUtil: MovieFilterUtil,
+        private val asyncMovieUpdater: AsyncMovieUpdater?
 ) {
 
   companion object {
@@ -41,12 +41,12 @@ class MovieService(
 
   fun movieExists(movieId: UUID): Boolean = movieRepo.existsById(movieId)
 
-  /** Fetch new movies from SF, and trigger an async background update of the movies when done */
-  fun fetchNewMoviesFromSf(): List<Movie> {
-    val sfMovies = sfService.allMovies()
+  /** Fetch new movies from Filmstaden, and trigger an async background update of the movies when done */
+  fun fetchNewMoviesFromFilmstaden(): List<Movie> {
+    val FilmstadenMovies = filmstadenService.allMovies()
 
     val ourMovies = movieRepo.findAll()
-    val newMoviesWeHaventPreviouslySeen = sfMovies
+    val newMoviesWeHaventPreviouslySeen = FilmstadenMovies
       .filter {
         filterUtil.isNewerThan(it)
           && !filterUtil.isMovieUnwantedBasedOnGenre(it.genres.map { it.name })
@@ -55,21 +55,21 @@ class MovieService(
       }
       .map {
         Movie(title = filterUtil.trimTitle(it.title),
-          sfId = it.ncgId,
+          filmstadenId = it.ncgId,
           releaseDate = it.releaseDate,
           poster = it.posterUrl,
-          sfSlug = it.slug,
+          filmstadenSlug = it.slug,
           runtime = Duration.ofMinutes(it.length?.toLong() ?: 0L),
           genres = it.genres.map { g -> g.name })
       }
 
     val savedEntities = movieRepo.saveAll(newMoviesWeHaventPreviouslySeen)
-    log.info("Fetched ${savedEntities.count()} new movies from SF")
+    log.info("Fetched ${savedEntities.count()} new movies from Filmstaden")
 
     asyncMovieUpdater?.extendMovieInfo(savedEntities)
     return savedEntities.sortedBy { it.releaseDate }
   }
 
-  private fun Iterable<Movie>.isOtherMovieAlreadyKnown(other: SfMovieDTO) =
-    this.firstOrNull { our -> our.sfId == other.ncgId } == null
+  private fun Iterable<Movie>.isOtherMovieAlreadyKnown(other: FilmstadenMovieDTO) =
+    this.firstOrNull { our -> our.filmstadenId == other.ncgId } == null
 }

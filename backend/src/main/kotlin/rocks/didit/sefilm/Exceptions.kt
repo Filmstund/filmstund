@@ -38,7 +38,7 @@ class TicketExpiredException(whichTicket: TicketNumber) :
 class TicketInUseException(whichTicket: TicketNumber) :
   KnownException("The ticket $whichTicket is already in use on a showing and cannot be removed")
 
-class SfTicketException(msg: String) : KnownException(msg)
+class FilmstadenTicketException(msg: String) : KnownException(msg)
 
 open class KnownException(
   msg: String,

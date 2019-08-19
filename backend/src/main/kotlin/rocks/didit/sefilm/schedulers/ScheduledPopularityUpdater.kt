@@ -11,7 +11,7 @@ import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toImdbId
 import rocks.didit.sefilm.toTmdbId
 import java.time.Instant
@@ -26,16 +26,16 @@ import java.util.*
   havingValue = "true"
 )
 class ScheduledPopularityUpdater(
-  private val movieRepository: MovieRepository,
-  private val sfService: SFService,
-  private val imdbClient: ImdbClient
+        private val movieRepository: MovieRepository,
+        private val filmstadenService: FilmstadenService,
+        private val imdbClient: ImdbClient
 ) {
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 10L * 60 * 1000L // 10min
     private const val UPDATE_INTERVAL = 4 * 60 * 60 * 1000L // 4 hours
 
-    private const val HAS_SF_SHOWINGS_POPULARITY = 500.0
+    private const val HAS_FILMSTADEN_SHOWINGS_POPULARITY = 500.0
   }
 
   private val log = LoggerFactory.getLogger(ScheduledPopularityUpdater::class.java)
@@ -88,10 +88,10 @@ class ScheduledPopularityUpdater(
       return
     }
 
-    val newPopularity = when (movie.hasFutureSfShowings()) {
+    val newPopularity = when (movie.hasFutureFilmstadenShowings()) {
       true -> {
-        log.info("[Popularity] ${movie.title} has future showings at SF, increasing popularity by $HAS_SF_SHOWINGS_POPULARITY")
-        popularityAndId.popularity + HAS_SF_SHOWINGS_POPULARITY
+        log.info("[Popularity] ${movie.title} has future showings at Filmstaden, increasing popularity by $HAS_FILMSTADEN_SHOWINGS_POPULARITY")
+        popularityAndId.popularity + HAS_FILMSTADEN_SHOWINGS_POPULARITY
       }
       false -> popularityAndId.popularity
     }
@@ -106,10 +106,10 @@ class ScheduledPopularityUpdater(
     movieRepository.save(updatedMovie)
   }
 
-  private fun Movie.hasFutureSfShowings(): Boolean {
-    if (this.sfId == null || this.sfId.isBlank()) return false
+  private fun Movie.hasFutureFilmstadenShowings(): Boolean {
+    if (this.filmstadenId == null || this.filmstadenId.isBlank()) return false
 
-    return sfService.getShowingDates(this.sfId).isNotEmpty()
+    return filmstadenService.getShowingDates(this.filmstadenId).isNotEmpty()
   }
 
   private fun rescheduleNextPopularityUpdate(weeks: Long = 4, movie: Movie) {
