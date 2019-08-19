@@ -73,7 +73,7 @@ workflows:
     jobs:
       - packtracker/report:
           project_root: "./frontend"
-          webpack_config: "react-scripts/config/webpack.config"
+          webpack_config: "react-scripts/config/webpack.config.js"
   build:
     jobs:
       - test-backend
