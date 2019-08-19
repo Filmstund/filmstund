@@ -11,9 +11,7 @@
     "@types/react-router": "^5.0.3",
     "@types/react-router-dom": "^4.3.4",
     "apollo": "^2.17.4",
-    "react-scripts": "3.1.1",
-    "source-map-explorer": "^2.0.1",
-    "webpack": "4.39.1"
+    "source-map-explorer": "^2.0.1"
   },
   "dependencies": {
     "@emotion/core": "^10.0.16",
@@ -45,6 +43,7 @@
     "react-router": "5.0.1",
     "react-router-dom": "5.0.1",
     "react-select": "3.0.4",
+    "react-scripts": "3.1.1",
     "recompose": "0.30.0",
     "rollbar": "2.12.0",
     "typescript": "^3.5.3",
