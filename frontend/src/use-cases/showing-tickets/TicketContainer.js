@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
 import MainButton from "../../use-cases/common/ui/MainButton";
 import Ticket from "./Ticket";
 import SeatRange from "./SeatRange";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
-import { ScreenSeats } from "../../use-cases/ticket/ScreenSeats";
+import { ScreenSeats } from "../ticket/ScreenSeats";
 import { SmallHeader } from "../../use-cases/common/ui/Header";
 import { navigateToShowing } from "../common/navigators/index";
 
@@ -24,17 +24,23 @@ const TicketContainer = props => {
     useAddTickets()
   );
 
-  const handleGoBackToShowing = useCallback(() => {
-    navigateToShowing(history, showing);
-  }, [history, showing]);
+  const handleGoBackToShowing = useCallback(
+    () => {
+      navigateToShowing(history, showing);
+    },
+    [history, showing]
+  );
 
-  const handleSubmitCinemaTicketUrls = useCallback(() => {
-    const nonEmptyUrls = cinemaTicketUrls.filter(
-      line => line.trim().length !== 0
-    );
+  const handleSubmitCinemaTicketUrls = useCallback(
+    () => {
+      const nonEmptyUrls = cinemaTicketUrls.filter(
+        line => line.trim().length !== 0
+      );
 
-    addTickets(showing.id, nonEmptyUrls).then(() => setCinemaTicketUrls([]));
-  }, [addTickets, cinemaTicketUrls, showing.id]);
+      addTickets(showing.id, nonEmptyUrls).then(() => setCinemaTicketUrls([]));
+    },
+    [addTickets, cinemaTicketUrls, showing.id]
+  );
 
   const { myTickets, ticketRange, sfSeatMap } = showing;
   return (
@@ -44,10 +50,10 @@ const TicketContainer = props => {
       </MainButton>
       <SmallHeader>Våra platser:</SmallHeader>
       <SeatRange ticketRange={ticketRange} />
-      <ScreenSeats ticketRange={ticketRange} seatMap={sfSeatMap} />
-      {myTickets.map(ticket => (
-        <Ticket key={ticket.id} {...ticket} />
-      ))}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <ScreenSeats ticketRange={ticketRange} seatMap={sfSeatMap} />
+      </div>
+      {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
       <StatusMessageBox
         success={success}
         errors={errors}
