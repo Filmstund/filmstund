@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 import {
   PromoteToAdmin,
   PromoteToAdminVariables
@@ -31,7 +31,7 @@ const promoteToAdminMutation = gql`
 `;
 
 export const usePromoteToAdmin = () => {
-  const mutate = useMutation<PromoteToAdmin, PromoteToAdminVariables>(
+  const [mutate] = useMutation<PromoteToAdmin, PromoteToAdminVariables>(
     promoteToAdminMutation
   );
 

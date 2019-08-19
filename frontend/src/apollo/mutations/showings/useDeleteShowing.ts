@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 import {
   DeleteShowing,
   DeleteShowingVariables
@@ -14,7 +14,7 @@ const deleteShowingMutation = gql`
 `;
 
 export const useDeleteShowing = () => {
-  const mutate = useMutation<DeleteShowing, DeleteShowingVariables>(
+  const [mutate] = useMutation<DeleteShowing, DeleteShowingVariables>(
     deleteShowingMutation
   );
 

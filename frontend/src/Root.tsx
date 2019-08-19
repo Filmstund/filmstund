@@ -1,14 +1,13 @@
-import React, { Component, lazy, Suspense, ErrorInfo } from "react";
+import React, { Component, ErrorInfo, lazy, Suspense } from "react";
 import { ApolloProvider } from "react-apollo";
-import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
 
 import { BrowserRouter as Router } from "react-router-dom";
+import { GlobalStyles } from "./GlobalStyles";
+import { rollbar } from "./lib/error-reporting";
 
 import client from "./store/apollo";
-import Login from "./use-cases/login/containers/Login";
-import { rollbar } from "./lib/error-reporting";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
-import { GlobalStyles } from "./GlobalStyles";
+import Login from "./use-cases/login/containers/Login";
 
 const AsyncApp = lazy(() => import("./App"));
 
@@ -50,14 +49,12 @@ export class Root extends Component<{}, State> {
 
     return (
       <ApolloProvider client={client}>
-        <ApolloHooksProvider client={client}>
-          <Router>
-            <Suspense fallback={<Loader />}>
-              <Login>{(props: any) => <AsyncApp {...props} />}</Login>
-            </Suspense>
-          </Router>
-          <GlobalStyles />
-        </ApolloHooksProvider>
+        <Router>
+          <Suspense fallback={<Loader />}>
+            <Login>{(props: any) => <AsyncApp {...props} />}</Login>
+          </Suspense>
+        </Router>
+        <GlobalStyles />
       </ApolloProvider>
     );
   }

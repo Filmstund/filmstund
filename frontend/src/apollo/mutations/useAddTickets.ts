@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 
 import { AddTickets, AddTicketsVariables } from "./__generated__/AddTickets";
 
@@ -62,7 +62,7 @@ const addTicketsMutation = gql`
 `;
 
 export const useAddTickets = () => {
-  const mutate = useMutation<AddTickets, AddTicketsVariables>(
+  const [mutate] = useMutation<AddTickets, AddTicketsVariables>(
     addTicketsMutation
   );
 

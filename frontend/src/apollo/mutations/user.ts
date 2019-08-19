@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { useMutation } from "react-apollo-hooks";
+import { useMutation } from "react-apollo";
 
 import { NewUserInfo } from "../../../__generated__/globalTypes";
 import { completeUserFragment } from "../queries/currentUser";
@@ -16,7 +16,7 @@ const updateUserMutation = gql`
 `;
 
 export const useUpdateUserMutation = () => {
-  const mutate = useMutation<UpdateUser, UpdateUserVariables>(
+  const [mutate] = useMutation<UpdateUser, UpdateUserVariables>(
     updateUserMutation
   );
 

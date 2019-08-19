@@ -36,7 +36,6 @@
     "prop-types": "15.6.2",
     "react": "16.9.0",
     "react-apollo": "3.0.1",
-    "react-apollo-hooks": "^0.4.3",
     "react-day-picker": "7.2.4",
     "react-dom": "16.9.0",
     "react-modal": "3.7.1",

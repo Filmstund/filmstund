@@ -71,8 +71,13 @@ const Profile: React.FC<Props> = ({ me }) => {
       });
 
       mutate(trimmedValues).then(({ data }) => {
-        const editedUser = data!.editedUser;
-        setEditedUser(editedUser);
+        const { nick, phone, sfMembershipId } = data!.editedUser;
+
+        setEditedUser({
+          nick: nick || "",
+          phone: phone || "",
+          sfMembershipId: sfMembershipId || ""
+        });
         setTimeout(clearState, 5000);
       });
     },
