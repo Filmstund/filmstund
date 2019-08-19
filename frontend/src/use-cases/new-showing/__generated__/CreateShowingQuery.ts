@@ -33,6 +33,7 @@ export interface CreateShowingQuery_me {
   __typename: "CurrentUser";
   id: any;
   nick: string | null;
+  name: string | null;
 }
 
 export interface CreateShowingQuery_previousLocations {
