@@ -16,8 +16,8 @@ data class CalendarEventDTO(
 
   companion object Factory {
     fun of(
-      summary: String, location: Location?, emails: Collection<String>, start: ZonedDateTime, end: ZonedDateTime,
-      sfBuyLink: String = "https://www.sf.se", description: String = "$summary @ ${location?.name}\n$sfBuyLink"
+            summary: String, location: Location?, emails: Collection<String>, start: ZonedDateTime, end: ZonedDateTime,
+            filmstadenBuyLink: String = "https://www.filmstaden.se", description: String = "$summary @ ${location?.name}\n$filmstadenBuyLink"
     ): CalendarEventDTO {
 
       return CalendarEventDTO(
@@ -26,7 +26,7 @@ data class CalendarEventDTO(
         attendees = emails.map { mapOf("email" to it) },
         start = mapOf("dateTime" to start.toOffsetDateTime().toString()),
         end = mapOf("dateTime" to end.toOffsetDateTime().toString()),
-        source = mapOf("title" to "SF Bio", "url" to sfBuyLink),
+        source = mapOf("title" to "Filmstaden Bio", "url" to filmstadenBuyLink),
         description = description
       )
     }

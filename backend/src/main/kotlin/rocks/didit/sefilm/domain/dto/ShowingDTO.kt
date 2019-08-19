@@ -12,23 +12,23 @@ import java.time.LocalTime
 import java.util.*
 
 data class ShowingDTO(
-  val id: UUID,
-  val webId: Base64ID,
-  val slug: String,
-  val date: LocalDate,
-  val time: LocalTime,
-  val movieId: UUID,
-  val location: Location,
-  val sfScreen: SfLiteScreenDTO?,
-  val private: Boolean,
-  val price: SEK?,
-  val ticketsBought: Boolean,
-  val admin: UserID,
-  val payToUser: UserID,
-  val expectedBuyDate: LocalDate?,
-  val participants: Collection<ParticipantDTO>,
-  val lastModifiedDate: Instant = Instant.EPOCH,
-  val createdDate: Instant = Instant.EPOCH
+        val id: UUID,
+        val webId: Base64ID,
+        val slug: String,
+        val date: LocalDate,
+        val time: LocalTime,
+        val movieId: UUID,
+        val location: Location,
+        val filmstadenScreen: FilmstadenLiteScreenDTO?,
+        val private: Boolean,
+        val price: SEK?,
+        val ticketsBought: Boolean,
+        val admin: UserID,
+        val payToUser: UserID,
+        val expectedBuyDate: LocalDate?,
+        val participants: Collection<ParticipantDTO>,
+        val lastModifiedDate: Instant = Instant.EPOCH,
+        val createdDate: Instant = Instant.EPOCH
 ) {
   fun fullDate(): LocalDateTime {
     return LocalDateTime.of(date, time)

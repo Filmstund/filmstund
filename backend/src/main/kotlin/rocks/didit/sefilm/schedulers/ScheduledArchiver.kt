@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -19,9 +19,9 @@ import java.time.LocalDateTime
   havingValue = "true"
 )
 class ScheduledArchiver(
-  private val movieRepository: MovieRepository,
-  showingRepository: ShowingRepository,
-  sfClient: SFService
+        private val movieRepository: MovieRepository,
+        showingRepository: ShowingRepository,
+        filmstadenClient: FilmstadenService
 ) {
 
   companion object {
@@ -30,7 +30,7 @@ class ScheduledArchiver(
   }
 
   private val log = LoggerFactory.getLogger(ScheduledArchiver::class.java)
-  private val archiveRules: List<ArchiveRule> = listOf(ReleaseDateAndShowingsRule(showingRepository, sfClient))
+  private val archiveRules: List<ArchiveRule> = listOf(ReleaseDateAndShowingsRule(showingRepository, filmstadenClient))
 
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledArchivations() {
@@ -60,14 +60,14 @@ class ScheduledArchiver(
 
 private class ReleaseDateAndShowingsRule(
   private val showingRepository: ShowingRepository,
-  private val sfClient: SFService
+  private val filmstadenClient: FilmstadenService
 ) : ArchiveRule {
 
   override fun isEligibleForArchivation(movie: Movie): Boolean {
     if (movie.isOlderThan(Duration.ofDays(65))) {
       val hasActiveShowings = movie.hasActiveShowings()
       if (!hasActiveShowings) {
-        return !movie.hasActiveShowingsOnSF()
+        return !movie.hasActiveShowingsOnFilmstaden()
       }
       return !hasActiveShowings
     }
@@ -84,11 +84,11 @@ private class ReleaseDateAndShowingsRule(
   private fun Movie.isOlderThan(maxAge: Duration) =
     Duration.between(this.releaseDate.atTime(0, 0), LocalDateTime.now()) > maxAge
 
-  private fun Movie.hasActiveShowingsOnSF(): Boolean {
-    if (this.sfId == null) {
+  private fun Movie.hasActiveShowingsOnFilmstaden(): Boolean {
+    if (this.filmstadenId == null) {
       return false
     }
-    return sfClient.getShowingDates(this.sfId).isNotEmpty()
+    return filmstadenClient.getShowingDates(this.filmstadenId).isNotEmpty()
   }
 }
 

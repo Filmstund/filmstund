@@ -18,8 +18,8 @@ type Mutation {
 
     ## // showing ###
 
-    # Fetch any new movies from SF, returns the movies that were added
-    fetchNewMoviesFromSf: [Movie!]
+    # Fetch any new movies from Filmstaden, returns the movies that were added
+    fetchNewMoviesFromFilmstaden: [Movie!]
 
     updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInput!): ParticipantPaymentInfo!
 

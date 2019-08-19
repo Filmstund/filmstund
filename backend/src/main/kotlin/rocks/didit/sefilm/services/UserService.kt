@@ -12,7 +12,7 @@ import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.SfMembershipId
+import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.notification.MailSettings
@@ -72,9 +72,9 @@ class UserService(
     .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
 
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
-    val newSfMembershipId = when {
-      newDetails.sfMembershipId == null || newDetails.sfMembershipId.isBlank() -> null
-      else -> SfMembershipId.valueOf(newDetails.sfMembershipId)
+    val newFilmstadenMembershipId = when {
+      newDetails.filmstadenMembershipId == null || newDetails.filmstadenMembershipId.isBlank() -> null
+      else -> FilmstadenMembershipId.valueOf(newDetails.filmstadenMembershipId)
     }
 
     val newPhoneNumber = when {
@@ -85,7 +85,7 @@ class UserService(
     val updatedUser = getUserEntityForCurrentUser().copy(
       phone = newPhoneNumber,
       nick = newDetails.nick,
-      sfMembershipId = newSfMembershipId
+      filmstadenMembershipId = newFilmstadenMembershipId
     )
 
     return userRepo.save(updatedUser).toDTO()
@@ -144,7 +144,7 @@ class UserService(
     this.lastName,
     this.nick,
     this.email,
-    this.sfMembershipId?.value,
+    this.filmstadenMembershipId?.value,
     this.phone?.number,
     this.avatar,
     this.foretagsbiljetter.map { it.toDTO() },

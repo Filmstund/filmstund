@@ -9,4 +9,4 @@ data class ForetagsbiljettDTO(
   val status: Foretagsbiljett.Status?
 )
 
-data class UserDetailsDTO(val nick: String?, val phone: String?, val sfMembershipId: String?)
+data class UserDetailsDTO(val nick: String?, val phone: String?, val filmstadenMembershipId: String?)

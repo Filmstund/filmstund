@@ -1,6 +1,6 @@
 type AdminPaymentDetails {
-    sfBuyLink: String
-    sfData: [SfData!]!
+    filmstadenBuyLink: String
+    filmstadenData: [FilmstadenData!]!
     participantPaymentInfos: [ParticipantPaymentInfo!]!
 }
 
@@ -12,9 +12,9 @@ type AttendeePaymentDetails {
     swishLink: String
 }
 
-type SfData {
+type FilmstadenData {
     user: User!
-    sfMembershipId: String
+    filmstadenMembershipId: String
     foretagsbiljett: String
 }
 
