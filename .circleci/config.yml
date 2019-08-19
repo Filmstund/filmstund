@@ -41,9 +41,6 @@ jobs:
             - frontend/node_modules
       - run: |
           cd frontend
-          yarn lint
-      - run: |
-          cd frontend
           yarn test
       - run: |
           cd frontend
