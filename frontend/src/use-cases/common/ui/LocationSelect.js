@@ -1,4 +1,4 @@
-import CreatableSelect from "react-select/lib/Creatable";
+import CreatableSelect from "react-select/creatable";
 import React from "react";
 
 const transformToSelectOptions = locations =>

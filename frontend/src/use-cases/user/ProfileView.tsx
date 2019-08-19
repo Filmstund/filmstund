@@ -1,21 +1,20 @@
-import React, { useState, useCallback } from "react";
 import styled from "@emotion/styled";
-import Field, { FieldWithoutMaxWidth } from "../common/ui/Field";
-import MainButton from "../common/ui/MainButton";
-import CopyValue from "../common/utils/CopyValue";
-import Input from "../common/ui/Input";
+import React, { useCallback, useState } from "react";
+import { useUpdateUserMutation } from "../../apollo/mutations/user";
 import alfons from "../../assets/alfons.jpg";
 
 import { trim } from "../../lib/Utils";
+import Field, { FieldWithoutMaxWidth } from "../common/ui/Field";
+import Input from "../common/ui/Input";
+import MainButton from "../common/ui/MainButton";
+import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import CopyValue from "../common/utils/CopyValue";
+import { PageTitle } from "../common/utils/PageTitle";
+import StatusMessageBox from "../common/utils/StatusMessageBox";
+import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
+import { UserProfile_me } from "./__generated__/UserProfile";
 
 import ForetagsbiljettListContainer from "./ForetagsbiljettListContainer";
-import StatusMessageBox from "../common/utils/StatusMessageBox";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
-import { PageTitle } from "../common/utils/PageTitle";
-import { DataProps } from "react-apollo";
-import { UserProfile } from "./__generated__/UserProfile";
-import { useUpdateUserMutation } from "../../apollo/mutations/user";
 
 const Box = styled.div`
   background: #fff;
@@ -42,11 +41,11 @@ const UserInfo = styled.div`
   padding: 1em;
 `;
 
-interface Props extends DataProps<UserProfile> {}
+interface Props {
+  me: UserProfile_me;
+}
 
-const Profile: React.FC<Props> = ({ data }) => {
-  const me = data.me!;
-
+const Profile: React.FC<Props> = ({ me }) => {
   const updateUser = useUpdateUserMutation();
 
   const { success, errors, clearState, mutate } = useApolloMutationResult(
@@ -63,19 +62,22 @@ const Profile: React.FC<Props> = ({ data }) => {
     sfMembershipId: me.sfMembershipId || ""
   });
 
-  const handleSubmit = useCallback(() => {
-    const trimmedValues = trim({
-      nick,
-      phone,
-      sfMembershipId
-    });
+  const handleSubmit = useCallback(
+    () => {
+      const trimmedValues = trim({
+        nick,
+        phone,
+        sfMembershipId
+      });
 
-    mutate(trimmedValues).then(({ data }) => {
-      const editedUser = data!.editedUser;
-      setEditedUser(editedUser);
-      setTimeout(clearState, 5000);
-    });
-  }, [clearState, mutate, nick, phone, setEditedUser, sfMembershipId]);
+      mutate(trimmedValues).then(({ data }) => {
+        const editedUser = data!.editedUser;
+        setEditedUser(editedUser);
+        setTimeout(clearState, 5000);
+      });
+    },
+    [clearState, mutate, nick, phone, setEditedUser, sfMembershipId]
+  );
 
   return (
     <PageWidthWrapper>

@@ -30,7 +30,7 @@ const MainGridContainer = styled.div`
 `;
 
 const AsyncHome = lazy(() => import("./use-cases/my-showings/Home"));
-const AsyncUser = lazy(() => import("./use-cases/user/index"));
+const AsyncUser = lazy(() => import("./use-cases/user"));
 const AsyncShowings = lazy(() => import("./use-cases/showings-list/Showings"));
 const AsyncNewShowing = lazy(() =>
   import("./use-cases/new-showing/NewShowing")

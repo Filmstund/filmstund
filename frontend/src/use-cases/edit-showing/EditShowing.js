@@ -1,7 +1,7 @@
-import { graphql, compose } from "react-apollo";
+import { graphql } from "react-apollo";
 import { withRouter } from "react-router";
 import gql from "graphql-tag";
-import { withProps, renderComponent, branch } from "recompose";
+import { withProps, renderComponent, branch, compose } from "recompose";
 import EditShowingForm from "./EditShowingForm";
 import { showingFragment } from "../common/showing/Showing";
 import Loader from "../common/utils/ProjectorLoader";
