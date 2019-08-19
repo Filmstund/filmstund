@@ -77,8 +77,8 @@ workflows:
   version: 2
   packtracker:
     jobs:
-      - packtracker/report
-        project_root: "./frontend"
+      - packtracker/report:
+          project_root: "./frontend"
   build:
     jobs:
       - test-backend
