@@ -4,7 +4,7 @@ import { compose } from "recompose";
 import googleIcon from "./assets/google-logo.svg";
 import itbioLogo from "./assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
 import {
   setUserInfo,
   clearSession,
