@@ -47,6 +47,21 @@ class TicketService(
       processTicketUrl(it, showing)
     }
 
+    val adminAssignedTickets = ticketRepository.findByShowingIdAndAssignedToUser(showing.id, showing.admin.id)
+    if(adminAssignedTickets.size > 1) {
+      val allTickets = ticketRepository.findByShowingId(showingId)
+      val participantsMissingTicket = showing.participants.filter {
+        participant -> allTickets.none {
+        ticket -> ticket.assignedToUser == participant.userId }
+      }
+
+      val reassigned = adminAssignedTickets.subList(1, adminAssignedTickets.size)
+              .zip(participantsMissingTicket)
+              .map { (ticket, participant) -> ticket.copy(assignedToUser = participant.userId) }
+      ticketRepository.saveAll(reassigned)
+        // TODO Write tests for this
+    }
+
     return getTicketsForCurrentUserAndShowing(showingId)
   }
 
