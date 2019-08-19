@@ -5,7 +5,7 @@ import styled from "@emotion/styled";
 import UserItem, { fragments as userItemFragments } from "./UserItem";
 import { SmallHeader } from "../../common/ui/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserTie } from "@fortawesome/free-solid-svg-icons";
+import { faUserTie } from "@fortawesome/free-solid-svg-icons/faUserTie";
 import gql from "graphql-tag";
 
 const ParticipantContainer = styled.div`
