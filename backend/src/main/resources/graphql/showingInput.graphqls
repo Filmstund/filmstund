@@ -16,6 +16,7 @@ input UpdateShowingInput {
     location: String!
     filmstadenRemoteEntityId: String
     time: LocalTime!
+    date: LocalDate!
 }
 
 input FilmstadenScreenInput {

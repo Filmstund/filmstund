@@ -229,7 +229,8 @@ class ShowingService(
                         expectedBuyDate = newValues.expectedBuyDate,
                         location = locationService.getOrCreateNewLocation(newValues.location),
                         time = newValues.time,
-                        filmstadenRemoteEntityId = newValues.filmstadenRemoteEntityId
+                        filmstadenRemoteEntityId = newValues.filmstadenRemoteEntityId,
+                        date = newValues.date
                 )
         )
                 .also {
