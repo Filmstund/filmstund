@@ -6,30 +6,26 @@ import Field from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import SelectBox from "../common/ui/SelectBox";
 import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
-import { useSfShowings } from "./hooks/useSfShowings";
+import { GroupedFilmstadenShowings } from "./hooks/useSfShowings";
 
 interface Props {
-  city: string;
-  movieId: string;
+  filmstadenShowings: GroupedFilmstadenShowings | null;
   selectedValue?: string;
   onSelect: (v: SfShowingsQuery_movie_showings) => void;
   date: string;
 }
 
 export const SfTimeSelector: React.FC<Props> = ({
-  city,
-  movieId,
+  filmstadenShowings,
   date,
   selectedValue,
   onSelect
 }) => {
-  const [sfDates] = useSfShowings(movieId, city);
-
-  if (!sfDates) {
+  if (!filmstadenShowings) {
     return <FontAwesomeIcon icon={faSpinner} spin />;
   }
 
-  const sfTimes = sfDates[date];
+  const sfTimes = filmstadenShowings[date];
 
   if (!sfTimes || sfTimes.length === 0) {
     return <div>Inga tider från Filmstaden för {formatYMD(date)}</div>;
@@ -38,7 +34,11 @@ export const SfTimeSelector: React.FC<Props> = ({
       <div>
         <SmallHeader>Välj tid från Filmstaden</SmallHeader>
         <Field text="Tid:">
-          <SelectBox options={sfTimes} onChange={onSelect} selectedValue={selectedValue} />
+          <SelectBox
+            options={sfTimes}
+            onChange={onSelect}
+            selectedValue={selectedValue}
+          />
         </Field>
       </div>
     );
