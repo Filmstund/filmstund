@@ -172,8 +172,6 @@ class ShowingService(
     }
 
     fun createShowing(data: CreateShowingDTO): ShowingDTO {
-        if (data.date == null || data.location == null || data.movieId == null || data.time == null) throw MissingParametersException()
-
         val adminUser = userService.getCompleteUser(currentLoggedInUser())
         return showingRepo
                 .save(data.toShowing(adminUser, movieService.getMovieOrThrow(data.movieId)))
@@ -273,9 +271,6 @@ class ShowingService(
 
     /* Fetch location from db or create it if it does not exist before converting the showing */
     private fun CreateShowingDTO.toShowing(admin: User, movie: Movie): Showing {
-        if (this.location == null) {
-            throw IllegalArgumentException("Location may not be null")
-        }
         val location = locationService.getOrCreateNewLocation(this.location)
         return Showing(
                 webId = Base64ID.random(),
