@@ -60,7 +60,7 @@ const TicketContainer = props => {
         successMessage="Uppdaterades!"
       />
       {showing.admin.id === me.id && (
-        <FieldWithoutMaxWidth text="Lägg till SF-bokningslänkar">
+        <FieldWithoutMaxWidth text="Lägg till Filmstaden-bokningslänkar">
           <TicketURLInput
             cinemaTicketUrls={cinemaTicketUrls}
             onChange={setCinemaTicketUrls}

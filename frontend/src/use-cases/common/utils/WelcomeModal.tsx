@@ -28,7 +28,7 @@ export const WelcomeModal: React.FC<Props> = ({ me: { filmstadenMembershipId } }
         <Header>Välkommen!</Header>
 
         <p>
-          SF har bytt bioklubbsnummer till ett annat format, och det heter
+          Filmstaden har bytt bioklubbsnummer till ett annat format, och det heter
           numera medlemsnummer.
         </p>
         <p>Var god uppdatera ditt registrerade nummer under profilsidan!</p>
