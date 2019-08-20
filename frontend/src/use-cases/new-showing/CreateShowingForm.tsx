@@ -98,8 +98,8 @@ export const CreateShowingForm: React.FC<Props> = props => {
     setShowingState(state => {
       const newState: ShowingState = {
         ...state,
-        time: formatLocalTime(timeUtc!),
-        location: cinemaName!,
+        time: formatLocalTime(timeUtc),
+        location: cinemaName,
         filmstadenScreen: { name, filmstadenId }
       };
 

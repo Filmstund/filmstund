@@ -14,6 +14,7 @@ export interface EditShowing_me {
 export interface EditShowing_showing_location {
   __typename: "Location";
   name: string;
+  cityAlias: string | null;
 }
 
 export interface EditShowing_showing_movie {
@@ -48,6 +49,7 @@ export interface EditShowing_showing {
   admin: EditShowing_showing_admin;
   price: any | null;
   private: boolean;
+  filmstadenRemoteEntityId: string | null;
   payToUser: EditShowing_showing_payToUser;
 }
 

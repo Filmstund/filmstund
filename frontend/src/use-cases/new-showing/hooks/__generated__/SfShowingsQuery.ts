@@ -14,10 +14,11 @@ export interface SfShowingsQuery_movie_showings_screen {
 
 export interface SfShowingsQuery_movie_showings {
   __typename: "FilmstadenShowing";
-  cinemaName: string | null;
-  screen: SfShowingsQuery_movie_showings_screen | null;
-  timeUtc: string | null;
+  cinemaName: string;
+  screen: SfShowingsQuery_movie_showings_screen;
+  timeUtc: string;
   tags: string[];
+  filmstadenRemoteEntityId: string;
 }
 
 export interface SfShowingsQuery_movie {

@@ -26,6 +26,7 @@ export const useSfShowings = (
             }
             timeUtc
             tags
+            filmstadenRemoteEntityId
           }
         }
       }

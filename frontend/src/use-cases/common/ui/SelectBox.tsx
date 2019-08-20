@@ -43,21 +43,20 @@ const RightArrow = styled.div`
 `;
 
 interface Props {
+  selectedValue?: string;
   options: SfShowingsQuery_movie_showings[];
   onChange: (v: SfShowingsQuery_movie_showings) => void;
 }
 
-const SelectBox: React.FC<Props> = ({ options, onChange }) => (
+const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
   <Box>
     {options.map(option => (
       <Option
         key={
-          option.cinemaName +
-          (option.screen ? option.screen.filmstadenId : "") +
-          option.timeUtc
+         option.filmstadenRemoteEntityId
         }
         onClick={() => onChange(option)}
-        selected={false}
+        selected={option.filmstadenRemoteEntityId === selectedValue}
       >
         <Lable>
           {option.timeUtc && formatLocalTime(option.timeUtc)}{" "}

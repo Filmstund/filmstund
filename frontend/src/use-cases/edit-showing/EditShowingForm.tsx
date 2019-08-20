@@ -1,26 +1,31 @@
-import React, { lazy, useState, useCallback } from "react";
-
-import Header from "../common/ui/Header";
-import Showing from "../common/showing/Showing";
-import Input from "../common/ui/Input";
-import Field from "../common/ui/Field";
-import MainButton, { RedButton } from "../common/ui/MainButton";
-import { formatYMD } from "../../lib/dateTools";
-import StatusMessageBox from "../common/utils/StatusMessageBox";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import * as navigators from "../common/navigators/index";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
-import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
 import styled from "@emotion/styled";
-import { margin } from "../../lib/style-vars";
+import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { parse } from "date-fns";
 import addDays from "date-fns/add_days";
-import { LocationSelect } from "../common/ui/LocationSelect";
-import { EditShowing_showing, EditShowing } from "./__generated__/EditShowing";
+import { keys } from "lodash-es";
+import React, { lazy, useCallback, useState } from "react";
 import { DataProps } from "react-apollo";
 import { RouteChildrenProps } from "react-router";
-import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
 import { useDeleteShowing } from "../../apollo/mutations/showings/useDeleteShowing";
+import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
+import { formatLocalTime, formatYMD } from "../../lib/dateTools";
+import { margin } from "../../lib/style-vars";
+import * as navigators from "../common/navigators/index";
+import Showing from "../common/showing/Showing";
+import Field from "../common/ui/Field";
+
+import Header, { SmallHeader } from "../common/ui/Header";
+import Input from "../common/ui/Input";
+import { LocationSelect } from "../common/ui/LocationSelect";
+import MainButton, { RedButton } from "../common/ui/MainButton";
+import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import StatusMessageBox from "../common/utils/StatusMessageBox";
+import { SfShowingsQuery_movie_showings } from "../new-showing/hooks/__generated__/SfShowingsQuery";
+import { useSfShowings } from "../new-showing/hooks/useSfShowings";
+import { SfTimeSelector } from "../new-showing/SfTimeSelector";
+import { EditShowing, EditShowing_showing } from "./__generated__/EditShowing";
 
 const DatePicker = lazy(() => import("../common/ui/date-picker/DatePicker"));
 
@@ -36,7 +41,9 @@ type SetShowingValueFn = <K extends keyof EditShowingFormShowing>(
 ) => void;
 
 interface EditShowingFormShowing {
+  date: string;
   expectedBuyDate: Date;
+  filmstadenRemoteEntityId: string | null;
   location: string;
   time: string;
   price: string;
@@ -52,6 +59,8 @@ const getInitialState = (
 ): EditShowingFormState => ({
   errors: null,
   showing: {
+    date: showing.date,
+    filmstadenRemoteEntityId: showing.filmstadenRemoteEntityId,
     expectedBuyDate: addDays(today, 7),
     location: showing.location.name,
     time: showing.time,
@@ -69,29 +78,39 @@ const EditShowingForm: React.FC<Props> = ({ data, history }) => {
     EditShowingFormState
   >(() => getInitialState(showing));
 
-  const { movie, admin, date, ticketsBought } = showing;
+  const { movie, admin, ticketsBought } = showing;
+
+  const city = showing.location.cityAlias || "GB";
+
+  const [sfdates] = useSfShowings(movie.id, city);
+
   const previousLocations = data.previousLocations || [];
 
   const updateShowing = useUpdateShowing();
   const deleteShowing = useDeleteShowing();
 
-  const handleDelete = useCallback(() => {
-    const proceed = window.confirm("Är du säker? Går ej att ångra!");
+  const handleDelete = useCallback(
+    () => {
+      const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
-    if (proceed) {
-      deleteShowing(showing.id).then(() => {
-        history.push("/showings");
-      });
-    }
-  }, [deleteShowing, showing, history]);
+      if (proceed) {
+        deleteShowing(showing.id).then(() => {
+          history.push("/showings");
+        });
+      }
+    },
+    [deleteShowing, showing, history]
+  );
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     updateShowing(showing.id, {
+      date: newValues.date,
       expectedBuyDate: formatYMD(newValues.expectedBuyDate),
       private: showing.private,
       payToUser: showing.payToUser.id,
       location: newValues.location,
       time: newValues.time,
+      filmstadenRemoteEntityId: newValues.filmstadenRemoteEntityId,
       price: (parseInt(newValues.price, 10) || 0) * 100
     })
       .then(() => {
@@ -103,7 +122,7 @@ const EditShowingForm: React.FC<Props> = ({ data, history }) => {
           errors
         }));
       });
-  }, [showing, setState, newValues, history, updateShowing]);
+  };
 
   const setShowingValue = useCallback<SetShowingValueFn>((key, value) => {
     setState(state => ({
@@ -112,39 +131,63 @@ const EditShowingForm: React.FC<Props> = ({ data, history }) => {
     }));
   }, []);
 
-  const setShowingDate = useCallback(
-    (v: Date) => setShowingValue("expectedBuyDate", v),
-    [setShowingValue]
-  );
+  const handleSfTimeSelect = (sfShowing: SfShowingsQuery_movie_showings) => {
+    const { filmstadenRemoteEntityId, cinemaName, timeUtc } = sfShowing;
+    setState(state => ({
+      ...state,
+      showing: {
+        ...state.showing,
+        filmstadenRemoteEntityId,
+        location: cinemaName,
+        time: formatLocalTime(timeUtc)
+      }
+    }));
+  };
 
   return (
     <PageWidthWrapper>
       <Header>Redigera besök</Header>
       <div>
         <Showing
-          date={formatYMD(date) + " " + newValues.time}
+          date={formatYMD(newValues.date) + " " + newValues.time}
           admin={admin}
           location={newValues.location}
           movie={movie}
         />
         <StatusMessageBox errors={errors} />
-        <Field text="Förväntat köpdatum:">
+        <Field text="Datum:">
           <DatePicker
-            value={newValues.expectedBuyDate}
-            onChange={setShowingDate}
-            disabledDays={[
-              {
-                before: today,
-                after: new Date(date)
+            value={parse(newValues.date)}
+            onChange={(value: Date) => {
+              setShowingValue("date", formatYMD(value));
+            }}
+            disabledDays={{ before: today }}
+            modifiers={{ filmstadendays: keys(sfdates).map(s => new Date(s)) }}
+            modifiersStyles={{
+              filmstadendays: {
+                backgroundColor: "#fff",
+                borderColor: "#d0021b",
+                color: "#d0021b"
               }
-            ]}
+            }}
           />
         </Field>
-        <Field text="Visningstid:">
+        <SfTimeSelector
+          date={newValues.date}
+          selectedValue={newValues.filmstadenRemoteEntityId || undefined}
+          onSelect={handleSfTimeSelect}
+          city={city}
+          movieId={movie.id}
+        />
+        <SmallHeader>...eller skapa egen tid</SmallHeader>
+        <Field text="Tid:">
           <Input
             type="time"
             value={newValues.time}
-            onChange={event => setShowingValue("time", event.target.value)}
+            onChange={event => {
+              setShowingValue("filmstadenRemoteEntityId", null);
+              setShowingValue("time", event.target.value);
+            }}
           />
         </Field>
         <Field text="Plats:">

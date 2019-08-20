@@ -9,19 +9,20 @@ import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowings
 import { useSfShowings } from "./hooks/useSfShowings";
 
 interface Props {
-  movieId: string;
-  city: string;
-  selectedDate: string;
-  onSelectDate: () => void;
-  onSelectShowingTime: () => void;
-}
-
-export const SfTimeSelector: React.FC<{
   city: string;
   movieId: string;
+  selectedValue?: string;
   onSelect: (v: SfShowingsQuery_movie_showings) => void;
   date: string;
-}> = ({ city, movieId, date, onSelect }) => {
+}
+
+export const SfTimeSelector: React.FC<Props> = ({
+  city,
+  movieId,
+  date,
+  selectedValue,
+  onSelect
+}) => {
   const [sfDates] = useSfShowings(movieId, city);
 
   if (!sfDates) {
@@ -37,10 +38,7 @@ export const SfTimeSelector: React.FC<{
       <div>
         <SmallHeader>Välj tid från Filmstaden</SmallHeader>
         <Field text="Tid:">
-          <SelectBox
-            options={sfTimes}
-            onChange={onSelect}
-          />
+          <SelectBox options={sfTimes} onChange={onSelect} selectedValue={selectedValue} />
         </Field>
       </div>
     );

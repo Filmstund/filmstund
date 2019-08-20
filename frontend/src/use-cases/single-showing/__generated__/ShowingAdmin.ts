@@ -60,6 +60,7 @@ export interface ShowingAdmin {
   id: any;
   price: any | null;
   private: boolean;
+  filmstadenRemoteEntityId: string | null;
   filmstadenScreen: ShowingAdmin_filmstadenScreen | null;
   payToUser: ShowingAdmin_payToUser;
   adminPaymentDetails: ShowingAdmin_adminPaymentDetails | null;

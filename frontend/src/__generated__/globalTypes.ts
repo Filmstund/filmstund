@@ -25,6 +25,7 @@ export interface CreateShowingInput {
   location: string;
   filmstadenScreen?: FilmstadenScreenInput | null;
   expectedBuyDate?: any | null;
+  filmstadenRemoteEntityId?: string | null;
 }
 
 export interface FilmstadenScreenInput {
@@ -65,8 +66,9 @@ export interface UpdateShowingInput {
   payToUser: string;
   expectedBuyDate?: any | null;
   location: string;
-  filmstadenScreen?: FilmstadenScreenInput | null;
+  filmstadenRemoteEntityId?: string | null;
   time: any;
+  date: any;
 }
 
 //==============================================================
