@@ -1,6 +1,6 @@
 import isAfter from "date-fns/is_after";
 import isSameDay from "date-fns/is_same_day";
-import { PaymentOption, PaymentType } from "../../../../__generated__/globalTypes";
+import { PaymentOption, PaymentType } from "../../../__generated__/globalTypes";
 
 import { formatYMD } from "../../../lib/dateTools";
 import { SingleShowing_me_foretagsbiljetter } from "../containers/__generated__/SingleShowing";

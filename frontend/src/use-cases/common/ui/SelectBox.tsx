@@ -2,9 +2,8 @@ import styled from "@emotion/styled";
 import React from "react";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
-import {
-  ShowingsSelectorQuery_movie_showings
-} from "../../single-showing/components/__generated__/ShowingsSelectorQuery";
+import { SfShowingsQuery_movie_showings } from "../../new-showing/hooks/__generated__/SfShowingsQuery";
+
 
 const Option = styled.div<{ selected: boolean }>`
   display: flex;
@@ -44,8 +43,8 @@ const RightArrow = styled.div`
 `;
 
 interface Props {
-  options: ShowingsSelectorQuery_movie_showings[];
-  onChange: (v: ShowingsSelectorQuery_movie_showings) => void;
+  options: SfShowingsQuery_movie_showings[];
+  onChange: (v: SfShowingsQuery_movie_showings) => void;
 }
 
 const SelectBox: React.FC<Props> = ({ options, onChange }) => (

@@ -3,7 +3,7 @@ import format from "date-fns/format";
 import isAfter from "date-fns/is_after";
 import { keys } from "lodash-es";
 import React, { ChangeEvent, lazy, useState } from "react";
-import { CreateShowingInput } from "../../../__generated__/globalTypes";
+import { CreateShowingInput } from "../../__generated__/globalTypes";
 import { formatLocalTime, formatYMD } from "../../lib/dateTools";
 import Showing from "../common/showing/Showing";
 import Field from "../common/ui/Field";
@@ -13,11 +13,11 @@ import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { ShowingsSelectorQuery_movie_showings } from "../single-showing/components/__generated__/ShowingsSelectorQuery";
 import {
   CreateShowingQuery,
   CreateShowingQuery_me
 } from "./__generated__/CreateShowingQuery";
+import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
 import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
 import { useSfShowings } from "./hooks/useSfShowings";
 import { SfTimeSelector } from "./SfTimeSelector";
@@ -90,7 +90,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
     }));
   };
 
-  const setShowingTime = (sfTime: ShowingsSelectorQuery_movie_showings) => {
+  const setShowingTime = (sfTime: SfShowingsQuery_movie_showings) => {
     const { timeUtc, cinemaName, screen } = sfTime;
 
     const { name, filmstadenId } = screen!;
@@ -116,7 +116,12 @@ export const CreateShowingForm: React.FC<Props> = props => {
     setShowingValue(key, value);
   };
 
-  const handleSubmit = ({ time, date, location, filmstadenScreen }: ShowingState) => {
+  const handleSubmit = ({
+    time,
+    date,
+    location,
+    filmstadenScreen
+  }: ShowingState) => {
     const showing: CreateShowingInput = {
       time,
       movieId,

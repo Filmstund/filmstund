@@ -4,7 +4,7 @@ import {
   MarkShowingAsBought,
   MarkShowingAsBoughtVariables
 } from "./__generated__/MarkShowingAsBought";
-import { UpdateShowingInput } from "../../../../__generated__/globalTypes";
+import { UpdateShowingInput } from "../../../__generated__/globalTypes";
 
 const markAsBoughtMutation = gql`
   mutation MarkShowingAsBought(
