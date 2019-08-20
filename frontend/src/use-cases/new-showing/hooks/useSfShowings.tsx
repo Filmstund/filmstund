@@ -6,22 +6,22 @@ import { useMemo } from "react";
 import { formatYMD } from "../../../lib/dateTools";
 import {
   SfShowingsQuery,
-  SfShowingsQuery_movie_sfShowings,
+  SfShowingsQuery_movie_showings,
   SfShowingsQueryVariables
 } from "./__generated__/SfShowingsQuery";
 
 export const useSfShowings = (
   movieId: string,
   city: string
-): [Dictionary<SfShowingsQuery_movie_sfShowings[]> | null, boolean] => {
+): [Dictionary<SfShowingsQuery_movie_showings[]> | null, boolean] => {
   const { data, loading } = useQuery<SfShowingsQuery, SfShowingsQueryVariables>(
     gql`
       query SfShowingsQuery($movieId: UUID!, $city: String) {
         movie(id: $movieId) {
-          sfShowings(city: $city) {
+          showings: filmstadenShowings(city: $city) {
             cinemaName
             screen {
-              sfId
+              filmstadenId
               name
             }
             timeUtc
@@ -39,13 +39,13 @@ export const useSfShowings = (
     }
   );
 
-  const sfShowingsQueryMovieSfShowings: SfShowingsQuery_movie_sfShowings[] =
-    data && data.movie ? data.movie.sfShowings : [];
+  const showings: SfShowingsQuery_movie_showings[] =
+    data && data.movie ? data.movie.showings : [];
 
   const sfdates = useMemo(
     () =>
-      groupBy(sfShowingsQueryMovieSfShowings, s => formatYMD(s.timeUtc || "")),
-    [sfShowingsQueryMovieSfShowings]
+      groupBy(showings, s => formatYMD(s.timeUtc || "")),
+    [showings]
   );
   return [sfdates, loading];
 };

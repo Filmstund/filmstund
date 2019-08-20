@@ -31,25 +31,25 @@ export interface TicketQuery_showing_ticketRange {
   seatings: TicketQuery_showing_ticketRange_seatings[] | null;
 }
 
-export interface TicketQuery_showing_sfSeatMap_coordinates {
-  __typename: "SfSeatCoordinates";
+export interface TicketQuery_showing_filmstadenSeatMap_coordinates {
+  __typename: "FilmstadenSeatCoordinates";
   x: number;
   y: number;
 }
 
-export interface TicketQuery_showing_sfSeatMap_dimensions {
-  __typename: "SfSeatDimensions";
+export interface TicketQuery_showing_filmstadenSeatMap_dimensions {
+  __typename: "FilmstadenSeatDimensions";
   width: number;
   height: number;
 }
 
-export interface TicketQuery_showing_sfSeatMap {
-  __typename: "SfSeatMap";
+export interface TicketQuery_showing_filmstadenSeatMap {
+  __typename: "FilmstadenSeatMap";
   row: number;
   number: number;
   seatType: string;
-  coordinates: TicketQuery_showing_sfSeatMap_coordinates;
-  dimensions: TicketQuery_showing_sfSeatMap_dimensions;
+  coordinates: TicketQuery_showing_filmstadenSeatMap_coordinates;
+  dimensions: TicketQuery_showing_filmstadenSeatMap_dimensions;
 }
 
 export interface TicketQuery_showing_myTickets_seat {
@@ -88,7 +88,7 @@ export interface TicketQuery_showing {
   slug: string;
   admin: TicketQuery_showing_admin;
   ticketRange: TicketQuery_showing_ticketRange | null;
-  sfSeatMap: TicketQuery_showing_sfSeatMap[];
+  filmstadenSeatMap: TicketQuery_showing_filmstadenSeatMap[];
   myTickets: TicketQuery_showing_myTickets[] | null;
 }
 

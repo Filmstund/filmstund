@@ -5,13 +5,21 @@ import { formatYMD } from "../../lib/dateTools";
 import Field from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import SelectBox from "../common/ui/SelectBox";
-import { SfShowingsQuery_movie_sfShowings } from "./hooks/__generated__/SfShowingsQuery";
+import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
 import { useSfShowings } from "./hooks/useSfShowings";
+
+interface Props {
+  movieId: string;
+  city: string;
+  selectedDate: string;
+  onSelectDate: () => void;
+  onSelectShowingTime: () => void;
+}
 
 export const SfTimeSelector: React.FC<{
   city: string;
   movieId: string;
-  onSelect: (v: SfShowingsQuery_movie_sfShowings) => void;
+  onSelect: (v: SfShowingsQuery_movie_showings) => void;
   date: string;
 }> = ({ city, movieId, date, onSelect }) => {
   const [sfDates] = useSfShowings(movieId, city);
@@ -23,11 +31,11 @@ export const SfTimeSelector: React.FC<{
   const sfTimes = sfDates[date];
 
   if (!sfTimes || sfTimes.length === 0) {
-    return <div>Inga tider från SF för {formatYMD(date)}</div>;
+    return <div>Inga tider från Filmstaden för {formatYMD(date)}</div>;
   } else {
     return (
       <div>
-        <SmallHeader>Välj tid från SF</SmallHeader>
+        <SmallHeader>Välj tid från Filmstaden</SmallHeader>
         <Field text="Tid:">
           <SelectBox
             options={sfTimes}

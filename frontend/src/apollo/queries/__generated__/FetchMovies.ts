@@ -6,7 +6,7 @@
 // GraphQL mutation operation: FetchMovies
 // ====================================================
 
-export interface FetchMovies_fetchNewMoviesFromSf {
+export interface FetchMovies_fetchNewMoviesFromFilmstaden {
   __typename: "Movie";
   id: any;
   poster: string | null;
@@ -17,7 +17,7 @@ export interface FetchMovies_fetchNewMoviesFromSf {
 
 export interface FetchMovies {
   /**
-   * Fetch any new movies from SF, returns the movies that were added
+   * Fetch any new movies from Filmstaden, returns the movies that were added
    */
-  fetchNewMoviesFromSf: FetchMovies_fetchNewMoviesFromSf[] | null;
+  fetchNewMoviesFromFilmstaden: FetchMovies_fetchNewMoviesFromFilmstaden[] | null;
 }

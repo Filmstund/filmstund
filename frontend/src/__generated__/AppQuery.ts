@@ -23,7 +23,7 @@ export interface AppQuery_me {
   lastName: string | null;
   nick: string | null;
   email: string;
-  sfMembershipId: string | null;
+  filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
   foretagsbiljetter: AppQuery_me_foretagsbiljetter[] | null;

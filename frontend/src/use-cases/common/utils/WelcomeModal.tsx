@@ -10,7 +10,7 @@ interface Props {
   me: AppQuery_me;
 }
 
-export const WelcomeModal: React.FC<Props> = ({ me: { sfMembershipId } }) => {
+export const WelcomeModal: React.FC<Props> = ({ me: { filmstadenMembershipId } }) => {
   const { history } = useRouter();
 
   const [modalOpen, setModalOpen] = useState(true);
@@ -20,7 +20,7 @@ export const WelcomeModal: React.FC<Props> = ({ me: { sfMembershipId } }) => {
     history.push("/user");
   }, [history]);
 
-  if (sfMembershipId) {
+  if (filmstadenMembershipId) {
     return null;
   } else {
     return (

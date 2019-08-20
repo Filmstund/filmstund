@@ -13,7 +13,7 @@ import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { SfShowings_movie_sfShowings } from "../single-showing/components/__generated__/SfShowings";
+import { ShowingsSelectorQuery_movie_showings } from "../single-showing/components/__generated__/ShowingsSelectorQuery";
 import {
   CreateShowingQuery,
   CreateShowingQuery_me
@@ -37,7 +37,7 @@ interface ShowingState {
   date: string;
   time: string;
   location: string;
-  sfScreen: { name: string; sfId: string } | null;
+  filmstadenScreen: { name: string; filmstadenId: string } | null;
   movieId: string;
   admin: CreateShowingQuery_me;
 }
@@ -58,7 +58,7 @@ const getInitialState = (props: Props): ShowingState => {
     date: formatYMD(date),
     time: format(now, "HH:mm"),
     location: "",
-    sfScreen: null,
+    filmstadenScreen: null,
     movieId: movieId,
     admin: me!
   };
@@ -70,7 +70,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
     movieId,
     navigateToShowing,
     clearSelectedMovie,
-    data: { movie, sfCities, previousLocations }
+    data: { movie, filmstadenCities, previousLocations }
   } = props;
 
   const [showing, setShowingState] = useState<ShowingState>(() =>
@@ -90,17 +90,17 @@ export const CreateShowingForm: React.FC<Props> = props => {
     }));
   };
 
-  const setShowingTime = (sfTime: SfShowings_movie_sfShowings) => {
+  const setShowingTime = (sfTime: ShowingsSelectorQuery_movie_showings) => {
     const { timeUtc, cinemaName, screen } = sfTime;
 
-    const { name, sfId } = screen!;
+    const { name, filmstadenId } = screen!;
 
     setShowingState(state => {
       const newState: ShowingState = {
         ...state,
         time: formatLocalTime(timeUtc!),
         location: cinemaName!,
-        sfScreen: { name, sfId }
+        filmstadenScreen: { name, filmstadenId }
       };
 
       handleSubmit(state);
@@ -116,12 +116,12 @@ export const CreateShowingForm: React.FC<Props> = props => {
     setShowingValue(key, value);
   };
 
-  const handleSubmit = ({ time, date, location, sfScreen }: ShowingState) => {
+  const handleSubmit = ({ time, date, location, filmstadenScreen }: ShowingState) => {
     const showing: CreateShowingInput = {
       time,
       movieId,
       date: formatYMD(date),
-      sfScreen,
+      filmstadenScreen,
       location
     };
 
@@ -147,12 +147,12 @@ export const CreateShowingForm: React.FC<Props> = props => {
           location={locationName}
           movie={movie || undefined}
         />
-        <Field text="SF-stad (används för att hämta rätt tider):">
+        <Field text="Filmstaden-stad (används för att hämta rätt tider):">
           <select
             value={city}
             onChange={({ target: { value } }) => setCity(value)}
           >
-            {sfCities.map(city => (
+            {filmstadenCities.map(city => (
               <option key={city.alias} value={city.alias}>
                 {city.name}
               </option>

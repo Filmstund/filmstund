@@ -6,9 +6,9 @@
 // GraphQL fragment: ShowingAdmin
 // ====================================================
 
-export interface ShowingAdmin_sfScreen {
-  __typename: "SfScreen";
-  sfId: string;
+export interface ShowingAdmin_filmstadenScreen {
+  __typename: "FilmstadenScreen";
+  filmstadenId: string;
   name: string;
 }
 
@@ -17,7 +17,7 @@ export interface ShowingAdmin_payToUser {
   id: any;
 }
 
-export interface ShowingAdmin_adminPaymentDetails_sfData_user {
+export interface ShowingAdmin_adminPaymentDetails_filmstadenData_user {
   __typename: "User";
   id: any;
   nick: string | null;
@@ -25,10 +25,10 @@ export interface ShowingAdmin_adminPaymentDetails_sfData_user {
   lastName: string | null;
 }
 
-export interface ShowingAdmin_adminPaymentDetails_sfData {
-  __typename: "SfData";
-  user: ShowingAdmin_adminPaymentDetails_sfData_user;
-  sfMembershipId: string | null;
+export interface ShowingAdmin_adminPaymentDetails_filmstadenData {
+  __typename: "FilmstadenData";
+  user: ShowingAdmin_adminPaymentDetails_filmstadenData_user;
+  filmstadenMembershipId: string | null;
   foretagsbiljett: string | null;
 }
 
@@ -50,8 +50,8 @@ export interface ShowingAdmin_adminPaymentDetails_participantPaymentInfos {
 
 export interface ShowingAdmin_adminPaymentDetails {
   __typename: "AdminPaymentDetails";
-  sfBuyLink: string | null;
-  sfData: ShowingAdmin_adminPaymentDetails_sfData[];
+  filmstadenBuyLink: string | null;
+  filmstadenData: ShowingAdmin_adminPaymentDetails_filmstadenData[];
   participantPaymentInfos: ShowingAdmin_adminPaymentDetails_participantPaymentInfos[];
 }
 
@@ -60,7 +60,7 @@ export interface ShowingAdmin {
   id: any;
   price: any | null;
   private: boolean;
-  sfScreen: ShowingAdmin_sfScreen | null;
+  filmstadenScreen: ShowingAdmin_filmstadenScreen | null;
   payToUser: ShowingAdmin_payToUser;
   adminPaymentDetails: ShowingAdmin_adminPaymentDetails | null;
 }

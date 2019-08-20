@@ -3,8 +3,8 @@ import React from "react";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 import {
-  SfShowings_movie_sfShowings
-} from "../../single-showing/components/__generated__/SfShowings";
+  ShowingsSelectorQuery_movie_showings
+} from "../../single-showing/components/__generated__/ShowingsSelectorQuery";
 
 const Option = styled.div<{ selected: boolean }>`
   display: flex;
@@ -44,8 +44,8 @@ const RightArrow = styled.div`
 `;
 
 interface Props {
-  options: SfShowings_movie_sfShowings[];
-  onChange: (v: SfShowings_movie_sfShowings) => void;
+  options: ShowingsSelectorQuery_movie_showings[];
+  onChange: (v: ShowingsSelectorQuery_movie_showings) => void;
 }
 
 const SelectBox: React.FC<Props> = ({ options, onChange }) => (
@@ -54,7 +54,7 @@ const SelectBox: React.FC<Props> = ({ options, onChange }) => (
       <Option
         key={
           option.cinemaName +
-          (option.screen ? option.screen.sfId : "") +
+          (option.screen ? option.screen.filmstadenId : "") +
           option.timeUtc
         }
         onClick={() => onChange(option)}

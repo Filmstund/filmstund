@@ -8,7 +8,7 @@ export const completeUserFragment = gql`
     lastName
     nick
     email
-    sfMembershipId
+    filmstadenMembershipId
     phone
     avatar
     foretagsbiljetter {

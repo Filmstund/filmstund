@@ -52,7 +52,7 @@ const useCreateShowingData = (movieId: string) =>
         previousLocations {
           name
         }
-        sfCities {
+        filmstadenCities {
           name
           alias
         }

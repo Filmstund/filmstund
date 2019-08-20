@@ -23,7 +23,7 @@ export interface UserProfile_me {
   lastName: string | null;
   nick: string | null;
   email: string;
-  sfMembershipId: string | null;
+  filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
   foretagsbiljetter: UserProfile_me_foretagsbiljetter[] | null;

@@ -41,9 +41,9 @@ export interface SingleShowing_showing_admin {
   nick: string | null;
 }
 
-export interface SingleShowing_showing_sfScreen {
-  __typename: "SfScreen";
-  sfId: string;
+export interface SingleShowing_showing_filmstadenScreen {
+  __typename: "FilmstadenScreen";
+  filmstadenId: string;
   name: string;
 }
 
@@ -52,7 +52,7 @@ export interface SingleShowing_showing_payToUser {
   id: any;
 }
 
-export interface SingleShowing_showing_adminPaymentDetails_sfData_user {
+export interface SingleShowing_showing_adminPaymentDetails_filmstadenData_user {
   __typename: "User";
   id: any;
   nick: string | null;
@@ -60,10 +60,10 @@ export interface SingleShowing_showing_adminPaymentDetails_sfData_user {
   lastName: string | null;
 }
 
-export interface SingleShowing_showing_adminPaymentDetails_sfData {
-  __typename: "SfData";
-  user: SingleShowing_showing_adminPaymentDetails_sfData_user;
-  sfMembershipId: string | null;
+export interface SingleShowing_showing_adminPaymentDetails_filmstadenData {
+  __typename: "FilmstadenData";
+  user: SingleShowing_showing_adminPaymentDetails_filmstadenData_user;
+  filmstadenMembershipId: string | null;
   foretagsbiljett: string | null;
 }
 
@@ -85,8 +85,8 @@ export interface SingleShowing_showing_adminPaymentDetails_participantPaymentInf
 
 export interface SingleShowing_showing_adminPaymentDetails {
   __typename: "AdminPaymentDetails";
-  sfBuyLink: string | null;
-  sfData: SingleShowing_showing_adminPaymentDetails_sfData[];
+  filmstadenBuyLink: string | null;
+  filmstadenData: SingleShowing_showing_adminPaymentDetails_filmstadenData[];
   participantPaymentInfos: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
 }
 
@@ -140,7 +140,7 @@ export interface SingleShowing_showing {
   admin: SingleShowing_showing_admin;
   price: any | null;
   private: boolean;
-  sfScreen: SingleShowing_showing_sfScreen | null;
+  filmstadenScreen: SingleShowing_showing_filmstadenScreen | null;
   payToUser: SingleShowing_showing_payToUser;
   adminPaymentDetails: SingleShowing_showing_adminPaymentDetails | null;
   myTickets: SingleShowing_showing_myTickets[] | null;

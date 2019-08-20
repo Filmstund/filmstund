@@ -23,8 +23,13 @@ export interface CreateShowingInput {
   time: any;
   movieId: any;
   location: string;
-  sfScreen?: SfScreenInput | null;
+  filmstadenScreen?: FilmstadenScreenInput | null;
   expectedBuyDate?: any | null;
+}
+
+export interface FilmstadenScreenInput {
+  filmstadenId: string;
+  name?: string | null;
 }
 
 export interface ForetagsbiljettInput {
@@ -34,7 +39,7 @@ export interface ForetagsbiljettInput {
 
 export interface NewUserInfo {
   nick?: string | null;
-  sfMembershipId?: string | null;
+  filmstadenMembershipId?: string | null;
   phone?: string | null;
 }
 
@@ -54,18 +59,13 @@ export interface PaymentOption {
   ticketNumber?: string | null;
 }
 
-export interface SfScreenInput {
-  sfId: string;
-  name?: string | null;
-}
-
 export interface UpdateShowingInput {
   price: any;
   private: boolean;
   payToUser: string;
   expectedBuyDate?: any | null;
   location: string;
-  sfScreen?: SfScreenInput | null;
+  filmstadenScreen?: FilmstadenScreenInput | null;
   time: any;
 }
 

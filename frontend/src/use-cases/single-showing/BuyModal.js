@@ -44,7 +44,7 @@ const TicketList = ({ tickets }) => (
           <CopyValue useStricken text={ticket.foretagsbiljett} />
         </div>
         <div css={{ flex: 1, paddingLeft: "1rem" }}>
-          <CopyValue useStricken text={ticket.sfMembershipId} />
+          <CopyValue useStricken text={ticket.filmstadenMembershipId} />
         </div>
       </div>
     ))}
@@ -103,7 +103,7 @@ const BuyModal = ({
                 "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
               {sfBuyLink && (
                 <a href={sfBuyLink} target="_blank" rel="noopener noreferrer">
-                  Öppna SF länk i nytt fönster
+                  Öppna Filmstaden-länk i nytt fönster
                 </a>
               )}
               <ParticipantsList

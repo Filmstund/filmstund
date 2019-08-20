@@ -109,8 +109,8 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
             payToUser: showing.payToUser.id,
             location: showing.location.name,
             time: showing.time,
-            sfScreen: showing.sfScreen
-              ? { name: showing.sfScreen.name, sfId: showing.sfScreen.sfId }
+            filmstadenScreen: showing.filmstadenScreen
+              ? { name: showing.filmstadenScreen.name, filmstadenId: showing.filmstadenScreen.filmstadenId }
               : null,
             price: ticketPrice * 100
           })
@@ -177,23 +177,23 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
       id
       price
       private
-      sfScreen {
-        sfId
+      filmstadenScreen {
+        filmstadenId
         name
       }
       payToUser {
         id
       }
       adminPaymentDetails {
-        sfBuyLink
-        sfData {
+        filmstadenBuyLink
+        filmstadenData {
           user {
             id
             nick
             firstName
             lastName
           }
-          sfMembershipId
+          filmstadenMembershipId
           foretagsbiljett
         }
         participantPaymentInfos {
