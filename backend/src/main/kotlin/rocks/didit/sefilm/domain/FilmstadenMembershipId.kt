@@ -3,31 +3,31 @@ package rocks.didit.sefilm.domain
 import com.fasterxml.jackson.annotation.JsonValue
 
 data class FilmstadenMembershipId(val value: String) {
-  companion object {
-    fun valueOf(profileId: String): FilmstadenMembershipId {
-      if (profileId[3] == '-' && profileId.length == 7) {
-        return FilmstadenMembershipId(profileId.toUpperCase())
-      }
-      if (profileId.length != 6) {
-        throw IllegalArgumentException("$profileId does not look like a valid profileId as supplied by Filmstaden")
-      }
-      val split = profileId.split('-', limit = 2)
-      if (split.size == 2 && (split[0].length != 3 || split[1].length != 3)) {
-        throw IllegalArgumentException("'$profileId' is an invalid membership id. Expected XXX-XXX")
-      }
+    companion object {
+        fun valueOf(profileId: String): FilmstadenMembershipId {
+            if (profileId[3] == '-' && profileId.length == 7) {
+                return FilmstadenMembershipId(profileId.toUpperCase())
+            }
+            if (profileId.length != 6) {
+                throw IllegalArgumentException("$profileId does not look like a valid profileId as supplied by Filmstaden")
+            }
+            val split = profileId.split('-', limit = 2)
+            if (split.size == 2 && (split[0].length != 3 || split[1].length != 3)) {
+                throw IllegalArgumentException("'$profileId' is an invalid membership id. Expected XXX-XXX")
+            }
 
-      return FilmstadenMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}".toUpperCase())
+            return FilmstadenMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}".toUpperCase())
+        }
     }
-  }
 
-  init {
-    if (value.length < 6 || value.length > 7) {
-      throw IllegalArgumentException("The Filmstaden membership id has wrong size. Expected 6-7, got ${value.length}")
+    init {
+        if (value.length < 6 || value.length > 7) {
+            throw IllegalArgumentException("The Filmstaden membership id has wrong size. Expected 6-7, got ${value.length}")
+        }
     }
-  }
 
-  @JsonValue
-  override fun toString(): String {
-    return value
-  }
+    @JsonValue
+    override fun toString(): String {
+        return value
+    }
 }

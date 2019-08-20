@@ -10,7 +10,7 @@ import java.util.*
 
 @Repository
 interface UserRepository : CrudRepository<User, UserID> {
-  fun findByFilmstadenMembershipId(filmstadenMembershipId: FilmstadenMembershipId): User?
-  fun findByCalendarFeedId(calendarFeedId: UUID): User?
-  fun existsByForetagsbiljetterNumber(biljett: TicketNumber): Boolean
+    fun findByFilmstadenMembershipId(filmstadenMembershipId: FilmstadenMembershipId): User?
+    fun findByCalendarFeedId(calendarFeedId: UUID): User?
+    fun existsByForetagsbiljetterNumber(biljett: TicketNumber): Boolean
 }

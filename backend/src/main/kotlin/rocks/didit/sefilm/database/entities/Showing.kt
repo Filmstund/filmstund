@@ -19,47 +19,47 @@ import java.util.*
 @Document
 data class Showing(
         @Id
-  val id: UUID = UUID.randomUUID(),
+        val id: UUID = UUID.randomUUID(),
         val webId: Base64ID = Base64ID.MISSING,
         val slug: String = "slug-less",
         val date: LocalDate? = null,
         val time: LocalTime? = null,
         @DBRef
-  val movie: Movie = Movie(),
+        val movie: Movie = Movie(),
         val location: Location? = null,
         val filmstadenScreen: FilmstadenLiteScreenDTO? = null,
         val private: Boolean = false,
         val price: SEK? = null,
         val ticketsBought: Boolean = false,
         @DBRef
-  val admin: User = User(),
+        val admin: User = User(),
         @DBRef
-  val payToUser: User = admin,
+        val payToUser: User = admin,
         val expectedBuyDate: LocalDate? = null,
         val participants: Set<Participant> = setOf(),
         @LastModifiedDate
-  val lastModifiedDate: Instant = Instant.EPOCH,
+        val lastModifiedDate: Instant = Instant.EPOCH,
         @CreatedDate
-  val createdDate: Instant = Instant.now()
+        val createdDate: Instant = Instant.now()
 ) {
 
-  fun toDto() = ShowingDTO(
-    id = id,
-    webId = webId,
-    slug = slug,
-    date = date ?: throw MissingParametersException("date"),
-    time = time ?: throw MissingParametersException("time"),
-    movieId = movie.id,
-    location = location ?: throw MissingParametersException("location"),
-    filmstadenScreen = filmstadenScreen,
-    private = private,
-    price = price,
-    ticketsBought = ticketsBought,
-    admin = admin.id,
-    payToUser = payToUser.id,
-    expectedBuyDate = expectedBuyDate,
-    participants = participants.map { it.toDto() },
-    lastModifiedDate = lastModifiedDate,
-    createdDate = createdDate
-  )
+    fun toDto() = ShowingDTO(
+            id = id,
+            webId = webId,
+            slug = slug,
+            date = date ?: throw MissingParametersException("date"),
+            time = time ?: throw MissingParametersException("time"),
+            movieId = movie.id,
+            location = location ?: throw MissingParametersException("location"),
+            filmstadenScreen = filmstadenScreen,
+            private = private,
+            price = price,
+            ticketsBought = ticketsBought,
+            admin = admin.id,
+            payToUser = payToUser.id,
+            expectedBuyDate = expectedBuyDate,
+            participants = participants.map { it.toDto() },
+            lastModifiedDate = lastModifiedDate,
+            createdDate = createdDate
+    )
 }

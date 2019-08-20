@@ -30,7 +30,7 @@ data class ShowingDTO(
         val lastModifiedDate: Instant = Instant.EPOCH,
         val createdDate: Instant = Instant.EPOCH
 ) {
-  fun fullDate(): LocalDateTime {
-    return LocalDateTime.of(date, time)
-  }
+    fun fullDate(): LocalDateTime {
+        return LocalDateTime.of(date, time)
+    }
 }

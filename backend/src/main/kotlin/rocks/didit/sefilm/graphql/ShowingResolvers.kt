@@ -21,70 +21,70 @@ import java.util.*
 
 @Component
 class ShowingQueryResolver(private val showingService: ShowingService) : GraphQLQueryResolver {
-  fun publicShowings(afterDate: LocalDate?) = showingService.getAllPublicShowings(afterDate ?: LocalDate.MIN)
-  fun privateShowingsForCurrentUser(afterDate: LocalDate?) =
-    showingService.getPrivateShowingsForCurrentUser(afterDate ?: LocalDate.MIN)
+    fun publicShowings(afterDate: LocalDate?) = showingService.getAllPublicShowings(afterDate ?: LocalDate.MIN)
+    fun privateShowingsForCurrentUser(afterDate: LocalDate?) =
+            showingService.getPrivateShowingsForCurrentUser(afterDate ?: LocalDate.MIN)
 
-  fun showing(id: UUID?, webId: Base64ID?): ShowingDTO? {
-    return when {
-      id != null -> showingService.getShowing(id)
-      webId != null -> showingService.getShowing(webId)
-      else -> null
+    fun showing(id: UUID?, webId: Base64ID?): ShowingDTO? {
+        return when {
+            id != null -> showingService.getShowing(id)
+            webId != null -> showingService.getShowing(webId)
+            else -> null
+        }
     }
-  }
 
-  fun showing(webId: Base64ID): ShowingDTO? = showingService.getShowing(webId)
-  fun showingForMovie(movieId: UUID) = showingService.getShowingByMovie(movieId)
+    fun showing(webId: Base64ID): ShowingDTO? = showingService.getShowing(webId)
+    fun showingForMovie(movieId: UUID) = showingService.getShowingByMovie(movieId)
 }
 
 @Component
 class ShowingResolver(
-  private val showingService: ShowingService,
-  private val userService: UserService,
-  private val movieService: MovieService,
-  private val ticketService: TicketService
+        private val showingService: ShowingService,
+        private val userService: UserService,
+        private val movieService: MovieService,
+        private val ticketService: TicketService
 ) : GraphQLResolver<ShowingDTO> {
-  fun admin(showing: ShowingDTO): LimitedUserDTO = userService
-    .getUser(showing.admin)
-    .orElseThrow { NotFoundException("admin user", showing.admin, showing.id) }
+    fun admin(showing: ShowingDTO): LimitedUserDTO = userService
+            .getUser(showing.admin)
+            .orElseThrow { NotFoundException("admin user", showing.admin, showing.id) }
 
-  fun payToUser(showing: ShowingDTO): LimitedUserDTO = userService
-    .getUser(showing.payToUser)
-    .orElseThrow { NotFoundException("payment receiver user", showing.payToUser, showing.id) }
+    fun payToUser(showing: ShowingDTO): LimitedUserDTO = userService
+            .getUser(showing.payToUser)
+            .orElseThrow { NotFoundException("payment receiver user", showing.payToUser, showing.id) }
 
-  fun movie(showing: ShowingDTO): Movie {
-    val id = showing.movieId
-    return movieService.getMovie(id)
-      .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
-  }
+    fun movie(showing: ShowingDTO): Movie {
+        val id = showing.movieId
+        return movieService.getMovie(id)
+                .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
+    }
 
-  fun myTickets(showing: ShowingDTO): List<Ticket> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
+    fun myTickets(showing: ShowingDTO): List<Ticket> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
-  fun ticketRange(showing: ShowingDTO): TicketRange? = ticketService.getTicketRange(showing.id)
+    fun ticketRange(showing: ShowingDTO): TicketRange? = ticketService.getTicketRange(showing.id)
 
-  fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO? =
-    showingService.getAdminPaymentDetails(showing.id)
+    fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO? =
+            showingService.getAdminPaymentDetails(showing.id)
 
-  fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO? =
-    showingService.getAttendeePaymentDetails(showing.id)
+    fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO? =
+            showingService.getAttendeePaymentDetails(showing.id)
 
-  fun filmstadenSeatMap(showing: ShowingDTO): List<FilmstadenSeatMapDTO> = showingService.fetchSeatMap(showing.id)
+    fun filmstadenSeatMap(showing: ShowingDTO): List<FilmstadenSeatMapDTO> = showingService.fetchSeatMap(showing.id)
 }
 
 @Component
 class ParticipantUserResolver(private val userService: UserService) : GraphQLResolver<ParticipantDTO> {
-  fun user(participant: ParticipantDTO): LimitedUserDTO = userService
-    .getUserOrThrow(participant.userId)
+    fun user(participant: ParticipantDTO): LimitedUserDTO = userService
+            .getUserOrThrow(participant.userId)
 }
 
 @Component
 class TicketUserResolver(private val userService: UserService) : GraphQLResolver<Ticket> {
-  fun assignedToUser(ticket: Ticket): LimitedUserDTO = userService
-    .getUserOrThrow(ticket.assignedToUser)
+    fun assignedToUser(ticket: Ticket): LimitedUserDTO = userService
+            .getUserOrThrow(ticket.assignedToUser)
 }
 
 @Component
 class FilmstadenDataUserResolver(private val userService: UserService) : GraphQLResolver<UserAndFilmstadenData> {
-  fun user(data: UserAndFilmstadenData): LimitedUserDTO = userService
-    .getUserOrThrow(data.userId)
+    fun user(data: UserAndFilmstadenData): LimitedUserDTO = userService
+            .getUserOrThrow(data.userId)
 }

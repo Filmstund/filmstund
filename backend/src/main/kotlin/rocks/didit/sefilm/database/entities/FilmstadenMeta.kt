@@ -7,10 +7,10 @@ import java.time.Instant
 
 @Document
 class FilmstadenMeta(
-  @Id
-  @JsonIgnore
-  val key: String = "filmstadenPopulate",
-  val timestamp: Instant? = null,
-  val description: String = "N/A",
-  val value: Any? = null
+        @Id
+        @JsonIgnore
+        val key: String = "filmstadenPopulate",
+        val timestamp: Instant? = null,
+        val description: String = "N/A",
+        val value: Any? = null
 )

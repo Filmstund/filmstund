@@ -21,6 +21,6 @@ class UserDTO(
         val signupDate: Instant = Instant.ofEpochSecond(0L),
         val calendarFeedId: UUID?
 ) {
-  fun toLimitedUserDTO() =
-    LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone, this.avatar)
+    fun toLimitedUserDTO() =
+            LimitedUserDTO(this.id, this.name, this.firstName, this.lastName, this.nick, this.phone, this.avatar)
 }

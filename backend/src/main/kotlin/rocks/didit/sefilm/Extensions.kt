@@ -10,13 +10,13 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.services.UserService
 
 internal fun currentLoggedInUser(): UserID {
-  val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-  if (authentication?.isAuthenticated != true) {
-    throw IllegalStateException("Cannot get current user if user isn't authenticated")
-  }
+    val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+    if (authentication?.isAuthenticated != true) {
+        throw IllegalStateException("Cannot get current user if user isn't authenticated")
+    }
 
-  val principal = authentication.principal as OpenIdConnectUserDetails
-  return UserID(principal.userId)
+    val principal = authentication.principal as OpenIdConnectUserDetails
+    return UserID(principal.userId)
 }
 
 internal fun String.toImdbId() = IMDbID.valueOf(this)
@@ -25,7 +25,7 @@ internal fun Long.toTmdbId() = TMDbID.valueOf(this)
 inline fun <reified T, E : Throwable> T?.orElseThrow(exceptionSupplier: () -> E): T = this ?: throw exceptionSupplier()
 
 internal fun UserID.lookupUsing(userService: UserService): User {
-  return userService.getCompleteUser(this).orElseThrow { NotFoundException("user", userID = this) }
+    return userService.getCompleteUser(this).orElseThrow { NotFoundException("user", userID = this) }
 }
 
 internal fun <T : Any> T.logger() = lazy { LoggerFactory.getLogger(this::class.java) }

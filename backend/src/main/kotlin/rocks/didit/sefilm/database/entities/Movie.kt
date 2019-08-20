@@ -14,7 +14,7 @@ import java.util.*
 @Document
 data class Movie(
         @Id
-  val id: UUID = UUID.randomUUID(),
+        val id: UUID = UUID.randomUUID(),
         val imdbId: IMDbID = IMDbID.MISSING,
         val filmstadenId: String? = null,
         val filmstadenSlug: String? = null,
@@ -28,20 +28,20 @@ data class Movie(
         val poster: String? = null,
         val genres: Collection<String> = emptyList(),
         @LastModifiedDate
-  val lastModifiedDate: Instant = Instant.EPOCH,
+        val lastModifiedDate: Instant = Instant.EPOCH,
         /** How popular the movie is, between 0 and infinity. Updated regularly */
-  val popularity: Double = 0.0,
+        val popularity: Double = 0.0,
         val popularityLastUpdated: Instant = Instant.EPOCH,
         /** If the movie is archived then it will be excluded from common functions
-   *  such as scheduled updates and it won't be visible to end users */
-  val archived: Boolean = false
+         *  such as scheduled updates and it won't be visible to end users */
+        val archived: Boolean = false
 ) {
 
-  /** Should we do an extended query to find more information about this movie? */
-  fun needsMoreInfo() =
-    synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
+    /** Should we do an extended query to find more information about this movie? */
+    fun needsMoreInfo() =
+            synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
 
-  fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 2
+    fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 2
 
-  fun durationUntilRelease(): Duration = Duration.between(LocalDateTime.now(), releaseDate.atTime(0, 0))
+    fun durationUntilRelease(): Duration = Duration.between(LocalDateTime.now(), releaseDate.atTime(0, 0))
 }

@@ -11,9 +11,9 @@ import rocks.didit.sefilm.database.TmdbIdConverter
 @EnableMongoAuditing
 class MongoConfiguration {
 
-  @Bean
-  fun customMongoConverters(): MongoCustomConversions {
-    val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
-    return MongoCustomConversions(converters)
-  }
+    @Bean
+    fun customMongoConverters(): MongoCustomConversions {
+        val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
+        return MongoCustomConversions(converters)
+    }
 }

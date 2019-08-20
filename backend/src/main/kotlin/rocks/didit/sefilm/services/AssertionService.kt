@@ -11,54 +11,54 @@ import rocks.didit.sefilm.domain.dto.ShowingDTO
 
 @Service
 class AssertionService(
-  private val userService: UserService,
-  private val foretagsbiljettService: ForetagsbiljettService
+        private val userService: UserService,
+        private val foretagsbiljettService: ForetagsbiljettService
 ) {
 
-  fun assertTicketsNotBought(userID: UserID, showing: Showing) {
-    if (showing.ticketsBought) {
-      throw TicketsAlreadyBoughtException(userID, showing.id)
-    }
-  }
-
-  fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
-    if (showing.participants.any { it.userId == userID }) {
-      throw UserAlreadyAttendedException(userID)
-    }
-  }
-
-  fun assertLoggedInUserIsAdmin(showing: ShowingDTO) = assertLoggedInUserIsAdmin(showing.admin)
-  fun assertLoggedInUserIsAdmin(showingAdmin: UserID) {
-    if (currentLoggedInUser() != showingAdmin) {
-      throw AccessDeniedException("Only the showing admin is allowed to do that")
-    }
-  }
-
-  fun assertUserHasPhoneNumber(userID: UserID) {
-    val user = userService.getUserOrThrow(userID)
-    if (user.phone == null || user.phone.isBlank()) {
-      throw MissingPhoneNumberException(userID)
-    }
-  }
-
-  fun assertForetagsbiljettIsUsable(userId: UserID, suppliedTicket: TicketNumber, showing: Showing) {
-    val matchingTickets = foretagsbiljettService
-      .getForetagsbiljetterForUser(userId)
-      .filter { it.number == suppliedTicket }
-
-    if (matchingTickets.isEmpty()) {
-      throw TicketNotFoundException(suppliedTicket)
-    }
-    if (matchingTickets.size > 1) {
-      throw DuplicateTicketException(": $suppliedTicket")
+    fun assertTicketsNotBought(userID: UserID, showing: Showing) {
+        if (showing.ticketsBought) {
+            throw TicketsAlreadyBoughtException(userID, showing.id)
+        }
     }
 
-    if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Foretagsbiljett.Status.Available) {
-      throw TicketAlreadyUsedException(suppliedTicket)
+    fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
+        if (showing.participants.any { it.userId == userID }) {
+            throw UserAlreadyAttendedException(userID)
+        }
     }
 
-    if (matchingTickets.first().expires.isBefore(showing.expectedBuyDate ?: showing.date)) {
-      throw TicketExpiredException(suppliedTicket)
+    fun assertLoggedInUserIsAdmin(showing: ShowingDTO) = assertLoggedInUserIsAdmin(showing.admin)
+    fun assertLoggedInUserIsAdmin(showingAdmin: UserID) {
+        if (currentLoggedInUser() != showingAdmin) {
+            throw AccessDeniedException("Only the showing admin is allowed to do that")
+        }
     }
-  }
+
+    fun assertUserHasPhoneNumber(userID: UserID) {
+        val user = userService.getUserOrThrow(userID)
+        if (user.phone == null || user.phone.isBlank()) {
+            throw MissingPhoneNumberException(userID)
+        }
+    }
+
+    fun assertForetagsbiljettIsUsable(userId: UserID, suppliedTicket: TicketNumber, showing: Showing) {
+        val matchingTickets = foretagsbiljettService
+                .getForetagsbiljetterForUser(userId)
+                .filter { it.number == suppliedTicket }
+
+        if (matchingTickets.isEmpty()) {
+            throw TicketNotFoundException(suppliedTicket)
+        }
+        if (matchingTickets.size > 1) {
+            throw DuplicateTicketException(": $suppliedTicket")
+        }
+
+        if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Foretagsbiljett.Status.Available) {
+            throw TicketAlreadyUsedException(suppliedTicket)
+        }
+
+        if (matchingTickets.first().expires.isBefore(showing.expectedBuyDate ?: showing.date)) {
+            throw TicketExpiredException(suppliedTicket)
+        }
+    }
 }

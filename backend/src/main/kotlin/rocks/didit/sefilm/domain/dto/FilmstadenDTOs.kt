@@ -6,10 +6,10 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 
 data class FilmstadenRatingDTO(
-  val age: Int,
-  val ageAccompanied: Int,
-  val alias: String,
-  val displayName: String
+        val age: Int,
+        val ageAccompanied: Int,
+        val alias: String,
+        val displayName: String
 )
 
 data class FilmstadenMovieDTO(
@@ -24,10 +24,10 @@ data class FilmstadenMovieDTO(
 )
 
 data class FilmstadenOriginalLanguageDTO(
-  val alias: String,
-  val englishName: String,
-  val nativeName: String,
-  val displayName: String
+        val alias: String,
+        val englishName: String,
+        val nativeName: String,
+        val displayName: String
 )
 
 data class FilmstadenPersonDTO(val displayName: String?, val firstName: String?, val lastName: String?)
@@ -58,12 +58,12 @@ data class FilmstadenExtendedMovieDTO(
 data class FilmstadenAttributeDTO(val alias: String, val displayName: String)
 
 data class FilmstadenScreenDTO(
-  val ncgId: String,
-  val title: String,
-  val slug: String,
-  val seatCount: Int,
-  val remoteSystemAlias: String,
-  val remoteEntityId: String
+        val ncgId: String,
+        val title: String,
+        val slug: String,
+        val seatCount: Int,
+        val remoteSystemAlias: String,
+        val remoteEntityId: String
 )
 
 data class FilmstadenShowItemsDTO(val totalNbrOfItems: Int, val items: List<FilmstadenShowDTO>)
@@ -93,13 +93,13 @@ data class FilmstadenCinemaWithAddressDTO(
 )
 
 data class FilmstadenAddressDTO(
-  val phoneNumber: String?,
-  val streetAddress: String,
-  val postalCode: String,
-  val postalAddress: String,
-  val city: Map<String, String>,
-  val country: Map<String, String>,
-  val coordinates: FilmstadenCoordinatesDTO
+        val phoneNumber: String?,
+        val streetAddress: String,
+        val postalCode: String,
+        val postalAddress: String,
+        val city: Map<String, String>,
+        val country: Map<String, String>,
+        val coordinates: FilmstadenCoordinatesDTO
 )
 
 data class FilmstadenCoordinatesDTO(val latitude: String, val longitude: String)
@@ -112,15 +112,15 @@ data class FilmstadenShowingDTO(
         val timeUtc: Instant,
         val tags: List<FilmstadenTag>
 ) {
-  companion object {
-    fun from(show: FilmstadenShowDTO) = FilmstadenShowingDTO(
-      show.cinema.title,
-      FilmstadenLiteScreenDTO(show.screen.ncgId, show.screen.title),
-      show.screen.seatCount,
-      show.timeUtc,
-      FilmstadenTag.convertTags(show.attributes)
-    )
-  }
+    companion object {
+        fun from(show: FilmstadenShowDTO) = FilmstadenShowingDTO(
+                show.cinema.title,
+                FilmstadenLiteScreenDTO(show.screen.ncgId, show.screen.title),
+                show.screen.seatCount,
+                show.timeUtc,
+                FilmstadenTag.convertTags(show.attributes)
+        )
+    }
 }
 
 data class FilmstadenSeatMapDTO(
@@ -135,50 +135,50 @@ data class FilmstadenSeatMapDTO(
 )
 
 data class FilmstadenSeatCoordinates(
-  val x: Float,
-  val y: Float
+        val x: Float,
+        val y: Float
 )
 
 data class FilmstadenSeatDimensions(
-  val width: Int,
-  val height: Int
+        val width: Int,
+        val height: Int
 )
 
 enum class FilmstadenTag {
-  `18år`,
-  `3D`,
-  VIP,
-  TXT,
-  EN,
-  JA,
-  SV,
-  `Sommar på bio`,
-  `Utmärkt film`,
-  `Syntolkning`,
-  `Uppläst text`,
-  Klassiker,
-  Classic,
-  `Ej textad`,
-  Textad,
-  Familj,
-  Barnvagnsbio,
-  Knattebio,
-  Unknown;
+    `18år`,
+    `3D`,
+    VIP,
+    TXT,
+    EN,
+    JA,
+    SV,
+    `Sommar på bio`,
+    `Utmärkt film`,
+    `Syntolkning`,
+    `Uppläst text`,
+    Klassiker,
+    Classic,
+    `Ej textad`,
+    Textad,
+    Familj,
+    Barnvagnsbio,
+    Knattebio,
+    Unknown;
 
-  companion object {
-    private val log = LoggerFactory.getLogger(FilmstadenTag::class.java)
+    companion object {
+        private val log = LoggerFactory.getLogger(FilmstadenTag::class.java)
 
-    fun convertTags(attributes: List<FilmstadenAttributeDTO>): List<FilmstadenTag> {
-      return attributes.map { a ->
-        try {
-          FilmstadenTag.valueOf(a.displayName)
-        } catch (e: IllegalArgumentException) {
-          log.warn("FilmstadenTag with name $a does not exist")
-          return@map null
+        fun convertTags(attributes: List<FilmstadenAttributeDTO>): List<FilmstadenTag> {
+            return attributes.map { a ->
+                try {
+                    FilmstadenTag.valueOf(a.displayName)
+                } catch (e: IllegalArgumentException) {
+                    log.warn("FilmstadenTag with name $a does not exist")
+                    return@map null
+                }
+            }.filterNotNull()
         }
-      }.filterNotNull()
     }
-  }
 }
 
 
