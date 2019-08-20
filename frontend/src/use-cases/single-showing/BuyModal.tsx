@@ -43,11 +43,33 @@ interface TicketListProps {
   tickets: SingleShowing_showing_adminPaymentDetails_filmstadenData[];
 }
 
+const TicketListRow = styled.div`
+  display: flex;
+  padding: 10px;
+  width: 100%;
+  transition: background-color 0.1s ease;
+
+  @media (min-width: 500px) {
+    max-width: 100%;
+  }
+  @media (min-width: 700px) {
+    max-width: 48%;
+  }
+
+  &:nth-of-type(even) {
+    background: #e3e3e3;
+  }
+
+  &:hover {
+    background: #fdd835;
+  }
+`;
+
 const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
   <div>
     <SmallHeader>Deltagare</SmallHeader>
     {tickets.map(ticket => (
-      <div key={ticket.user.id} css={{ display: "flex" }}>
+      <TicketListRow key={ticket.user.id}>
         <div>
           <UserFullName user={ticket.user} />
         </div>
@@ -57,7 +79,7 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
         <div css={{ flex: 1, paddingLeft: "1rem" }}>
           <CopyValue useStricken text={ticket.filmstadenMembershipId || ""} />
         </div>
-      </div>
+      </TicketListRow>
     ))}
   </div>
 );
