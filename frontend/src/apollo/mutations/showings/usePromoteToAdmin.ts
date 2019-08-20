@@ -3,7 +3,7 @@ import { useMutation } from "react-apollo";
 import {
   PromoteToAdmin,
   PromoteToAdminVariables
-} from "../__generated__/PromoteToAdmin";
+} from "./__generated__/PromoteToAdmin";
 
 const promoteToAdminMutation = gql`
   mutation PromoteToAdmin($showingId: UUID!, $userId: UserID!) {

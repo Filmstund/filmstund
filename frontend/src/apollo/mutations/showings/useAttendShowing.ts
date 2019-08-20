@@ -3,12 +3,12 @@ import { useMutation } from "react-apollo";
 import {
   AttendShowing,
   AttendShowingVariables
-} from "../__generated__/AttendShowing";
+} from "./__generated__/AttendShowing";
 import { PaymentOption } from "../../../../__generated__/globalTypes";
 import {
   UnattendShowing,
   UnattendShowingVariables
-} from "../__generated__/UnattendShowing";
+} from "./__generated__/UnattendShowing";
 
 const participantsFragment = gql`
   fragment ShowingParticipant on Showing {

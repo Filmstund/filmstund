@@ -3,7 +3,7 @@ import { useMutation } from "react-apollo";
 import {
   DeleteShowing,
   DeleteShowingVariables
-} from "../__generated__/DeleteShowing";
+} from "./__generated__/DeleteShowing";
 
 const deleteShowingMutation = gql`
   mutation DeleteShowing($showingId: UUID!) {

@@ -5,7 +5,7 @@ import React from "react";
 import { formatShowingDateTime } from "../../../lib/dateTools";
 import PosterBox from "../ui/PosterBox";
 import { PageTitle } from "../utils/PageTitle";
-import { OldShowing_admin, OldShowing_movie } from "./__generated__/OldShowing";
+import { OldShowing_movie } from "./__generated__/OldShowing";
 
 const VerticalPaddingContainer = styled.div`
   padding: 1em 0;
@@ -39,7 +39,7 @@ const StyledShowing = styled.div<{ disabled?: boolean }>`
 
 interface Props {
   movie?: OldShowing_movie;
-  admin: OldShowing_admin;
+  admin: { name: string | null; nick: string | null } | null;
   location: string;
   date: string;
   setTitleTag?: boolean;

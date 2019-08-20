@@ -1,15 +1,18 @@
-import React from "react";
 import styled from "@emotion/styled";
+import React from "react";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
-import { CreateShowingQuery_movie_sfShowings } from "../../new-showing/__generated__/CreateShowingQuery";
+import {
+  SfShowings_movie_sfShowings
+} from "../../single-showing/components/__generated__/SfShowings";
 
-const Option = styled.div`
+const Option = styled.div<{ selected: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1em;
-  color: #8e1b1b;
+  background: ${props => (props.selected ? "#8e1b1b" : "none")};
+  color: ${props => (props.selected ? "#fff" : "#8e1b1b")};
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 `;
@@ -41,8 +44,8 @@ const RightArrow = styled.div`
 `;
 
 interface Props {
-  options: CreateShowingQuery_movie_sfShowings[];
-  onChange: (v: CreateShowingQuery_movie_sfShowings) => void;
+  options: SfShowings_movie_sfShowings[];
+  onChange: (v: SfShowings_movie_sfShowings) => void;
 }
 
 const SelectBox: React.FC<Props> = ({ options, onChange }) => (
@@ -55,6 +58,7 @@ const SelectBox: React.FC<Props> = ({ options, onChange }) => (
           option.timeUtc
         }
         onClick={() => onChange(option)}
+        selected={false}
       >
         <Lable>
           {option.timeUtc && formatLocalTime(option.timeUtc)}{" "}
@@ -62,9 +66,7 @@ const SelectBox: React.FC<Props> = ({ options, onChange }) => (
           {option.cinemaName && option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag => (
-            <Tag key={tag}>{tag}</Tag>
-          ))}
+          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>

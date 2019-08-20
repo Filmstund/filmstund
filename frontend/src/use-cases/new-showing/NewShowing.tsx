@@ -7,7 +7,7 @@ import { navigateToShowing } from "../common/navigators";
 
 import { movieFragment } from "../common/showing/Movie";
 import { NewShowingQuery } from "./__generated__/NewShowingQuery";
-import CreateShowingForm from "./CreateShowingForm";
+import { CreateShowingFormFetcher } from "./CreateShowingFormFetcher";
 import MovieSelector from "./MovieSelector";
 
 const NewShowing = () => {
@@ -46,7 +46,7 @@ const NewShowing = () => {
 
   if (movieId) {
     return (
-      <CreateShowingForm
+      <CreateShowingFormFetcher
         movieId={movieId}
         navigateToShowing={handleNavigateToShowing}
         clearSelectedMovie={clearSelectedMovie}
