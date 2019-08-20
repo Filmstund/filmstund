@@ -33,7 +33,8 @@ type FilmstadenShowing {
     screen: FilmstadenScreen,
     seatCount: Int,
     timeUtc: String,
-    tags: [String!]!
+    tags: [String!]!,
+    filmstadenRemoteEntityId: String
 }
 
 type FilmstadenSeatMap {
