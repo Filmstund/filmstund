@@ -4,7 +4,7 @@ import { UpdateShowingInput } from "../../../../__generated__/globalTypes";
 import {
   UpdateShowing,
   UpdateShowingVariables
-} from "../__generated__/UpdateShowing";
+} from "./__generated__/UpdateShowing";
 
 const updateShowingMutation = gql`
   mutation UpdateShowing($showingId: UUID!, $showing: UpdateShowingInput!) {

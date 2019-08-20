@@ -3,7 +3,7 @@ import { useMutation } from "react-apollo";
 import {
   MarkShowingAsBought,
   MarkShowingAsBoughtVariables
-} from "../__generated__/MarkShowingAsBought";
+} from "./__generated__/MarkShowingAsBought";
 import { UpdateShowingInput } from "../../../../__generated__/globalTypes";
 
 const markAsBoughtMutation = gql`

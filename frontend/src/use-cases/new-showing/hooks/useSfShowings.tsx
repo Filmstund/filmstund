@@ -4,12 +4,11 @@ import { Dictionary } from "lodash";
 import { groupBy } from "lodash-es";
 import { useMemo } from "react";
 import { formatYMD } from "../../../lib/dateTools";
-import { CreateShowingQuery_movie_sfShowings } from "../__generated__/CreateShowingQuery";
 import {
   SfShowingsQuery,
   SfShowingsQuery_movie_sfShowings,
   SfShowingsQueryVariables
-} from "../__generated__/SfShowingsQuery";
+} from "./__generated__/SfShowingsQuery";
 
 export const useSfShowings = (
   movieId: string,
@@ -40,7 +39,7 @@ export const useSfShowings = (
     }
   );
 
-  const sfShowingsQueryMovieSfShowings: CreateShowingQuery_movie_sfShowings[] =
+  const sfShowingsQueryMovieSfShowings: SfShowingsQuery_movie_sfShowings[] =
     data && data.movie ? data.movie.sfShowings : [];
 
   const sfdates = useMemo(

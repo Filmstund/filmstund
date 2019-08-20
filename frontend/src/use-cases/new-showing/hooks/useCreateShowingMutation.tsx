@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { showingFragment } from "../../common/showing/Showing";
-import { CreateShowing, CreateShowingVariables } from "../__generated__/CreateShowing";
+import { CreateShowing, CreateShowingVariables } from "./__generated__/CreateShowing";
 
 export const useCreateShowingMutation = () =>
 useMutation<CreateShowing, CreateShowingVariables>(

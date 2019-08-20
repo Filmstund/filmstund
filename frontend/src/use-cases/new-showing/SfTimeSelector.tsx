@@ -5,19 +5,19 @@ import { formatYMD } from "../../lib/dateTools";
 import Field from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import SelectBox from "../common/ui/SelectBox";
-import { CreateShowingQuery_movie_sfShowings } from "./__generated__/CreateShowingQuery";
+import { SfShowingsQuery_movie_sfShowings } from "./hooks/__generated__/SfShowingsQuery";
 import { useSfShowings } from "./hooks/useSfShowings";
 
 export const SfTimeSelector: React.FC<{
   city: string;
   movieId: string;
-  onSelect: (v: CreateShowingQuery_movie_sfShowings) => void;
+  onSelect: (v: SfShowingsQuery_movie_sfShowings) => void;
   date: string;
 }> = ({ city, movieId, date, onSelect }) => {
   const [sfDates] = useSfShowings(movieId, city);
 
   if (!sfDates) {
-    return <FontAwesomeIcon icon={faSpinner} spin/>;
+    return <FontAwesomeIcon icon={faSpinner} spin />;
   }
 
   const sfTimes = sfDates[date];
@@ -29,7 +29,10 @@ export const SfTimeSelector: React.FC<{
       <div>
         <SmallHeader>Välj tid från SF</SmallHeader>
         <Field text="Tid:">
-          <SelectBox options={sfTimes} onChange={onSelect}/>
+          <SelectBox
+            options={sfTimes}
+            onChange={onSelect}
+          />
         </Field>
       </div>
     );

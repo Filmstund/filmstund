@@ -3,7 +3,7 @@ import { useMutation } from "react-apollo";
 import {
   TogglePaidChange,
   TogglePaidChangeVariables
-} from "../__generated__/TogglePaidChange";
+} from "./__generated__/TogglePaidChange";
 import { ParticipantPaymentInput } from "../../../../__generated__/globalTypes";
 
 const togglePaidChangeMutation = gql`

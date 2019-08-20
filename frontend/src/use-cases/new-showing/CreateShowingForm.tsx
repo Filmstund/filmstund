@@ -13,10 +13,10 @@ import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import { SfShowings_movie_sfShowings } from "../single-showing/components/__generated__/SfShowings";
 import {
   CreateShowingQuery,
-  CreateShowingQuery_me,
-  CreateShowingQuery_movie_sfShowings
+  CreateShowingQuery_me
 } from "./__generated__/CreateShowingQuery";
 import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
 import { useSfShowings } from "./hooks/useSfShowings";
@@ -90,7 +90,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
     }));
   };
 
-  const setShowingTime = (sfTime: CreateShowingQuery_movie_sfShowings) => {
+  const setShowingTime = (sfTime: SfShowings_movie_sfShowings) => {
     const { timeUtc, cinemaName, screen } = sfTime;
 
     const { name, sfId } = screen!;
