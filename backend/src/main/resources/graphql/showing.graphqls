@@ -16,6 +16,7 @@ type Showing {
     participants: [Participant!]!
     lastModifiedDate: String!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
+    filmstadenRemoteEntityId: String
 }
 
 type Participant {
