@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { PaymentOption } from "./../../../../../__generated__/globalTypes";
+import { PaymentOption } from "./../../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: AttendShowing

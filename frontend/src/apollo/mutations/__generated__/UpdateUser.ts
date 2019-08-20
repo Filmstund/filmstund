@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { NewUserInfo, ForetagsbiljettStatus } from "./../../../../__generated__/globalTypes";
+import { NewUserInfo, ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateUser

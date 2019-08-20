@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettStatus } from "./../../__generated__/globalTypes";
+import { ForetagsbiljettStatus } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: AppQuery

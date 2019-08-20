@@ -95,9 +95,7 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
   const markAsBought = useMarkAsBought();
 
   const handleMarkBought = useCallback(
-    (event: Event) => {
-      event.preventDefault();
-
+    () => {
       const nonEmptyTicketUrls = cinemaTicketUrls.filter(
         line => line.trim().length !== 0
       );
@@ -152,7 +150,6 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
           handlePaidChange={handlePaidChange}
           ticketPrice={ticketPrice}
           cinemaTicketUrls={cinemaTicketUrls}
-          adminPaymentDetails={showing.adminPaymentDetails}
           closeModal={() => setState(state => ({ ...state, showModal: false }))}
         />
       )}

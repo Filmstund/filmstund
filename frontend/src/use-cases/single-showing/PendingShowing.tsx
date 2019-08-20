@@ -1,11 +1,13 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, ChangeEvent } from "react";
 import gql from "graphql-tag";
 
-import { SmallHeader } from "../../use-cases/common/ui/Header";
+import { SmallHeader } from "../common/ui/Header";
 import MainButton, { GrayButton } from "../../use-cases/common/ui/MainButton";
 import Modal from "../../use-cases/common/ui/Modal";
+import { SingleShowing_me_foretagsbiljetter } from "./containers/__generated__/SingleShowing";
 
 import createPaymentOptions, {
+  DisplayPaymentOption,
   stringifyOption
 } from "./utils/createPaymentOptions";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
@@ -14,7 +16,17 @@ import {
   useUnattendShowing
 } from "../../apollo/mutations/showings/useAttendShowing";
 
-export const PendingShowing = ({ isParticipating, foretagsbiljetter }) => {
+interface Props {
+  showingId: string;
+  isParticipating: boolean;
+  foretagsbiljetter: SingleShowing_me_foretagsbiljetter[];
+}
+
+export const PendingShowing: React.FC<Props> = ({
+  showingId,
+  isParticipating,
+  foretagsbiljetter
+}) => {
   const [selectedIndex, handleSelectIndex] = useStateWithHandleChange(0);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -30,30 +42,37 @@ export const PendingShowing = ({ isParticipating, foretagsbiljetter }) => {
     paymentOption => {
       const { type, ticketNumber } = paymentOption;
 
-      attendShowing({ paymentOption: { type, ticketNumber } }).then(() =>
+      attendShowing(showingId, { type, ticketNumber }).then(() =>
         setModalOpen(false)
       );
     },
     [attendShowing]
   );
 
-  const handleClickSelectPaymentOption = useCallback(() => {
-    attendWithPaymentOption(paymentOptions[selectedIndex]);
-  }, [attendWithPaymentOption, paymentOptions, selectedIndex]);
+  const handleClickSelectPaymentOption = useCallback(
+    () => {
+      attendWithPaymentOption(paymentOptions[selectedIndex]);
+    },
+    [attendWithPaymentOption, paymentOptions, selectedIndex]
+  );
 
-  const handleClickAttend = useCallback(() => {
-    if (paymentOptions.length > 1) {
-      setModalOpen(true);
-    } else {
-      // Attend with Swish option
-      attendWithPaymentOption(paymentOptions[0]);
-    }
-  }, [attendWithPaymentOption, paymentOptions]);
+  const handleClickAttend = useCallback(
+    () => {
+      if (paymentOptions.length > 1) {
+        setModalOpen(true);
+      } else {
+        // Attend with Swish option
+        attendWithPaymentOption(paymentOptions[0]);
+      }
+    },
+    [attendWithPaymentOption, paymentOptions]
+  );
 
   return (
     <>
       {modalOpen && (
         <ModalPaymentOptions
+          selectedIndex={selectedIndex}
           setPaymentOption={handleSelectIndex}
           paymentOptions={paymentOptions}
           setModalOpen={setModalOpen}
@@ -61,7 +80,7 @@ export const PendingShowing = ({ isParticipating, foretagsbiljetter }) => {
         />
       )}
       {isParticipating ? (
-        <GrayButton onClick={unattendShowing}>Avanmäl</GrayButton>
+        <GrayButton onClick={() => unattendShowing(showingId)}>Avanmäl</GrayButton>
       ) : (
         <MainButton onClick={handleClickAttend}>Jag hänger på!</MainButton>
       )}
@@ -69,7 +88,15 @@ export const PendingShowing = ({ isParticipating, foretagsbiljetter }) => {
   );
 };
 
-const ModalPaymentOptions = ({
+interface ModalPaymentOptionsProps {
+  selectedIndex: number,
+  paymentOptions: DisplayPaymentOption[],
+  setModalOpen: (v: boolean) => void,
+  handleClickSelectPaymentOption: () => void,
+  setPaymentOption: (event: ChangeEvent<HTMLSelectElement>) => void
+}
+
+const ModalPaymentOptions: React.FC<ModalPaymentOptionsProps> = ({
   selectedIndex,
   paymentOptions,
   setModalOpen,
@@ -97,7 +124,7 @@ const ModalPaymentOptions = ({
   );
 };
 
-PendingShowing.fragments = {
+(PendingShowing as any).fragments = {
   currentUser: gql`
     fragment PendingShowing on CurrentUser {
       foretagsbiljetter {
