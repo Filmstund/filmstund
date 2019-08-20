@@ -31,7 +31,7 @@ export const useSfShowings = (
       }
     `,
     {
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "no-cache",
       variables: {
         city,
         movieId
@@ -43,8 +43,7 @@ export const useSfShowings = (
     data && data.movie ? data.movie.showings : [];
 
   const sfdates = useMemo(
-    () =>
-      groupBy(showings, s => formatYMD(s.timeUtc || "")),
+    () => groupBy(showings, s => formatYMD(s.timeUtc || "")),
     [showings]
   );
   return [sfdates, loading];
