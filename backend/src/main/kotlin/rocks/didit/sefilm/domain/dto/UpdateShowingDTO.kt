@@ -9,6 +9,6 @@ data class UpdateShowingDTO(
         val payToUser: String = "N/A",
         val expectedBuyDate: LocalDate? = null,
         val location: String = "Filmstaden Bergakungen",
-        val filmstadenScreen: FilmstadenLiteScreenDTO? = null,
+        val filmstadenRemoteEntityId: String? = null,
         val time: LocalTime = LocalTime.NOON
 )

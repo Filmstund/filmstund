@@ -28,7 +28,8 @@ data class ShowingDTO(
         val expectedBuyDate: LocalDate?,
         val participants: Collection<ParticipantDTO>,
         val lastModifiedDate: Instant = Instant.EPOCH,
-        val createdDate: Instant = Instant.EPOCH
+        val createdDate: Instant = Instant.EPOCH,
+        val filmstadenRemoteEntityId: String?
 ) {
     fun fullDate(): LocalDateTime {
         return LocalDateTime.of(date, time)

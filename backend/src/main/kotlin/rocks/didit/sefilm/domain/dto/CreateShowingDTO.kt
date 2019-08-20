@@ -10,5 +10,6 @@ data class CreateShowingDTO(
         val movieId: UUID?,
         val location: String?,
         val filmstadenScreen: FilmstadenLiteScreenDTO?,
-        val expectedBuyDate: LocalDate?
+        val expectedBuyDate: LocalDate?,
+        val filmstadenRemoteEntityId: String?
 )

@@ -228,8 +228,8 @@ class ShowingService(
                         payToUser = userService.getCompleteUser(UserID(newValues.payToUser)),
                         expectedBuyDate = newValues.expectedBuyDate,
                         location = locationService.getOrCreateNewLocation(newValues.location),
-                        filmstadenScreen = newValues.filmstadenScreen,
-                        time = newValues.time
+                        time = newValues.time,
+                        filmstadenRemoteEntityId = newValues.filmstadenRemoteEntityId
                 )
         )
                 .also {
@@ -287,7 +287,8 @@ class ShowingService(
                 admin = admin,
                 payToUser = admin,
                 expectedBuyDate = this.expectedBuyDate,
-                participants = setOf(SwishParticipant(admin.id))
+                participants = setOf(SwishParticipant(admin.id)),
+                filmstadenRemoteEntityId = this.filmstadenRemoteEntityId
         )
     }
 
