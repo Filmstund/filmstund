@@ -6,10 +6,10 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document
-class SfMeta(
+class FilmstadenMeta(
   @Id
   @JsonIgnore
-  val key: String = "sfpopulate",
+  val key: String = "filmstadenPopulate",
   val timestamp: Instant? = null,
   val description: String = "N/A",
   val value: Any? = null

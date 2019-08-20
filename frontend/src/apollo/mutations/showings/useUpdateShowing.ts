@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { useMutation } from "react-apollo";
-import { UpdateShowingInput } from "../../../../__generated__/globalTypes";
+import { UpdateShowingInput } from "../../../__generated__/globalTypes";
 import {
   UpdateShowing,
   UpdateShowingVariables

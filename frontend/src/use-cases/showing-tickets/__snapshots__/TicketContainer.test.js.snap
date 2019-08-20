@@ -19,7 +19,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
       style="display: flex; justify-content: center;"
     />
     <div
-      class="css-qzkjqk"
+      class="css-18sytmz"
     >
       <div
         class="css-9pmse3-CompanyHeader"
@@ -175,7 +175,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
       <label
         class="css-1vtr8wv"
       >
-        Lägg till SF-bokningslänkar
+        Lägg till Filmstaden-bokningslänkar
       </label>
       <br />
       <textarea

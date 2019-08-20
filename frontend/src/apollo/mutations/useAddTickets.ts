@@ -18,7 +18,7 @@ export const ticketFragment = gql`
         numbers
       }
     }
-    sfSeatMap {
+    filmstadenSeatMap {
       row
       number
       seatType

@@ -3,7 +3,7 @@ package rocks.didit.sefilm.services
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.SfTicketException
+import rocks.didit.sefilm.FilmstadenTicketException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
@@ -11,20 +11,20 @@ import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.SfMembershipId
+import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.SeatRange
-import rocks.didit.sefilm.domain.dto.SfTicketDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import java.util.*
 
 @Service
 class TicketService(
-  private val sfClient: SFService,
-  private val userRepository: UserRepository,
-  private val ticketRepository: TicketRepository,
-  private val showingRepository: ShowingRepository
+        private val filmstadenClient: FilmstadenService,
+        private val userRepository: UserRepository,
+        private val ticketRepository: TicketRepository,
+        private val showingRepository: ShowingRepository
 ) {
 
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
@@ -42,7 +42,7 @@ class TicketService(
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
 
-    validateSfTicketUrls(userSuppliedTicketUrl)
+    validateFilmstadenTicketUrls(userSuppliedTicketUrl)
     userSuppliedTicketUrl.forEach {
       processTicketUrl(it, showing)
     }
@@ -52,24 +52,24 @@ class TicketService(
 
   private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {
     val (sysId, sfShowingId, ticketId) = extractIdsFromUrl(userSuppliedTicketUrl)
-    val sfTickets = sfClient.fetchTickets(sysId, sfShowingId, ticketId)
+    val filmstadenTickets = filmstadenClient.fetchTickets(sysId, sfShowingId, ticketId)
 
-    val tickets = sfTickets.map {
-      val barcode = sfClient.fetchBarcode(it.id)
+    val tickets = filmstadenTickets.map {
+      val barcode = filmstadenClient.fetchBarcode(it.id)
       if (it.profileId == null || it.profileId.isBlank()) {
         return@map it.toTicket(showing.id, showing.admin.id, barcode)
       }
 
-      val userIdForThatMember = getUserIdFromSfMembershipId(SfMembershipId.valueOf(it.profileId), showing)
+      val userIdForThatMember = getUserIdFromFilmstadenMembershipId(FilmstadenMembershipId.valueOf(it.profileId), showing)
       it.toTicket(showing.id, userIdForThatMember, barcode)
     }
 
     ticketRepository.saveAll(tickets)
   }
 
-  private fun getUserIdFromSfMembershipId(sfMembershipId: SfMembershipId, showing: Showing): UserID {
+  private fun getUserIdFromFilmstadenMembershipId(filmstadenMembershipId: FilmstadenMembershipId, showing: Showing): UserID {
     val userIdForThatMember = userRepository
-      .findBySfMembershipId(sfMembershipId)
+      .findByFilmstadenMembershipId(filmstadenMembershipId)
       ?.id
       ?: return showing.admin.id
 
@@ -115,7 +115,7 @@ class TicketService(
     return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
   }
 
-  private fun SfTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
+  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
     val seat = Seat(this.seat.row, this.seat.number)
     return Ticket(
       id = this.id,
@@ -144,11 +144,11 @@ class TicketService(
       .any { it.userId == currentLoggedInUser }
   }
 
-  private fun validateSfTicketUrls(links: List<String>) {
-    val linkRegex = Regex(".+sf\\.se/bokning/mina-e-biljetter/Sys.+?/AA.+?/RE.+")
+  private fun validateFilmstadenTicketUrls(links: List<String>) {
+    val linkRegex = Regex(".+filmstaden\\.se/bokning/mina-e-biljetter/Sys.+?/AA.+?/RE.+")
     links.forEach {
       if (!it.matches(linkRegex)) {
-        throw SfTicketException("$it does not look lika a valid ticket link. The link should look like this: https://www.sf.se/bokning/mina-e-biljetter/Sys99-SE/AA-1156-201712271800/RE-HPOUKRTI2N")
+        throw FilmstadenTicketException("$it does not look like a valid ticket link. The link should look like this: https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6")
       }
     }
   }

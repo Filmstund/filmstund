@@ -7,7 +7,7 @@ export const useFetchMovies = () =>
   useMutation<FetchMovies>(
     gql`
       mutation FetchMovies {
-        fetchNewMoviesFromSf {
+        fetchNewMoviesFromFilmstaden {
           ...Movie
           id
           popularity

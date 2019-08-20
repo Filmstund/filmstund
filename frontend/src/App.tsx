@@ -39,7 +39,7 @@ const AsyncEditShowing = lazy(() =>
   import("./use-cases/edit-showing/EditShowing")
 );
 const AsyncShowingTickets = lazy(() =>
-  import("./use-cases/showing-tickets/index")
+  import("./use-cases/showing-tickets/TicketScreen")
 );
 const AsyncSingleShowing = lazy(() =>
   import("./use-cases/single-showing/screen/SingleShowingScreen")

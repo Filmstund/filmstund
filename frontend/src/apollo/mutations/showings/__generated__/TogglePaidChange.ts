@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ParticipantPaymentInput } from "./../../../../../__generated__/globalTypes";
+import { ParticipantPaymentInput } from "./../../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: TogglePaidChange

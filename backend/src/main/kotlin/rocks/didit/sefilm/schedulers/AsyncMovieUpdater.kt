@@ -13,7 +13,7 @@ import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -25,9 +25,9 @@ import java.util.*
   havingValue = "true"
 )
 class AsyncMovieUpdater(
-  private val movieRepository: MovieRepository,
-  private val sfClient: SFService,
-  private val imdbClient: ImdbClient
+        private val movieRepository: MovieRepository,
+        private val filmstadenClient: FilmstadenService,
+        private val imdbClient: ImdbClient
 ) {
 
   companion object {
@@ -59,7 +59,7 @@ class AsyncMovieUpdater(
       try {
         updateInfo(it)
       } catch (e: Exception) {
-        log.warn("[MovieUpdater] An error occurred when updating '${it.title}' ID=${it.id}, SF id=${it.sfId}", e)
+        log.warn("[MovieUpdater] An error occurred when updating '${it.title}' ID=${it.id}, Filmstaden id=${it.filmstadenId}", e)
       }
       randomBackoff()
     }
@@ -88,23 +88,23 @@ class AsyncMovieUpdater(
 
   private fun fetchExtendedInfoForMovie(movie: Movie) {
     when {
-      movie.sfId != null -> updateFromSf(movie)
+      movie.filmstadenId != null -> updateFromFilmstaden(movie)
       movie.tmdbId.isSupplied() -> updateFromTmdbById(movie)
       movie.imdbId.isSupplied() -> updateFromTmdbByImdbId(movie)
       else -> updateFromImdbByTitle(movie)
     }
   }
 
-  private fun updateFromSf(movie: Movie): Movie {
-    log.info("[SF] Fetching extended info from SF for ${movie.log()} and sfId: ${movie.sfId}")
-    val updatedMovie = sfClient.fetchExtendedInfo(movie.sfId!!)
+  private fun updateFromFilmstaden(movie: Movie): Movie {
+    log.info("[Filmstaden] Fetching extended info from Filmstaden for ${movie.log()} and filmstadenId: ${movie.filmstadenId}")
+    val updatedMovie = filmstadenClient.fetchExtendedInfo(movie.filmstadenId!!)
     if (updatedMovie == null) {
-      log.info("[SF] ${movie.log()} not found. Removing that SF id...")
-      return movieRepository.save(movie.copy(sfId = null))
+      log.info("[Filmstaden] ${movie.log()} not found. Removing that Filmstaden id...")
+      return movieRepository.save(movie.copy(filmstadenId = null))
     }
 
     val copy = movie.copy(synopsis = updatedMovie.shortDescription,
-      sfSlug = updatedMovie.slug,
+      filmstadenSlug = updatedMovie.slug,
       originalTitle = updatedMovie.originalTitle,
       releaseDate = updatedMovie.releaseDate ?: movie.releaseDate,
       productionYear = updatedMovie.productionYear,
@@ -114,9 +114,9 @@ class AsyncMovieUpdater(
 
     val saved = movieRepository.save(copy)
     if (saved.needsMoreInfo()) {
-      log.info("[SF] Updated ${movie.log()} with SF data, but not all info were available")
+      log.info("[Filmstaden] Updated ${movie.log()} with Filmstaden data, but not all info were available")
     } else {
-      log.info("[SF] Successfully updated ${movie.log()} with SF data")
+      log.info("[Filmstaden] Successfully updated ${movie.log()} with Filmstaden data")
     }
     return saved
   }

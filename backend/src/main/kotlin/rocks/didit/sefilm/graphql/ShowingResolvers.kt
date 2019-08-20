@@ -68,7 +68,7 @@ class ShowingResolver(
   fun attendeePaymentDetails(showing: ShowingDTO): AttendeePaymentDetailsDTO? =
     showingService.getAttendeePaymentDetails(showing.id)
 
-  fun sfSeatMap(showing: ShowingDTO): List<SfSeatMapDTO> = showingService.fetchSeatMap(showing.id)
+  fun filmstadenSeatMap(showing: ShowingDTO): List<FilmstadenSeatMapDTO> = showingService.fetchSeatMap(showing.id)
 }
 
 @Component
@@ -84,7 +84,7 @@ class TicketUserResolver(private val userService: UserService) : GraphQLResolver
 }
 
 @Component
-class SfDataUserResolver(private val userService: UserService) : GraphQLResolver<UserAndSfData> {
-  fun user(data: UserAndSfData): LimitedUserDTO = userService
+class FilmstadenDataUserResolver(private val userService: UserService) : GraphQLResolver<UserAndFilmstadenData> {
+  fun user(data: UserAndFilmstadenData): LimitedUserDTO = userService
     .getUserOrThrow(data.userId)
 }

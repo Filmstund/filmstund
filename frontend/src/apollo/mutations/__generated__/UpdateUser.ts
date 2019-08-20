@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { NewUserInfo, ForetagsbiljettStatus } from "./../../../../__generated__/globalTypes";
+import { NewUserInfo, ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateUser
@@ -23,7 +23,7 @@ export interface UpdateUser_editedUser {
   lastName: string | null;
   nick: string | null;
   email: string;
-  sfMembershipId: string | null;
+  filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
   foretagsbiljetter: UpdateUser_editedUser_foretagsbiljetter[] | null;

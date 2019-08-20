@@ -4,7 +4,7 @@ import {
   AttendShowing,
   AttendShowingVariables
 } from "./__generated__/AttendShowing";
-import { PaymentOption } from "../../../../__generated__/globalTypes";
+import { PaymentOption } from "../../../__generated__/globalTypes";
 import {
   UnattendShowing,
   UnattendShowingVariables

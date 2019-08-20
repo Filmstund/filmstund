@@ -53,13 +53,13 @@ const Profile: React.FC<Props> = ({ me }) => {
   );
 
   const [
-    { phone, sfMembershipId, nick },
+    { phone, filmstadenMembershipId, nick },
     handleChange,
     setEditedUser
   ] = useStateWithHandleChangeName({
     nick: me.nick || "",
     phone: me.phone || "",
-    sfMembershipId: me.sfMembershipId || ""
+    filmstadenMembershipId: me.filmstadenMembershipId || ""
   });
 
   const handleSubmit = useCallback(
@@ -67,21 +67,21 @@ const Profile: React.FC<Props> = ({ me }) => {
       const trimmedValues = trim({
         nick,
         phone,
-        sfMembershipId
+        filmstadenMembershipId
       });
 
       mutate(trimmedValues).then(({ data }) => {
-        const { nick, phone, sfMembershipId } = data!.editedUser;
+        const { nick, phone, filmstadenMembershipId } = data!.editedUser;
 
         setEditedUser({
           nick: nick || "",
           phone: phone || "",
-          sfMembershipId: sfMembershipId || ""
+          filmstadenMembershipId: filmstadenMembershipId || ""
         });
         setTimeout(clearState, 5000);
       });
     },
-    [clearState, mutate, nick, phone, setEditedUser, sfMembershipId]
+    [clearState, mutate, nick, phone, setEditedUser, filmstadenMembershipId]
   );
 
   return (
@@ -103,11 +103,11 @@ const Profile: React.FC<Props> = ({ me }) => {
       <Field text="Nick:">
         <Input type="text" name="nick" value={nick} onChange={handleChange} />
       </Field>
-      <Field text="SF medlemsnummer:">
+      <Field text="Filmstaden medlemsnummer:">
         <Input
           type="text"
-          value={sfMembershipId}
-          name="sfMembershipId"
+          value={filmstadenMembershipId}
+          name="filmstadenMembershipId"
           placeholder="XXX-XXX"
           maxLength={7}
           onChange={handleChange}

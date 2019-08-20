@@ -26,7 +26,7 @@ export const BoughtShowing = ({
   const openSwishLink = () => openSwish(swishLink);
 
   return (
-    <React.Fragment>
+    <>
       {(isAdmin || myTickets.length > 0) && (
         <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>
       )}
@@ -37,7 +37,7 @@ export const BoughtShowing = ({
           <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 };
 

@@ -13,23 +13,23 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.events.*
-import rocks.didit.sefilm.services.external.SFService
+import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
 
 @Service
 class ShowingService(
-  private val showingRepo: ShowingRepository,
-  private val paymentInfoRepo: ParticipantPaymentInfoRepository,
-  private val movieService: MovieService,
-  private val userService: UserService,
-  private val ticketService: TicketService,
-  private val slugService: SlugService,
-  private val sfService: SFService,
-  private val locationService: LocationService,
-  private val eventPublisher: EventPublisher,
-  private val assertionService: AssertionService
+        private val showingRepo: ShowingRepository,
+        private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+        private val movieService: MovieService,
+        private val userService: UserService,
+        private val ticketService: TicketService,
+        private val slugService: SlugService,
+        private val filmstadenService: FilmstadenService,
+        private val locationService: LocationService,
+        private val eventPublisher: EventPublisher,
+        private val assertionService: AssertionService
 ) {
 
   companion object {
@@ -73,7 +73,7 @@ class ShowingService(
       .map { it.toDto() }
   }
 
-  /** Info that is needed before you buy the tickets at SF */
+  /** Info that is needed before you buy the tickets at Filmstaden */
   fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
     val showing = getShowingEntity(showingId)
     if (showing.admin.id != currentLoggedInUser()) {
@@ -85,10 +85,10 @@ class ShowingService(
     val ticketMap = showing.participants.map {
       val user = userService.getCompleteUser(it.userId).orElseThrow { NotFoundException("user", it.userId, showingId) }
       val ftgTicket = (it as? FtgBiljettParticipant)?.ticketNumber
-      UserAndSfData(user.id, user.sfMembershipId, ftgTicket)
+      UserAndFilmstadenData(user.id, user.filmstadenMembershipId, ftgTicket)
     }
 
-    return AdminPaymentDetailsDTO(sfService.getSfBuyLink(showing.movie.id), ticketMap, paymentInfos)
+    return AdminPaymentDetailsDTO(filmstadenService.getFilmstadenBuyLink(showing.movie.id), ticketMap, paymentInfos)
   }
 
   /** Info a user needs for paying the one who bought the tickets */
@@ -228,7 +228,7 @@ class ShowingService(
         payToUser = userService.getCompleteUser(UserID(newValues.payToUser)),
         expectedBuyDate = newValues.expectedBuyDate,
         location = locationService.getOrCreateNewLocation(newValues.location),
-        sfScreen = newValues.sfScreen,
+        filmstadenScreen = newValues.filmstadenScreen,
         time = newValues.time
       )
     )
@@ -238,14 +238,14 @@ class ShowingService(
       .toDto()
   }
 
-  fun fetchSeatMap(showingId: UUID): List<SfSeatMapDTO> {
+  fun fetchSeatMap(showingId: UUID): List<FilmstadenSeatMapDTO> {
     val showing = getShowingOrThrow(showingId)
-    if (showing.location.sfId == null || showing.sfScreen?.sfId == null) {
-      log.debug("Showing $showingId is not at a Sf location or does not have an associated Sf screen")
+    if (showing.location.filmstadenId == null || showing.filmstadenScreen?.filmstadenId == null) {
+      log.debug("Showing $showingId is not at a Filmstaden location or does not have an associated Filmstaden screen")
       return listOf()
     }
 
-    return sfService.getSfSeatMap(showing.location.sfId, showing.sfScreen.sfId)
+    return filmstadenService.getFilmstadenSeatMap(showing.location.filmstadenId, showing.filmstadenScreen.filmstadenId)
   }
 
   private fun createParticipantBasedOnPaymentType(paymentOption: PaymentOption, userId: UserID, showing: Showing): Participant =
@@ -283,7 +283,7 @@ class ShowingService(
       time = this.time,
       movie = movieService.getMovieOrThrow(this.movieId),
       location = location,
-      sfScreen = this.sfScreen,
+      filmstadenScreen = this.filmstadenScreen,
       admin = admin,
       payToUser = admin,
       expectedBuyDate = this.expectedBuyDate,

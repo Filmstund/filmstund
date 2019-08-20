@@ -6,23 +6,23 @@
 // GraphQL query operation: SfShowingsQuery
 // ====================================================
 
-export interface SfShowingsQuery_movie_sfShowings_screen {
-  __typename: "SfScreen";
-  sfId: string;
+export interface SfShowingsQuery_movie_showings_screen {
+  __typename: "FilmstadenScreen";
+  filmstadenId: string;
   name: string;
 }
 
-export interface SfShowingsQuery_movie_sfShowings {
-  __typename: "SfShowing";
+export interface SfShowingsQuery_movie_showings {
+  __typename: "FilmstadenShowing";
   cinemaName: string | null;
-  screen: SfShowingsQuery_movie_sfShowings_screen | null;
+  screen: SfShowingsQuery_movie_showings_screen | null;
   timeUtc: string | null;
   tags: string[];
 }
 
 export interface SfShowingsQuery_movie {
   __typename: "Movie";
-  sfShowings: SfShowingsQuery_movie_sfShowings[];
+  showings: SfShowingsQuery_movie_showings[];
 }
 
 export interface SfShowingsQuery {

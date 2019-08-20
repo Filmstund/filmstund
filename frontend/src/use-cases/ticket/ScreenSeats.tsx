@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { flatMap, groupBy, map } from "lodash-es";
 import React from "react";
 import {
-  TicketQuery_showing_sfSeatMap,
+  TicketQuery_showing_filmstadenSeatMap,
   TicketQuery_showing_ticketRange
 } from "../showing-tickets/__generated__/TicketQuery";
 
@@ -21,7 +21,7 @@ const Screen = styled.div<{ height: number; width: number }>`
 
 interface Props {
   ticketRange: TicketQuery_showing_ticketRange;
-  seatMap: TicketQuery_showing_sfSeatMap[];
+  seatMap: TicketQuery_showing_filmstadenSeatMap[];
 }
 
 export const ScreenSeats: React.FC<Props> = ({ ticketRange, seatMap }) => {

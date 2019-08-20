@@ -2,7 +2,7 @@ package rocks.didit.sefilm.database.repositories
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import rocks.didit.sefilm.database.entities.SfMeta
+import rocks.didit.sefilm.database.entities.FilmstadenMeta
 
 @Repository
-interface SfMetaRepository : CrudRepository<SfMeta, String>
+interface FilmstadenMetaRepository : CrudRepository<FilmstadenMeta, String>

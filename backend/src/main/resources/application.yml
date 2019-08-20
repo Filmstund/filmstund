@@ -13,7 +13,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
   cache:
-    cache-names: sfdates,sfdate,sfSeatMap
+    cache-names: filmstadenDates,filmstadenSeatMap
     caffeine:
       spec: maximumSize=500,expireAfterWrite=43200s
 

@@ -26,8 +26,8 @@ export interface CreateShowingQuery_previousLocations {
   name: string;
 }
 
-export interface CreateShowingQuery_sfCities {
-  __typename: "SfCity";
+export interface CreateShowingQuery_filmstadenCities {
+  __typename: "FilmstadenCity";
   name: string;
   alias: string;
 }
@@ -36,7 +36,7 @@ export interface CreateShowingQuery {
   movie: CreateShowingQuery_movie | null;
   me: CreateShowingQuery_me;
   previousLocations: CreateShowingQuery_previousLocations[];
-  sfCities: CreateShowingQuery_sfCities[];
+  filmstadenCities: CreateShowingQuery_filmstadenCities[];
 }
 
 export interface CreateShowingQueryVariables {

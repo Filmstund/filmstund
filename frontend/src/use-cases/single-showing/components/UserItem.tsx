@@ -1,20 +1,13 @@
-import React from "react";
 import styled from "@emotion/styled";
 import gql from "graphql-tag";
-
-const pointerHover = `
-  &:hover {
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
-  }
-`;
+import React from "react";
 
 const PaddingContainer = styled.div`
   flex: 1;
   padding: 1em;
 `;
 
-const Poster = styled.div`
+const Poster = styled.div<{ src: string }>`
   background-image: url(${props => props.src});
   background-size: cover;
   height: 96px;
@@ -27,9 +20,27 @@ const Header = styled.h3`
   margin: 0;
   overflow: hidden;
 `;
-const UserItem = ({ className, showPhone, user, children }) => (
+
+interface Props {
+  className?: string;
+  showPhone: boolean;
+  user: {
+    phone: string | null;
+    avatar: string | null;
+    firstName: string | null;
+    nick: string | null;
+    lastName: string | null;
+  };
+}
+
+const UserItem: React.FC<Props> = ({
+  className,
+  showPhone,
+  user,
+  children
+}) => (
   <div className={className}>
-    <Poster src={user.avatar} />
+    <Poster src={user.avatar!} />
     <PaddingContainer>
       <Header>
         {user.firstName} '{user.nick}' {user.lastName}
@@ -66,5 +77,4 @@ export default styled(UserItem)`
   @media (min-width: 700px) {
     max-width: 48%;
   }
-  ${props => props.onClick && pointerHover};
 `;

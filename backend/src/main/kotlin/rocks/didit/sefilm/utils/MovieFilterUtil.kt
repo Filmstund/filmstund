@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.utils
 
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.domain.dto.SfMovieDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenMovieDTO
 import java.time.LocalDate
 
 @Component
@@ -57,6 +57,6 @@ class MovieFilterUtil {
     return trimmedTitle.trim()
   }
 
-  fun isNewerThan(movie: SfMovieDTO, thisDate: LocalDate = LocalDate.now().minusMonths(1)) =
+  fun isNewerThan(movie: FilmstadenMovieDTO, thisDate: LocalDate = LocalDate.now().minusMonths(1)) =
     movie.releaseDate.isAfter(thisDate)
 }

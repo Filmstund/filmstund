@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettStatus } from "./../../__generated__/globalTypes";
+import { ForetagsbiljettStatus } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: AppQuery
@@ -23,7 +23,7 @@ export interface AppQuery_me {
   lastName: string | null;
   nick: string | null;
   email: string;
-  sfMembershipId: string | null;
+  filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
   foretagsbiljetter: AppQuery_me_foretagsbiljetter[] | null;

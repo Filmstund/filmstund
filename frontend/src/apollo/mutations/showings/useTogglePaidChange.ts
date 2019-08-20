@@ -4,7 +4,7 @@ import {
   TogglePaidChange,
   TogglePaidChangeVariables
 } from "./__generated__/TogglePaidChange";
-import { ParticipantPaymentInput } from "../../../../__generated__/globalTypes";
+import { ParticipantPaymentInput } from "../../../__generated__/globalTypes";
 
 const togglePaidChangeMutation = gql`
   mutation TogglePaidChange($paymentInfo: ParticipantPaymentInput!) {

@@ -6,5 +6,5 @@ data class ScreenDTO(
   val localTime: LocalTime,
   val screen: String,
   val cinema: String,
-  val tags: List<SfTag>
+  val tags: List<FilmstadenTag>
 )
