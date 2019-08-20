@@ -1,14 +1,16 @@
 /** @jsx jsx */
 import { jsx } from "@emotion/core";
 import styled from "@emotion/styled";
+import * as React from "react";
 import fslogo from "../../assets/fslogo.png";
+import { TicketQuery_showing_myTickets } from "./__generated__/TicketQuery";
 
 const TicketWrapper = styled.div`
   margin: 3rem 0;
   padding: 1rem;
   max-width: 24rem;
   border: 0.0625rem dotted #c5c5c5;
-  font-family: "SF-Sans";
+  font-family: "SF-Sans", sans-serif;
 `;
 
 const FlexRowContainer = styled.div`
@@ -53,7 +55,7 @@ const FlexRowPaddingContainer = styled(FlexRowContainer)`
   padding: 1rem;
 `;
 
-const CompanyHeader = ({ cinema }) => (
+const CompanyHeader: React.FC<{ cinema: string }> = ({ cinema }) => (
   <FlexRowContainer css={{ marginBottom: "1rem" }}>
     <img
       alt="FS logo"
@@ -67,12 +69,17 @@ const CompanyHeader = ({ cinema }) => (
   </FlexRowContainer>
 );
 
-const TicketHeader = ({ movieName, movieRating, showAttributes }) => (
+const TicketHeader: React.FC<
+  Pick<
+    TicketQuery_showing_myTickets,
+    "movieName" | "movieRating" | "showAttributes"
+  >
+> = ({ movieName, movieRating, showAttributes }) => (
   <FlexColumnContainer css={{ marginBottom: "1rem" }}>
     <HeaderText css={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
     <FlexSpaceRowContainer>
       <FlexRowContainer>
-        {showAttributes.map(attr => (
+        {(showAttributes || []).map(attr => (
           <ShowAttribute key={attr}>{attr}</ShowAttribute>
         ))}
       </FlexRowContainer>
@@ -81,21 +88,35 @@ const TicketHeader = ({ movieName, movieRating, showAttributes }) => (
   </FlexColumnContainer>
 );
 
-const TicketValueWithLabel = ({ label, value, style }) => (
+interface TicketValueWithLabelProps {
+  label: string;
+  value: string | number;
+  style?: {};
+}
+
+const TicketValueWithLabel: React.FC<TicketValueWithLabelProps> = ({
+  label,
+  value,
+  style = {}
+}) => (
   <FlexColumnContainer css={{ ...style, paddingRight: "1rem" }}>
     <LabelText>{label}</LabelText>
     <HeaderText>{value}</HeaderText>
   </FlexColumnContainer>
 );
 
-const TicketDateTime = ({ date, time }) => (
+const TicketDateTime: React.FC<
+  Pick<TicketQuery_showing_myTickets, "date" | "time">
+> = ({ date, time }) => (
   <FlexRowContainer css={{ marginBottom: "1rem" }}>
     <TicketValueWithLabel label="Datum" value={date} />
     <TicketValueWithLabel label="Tid" value={time.substring(0, 5)} />
   </FlexRowContainer>
 );
 
-const TicketPlacement = ({ screen, seat }) => (
+const TicketPlacement: React.FC<
+  Pick<TicketQuery_showing_myTickets, "screen" | "seat">
+> = ({ screen, seat }) => (
   <FlexRowPaddingContainer
     css={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
   >
@@ -109,13 +130,20 @@ const TicketPlacement = ({ screen, seat }) => (
   </FlexRowPaddingContainer>
 );
 
-const TicketCustomerType = ({ customerType }) => (
-  <FlexRowContainer css={{ marginBottom: "1rem", fontWeight: "500" }}>
+const TicketCustomerType: React.FC<
+  Pick<TicketQuery_showing_myTickets, "customerType">
+> = ({ customerType }) => (
+  <FlexRowContainer css={{ marginBottom: "1rem", fontWeight: 500 }}>
     {customerType}
   </FlexRowContainer>
 );
 
-const TicketCode = ({ src, id, profileId }) => {
+interface TicketCodeProps
+  extends Pick<TicketQuery_showing_myTickets, "id" | "profileId"> {
+  src: string;
+}
+
+const TicketCode: React.FC<TicketCodeProps> = ({ src, id, profileId }) => {
   return (
     <FlexRowContainer css={{ marginBottom: "1rem" }}>
       <FlexColumnContainer css={{ alignItems: "left" }}>
@@ -128,19 +156,25 @@ const TicketCode = ({ src, id, profileId }) => {
   );
 };
 
-const Ticket = ({
-  id,
-  cinema,
-  time,
-  date,
-  movieName,
-  movieRating,
-  screen,
-  customerType,
-  showAttributes,
-  profileId,
-  seat,
-  barcode
+interface Props {
+  ticket: TicketQuery_showing_myTickets;
+}
+
+export const Ticket: React.FC<Props> = ({
+  ticket: {
+    id,
+    cinema,
+    time,
+    date,
+    movieName,
+    movieRating,
+    screen,
+    customerType,
+    showAttributes,
+    profileId,
+    seat,
+    barcode
+  }
 }) => (
   <TicketWrapper>
     <CompanyHeader cinema={cinema} />
@@ -155,5 +189,3 @@ const Ticket = ({
     <TicketCode id={id} profileId={profileId} src={barcode} />
   </TicketWrapper>
 );
-
-export default Ticket;

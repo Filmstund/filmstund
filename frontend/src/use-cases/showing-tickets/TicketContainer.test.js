@@ -1,7 +1,7 @@
 import React from "react";
 import { render, cleanup } from "@testing-library/react";
 
-import TicketContainer from "./TicketContainer";
+import {TicketContainer} from "./TicketContainer";
 import { createMockTicket, createMockSeat } from "./__mocks__/ticket";
 
 const mockUserData = {

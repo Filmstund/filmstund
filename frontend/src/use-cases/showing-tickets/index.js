@@ -1,8 +1,8 @@
-import { compose, withProps, branch, renderComponent } from "recompose";
+import { branch, compose, renderComponent, withProps } from "recompose";
 import { withRouter } from "react-router";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
-import TicketContainer from "./TicketContainer";
+import { TicketContainer } from "./TicketContainer";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { ticketFragment } from "../../apollo/mutations/useAddTickets";
 

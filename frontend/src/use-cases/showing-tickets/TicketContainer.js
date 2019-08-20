@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
 import MainButton from "../../use-cases/common/ui/MainButton";
-import Ticket from "./Ticket";
-import SeatRange from "./SeatRange";
+import {Ticket} from "./Ticket";
+import { SeatRange } from "./SeatRange";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { PageWidthWrapper } from "../../use-cases/common/ui/PageWidthWrapper";
 import { ScreenSeats } from "../ticket/ScreenSeats";
@@ -13,7 +13,7 @@ import { FieldWithoutMaxWidth } from "../common/ui/Field";
 import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 
-const TicketContainer = props => {
+export const TicketContainer = props => {
   const {
     data: { me, showing },
     history
@@ -53,7 +53,7 @@ const TicketContainer = props => {
       <div style={{ display: "flex", justifyContent: "center" }}>
         <ScreenSeats ticketRange={ticketRange} seatMap={sfSeatMap} />
       </div>
-      {myTickets.map(ticket => <Ticket key={ticket.id} {...ticket} />)}
+      {myTickets.map(ticket => <Ticket key={ticket.id} ticket={ticket} />)}
       <StatusMessageBox
         success={success}
         errors={errors}
@@ -71,5 +71,3 @@ const TicketContainer = props => {
     </PageWidthWrapper>
   );
 };
-
-export default TicketContainer;
