@@ -120,7 +120,8 @@ data class FilmstadenShowingDTO(
                 show.screen.seatCount,
                 show.timeUtc,
                 FilmstadenTag.convertTags(show.attributes),
-        show.remoteEntityId)
+                show.remoteEntityId
+        )
     }
 }
 
