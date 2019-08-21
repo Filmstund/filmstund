@@ -199,7 +199,7 @@ class ShowingService(
         return getAllPublicShowings()
     }
 
-    fun markAsBought(showingId: UUID): ShowingDTO {
+    fun markAsBought(showingId: UUID, price: SEK): ShowingDTO {
         val showing = getShowingEntity(showingId)
         assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
         assertionService.assertUserHasPhoneNumber(showing.admin.id)
@@ -211,7 +211,7 @@ class ShowingService(
 
         createInitialPaymentInfo(showing)
         return showingRepo
-                .save(showing.copy(ticketsBought = true))
+                .save(showing.copy(ticketsBought = true, price = price))
                 .also {
                     eventPublisher.publish(TicketsBoughtEvent(this, it, it.admin))
                 }
