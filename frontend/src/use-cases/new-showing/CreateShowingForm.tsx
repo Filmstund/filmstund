@@ -12,7 +12,10 @@ import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { CreateShowingQuery, CreateShowingQuery_me } from "./__generated__/CreateShowingQuery";
+import {
+  CreateShowingQuery,
+  CreateShowingQuery_me
+} from "./__generated__/CreateShowingQuery";
 import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
 import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
 
@@ -29,6 +32,7 @@ interface ShowingState {
   date: string;
   time: string;
   location: string;
+  filmstadenRemoteEntityId: string | null;
   filmstadenScreen: { name: string; filmstadenId: string } | null;
   movieId: string;
   admin: CreateShowingQuery_me;
@@ -50,6 +54,7 @@ const getInitialState = (props: Props): ShowingState => {
     date: formatYMD(date),
     time: format(now, "HH:mm"),
     location: "",
+    filmstadenRemoteEntityId: null,
     filmstadenScreen: null,
     movieId: movieId,
     admin: me!
@@ -82,13 +87,14 @@ export const CreateShowingForm: React.FC<Props> = props => {
   };
 
   const setShowingTime = (sfTime: SfShowingsQuery_movie_showings) => {
-    const { timeUtc, cinemaName, screen } = sfTime;
+    const { timeUtc, cinemaName, filmstadenRemoteEntityId, screen } = sfTime;
 
     const { name, filmstadenId } = screen!;
 
     setShowingState(state => {
       const newState: ShowingState = {
         ...state,
+        filmstadenRemoteEntityId,
         time: formatLocalTime(timeUtc),
         location: cinemaName,
         filmstadenScreen: { name, filmstadenId }
@@ -110,12 +116,14 @@ export const CreateShowingForm: React.FC<Props> = props => {
   const handleSubmit = ({
     time,
     date,
+    filmstadenRemoteEntityId,
     location,
     filmstadenScreen
   }: ShowingState) => {
     const showing: CreateShowingInput = {
       time,
       movieId,
+      filmstadenRemoteEntityId,
       date: formatYMD(date),
       filmstadenScreen,
       location

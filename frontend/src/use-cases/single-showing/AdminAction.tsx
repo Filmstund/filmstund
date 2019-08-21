@@ -103,19 +103,8 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
       const nonEmptyTicketUrls = cinemaTicketUrls.filter(
         line => line.trim().length !== 0
       );
-
       addTickets(showing.id, nonEmptyTicketUrls)
-        .then(() =>
-          markAsBought(showing.id, {
-            date: showing.date,
-            private: showing.private,
-            payToUser: showing.payToUser.id,
-            location: showing.location.name,
-            time: showing.time,
-            filmstadenRemoteEntityId: showing.filmstadenRemoteEntityId,
-            price: ticketPrice * 100
-          })
-        )
+        .then(() => markAsBought(showing.id, ticketPrice * 100))
         .then(() => {
           setState(state => ({
             ...state,
