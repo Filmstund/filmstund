@@ -1,28 +1,28 @@
-import React, { lazy, useState, useCallback } from "react";
-
-import Header from "../common/ui/Header";
-import Showing from "../common/showing/Showing";
-import Input from "../common/ui/Input";
-import Field from "../common/ui/Field";
-import MainButton, { RedButton } from "../common/ui/MainButton";
-import { formatYMD } from "../../lib/dateTools";
-import StatusMessageBox from "../common/utils/StatusMessageBox";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import * as navigators from "../common/navigators/index";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
-import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
 import styled from "@emotion/styled";
-import { margin } from "../../lib/style-vars";
+import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addDays from "date-fns/add_days";
-import { LocationSelect } from "../common/ui/LocationSelect";
-import { EditShowing_showing, EditShowing } from "./__generated__/EditShowing";
+import React, { useCallback, useState } from "react";
 import { DataProps } from "react-apollo";
 import { RouteChildrenProps } from "react-router";
-import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
 import { useDeleteShowing } from "../../apollo/mutations/showings/useDeleteShowing";
+import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
+import { formatLocalTime, formatYMD } from "../../lib/dateTools";
+import { margin } from "../../lib/style-vars";
+import * as navigators from "../common/navigators/index";
+import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
+import Showing from "../common/showing/Showing";
+import Field from "../common/ui/Field";
 
-const DatePicker = lazy(() => import("../common/ui/date-picker/DatePicker"));
+import Header, { SmallHeader } from "../common/ui/Header";
+import Input from "../common/ui/Input";
+import { LocationSelect } from "../common/ui/LocationSelect";
+import MainButton, { RedButton } from "../common/ui/MainButton";
+import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
+import StatusMessageBox from "../common/utils/StatusMessageBox";
+import { SfShowingsQuery_movie_showings } from "../new-showing/hooks/__generated__/SfShowingsQuery";
+import { EditShowing, EditShowing_showing } from "./__generated__/EditShowing";
 
 const today = new Date();
 
@@ -36,27 +36,23 @@ type SetShowingValueFn = <K extends keyof EditShowingFormShowing>(
 ) => void;
 
 interface EditShowingFormShowing {
+  date: string;
   expectedBuyDate: Date;
+  filmstadenRemoteEntityId: string | null;
   location: string;
   time: string;
   price: string;
 }
 
-interface EditShowingFormState {
-  errors: Error[] | null;
-  showing: EditShowingFormShowing;
-}
-
 const getInitialState = (
   showing: EditShowing_showing
-): EditShowingFormState => ({
-  errors: null,
-  showing: {
-    expectedBuyDate: addDays(today, 7),
-    location: showing.location.name,
-    time: showing.time,
-    price: showing.price !== null ? String(showing.price / 100) : ""
-  }
+): EditShowingFormShowing => ({
+  date: showing.date,
+  filmstadenRemoteEntityId: showing.filmstadenRemoteEntityId,
+  expectedBuyDate: addDays(today, 7),
+  location: showing.location.name,
+  time: showing.time,
+  price: showing.price !== null ? String(showing.price / 100) : ""
 });
 
 interface Props
@@ -65,99 +61,114 @@ interface Props
 
 const EditShowingForm: React.FC<Props> = ({ data, history }) => {
   const showing = data.showing!;
-  const [{ errors, showing: newValues }, setState] = useState<
-    EditShowingFormState
-  >(() => getInitialState(showing));
+  const [errors, setErrors] = useState<Error[] | null>(null);
+  const [formState, setFormState] = useState<EditShowingFormShowing>(() =>
+    getInitialState(showing)
+  );
 
-  const { movie, admin, date, ticketsBought } = showing;
+  const { movie, admin, ticketsBought } = showing;
+
   const previousLocations = data.previousLocations || [];
 
   const updateShowing = useUpdateShowing();
   const deleteShowing = useDeleteShowing();
 
-  const handleDelete = useCallback(() => {
-    const proceed = window.confirm("Är du säker? Går ej att ångra!");
+  const handleDelete = useCallback(
+    () => {
+      const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
-    if (proceed) {
-      deleteShowing(showing.id).then(() => {
-        history.push("/showings");
-      });
-    }
-  }, [deleteShowing, showing, history]);
+      if (proceed) {
+        deleteShowing(showing.id).then(() => {
+          history.push("/showings");
+        });
+      }
+    },
+    [deleteShowing, showing, history]
+  );
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     updateShowing(showing.id, {
-      expectedBuyDate: formatYMD(newValues.expectedBuyDate),
+      date: formState.date,
+      expectedBuyDate: formatYMD(formState.expectedBuyDate),
       private: showing.private,
       payToUser: showing.payToUser.id,
-      location: newValues.location,
-      time: newValues.time,
-      price: (parseInt(newValues.price, 10) || 0) * 100
+      location: formState.location,
+      time: formState.time,
+      filmstadenRemoteEntityId: formState.filmstadenRemoteEntityId,
+      price: (parseInt(formState.price, 10) || 0) * 100
     })
       .then(() => {
-        return navigators.navigateToShowing(history, showing);
+        setErrors(null);
+        navigators.navigateToShowing(history, showing);
       })
       .catch(errors => {
-        setState(state => ({
-          ...state,
-          errors
-        }));
+        setErrors(errors);
       });
-  }, [showing, setState, newValues, history, updateShowing]);
+  };
 
   const setShowingValue = useCallback<SetShowingValueFn>((key, value) => {
-    setState(state => ({
+    setFormState(state => ({
       ...state,
-      showing: { ...state.showing, [key]: value }
+      [key]: value
     }));
   }, []);
 
-  const setShowingDate = useCallback(
-    (v: Date) => setShowingValue("expectedBuyDate", v),
-    [setShowingValue]
-  );
+  const handleSfTimeSelect = (sfShowing: SfShowingsQuery_movie_showings) => {
+    const { filmstadenRemoteEntityId, cinemaName, timeUtc } = sfShowing;
+    setFormState(state => ({
+      ...state,
+      filmstadenRemoteEntityId,
+      location: cinemaName,
+      time: formatLocalTime(timeUtc)
+    }));
+  };
+
+  const handleOtherTimeSelect = (time: string) => {
+    setFormState(state => ({
+      ...state,
+      filmstadenRemoteEntityId: null,
+      time
+    }));
+  };
 
   return (
     <PageWidthWrapper>
       <Header>Redigera besök</Header>
       <div>
         <Showing
-          date={formatYMD(date) + " " + newValues.time}
+          date={formatYMD(formState.date) + " " + formState.time}
           admin={admin}
-          location={newValues.location}
+          location={formState.location}
           movie={movie}
         />
         <StatusMessageBox errors={errors} />
-        <Field text="Förväntat köpdatum:">
-          <DatePicker
-            value={newValues.expectedBuyDate}
-            onChange={setShowingDate}
-            disabledDays={[
-              {
-                before: today,
-                after: new Date(date)
-              }
-            ]}
-          />
-        </Field>
-        <Field text="Visningstid:">
+        <FilmstadenShowingSelector
+          onChangeDate={value => setShowingValue("date", value)}
+          onSelectShowing={handleSfTimeSelect}
+          movieId={movie.id}
+          date={formState.date}
+          filmstadenRemoteEntityId={formState.filmstadenRemoteEntityId}
+          city={showing.location.cityAlias || "GB"}
+        />
+        <SmallHeader>...eller skapa egen tid</SmallHeader>
+        <Field text="Tid:">
           <Input
             type="time"
-            value={newValues.time}
-            onChange={event => setShowingValue("time", event.target.value)}
+            value={formState.time}
+            onChange={event => handleOtherTimeSelect(event.target.value)}
           />
         </Field>
         <Field text="Plats:">
           <LocationSelect
             previousLocations={previousLocations}
-            value={newValues.location}
+            value={formState.location}
             onChange={(value: string) => setShowingValue("location", value)}
           />
         </Field>
         <Field text="Pris:">
           <Input
             type="text"
-            value={newValues.price}
+            value={formState.price}
             onChange={event => setShowingValue("price", event.target.value)}
           />
         </Field>

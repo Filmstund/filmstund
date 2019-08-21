@@ -76,21 +76,24 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
     [showing, togglePaidChange]
   );
 
-  const handleStartBooking = useCallback(async () => {
-    setState(state => ({
-      ...state,
-      showModal: true,
-      loadingModal: true,
-      errors: null
-    }));
+  const handleStartBooking = useCallback(
+    async () => {
+      setState(state => ({
+        ...state,
+        showModal: true,
+        loadingModal: true,
+        errors: null
+      }));
 
-    await onBeforeOpenBuyModal();
+      await onBeforeOpenBuyModal();
 
-    setState(state => ({
-      ...state,
-      loadingModal: false
-    }));
-  }, [setState, onBeforeOpenBuyModal]);
+      setState(state => ({
+        ...state,
+        loadingModal: false
+      }));
+    },
+    [setState, onBeforeOpenBuyModal]
+  );
 
   const addTickets = useAddTickets();
   const markAsBought = useMarkAsBought();
@@ -100,20 +103,8 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
       const nonEmptyTicketUrls = cinemaTicketUrls.filter(
         line => line.trim().length !== 0
       );
-
       addTickets(showing.id, nonEmptyTicketUrls)
-        .then(() =>
-          markAsBought(showing.id, {
-            private: showing.private,
-            payToUser: showing.payToUser.id,
-            location: showing.location.name,
-            time: showing.time,
-            filmstadenScreen: showing.filmstadenScreen
-              ? { name: showing.filmstadenScreen.name, filmstadenId: showing.filmstadenScreen.filmstadenId }
-              : null,
-            price: ticketPrice * 100
-          })
-        )
+        .then(() => markAsBought(showing.id, ticketPrice * 100))
         .then(() => {
           setState(state => ({
             ...state,
@@ -132,9 +123,12 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
 
   const { history } = useRouter();
 
-  const handlePressEdit = useCallback(() => {
-    navigateToEditShowing(history, showing);
-  }, [history, showing]);
+  const handlePressEdit = useCallback(
+    () => {
+      navigateToEditShowing(history, showing);
+    },
+    [history, showing]
+  );
 
   const { ticketsBought } = showing;
 
@@ -176,6 +170,7 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
       id
       price
       private
+      filmstadenRemoteEntityId
       filmstadenScreen {
         filmstadenId
         name

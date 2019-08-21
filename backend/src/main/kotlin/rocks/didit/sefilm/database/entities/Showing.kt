@@ -40,9 +40,9 @@ data class Showing(
         @LastModifiedDate
         val lastModifiedDate: Instant = Instant.EPOCH,
         @CreatedDate
-        val createdDate: Instant = Instant.now()
+        val createdDate: Instant = Instant.now(),
+        val filmstadenRemoteEntityId: String? = null
 ) {
-
     fun toDto() = ShowingDTO(
             id = id,
             webId = webId,
@@ -60,6 +60,7 @@ data class Showing(
             expectedBuyDate = expectedBuyDate,
             participants = participants.map { it.toDto() },
             lastModifiedDate = lastModifiedDate,
-            createdDate = createdDate
+            createdDate = createdDate,
+            filmstadenRemoteEntityId = filmstadenRemoteEntityId
     )
 }

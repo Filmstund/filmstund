@@ -5,6 +5,7 @@ input CreateShowingInput {
     location: String!
     filmstadenScreen: FilmstadenScreenInput
     expectedBuyDate: LocalDate
+    filmstadenRemoteEntityId: String
 }
 
 input UpdateShowingInput {
@@ -13,8 +14,9 @@ input UpdateShowingInput {
     payToUser: ID!
     expectedBuyDate: LocalDate
     location: String!
-    filmstadenScreen: FilmstadenScreenInput
+    filmstadenRemoteEntityId: String
     time: LocalTime!
+    date: LocalDate!
 }
 
 input FilmstadenScreenInput {

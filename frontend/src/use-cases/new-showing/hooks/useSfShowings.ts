@@ -1,6 +1,5 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { Dictionary } from "lodash";
 import { groupBy } from "lodash-es";
 import { useMemo } from "react";
 import { formatYMD } from "../../../lib/dateTools";
@@ -10,10 +9,14 @@ import {
   SfShowingsQueryVariables
 } from "./__generated__/SfShowingsQuery";
 
+export type GroupedFilmstadenShowings = {
+  [date: string]: SfShowingsQuery_movie_showings[];
+};
+
 export const useSfShowings = (
   movieId: string,
   city: string
-): [Dictionary<SfShowingsQuery_movie_showings[]> | null, boolean] => {
+): [GroupedFilmstadenShowings | null, boolean] => {
   const { data, loading } = useQuery<SfShowingsQuery, SfShowingsQueryVariables>(
     gql`
       query SfShowingsQuery($movieId: UUID!, $city: String) {
@@ -26,6 +29,7 @@ export const useSfShowings = (
             }
             timeUtc
             tags
+            filmstadenRemoteEntityId
           }
         }
       }

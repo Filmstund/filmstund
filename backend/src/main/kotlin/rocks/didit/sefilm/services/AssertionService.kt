@@ -29,7 +29,7 @@ class AssertionService(
 
     fun assertLoggedInUserIsAdmin(showing: ShowingDTO) = assertLoggedInUserIsAdmin(showing.admin)
     fun assertLoggedInUserIsAdmin(showingAdmin: UserID) {
-        if (currentLoggedInUser() != showingAdmin) {
+        if (currentLoggedInUserId() != showingAdmin) {
             throw AccessDeniedException("Only the showing admin is allowed to do that")
         }
     }

@@ -70,7 +70,7 @@ class FilmstadenService(
 
     fun fetchExtendedInfo(filmstadenId: String): FilmstadenExtendedMovieDTO? {
         val body = restTemplate.exchange(
-                API_URL + "/v2/movie/sv/{filmstadenId}",
+                "$API_URL/v2/movie/sv/{filmstadenId}",
                 HttpMethod.GET,
                 httpEntity,
                 FilmstadenExtendedMovieDTO::class.java,
@@ -144,6 +144,24 @@ class FilmstadenService(
                         screenId
                 )
                 .body ?: listOf()
+    }
+
+    fun fetchFilmstadenShow(filmstadenRemoteEntityId: String): FilmstadenShowDTO {
+
+        val filmstadenShowItemsDTO = restTemplate
+                .exchange(
+                        "$API_URL/v2/show/sv/1/200?filter.remoteEntityId=AA-1036-201908221930",
+                        HttpMethod.GET,
+                        httpEntity,
+                        object : ParameterizedTypeReference<FilmstadenShowItemsDTO>() {}
+                ).body ?: throw ExternalProviderException("[Filmstaden] Response body is null")
+
+        if(filmstadenShowItemsDTO.totalNbrOfItems != 1) {
+            throw ExternalProviderException("[Filmstaden] More than one show found in Filmstaden API")
+        }
+
+        return filmstadenShowItemsDTO.items.first()
+
     }
 }
 

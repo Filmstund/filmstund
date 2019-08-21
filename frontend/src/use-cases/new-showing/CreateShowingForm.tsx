@@ -1,10 +1,9 @@
-import { parse } from "date-fns";
 import format from "date-fns/format";
 import isAfter from "date-fns/is_after";
-import { keys } from "lodash-es";
-import React, { ChangeEvent, lazy, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { CreateShowingInput } from "../../__generated__/globalTypes";
 import { formatLocalTime, formatYMD } from "../../lib/dateTools";
+import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
 import Field from "../common/ui/Field";
 
@@ -19,10 +18,6 @@ import {
 } from "./__generated__/CreateShowingQuery";
 import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
 import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
-import { useSfShowings } from "./hooks/useSfShowings";
-import { SfTimeSelector } from "./SfTimeSelector";
-
-const DatePicker = lazy(() => import("../common/ui/date-picker/DatePicker"));
 
 const now = new Date();
 
@@ -37,6 +32,7 @@ interface ShowingState {
   date: string;
   time: string;
   location: string;
+  filmstadenRemoteEntityId: string | null;
   filmstadenScreen: { name: string; filmstadenId: string } | null;
   movieId: string;
   admin: CreateShowingQuery_me;
@@ -58,6 +54,7 @@ const getInitialState = (props: Props): ShowingState => {
     date: formatYMD(date),
     time: format(now, "HH:mm"),
     location: "",
+    filmstadenRemoteEntityId: null,
     filmstadenScreen: null,
     movieId: movieId,
     admin: me!
@@ -78,7 +75,6 @@ export const CreateShowingForm: React.FC<Props> = props => {
   );
 
   const [createShowing] = useCreateShowingMutation();
-  const [sfdates] = useSfShowings(movieId, city);
 
   const setShowingValue = <K extends keyof ShowingState>(
     key: K,
@@ -91,19 +87,20 @@ export const CreateShowingForm: React.FC<Props> = props => {
   };
 
   const setShowingTime = (sfTime: SfShowingsQuery_movie_showings) => {
-    const { timeUtc, cinemaName, screen } = sfTime;
+    const { timeUtc, cinemaName, filmstadenRemoteEntityId, screen } = sfTime;
 
     const { name, filmstadenId } = screen!;
 
     setShowingState(state => {
       const newState: ShowingState = {
         ...state,
-        time: formatLocalTime(timeUtc!),
-        location: cinemaName!,
+        filmstadenRemoteEntityId,
+        time: formatLocalTime(timeUtc),
+        location: cinemaName,
         filmstadenScreen: { name, filmstadenId }
       };
 
-      handleSubmit(state);
+      handleSubmit(newState);
 
       return newState;
     });
@@ -119,12 +116,14 @@ export const CreateShowingForm: React.FC<Props> = props => {
   const handleSubmit = ({
     time,
     date,
+    filmstadenRemoteEntityId,
     location,
     filmstadenScreen
   }: ShowingState) => {
     const showing: CreateShowingInput = {
       time,
       movieId,
+      filmstadenRemoteEntityId,
       date: formatYMD(date),
       filmstadenScreen,
       location
@@ -164,26 +163,12 @@ export const CreateShowingForm: React.FC<Props> = props => {
             ))}
           </select>
         </Field>
-        <Field text="Datum:">
-          <DatePicker
-            value={parse(showing.date)}
-            onChange={(value: Date) => {
-              setShowingValue("date", formatYMD(value));
-            }}
-            disabledDays={{ before: now }}
-            modifiers={{ sfdays: keys(sfdates).map(s => new Date(s)) }}
-            modifiersStyles={{
-              sfdays: {
-                backgroundColor: "#fff",
-                borderColor: "#d0021b",
-                color: "#d0021b"
-              }
-            }}
-          />
-        </Field>
-        <SfTimeSelector
+
+        <FilmstadenShowingSelector
           date={showing.date}
-          onSelect={setShowingTime}
+          filmstadenRemoteEntityId={null}
+          onChangeDate={value => setShowingValue("date", value)}
+          onSelectShowing={setShowingTime}
           city={city}
           movieId={movieId}
         />

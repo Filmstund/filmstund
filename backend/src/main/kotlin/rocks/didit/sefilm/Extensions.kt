@@ -9,7 +9,7 @@ import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.services.UserService
 
-internal fun currentLoggedInUser(): UserID {
+internal fun currentLoggedInUserId(): UserID {
     val authentication: Authentication? = SecurityContextHolder.getContext().authentication
     if (authentication?.isAuthenticated != true) {
         throw IllegalStateException("Cannot get current user if user isn't authenticated")

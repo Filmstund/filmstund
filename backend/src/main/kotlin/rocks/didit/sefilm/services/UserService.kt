@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.OpenIdConnectUserDetails
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
@@ -52,7 +52,7 @@ class UserService(
             .orElseThrow { NotFoundException("user", userID = id) }
 
     fun getCurrentUser(): UserDTO {
-        return currentLoggedInUser().let {
+        return currentLoggedInUserId().let {
             getCompleteUser(it).toDTO()
         }
     }
@@ -67,8 +67,8 @@ class UserService(
         return getCompleteUser(UserID(principal.userId))
     }
 
-    private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUser())
-            .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
+    private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUserId())
+            .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
 
     fun updateUser(newDetails: UserDetailsDTO): UserDTO {
         val newFilmstadenMembershipId = when {

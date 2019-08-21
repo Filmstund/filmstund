@@ -5,6 +5,7 @@ package rocks.didit.sefilm.graphql
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.PaymentOption
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
@@ -29,7 +30,7 @@ class ShowingMutationResolver(
 
     fun deleteShowing(showingId: UUID): List<ShowingDTO> = showingService.deleteShowing(showingId)
 
-    fun markAsBought(showingId: UUID): ShowingDTO = showingService.markAsBought(showingId)
+    fun markAsBought(showingId: UUID, price: SEK): ShowingDTO = showingService.markAsBought(showingId, price)
 
     fun processTicketUrls(showingId: UUID, ticketUrls: List<String>): ShowingDTO {
         ticketService.processTickets(ticketUrls, showingId)

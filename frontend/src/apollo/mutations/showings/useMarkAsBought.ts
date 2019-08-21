@@ -4,18 +4,10 @@ import {
   MarkShowingAsBought,
   MarkShowingAsBoughtVariables
 } from "./__generated__/MarkShowingAsBought";
-import { UpdateShowingInput } from "../../../__generated__/globalTypes";
 
 const markAsBoughtMutation = gql`
-  mutation MarkShowingAsBought(
-    $showingId: UUID!
-    $showing: UpdateShowingInput
-  ) {
-    updateShowing(showingId: $showingId, newValues: $showing) {
-      id
-    }
-
-    markAsBought(showingId: $showingId) {
+  mutation MarkShowingAsBought($showingId: UUID!, $price: SEK!) {
+    markAsBought(showingId: $showingId, price: $price) {
       id
       ticketsBought
       price
@@ -24,6 +16,7 @@ const markAsBoughtMutation = gql`
         id
       }
       expectedBuyDate
+      date
       time
       myTickets {
         id
@@ -58,13 +51,14 @@ const markAsBoughtMutation = gql`
 `;
 
 export const useMarkAsBought = () => {
-  const [mutate] = useMutation<MarkShowingAsBought, MarkShowingAsBoughtVariables>(
-    markAsBoughtMutation
-  );
+  const [mutate] = useMutation<
+    MarkShowingAsBought,
+    MarkShowingAsBoughtVariables
+  >(markAsBoughtMutation);
 
-  return (showingId: string, showing: UpdateShowingInput) =>
+  return (showingId: string, price: number) =>
     mutate({
-      variables: { showing, showingId },
+      variables: { showingId, price },
       refetchQueries: ["ShowingsQuery"]
     });
 };

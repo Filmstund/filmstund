@@ -22,6 +22,10 @@ const data = graphql(
         ...OldShowing
         price
         private
+        filmstadenRemoteEntityId
+        location {
+          cityAlias
+        }
         payToUser {
           id
         }

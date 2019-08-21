@@ -16,6 +16,7 @@ type Showing {
     participants: [Participant!]!
     lastModifiedDate: String!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
+    filmstadenRemoteEntityId: String
 }
 
 type Participant {
@@ -29,11 +30,12 @@ type FilmstadenScreen {
 }
 
 type FilmstadenShowing {
-    cinemaName: String,
-    screen: FilmstadenScreen,
-    seatCount: Int,
-    timeUtc: String,
-    tags: [String!]!
+    cinemaName: String!,
+    screen: FilmstadenScreen!,
+    seatCount: Int!,
+    timeUtc: String!,
+    tags: [String!]!,
+    filmstadenRemoteEntityId: String!
 }
 
 type FilmstadenSeatMap {

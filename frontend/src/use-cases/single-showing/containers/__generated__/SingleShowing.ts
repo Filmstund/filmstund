@@ -140,6 +140,7 @@ export interface SingleShowing_showing {
   admin: SingleShowing_showing_admin;
   price: any | null;
   private: boolean;
+  filmstadenRemoteEntityId: string | null;
   filmstadenScreen: SingleShowing_showing_filmstadenScreen | null;
   payToUser: SingleShowing_showing_payToUser;
   adminPaymentDetails: SingleShowing_showing_adminPaymentDetails | null;

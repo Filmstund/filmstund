@@ -65,6 +65,7 @@ data class FilmstadenScreenDTO(
         val remoteSystemAlias: String,
         val remoteEntityId: String
 )
+fun FilmstadenScreenDTO.toFilmstadenLiteScreen() = FilmstadenLiteScreenDTO(this.ncgId, this.title)
 
 data class FilmstadenShowItemsDTO(val totalNbrOfItems: Int, val items: List<FilmstadenShowDTO>)
 data class FilmstadenLocationItemsDTO(val totalNbrOfItems: Int, val items: List<FilmstadenCinemaWithAddressDTO>)
@@ -110,7 +111,8 @@ data class FilmstadenShowingDTO(
         val screen: FilmstadenLiteScreenDTO,
         val seatCount: Int,
         val timeUtc: Instant,
-        val tags: List<FilmstadenTag>
+        val tags: List<FilmstadenTag>,
+        val filmstadenRemoteEntityId: String
 ) {
     companion object {
         fun from(show: FilmstadenShowDTO) = FilmstadenShowingDTO(
@@ -118,7 +120,8 @@ data class FilmstadenShowingDTO(
                 FilmstadenLiteScreenDTO(show.screen.ncgId, show.screen.title),
                 show.screen.seatCount,
                 show.timeUtc,
-                FilmstadenTag.convertTags(show.attributes)
+                FilmstadenTag.convertTags(show.attributes),
+                show.remoteEntityId
         )
     }
 }

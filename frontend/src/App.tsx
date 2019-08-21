@@ -61,7 +61,7 @@ interface Props {
 const App: React.FC<Props> = ({ signout }) => {
   const { data } = useQuery<AppQuery>(appQuery);
 
-  if (!data) {
+  if (!data || !data.me) {
     return <Loader />;
   }
 

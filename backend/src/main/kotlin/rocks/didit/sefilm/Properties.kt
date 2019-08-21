@@ -9,6 +9,7 @@ class Properties {
     var baseUrl = BaseUrl()
     var tmdb = Tmdb()
     var enableSeeding: Boolean = true
+    var enableReassignment: Boolean = true
     var defaultCity: String = "GB"
 
     var google = Google()

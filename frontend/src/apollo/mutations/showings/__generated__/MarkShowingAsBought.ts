@@ -2,16 +2,9 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { UpdateShowingInput } from "./../../../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: MarkShowingAsBought
 // ====================================================
-
-export interface MarkShowingAsBought_updateShowing {
-  __typename: "Showing";
-  id: any;
-}
 
 export interface MarkShowingAsBought_markAsBought_payToUser {
   __typename: "User";
@@ -76,11 +69,10 @@ export interface MarkShowingAsBought_markAsBought {
 }
 
 export interface MarkShowingAsBought {
-  updateShowing: MarkShowingAsBought_updateShowing;
   markAsBought: MarkShowingAsBought_markAsBought;
 }
 
 export interface MarkShowingAsBoughtVariables {
   showingId: any;
-  showing?: UpdateShowingInput | null;
+  price: any;
 }
