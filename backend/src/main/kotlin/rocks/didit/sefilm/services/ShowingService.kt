@@ -173,8 +173,12 @@ class ShowingService(
 
     fun createShowing(data: CreateShowingDTO): ShowingDTO {
         val adminUser = userService.getCompleteUser(currentLoggedInUserId())
+        val filmstadenShow = data.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
         return showingRepo
-                .save(data.toShowing(adminUser, movieService.getMovieOrThrow(data.movieId)))
+                .save(data.toShowing(adminUser,
+                        movieService.getMovieOrThrow(data.movieId),
+                        filmstadenShow?.screen
+                ))
                 .also {
                     eventPublisher.publish(NewShowingEvent(this, it, adminUser))
                 }
@@ -219,6 +223,7 @@ class ShowingService(
         assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
 
         log.info("Updating showing ($showingId) to new values: $newValues")
+        val filmstadenShow = newValues.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
         return showingRepo.save(
                 showing.copy(
                         price = SEK(newValues.price),
@@ -228,6 +233,7 @@ class ShowingService(
                         location = locationService.getOrCreateNewLocation(newValues.location),
                         time = newValues.time,
                         filmstadenRemoteEntityId = newValues.filmstadenRemoteEntityId,
+                        filmstadenScreen = filmstadenShow?.screen?.toFilmstadenLiteScreen(),
                         date = newValues.date
                 )
         )
@@ -270,7 +276,9 @@ class ShowingService(
     private fun Showing.isParticipantInShowing(userID: UserID): Boolean = this.participants.any { it.userId == userID }
 
     /* Fetch location from db or create it if it does not exist before converting the showing */
-    private fun CreateShowingDTO.toShowing(admin: User, movie: Movie): Showing {
+    private fun CreateShowingDTO.toShowing(admin: User,
+                                           movie: Movie,
+                                           filmstadenScreen: FilmstadenScreenDTO?): Showing {
         val location = locationService.getOrCreateNewLocation(this.location)
         return Showing(
                 webId = Base64ID.random(),
@@ -279,7 +287,7 @@ class ShowingService(
                 time = this.time,
                 movie = movieService.getMovieOrThrow(this.movieId),
                 location = location,
-                filmstadenScreen = this.filmstadenScreen,
+                filmstadenScreen = filmstadenScreen?.toFilmstadenLiteScreen(),
                 admin = admin,
                 payToUser = admin,
                 expectedBuyDate = this.expectedBuyDate,
