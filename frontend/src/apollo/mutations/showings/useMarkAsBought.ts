@@ -16,6 +16,7 @@ const markAsBoughtMutation = gql`
         id
       }
       expectedBuyDate
+      date
       time
       myTickets {
         id
