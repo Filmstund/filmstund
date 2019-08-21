@@ -46,8 +46,10 @@ interface TicketListProps {
 const TicketListRow = styled.div`
   display: flex;
   padding: 10px;
+  font-size: 13px;
   width: 100%;
   transition: background-color 0.1s ease;
+  background: #f8f8f8;
 
   @media (min-width: 500px) {
     max-width: 100%;
@@ -70,13 +72,15 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
     <SmallHeader>Deltagare</SmallHeader>
     {tickets.map(ticket => (
       <TicketListRow key={ticket.user.id}>
-        <div>
+        <div css={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
         </div>
-        <div css={{ flex: 1, paddingLeft: "1rem" }}>
-          <CopyValue useStricken text={ticket.foretagsbiljett || ""} />
-        </div>
-        <div css={{ flex: 1, paddingLeft: "1rem" }}>
+        {ticket.foretagsbiljett && (
+          <div css={{ width: 100, textAlign: "right" }}>
+            <CopyValue useStricken text={ticket.foretagsbiljett} />
+          </div>
+        )}
+        <div css={{ width: 100, textAlign: "right" }}>
           <CopyValue useStricken text={ticket.filmstadenMembershipId || ""} />
         </div>
       </TicketListRow>
