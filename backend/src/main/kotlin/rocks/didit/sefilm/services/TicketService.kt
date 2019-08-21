@@ -16,12 +16,14 @@ import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.util.*
 
 @Service
 class TicketService(
-        private val filmstadenClient: FilmstadenService,
+        private val filmstadenService: FilmstadenService,
+        private val locationService: LocationService,
         private val userRepository: UserRepository,
         private val ticketRepository: TicketRepository,
         private val showingRepository: ShowingRepository
@@ -34,15 +36,16 @@ class TicketService(
     }
 
     fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
-        val currentLoggedInUser = currentLoggedInUserId()
+        val currentLoggedInUserId = currentLoggedInUserId()
         val showing =
-                showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
+                showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUserId, showingId) }
 
-        if (showing.admin.id != currentLoggedInUser) {
+        if (showing.admin.id != currentLoggedInUserId) {
             throw AccessDeniedException("Only the showing admin is allowed to do that")
         }
 
         validateFilmstadenTicketUrls(userSuppliedTicketUrl)
+        userSuppliedTicketUrl.firstOrNull()?.let { updateShowingFromTicketUrl(showing, it) }
         userSuppliedTicketUrl.forEach {
             processTicketUrl(it, showing)
         }
@@ -50,12 +53,26 @@ class TicketService(
         return getTicketsForCurrentUserAndShowing(showingId)
     }
 
+    private fun updateShowingFromTicketUrl(showing: Showing, ticketUrl: String) {
+        val (_, filmstadenRemoteEntityId, _)  = extractIdsFromUrl(ticketUrl)
+        val fetchFilmstadenShow = filmstadenService.fetchFilmstadenShow(filmstadenRemoteEntityId)
+        val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema.title)
+        val updatedShowing = showing.copy(
+                filmstadenScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen(),
+                time = fetchFilmstadenShow.time.toLocalTime(),
+                date = fetchFilmstadenShow.time.toLocalDate(),
+                location = location
+        )
+
+        showingRepository.save(updatedShowing)
+    }
+
     private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {
-        val (sysId, sfShowingId, ticketId) = extractIdsFromUrl(userSuppliedTicketUrl)
-        val filmstadenTickets = filmstadenClient.fetchTickets(sysId, sfShowingId, ticketId)
+        val (sysId, filmstadenRemoteEntityId, ticketId) = extractIdsFromUrl(userSuppliedTicketUrl)
+        val filmstadenTickets = filmstadenService.fetchTickets(sysId, filmstadenRemoteEntityId, ticketId)
 
         val tickets = filmstadenTickets.map {
-            val barcode = filmstadenClient.fetchBarcode(it.id)
+            val barcode = filmstadenService.fetchBarcode(it.id)
             if (it.profileId == null || it.profileId.isBlank()) {
                 return@map it.toTicket(showing.id, showing.admin.id, barcode)
             }

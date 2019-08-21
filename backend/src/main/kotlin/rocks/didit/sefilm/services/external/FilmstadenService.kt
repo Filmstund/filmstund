@@ -150,7 +150,7 @@ class FilmstadenService(
 
         val filmstadenShowItemsDTO = restTemplate
                 .exchange(
-                        "${API_URL}v2/show/sv/1/200?filter.remoteEntityId=AA-1036-201908221930",
+                        "$API_URL/v2/show/sv/1/200?filter.remoteEntityId=AA-1036-201908221930",
                         HttpMethod.GET,
                         httpEntity,
                         object : ParameterizedTypeReference<FilmstadenShowItemsDTO>() {}
