@@ -8,9 +8,9 @@ import java.util.*
 
 @Repository
 interface TicketRepository : CrudRepository<Ticket, String> {
-  fun findByShowingIdAndAssignedToUser(showingId: UUID, userId: UserID): List<Ticket>
+    fun findByShowingIdAndAssignedToUser(showingId: UUID, userId: UserID): List<Ticket>
 
-  fun findByShowingId(showingId: UUID): List<Ticket>
+    fun findByShowingId(showingId: UUID): List<Ticket>
 
-  fun findByAssignedToUser(userId: UserID): List<Ticket>
+    fun findByAssignedToUser(userId: UserID): List<Ticket>
 }

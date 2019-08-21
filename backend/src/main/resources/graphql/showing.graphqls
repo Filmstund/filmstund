@@ -6,7 +6,7 @@ type Showing {
     time: String!
     movie: Movie!
     location: Location!
-    sfScreen: SfScreen
+    filmstadenScreen: FilmstadenScreen
     private: Boolean!
     price: SEK
     ticketsBought: Boolean!
@@ -15,7 +15,8 @@ type Showing {
     expectedBuyDate: String
     participants: [Participant!]!
     lastModifiedDate: String!
-    sfSeatMap: [SfSeatMap!]!
+    filmstadenSeatMap: [FilmstadenSeatMap!]!
+    filmstadenRemoteEntityId: String
 }
 
 type Participant {
@@ -23,33 +24,34 @@ type Participant {
     paymentType: String!
 }
 
-type SfScreen {
-    sfId: ID!
+type FilmstadenScreen {
+    filmstadenId: ID!
     name: String!
 }
 
-type SfShowing {
-    cinemaName: String,
-    screen: SfScreen,
-    seatCount: Int,
-    timeUtc: String,
-    tags: [String!]!
+type FilmstadenShowing {
+    cinemaName: String!,
+    screen: FilmstadenScreen!,
+    seatCount: Int!,
+    timeUtc: String!,
+    tags: [String!]!,
+    filmstadenRemoteEntityId: String!
 }
 
-type SfSeatMap {
+type FilmstadenSeatMap {
     row: Int!
     number: Int!
     seatType: String!
-    coordinates: SfSeatCoordinates!
-    dimensions: SfSeatDimensions!
+    coordinates: FilmstadenSeatCoordinates!
+    dimensions: FilmstadenSeatDimensions!
 }
 
-type SfSeatCoordinates {
+type FilmstadenSeatCoordinates {
     x: Float!
     y: Float!
 }
 
-type SfSeatDimensions {
+type FilmstadenSeatDimensions {
     width: Int!
     height: Int!
 }

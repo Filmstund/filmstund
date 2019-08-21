@@ -10,7 +10,7 @@ type Location {
     alias: [String!]!
 }
 
-type SfCity {
+type FilmstadenCity {
     name: String!
     alias: String!
 }

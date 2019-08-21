@@ -2,7 +2,7 @@ import React, { lazy } from "react";
 
 import styled from "@emotion/styled";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 
 import Field from "../../use-cases/common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";

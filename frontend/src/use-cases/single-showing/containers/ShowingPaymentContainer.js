@@ -1,6 +1,6 @@
 import React from "react";
-import BoughtShowing from "../BoughtShowing";
-import PendingShowing from "../PendingShowing";
+import { BoughtShowing } from "../BoughtShowing";
+import { PendingShowing } from "../PendingShowing";
 
 const ShowingPaymentContainer = ({
   foretagsbiljetter,

@@ -1,4 +1,7 @@
-version: 2
+version: 2.1
+
+orbs:
+  packtracker: packtracker/report@2.2.2
 
 defaults: &defaults
   working_directory: ~/itbio
@@ -38,13 +41,7 @@ jobs:
             - frontend/node_modules
       - run: |
           cd frontend
-          yarn lint
-      - run: |
-          cd frontend
           yarn test
-      - run: |
-          cd frontend
-          yarn packtracker
   build-docker:
     <<: *defaults
     machine: true
@@ -72,6 +69,10 @@ jobs:
 
 workflows:
   version: 2
+  packtracker:
+    jobs:
+      - packtracker/report:
+          project_root: "./frontend"
   build:
     jobs:
       - test-backend

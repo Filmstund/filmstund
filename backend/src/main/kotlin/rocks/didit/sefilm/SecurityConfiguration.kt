@@ -29,116 +29,116 @@ import java.time.Instant
 
 class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
 
-  val userId: String = userInfo.getValue("sub") as String
-  private val username: String? = userInfo["email"] as String
-  val firstName: String? = userInfo["given_name"] as String
-  val lastName: String? = userInfo["family_name"] as String
-  val avatarUrl: String? = userInfo["picture"] as String
+    val userId: String = userInfo.getValue("sub") as String
+    private val username: String? = userInfo["email"] as String
+    val firstName: String? = userInfo["given_name"] as String
+    val lastName: String? = userInfo["family_name"] as String
+    val avatarUrl: String? = userInfo["picture"] as String
 
-  override fun getUsername(): String? = username
-  fun getName(): String? = "$firstName $lastName"
-  override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_USER"))
-  override fun getPassword(): String? = null
-  override fun isAccountNonExpired(): Boolean = true
-  override fun isAccountNonLocked(): Boolean = true
-  override fun isCredentialsNonExpired(): Boolean = true
-  override fun isEnabled(): Boolean = true
+    override fun getUsername(): String? = username
+    fun getName(): String? = "$firstName $lastName"
+    override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_USER"))
+    override fun getPassword(): String? = null
+    override fun isAccountNonExpired(): Boolean = true
+    override fun isAccountNonLocked(): Boolean = true
+    override fun isCredentialsNonExpired(): Boolean = true
+    override fun isEnabled(): Boolean = true
 
-  override fun toString(): String {
-    return "OpenIdConnectUserDetails(userId='$userId', username=$username, firstName=$firstName, lastName=$lastName, avatarUrl=$avatarUrl)"
-  }
+    override fun toString(): String {
+        return "OpenIdConnectUserDetails(userId='$userId', username=$username, firstName=$firstName, lastName=$lastName, avatarUrl=$avatarUrl)"
+    }
 }
 
 class OpenidUserAuthConverter : UserAuthenticationConverter {
-  override fun extractAuthentication(map: Map<String, *>): Authentication? {
-    val user = OpenIdConnectUserDetails(map)
-    return UsernamePasswordAuthenticationToken(user, "N/A", user.authorities)
-  }
+    override fun extractAuthentication(map: Map<String, *>): Authentication? {
+        val user = OpenIdConnectUserDetails(map)
+        return UsernamePasswordAuthenticationToken(user, "N/A", user.authorities)
+    }
 
-  override fun convertUserAuthentication(userAuthentication: Authentication) =
-    throw UnsupportedOperationException("This operation is not supported")
+    override fun convertUserAuthentication(userAuthentication: Authentication) =
+            throw UnsupportedOperationException("This operation is not supported")
 }
 
 @Component
 class LoginListener(private val userRepository: UserRepository) : ApplicationListener<AuthenticationSuccessEvent> {
-  private val log = LoggerFactory.getLogger(LoginListener::class.java)
+    private val log = LoggerFactory.getLogger(LoginListener::class.java)
 
-  override fun onApplicationEvent(event: AuthenticationSuccessEvent) {
-    createOrUpdateUser(event.authentication)
-  }
-
-  private fun createOrUpdateUser(authentication: Authentication) {
-    val principal = authentication.principal as OpenIdConnectUserDetails?
-      ?: throw IllegalStateException("Successful authentication without a principal")
-
-    val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
-    if (maybeUser == null) {
-      val newUser = User(
-        id = UserID(principal.userId),
-        name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
-        firstName = principal.firstName,
-        lastName = principal.lastName,
-        nick = principal.firstName ?: "Houdini",
-        email = principal.username ?: "",
-        avatar = principal.avatarUrl,
-        lastLogin = Instant.now(),
-        signupDate = Instant.now()
-      )
-      userRepository.save(newUser)
-      log.info("Created new user ${newUser.name} (${newUser.id})")
-    } else {
-      val updatedUser = maybeUser.copy(
-        name = "${principal.firstName} ${principal.lastName}",
-        firstName = principal.firstName,
-        lastName = principal.lastName,
-        avatar = principal.avatarUrl,
-        lastLogin = Instant.now()
-      )
-      if (maybeUser != updatedUser) {
-        userRepository.save(updatedUser)
-      }
+    override fun onApplicationEvent(event: AuthenticationSuccessEvent) {
+        createOrUpdateUser(event.authentication)
     }
-  }
+
+    private fun createOrUpdateUser(authentication: Authentication) {
+        val principal = authentication.principal as OpenIdConnectUserDetails?
+                ?: throw IllegalStateException("Successful authentication without a principal")
+
+        val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
+        if (maybeUser == null) {
+            val newUser = User(
+                    id = UserID(principal.userId),
+                    name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
+                    firstName = principal.firstName,
+                    lastName = principal.lastName,
+                    nick = principal.firstName ?: "Houdini",
+                    email = principal.username ?: "",
+                    avatar = principal.avatarUrl,
+                    lastLogin = Instant.now(),
+                    signupDate = Instant.now()
+            )
+            userRepository.save(newUser)
+            log.info("Created new user ${newUser.name} (${newUser.id})")
+        } else {
+            val updatedUser = maybeUser.copy(
+                    name = "${principal.firstName} ${principal.lastName}",
+                    firstName = principal.firstName,
+                    lastName = principal.lastName,
+                    avatar = principal.avatarUrl,
+                    lastLogin = Instant.now()
+            )
+            if (maybeUser != updatedUser) {
+                userRepository.save(updatedUser)
+            }
+        }
+    }
 }
 
 @Configuration
 @EnableWebSecurity
 @EnableResourceServer
 class ResourceServerConfig(
-  private val properties: Properties
+        private val properties: Properties
 ) : ResourceServerConfigurerAdapter() {
 
-  override fun configure(resources: ResourceServerSecurityConfigurer) {
-    resources
-      .resourceId(properties.google.clientId)
-      .stateless(true)
-  }
+    override fun configure(resources: ResourceServerSecurityConfigurer) {
+        resources
+                .resourceId(properties.google.clientId)
+                .stateless(true)
+    }
 
-  override fun configure(http: HttpSecurity) {
-    http
-      .cors().and()
-      .antMatcher("/**")
-      .authorizeRequests()
-      .antMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
-      .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
-      .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
-      .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
-      .antMatchers(HttpMethod.GET, "${MetaController.PATH}/**").permitAll()
-      .anyRequest().fullyAuthenticated()
-  }
+    override fun configure(http: HttpSecurity) {
+        http
+                .cors().and()
+                .antMatcher("/**")
+                .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
+                .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
+                .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
+                .antMatchers(HttpMethod.GET, "${MetaController.PATH}/**").permitAll()
+                .anyRequest().fullyAuthenticated()
+    }
 
-  @Bean
-  fun jwkTokenStore(accessTokenConverter: AccessTokenConverter): JwkTokenStore {
-    return JwkTokenStore(properties.google.jwkUri, accessTokenConverter)
-  }
+    @Bean
+    fun jwkTokenStore(accessTokenConverter: AccessTokenConverter): JwkTokenStore {
+        return JwkTokenStore(properties.google.jwkUri, accessTokenConverter)
+    }
 
-  @Bean
-  fun accessTokenConverter(userAuthenticationConverter: UserAuthenticationConverter): AccessTokenConverter {
-    val default = DefaultAccessTokenConverter()
-    default.setUserTokenConverter(userAuthenticationConverter)
-    return default
-  }
+    @Bean
+    fun accessTokenConverter(userAuthenticationConverter: UserAuthenticationConverter): AccessTokenConverter {
+        val default = DefaultAccessTokenConverter()
+        default.setUserTokenConverter(userAuthenticationConverter)
+        return default
+    }
 
-  @Bean
-  fun userAuthenticationConverter() = OpenidUserAuthConverter()
+    @Bean
+    fun userAuthenticationConverter() = OpenidUserAuthConverter()
 }

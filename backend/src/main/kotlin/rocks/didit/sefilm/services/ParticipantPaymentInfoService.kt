@@ -10,31 +10,31 @@ import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 
 @Service
 class ParticipantPaymentInfoService(
-  private val participantInfoRepo: ParticipantPaymentInfoRepository,
-  private val showingService: ShowingService,
-  private val assertionService: AssertionService
+        private val participantInfoRepo: ParticipantPaymentInfoRepository,
+        private val showingService: ShowingService,
+        private val assertionService: AssertionService
 ) {
 
-  fun updatePaymentInfo(participantInfo: ParticipantPaymentInfoDTO): ParticipantPaymentInfo {
-    if (participantInfo.showingId == null || participantInfo.userId == null) {
-      throw IllegalArgumentException("Missing showing id and/or user id")
+    fun updatePaymentInfo(participantInfo: ParticipantPaymentInfoDTO): ParticipantPaymentInfo {
+        if (participantInfo.showingId == null || participantInfo.userId == null) {
+            throw IllegalArgumentException("Missing showing id and/or user id")
+        }
+        assertionService.assertLoggedInUserIsAdmin(showingService.getShowingOrThrow(participantInfo.showingId))
+
+        val paymentInfo = participantInfoRepo
+                .findById(participantInfo.id)
+                .orElseThrow {
+                    NotFoundException(
+                            "participant info '${participantInfo.id}'",
+                            showingId = participantInfo.showingId
+                    )
+                }
+
+        if (paymentInfo.showingId != participantInfo.showingId) {
+            throw AccessDeniedException("Oh no you didn't!")
+        }
+
+        val newInfo = paymentInfo.copy(hasPaid = participantInfo.hasPaid, amountOwed = SEK(participantInfo.amountOwed))
+        return participantInfoRepo.save(newInfo)
     }
-    assertionService.assertLoggedInUserIsAdmin(showingService.getShowingOrThrow(participantInfo.showingId))
-
-    val paymentInfo = participantInfoRepo
-      .findById(participantInfo.id)
-      .orElseThrow {
-        NotFoundException(
-          "participant info '${participantInfo.id}'",
-          showingId = participantInfo.showingId
-        )
-      }
-
-    if (paymentInfo.showingId != participantInfo.showingId) {
-      throw AccessDeniedException("Oh no you didn't!")
-    }
-
-    val newInfo = paymentInfo.copy(hasPaid = participantInfo.hasPaid, amountOwed = SEK(participantInfo.amountOwed))
-    return participantInfoRepo.save(newInfo)
-  }
 }

@@ -12,5 +12,10 @@ LABEL Description="The SeFilm frontend served by nginx"
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN mkdir -p /srv/
 COPY --from=builder /srv/http/build /srv/http
+
+ARG TAG
+ENV TAG=${TAG:-"dev"}
+RUN echo $TAG > /srv/http/gitinfo
+
 EXPOSE 80
 RUN chown nginx:nginx /srv/http -R

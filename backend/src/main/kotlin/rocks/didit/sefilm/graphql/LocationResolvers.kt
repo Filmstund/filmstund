@@ -8,7 +8,7 @@ import rocks.didit.sefilm.services.LocationService
 
 @Component
 class LocationResolver(private val locationService: LocationService) : GraphQLQueryResolver {
-  fun previousLocations() = locationService.allLocations()
-  fun location(id: String) = locationService.getLocation(id)
-  fun sfCities() = locationService.sfCities()
+    fun previousLocations() = locationService.allLocations()
+    fun location(id: String) = locationService.getLocation(id)
+    fun filmstadenCities() = locationService.filmstadenCities()
 }

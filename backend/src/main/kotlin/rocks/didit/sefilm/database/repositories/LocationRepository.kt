@@ -7,5 +7,5 @@ import java.util.*
 
 @Repository
 interface LocationRepository : CrudRepository<Location, String> {
-  fun findByNameIgnoreCaseOrAliasIgnoreCase(id: String, alias: String): Optional<Location>
+    fun findByNameIgnoreCaseOrAliasIgnoreCase(id: String, alias: String): Optional<Location>
 }

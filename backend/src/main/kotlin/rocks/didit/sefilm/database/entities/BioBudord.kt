@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 data class BioBudord(
-  @Id
-  val number: Long = -1,
-  val phrase: String = ""
+        @Id
+        val number: Long = -1,
+        val phrase: String = ""
 )

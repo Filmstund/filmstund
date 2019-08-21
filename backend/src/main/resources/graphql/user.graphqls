@@ -5,7 +5,7 @@ type CurrentUser {
     lastName: String
     nick: String
     email: String!
-    sfMembershipId: String
+    filmstadenMembershipId: String
     phone: String
     avatar: String
     foretagsbiljetter: [Foretagsbiljett!]
@@ -41,7 +41,7 @@ enum ForetagsbiljettStatus {
 
 input NewUserInfo {
     nick: String
-    sfMembershipId: String
+    filmstadenMembershipId: String
     phone: String
 }
 
