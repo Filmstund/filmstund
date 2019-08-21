@@ -10,10 +10,9 @@ import rocks.didit.sefilm.notification.providers.NotificationProviderDTO
 @Component
 class NotificationResolvers(private val notificationProviders: List<NotificationProvider<*>>) : GraphQLQueryResolver {
 
-  fun allNotificationProviders(): List<NotificationProviderDTO>
-    = notificationProviders
-    .filter { it.isSubscribable }
-    .map { NotificationProviderDTO.from(it) }
+    fun allNotificationProviders(): List<NotificationProviderDTO> = notificationProviders
+            .filter { it.isSubscribable }
+            .map { NotificationProviderDTO.from(it) }
 
-  fun allNotificationTypes() = NotificationType.values().toList()
+    fun allNotificationTypes() = NotificationType.values().toList()
 }

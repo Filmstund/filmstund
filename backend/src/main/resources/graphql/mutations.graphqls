@@ -9,7 +9,7 @@ type Mutation {
     # Delete a showign and return all public showings
     deleteShowing(showingId: UUID!): [Showing!]
 
-    markAsBought(showingId: UUID!): Showing!
+    markAsBought(showingId: UUID!, price: SEK!): Showing!
     processTicketUrls(showingId: UUID!, ticketUrls: [String!]): Showing!
 
     updateShowing(showingId: UUID!, newValues: UpdateShowingInput): Showing!
@@ -18,8 +18,8 @@ type Mutation {
 
     ## // showing ###
 
-    # Fetch any new movies from SF, returns the movies that were added
-    fetchNewMoviesFromSf: [Movie!]
+    # Fetch any new movies from Filmstaden, returns the movies that were added
+    fetchNewMoviesFromFilmstaden: [Movie!]
 
     updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInput!): ParticipantPaymentInfo!
 

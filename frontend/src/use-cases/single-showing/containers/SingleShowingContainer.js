@@ -1,30 +1,30 @@
+import gql from "graphql-tag";
 import React, { useCallback, useState } from "react";
-
+import { graphql } from "react-apollo";
 import { branch, compose, renderComponent } from "recompose";
 
+import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
+import { navigateToShowingTickets } from "../../common/navigators";
+import { MissingShowing } from "../../common/showing/MissingShowing";
 import Showing, { showingFragment } from "../../common/showing/Showing";
+import IMDbLink from "../../common/ui/IMDbLink";
 import { ButtonContainer } from "../../common/ui/MainButton";
+import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
+import Loader from "../../common/utils/ProjectorLoader";
+import { useScrollToTop } from "../../common/utils/useScrollToTop";
 import AdminAction from "../AdminAction";
 import ParticipantList from "../components/ParticipantsList";
 import SwishModal from "../components/SwishModal";
-import IMDbLink from "../../common/ui/IMDbLink";
-import { graphql } from "react-apollo";
-import gql from "graphql-tag";
-import Loader from "../../common/utils/ProjectorLoader";
-import { navigateToShowingTickets } from "../../common/navigators/index";
-import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
-import { promoteToAdmin } from "../../../apollo/mutations/showings";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
-import { MissingShowing } from "../../common/showing/MissingShowing";
-import { useScrollToTop } from "../../common/utils/useScrollToTop";
 
 const SingleShowingContainer = ({
-  promoteToAdmin,
   data: { me, showing, refetch },
   history
 }) => {
   const [openModal, setOpenModal] = useState(false);
+
+  const promoteToAdmin = usePromoteToAdmin();
 
   useScrollToTop();
 
@@ -131,7 +131,6 @@ const is404 = branch(
 
 export default compose(
   data,
-  promoteToAdmin,
   isLoading,
   is404
 )(SingleShowingContainer);

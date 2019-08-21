@@ -8,5 +8,5 @@ import java.util.*
 
 @Component
 class UserAuditorAware(private val userService: UserService) : AuditorAware<User> {
-  override fun getCurrentAuditor() = Optional.ofNullable(userService.currentUserOrNull())
+    override fun getCurrentAuditor() = Optional.ofNullable(userService.currentUserOrNull())
 }

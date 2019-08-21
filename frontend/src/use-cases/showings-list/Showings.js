@@ -57,9 +57,8 @@ class Showings extends Component {
       data: { showings = [] }
     } = this.props;
 
-    const { previous = [], upcoming = [] } = groupBy(
-      showings,
-      s => (isBefore(showingDate(s), today) ? "previous" : "upcoming")
+    const { previous = [], upcoming = [] } = groupBy(showings, s =>
+      isBefore(showingDate(s), today) ? "previous" : "upcoming"
     );
 
     return (

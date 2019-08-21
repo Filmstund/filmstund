@@ -1,4 +1,4 @@
-# A ticket assigned to a user that allowes access to SF
+# A ticket assigned to a user that allowes access to Filmstaden
 type Ticket {
     id: String!
     showingId: UUID!

@@ -7,24 +7,24 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.LocationRepository
-import rocks.didit.sefilm.domain.dto.SfCityAliasDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenCityAliasDTO
 import java.util.*
 
 @Service
 class LocationService(private val locationRepo: LocationRepository) {
-  fun allLocations() = locationRepo.findAll().toList()
-  fun getLocation(name: String): Optional<Location> = locationRepo.findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
+    fun allLocations() = locationRepo.findAll().toList()
+    fun getLocation(name: String): Optional<Location> = locationRepo.findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
 
-  fun sfCities(): List<SfCityAliasDTO> {
-    val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
+    fun filmstadenCities(): List<FilmstadenCityAliasDTO> {
+        val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
 
-    val cityResource = ClassPathResource("seeds/sf-cities.json")
-    return objectMapper.readValue(cityResource.inputStream)
-  }
+        val cityResource = ClassPathResource("seeds/filmstaden-cities.json")
+        return objectMapper.readValue(cityResource.inputStream)
+    }
 
-  fun getOrCreateNewLocation(name: String): Location {
-    return locationRepo
-      .findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
-      .orElseGet { locationRepo.save(Location(name = name)) }
-  }
+    fun getOrCreateNewLocation(name: String): Location {
+        return locationRepo
+                .findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
+                .orElseGet { locationRepo.save(Location(name = name)) }
+    }
 }

@@ -12,17 +12,17 @@ import rocks.didit.sefilm.web.controllers.CalendarController
 
 @Component
 class UserResolver(private val userService: UserService) : GraphQLQueryResolver {
-  fun allUsers() = userService.allUsers()
-  /** The currently logged in user */
-  fun currentUser() = userService.getCurrentUser()
+    fun allUsers() = userService.allUsers()
+    /** The currently logged in user */
+    fun currentUser() = userService.getCurrentUser()
 }
 
 @Component
 class CalendarFeedResolver(private val properties: Properties) : GraphQLResolver<UserDTO> {
-  fun calendarFeedUrl(user: UserDTO): String? {
-    if (user.calendarFeedId == null) {
-      return null
+    fun calendarFeedUrl(user: UserDTO): String? {
+        if (user.calendarFeedId == null) {
+            return null
+        }
+        return "${properties.baseUrl.api}${CalendarController.PATH}/${user.calendarFeedId}"
     }
-    return "${properties.baseUrl.api}${CalendarController.PATH}/${user.calendarFeedId}"
-  }
 }

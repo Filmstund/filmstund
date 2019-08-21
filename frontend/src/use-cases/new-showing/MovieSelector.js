@@ -7,7 +7,7 @@ import Movie from "../common/showing/Movie";
 import styled from "@emotion/styled";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSyncAlt } from "@fortawesome/free-solid-svg-icons/faSyncAlt";
 
 import Field from "../common/ui/Field";
 import Input from "../common/ui/Input";

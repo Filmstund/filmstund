@@ -1,8 +1,8 @@
 type Movie {
     id: UUID!
     imdbId: IMDbID
-    sfId: String
-    sfSlug: String
+    filmstadenId: String
+    filmstadenSlug: String
     tmdbId: TMDbID
     title: String!
     synopsis: String
@@ -16,6 +16,6 @@ type Movie {
     popularity: Float!
     popularityLastUpdated: String!
     archived: Boolean!
-    sfShowings(city: String = "GB", afterDate: LocalDate): [SfShowing!]!
+    filmstadenShowings(city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
 }
 

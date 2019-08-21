@@ -8,16 +8,16 @@ import java.security.SecureRandom
 
 @Service
 class BudordService(private val budordRepo: BudordRepository) {
-  fun getAll() = budordRepo.findAll().toList()
+    fun getAll() = budordRepo.findAll().toList()
 
-  fun getRandom(): BioBudord {
-    val all = budordRepo.findAll()
-    val count = all.count() - 1
-    if (count <= 0) {
-      throw NotFoundException("any budord :(")
+    fun getRandom(): BioBudord {
+        val all = budordRepo.findAll()
+        val count = all.count() - 1
+        if (count <= 0) {
+            throw NotFoundException("any budord :(")
+        }
+
+        val randomIndex = SecureRandom().nextInt(count)
+        return all.elementAt(randomIndex)
     }
-
-    val randomIndex = SecureRandom().nextInt(count)
-    return all.elementAt(randomIndex)
-  }
 }

@@ -6,9 +6,9 @@ package rocks.didit.sefilm.domain.dto
  * @param d List of movie/shows/people results actually found
  */
 data class ImdbSearchResults(
-  val v: Int,
-  val q: String,
-  val d: List<ImdbResult>?
+        val v: Int,
+        val q: String,
+        val d: List<ImdbResult>?
 )
 
 /**
@@ -20,11 +20,11 @@ data class ImdbSearchResults(
  * @param i Image url, width, and height
  */
 data class ImdbResult(
-  val l: String,
-  val id: String,
-  val s: String?,
-  val y: Int?,
-  val q: String?,
-  val i: List<String>?
+        val l: String,
+        val id: String,
+        val s: String?,
+        val y: Int?,
+        val q: String?,
+        val i: List<String>?
 )
 

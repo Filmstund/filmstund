@@ -10,7 +10,7 @@ const PayToUser = ({ user }) => (
   </span>
 );
 
-const BoughtShowing = ({
+export const BoughtShowing = ({
   isAdmin,
   attendeePaymentDetails,
   myTickets,
@@ -26,7 +26,7 @@ const BoughtShowing = ({
   const openSwishLink = () => openSwish(swishLink);
 
   return (
-    <React.Fragment>
+    <>
       {(isAdmin || myTickets.length > 0) && (
         <MainButton onClick={onClickTickets}>Mina biljetter</MainButton>
       )}
@@ -37,7 +37,7 @@ const BoughtShowing = ({
           <MainButton onClick={openSwishLink}>Öppna Swish</MainButton>
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 };
 
@@ -62,5 +62,3 @@ BoughtShowing.fragments = {
     }
   `
 };
-
-export default BoughtShowing;

@@ -8,8 +8,8 @@ import rocks.didit.sefilm.services.BudordService
 
 @Component
 class BioBudordResolver(private val budordService: BudordService) : GraphQLQueryResolver {
-  fun allBiobudord() = budordService.getAll()
-  fun randomBudord() = budordService.getRandom()
+    fun allBiobudord() = budordService.getAll()
+    fun randomBudord() = budordService.getRandom()
 }
 
 
