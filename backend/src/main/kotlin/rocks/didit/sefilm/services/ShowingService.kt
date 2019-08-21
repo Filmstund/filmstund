@@ -67,7 +67,7 @@ class ShowingService(
                     .map { it.toDto() }
 
     fun getPrivateShowingsForCurrentUser(afterDate: LocalDate = LocalDate.MIN): List<ShowingDTO> {
-        val currentLoggedInUser = currentLoggedInUser()
+        val currentLoggedInUser = currentLoggedInUserId()
         return showingRepo.findByPrivateOrderByDateDesc(true)
                 .filter { it.userIsInvolvedInThisShowing(currentLoggedInUser) }
                 .map { it.toDto() }
@@ -76,7 +76,7 @@ class ShowingService(
     /** Info that is needed before you buy the tickets at Filmstaden */
     fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
         val showing = getShowingEntity(showingId)
-        if (showing.admin.id != currentLoggedInUser()) {
+        if (showing.admin.id != currentLoggedInUserId()) {
             return null
         }
 
@@ -93,7 +93,7 @@ class ShowingService(
 
     /** Info a user needs for paying the one who bought the tickets */
     fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO? =
-            getAttendeePaymentDetailsForUser(currentLoggedInUser(), showingId)
+            getAttendeePaymentDetailsForUser(currentLoggedInUserId(), showingId)
 
     fun getAttendeePaymentDetailsForUser(userID: UserID, showingId: UUID): AttendeePaymentDetailsDTO? {
         val showing = getShowingEntity(showingId)
@@ -128,7 +128,7 @@ class ShowingService(
 
     fun attendShowing(showingId: UUID, paymentOption: PaymentOption): ShowingDTO {
         val showing = getShowingEntity(showingId)
-        val userId = currentLoggedInUser()
+        val userId = currentLoggedInUserId()
         assertionService.assertTicketsNotBought(userId, showing)
         assertionService.assertUserNotAlreadyAttended(userId, showing)
 
@@ -147,7 +147,7 @@ class ShowingService(
 
     fun unattendShowing(showingId: UUID): ShowingDTO {
         val showing = getShowingEntity(showingId)
-        val currentUserId = currentLoggedInUser()
+        val currentUserId = currentLoggedInUserId()
         assertionService.assertTicketsNotBought(currentUserId, showing)
 
         val participantLst = showing
@@ -172,7 +172,7 @@ class ShowingService(
     }
 
     fun createShowing(data: CreateShowingDTO): ShowingDTO {
-        val adminUser = userService.getCompleteUser(currentLoggedInUser())
+        val adminUser = userService.getCompleteUser(currentLoggedInUserId())
         return showingRepo
                 .save(data.toShowing(adminUser, movieService.getMovieOrThrow(data.movieId)))
                 .also {
@@ -187,7 +187,7 @@ class ShowingService(
         assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
         assertionService.assertTicketsNotBought(showing.admin.id, showing)
 
-        paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUser())
+        paymentInfoRepo.deleteByShowingIdAndUserId(showing.id, currentLoggedInUserId())
         ticketService.deleteTickets(showing)
         showingRepo.delete(showing)
 

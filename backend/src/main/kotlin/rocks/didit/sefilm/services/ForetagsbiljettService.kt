@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
 import rocks.didit.sefilm.TicketInUseException
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.*
@@ -46,8 +46,8 @@ class ForetagsbiljettService(
             .orElseGet { listOf() }
 
     fun addForetagsbiljetterToCurrentUser(biljetter: List<ForetagsbiljettDTO>) {
-        val currentUser = userRepository.findById(currentLoggedInUser())
-                .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
+        val currentUser = userRepository.findById(currentLoggedInUserId())
+                .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
         val biljetterWithouthNew = currentUser
                 .foretagsbiljetter
                 .filterNot { (ticket) -> biljetter.any { ticket.number == it.number } }
@@ -64,8 +64,8 @@ class ForetagsbiljettService(
     }
 
     fun deleteTicketFromUser(biljett: ForetagsbiljettDTO) {
-        val currentUser = userRepository.findById(currentLoggedInUser())
-                .orElseThrow { NotFoundException("current user", currentLoggedInUser()) }
+        val currentUser = userRepository.findById(currentLoggedInUserId())
+                .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
 
         val ticketNumber = TicketNumber(biljett.number)
         val ticket = currentUser.foretagsbiljetter.find { it.number == ticketNumber }
@@ -85,7 +85,7 @@ class ForetagsbiljettService(
             val ticketNumber = TicketNumber(it.number)
             if (!userBiljetter.any { it.number == ticketNumber }
                     && userRepository.existsByForetagsbiljetterNumber(TicketNumber(it.number))) {
-                throw TicketAlreadyInUserException(currentLoggedInUser())
+                throw TicketAlreadyInUserException(currentLoggedInUserId())
             }
         }
     }

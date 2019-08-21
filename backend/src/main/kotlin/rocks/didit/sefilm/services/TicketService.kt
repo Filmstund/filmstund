@@ -4,7 +4,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.FilmstadenTicketException
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
@@ -28,13 +28,13 @@ class TicketService(
 ) {
 
     fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
-        val user = currentLoggedInUser()
+        val user = currentLoggedInUserId()
         isUserIsParticipant(showingId, user)
         return ticketRepository.findByShowingIdAndAssignedToUser(showingId, user)
     }
 
     fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
-        val currentLoggedInUser = currentLoggedInUser()
+        val currentLoggedInUser = currentLoggedInUserId()
         val showing =
                 showingRepository.findById(showingId).orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
 
@@ -95,7 +95,7 @@ class TicketService(
     }
 
     fun getTicketRange(showingId: UUID): TicketRange? {
-        val currentLoggedInUser = currentLoggedInUser()
+        val currentLoggedInUser = currentLoggedInUserId()
         if (!isUserIsParticipant(showingId, currentLoggedInUser)) {
             return null
         }
