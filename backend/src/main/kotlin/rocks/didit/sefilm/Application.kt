@@ -64,12 +64,6 @@ class Application {
     }
 
     @Bean
-    fun customMongoConverters(): MongoCustomConversions {
-        val converters = listOf(ImdbIdConverter(), TmdbIdConverter())
-        return MongoCustomConversions(converters)
-    }
-
-    @Bean
     fun httpClient(): HttpClient {
         return HttpClientBuilder.create()
                 .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0")
