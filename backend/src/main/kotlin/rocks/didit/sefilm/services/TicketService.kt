@@ -18,6 +18,7 @@ import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.services.external.FilmstadenService
+import java.time.ZoneId
 import java.util.*
 
 @Service
@@ -49,18 +50,36 @@ class TicketService(
         userSuppliedTicketUrl.forEach {
             processTicketUrl(it, showing)
         }
+        reassignLeftoverTickets(showing)
 
         return getTicketsForCurrentUserAndShowing(showingId)
+    }
+
+    private fun reassignLeftoverTickets(showing: Showing) {
+        val adminAssignedTickets = ticketRepository.findByShowingIdAndAssignedToUser(showing.id, showing.admin.id)
+        if (adminAssignedTickets.size > 1) {
+            val allTickets = ticketRepository.findByShowingId(showing.id)
+            val participantsMissingTicket = showing.participants.filter { participant ->
+                allTickets.none { ticket -> ticket.assignedToUser == participant.userId }
+            }
+
+            val reassigned = adminAssignedTickets.subList(1, adminAssignedTickets.size)
+                    .zip(participantsMissingTicket)
+                    .map { (ticket, participant) -> ticket.copy(assignedToUser = participant.userId) }
+            ticketRepository.saveAll(reassigned)
+        }
     }
 
     private fun updateShowingFromTicketUrl(showing: Showing, ticketUrl: String) {
         val (_, filmstadenRemoteEntityId, _)  = extractIdsFromUrl(ticketUrl)
         val fetchFilmstadenShow = filmstadenService.fetchFilmstadenShow(filmstadenRemoteEntityId)
         val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema.title)
+        val zonedDateTime = fetchFilmstadenShow.timeUtc.atZone(ZoneId.of("Europe/Stockholm"))
+
         val updatedShowing = showing.copy(
                 filmstadenScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen(),
-                time = fetchFilmstadenShow.time.toLocalTime(),
-                date = fetchFilmstadenShow.time.toLocalDate(),
+                time = zonedDateTime.toLocalTime(),
+                date = zonedDateTime.toLocalDate(),
                 location = location
         )
 
