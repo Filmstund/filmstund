@@ -12,7 +12,7 @@ export const SeatRange: React.FC<Props> = ({ ticketRange }) => {
     return null;
   }
 
-  const ticketRanges = orderBy(ticketRange.seatings || [], ["row"], ["desc"]);
+  const ticketRanges = orderBy(ticketRange.seatings || [], ["row"], ["asc"]);
 
   return (
     <>

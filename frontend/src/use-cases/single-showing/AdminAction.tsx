@@ -12,6 +12,7 @@ import {
   SingleShowing_showing,
   SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
 } from "./containers/__generated__/SingleShowing";
+import { CopyHighlightStringButton } from "./CopyHighlightStringButton";
 
 interface Props {
   onBeforeOpenBuyModal: () => Promise<any>;
@@ -153,6 +154,7 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
           closeModal={() => setState(state => ({ ...state, showModal: false }))}
         />
       )}
+      <CopyHighlightStringButton participants={showing.participants} />
       {adminMessage && <div>{adminMessage}</div>}
       {ticketsBought ? (
         <GrayButton onClick={handleStartBooking}>
