@@ -35,7 +35,7 @@ export const CopyHighlightStringButton: React.FC<{
 
   return (
     <GrayButton onClick={handleClick}>
-      {active ? "Koperiat!" : "Kopiera highlightsträng"}
+      {active ? "Kopierat!" : "Kopiera highlightsträng"}
     </GrayButton>
   );
 };
