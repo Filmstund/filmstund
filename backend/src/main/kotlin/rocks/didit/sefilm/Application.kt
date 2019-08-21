@@ -155,6 +155,9 @@ class Application {
             log.info("Seeding not enabled, ignoring...")
             return@ApplicationRunner
         }
+
+        log.info("Reassignment enabled=${properties.enableReassignment}")
+
         if (!properties.tmdb.apiKeyExists()) {
             log.warn("TMDB api key not set. Some features will not work properly!")
         }

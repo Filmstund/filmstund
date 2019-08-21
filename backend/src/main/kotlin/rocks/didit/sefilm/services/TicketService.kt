@@ -4,6 +4,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.FilmstadenTicketException
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.entities.Seat
 import rocks.didit.sefilm.database.entities.Showing
@@ -23,6 +24,7 @@ import java.util.*
 
 @Service
 class TicketService(
+        private val properties: Properties,
         private val filmstadenService: FilmstadenService,
         private val locationService: LocationService,
         private val userRepository: UserRepository,
@@ -50,7 +52,10 @@ class TicketService(
         userSuppliedTicketUrl.forEach {
             processTicketUrl(it, showing)
         }
-        reassignLeftoverTickets(showing)
+
+        if (properties.enableReassignment) {
+            reassignLeftoverTickets(showing)
+        }
 
         return getTicketsForCurrentUserAndShowing(showingId)
     }
