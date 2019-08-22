@@ -1,7 +1,7 @@
 export const groupSeatingRange = (nums: number[]): number[][] =>
   nums.reduce<{ groups: number[][]; lastElement: number | undefined }>(
     ({ groups, lastElement }, curr) => {
-      if (curr !== (lastElement || 0) + 1) {
+      if (lastElement === undefined  || curr !== lastElement + 1) {
         groups.push([curr]);
       } else {
         groups[groups.length - 1].push(curr);
