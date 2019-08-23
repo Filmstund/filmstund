@@ -50,15 +50,10 @@ const markAsBoughtMutation = gql`
   }
 `;
 
-export const useMarkAsBought = () => {
-  const [mutate] = useMutation<
-    MarkShowingAsBought,
-    MarkShowingAsBoughtVariables
-  >(markAsBoughtMutation);
-
-  return (showingId: string, price: number) =>
-    mutate({
-      variables: { showingId, price },
+export const useMarkAsBought = () =>
+  useMutation<MarkShowingAsBought, MarkShowingAsBoughtVariables>(
+    markAsBoughtMutation,
+    {
       refetchQueries: ["ShowingsQuery"]
-    });
-};
+    }
+  );

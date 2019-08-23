@@ -4,7 +4,6 @@ import {
   TogglePaidChange,
   TogglePaidChangeVariables
 } from "./__generated__/TogglePaidChange";
-import { ParticipantPaymentInput } from "../../../__generated__/globalTypes";
 
 const togglePaidChangeMutation = gql`
   mutation TogglePaidChange($paymentInfo: ParticipantPaymentInput!) {
@@ -15,11 +14,8 @@ const togglePaidChangeMutation = gql`
   }
 `;
 
-export const useTogglePaidChange = () => {
-  const [mutate] = useMutation<TogglePaidChange, TogglePaidChangeVariables>(
-    togglePaidChangeMutation
+export const useTogglePaidChange = () =>
+  useMutation<TogglePaidChange, TogglePaidChangeVariables>(
+    togglePaidChangeMutation,
+    { refetchQueries: ["ShowingsQuery"] }
   );
-
-  return (paymentInfo: ParticipantPaymentInput) =>
-    mutate({ variables: { paymentInfo }, refetchQueries: ["ShowingsQuery"] });
-};
