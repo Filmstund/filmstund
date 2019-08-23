@@ -8,13 +8,9 @@ data class FilmstadenMembershipId(val value: String) {
             if (profileId[3] == '-' && profileId.length == 7) {
                 return FilmstadenMembershipId(profileId.toUpperCase())
             }
-            if (profileId.length != 6) {
-                throw IllegalArgumentException("$profileId does not look like a valid profileId as supplied by Filmstaden")
-            }
+            require(profileId.length == 6) { "$profileId does not look like a valid profileId as supplied by Filmstaden" }
             val split = profileId.split('-', limit = 2)
-            if (split.size == 2 && (split[0].length != 3 || split[1].length != 3)) {
-                throw IllegalArgumentException("'$profileId' is an invalid membership id. Expected XXX-XXX")
-            }
+            require(!(split.size == 2 && (split[0].length != 3 || split[1].length != 3))) { "'$profileId' is an invalid membership id. Expected XXX-XXX" }
 
             return FilmstadenMembershipId("${profileId.substring(0, 3)}-${profileId.substring(3, profileId.length)}".toUpperCase())
         }

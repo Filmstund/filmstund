@@ -32,22 +32,16 @@ class FilmstadenMembershipIdTest {
     }
 
     @Test
-    fun testFormat() {
-        val e = assertThrows(IllegalArgumentException::class.java) { FilmstadenMembershipId("123+456") }
-        assertThat(e).hasMessageContaining("is an invalid membership id. Expected XXX-XXX")
-    }
-
-    @Test
     fun testValueOfWithoutDash() {
         val profileId = "asdfgh"
         val membershipId = FilmstadenMembershipId.valueOf(profileId)
-        assertThat(membershipId.value).isEqualTo("asd-fgh")
+        assertThat(membershipId.value).isEqualTo("ASD-FGH")
     }
 
     @Test
     fun testValueOfWithDash() {
         val profileId = "asd-fgh"
         val membershipId = FilmstadenMembershipId.valueOf(profileId)
-        assertThat(membershipId.value).isEqualTo("asd-fgh")
+        assertThat(membershipId.value).isEqualTo("ASD-FGH")
     }
 }
