@@ -9,7 +9,6 @@ import { navigateToShowing } from "../common/navigators";
 import { FieldWithoutMaxWidth } from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 import { ScreenSeats } from "../ticket/ScreenSeats";
 import {
   TicketQuery_me,
@@ -27,9 +26,8 @@ export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
   const { history } = useRouter();
 
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
-  const { errors, success, mutate: addTickets } = useApolloMutationResult(
-    useAddTickets()
-  );
+  const [addTickets, { error, called, loading }] = useAddTickets();
+  const success = called && !error && !loading;
 
   const handleGoBackToShowing = () => {
     navigateToShowing(history, showing);
@@ -40,7 +38,9 @@ export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
       line => line.trim().length !== 0
     );
 
-    addTickets(showing.id, nonEmptyUrls).then(() => setCinemaTicketUrls([]));
+    addTickets({
+      variables: { showingId: showing.id, tickets: nonEmptyUrls }
+    }).then(() => setCinemaTicketUrls([]));
   };
 
   const { myTickets, ticketRange, filmstadenSeatMap } = showing;
@@ -62,7 +62,7 @@ export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
       {tickets.map(ticket => <Ticket key={ticket.id} ticket={ticket} />)}
       <StatusMessageBox
         success={success}
-        errors={errors}
+        errors={error ? [error] : null}
         successMessage="Uppdaterades!"
       />
       {showing.admin.id === me.id && (

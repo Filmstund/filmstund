@@ -61,11 +61,5 @@ const addTicketsMutation = gql`
   ${ticketFragment}
 `;
 
-export const useAddTickets = () => {
-  const [mutate] = useMutation<AddTickets, AddTicketsVariables>(
-    addTicketsMutation
-  );
-
-  return (showingId: string, tickets: string[]) =>
-    mutate({ variables: { showingId, tickets } });
-};
+export const useAddTickets = () =>
+  useMutation<AddTickets, AddTicketsVariables>(addTicketsMutation);
