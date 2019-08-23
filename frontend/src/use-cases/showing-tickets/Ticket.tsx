@@ -143,11 +143,19 @@ interface TicketCodeProps
   src: string;
 }
 
+const AztecCodeImage = styled.img`
+  width: 128px;
+  height: 128px;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  filter: contrast(2);
+`;
+
 const TicketCode: React.FC<TicketCodeProps> = ({ src, id, profileId }) => {
   return (
     <FlexRowContainer css={{ marginBottom: "1rem" }}>
       <FlexColumnContainer css={{ alignItems: "left" }}>
-        <img alt={id} src={src} css={{ width: "128px", height: "128px" }} />
+        <AztecCodeImage alt={id} src={src} />
         <div>
           {id} {profileId}
         </div>

@@ -158,7 +158,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         >
           <img
             alt="1"
-            class="css-1fdkgj9-TicketCode"
+            class="css-6n2ytg"
             src="this-is-barcode"
           />
           <div>
