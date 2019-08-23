@@ -87,7 +87,7 @@ tasks.register("versionBanner") {
   }
 
     doLast {
-      val git = Grgit.open()
+      val git = Grgit.open(mapOf("currentDir" to project.rootDir))
       val gitHead = git.head()
       val gitCommitId = addPipeToTheEndOfStr(gitHead.id)
       val gitCommitTime = addPipeToTheEndOfStr(gitHead.dateTime)
@@ -109,17 +109,17 @@ tasks.register("versionBanner") {
       bannerFile.writeText(banner, Charsets.UTF_8)
     }
   }
-/*
-  task copyBanner(dependsOn: "versionBanner", type: Copy) {
-    from "build/"
-    include "banner.txt"
-    into "build/resources/main"
-  }
 
-  processResources.dependsOn copyBanner
-
+tasks.register("copyBanner", Copy::class) {
+  dependsOn("versionBanner")
+  from("build/")
+  include("banner.txt")
+  into("build/resources/main")
 }
- */
+
+tasks.named("processResources") {
+  dependsOn("copyBanner")
+}
 
 release {
   preTagCommitMessage = "[Release] - Prepare release: "
