@@ -10,10 +10,11 @@ import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import { ShowingNeue } from "../common/showing/ShowingNeue";
 import { RedHeader } from "../common/ui/RedHeader";
 import { getTodaysDate } from "../../lib/dateTools";
-import isAfter from "date-fns/is_after";
-import isBefore from "date-fns/is_before";
-import isSameDay from "date-fns/is_same_day";
-import subMinutes from "date-fns/sub_minutes";
+import parseISO from "date-fns/parseISO";
+import isAfter from "date-fns/isAfter";
+import isBefore from "date-fns/isBefore";
+import isSameDay from "date-fns/isSameDay";
+import subMinutes from "date-fns/subMinutes";
 import {
   navigateToShowing,
   navigateToShowingTickets
@@ -27,7 +28,7 @@ import { ItsHappeningTitle } from "./ItsHappeningTitle";
 import { EmptyList } from "../common/ui/EmptyList";
 import { PageTitle } from "../common/utils/PageTitle";
 
-const showingDate = showing => showing.date + " " + showing.time;
+const showingDate = showing => parseISO(showing.date + " " + showing.time);
 
 const today = getTodaysDate();
 

@@ -16,11 +16,12 @@ import {
 } from "../common/navigators/index";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
-import isBefore from "date-fns/is_before";
+import isBefore from "date-fns/isBefore";
+import parseISO from "date-fns/parseISO";
 import { EmptyList } from "../common/ui/EmptyList";
 import { PageTitle } from "../common/utils/PageTitle";
 
-const showingDate = showing => showing.date + " " + showing.time;
+const showingDate = showing => parseISO(showing.date + " " + showing.time);
 
 const today = getTodaysDate();
 

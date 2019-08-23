@@ -1,8 +1,8 @@
-import isAfter from "date-fns/is_after";
-import isSameDay from "date-fns/is_same_day";
+import isAfter from "date-fns/isAfter";
+import isSameDay from "date-fns/isSameDay";
 import { PaymentOption, PaymentType } from "../../../__generated__/globalTypes";
 
-import { formatYMD } from "../../../lib/dateTools";
+import { formatYMD, parseDate } from "../../../lib/dateTools";
 import { SingleShowing_me_foretagsbiljetter } from "../containers/__generated__/SingleShowing";
 
 export interface DisplayPaymentOption extends PaymentOption {
@@ -33,7 +33,7 @@ const createForetagsbiljetter = (
     .filter(
       ({ status, expires }) =>
         status === "Available" &&
-        (isSameDay(expires, now) || isAfter(expires, now))
+        (isSameDay(expires, parseDate(now)) || isAfter(expires, parseDate(now)))
     )
     .map(({ number, expires }) =>
       createPaymentOption(
