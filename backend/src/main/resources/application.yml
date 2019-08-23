@@ -70,3 +70,4 @@ graphql:
 logging:
   level:
     rocks.didit: ${logLevel:INFO}
+    rocks.didit.sefilm.logging: INFO
