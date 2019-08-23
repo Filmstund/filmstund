@@ -97,13 +97,14 @@ class Home extends Component {
 
   render() {
     const {
-      data: { showings = [] }
+      data: { showings = [], me }
     } = this.props;
 
     const compareTime = subMinutes(today, 30);
 
     const todayShowings = showings.filter(
       s =>
+        s.participants.some(p => p.user.id === me.id) &&
         isBefore(compareTime, showingDate(s)) &&
         isSameDay(compareTime, showingDate(s))
     );
