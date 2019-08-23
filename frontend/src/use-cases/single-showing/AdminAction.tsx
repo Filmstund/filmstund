@@ -1,17 +1,10 @@
 import gql from "graphql-tag";
 import React, { useCallback, useState } from "react";
-
-import { useMarkAsBought } from "../../apollo/mutations/showings/useMarkAsBought";
-import { useTogglePaidChange } from "../../apollo/mutations/showings/useTogglePaidChange";
-import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 import { useRouter } from "../../lib/useRouter";
 import { navigateToEditShowing } from "../common/navigators";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
-import BuyModal from "./BuyModal";
-import {
-  SingleShowing_showing,
-  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
-} from "./containers/__generated__/SingleShowing";
+import { BuyModal } from "./BuyModal";
+import { SingleShowing_showing } from "./containers/__generated__/SingleShowing";
 import { CopyHighlightStringButton } from "./CopyHighlightStringButton";
 
 interface Props {
@@ -20,69 +13,27 @@ interface Props {
 }
 
 interface State {
-  errors: Error[] | null;
   adminMessage: string | null;
-  ticketPrice: number;
-  cinemaTicketUrls: string[];
-  buyData: null;
   loadingModal: boolean;
   showModal: boolean;
 }
 
-const getInitialState = (showing: SingleShowing_showing): State => ({
-  errors: null,
+const initialState: State = {
   adminMessage: null,
-  ticketPrice: showing.price / 100,
-  cinemaTicketUrls: [],
-  buyData: null,
   loadingModal: false,
   showModal: false
-});
+};
 
 const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
-  const [state, setState] = useState(() => getInitialState(showing));
-  const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
-
-  const { errors, ticketPrice, showModal, loadingModal, adminMessage } = state;
-
-  const setPrice = useCallback(
-    (price: string) => {
-      const priceNumber = parseInt(price, 10);
-
-      setState(state => ({
-        ...state,
-        ticketPrice: priceNumber
-      }));
-    },
-    [setState]
-  );
-
-  const togglePaidChange = useTogglePaidChange();
-
-  const handlePaidChange = useCallback(
-    (
-      info: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
-    ) => {
-      const { id, user, hasPaid, amountOwed } = info;
-
-      togglePaidChange({
-        amountOwed,
-        hasPaid,
-        id,
-        showingId: showing.id,
-        userId: user.id
-      });
-    },
-    [showing, togglePaidChange]
-  );
+  const [state, setState] = useState(initialState);
+  const { showModal, loadingModal, adminMessage } = state;
 
   const handleStartBooking = useCallback(
     async () => {
       setState(state => ({
         ...state,
         showModal: true,
-        loadingModal: true,
-        errors: null
+        loadingModal: true
       }));
 
       await onBeforeOpenBuyModal();
@@ -93,32 +44,6 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
       }));
     },
     [setState, onBeforeOpenBuyModal]
-  );
-
-  const addTickets = useAddTickets();
-  const markAsBought = useMarkAsBought();
-
-  const handleMarkBought = useCallback(
-    () => {
-      const nonEmptyTicketUrls = cinemaTicketUrls.filter(
-        line => line.trim().length !== 0
-      );
-      addTickets(showing.id, nonEmptyTicketUrls)
-        .then(() => markAsBought(showing.id, ticketPrice * 100))
-        .then(() => {
-          setState(state => ({
-            ...state,
-            showModal: false
-          }));
-        })
-        .catch(errors => {
-          setState(state => ({
-            ...state,
-            errors
-          }));
-        });
-    },
-    [addTickets, setState, showing, markAsBought, cinemaTicketUrls, ticketPrice]
   );
 
   const { history } = useRouter();
@@ -136,15 +61,8 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
     <>
       {showModal && (
         <BuyModal
-          errors={errors}
           loading={loadingModal}
-          setPrice={setPrice}
-          setCinemaTicketUrls={setCinemaTicketUrls}
           showing={showing}
-          handleMarkBought={handleMarkBought}
-          handlePaidChange={handlePaidChange}
-          ticketPrice={ticketPrice}
-          cinemaTicketUrls={cinemaTicketUrls}
           closeModal={() => setState(state => ({ ...state, showModal: false }))}
         />
       )}
