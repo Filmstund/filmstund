@@ -56,7 +56,7 @@ class IMDbID(
     }
 
     init {
-        if (value != null && !value.matches(Regex("^tt[0-9]{7}"))) {
+        if (value != null && !value.matches(Regex("^tt[0-9]{7,8}"))) {
             throw IllegalArgumentException("Illegal IMDb ID format: $value")
         }
     }
