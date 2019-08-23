@@ -8,14 +8,14 @@ const DATE_MONTH_TIME = "d MMM HH:mm";
 const HOUR_MINUTE = "HH:mm";
 const DATE_MONTH = "d MMMM yyyy";
 const YMD = "yyyy-MM-dd";
-const ISO_DATE = "yyyy-MM-dd'T'HH:mm:ss.SSSxxx";
+// const ISO_DATE = "yyyy-MM-dd'T'HH:mm:ss.SSSxxx";
 
 const padWithZero = (s: string): string => padStart(s, 2, "0");
 
 const padAndJoinWith = (elems: string[], joiner: string): string =>
   elems.map(padWithZero).join(joiner);
 
-export const getTodaysDate = (): Date => parseDate(format(new Date(), ISO_DATE));
+export const getTodaysDate = (): Date => parseDate(format(new Date(), YMD));
 
 export const showingDateToString = (
   date: string[],
@@ -26,7 +26,7 @@ export const showingDateToString = (
   return dateString + " " + timeString;
 };
 
-export const parseDate = (date: string) => parse(date, YMD, 0);
+export const parseDate = (date: string) => parse(date, YMD, new Date());
 
 export const formatShowingDateTime = (date: string | number | Date): string => {
   if (typeof date === "string") {

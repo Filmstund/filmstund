@@ -6,7 +6,7 @@ import { branch, compose, renderComponent } from "recompose";
 import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
 import { navigateToShowingTickets } from "../../common/navigators";
 import { MissingShowing } from "../../common/showing/MissingShowing";
-import Showing, { showingFragment } from "../../common/showing/Showing";
+import Showing, { oldShowingFragment } from "../../common/showing/Showing";
 import IMDbLink from "../../common/ui/IMDbLink";
 import { ButtonContainer } from "../../common/ui/MainButton";
 import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
@@ -109,7 +109,7 @@ const data = graphql(
     }
     ${ShowingPaymentContainer.fragments.showing}
     ${ShowingPaymentContainer.fragments.currentUser}
-    ${showingFragment}
+    ${oldShowingFragment}
     ${AdminAction.fragments.showing}
     ${ParticipantList.fragments.participant}
   `,

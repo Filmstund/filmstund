@@ -31,14 +31,14 @@ export interface ShowingsQuery_showings_participants {
 
 export interface ShowingsQuery_showings {
   __typename: "Showing";
+  id: any;
   date: string;
   time: string;
+  webId: any;
+  slug: string;
   movie: ShowingsQuery_showings_movie;
   myTickets: ShowingsQuery_showings_myTickets[] | null;
   participants: ShowingsQuery_showings_participants[];
-  id: any;
-  webId: any;
-  slug: string;
 }
 
 export interface ShowingsQuery {

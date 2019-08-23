@@ -3,7 +3,6 @@ import { Header } from "../ui/RedHeader";
 import { faQrcode } from "@fortawesome/free-solid-svg-icons/faQrcode";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons/faChevronRight";
 import { formatShowingDateTime } from "../../../lib/dateTools";
-import gql from "graphql-tag";
 import {
   Box,
   ButtonText,
@@ -51,27 +50,4 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
       </Column>
     </Box>
   );
-};
-
-ShowingNeue.fragments = {
-  showing: gql`
-    fragment ShowingNeue on Showing {
-      date
-      time
-      movie {
-        id
-        poster
-        title
-      }
-      myTickets {
-        id
-      }
-      participants {
-        user {
-          id
-          avatar
-        }
-      }
-    }
-  `
 };
