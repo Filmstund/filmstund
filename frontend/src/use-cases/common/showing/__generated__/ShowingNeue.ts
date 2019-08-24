@@ -31,8 +31,11 @@ export interface ShowingNeue_participants {
 
 export interface ShowingNeue {
   __typename: "Showing";
+  id: any;
   date: string;
   time: string;
+  webId: any;
+  slug: string;
   movie: ShowingNeue_movie;
   myTickets: ShowingNeue_myTickets[] | null;
   participants: ShowingNeue_participants[];

@@ -1,4 +1,4 @@
-import { parse } from "date-fns";
+import parseISO from "date-fns/parseISO";
 import { keys } from "lodash-es";
 import React, { lazy } from "react";
 import { formatYMD } from "../../../lib/dateTools";
@@ -40,7 +40,7 @@ export const FilmstadenShowingSelector: React.FC<
     <>
       <Field text="Datum:">
         <DatePicker
-          value={parse(date)}
+          value={parseISO(date)}
           onChange={handleChange}
           disabledDays={{ before: today }}
           modifiers={{

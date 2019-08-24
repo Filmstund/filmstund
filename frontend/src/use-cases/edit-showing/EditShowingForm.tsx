@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import addDays from "date-fns/add_days";
+import addDays from "date-fns/addDays";
 import React, { useCallback, useState } from "react";
 import { DataProps } from "react-apollo";
 import { RouteChildrenProps } from "react-router";
