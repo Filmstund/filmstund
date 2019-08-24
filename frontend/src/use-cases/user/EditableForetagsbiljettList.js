@@ -12,7 +12,7 @@ import { useApolloMutationResult } from "../common/utils/useApolloMutationResult
 import { margin } from "../../lib/style-vars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import addYears from "date-fns/add_years";
+import addYears from "date-fns/addYears";
 import Foretagsbiljett from "./Foretagsbiljett";
 
 const DEFAULT_DATE = addYears(new Date(), 1);

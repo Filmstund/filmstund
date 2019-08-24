@@ -1,8 +1,7 @@
-import format from "date-fns/format";
-import isAfter from "date-fns/is_after";
+import isAfter from "date-fns/isAfter";
 import React, { ChangeEvent, useState } from "react";
 import { CreateShowingInput } from "../../__generated__/globalTypes";
-import { formatLocalTime, formatYMD } from "../../lib/dateTools";
+import { formatLocalTime, formatYMD, parseDate } from "../../lib/dateTools";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
 import Field from "../common/ui/Field";
@@ -46,13 +45,13 @@ const getInitialState = (props: Props): ShowingState => {
 
   let date = now;
 
-  if (movie && isAfter(movie.releaseDate, now)) {
+  if (movie && isAfter(parseDate(movie.releaseDate), now)) {
     date = new Date(movie.releaseDate);
   }
 
   return {
     date: formatYMD(date),
-    time: format(now, "HH:mm"),
+    time: formatLocalTime(now),
     location: "",
     filmstadenRemoteEntityId: null,
     filmstadenScreen: null,

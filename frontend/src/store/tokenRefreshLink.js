@@ -1,6 +1,6 @@
 import { getExpiresAt, setUserInfo } from "../lib/session";
-import isAfter from "date-fns/is_after";
-import addMinutes from "date-fns/add_minutes";
+import isAfter from "date-fns/isAfter";
+import addMinutes from "date-fns/addMinutes";
 import { setContext } from "apollo-link-context";
 
 export const tokenRefresh = setContext(async (req, { headers }) => {

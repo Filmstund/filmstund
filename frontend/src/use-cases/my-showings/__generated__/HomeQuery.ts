@@ -36,14 +36,14 @@ export interface HomeQuery_showings_admin {
 
 export interface HomeQuery_showings {
   __typename: "Showing";
+  id: any;
   date: string;
   time: string;
+  webId: any;
+  slug: string;
   movie: HomeQuery_showings_movie;
   myTickets: HomeQuery_showings_myTickets[] | null;
   participants: HomeQuery_showings_participants[];
-  id: any;
-  webId: any;
-  slug: string;
   admin: HomeQuery_showings_admin;
 }
 

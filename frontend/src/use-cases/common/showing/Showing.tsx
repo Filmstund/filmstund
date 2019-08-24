@@ -93,7 +93,7 @@ export const movieFragment = gql`
   }
 `;
 
-export const showingFragment = gql`
+export const oldShowingFragment = gql`
   fragment OldShowing on Showing {
     id
     webId

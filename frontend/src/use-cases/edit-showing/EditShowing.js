@@ -3,7 +3,7 @@ import { withRouter } from "react-router";
 import gql from "graphql-tag";
 import { withProps, renderComponent, branch, compose } from "recompose";
 import EditShowingForm from "./EditShowingForm";
-import { showingFragment } from "../common/showing/Showing";
+import { oldShowingFragment } from "../common/showing/Showing";
 import Loader from "../common/utils/ProjectorLoader";
 
 const routerParamsToShowingId = ({ match }) => {
@@ -34,7 +34,7 @@ const data = graphql(
         name
       }
     }
-    ${showingFragment}
+    ${oldShowingFragment}
   `,
   { options: { errorPolicy: "ignore", fetchPolicy: "cache-and-network" } }
 );

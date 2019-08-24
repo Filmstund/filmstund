@@ -62,6 +62,7 @@ export interface MarkShowingAsBought_markAsBought {
   private: boolean;
   payToUser: MarkShowingAsBought_markAsBought_payToUser;
   expectedBuyDate: string | null;
+  date: string;
   time: string;
   myTickets: MarkShowingAsBought_markAsBought_myTickets[] | null;
   attendeePaymentDetails: MarkShowingAsBought_markAsBought_attendeePaymentDetails | null;
