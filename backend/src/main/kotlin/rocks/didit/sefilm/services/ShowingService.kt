@@ -14,22 +14,24 @@ import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.events.*
 import rocks.didit.sefilm.services.external.FilmstadenService
+import rocks.didit.sefilm.services.external.SlackService
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
 
 @Service
 class ShowingService(
-  private val showingRepo: ShowingRepository,
-  private val paymentInfoRepo: ParticipantPaymentInfoRepository,
-  private val movieService: MovieService,
-  private val userService: UserService,
-  private val ticketService: TicketService,
-  private val slugService: SlugService,
-  private val filmstadenService: FilmstadenService,
-  private val locationService: LocationService,
-  private val eventPublisher: EventPublisher,
-  private val assertionService: AssertionService
+        private val showingRepo: ShowingRepository,
+        private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+        private val movieService: MovieService,
+        private val userService: UserService,
+        private val ticketService: TicketService,
+        private val slugService: SlugService,
+        private val filmstadenService: FilmstadenService,
+        private val locationService: LocationService,
+        private val eventPublisher: EventPublisher,
+        private val assertionService: AssertionService,
+        private val slackService: SlackService
 ) {
 
   companion object {
@@ -183,7 +185,8 @@ class ShowingService(
         )
       )
       .also {
-        eventPublisher.publish(NewShowingEvent(this, it, adminUser))
+          slackService.postNewShowing(it)
+          eventPublisher.publish(NewShowingEvent(this, it, adminUser))
       }
       .toDto()
   }

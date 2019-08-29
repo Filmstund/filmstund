@@ -16,6 +16,8 @@ class Properties {
 
   var notification = Notification()
 
+    var slack = Slack()
+
   class Tmdb {
     var apikey: String? = null
     fun apiKeyExists(): Boolean {
@@ -47,4 +49,8 @@ class Properties {
     var url: String = ""
     var validateUrl: String = ""
   }
+
+    class Slack {
+        var slackHookUrl: String = ""
+    }
 }
