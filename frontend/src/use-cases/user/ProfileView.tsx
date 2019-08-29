@@ -14,7 +14,7 @@ import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 import { UserProfile_me } from "./__generated__/UserProfile";
 
-import ForetagsbiljettListContainer from "./ForetagsbiljettListContainer";
+import ForetagsbiljettList from "./ForetagsbiljettList";
 
 const Box = styled.div`
   background: #fff;
@@ -126,7 +126,7 @@ const Profile: React.FC<Props> = ({ me }) => {
         {me.calendarFeedUrl && <CopyValue text={me.calendarFeedUrl} />}
       </FieldWithoutMaxWidth>
       <MainButton onClick={handleSubmit}>Spara användare</MainButton>
-      <ForetagsbiljettListContainer foretagsbiljetter={me.foretagsbiljetter} />
+      <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter || []} />
     </PageWidthWrapper>
   );
 };

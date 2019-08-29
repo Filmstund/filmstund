@@ -20,7 +20,7 @@ interface Props {
   meId?: string;
   isAdmin?: boolean;
   participants: SingleShowing_showing_participants[];
-  showPhone: boolean;
+  showPhone?: boolean;
   onClickItem?: (userId: string) => void;
 }
 
@@ -28,38 +28,39 @@ const ParticipantsList: React.FC<Props> = ({
   meId,
   isAdmin = false,
   participants,
-  showPhone,
+  showPhone = false,
   onClickItem
 }) => {
   return (
     <div>
       <SmallHeader>{participants.length} Deltagare</SmallHeader>
       <ParticipantContainer>
-        {participants.map((participant) => {
-
+        {participants.map(participant => {
           const user = participant.user!;
 
           return (
             <UserItem key={user.id} showPhone={showPhone} user={user}>
               {isAdmin &&
-              user.id !== meId && (
-                <div
-                  css={{
-                    display: "inline-block",
-                    cursor: "pointer",
-                    marginTop: 10,
-                    padding: 5
-                  }}
-                  onClick={() =>
-                    window.confirm(
-                      `Vill du ge admin till ${user.nick ||
-                      user.firstName}? (Detta går ej att ångra!)`
-                    ) && onClickItem && onClickItem(user.id)
-                  }
-                >
-                  <FontAwesomeIcon icon={faUserTie}/> Ge admin
-                </div>
-              )}
+                user.id !== meId && (
+                  <div
+                    css={{
+                      display: "inline-block",
+                      cursor: "pointer",
+                      marginTop: 10,
+                      padding: 5
+                    }}
+                    onClick={() =>
+                      window.confirm(
+                        `Vill du ge admin till ${user.nick ||
+                          user.firstName}? (Detta går ej att ångra!)`
+                      ) &&
+                      onClickItem &&
+                      onClickItem(user.id)
+                    }
+                  >
+                    <FontAwesomeIcon icon={faUserTie} /> Ge admin
+                  </div>
+                )}
             </UserItem>
           );
         })}
@@ -68,18 +69,16 @@ const ParticipantsList: React.FC<Props> = ({
   );
 };
 
-(ParticipantsList as any).fragments = {
-  participant: gql`
-    fragment ParticipantsList on Participant {
-      user {
-        ...UserItem
-        id
-        nick
-        firstName
-      }
+export const participantsListFragment = gql`
+  fragment ParticipantsList on Participant {
+    user {
+      ...UserItem
+      id
+      nick
+      firstName
     }
-    ${userItemFragments.user}
-  `
-};
+  }
+  ${userItemFragments.user}
+`;
 
 export default ParticipantsList;

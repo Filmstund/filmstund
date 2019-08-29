@@ -4,12 +4,11 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addDays from "date-fns/addDays";
 import React, { useCallback, useState } from "react";
-import { DataProps } from "react-apollo";
-import { RouteChildrenProps } from "react-router";
 import { useDeleteShowing } from "../../apollo/mutations/showings/useDeleteShowing";
 import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
 import { formatLocalTime, formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
+import { useRouter } from "../../lib/useRouter";
 import * as navigators from "../common/navigators/index";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
@@ -22,7 +21,10 @@ import MainButton, { RedButton } from "../common/ui/MainButton";
 import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { SfShowingsQuery_movie_showings } from "../new-showing/hooks/__generated__/SfShowingsQuery";
-import { EditShowing, EditShowing_showing } from "./__generated__/EditShowing";
+import {
+  EditShowing_previousLocations,
+  EditShowing_showing
+} from "./__generated__/EditShowing";
 
 const today = new Date();
 
@@ -55,20 +57,19 @@ const getInitialState = (
   price: showing.price !== null ? String(showing.price / 100) : ""
 });
 
-interface Props
-  extends DataProps<EditShowing>,
-    RouteChildrenProps<{ webId: string }> {}
+interface Props {
+  showing: EditShowing_showing;
+  previousLocations: EditShowing_previousLocations[];
+}
 
-const EditShowingForm: React.FC<Props> = ({ data, history }) => {
-  const showing = data.showing!;
+const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
+  const { history } = useRouter();
   const [errors, setErrors] = useState<Error[] | null>(null);
   const [formState, setFormState] = useState<EditShowingFormShowing>(() =>
     getInitialState(showing)
   );
 
   const { movie, admin, ticketsBought } = showing;
-
-  const previousLocations = data.previousLocations || [];
 
   const updateShowing = useUpdateShowing();
   const deleteShowing = useDeleteShowing();

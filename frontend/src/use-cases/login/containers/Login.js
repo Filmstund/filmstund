@@ -1,25 +1,19 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { compose } from "recompose";
 import googleIcon from "./assets/google-logo.svg";
 import itbioLogo from "./assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
-import {
-  setUserInfo,
-  clearSession,
-  getGoogleId,
-  hasToken
-} from "../../../lib/session";
+import { clearSession, getGoogleId, hasToken, setUserInfo } from "../../../lib/session";
 import { provideGoogleLogin } from "./GoogleLoginProvider";
 import {
   Container,
   ContentContainer,
-  LoginContainer,
   ErrorBox,
-  LoginDialog,
   GoogleButton,
-  GoogleLogo
+  GoogleLogo,
+  LoginContainer,
+  LoginDialog
 } from "../components/login-styles";
 
 class Login extends Component {
@@ -131,7 +125,4 @@ class Login extends Component {
   }
 }
 
-export default compose(
-  withRouter,
-  provideGoogleLogin
-)(Login);
+export default withRouter(provideGoogleLogin(Login));
