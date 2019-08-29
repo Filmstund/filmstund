@@ -82,46 +82,44 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
   );
 };
 
-(AdminAction as any).fragments = {
-  showing: gql`
-    fragment ShowingAdmin on Showing {
+export const adminActionFragments = gql`
+  fragment ShowingAdmin on Showing {
+    id
+    price
+    private
+    filmstadenRemoteEntityId
+    filmstadenScreen {
+      filmstadenId
+      name
+    }
+    payToUser {
       id
-      price
-      private
-      filmstadenRemoteEntityId
-      filmstadenScreen {
-        filmstadenId
-        name
-      }
-      payToUser {
-        id
-      }
-      adminPaymentDetails {
-        filmstadenBuyLink
-        filmstadenData {
-          user {
-            id
-            nick
-            firstName
-            lastName
-          }
-          filmstadenMembershipId
-          foretagsbiljett
-        }
-        participantPaymentInfos {
+    }
+    adminPaymentDetails {
+      filmstadenBuyLink
+      filmstadenData {
+        user {
           id
-          hasPaid
-          amountOwed
-          user {
-            id
-            nick
-            name
-            phone
-          }
+          nick
+          firstName
+          lastName
+        }
+        filmstadenMembershipId
+        foretagsbiljett
+      }
+      participantPaymentInfos {
+        id
+        hasPaid
+        amountOwed
+        user {
+          id
+          nick
+          name
+          phone
         }
       }
     }
-  `
-};
+  }
+`;
 
 export default AdminAction;
