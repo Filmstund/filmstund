@@ -5,6 +5,7 @@ import graphql.ExceptionWhileDataFetching
 import graphql.GraphQLError
 import graphql.execution.DataFetcherExceptionHandler
 import graphql.execution.DataFetcherExceptionHandlerParameters
+import graphql.execution.DataFetcherExceptionHandlerResult
 import graphql.language.SourceLocation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,9 +17,9 @@ import rocks.didit.sefilm.KnownException
 class GraphqlExceptionHandler : DataFetcherExceptionHandler {
   private val log: Logger = LoggerFactory.getLogger(GraphqlExceptionHandler::class.java)
 
-  override fun accept(handlerParameters: DataFetcherExceptionHandlerParameters) {
+  override fun onException(handlerParameters: DataFetcherExceptionHandlerParameters): DataFetcherExceptionHandlerResult {
     val exception = handlerParameters.exception
-    val sourceLocation = handlerParameters.field.sourceLocation
+    val sourceLocation = handlerParameters.sourceLocation
     val path = handlerParameters.path
 
     val graphqlError = when (exception) {
@@ -33,8 +34,9 @@ class GraphqlExceptionHandler : DataFetcherExceptionHandler {
         ExceptionWhileDataFetching(path, exception, sourceLocation)
       }
     }
-    handlerParameters.executionContext.addError(graphqlError, path)
-
+    return DataFetcherExceptionHandlerResult.Builder()
+      .error(graphqlError)
+      .build()
   }
 
   private fun createFetchingError(msg: String, extensions: Map<String, Any?> = mapOf()): GraphQLError {
