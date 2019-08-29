@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.execution.AsyncExecutionStrategy
-import graphql.servlet.ObjectMapperConfigurer
+import graphql.servlet.config.ObjectMapperConfigurer
 import org.apache.http.client.HttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.slf4j.LoggerFactory
