@@ -35,6 +35,8 @@ sefilm:
   google:
     clientId: 692064172675-montab9pi57304e68r932c6lm7111oaf.apps.googleusercontent.com
     jwkUri: https://www.googleapis.com/oauth2/v3/certs
+  slack:
+    slackHookUrl: ${slackHookUrl}
 
   # Whetever or not tickets should be auto assigned to other than admin
   enableReassignment: ${enableReassignment:true}
