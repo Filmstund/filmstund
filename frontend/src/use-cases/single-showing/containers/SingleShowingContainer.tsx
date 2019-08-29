@@ -1,9 +1,9 @@
 import gql from "graphql-tag";
 import React, { useCallback, useState } from "react";
-import { graphql } from "react-apollo";
-import { branch, compose, renderComponent } from "recompose";
+import { useQuery } from "react-apollo";
 
 import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
+import { useRouter } from "../../../lib/useRouter";
 import { navigateToShowingTickets } from "../../common/navigators";
 import { MissingShowing } from "../../common/showing/MissingShowing";
 import Showing, { oldShowingFragment } from "../../common/showing/Showing";
@@ -12,25 +12,40 @@ import { ButtonContainer } from "../../common/ui/MainButton";
 import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
 import Loader from "../../common/utils/ProjectorLoader";
 import { useScrollToTop } from "../../common/utils/useScrollToTop";
-import AdminAction from "../AdminAction";
-import ParticipantList from "../components/ParticipantsList";
+import AdminAction, { adminActionFragments } from "../AdminAction";
+import ParticipantList, {
+  participantsListFragment
+} from "../components/ParticipantsList";
 import SwishModal from "../components/SwishModal";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
+import {
+  SingleShowing,
+  SingleShowing_me,
+  SingleShowing_showing,
+  SingleShowingVariables
+} from "./__generated__/SingleShowing";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
 
-const SingleShowingContainer = ({
-  data: { me, showing, refetch },
-  history
-}) => {
+interface Props {
+  me: SingleShowing_me;
+  showing: SingleShowing_showing;
+  refetch: () => Promise<unknown>;
+}
+
+const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
+  const { history } = useRouter();
   const [openModal, setOpenModal] = useState(false);
 
   const promoteToAdmin = usePromoteToAdmin();
 
   useScrollToTop();
 
-  const navigateToTickets = useCallback(() => {
-    navigateToShowingTickets(history, showing);
-  }, [history, showing]);
+  const navigateToTickets = useCallback(
+    () => {
+      navigateToShowingTickets(history, showing);
+    },
+    [history, showing]
+  );
 
   const openSwish = useCallback(swishLink => {
     setOpenModal(true);
@@ -84,53 +99,61 @@ const SingleShowingContainer = ({
   );
 };
 
-const data = graphql(
-  gql`
-    query SingleShowing($webId: Base64ID!) {
-      me: currentUser {
-        ...PendingShowing
-        id
-      }
-      showing(webId: $webId) {
-        ...OldShowing
-        ...ShowingAdmin
-        ...BoughtShowing
-        webId
-        slug
-        price
-        private
-        movie {
-          imdbId
+const useSingleShowingData = (webId: string) =>
+  useQuery<SingleShowing, SingleShowingVariables>(
+    gql`
+      query SingleShowing($webId: Base64ID!) {
+        me: currentUser {
+          ...PendingShowing
+          id
         }
-        participants {
-          ...ParticipantsList
+        showing(webId: $webId) {
+          ...OldShowing
+          ...ShowingAdmin
+          ...BoughtShowing
+          webId
+          slug
+          price
+          private
+          movie {
+            imdbId
+          }
+          participants {
+            ...ParticipantsList
+          }
         }
       }
-    }
-    ${ShowingPaymentContainer.fragments.showing}
-    ${ShowingPaymentContainer.fragments.currentUser}
-    ${oldShowingFragment}
-    ${AdminAction.fragments.showing}
-    ${ParticipantList.fragments.participant}
-  `,
-  {
-    options: ({ webId }) => ({
+      ${ShowingPaymentContainer.fragments.showing}
+      ${ShowingPaymentContainer.fragments.currentUser}
+      ${oldShowingFragment}
+      ${adminActionFragments}
+      ${participantsListFragment}
+    `,
+    {
       errorPolicy: "ignore",
       fetchPolicy: "cache-and-network",
       variables: { webId }
-    })
+    }
+  );
+
+const SingleShowingLoader: React.FC<{ webId: string }> = ({ webId }) => {
+  const { data, loading, refetch } = useSingleShowingData(webId);
+
+  if (!data || loading) {
+    return <Loader />;
   }
-);
 
-const isLoading = branch(({ data: { me } }) => !me, renderComponent(Loader));
+  if (!data.showing) {
+    return <MissingShowing />;
+  }
 
-const is404 = branch(
-  ({ data: { showing } }) => !showing,
-  renderComponent(MissingShowing)
-);
+  return (
+    <SingleShowingContainer
+      showing={data.showing}
+      me={data.me}
+      refetch={refetch}
+    />
+  );
+};
 
-export default compose(
-  data,
-  isLoading,
-  is404
-)(SingleShowingContainer);
+export default SingleShowingLoader;

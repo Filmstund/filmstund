@@ -1,14 +1,14 @@
-import React, { lazy } from "react";
-
 import styled from "@emotion/styled";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { lazy } from "react";
+import { formatYMD } from "../../lib/dateTools";
+import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
 import Field from "../../use-cases/common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
-import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
-import { formatYMD } from "../../lib/dateTools";
 import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
+import { UserProfile_me_foretagsbiljetter } from "./__generated__/UserProfile";
 
 const DatePickerInput = lazy(() =>
   import("../../use-cases/common/ui/date-picker/DatePickerInput")
@@ -34,7 +34,7 @@ const BiljettField = styled(Field)`
   padding: 0 0.5em;
 `;
 
-const localizeTicketStatus = status => {
+const localizeTicketStatus = (status: string) => {
   switch (status) {
     case "Available":
       return "Tillgänglig";
@@ -55,7 +55,7 @@ const ValueField = styled.div`
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
 
-const DateInput = ({ onChange, ...props }) => {
+const DateInput = ({ onChange, ...props }: any) => {
   const handleChange = useHandleChangeEvent(onChange);
 
   if (isIOS) {
@@ -65,9 +65,27 @@ const DateInput = ({ onChange, ...props }) => {
   }
 };
 
-const Foretagsbiljett = ({
+interface EditableForetagsbiljettProps {
+  biljett: UserProfile_me_foretagsbiljetter;
+  editable: true;
+  handleChangeForetagsbiljett: () => void;
+  handleSetExpiresForetagsbiljett: () => void;
+  handleRemoveForetagsbiljett: () => void;
+}
+
+interface ForetagsbiljettProps {
+  biljett: UserProfile_me_foretagsbiljetter;
+  editable: false;
+  handleChangeForetagsbiljett?: undefined;
+  handleSetExpiresForetagsbiljett?: undefined;
+  handleRemoveForetagsbiljett: () => void;
+}
+
+type Props = EditableForetagsbiljettProps | ForetagsbiljettProps;
+
+const Foretagsbiljett: React.FC<Props> = ({
   biljett,
-  editable = true,
+  editable,
   handleChangeForetagsbiljett,
   handleSetExpiresForetagsbiljett,
   handleRemoveForetagsbiljett
@@ -101,11 +119,9 @@ const Foretagsbiljett = ({
       </BiljettField>
     )}
 
-    <IconButton
-      size="2x"
-      icon={faTrash}
-      onClick={handleRemoveForetagsbiljett}
-    />
+    <div onClick={handleRemoveForetagsbiljett}>
+      <IconButton size="2x" icon={faTrash} />
+    </div>
   </ForetagsbiljettWrapper>
 );
 

@@ -1,21 +1,27 @@
 import React, { useCallback } from "react";
 
-import { SmallHeader } from "../../use-cases/common/ui/Header";
-
-import Foretagsbiljett from "./Foretagsbiljett";
+import { SmallHeader } from "../common/ui/Header";
+import { UserProfile_me_foretagsbiljetter } from "./__generated__/UserProfile";
 import EditableForetagsbiljettList from "./EditableForetagsbiljettList";
 
-const ForetagsbiljettList = ({
-  addForetagsbiljett,
-  deleteForetagsbiljett,
-  foretagsbiljetter = []
-}) => {
+import Foretagsbiljett from "./Foretagsbiljett";
+import { useDeleteForetagsbiljett } from "./useDeleteForetagsbiljett";
+
+interface Props {
+  foretagsbiljetter: UserProfile_me_foretagsbiljetter[];
+}
+
+const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
+  const [deleteForetagsbiljett] = useDeleteForetagsbiljett();
+
   const handleDeleteForetagsBiljett = useCallback(
-    ({ status, number, expires }) => {
+    ({ status, number, expires }: UserProfile_me_foretagsbiljetter) => {
       switch (status) {
         case "Available":
           if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
-            deleteForetagsbiljett({ number, expires });
+            deleteForetagsbiljett({
+              variables: { ticket: { number, expires } }
+            });
           }
           break;
         case "Pending":
@@ -25,7 +31,7 @@ const ForetagsbiljettList = ({
           break;
         case "Used":
         case "Expired":
-          deleteForetagsbiljett({ number, expires });
+          deleteForetagsbiljett({ variables: { ticket: { number, expires } } });
           break;
         default:
           throw new Error(`Invalid status ${status}`);
@@ -47,7 +53,7 @@ const ForetagsbiljettList = ({
           }
         />
       ))}
-      <EditableForetagsbiljettList addForetagsbiljett={addForetagsbiljett} />
+      <EditableForetagsbiljettList />
     </div>
   );
 };

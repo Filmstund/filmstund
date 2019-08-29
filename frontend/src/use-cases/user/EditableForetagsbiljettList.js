@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 import styled from "@emotion/styled";
 import { uniqueId } from "lodash-es";
@@ -7,13 +7,13 @@ import MainButton from "../../use-cases/common/ui/MainButton";
 import { formatYMD } from "../../lib/dateTools";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons/faPlusCircle";
-import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 
 import { margin } from "../../lib/style-vars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import addYears from "date-fns/addYears";
 import Foretagsbiljett from "./Foretagsbiljett";
+import { useAddForetagsbiljett } from "./useAddForetagsbiljett";
 
 const DEFAULT_DATE = addYears(new Date(), 1);
 
@@ -30,23 +30,27 @@ const AddForetagsbiljettContainer = styled.div`
 
 const EditableForetagsbiljettList = props => {
   const [tickets, setTickets] = useState([]);
+  const [
+    saveForetagsBiljetter,
+    { called, loading, error }
+  ] = useAddForetagsbiljett();
+  const success = called && !error && !loading;
 
-  const {
-    errors,
-    success,
-    mutate: saveForetagsBiljetter
-  } = useApolloMutationResult(props.addForetagsbiljett);
+  const onClickSubmit = useCallback(
+    () => {
+      const ticketsToSubmit = tickets
+        .filter(({ number }) => number && number.trim())
+        .map(({ number, expires }) => ({
+          number,
+          expires: formatYMD(expires)
+        }));
 
-  const onClickSubmit = useCallback(() => {
-    const ticketsToSubmit = tickets
-      .filter(({ number }) => number && number.trim())
-      .map(({ number, expires }) => ({
-        number,
-        expires: formatYMD(expires)
-      }));
-
-    return saveForetagsBiljetter(ticketsToSubmit).then(() => setTickets([]));
-  }, [saveForetagsBiljetter, tickets]);
+      return saveForetagsBiljetter({
+        variables: { biljetter: ticketsToSubmit }
+      }).then(() => setTickets([]));
+    },
+    [saveForetagsBiljetter, tickets]
+  );
 
   const addForetagsbiljett = useCallback(() => {
     const foretagsbiljett = {
@@ -95,7 +99,7 @@ const EditableForetagsbiljettList = props => {
       </AddForetagsbiljettContainer>
       <MainButton onClick={onClickSubmit}>Spara företagsbiljetter</MainButton>
       <StatusMessageBox
-        errors={errors}
+        errors={error ? error.graphQLErrors : null}
         success={success}
         successMessage="Företagsbiljetter uppdaterades!"
       />
