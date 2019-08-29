@@ -4,21 +4,21 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 data class FilmstadenTicketDTO(
-        val id: String,
-        val profileId: String?,
-        val customerTypeDefinition: String,
-        val customerType: String,
-        val qrCode: String,
-        val toiletCode: String,
-        val isRefunded: Boolean,
-        val cinema: FilmstadenCinemaDTO,
-        val movie: FilmstadenNamedMovieDTO,
-        val show: FilmstadenTicketShowDTO,
-        val seat: FilmstadenSeatDTO,
-        val screen: FilmstadenTicketScreenDTO,
-        val receipt: Map<String, Any>,
-        val labels: Map<String, Any?>,
-        val products: List<Map<Any, Any>>
+  val id: String,
+  val profileId: String?,
+  val customerTypeDefinition: String,
+  val customerType: String,
+  val qrCode: String,
+  val toiletCode: String,
+  val isRefunded: Boolean,
+  val cinema: FilmstadenCinemaDTO,
+  val movie: FilmstadenNamedMovieDTO,
+  val show: FilmstadenTicketShowDTO,
+  val seat: FilmstadenSeatDTO,
+  val screen: FilmstadenTicketScreenDTO,
+  val receipt: Map<String, Any>,
+  val labels: Map<String, Any?>,
+  val products: List<Map<Any, Any>>
 )
 
 data class FilmstadenCinemaDTO(val city: FilmstadenCityDTO, val title: String, val company: Map<String, Any?>)
@@ -31,11 +31,17 @@ data class FilmstadenNamedMovieDTO(val title: String, val rating: FilmstadenDisp
 
 data class FilmstadenDisplayNameDTO(val displayName: String)
 
-data class FilmstadenSeatDTO(val number: Int, val row: Int, val section: String, val type: String, val unnumberedText: String?)
+data class FilmstadenSeatDTO(
+  val number: Int,
+  val row: Int,
+  val section: String,
+  val type: String,
+  val unnumberedText: String?
+)
 
 data class FilmstadenTicketShowDTO(
-        val attributes: List<FilmstadenDisplayNameDTO>,
-        val date: LocalDate,
-        val time: LocalTime,
-        val unnumbered: Boolean
+  val attributes: List<FilmstadenDisplayNameDTO>,
+  val date: LocalDate,
+  val time: LocalTime,
+  val unnumbered: Boolean
 )

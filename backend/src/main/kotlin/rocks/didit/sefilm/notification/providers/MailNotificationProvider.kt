@@ -11,24 +11,31 @@ import rocks.didit.sefilm.notification.MailSettings
 import rocks.didit.sefilm.notification.ProviderHelper
 
 @Component
-@ConditionalOnProperty(prefix = "sefilm.notification.provider.MailProvider", name = ["enabled"], matchIfMissing = true, havingValue = "true")
-class MailNotificationProvider(private val providerHelper: ProviderHelper) : NotificationProvider<MailSettings>, ApplicationListener<NotificationEvent> {
+@ConditionalOnProperty(
+  prefix = "sefilm.notification.provider.MailProvider",
+  name = ["enabled"],
+  matchIfMissing = true,
+  havingValue = "true"
+)
+class MailNotificationProvider(private val providerHelper: ProviderHelper) : NotificationProvider<MailSettings>,
+  ApplicationListener<NotificationEvent> {
 
-    private val log = LoggerFactory.getLogger(MailNotificationProvider::class.java)
+  private val log = LoggerFactory.getLogger(MailNotificationProvider::class.java)
 
-    override fun getNotifiableUsers(knownRecipients: List<UserID>): List<NotifiableUser<MailSettings>> = providerHelper.getNotifiableUsers(knownRecipients, MailSettings::class)
-            .filter { it.notificationSettings.mailAddress != null }
+  override fun getNotifiableUsers(knownRecipients: List<UserID>): List<NotifiableUser<MailSettings>> =
+    providerHelper.getNotifiableUsers(knownRecipients, MailSettings::class)
+      .filter { it.notificationSettings.mailAddress != null }
 
-    @Async
-    override fun onApplicationEvent(event: NotificationEvent) {
-        getNotifiableUsers(event.potentialRecipients).forEach { user ->
-            if (user.enabledTypes.contains(event.type)) {
-                // TODO: actually send mail
-                log.debug("(Not-actually) Sending mail notification to ${user.notificationSettings.mailAddress}")
-            }
-        }
+  @Async
+  override fun onApplicationEvent(event: NotificationEvent) {
+    getNotifiableUsers(event.potentialRecipients).forEach { user ->
+      if (user.enabledTypes.contains(event.type)) {
+        // TODO: actually send mail
+        log.debug("(Not-actually) Sending mail notification to ${user.notificationSettings.mailAddress}")
+      }
     }
+  }
 
-    override val name = "E-Mail"
-    override val isSubscribable = true
+  override val name = "E-Mail"
+  override val isSubscribable = true
 }
