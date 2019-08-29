@@ -12,9 +12,11 @@ import QuoteBox from "./QuoteBox";
 const Bioord: React.FC<{ biobudord: BioordQuery_allBiobudord[] }> = ({
   biobudord
 }) => {
-  const { faded, value } = useFadeBetweenValues(biobudord, sample);
+  const { faded, value: budord } = useFadeBetweenValues(biobudord, sample);
 
-  const budord = value!;
+  if (!budord) {
+    return null;
+  }
 
   return (
     <QuoteBox faded={faded} number={budord.number}>
