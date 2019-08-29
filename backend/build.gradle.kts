@@ -33,49 +33,47 @@ tasks.withType<Test> {
 }
 
 dependencies {
-  compile("com.graphql-java:graphql-spring-boot-starter:5.0.2")
+  implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:5.10.0")
 //  UI for GraphQL queries available at /graphiql
-//  compile("com.graphql-java:graphiql-spring-boot-starter:5.0.2")
-  compile("com.graphql-java:graphql-java-tools:5.2.4")
-  compile("com.graphql-java:graphql-java:9.4")
-  compile("org.springframework.boot:spring-boot-starter-web-services")
-  compile("org.springframework.boot:spring-boot-starter-logging")
-  compile("org.springframework.boot:spring-boot-starter-data-mongodb")
-  compile("org.springframework.boot:spring-boot-starter-cache")
-  compile("org.springframework.boot:spring-boot-starter-security")
-  compile("org.springframework.boot:spring-boot-starter-mustache")
-  compile("org.springframework.security:spring-security-jwt:1.0.10.RELEASE")
-  compile("org.springframework.security.oauth:spring-security-oauth2:2.3.6.RELEASE")
-  compile("org.springframework.boot:spring-boot-devtools")
+//  compile("com.graphql-java-kickstart:graphiql-spring-boot-starter:5.10.0")
+  implementation("org.springframework.boot:spring-boot-starter-web-services")
+  implementation("org.springframework.boot:spring-boot-starter-logging")
+  implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+  implementation("org.springframework.boot:spring-boot-starter-cache")
+  implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.boot:spring-boot-starter-mustache")
+  implementation("org.springframework.security:spring-security-jwt:1.0.10.RELEASE")
+  implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.6.RELEASE")
+  implementation("org.springframework.boot:spring-boot-devtools")
 
 
   /* The below is fix for kotlin-reflect in 1.2.20 */
-  compile("org.springframework.data:spring-data-mongodb")
-  compile("org.springframework.data:spring-data-commons")
+  implementation("org.springframework.data:spring-data-mongodb")
+  implementation("org.springframework.data:spring-data-commons")
 
-  compile("com.github.ben-manes.caffeine:caffeine:2.+")
-  compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
-  compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.+")
-  compile("com.googlecode.libphonenumber:libphonenumber:8.10.17")
-  compile("com.google.guava:guava:28.0-jre")
-  compile("net.sf.biweekly:biweekly:0.6.3")
+  implementation("com.github.ben-manes.caffeine:caffeine:2.+")
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.+")
+  implementation("com.googlecode.libphonenumber:libphonenumber:8.10.17")
+  implementation("com.google.guava:guava:28.1-jre")
+  implementation("net.sf.biweekly:biweekly:0.6.3")
 
   /* The following are needed under java 11 */
   runtime("org.apache.commons:commons-lang3:3.9")
   runtime("javax.xml.bind:jaxb-api:2.3.0")
   runtime("com.sun.xml.bind:jaxb-impl:2.3.0")
-  runtime("com.sun.xml.bind:jaxb-core:2.3.0")
-  runtime("javax.activation:activation:1.1")
-  compile("org.apache.httpcomponents:httpclient:4.5.9")
+  runtime("com.sun.xml.bind:jaxb-core:2.3.0.1")
+  runtime("javax.activation:activation:1.1.1")
+  implementation("org.apache.httpcomponents:httpclient:4.5.9")
 
   implementation(kotlin("stdlib-jdk8"))
   implementation(kotlin("stdlib"))
   implementation(kotlin("reflect"))
 
-  testCompile("org.springframework.boot:spring-boot-starter-test")
+  testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-  testCompile("org.mockito:mockito-core:3.0.0")
+  testImplementation("org.mockito:mockito-core:3.0.0")
 }
 
 tasks.register("versionBanner") {
