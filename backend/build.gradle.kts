@@ -19,6 +19,7 @@ plugins {
   id("net.researchgate.release") version "2.8.1"
   id("com.google.cloud.tools.jib") version "1.5.1"
   id("com.github.ben-manes.versions") version "0.22.0"
+  id("com.gorylenko.gradle-git-properties") version "2.1.0"
 }
 
 tasks.withType<KotlinCompile> {
@@ -42,6 +43,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-mustache")
+  implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.security:spring-security-jwt:1.0.10.RELEASE")
   implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.6.RELEASE")
   implementation("org.springframework.boot:spring-boot-devtools")
@@ -137,4 +139,12 @@ tasks.register("printVersion") {
   doLast {
     println("Current version: $version")
   }
+}
+
+gitProperties {
+  keys = listOf("git.branch", "git.commit.id", "git.commit.message.short", "git.commit.time", "git.tags")
+}
+
+springBoot {
+  buildInfo()
 }

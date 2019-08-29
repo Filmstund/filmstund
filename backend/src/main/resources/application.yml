@@ -17,6 +17,14 @@ spring:
     caffeine:
       spec: maximumSize=500,expireAfterWrite=43200s
 
+management:
+  endpoints:
+    web:
+      base-path: "/"
+  info:
+    git:
+      mode: "full"
+
 sefilm:
   baseUrl:
     api: ${apiBaseUrl:http://localhost:8080}

@@ -120,6 +120,8 @@ class ResourceServerConfig(
       .antMatcher("/**")
       .authorizeRequests()
       .antMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
+            .antMatchers(HttpMethod.GET, "/info").permitAll()
+            .antMatchers(HttpMethod.GET, "/health").permitAll()
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
