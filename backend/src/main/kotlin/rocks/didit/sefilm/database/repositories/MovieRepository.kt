@@ -7,5 +7,5 @@ import java.util.*
 
 @Repository
 interface MovieRepository : CrudRepository<Movie, UUID> {
-    fun findByArchivedOrderByPopularityDesc(archived: Boolean = false): List<Movie>
+  fun findByArchivedOrderByPopularityDesc(archived: Boolean = false): List<Movie>
 }

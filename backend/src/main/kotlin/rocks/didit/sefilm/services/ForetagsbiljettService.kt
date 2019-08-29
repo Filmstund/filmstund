@@ -13,93 +13,93 @@ import java.time.LocalDate
 
 @Service
 class ForetagsbiljettService(
-        private val showingRepository: ShowingRepository,
-        private val userRepository: UserRepository
+  private val showingRepository: ShowingRepository,
+  private val userRepository: UserRepository
 ) {
 
-    fun getStatusOfTicket(ticket: Foretagsbiljett): Foretagsbiljett.Status {
-        if (ticket.expires < LocalDate.now()) {
-            return Foretagsbiljett.Status.Expired
-        }
-
-        val showings = showingRepository.findAll()
-                .filter { s -> s.participants.any { p -> hasTicket(p, ticket) } }
-
-        if (showings.size > 1) {
-            throw AssertionError("More than one showing with Företagsbiljett: ${ticket.number}")
-        }
-
-        if (showings.isEmpty()) {
-            return Foretagsbiljett.Status.Available
-        }
-
-        return if (showings.first().ticketsBought) {
-            Foretagsbiljett.Status.Used
-        } else {
-            Foretagsbiljett.Status.Pending
-        }
+  fun getStatusOfTicket(ticket: Foretagsbiljett): Foretagsbiljett.Status {
+    if (ticket.expires < LocalDate.now()) {
+      return Foretagsbiljett.Status.Expired
     }
 
-    fun getForetagsbiljetterForUser(userID: UserID): List<Foretagsbiljett> = userRepository
-            .findById(userID)
-            .map { it.foretagsbiljetter }
-            .orElseGet { listOf() }
+    val showings = showingRepository.findAll()
+      .filter { s -> s.participants.any { p -> hasTicket(p, ticket) } }
 
-    fun addForetagsbiljetterToCurrentUser(biljetter: List<ForetagsbiljettDTO>) {
-        val currentUser = userRepository.findById(currentLoggedInUserId())
-                .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
-        val biljetterWithouthNew = currentUser
-                .foretagsbiljetter
-                .filterNot { (ticket) -> biljetter.any { ticket.number == it.number } }
-
-
-        assertForetagsbiljetterNotAlreadyInUse(biljetter, currentUser.foretagsbiljetter)
-
-        val newTickets = biljetter.map { Foretagsbiljett.valueOf(it) }
-        val combinedTickets = newTickets
-                .plus(biljetterWithouthNew)
-                .sortedBy { it.expires }
-
-        userRepository.save(currentUser.copy(foretagsbiljetter = combinedTickets))
+    if (showings.size > 1) {
+      throw AssertionError("More than one showing with Företagsbiljett: ${ticket.number}")
     }
 
-    fun deleteTicketFromUser(biljett: ForetagsbiljettDTO) {
-        val currentUser = userRepository.findById(currentLoggedInUserId())
-                .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
-
-        val ticketNumber = TicketNumber(biljett.number)
-        val ticket = currentUser.foretagsbiljetter.find { it.number == ticketNumber }
-                ?: throw NotFoundException("företagsbiljett with number $ticketNumber")
-        assertTicketIsntPending(ticket)
-
-        val ticketsWithoutDeleted = currentUser.foretagsbiljetter.filterNot { it.number == ticketNumber }
-        userRepository.save(currentUser.copy(foretagsbiljetter = ticketsWithoutDeleted))
+    if (showings.isEmpty()) {
+      return Foretagsbiljett.Status.Available
     }
 
-    /** The tickets are allowed to be in use by the current user. */
-    private fun assertForetagsbiljetterNotAlreadyInUse(
-            biljetter: List<ForetagsbiljettDTO>,
-            userBiljetter: List<Foretagsbiljett>
-    ) {
-        biljetter.forEach {
-            val ticketNumber = TicketNumber(it.number)
-            if (!userBiljetter.any { it.number == ticketNumber }
-                    && userRepository.existsByForetagsbiljetterNumber(TicketNumber(it.number))) {
-                throw TicketAlreadyInUserException(currentLoggedInUserId())
-            }
-        }
+    return if (showings.first().ticketsBought) {
+      Foretagsbiljett.Status.Used
+    } else {
+      Foretagsbiljett.Status.Pending
     }
+  }
 
-    private fun assertTicketIsntPending(ticket: Foretagsbiljett) {
-        if (getStatusOfTicket(ticket) == Foretagsbiljett.Status.Pending) {
-            throw TicketInUseException(ticket.number)
-        }
-    }
+  fun getForetagsbiljetterForUser(userID: UserID): List<Foretagsbiljett> = userRepository
+    .findById(userID)
+    .map { it.foretagsbiljetter }
+    .orElseGet { listOf() }
 
-    private fun hasTicket(p: Participant, ticket: Foretagsbiljett): Boolean {
-        return when (p) {
-            is FtgBiljettParticipant -> p.ticketNumber == ticket.number
-            else -> false
-        }
+  fun addForetagsbiljetterToCurrentUser(biljetter: List<ForetagsbiljettDTO>) {
+    val currentUser = userRepository.findById(currentLoggedInUserId())
+      .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
+    val biljetterWithouthNew = currentUser
+      .foretagsbiljetter
+      .filterNot { (ticket) -> biljetter.any { ticket.number == it.number } }
+
+
+    assertForetagsbiljetterNotAlreadyInUse(biljetter, currentUser.foretagsbiljetter)
+
+    val newTickets = biljetter.map { Foretagsbiljett.valueOf(it) }
+    val combinedTickets = newTickets
+      .plus(biljetterWithouthNew)
+      .sortedBy { it.expires }
+
+    userRepository.save(currentUser.copy(foretagsbiljetter = combinedTickets))
+  }
+
+  fun deleteTicketFromUser(biljett: ForetagsbiljettDTO) {
+    val currentUser = userRepository.findById(currentLoggedInUserId())
+      .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
+
+    val ticketNumber = TicketNumber(biljett.number)
+    val ticket = currentUser.foretagsbiljetter.find { it.number == ticketNumber }
+      ?: throw NotFoundException("företagsbiljett with number $ticketNumber")
+    assertTicketIsntPending(ticket)
+
+    val ticketsWithoutDeleted = currentUser.foretagsbiljetter.filterNot { it.number == ticketNumber }
+    userRepository.save(currentUser.copy(foretagsbiljetter = ticketsWithoutDeleted))
+  }
+
+  /** The tickets are allowed to be in use by the current user. */
+  private fun assertForetagsbiljetterNotAlreadyInUse(
+    biljetter: List<ForetagsbiljettDTO>,
+    userBiljetter: List<Foretagsbiljett>
+  ) {
+    biljetter.forEach {
+      val ticketNumber = TicketNumber(it.number)
+      if (!userBiljetter.any { it.number == ticketNumber }
+        && userRepository.existsByForetagsbiljetterNumber(TicketNumber(it.number))) {
+        throw TicketAlreadyInUserException(currentLoggedInUserId())
+      }
     }
+  }
+
+  private fun assertTicketIsntPending(ticket: Foretagsbiljett) {
+    if (getStatusOfTicket(ticket) == Foretagsbiljett.Status.Pending) {
+      throw TicketInUseException(ticket.number)
+    }
+  }
+
+  private fun hasTicket(p: Participant, ticket: Foretagsbiljett): Boolean {
+    return when (p) {
+      is FtgBiljettParticipant -> p.ticketNumber == ticket.number
+      else -> false
+    }
+  }
 }

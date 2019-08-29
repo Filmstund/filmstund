@@ -18,28 +18,30 @@ import java.util.*
 
 @Component
 class MovieQueryResolver(private val movieService: MovieService) : GraphQLQueryResolver {
-    fun getMovie(id: UUID) = movieService.getMovie(id)
-    fun allMovies() = movieService.allMovies()
-    fun archivedMovies() = movieService.archivedMovies()
+  fun getMovie(id: UUID) = movieService.getMovie(id)
+  fun allMovies() = movieService.allMovies()
+  fun archivedMovies() = movieService.archivedMovies()
 }
 
 @Component
 class FilmstadenShowingResolver(
-        private val filmstadenService: FilmstadenService,
-        private val properties: Properties
+  private val filmstadenService: FilmstadenService,
+  private val properties: Properties
 ) : GraphQLResolver<Movie> {
 
-    private val log: Logger = LoggerFactory.getLogger(FilmstadenShowingResolver::class.java)
-    fun filmstadenShowings(movie: Movie, city: String?, afterDate: LocalDate?): List<FilmstadenShowingDTO> {
-        log.info("Fetching Filmstaden showings after ${afterDate
-                ?: "EPOCH"} in city=$city for '${movie.title}' (${movie.id})")
-        if (movie.filmstadenId == null) return listOf()
-        return filmstadenService.getShowingDates(movie.filmstadenId, city ?: properties.defaultCity)
-                .filter {
-                    val after = (afterDate ?: LocalDate.MIN).atStartOfDay().toInstant(ZoneOffset.UTC)
-                    it.timeUtc.isAfter(after)
-                }
-    }
+  private val log: Logger = LoggerFactory.getLogger(FilmstadenShowingResolver::class.java)
+  fun filmstadenShowings(movie: Movie, city: String?, afterDate: LocalDate?): List<FilmstadenShowingDTO> {
+    log.info(
+      "Fetching Filmstaden showings after ${afterDate
+        ?: "EPOCH"} in city=$city for '${movie.title}' (${movie.id})"
+    )
+    if (movie.filmstadenId == null) return listOf()
+    return filmstadenService.getShowingDates(movie.filmstadenId, city ?: properties.defaultCity)
+      .filter {
+        val after = (afterDate ?: LocalDate.MIN).atStartOfDay().toInstant(ZoneOffset.UTC)
+        it.timeUtc.isAfter(after)
+      }
+  }
 }
 
 

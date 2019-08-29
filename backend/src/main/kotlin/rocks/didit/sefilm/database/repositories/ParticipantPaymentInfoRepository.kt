@@ -8,7 +8,7 @@ import java.util.*
 
 @Repository
 interface ParticipantPaymentInfoRepository : CrudRepository<ParticipantPaymentInfo, UUID> {
-    fun findByShowingId(showingId: UUID): Collection<ParticipantPaymentInfo>
-    fun findByShowingIdAndUserId(showingId: UUID, userId: UserID): Optional<ParticipantPaymentInfo>
-    fun deleteByShowingIdAndUserId(showingId: UUID, userId: UserID)
+  fun findByShowingId(showingId: UUID): Collection<ParticipantPaymentInfo>
+  fun findByShowingIdAndUserId(showingId: UUID, userId: UserID): Optional<ParticipantPaymentInfo>
+  fun deleteByShowingIdAndUserId(showingId: UUID, userId: UserID)
 }

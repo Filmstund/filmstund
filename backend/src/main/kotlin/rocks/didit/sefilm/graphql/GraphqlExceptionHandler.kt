@@ -14,35 +14,35 @@ import rocks.didit.sefilm.KnownException
 
 @Component
 class GraphqlExceptionHandler : DataFetcherExceptionHandler {
-    private val log: Logger = LoggerFactory.getLogger(GraphqlExceptionHandler::class.java)
+  private val log: Logger = LoggerFactory.getLogger(GraphqlExceptionHandler::class.java)
 
-    override fun accept(handlerParameters: DataFetcherExceptionHandlerParameters) {
-        val exception = handlerParameters.exception
-        val sourceLocation = handlerParameters.field.sourceLocation
-        val path = handlerParameters.path
+  override fun accept(handlerParameters: DataFetcherExceptionHandlerParameters) {
+    val exception = handlerParameters.exception
+    val sourceLocation = handlerParameters.field.sourceLocation
+    val path = handlerParameters.path
 
-        val graphqlError = when (exception) {
-            is KnownException -> createFetchingError(
-                    exception.message ?: "",
-                    mapOf("offendingUser" to exception.whichUser, "showing" to exception.whichShowing)
-            )
-            is IllegalArgumentException -> createFetchingError(exception.message ?: "")
-            is AccessDeniedException -> createFetchingError(exception.message ?: "")
-            else -> {
-                log.warn("Exception during data fetching: ${exception.message}", exception)
-                ExceptionWhileDataFetching(path, exception, sourceLocation)
-            }
-        }
-        handlerParameters.executionContext.addError(graphqlError, path)
-
+    val graphqlError = when (exception) {
+      is KnownException -> createFetchingError(
+        exception.message ?: "",
+        mapOf("offendingUser" to exception.whichUser, "showing" to exception.whichShowing)
+      )
+      is IllegalArgumentException -> createFetchingError(exception.message ?: "")
+      is AccessDeniedException -> createFetchingError(exception.message ?: "")
+      else -> {
+        log.warn("Exception during data fetching: ${exception.message}", exception)
+        ExceptionWhileDataFetching(path, exception, sourceLocation)
+      }
     }
+    handlerParameters.executionContext.addError(graphqlError, path)
 
-    private fun createFetchingError(msg: String, extensions: Map<String, Any?> = mapOf()): GraphQLError {
-        return object : GraphQLError {
-            override fun getMessage(): String = msg
-            override fun getErrorType(): ErrorType = ErrorType.DataFetchingException
-            override fun getLocations(): List<SourceLocation> = listOf()
-            override fun getExtensions(): Map<String, Any?> = extensions
-        }
+  }
+
+  private fun createFetchingError(msg: String, extensions: Map<String, Any?> = mapOf()): GraphQLError {
+    return object : GraphQLError {
+      override fun getMessage(): String = msg
+      override fun getErrorType(): ErrorType = ErrorType.DataFetchingException
+      override fun getLocations(): List<SourceLocation> = listOf()
+      override fun getExtensions(): Map<String, Any?> = extensions
     }
+  }
 }

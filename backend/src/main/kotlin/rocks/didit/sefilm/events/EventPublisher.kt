@@ -5,9 +5,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class EventPublisher(
-        private val eventPublisher: ApplicationEventPublisher) {
+  private val eventPublisher: ApplicationEventPublisher
+) {
 
-    fun publish(event: ITBioEvent) {
-        eventPublisher.publishEvent(event)
-    }
+  fun publish(event: ITBioEvent) {
+    eventPublisher.publishEvent(event)
+  }
 }

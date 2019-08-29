@@ -13,23 +13,23 @@ import rocks.didit.sefilm.services.UserService
 
 @Component
 class ParticipantPaymentInfoResolver(
-        private val userService: UserService,
-        private val showingService: ShowingService
+  private val userService: UserService,
+  private val showingService: ShowingService
 ) : GraphQLResolver<ParticipantPaymentInfo> {
 
-    fun user(participantPaymentInfo: ParticipantPaymentInfo): LimitedUserDTO =
-            userService.getUserOrThrow(participantPaymentInfo.userId)
+  fun user(participantPaymentInfo: ParticipantPaymentInfo): LimitedUserDTO =
+    userService.getUserOrThrow(participantPaymentInfo.userId)
 
-    fun showing(participantPaymentInfo: ParticipantPaymentInfo): ShowingDTO =
-            showingService.getShowingOrThrow(participantPaymentInfo.showingId)
+  fun showing(participantPaymentInfo: ParticipantPaymentInfo): ShowingDTO =
+    showingService.getShowingOrThrow(participantPaymentInfo.showingId)
 }
 
 @Component
 class PaymentInfoResolver(
-        private val userService: UserService
+  private val userService: UserService
 ) : GraphQLResolver<AttendeePaymentDetailsDTO> {
 
-    fun payTo(paymentDTO: AttendeePaymentDetailsDTO): LimitedUserDTO = userService.getUserOrThrow(paymentDTO.payTo)
+  fun payTo(paymentDTO: AttendeePaymentDetailsDTO): LimitedUserDTO = userService.getUserOrThrow(paymentDTO.payTo)
 
-    fun payer(paymentDTO: AttendeePaymentDetailsDTO): LimitedUserDTO = userService.getUserOrThrow(paymentDTO.payerUserID)
+  fun payer(paymentDTO: AttendeePaymentDetailsDTO): LimitedUserDTO = userService.getUserOrThrow(paymentDTO.payerUserID)
 }
