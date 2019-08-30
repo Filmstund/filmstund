@@ -35,8 +35,6 @@ sefilm:
   google:
     clientId: 692064172675-montab9pi57304e68r932c6lm7111oaf.apps.googleusercontent.com
     jwkUri: https://www.googleapis.com/oauth2/v3/certs
-  slack:
-    slackHookUrl: ${slackHookUrl}
 
   # Whetever or not tickets should be auto assigned to other than admin
   enableReassignment: ${enableReassignment:true}
@@ -51,10 +49,13 @@ sefilm:
       popularityUpdater: ${popularityUpdaterEnabled:true}
   notification:
     provider:
+      Slack:
+        enabled: ${slackProviderEnabled:true}
+        slackHookUrl: ${slackHookUrl:}
       MailProvider:
-        enabled: ${mailProviderEnabled:true}
+        enabled: ${mailProviderEnabled:false}
       Pushover:
-        enabled: ${pushoverProviderEnabled:true}
+        enabled: ${pushoverProviderEnabled:false}
         apiToken: ${pushoverApiToken}
         url: ${pushoverUrl:https://api.pushover.net/1/messages.json}
         validateUrl: ${pushoverValidateUrl:https://api.pushover.net/1/users/validate.json}
