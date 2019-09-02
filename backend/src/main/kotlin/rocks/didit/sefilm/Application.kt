@@ -30,12 +30,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.mongo.entities.Location
-import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.mongo.repositories.LocationRepository
 import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
 import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
+import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
@@ -162,11 +161,6 @@ class Application {
     }
 
     val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
-
-    val budordResource = ClassPathResource("seeds/budord.json")
-    val budords: List<BioBudord> = objectMapper.readValue(budordResource.inputStream)
-    budordRepo.saveAll(budords)
-    log.info("Seeded budord with ${budords.size} values")
 
     val locationsResource = ClassPathResource("seeds/locations.json")
     val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
