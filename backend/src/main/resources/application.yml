@@ -16,6 +16,15 @@ spring:
     cache-names: filmstadenDates,filmstadenSeatMap
     caffeine:
       spec: maximumSize=500,expireAfterWrite=43200s
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  datasource:
+    url: ${SEFILM_JDBC_URI:jdbc:postgresql://localhost:5432/sefilm}
+    username: ${SEFILM_JDBC_USERNAME:sefilm}
+    password: ${SEFILM_JDBC_PASSWORD:}
+  jpa:
+    properties:
+      hibernate.jdbc.lob.non_contextual_creation: true
 
 management:
   endpoints:

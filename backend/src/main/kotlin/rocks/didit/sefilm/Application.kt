@@ -30,9 +30,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import rocks.didit.sefilm.database.mongo.entities.BioBudord
+import rocks.didit.sefilm.database.entities.BioBudord
 import rocks.didit.sefilm.database.mongo.entities.Location
-import rocks.didit.sefilm.database.mongo.repositories.BudordRepository
+import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.database.mongo.repositories.LocationRepository
 import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
 import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository

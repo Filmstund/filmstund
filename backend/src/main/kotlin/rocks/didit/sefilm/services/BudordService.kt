@@ -2,8 +2,8 @@ package rocks.didit.sefilm.services
 
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.mongo.entities.BioBudord
-import rocks.didit.sefilm.database.mongo.repositories.BudordRepository
+import rocks.didit.sefilm.database.entities.BioBudord
+import rocks.didit.sefilm.database.repositories.BudordRepository
 import java.security.SecureRandom
 
 @Service

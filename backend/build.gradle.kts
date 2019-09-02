@@ -39,7 +39,6 @@ dependencies {
 //  compile("com.graphql-java-kickstart:graphiql-spring-boot-starter:5.10.0")
   implementation("org.springframework.boot:spring-boot-starter-web-services")
   implementation("org.springframework.boot:spring-boot-starter-logging")
-  implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
   implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-mustache")
@@ -47,6 +46,12 @@ dependencies {
   implementation("org.springframework.security:spring-security-jwt:1.0.10.RELEASE")
   implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.6.RELEASE")
   implementation("org.springframework.boot:spring-boot-devtools")
+
+  // Database
+  implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  runtime("org.postgresql:postgresql:42.2.6")
+  implementation("org.liquibase:liquibase-core:3.8.0")
 
 
   /* The below is fix for kotlin-reflect in 1.2.20 */
