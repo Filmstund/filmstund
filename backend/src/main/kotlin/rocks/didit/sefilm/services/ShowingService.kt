@@ -4,12 +4,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.*
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.mongo.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.User
+import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.events.*
@@ -20,16 +20,16 @@ import java.util.*
 
 @Service
 class ShowingService(
-        private val showingRepo: ShowingRepository,
-        private val paymentInfoRepo: ParticipantPaymentInfoRepository,
-        private val movieService: MovieService,
-        private val userService: UserService,
-        private val ticketService: TicketService,
-        private val slugService: SlugService,
-        private val filmstadenService: FilmstadenService,
-        private val locationService: LocationService,
-        private val eventPublisher: EventPublisher,
-        private val assertionService: AssertionService
+  private val showingRepo: ShowingRepository,
+  private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+  private val movieService: MovieService,
+  private val userService: UserService,
+  private val ticketService: TicketService,
+  private val slugService: SlugService,
+  private val filmstadenService: FilmstadenService,
+  private val locationService: LocationService,
+  private val eventPublisher: EventPublisher,
+  private val assertionService: AssertionService
 ) {
 
   companion object {

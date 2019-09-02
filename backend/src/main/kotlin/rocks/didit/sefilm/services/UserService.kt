@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUserId
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.entities.User
+import rocks.didit.sefilm.database.mongo.repositories.UserRepository
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber

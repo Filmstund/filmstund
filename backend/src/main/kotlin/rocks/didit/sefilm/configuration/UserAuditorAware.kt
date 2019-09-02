@@ -2,7 +2,7 @@ package rocks.didit.sefilm.configuration
 
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.mongo.entities.User
 import rocks.didit.sefilm.services.UserService
 import java.util.*
 

@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.domain.dto
 
-import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.UserID

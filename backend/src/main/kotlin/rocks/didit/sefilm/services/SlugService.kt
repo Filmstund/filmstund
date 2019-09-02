@@ -1,8 +1,8 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.stereotype.Service
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.mongo.entities.Showing
 
 @Service
 class SlugService {

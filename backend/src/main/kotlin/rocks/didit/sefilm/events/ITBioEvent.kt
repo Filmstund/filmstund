@@ -1,8 +1,8 @@
 package rocks.didit.sefilm.events
 
 import org.springframework.context.ApplicationEvent
-import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.mongo.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.User
 import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.notification.NotificationType

@@ -11,7 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.mongo.entities.Movie
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UserDTO

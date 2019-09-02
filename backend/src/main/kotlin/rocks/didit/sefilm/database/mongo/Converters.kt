@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.database
+package rocks.didit.sefilm.database.mongo
 
 import org.springframework.core.convert.converter.Converter
 import org.springframework.stereotype.Component

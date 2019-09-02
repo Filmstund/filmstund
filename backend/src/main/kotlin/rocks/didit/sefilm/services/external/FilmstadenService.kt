@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.*
 import java.time.ZoneOffset
 import java.time.ZonedDateTime

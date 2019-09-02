@@ -3,7 +3,7 @@ package rocks.didit.sefilm.services
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.*
-import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.Showing
 import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.UserID

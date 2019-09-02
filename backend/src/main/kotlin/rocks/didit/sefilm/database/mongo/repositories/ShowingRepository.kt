@@ -1,8 +1,8 @@
-package rocks.didit.sefilm.database.repositories
+package rocks.didit.sefilm.database.mongo.repositories
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.Showing
 import rocks.didit.sefilm.domain.Base64ID
 import java.util.*
 

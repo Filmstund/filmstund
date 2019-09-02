@@ -3,7 +3,7 @@ package rocks.didit.sefilm
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.mongo.entities.User
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.UserID

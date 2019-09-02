@@ -20,8 +20,8 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.entities.User
+import rocks.didit.sefilm.database.mongo.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController

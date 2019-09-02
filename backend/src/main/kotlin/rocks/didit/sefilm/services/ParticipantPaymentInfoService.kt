@@ -3,8 +3,8 @@ package rocks.didit.sefilm.services
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.database.repositories.ParticipantPaymentInfoRepository
+import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoRepository
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 

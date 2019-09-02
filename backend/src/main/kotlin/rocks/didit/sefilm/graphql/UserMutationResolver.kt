@@ -4,7 +4,7 @@ package rocks.didit.sefilm.graphql
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.services.ForetagsbiljettService
 import rocks.didit.sefilm.services.ParticipantPaymentInfoService

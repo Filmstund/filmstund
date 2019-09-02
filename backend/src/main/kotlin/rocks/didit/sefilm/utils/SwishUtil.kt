@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.utils
 
-import rocks.didit.sefilm.database.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.mongo.entities.Showing
 import rocks.didit.sefilm.domain.IntValue
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.StringValue

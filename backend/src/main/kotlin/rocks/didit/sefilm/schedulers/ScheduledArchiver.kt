@@ -4,9 +4,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.LocalDate

@@ -5,8 +5,8 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
 import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.currentLoggedInUserId
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.repositories.UserRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import java.time.LocalDate

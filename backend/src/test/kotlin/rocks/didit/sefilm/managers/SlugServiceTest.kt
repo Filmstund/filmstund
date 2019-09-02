@@ -7,8 +7,8 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.mongo.entities.Showing
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.SlugService
 

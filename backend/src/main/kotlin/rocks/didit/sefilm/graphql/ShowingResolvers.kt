@@ -6,8 +6,8 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.Ticket
+import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.mongo.entities.Ticket
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.*

@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.domain.dto
 
-import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.mongo.entities.Location
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ParticipantDTO
 import rocks.didit.sefilm.domain.SEK

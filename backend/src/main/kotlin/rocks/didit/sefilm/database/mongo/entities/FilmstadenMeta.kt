@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.database.entities
+package rocks.didit.sefilm.database.mongo.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id

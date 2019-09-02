@@ -1,8 +1,8 @@
-package rocks.didit.sefilm.database.repositories
+package rocks.didit.sefilm.database.mongo.repositories
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.mongo.entities.Location
 import java.util.*
 
 @Repository

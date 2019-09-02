@@ -4,8 +4,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenMovieDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater

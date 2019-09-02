@@ -5,8 +5,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Service
-import rocks.didit.sefilm.database.entities.Location
-import rocks.didit.sefilm.database.repositories.LocationRepository
+import rocks.didit.sefilm.database.mongo.entities.Location
+import rocks.didit.sefilm.database.mongo.repositories.LocationRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenCityAliasDTO
 import java.util.*
 

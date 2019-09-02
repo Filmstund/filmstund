@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.database.entities
+package rocks.didit.sefilm.database.mongo.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate

@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.domain.dto
 
-import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.mongo.entities.Location
 import java.io.Serializable
 import java.time.ZonedDateTime
 
