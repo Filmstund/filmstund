@@ -31,7 +31,7 @@ class CalendarService(
   private val calendarDescription: String = "Dina visningar på $CALENDAR_NAME (${properties.baseUrl.frontend})"
 
   companion object {
-    private const val CALENDAR_NAME = "ITBio"
+    private const val CALENDAR_NAME = "SeFilm"
     private val stockholmZoneId = TimeZone.getTimeZone("Europe/Stockholm").toZoneId()
 
     private val log: Logger = LoggerFactory.getLogger(CalendarService::class.java)
@@ -66,7 +66,7 @@ class CalendarService(
 
   private fun ShowingDTO.toVEvent(user: UserDTO): VEvent {
     val movie = movieService.getMovie(this.movieId) ?: return VEvent()
-    val showingUrl = "${properties.baseUrl.frontend}/showings/$id"
+    val showingUrl = "${properties.baseUrl.frontend}/showings/$webId/$slug"
 
     val vEvent = VEvent()
     vEvent.setSummary(movie.title).language = "en-us"
