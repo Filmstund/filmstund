@@ -59,7 +59,8 @@ sefilm:
         apiToken: ${pushoverApiToken}
         url: ${pushoverUrl:https://api.pushover.net/1/messages.json}
         validateUrl: ${pushoverValidateUrl:https://api.pushover.net/1/users/validate.json}
-
+  calendar:
+    duration-before-alert: ${calendarDurationBeforeAlert:4h}
 
 graphql:
   servlet:
