@@ -86,7 +86,7 @@ class CalendarService(
     vEvent.lastModified = LastModified(Date.from(this.lastModifiedDate))
     vEvent.transparency = Transparency.opaque()
 
-    val alarmTriggerDate = Date.from(this.getStartDate().minus(1, ChronoUnit.HOURS))
+    val alarmTriggerDate = Date.from(this.getStartDate().minusSeconds(properties.calendar.durationBeforeAlert.toSeconds()))
     vEvent.addAlarm(VAlarm.audio(Trigger(alarmTriggerDate)))
 
     return vEvent

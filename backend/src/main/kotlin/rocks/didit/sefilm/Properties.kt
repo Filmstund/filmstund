@@ -2,6 +2,7 @@ package rocks.didit.sefilm
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
+import java.time.Duration
 
 @ConfigurationProperties("sefilm", ignoreInvalidFields = true)
 @Component
@@ -15,6 +16,8 @@ class Properties {
   var google = Google()
 
   var notification = Notification()
+
+  var calendar = Calendar()
 
   class Tmdb {
     var apikey: String? = null
@@ -52,5 +55,9 @@ class Properties {
   class Slack {
     var enabled: Boolean = false
     var slackHookUrl: String = ""
+  }
+
+  class Calendar {
+    var durationBeforeAlert: Duration = Duration.ofHours(4)
   }
 }
