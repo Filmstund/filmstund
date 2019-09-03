@@ -9,7 +9,7 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.OpenIdConnectUserDetails
 import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.mongo.entities.User
-import rocks.didit.sefilm.database.mongo.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
@@ -25,7 +25,7 @@ import java.util.*
 
 @Service
 class UserService(
-  private val userRepo: UserRepository,
+  private val userRepo: UserMongoRepository,
   private val pushoverService: PushoverService?,
   private val foretagsbiljettService: ForetagsbiljettService
 ) {

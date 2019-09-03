@@ -5,16 +5,16 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
 import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.currentLoggedInUserId
-import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
-import rocks.didit.sefilm.database.mongo.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import java.time.LocalDate
 
 @Service
 class ForetagsbiljettService(
-  private val showingRepository: ShowingRepository,
-  private val userRepository: UserRepository
+  private val showingRepository: ShowingMongoRepository,
+  private val userRepository: UserMongoRepository
 ) {
 
   fun getStatusOfTicket(ticket: Foretagsbiljett): Foretagsbiljett.Status {

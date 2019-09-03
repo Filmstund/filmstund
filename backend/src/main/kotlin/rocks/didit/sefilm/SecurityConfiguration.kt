@@ -21,7 +21,7 @@ import org.springframework.security.oauth2.provider.token.UserAuthenticationConv
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.mongo.entities.User
-import rocks.didit.sefilm.database.mongo.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
@@ -60,7 +60,7 @@ class OpenidUserAuthConverter : UserAuthenticationConverter {
 }
 
 @Component
-class LoginListener(private val userRepository: UserRepository) : ApplicationListener<AuthenticationSuccessEvent> {
+class LoginListener(private val userRepository: UserMongoRepository) : ApplicationListener<AuthenticationSuccessEvent> {
   private val log = LoggerFactory.getLogger(LoginListener::class.java)
 
   override fun onApplicationEvent(event: AuthenticationSuccessEvent) {

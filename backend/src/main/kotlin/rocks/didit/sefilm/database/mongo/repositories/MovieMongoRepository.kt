@@ -6,6 +6,6 @@ import rocks.didit.sefilm.database.mongo.entities.Movie
 import java.util.*
 
 @Repository
-interface MovieRepository : CrudRepository<Movie, UUID> {
+interface MovieMongoRepository : CrudRepository<Movie, UUID> {
   fun findByArchivedOrderByPopularityDesc(archived: Boolean = false): List<Movie>
 }

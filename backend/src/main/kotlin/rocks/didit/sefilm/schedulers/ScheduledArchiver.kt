@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
-import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.LocalDate
@@ -19,8 +19,8 @@ import java.time.LocalDateTime
   havingValue = "true"
 )
 class ScheduledArchiver(
-  private val movieRepository: MovieRepository,
-  showingRepository: ShowingRepository,
+  private val movieRepository: MovieMongoRepository,
+  showingRepository: ShowingMongoRepository,
   filmstadenClient: FilmstadenService
 ) {
 
@@ -59,7 +59,7 @@ class ScheduledArchiver(
 }
 
 private class ReleaseDateAndShowingsRule(
-  private val showingRepository: ShowingRepository,
+  private val showingRepository: ShowingMongoRepository,
   private val filmstadenClient: FilmstadenService
 ) : ArchiveRule {
 

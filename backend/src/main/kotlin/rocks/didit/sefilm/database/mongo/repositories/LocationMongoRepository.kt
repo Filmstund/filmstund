@@ -6,6 +6,6 @@ import rocks.didit.sefilm.database.mongo.entities.Location
 import java.util.*
 
 @Repository
-interface LocationRepository : CrudRepository<Location, String> {
+interface LocationMongoRepository : CrudRepository<Location, String> {
   fun findByNameIgnoreCaseOrAliasIgnoreCase(id: String, alias: String): Optional<Location>
 }

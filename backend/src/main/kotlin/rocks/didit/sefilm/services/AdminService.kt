@@ -2,14 +2,14 @@ package rocks.didit.sefilm.services
 
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.util.*
 
 @Service
 class AdminService(
-  private val showingRepository: ShowingRepository,
+  private val showingRepository: ShowingMongoRepository,
   private val userService: UserService,
   private val assertionService: AssertionService
 ) {

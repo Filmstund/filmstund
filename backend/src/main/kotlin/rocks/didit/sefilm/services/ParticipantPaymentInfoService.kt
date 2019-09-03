@@ -4,13 +4,13 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoMongoRepository
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 
 @Service
 class ParticipantPaymentInfoService(
-  private val participantInfoRepo: ParticipantPaymentInfoRepository,
+  private val participantInfoRepo: ParticipantPaymentInfoMongoRepository,
   private val showingService: ShowingService,
   private val assertionService: AssertionService
 ) {

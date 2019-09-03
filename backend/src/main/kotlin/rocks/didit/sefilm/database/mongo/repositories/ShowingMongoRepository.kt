@@ -7,7 +7,7 @@ import rocks.didit.sefilm.domain.Base64ID
 import java.util.*
 
 @Repository
-interface ShowingRepository : CrudRepository<Showing, UUID> {
+interface ShowingMongoRepository : CrudRepository<Showing, UUID> {
   fun findByPrivateOrderByDateDesc(isPrivate: Boolean): List<Showing>
   fun findByMovieIdOrderByDateDesc(movieId: UUID): List<Showing>
   fun findByWebId(webId: Base64ID): Optional<Showing>

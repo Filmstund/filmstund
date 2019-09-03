@@ -6,12 +6,12 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.database.mongo.entities.Location
-import rocks.didit.sefilm.database.mongo.repositories.LocationRepository
+import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenCityAliasDTO
 import java.util.*
 
 @Service
-class LocationService(private val locationRepo: LocationRepository) {
+class LocationService(private val locationRepo: LocationMongoRepository) {
   fun allLocations() = locationRepo.findAll().toList()
   fun getLocation(name: String): Optional<Location> = locationRepo.findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
 

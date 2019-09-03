@@ -9,9 +9,9 @@ import rocks.didit.sefilm.currentLoggedInUserId
 import rocks.didit.sefilm.database.mongo.entities.Seat
 import rocks.didit.sefilm.database.mongo.entities.Showing
 import rocks.didit.sefilm.database.mongo.entities.Ticket
-import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
-import rocks.didit.sefilm.database.mongo.repositories.TicketRepository
-import rocks.didit.sefilm.database.mongo.repositories.UserRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.TicketMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
@@ -27,9 +27,9 @@ class TicketService(
   private val properties: Properties,
   private val filmstadenService: FilmstadenService,
   private val locationService: LocationService,
-  private val userRepository: UserRepository,
-  private val ticketRepository: TicketRepository,
-  private val showingRepository: ShowingRepository
+  private val userRepository: UserMongoRepository,
+  private val ticketRepository: TicketMongoRepository,
+  private val showingRepository: ShowingMongoRepository
 ) {
 
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {

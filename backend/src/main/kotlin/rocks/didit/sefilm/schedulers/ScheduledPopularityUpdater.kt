@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
+import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
@@ -26,7 +26,7 @@ import java.util.*
   havingValue = "true"
 )
 class ScheduledPopularityUpdater(
-  private val movieRepository: MovieRepository,
+  private val movieRepository: MovieMongoRepository,
   private val filmstadenService: FilmstadenService,
   private val imdbClient: ImdbClient
 ) {

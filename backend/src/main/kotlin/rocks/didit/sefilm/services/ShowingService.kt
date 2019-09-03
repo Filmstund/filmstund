@@ -8,8 +8,8 @@ import rocks.didit.sefilm.database.mongo.entities.Movie
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.mongo.entities.Showing
 import rocks.didit.sefilm.database.mongo.entities.User
-import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoRepository
-import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.domain.*
 import rocks.didit.sefilm.domain.dto.*
 import rocks.didit.sefilm.events.*
@@ -20,8 +20,8 @@ import java.util.*
 
 @Service
 class ShowingService(
-  private val showingRepo: ShowingRepository,
-  private val paymentInfoRepo: ParticipantPaymentInfoRepository,
+  private val showingRepo: ShowingMongoRepository,
+  private val paymentInfoRepo: ParticipantPaymentInfoMongoRepository,
   private val movieService: MovieService,
   private val userService: UserService,
   private val ticketService: TicketService,

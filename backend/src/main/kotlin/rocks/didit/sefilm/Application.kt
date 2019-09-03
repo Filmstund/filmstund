@@ -31,9 +31,9 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import rocks.didit.sefilm.database.mongo.entities.Location
-import rocks.didit.sefilm.database.mongo.repositories.LocationRepository
-import rocks.didit.sefilm.database.mongo.repositories.MovieRepository
-import rocks.didit.sefilm.database.mongo.repositories.ShowingRepository
+import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
@@ -103,7 +103,7 @@ class Application {
   }
 
   @Bean
-  fun removeUnwantedMovies(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) =
+  fun removeUnwantedMovies(movieRepository: MovieMongoRepository, titleExtensions: MovieFilterUtil) =
     ApplicationRunner { _ ->
       val unwantedMovies = movieRepository
         .findAll()
@@ -113,7 +113,7 @@ class Application {
     }
 
   @Bean
-  fun createSlugsAndWebIds(showingRepository: ShowingRepository, slugService: SlugService) = ApplicationRunner { _ ->
+  fun createSlugsAndWebIds(showingRepository: ShowingMongoRepository, slugService: SlugService) = ApplicationRunner { _ ->
     val showingsWithMissingWebId = showingRepository
       .findAll()
       .filter {
@@ -127,7 +127,7 @@ class Application {
   }
 
   @Bean
-  fun trimMovieNames(movieRepository: MovieRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner { _ ->
+  fun trimMovieNames(movieRepository: MovieMongoRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner { _ ->
     movieRepository.findAll()
       .filter {
         titleExtensions.titleRequiresTrimming(it.title)
@@ -144,7 +144,7 @@ class Application {
 
   @Bean
   fun seedInitialData(
-    locationsRepo: LocationRepository,
+    locationsRepo: LocationMongoRepository,
     budordRepo: BudordRepository,
     filmstadenService: FilmstadenService,
     properties: Properties

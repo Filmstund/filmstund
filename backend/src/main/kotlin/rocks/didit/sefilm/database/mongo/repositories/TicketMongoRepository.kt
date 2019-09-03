@@ -7,7 +7,7 @@ import rocks.didit.sefilm.domain.UserID
 import java.util.*
 
 @Repository
-interface TicketRepository : CrudRepository<Ticket, String> {
+interface TicketMongoRepository : CrudRepository<Ticket, String> {
   fun findByShowingIdAndAssignedToUser(showingId: UUID, userId: UserID): List<Ticket>
 
   fun findByShowingId(showingId: UUID): List<Ticket>
