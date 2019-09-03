@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.services
 
 import biweekly.ICalendar
+import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.parameter.CalendarUserType
 import biweekly.parameter.ParticipationLevel
@@ -18,6 +19,7 @@ import rocks.didit.sefilm.domain.dto.UserDTO
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
@@ -83,6 +85,9 @@ class CalendarService(
     vEvent.created = Created(Date.from(this.createdDate))
     vEvent.lastModified = LastModified(Date.from(this.lastModifiedDate))
     vEvent.transparency = Transparency.opaque()
+
+    val alarmTriggerDate = Date.from(this.getStartDate().minus(1, ChronoUnit.HOURS))
+    vEvent.addAlarm(VAlarm.audio(Trigger(alarmTriggerDate)))
 
     return vEvent
   }
