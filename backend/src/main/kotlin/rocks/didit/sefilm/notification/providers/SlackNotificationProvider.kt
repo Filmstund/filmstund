@@ -44,7 +44,7 @@ class SlackNotificationProvider(
 
     val showingUrl = getShowingUrl(event)
     val dateField = SlackField("Datum", event.showing.date.toString())
-    val timeField = SlackField("Time", event.showing.time.toString())
+    val timeField = SlackField("Tid", event.showing.time.toString())
     val attachement = createAttachement(
       "${event.showing.admin.nick} har ändrat sin visning",
       showingUrl,
