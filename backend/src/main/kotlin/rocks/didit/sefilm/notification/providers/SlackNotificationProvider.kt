@@ -46,7 +46,7 @@ class SlackNotificationProvider(
     val dateField = SlackField("Datum", event.showing.date.toString(), true)
     val timeField = SlackField("Tid", event.showing.time.toString(), true)
     val attachement = createAttachement(
-      "${event.showing.admin.nick} har ändrat sin visning",
+      "<!here> ${event.showing.admin.nick} har ändrat sin visning",
       showingUrl,
       event,
       listOf(dateField, timeField)
@@ -59,7 +59,7 @@ class SlackNotificationProvider(
   @EventListener
   fun pushOnNewEvent(event: NewShowingEvent) {
     val showingUrl = getShowingUrl(event)
-    val attachement = createAttachement("${event.showing.admin.nick} har skapat en ny visning!", showingUrl, event)
+    val attachement = createAttachement("<!here> ${event.showing.admin.nick} har skapat en ny visning!", showingUrl, event)
     pushToSlack(SlackPayload(attachments = listOf(attachement)))
   }
 
@@ -73,7 +73,7 @@ class SlackNotificationProvider(
     fields: List<SlackField> = emptyList()
   ): SlackAttachement {
     return SlackAttachement(
-      "Ny visning: <$showingUrl>",
+      "SeFilm visning för <${event.showing.movie.title}>",
       pretext,
       event.ifIMDbSupplied("IMDb"),
       event.ifIMDbSupplied("https://www.imdb.com/title/${event.showing.movie.imdbId.value}"),
