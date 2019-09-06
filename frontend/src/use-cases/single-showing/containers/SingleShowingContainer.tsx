@@ -1,3 +1,4 @@
+import { NetworkStatus } from "apollo-client";
 import gql from "graphql-tag";
 import React, { useCallback, useState } from "react";
 import { useQuery } from "react-apollo";
@@ -137,9 +138,9 @@ const useSingleShowingData = (webId: string) =>
   );
 
 const SingleShowingLoader: React.FC<{ webId: string }> = ({ webId }) => {
-  const { data, loading, refetch } = useSingleShowingData(webId);
+  const { data, loading, refetch, networkStatus } = useSingleShowingData(webId);
 
-  if (!data || loading) {
+  if (!data || (loading && networkStatus !== NetworkStatus.refetch)) {
     return <Loader />;
   }
 
