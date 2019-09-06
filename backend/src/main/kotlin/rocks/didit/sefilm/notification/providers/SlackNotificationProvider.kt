@@ -75,6 +75,9 @@ class SlackNotificationProvider(
     return SlackAttachement(
       "Ny visning: <$showingUrl>",
       pretext,
+      event.ifIMDbSupplied("IMDb"),
+      event.ifIMDbSupplied("https://www.imdb.com/title/${event.showing.movie.imdbId.value}"),
+      event.ifIMDbSupplied("https://pbs.twimg.com/profile_images/976507090624589824/0x28al44_400x400.jpg"),
       "grey",
       event.showing.movie.title,
       showingUrl,
@@ -87,6 +90,16 @@ class SlackNotificationProvider(
       fields
     )
   }
+
+  private fun ShowingEvent.ifIMDbSupplied(str: String): String? {
+    return if (showing.movie.imdbId.isSupplied()) {
+      str
+    } else {
+      null
+    }
+  }
+
+  private fun hasIMDbId(event: ShowingEvent): Boolean = event.showing.movie.imdbId.isSupplied()
 
   private fun pushToSlack(slackPayload: SlackPayload) {
     val slackUrl: String = properties.notification.provider.slack.slackHookUrl
@@ -128,6 +141,12 @@ data class SlackField(
 data class SlackAttachement(
   val fallback: String,
   val pretext: String? = null,
+  @JsonProperty("author_name")
+  val authorName: String? = null,
+  @JsonProperty("author_link")
+  val authorLink: String? = null,
+  @JsonProperty("author_icon")
+  val authorIcon: String? = null,
   val color: String = "grey",
   val title: String,
   @JsonProperty("title_link")
