@@ -24,7 +24,7 @@ sealed class ShowingEvent(
 class NewShowingEvent(src: Any, showing: Showing, user: User) :
   ShowingEvent(src, showing, user, NotificationType.NewShowing)
 
-class UpdatedShowingEvent(src: Any, showing: Showing, user: User) :
+class UpdatedShowingEvent(src: Any, showing: Showing, val originalShowing: Showing, user: User) :
   ShowingEvent(src, showing, user, NotificationType.UpdateShowing, showing.allParticipants())
 
 class DeletedShowingEvent(src: Any, showing: Showing, user: User) :
