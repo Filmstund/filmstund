@@ -97,9 +97,9 @@ workflows:
       - test-frontend
       - build-docker:
           requires:
-            - test-frontend-jdk8
-            - test-frontend-jdk11
-            - test-backend
+            - test-frontend
+            - test-backend-jdk8
+            - test-backend-jdk11
       - push-docker:
           requires:
             - build-docker
