@@ -13,6 +13,7 @@ import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
 
@@ -43,6 +44,10 @@ data class Showing(
   val createdDate: Instant = Instant.now(),
   val filmstadenRemoteEntityId: String? = null
 ) {
+
+  val dateTime: LocalDateTime
+    get() = LocalDateTime.of(date, time)
+
   fun toDto() = ShowingDTO(
     id = id,
     webId = webId,
