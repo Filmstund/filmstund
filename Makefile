@@ -10,7 +10,7 @@ frontend:
 	docker tag ${FRONTEND_IMG} ${NAME}-frontend:latest
 
 backend:
-	cd ${DIRECTORY}/backend; ./gradlew build jibDockerBuild --image=${BACKEND_IMG}
+	cd ${DIRECTORY}/backend; ./gradlew --no-daemon build jibDockerBuild --image=${BACKEND_IMG}
 	docker tag ${BACKEND_IMG} ${NAME}-backend:latest
 
 docker: frontend backend
