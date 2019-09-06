@@ -10,9 +10,17 @@ jobs:
   test-backend:
     <<: *defaults
     docker:
-      - image: circleci/openjdk:11-browsers-legacy
+      - image: circleci/openjdk:11-jdk
     steps:
-      - checkout
+      - run: |
+          trigger_job test-backend-jdk8
+          trigger_job test-backend-jdk11
+
+  test-backend-jdk8:
+    <<: *defaults
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
       - restore_cache:
           key: gradle-{{ checksum "backend/build.gradle" }}
       - run: |
@@ -22,6 +30,22 @@ jobs:
           key: gradle-{{ checksum "backend/build.gradle" }}
           paths:
             - ~/.gradle
+
+  test-backend-jdk11:
+    <<: *defaults
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - restore_cache:
+          key: gradle-{{ checksum "backend/build.gradle" }}
+      - run: |
+          cd backend
+          ./gradlew check
+      - save_cache:
+          key: gradle-{{ checksum "backend/build.gradle" }}
+          paths:
+            - ~/.gradle
+
   test-frontend:
     <<: *defaults
     docker:
