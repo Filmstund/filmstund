@@ -114,7 +114,7 @@ class SlackNotificationProvider(
 
     val request = HttpEntity(objectMapper.writeValueAsString(slackPayload), headers)
     try {
-      log.info("Notifying Slack about a new showing: {}", slackPayload.attachments[0].titleLink)
+      log.info("Notifying Slack about showing: {}", slackPayload.attachments[0].titleLink)
       restTemplate.postForEntity(slackUrl, request, String::class.java)
     } catch (e: Exception) {
       log.warn("Failed to post Slack Webhook", e)
