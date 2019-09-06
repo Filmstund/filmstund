@@ -14,12 +14,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: gradle-{{ checksum "backend/build.gradle" }}
+          key: gradle-jdk8-{{ checksum "backend/build.gradle.kts" }}
       - run: |
           cd backend
           ./gradlew check
       - save_cache:
-          key: gradle-{{ checksum "backend/build.gradle" }}
+          key: gradle-jdk8-{{ checksum "backend/build.gradle.kts" }}
           paths:
             - ~/.gradle
 
@@ -30,12 +30,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: gradle-{{ checksum "backend/build.gradle" }}
+          key: gradle-{{ checksum "backend/build.gradle.kts" }}
       - run: |
           cd backend
           ./gradlew check
       - save_cache:
-          key: gradle-{{ checksum "backend/build.gradle" }}
+          key: gradle-{{ checksum "backend/build.gradle.kts" }}
           paths:
             - ~/.gradle
 
