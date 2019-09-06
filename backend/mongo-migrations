@@ -1,4 +1,7 @@
 ### Pending migrations ###
+N/A
+
+### Migrations already done in deployed application ###
 db.movie.update({}, {$rename:{"sfId":"filmstadenId"}}, false, true);
 db.movie.update({}, {$rename:{"sfSlug":"filmstadenSlug"}}, false, true);
 db.user.update({}, {$rename:{"sfMembershipId":"filmstadenMembershipId"}}, false, true);
@@ -47,7 +50,7 @@ db.showing.find({}).forEach(s => {
 });
 
 # Remove old bioklubbnummer
-db.getCollection('user').updateMany( {}, {$unset: {"bioklubbnummer": "", "filmstadenMembershipId": ""}})
+db.getCollection('user').updateMany( {}, {$unset: {"bioklubbnummer": "", "sfMembershipId": ""}})
 # Remove old non-working posters
 db.getCollection('movie').updateMany({poster: /.*msprod-catalogapi.*/}, {$unset: {"poster": ""}})
 

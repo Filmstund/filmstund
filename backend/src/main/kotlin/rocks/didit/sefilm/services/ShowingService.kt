@@ -156,9 +156,7 @@ class ShowingService(
 
     if (participantLst.isEmpty()) {
       return showing.toDto()
-    } else if (participantLst.size > 1) {
-      throw IllegalStateException("Participant $currentUserId has participated more than one time on showing $showingId")
-    }
+    } else check(participantLst.size <= 1) { "Participant $currentUserId has participated more than one time on showing $showingId" }
 
     val participant = participantLst.first()
     val participantsWithoutLoggedInUser = showing.participants.minus(participant)
@@ -183,7 +181,7 @@ class ShowingService(
         )
       )
       .also {
-          eventPublisher.publish(NewShowingEvent(this, it, adminUser))
+        eventPublisher.publish(NewShowingEvent(this, it, adminUser))
       }
       .toDto()
   }
@@ -241,7 +239,7 @@ class ShowingService(
       )
     )
       .also {
-        eventPublisher.publish(UpdatedShowingEvent(this, it, it.admin))
+        eventPublisher.publish(UpdatedShowingEvent(this, it, showing, it.admin))
       }
       .toDto()
   }
@@ -308,7 +306,7 @@ class ShowingService(
   private fun createInitialPaymentInfo(showing: Showing) {
     val participants = showing
       .participants
-      .map { it ->
+      .map {
         val hasPaid = it.userId == showing.payToUser.id || it is FtgBiljettParticipant
         ParticipantPaymentInfo(
           userId = it.userId,

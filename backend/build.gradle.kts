@@ -134,7 +134,7 @@ release {
 
 jib {
     container {
-        jvmFlags = listOf("-Duser.language=sv-SE", "-Dfile.encoding=UTF-8 ", "-Duser.timezone=UTC")
+        jvmFlags = listOf("-Duser.language=sv-SE", "-Dfile.encoding=UTF-8", "-Duser.timezone=UTC")
         ports = listOf("8080")
     }
 }

@@ -22,6 +22,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.client.BufferingClientHttpRequestFactory
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.scheduling.annotation.EnableAsync
@@ -38,6 +39,7 @@ import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
+import rocks.didit.sefilm.logging.OutgoingLoggingInterceptor
 import rocks.didit.sefilm.notification.MailSettings
 import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.services.SlugService
@@ -67,13 +69,19 @@ class Application {
   }
 
   @Bean
-  fun httpRequestFactory(httpClient: HttpClient) = HttpComponentsClientHttpRequestFactory(httpClient)
+  fun httpComponentsClientHttpRequestFactory(httpClient: HttpClient) =
+    HttpComponentsClientHttpRequestFactory(httpClient)
+
+  @Bean
+  fun requestFactory(clientHttpRequestFactory: HttpComponentsClientHttpRequestFactory) =
+    BufferingClientHttpRequestFactory(clientHttpRequestFactory)
 
   @Bean
   @Primary
-  fun getRestClient(requestFactory: HttpComponentsClientHttpRequestFactory): RestTemplate {
+  fun getRestClient(requestFactory: BufferingClientHttpRequestFactory): RestTemplate {
     val restClient = RestTemplate(requestFactory)
     restClient.errorHandler = ExternalProviderErrorHandler()
+    restClient.interceptors.add(OutgoingLoggingInterceptor())
     return restClient
   }
 

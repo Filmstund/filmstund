@@ -7,21 +7,38 @@ defaults: &defaults
   working_directory: ~/itbio
 
 jobs:
-  test-backend:
+  test-backend-jdk8:
     <<: *defaults
     docker:
-      - image: circleci/openjdk:11-browsers-legacy
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - restore_cache:
-          key: gradle-{{ checksum "backend/build.gradle" }}
+          key: gradle-jdk8-{{ checksum "backend/build.gradle.kts" }}
       - run: |
           cd backend
           ./gradlew check
       - save_cache:
-          key: gradle-{{ checksum "backend/build.gradle" }}
+          key: gradle-jdk8-{{ checksum "backend/build.gradle.kts" }}
           paths:
             - ~/.gradle
+
+  test-backend-jdk11:
+    <<: *defaults
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - checkout
+      - restore_cache:
+          key: gradle-{{ checksum "backend/build.gradle.kts" }}
+      - run: |
+          cd backend
+          ./gradlew check
+      - save_cache:
+          key: gradle-{{ checksum "backend/build.gradle.kts" }}
+          paths:
+            - ~/.gradle
+
   test-frontend:
     <<: *defaults
     docker:
@@ -44,7 +61,9 @@ jobs:
           yarn test
   build-docker:
     <<: *defaults
-    machine: true
+    machine:
+      image: ubuntu-1604:201903-01
+      docker_layer_caching: true
     steps:
       - checkout
       - run: |
@@ -75,12 +94,14 @@ workflows:
           project_root: "./frontend"
   build:
     jobs:
-      - test-backend
+      - test-backend-jdk8
+      - test-backend-jdk11
       - test-frontend
       - build-docker:
           requires:
             - test-frontend
-            - test-backend
+            - test-backend-jdk8
+            - test-backend-jdk11
       - push-docker:
           requires:
             - build-docker
