@@ -19,7 +19,6 @@ import rocks.didit.sefilm.domain.dto.UserDTO
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
@@ -86,7 +85,7 @@ class CalendarService(
     vEvent.lastModified = LastModified(Date.from(this.lastModifiedDate))
     vEvent.transparency = Transparency.opaque()
 
-    val alarmTriggerDate = Date.from(this.getStartDate().minusSeconds(properties.calendar.durationBeforeAlert.toSeconds()))
+    val alarmTriggerDate = Date.from(this.getStartDate().minusMillis(properties.calendar.durationBeforeAlert.toMillis()))
     vEvent.addAlarm(VAlarm.audio(Trigger(alarmTriggerDate)))
 
     return vEvent
