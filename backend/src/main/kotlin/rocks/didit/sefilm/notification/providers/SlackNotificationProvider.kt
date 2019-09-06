@@ -99,8 +99,6 @@ class SlackNotificationProvider(
     }
   }
 
-  private fun hasIMDbId(event: ShowingEvent): Boolean = event.showing.movie.imdbId.isSupplied()
-
   private fun pushToSlack(slackPayload: SlackPayload) {
     val slackUrl: String = properties.notification.provider.slack.slackHookUrl
     if (slackUrl.isBlank()) {
