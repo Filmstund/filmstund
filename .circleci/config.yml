@@ -7,15 +7,6 @@ defaults: &defaults
   working_directory: ~/itbio
 
 jobs:
-  test-backend:
-    <<: *defaults
-    docker:
-      - image: circleci/openjdk:11-jdk
-    steps:
-      - run: |
-          trigger_job test-backend-jdk8
-          trigger_job test-backend-jdk11
-
   test-backend-jdk8:
     <<: *defaults
     docker:
@@ -101,11 +92,13 @@ workflows:
           project_root: "./frontend"
   build:
     jobs:
-      - test-backend
+      - test-backend-jdk8
+      - test-backend-jdk11
       - test-frontend
       - build-docker:
           requires:
-            - test-frontend
+            - test-frontend-jdk8
+            - test-frontend-jdk11
             - test-backend
       - push-docker:
           requires:
