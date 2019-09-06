@@ -40,14 +40,15 @@ class SlackNotificationProvider(
 
     val headers = HttpHeaders()
     headers.contentType = MediaType.APPLICATION_JSON
+    val showingUrl = "${properties.baseUrl.frontend}/showings/${event.showing.webId}/${event.showing.slug}"
     val payload = mapOf(
-      "text" to "Ny visning: <${properties.baseUrl.frontend}/showings/${event.showing.webId}/${event.showing.slug}>",
+      "text" to "Ny visning: <$showingUrl>",
       "icon_emoji" to ":sf:",
       "username" to "SeFilm"
     )
     val request = HttpEntity<String>(objectMapper.writeValueAsString(payload), headers)
     try {
-      log.debug("About to POST {} to {}", request, slackUrl)
+      log.info("Notifying Slack about a new showing: {}", showingUrl)
       restTemplate.postForEntity(slackUrl, request, String::class.java)
     } catch (e: Exception) {
       log.warn("Failed to post Slack Webhook", e)
