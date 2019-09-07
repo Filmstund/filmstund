@@ -8,7 +8,9 @@
     "postalCode": "412 58",
     "postalAddress": "Göteborg",
     "alias": [
-      "Hubben"
+      {
+        "alias": "Hubben"
+      }
     ]
   }
 ]

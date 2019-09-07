@@ -23,3 +23,31 @@ values (1, 'Du skall icke spoila'),
        (10, 'Du skall icke frestas av 3D, ty det är djävulens påfund'),
        (37, 'Tag icke med en bebis');
 --rollback delete from bio_budord where number in (1,2,3,4,5,6,7,8,9,10,37);
+
+--changeset eda:createLocationTable
+create table location
+(
+    name               varchar(100)             not null
+        constraint location_pk primary key,
+    city_alias         varchar(2)               null,
+    city               varchar(100)             null,
+    street_address     varchar(100)             null,
+    postal_code        varchar(10)              null,
+    postal_address     varchar(100)             null,
+    latitude           float                    null,
+    longitude          float                    null,
+    filmstaden_id      varchar(10)              null
+        constraint location_fsId_unique unique,
+    last_modified_date timestamp with time zone not null default current_timestamp
+);
+--rollback DROP table if exists location;
+
+--changeset eda:createLocationAliasTable
+create table location_alias
+(
+    location           varchar(100)
+        constraint location_alias_fk references location,
+    alias              varchar(100)             not null,
+    last_modified_date timestamp with time zone not null default current_timestamp
+);
+--rollback drop table if exists location_alias;
