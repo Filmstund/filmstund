@@ -33,7 +33,6 @@ const useEditShowingData = (webId: string) =>
       ${oldShowingFragment}
     `,
     {
-      errorPolicy: "ignore",
       fetchPolicy: "cache-and-network",
       variables: { webId }
     }

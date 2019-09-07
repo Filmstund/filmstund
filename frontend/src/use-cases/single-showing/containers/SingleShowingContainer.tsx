@@ -1,6 +1,6 @@
-import { NetworkStatus } from "apollo-client";
+import { ApolloError, NetworkStatus } from "apollo-client";
 import gql from "graphql-tag";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "react-apollo";
 
 import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
@@ -12,6 +12,7 @@ import IMDbLink from "../../common/ui/IMDbLink";
 import { ButtonContainer } from "../../common/ui/MainButton";
 import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
 import Loader from "../../common/utils/ProjectorLoader";
+import StatusMessageBox from "../../common/utils/StatusMessageBox";
 import { useScrollToTop } from "../../common/utils/useScrollToTop";
 import AdminAction, { adminActionFragments } from "../AdminAction";
 import ParticipantList, {
@@ -29,11 +30,17 @@ import ShowingPaymentContainer from "./ShowingPaymentContainer";
 
 interface Props {
   me: SingleShowing_me;
-  showing: SingleShowing_showing;
+  error: ApolloError | undefined;
+  showing: SingleShowing_showing | null;
   refetch: () => Promise<unknown>;
 }
 
-const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
+const SingleShowingContainer: React.FC<Props> = ({
+  me,
+  showing,
+  error,
+  refetch
+}) => {
   const { history } = useRouter();
   const [openModal, setOpenModal] = useState(false);
 
@@ -41,19 +48,22 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
 
   useScrollToTop();
 
-  const navigateToTickets = useCallback(
-    () => {
+  const navigateToTickets = () => {
+    if (showing) {
       navigateToShowingTickets(history, showing);
-    },
-    [history, showing]
-  );
+    }
+  };
 
-  const openSwish = useCallback(swishLink => {
+  const openSwish = (swishLink?: string) => {
     setOpenModal(true);
     if (swishLink) {
-      window.location = swishLink;
+      window.location.href = swishLink;
     }
-  }, []);
+  };
+
+  if (!showing) {
+    return <MissingShowing />;
+  }
 
   const isAdmin = userIsAdmin(showing, me);
   const isParticipating = userIsParticipating(showing.participants, me);
@@ -76,6 +86,7 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
         location={showing.location.name}
         ticketsBought={showing.ticketsBought}
       />
+      {error && <StatusMessageBox errors={error.graphQLErrors} />}
       <ButtonContainer>
         <IMDbLink imdbId={showing.movie.imdbId} />
         {isAdmin && (
@@ -131,25 +142,23 @@ const useSingleShowingData = (webId: string) =>
       ${participantsListFragment}
     `,
     {
-      errorPolicy: "ignore",
       fetchPolicy: "cache-and-network",
       variables: { webId }
     }
   );
 
 const SingleShowingLoader: React.FC<{ webId: string }> = ({ webId }) => {
-  const { data, loading, refetch, networkStatus } = useSingleShowingData(webId);
+  const { data, loading, error, refetch, networkStatus } = useSingleShowingData(
+    webId
+  );
 
   if (!data || (loading && networkStatus !== NetworkStatus.refetch)) {
     return <Loader />;
   }
 
-  if (!data.showing) {
-    return <MissingShowing />;
-  }
-
   return (
     <SingleShowingContainer
+      error={error}
       showing={data.showing}
       me={data.me}
       refetch={refetch}
