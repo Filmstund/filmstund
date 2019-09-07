@@ -1,5 +1,5 @@
-import React from "react";
 import styled from "@emotion/styled";
+import React from "react";
 
 export const StatusBox = styled.div<{ error?: boolean }>`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -9,8 +9,22 @@ export const StatusBox = styled.div<{ error?: boolean }>`
   color: ${props => (props.error ? "white" : "black")};
 `;
 
+const messageIsNotNullError = (message: string): boolean =>
+  !message.includes("Cannot return null for non-nullable type");
+
+const formatErrors = (errors: readonly Error[] | string): string => {
+  if (Array.isArray(errors)) {
+    return errors
+      .map(e => e.message)
+      .filter(messageIsNotNullError)
+      .join("\n");
+  } else {
+    return errors;
+  }
+};
+
 interface Props {
-  errors?: Error[] | null | undefined;
+  errors?: readonly Error[] | string | null | undefined;
   success?: boolean;
   successMessage?: string;
 }
@@ -23,7 +37,8 @@ const StatusMessageBox: React.FC<Props> = ({
   if (success) {
     return <StatusBox>{successMessage}</StatusBox>;
   } else if (errors) {
-    return <StatusBox error>{errors.map(e => e.message).join(", ")}</StatusBox>;
+    const message = formatErrors(errors);
+    return <StatusBox error>{message}</StatusBox>;
   } else {
     return null;
   }

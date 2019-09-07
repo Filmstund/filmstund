@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { lazy } from "react";
+import React, { ChangeEvent, lazy } from "react";
+import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
 import { formatYMD } from "../../lib/dateTools";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
@@ -20,7 +21,7 @@ const ForetagsbiljettWrapper = styled.div`
   padding: 0.5em 0;
 `;
 
-const ForetagsbiljettInput = styled(Input)`
+const MaxWidthInput = styled(Input)`
   max-width: 13.6em;
   background: ${props => (props.disabled ? "rgba(0, 0, 0, 0.04)" : "inherit")};
 `;
@@ -66,10 +67,10 @@ const DateInput = ({ onChange, ...props }: any) => {
 };
 
 interface EditableForetagsbiljettProps {
-  biljett: UserProfile_me_foretagsbiljetter;
+  biljett: ForetagsbiljettInput;
   editable: true;
-  handleChangeForetagsbiljett: () => void;
-  handleSetExpiresForetagsbiljett: () => void;
+  handleChangeForetagsbiljett: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleSetExpiresForetagsbiljett: (value: Date) => void;
   handleRemoveForetagsbiljett: () => void;
 }
 
@@ -83,43 +84,38 @@ interface ForetagsbiljettProps {
 
 type Props = EditableForetagsbiljettProps | ForetagsbiljettProps;
 
-const Foretagsbiljett: React.FC<Props> = ({
-  biljett,
-  editable,
-  handleChangeForetagsbiljett,
-  handleSetExpiresForetagsbiljett,
-  handleRemoveForetagsbiljett
-}) => (
+const Foretagsbiljett: React.FC<Props> = (props) => (
   <ForetagsbiljettWrapper>
     <BiljettField text="Nummer">
-      {editable ? (
-        <ForetagsbiljettInput
+      {props.editable ? (
+        <MaxWidthInput
           type="text"
-          value={biljett.number}
+          value={props.biljett.number}
           maxLength={11}
-          onChange={handleChangeForetagsbiljett}
+          onChange={props.handleChangeForetagsbiljett}
         />
       ) : (
-        <ValueField>{biljett.number}</ValueField>
+        <ValueField>{props.biljett.number}</ValueField>
       )}
     </BiljettField>
     <BiljettField text="Utgångsdatum">
-      {editable ? (
+      {props.editable ? (
         <DateInput
-          value={biljett.expires}
-          onChange={handleSetExpiresForetagsbiljett}
+          value={props.biljett.expires}
+          onChange={props.handleSetExpiresForetagsbiljett}
         />
       ) : (
-        <ValueField>{formatYMD(biljett.expires)}</ValueField>
+        <ValueField>{formatYMD(props.biljett.expires)}</ValueField>
       )}
     </BiljettField>
-    {biljett.status && (
-      <BiljettField text="Status">
-        <ValueField>{localizeTicketStatus(biljett.status)}</ValueField>
-      </BiljettField>
-    )}
+    {"status" in props.biljett &&
+      props.biljett.status && (
+        <BiljettField text="Status">
+          <ValueField>{localizeTicketStatus(props.biljett.status)}</ValueField>
+        </BiljettField>
+      )}
 
-    <div onClick={handleRemoveForetagsbiljett}>
+    <div onClick={props.handleRemoveForetagsbiljett}>
       <IconButton size="2x" icon={faTrash} />
     </div>
   </ForetagsbiljettWrapper>
