@@ -6,8 +6,8 @@ import rocks.didit.sefilm.domain.UserID
 data class AttendeePaymentDetailsDTO(
   val hasPaid: Boolean = false,
   val amountOwed: SEK = SEK(0),
-  val payTo: UserID = UserID(),
+  val payTo: UserID = UserID.MISSING,
   val swishLink: String? = null,
   val payToPhoneNumber: String = "",
-  val payerUserID: UserID = UserID()
+  val payerUserID: UserID = UserID.MISSING
 )

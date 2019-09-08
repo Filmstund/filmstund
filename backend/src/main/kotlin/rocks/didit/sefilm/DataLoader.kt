@@ -28,7 +28,6 @@ class DataLoader(
 
     seedLocations(objectMapper)
     seedLocationsFromFilmstaden(objectMapper)
-    migrateLocationsFromMongo()
   }
 
   private fun seedLocations(objectMapper: ObjectMapper) {
@@ -66,35 +65,6 @@ class DataLoader(
 
     val savedRows = locationRepository.saveAll(locationsFromFilmstaden).count()
     log.info("Seeded $savedRows locations from Filmstaden for city: $defaultCity")
-  }
-
-  private fun migrateLocationsFromMongo() {
-    log.info(
-      "{} locations are stored in MongoDB and {} are stored in Postgres",
-      locationsMongoRepo.count(),
-      locationRepository.count()
-    )
-
-    locationsMongoRepo.findAll()
-      .filterNot { locationRepository.existsById(it.name ?: "NON_EXISTANT") }
-      .filterNot { it.name.isNullOrEmpty() }
-      .forEach {
-        val pgLoc = Location(
-          name = it.name!!,
-          cityAlias = it.cityAlias,
-          city = it.city,
-          streetAddress = it.streetAddress,
-          postalCode = it.postalCode,
-          postalAddress = it.postalAddress,
-          latitude = it.latitude,
-          longitude = it.longitude,
-          filmstadenId = it.filmstadenId,
-          alias = it.alias.map { name -> LocationAlias(name) }
-        )
-
-        val savedLoc = locationRepository.save(pgLoc)
-        log.debug("{} migrated as {}", it.name, savedLoc)
-      }
   }
 
   private data class LocationAliasDTO(val filmstadenId: String, val alias: List<String>)

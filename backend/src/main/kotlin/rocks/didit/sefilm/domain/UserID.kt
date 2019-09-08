@@ -2,11 +2,13 @@ package rocks.didit.sefilm.domain
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-data class UserID(val id: String = "N/A") {
+data class UserID(val id: String) {
+  companion object {
+    val MISSING = UserID("N/A")
+  }
+
   init {
-    if (id.isBlank()) {
-      throw IllegalArgumentException("Id may not be blank")
-    }
+    require(!id.isBlank()) { "Id may not be blank" }
   }
 
   @JsonValue

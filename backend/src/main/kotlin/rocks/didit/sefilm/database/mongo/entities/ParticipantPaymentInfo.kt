@@ -10,7 +10,7 @@ import java.util.*
 data class ParticipantPaymentInfo(
   @Id
   val id: UUID = UUID.randomUUID(),
-  val userId: UserID = UserID(),
+  val userId: UserID = UserID.MISSING,
   val showingId: UUID = UUID.randomUUID(),
   val hasPaid: Boolean = false,
   val amountOwed: SEK = SEK(0)

@@ -51,3 +51,47 @@ create table location_alias
     last_modified_date timestamp with time zone not null default current_timestamp
 );
 --rollback drop table if exists location_alias;
+
+--changeset eda:createTableUsers
+create table users
+(
+    id                 uuid
+        constraint user_pk primary key,
+    first_name         varchar(100) not null,
+    last_name          varchar(100) not null,
+    nick               varchar(50)  not null,
+    email              varchar(100) not null,
+    phone              varchar(13)  null,
+    avatar             varchar(255) null,
+    calendar_feed_id   uuid
+        constraint user_calendarfeedid_unique unique,
+    last_login         timestamp    not null default current_timestamp,
+    signup_date        timestamp    not null default current_timestamp,
+    last_modified_date timestamp    not null default current_timestamp
+);
+--rollback drop table if exists "user";
+
+--changeset eda:createTableUserIds
+create table user_ids
+(
+    user_id       uuid
+        constraint user_ids_fk references users on delete cascade,
+    google_id     varchar(25)
+        constraint user_ids_google_uniq unique,
+    filmstaden_id varchar(7) null
+        constraint user_ids_fsid_uniq unique,
+    constraint user_ids_pk primary key (user_id)
+);
+--rollback drop table if exists user_ids;
+
+--changeset eda:createTableGiftCert
+create table gift_certificate
+(
+    user_id    uuid
+        constraint giftcert_user_fk references users on delete cascade,
+    number     varchar(15)
+        constraint giftcert_number_unique unique,
+    expires_at date not null default current_date + interval '1 year',
+    constraint giftcert_pk primary key (user_id, number)
+);
+--rollback drop table if exists gift_certificate;

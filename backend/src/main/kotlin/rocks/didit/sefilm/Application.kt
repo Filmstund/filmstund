@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import rocks.didit.sefilm.database.mongo.MongoMigrator
 import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
@@ -155,10 +156,7 @@ class Application {
   @Transactional
   fun seedInitialData(
     dataLoader: DataLoader,
-    locationsMongoRepo: LocationMongoRepository,
-    locationRepository: LocationRepository,
-    budordRepo: BudordRepository,
-    filmstadenService: FilmstadenService,
+    mongoMigrator: MongoMigrator,
     properties: Properties
   ) = ApplicationRunner { _ ->
     if (!properties.enableSeeding) {
@@ -174,6 +172,7 @@ class Application {
 
 
     dataLoader.seedInitialData()
+    mongoMigrator.migrateFromMongo()
   }
 
   @Bean
