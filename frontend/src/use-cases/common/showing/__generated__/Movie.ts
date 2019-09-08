@@ -8,7 +8,7 @@
 
 export interface Movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   poster: string | null;
   title: string;
   releaseDate: string;

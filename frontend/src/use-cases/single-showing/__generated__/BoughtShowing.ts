@@ -13,7 +13,7 @@ export interface BoughtShowing_myTickets {
 
 export interface BoughtShowing_attendeePaymentDetails_payTo {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   phone: string | null;
   firstName: string | null;
   nick: string | null;
@@ -22,7 +22,7 @@ export interface BoughtShowing_attendeePaymentDetails_payTo {
 
 export interface BoughtShowing_attendeePaymentDetails {
   __typename: "AttendeePaymentDetails";
-  amountOwed: any;
+  amountOwed: SeFilmSEK;
   swishLink: string | null;
   hasPaid: boolean;
   payTo: BoughtShowing_attendeePaymentDetails_payTo;

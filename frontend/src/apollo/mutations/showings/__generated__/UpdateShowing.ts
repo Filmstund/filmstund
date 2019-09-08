@@ -10,16 +10,16 @@ import { UpdateShowingInput } from "./../../../../__generated__/globalTypes";
 
 export interface UpdateShowing_updateShowing_payToUser {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface UpdateShowing_updateShowing {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   time: string;
   date: string;
   ticketsBought: boolean;
-  price: any | null;
+  price: SeFilmSEK | null;
   private: boolean;
   payToUser: UpdateShowing_updateShowing_payToUser;
   expectedBuyDate: string | null;
@@ -30,6 +30,6 @@ export interface UpdateShowing {
 }
 
 export interface UpdateShowingVariables {
-  showingId: any;
+  showingId: SeFilmUUID;
   showing: UpdateShowingInput;
 }

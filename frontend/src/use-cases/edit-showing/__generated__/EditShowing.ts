@@ -8,7 +8,7 @@
 
 export interface EditShowing_me {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface EditShowing_showing_location {
@@ -19,27 +19,27 @@ export interface EditShowing_showing_location {
 
 export interface EditShowing_showing_movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   title: string;
   poster: string | null;
 }
 
 export interface EditShowing_showing_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   name: string | null;
   nick: string | null;
 }
 
 export interface EditShowing_showing_payToUser {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface EditShowing_showing {
   __typename: "Showing";
-  id: any;
-  webId: any;
+  id: SeFilmUUID;
+  webId: SeFilmBase64ID;
   slug: string;
   date: string;
   time: string;
@@ -47,7 +47,7 @@ export interface EditShowing_showing {
   ticketsBought: boolean;
   movie: EditShowing_showing_movie;
   admin: EditShowing_showing_admin;
-  price: any | null;
+  price: SeFilmSEK | null;
   private: boolean;
   filmstadenRemoteEntityId: string | null;
   payToUser: EditShowing_showing_payToUser;
@@ -65,5 +65,5 @@ export interface EditShowing {
 }
 
 export interface EditShowingVariables {
-  webId: any;
+  webId: SeFilmBase64ID;
 }

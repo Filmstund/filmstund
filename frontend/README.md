@@ -20,8 +20,8 @@ $ yarn start
 $ find src -name __generated__ -exec rm -r {} \;
 
 # Fetch new typings unauthorized
-$ yarn apollo client:codegen --target typescript --includes "src/**/*.{js,ts,tsx}" --globalTypesFile=src/__generated__/globalTypes.ts --endpoint http://localhost:8080/graphql
+$ yarn apollo client:codegen --target typescript --customScalarsPrefix=SeFilm --passthroughCustomScalars --includes "src/**/*.{js,ts,tsx}" --globalTypesFile=src/__generated__/globalTypes.ts --endpoint http://localhost:8080/graphql
 
 # Fetch new typings with bearer token
-$ yarn apollo client:codegen --target typescript --includes "src/**/*.{js,ts,tsx}" --globalTypesFile=src/__generated__/globalTypes.ts --endpoint http://localhost:8080/graphql --header 'Authorization: Bearer token_here'
+$ yarn apollo client:codegen --target typescript --customScalarsPrefix=SeFilm --passthroughCustomScalars --includes "src/**/*.{js,ts,tsx}" --globalTypesFile=src/__generated__/globalTypes.ts --endpoint http://localhost:8080/graphql --header 'Authorization: Bearer token_here'
 ```

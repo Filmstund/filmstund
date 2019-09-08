@@ -28,8 +28,18 @@ const AddForetagsbiljettContainer = styled.div`
   padding-bottom: 2em;
 `;
 
-interface ForetagsbiljettInputDraft extends ForetagsbiljettInput {
+const transformDraftToInput = ({
+  number,
+  expires
+}: ForetagsbiljettInputDraft): ForetagsbiljettInput => ({
+  number,
+  expires: formatYMD(expires)
+});
+
+interface ForetagsbiljettInputDraft {
   id: string;
+  number: string;
+  expires: Date;
 }
 
 const EditableForetagsbiljettList: React.FC = () => {
@@ -44,10 +54,7 @@ const EditableForetagsbiljettList: React.FC = () => {
     () => {
       const ticketsToSubmit = tickets
         .filter(({ number }) => number && number.trim())
-        .map(({ number, expires }) => ({
-          number,
-          expires: formatYMD(expires)
-        }));
+        .map(transformDraftToInput);
 
       return saveForetagsBiljetter({
         variables: { tickets: ticketsToSubmit }
@@ -57,7 +64,7 @@ const EditableForetagsbiljettList: React.FC = () => {
   );
 
   const addForetagsbiljett = useCallback(() => {
-    const foretagsbiljett = {
+    const foretagsbiljett: ForetagsbiljettInputDraft = {
       id: uniqueId("ftg-"),
       number: "",
       expires: DEFAULT_DATE
@@ -91,7 +98,7 @@ const EditableForetagsbiljettList: React.FC = () => {
         {tickets.map(biljett => (
           <Foretagsbiljett
             key={biljett.id}
-            biljett={biljett}
+            biljett={transformDraftToInput(biljett)}
             editable={true}
             handleChangeForetagsbiljett={v => handleChange(biljett.id, v)}
             handleSetExpiresForetagsbiljett={v =>

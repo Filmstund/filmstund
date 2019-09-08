@@ -10,7 +10,7 @@ import { ParticipantPaymentInput } from "./../../../../__generated__/globalTypes
 
 export interface TogglePaidChange_updateParticipantPaymentInfo {
   __typename: "ParticipantPaymentInfo";
-  id: any;
+  id: SeFilmUUID;
   hasPaid: boolean;
 }
 

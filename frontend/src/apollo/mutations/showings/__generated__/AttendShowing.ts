@@ -10,7 +10,7 @@ import { PaymentOption } from "./../../../../__generated__/globalTypes";
 
 export interface AttendShowing_attendShowing_participants_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -25,7 +25,7 @@ export interface AttendShowing_attendShowing_participants {
 
 export interface AttendShowing_attendShowing {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   participants: AttendShowing_attendShowing_participants[];
 }
 
@@ -34,6 +34,6 @@ export interface AttendShowing {
 }
 
 export interface AttendShowingVariables {
-  showingId: any;
+  showingId: SeFilmUUID;
   paymentOption: PaymentOption;
 }
