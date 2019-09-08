@@ -96,7 +96,7 @@ export const AdminModalBeforeTicketsBought: React.FC<
 > = ({ closeModal, showing, adminPaymentDetails }) => {
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
   const [ticketPrice, handlePriceChange] = useStateWithHandleChange(
-    showing.price / 100,
+    (showing.price || 0) / 100,
     priceTransformer
   );
 
@@ -148,7 +148,9 @@ export const AdminModalBeforeTicketsBought: React.FC<
       )}
       <ParticipantsList participants={showing.participants} showPhone={true} />
       <TicketList tickets={filmstadenData} />
-      <StatusMessageBox errors={mutationErrors.length > 0 ? mutationErrors : null} />
+      <StatusMessageBox
+        errors={mutationErrors.length > 0 ? mutationErrors : null}
+      />
       <Field text="Biljettpris:">
         <Input
           type="number"

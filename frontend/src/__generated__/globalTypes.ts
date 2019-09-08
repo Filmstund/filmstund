@@ -19,12 +19,12 @@ export enum PaymentType {
 }
 
 export interface CreateShowingInput {
-  date: any;
-  time: any;
-  movieId: any;
+  date: SeFilmLocalDate;
+  time: SeFilmLocalTime;
+  movieId: SeFilmUUID;
   location: string;
   filmstadenScreen?: FilmstadenScreenInput | null;
-  expectedBuyDate?: any | null;
+  expectedBuyDate?: SeFilmLocalDate | null;
   filmstadenRemoteEntityId?: string | null;
 }
 
@@ -35,7 +35,7 @@ export interface FilmstadenScreenInput {
 
 export interface ForetagsbiljettInput {
   number: string;
-  expires?: any | null;
+  expires?: SeFilmLocalDate | null;
 }
 
 export interface NewUserInfo {
@@ -45,11 +45,11 @@ export interface NewUserInfo {
 }
 
 export interface ParticipantPaymentInput {
-  id: any;
+  id: SeFilmUUID;
   userId: string;
-  showingId?: any | null;
+  showingId?: SeFilmUUID | null;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: SeFilmSEK;
 }
 
 /**
@@ -61,14 +61,14 @@ export interface PaymentOption {
 }
 
 export interface UpdateShowingInput {
-  price: any;
+  price: SeFilmSEK;
   private: boolean;
   payToUser: string;
-  expectedBuyDate?: any | null;
+  expectedBuyDate?: SeFilmLocalDate | null;
   location: string;
   filmstadenRemoteEntityId?: string | null;
-  time: any;
-  date: any;
+  time: SeFilmLocalTime;
+  date: SeFilmLocalDate;
 }
 
 //==============================================================

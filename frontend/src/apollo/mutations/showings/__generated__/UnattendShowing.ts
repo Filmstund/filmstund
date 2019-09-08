@@ -8,7 +8,7 @@
 
 export interface UnattendShowing_unattendShowing_participants_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -23,7 +23,7 @@ export interface UnattendShowing_unattendShowing_participants {
 
 export interface UnattendShowing_unattendShowing {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   participants: UnattendShowing_unattendShowing_participants[];
 }
 
@@ -32,5 +32,5 @@ export interface UnattendShowing {
 }
 
 export interface UnattendShowingVariables {
-  showingId: any;
+  showingId: SeFilmUUID;
 }

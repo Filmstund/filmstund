@@ -13,22 +13,22 @@ export interface OldShowing_location {
 
 export interface OldShowing_movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   title: string;
   poster: string | null;
 }
 
 export interface OldShowing_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   name: string | null;
   nick: string | null;
 }
 
 export interface OldShowing {
   __typename: "Showing";
-  id: any;
-  webId: any;
+  id: SeFilmUUID;
+  webId: SeFilmBase64ID;
   slug: string;
   date: string;
   time: string;

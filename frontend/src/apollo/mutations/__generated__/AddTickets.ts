@@ -8,7 +8,7 @@
 
 export interface AddTickets_processTicketUrls_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface AddTickets_processTicketUrls_ticketRange_seatings {
@@ -63,7 +63,7 @@ export interface AddTickets_processTicketUrls_myTickets {
   screen: string;
   profileId: string | null;
   seat: AddTickets_processTicketUrls_myTickets_seat;
-  date: any;
+  date: SeFilmLocalDate;
   time: string;
   movieName: string;
   /**
@@ -78,8 +78,8 @@ export interface AddTickets_processTicketUrls_myTickets {
 
 export interface AddTickets_processTicketUrls {
   __typename: "Showing";
-  id: any;
-  webId: any;
+  id: SeFilmUUID;
+  webId: SeFilmBase64ID;
   slug: string;
   admin: AddTickets_processTicketUrls_admin;
   ticketRange: AddTickets_processTicketUrls_ticketRange | null;
@@ -92,6 +92,6 @@ export interface AddTickets {
 }
 
 export interface AddTicketsVariables {
-  showingId: any;
+  showingId: SeFilmUUID;
   tickets?: string[] | null;
 }

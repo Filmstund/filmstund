@@ -11,13 +11,13 @@ import { ForetagsbiljettInput, ForetagsbiljettStatus } from "./../../../__genera
 export interface AddForetagsbiljett_addForetagsBiljetter_foretagsbiljetter {
   __typename: "Foretagsbiljett";
   number: string;
-  expires: any;
+  expires: SeFilmLocalDate;
   status: ForetagsbiljettStatus;
 }
 
 export interface AddForetagsbiljett_addForetagsBiljetter {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
   foretagsbiljetter: AddForetagsbiljett_addForetagsBiljetter_foretagsbiljetter[] | null;
 }
 

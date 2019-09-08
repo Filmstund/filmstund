@@ -10,7 +10,7 @@ import { ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
 
 export interface PendingShowing_foretagsbiljetter {
   __typename: "Foretagsbiljett";
-  expires: any;
+  expires: SeFilmLocalDate;
   number: string;
   status: ForetagsbiljettStatus;
 }

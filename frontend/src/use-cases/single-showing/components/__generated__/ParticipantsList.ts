@@ -13,7 +13,7 @@ export interface ParticipantsList_user {
   nick: string | null;
   lastName: string | null;
   phone: string | null;
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface ParticipantsList {

@@ -8,12 +8,12 @@
 
 export interface TicketQuery_me {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface TicketQuery_showing_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface TicketQuery_showing_ticketRange_seatings {
@@ -68,7 +68,7 @@ export interface TicketQuery_showing_myTickets {
   screen: string;
   profileId: string | null;
   seat: TicketQuery_showing_myTickets_seat;
-  date: any;
+  date: SeFilmLocalDate;
   time: string;
   movieName: string;
   /**
@@ -83,8 +83,8 @@ export interface TicketQuery_showing_myTickets {
 
 export interface TicketQuery_showing {
   __typename: "Showing";
-  id: any;
-  webId: any;
+  id: SeFilmUUID;
+  webId: SeFilmBase64ID;
   slug: string;
   admin: TicketQuery_showing_admin;
   ticketRange: TicketQuery_showing_ticketRange | null;
@@ -98,5 +98,5 @@ export interface TicketQuery {
 }
 
 export interface TicketQueryVariables {
-  webId: any;
+  webId: SeFilmBase64ID;
 }

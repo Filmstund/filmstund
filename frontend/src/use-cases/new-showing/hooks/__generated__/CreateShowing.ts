@@ -15,22 +15,22 @@ export interface CreateShowing_showing_location {
 
 export interface CreateShowing_showing_movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   title: string;
   poster: string | null;
 }
 
 export interface CreateShowing_showing_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   name: string | null;
   nick: string | null;
 }
 
 export interface CreateShowing_showing {
   __typename: "Showing";
-  id: any;
-  webId: any;
+  id: SeFilmUUID;
+  webId: SeFilmBase64ID;
   slug: string;
   date: string;
   time: string;

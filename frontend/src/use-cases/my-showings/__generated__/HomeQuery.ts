@@ -8,7 +8,7 @@
 
 export interface HomeQuery_showings_movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   poster: string | null;
   title: string;
 }
@@ -20,7 +20,7 @@ export interface HomeQuery_showings_myTickets {
 
 export interface HomeQuery_showings_participants_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   avatar: string | null;
 }
 
@@ -31,15 +31,15 @@ export interface HomeQuery_showings_participants {
 
 export interface HomeQuery_showings_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface HomeQuery_showings {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   date: string;
   time: string;
-  webId: any;
+  webId: SeFilmBase64ID;
   slug: string;
   movie: HomeQuery_showings_movie;
   myTickets: HomeQuery_showings_myTickets[] | null;
@@ -49,7 +49,7 @@ export interface HomeQuery_showings {
 
 export interface HomeQuery_me {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface HomeQuery {
