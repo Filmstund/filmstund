@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
+import rocks.didit.sefilm.KnownException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.mongo.entities.Movie
 import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
@@ -59,10 +60,10 @@ class AsyncMovieUpdater(
       try {
         updateInfo(it)
       } catch (e: Exception) {
-        log.warn(
-          "[MovieUpdater] An error occurred when updating '${it.title}' ID=${it.id}, Filmstaden id=${it.filmstadenId}",
-          e
-        )
+        log.warn("[MovieUpdater] An error occurred when updating '${it.title}' ID=${it.id}, Filmstaden id=${it.filmstadenId}")
+        if (e !is KnownException) {
+          log.warn("Exception", e)
+        }
       }
       randomBackoff()
     }
