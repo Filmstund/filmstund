@@ -27,7 +27,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.692064172675-montab9pi57304e68r932c6lm7111oaf</string>
+				<string>com.googleusercontent.apps.976792570239-2plt93mmibojvtq3ipngcmk6php2eajq</string>
 			</array>
 		</dict>
 	</array>
@@ -42,6 +42,11 @@
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>192.168.1.13</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
@@ -64,5 +69,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>sf_bold.ttf</string>
+		<string>sf_regular.ttf</string>
+	</array>
 </dict>
 </plist>
