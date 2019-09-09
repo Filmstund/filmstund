@@ -9,7 +9,8 @@ const moviePoster =
 export const ShowingListItem: React.FC<{
   showing: ShowingsByMovieQuery_publicShowings;
   onPressShowTicket: () => void;
-}> = ({ onPressShowTicket, showing }) => (
+  onPressShowing: () => void;
+}> = ({ onPressShowing, onPressShowTicket, showing }) => (
   <View
     style={{
       padding,
@@ -19,15 +20,17 @@ export const ShowingListItem: React.FC<{
       flexDirection: "row"
     }}
   >
-    <Image
-      source={{
-        uri: showing.movie.poster || moviePoster,
-        height: 199,
-        width: 134
-      }}
-    />
+    <TouchableOpacity onPress={onPressShowing}>
+      <Image
+        source={{
+          uri: showing.movie.poster || moviePoster,
+          height: 199,
+          width: 134
+        }}
+      />
+    </TouchableOpacity>
     <View style={{ paddingHorizontal: padding, flex: 1 }}>
-      <View style={{ flex: 1 }}>
+      <TouchableOpacity style={{ flex: 1 }} onPress={onPressShowing}>
         <Text style={{ fontSize: 18, fontWeight: "500" }}>
           {showing.movie.title}
         </Text>
@@ -35,30 +38,31 @@ export const ShowingListItem: React.FC<{
           {showing.date} {showing.time}
         </Text>
         <Text>{showing.location.name}</Text>
-      </View>
-      {showing.myTickets && showing.myTickets.length > 0 && (
-        <View style={{ alignItems: "flex-start" }}>
-          <TouchableOpacity onPress={onPressShowTicket}>
-            <View
-              style={{
-                backgroundColor: "#d0021b",
-                borderRadius: 5,
-                padding: 13
-              }}
-            >
-              <Text
+      </TouchableOpacity>
+      {showing.myTickets &&
+        showing.myTickets.length > 0 && (
+          <View style={{ alignItems: "flex-start" }}>
+            <TouchableOpacity onPress={onPressShowTicket}>
+              <View
                 style={{
-                  color: "white",
-                  fontSize: 14,
-                  fontWeight: "500"
+                  backgroundColor: "#d0021b",
+                  borderRadius: 5,
+                  padding: 13
                 }}
               >
-                Visa biljett
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      )}
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 14,
+                    fontWeight: "500"
+                  }}
+                >
+                  Visa biljett
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
     </View>
     <View>
       <Text>{">"}</Text>

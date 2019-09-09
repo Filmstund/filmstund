@@ -8,9 +8,9 @@ type ShowingFilterFn = (s: ShowingsByMovieQuery_publicShowings) => boolean;
 
 const today = parseISO(format(new Date(), "yyyy-MM-dd"));
 
-export const showingDate = (showing: ShowingsByMovieQuery_publicShowings) =>
-  parseISO(showing.date + " " + showing.time);
-
+export const showingDate = (
+  showing: Pick<ShowingsByMovieQuery_publicShowings, "date" | "time">
+) => parseISO(showing.date + " " + showing.time);
 
 export const filterShowingsParticipatedByMe = (
   meId: string

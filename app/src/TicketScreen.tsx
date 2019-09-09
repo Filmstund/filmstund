@@ -71,7 +71,11 @@ const Ticket = ({
             Rad {ticket.seat.row}
           </Text>
           <Text
-            style={{ fontFamily: sfSansRegular, color: "#7b7b7b", fontSize: 20 }}
+            style={{
+              fontFamily: sfSansRegular,
+              color: "#7b7b7b",
+              fontSize: 20
+            }}
           >
             {" "}
             |{" "}
@@ -102,19 +106,16 @@ const Ticket = ({
   </View>
 );
 
-export const TicketScreen: React.FC<
-  NavigationInjectedProps<{ showingId: string }>
-> = ({ navigation }) => {
-  const showingId = navigation.state.params
-    ? navigation.state.params.showingId
-    : "undefined";
-  const [{ data, error, fetching }, executeQuery] = useQuery<
-    ShowingQuery,
-    ShowingQueryVariables
-  >({
+const useShowingTickets = (showingId: string) =>
+  useQuery<ShowingTicketsQuery, ShowingTicketsQueryVariables>({
     query: gql`
-      query ShowingQuery($showingId: UUID!) {
+      query ShowingTicketsQuery($showingId: UUID!) {
         showing(id: $showingId) {
+          date
+          time
+          location {
+            name
+          }
           movie {
             title
           }
@@ -135,16 +136,28 @@ export const TicketScreen: React.FC<
     variables: { showingId }
   });
 
+export const TicketScreen: React.FC<
+  NavigationInjectedProps<{ showingId: string }>
+> = ({ navigation }) => {
+  const showingId = navigation.state.params
+    ? navigation.state.params.showingId
+    : "undefined";
+  const [{ data, error, fetching }, executeQuery] = useShowingTickets(
+    showingId
+  );
+
   if (!data || fetching) {
     return <ActivityIndicator />;
   }
+
+  const { showing } = data;
 
   const { width } = Dimensions.get("window");
 
   return (
     <View>
       <ScrollView horizontal pagingEnabled>
-        {data.showing.myTickets.map(ticket => (
+        {showing.myTickets.map(ticket => (
           <Ticket key={ticket.id} width={width} ticket={ticket} />
         ))}
       </ScrollView>
@@ -163,7 +176,7 @@ export const TicketScreen: React.FC<
           }}
         >
           <Text>Biograf</Text>
-          <Text style={{ fontWeight: "600" }}>Filmstaden Bergakungen</Text>
+          <Text style={{ fontWeight: "600" }}>{showing.location.name}</Text>
         </View>
         <View
           style={{
@@ -173,7 +186,7 @@ export const TicketScreen: React.FC<
           }}
         >
           <Text>Datum</Text>
-          <Text style={{ fontWeight: "600" }}>2019-08-22</Text>
+          <Text style={{ fontWeight: "600" }}>{showing.date}</Text>
         </View>
         <View
           style={{
@@ -183,7 +196,7 @@ export const TicketScreen: React.FC<
           }}
         >
           <Text>Tid</Text>
-          <Text style={{ fontWeight: "600" }}>19:30</Text>
+          <Text style={{ fontWeight: "600" }}>{showing.time}</Text>
         </View>
       </View>
     </View>

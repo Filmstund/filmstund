@@ -1,10 +1,13 @@
 import gql from "graphql-tag";
 import { orderBy } from "lodash";
 import * as React from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { NavigationInjectedProps, StackActions } from "react-navigation";
 import { useQuery } from "urql";
-import { ShowingsByMovieQuery } from "./__generated__/ShowingsByMovieQuery";
+import {
+  ShowingsByMovieQuery,
+  ShowingsByMovieQuery_publicShowings
+} from "./__generated__/ShowingsByMovieQuery";
 import {
   filterShowingsParticipatedByMeAndAfterToday,
   filterShowingsParticipatedByMeAndBeforeToday,
@@ -13,6 +16,47 @@ import {
 import { RedHeader } from "./RedHeader";
 import { ShowingListItem } from "./ShowingListItem";
 import { ShowingListItemContainer } from "./ShowingListItemContainer";
+
+const OrderedShowingList = ({
+  onPressShowing,
+  onPressTicket,
+  order,
+  showings
+}: {
+  order: "asc" | "desc";
+  showings: ShowingsByMovieQuery_publicShowings[];
+  onPressTicket: (showingId: string) => void;
+  onPressShowing: (showingId: string) => void;
+}) => {
+  if (showings.length === 0) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          height: 50
+        }}
+      >
+        <Text style={{ color: "#9b9b9b" }}>Inga besök</Text>
+      </View>
+    );
+  }
+
+  return (
+    <>
+      {orderBy(showings, [showingDate], [order]).map(
+        (showing: ShowingsByMovieQuery_publicShowings) => (
+          <ShowingListItem
+            key={showing.id}
+            showing={showing}
+            onPressShowTicket={() => onPressTicket(showing.id)}
+            onPressShowing={() => onPressShowing(showing.id)}
+          />
+        )
+      )}
+    </>
+  );
+};
 
 export const TodayScreen: React.FC<NavigationInjectedProps> = ({
   navigation
@@ -61,7 +105,17 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
     `
   });
 
-  const onPress = (showingId: string) =>
+  const onPressShowing = (showingId: string) =>
+    navigation.dispatch(
+      StackActions.push({
+        routeName: "Showing",
+        params: {
+          showingId
+        }
+      })
+    );
+
+  const onPressTicket = (showingId: string) =>
     navigation.dispatch(
       StackActions.push({
         routeName: "Ticket",
@@ -81,34 +135,24 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
         data && (
           <ShowingListItemContainer>
             <RedHeader>Mina kommande besök</RedHeader>
-            {orderBy(
-              data.publicShowings.filter(
+            <OrderedShowingList
+              order={"asc"}
+              showings={data.publicShowings.filter(
                 filterShowingsParticipatedByMeAndAfterToday(data.me.id)
-              ),
-              [showingDate],
-              ["asc"]
-            ).map(showing => (
-              <ShowingListItem
-                key={showing.id}
-                showing={showing}
-                onPressShowTicket={() => onPress(showing.id)}
-              />
-            ))}
+              )}
+              onPressShowing={onPressShowing}
+              onPressTicket={onPressTicket}
+            />
 
             <RedHeader>Mina tidigare besök</RedHeader>
-            {orderBy(
-              data.publicShowings.filter(
+            <OrderedShowingList
+              order={"desc"}
+              showings={data.publicShowings.filter(
                 filterShowingsParticipatedByMeAndBeforeToday(data.me.id)
-              ),
-              [showingDate],
-              ["desc"]
-            ).map(showing => (
-              <ShowingListItem
-                key={showing.id}
-                showing={showing}
-                onPressShowTicket={() => onPress(showing.id)}
-              />
-            ))}
+              )}
+              onPressShowing={onPressShowing}
+              onPressTicket={onPressTicket}
+            />
           </ShowingListItemContainer>
         )}
     </ScrollView>

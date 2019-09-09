@@ -3,16 +3,17 @@ import { useEffect, useState } from "react";
 import { Image, SafeAreaView, StatusBar, Text, View } from "react-native";
 import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
+import {
+  createAppContainer,
+  createSwitchNavigator,
+  NavigationInjectedProps
+} from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 // @ts-ignore
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createClient, Provider } from "urql";
-import {
-  getToken,
-  restoreTokenFromOfflineStorage,
-  setToken
-} from "./src/lib/session";
+import { getToken, setToken } from "./src/lib/session";
+import { ShowingScreen } from "./src/ShowingScreen";
 import { padding } from "./src/style";
 import { TicketScreen } from "./src/TicketScreen";
 import { TodayScreen } from "./src/TodayScreen";
@@ -41,6 +42,9 @@ const TodayStack = createStackNavigator({
     navigationOptions: options => ({
       title: "Today"
     })
+  },
+  Showing: {
+    screen: ShowingScreen
   },
   Ticket: {
     screen: TicketScreen
@@ -95,7 +99,7 @@ const App = () => {
 
         if (user.idToken) {
           setToken(user.idToken);
-        //   setSignedIn(true);
+          //   setSignedIn(true);
         }
       } catch (e) {
         return;
