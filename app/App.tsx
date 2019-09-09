@@ -8,6 +8,7 @@ import { createStackNavigator } from "react-navigation-stack";
 // @ts-ignore
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createClient, Provider } from "urql";
+import { AccountScreen } from "./src/AccountScreen";
 import { getToken, setToken } from "./src/lib/session";
 import { MoviesScreen } from "./src/MoviesScreen";
 import { ShowingScreen } from "./src/ShowingScreen";
@@ -21,10 +22,6 @@ GoogleSignin.configure({
   iosClientId:
     "976792570239-2plt93mmibojvtq3ipngcmk6php2eajq.apps.googleusercontent.com"
 });
-
-const ProfileScreen: React.FC = () => {
-  return <Text>Profile</Text>;
-};
 
 const TodayStack = createStackNavigator({
   Today: {
@@ -50,6 +47,15 @@ const MoviesStack = createStackNavigator({
   }
 });
 
+const AccountStack = createStackNavigator({
+  Account: {
+    screen: AccountScreen,
+    navigationOptions: options => ({
+      title: "Account"
+    })
+  }
+});
+
 const ShowingsStack = createStackNavigator({
   Showings: {
     screen: ShowingsScreen,
@@ -70,7 +76,7 @@ const TabNavigator = createBottomTabNavigator(
     Today: TodayStack,
     Movies: MoviesStack,
     Showings: ShowingsStack,
-    Account: ProfileScreen
+    Account: AccountStack
   },
   {
     tabBarOptions: {
