@@ -4,10 +4,9 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.entities.*
 import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
-import rocks.didit.sefilm.database.repositories.LocationRepository
-import rocks.didit.sefilm.database.repositories.UserIdsRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.repositories.*
 import rocks.didit.sefilm.logger
 import java.util.*
 
@@ -17,13 +16,67 @@ class MongoMigrator(
   val locationsMongoRepo: LocationMongoRepository,
   val userRepo: UserRepository,
   val userIdsRepo: UserIdsRepository,
-  val mongoUserRepo: UserMongoRepository
+  val mongoUserRepo: UserMongoRepository,
+  val movieRepo: MovieRepository,
+  val mongoMovieRepo: MovieMongoRepository,
+  val genreRepository: GenreRepository,
+  val movieIdsRepo: MovieIdsRepository
 ) {
   private val log by logger()
   @Transactional
   fun migrateFromMongo() {
     migrateLocationsFromMongo()
     migrateUsersFromMongo()
+    migrateMoviesFromMongo()
+  }
+
+  private fun migrateMoviesFromMongo() {
+    if (log.isInfoEnabled) {
+      log.info(
+        "{} movies are eligible for migration from MongoDB. We have {} movies in postgres currently",
+        mongoMovieRepo.count(),
+        movieRepo.count()
+      )
+    }
+
+    mongoMovieRepo.findAll()
+      .filterNot { movieRepo.existsById(it.id) }
+      .forEach {
+        migrateMovieFromMongo(it)
+      }
+  }
+
+  private fun migrateMovieFromMongo(it: rocks.didit.sefilm.database.mongo.entities.Movie) {
+    val movie = Movie(
+      id = it.id,
+      lastModifiedDate = it.lastModifiedDate,
+      archived = it.archived,
+      createdDate = it.lastModifiedDate,
+      slug = it.filmstadenSlug,
+      originalTitle = it.originalTitle,
+      popularity = it.popularity,
+      popularityLastUpdated = it.popularityLastUpdated,
+      poster = it.poster,
+      productionYear = it.productionYear,
+      releaseDate = it.releaseDate,
+      runtime = it.runtime,
+      synopsis = it.synopsis,
+      title = it.title
+    )
+
+    val savedMovie = movieRepo.save(movie)
+
+    MovieIds(it.id, movie, it.imdbId, it.tmdbId, it.filmstadenId)
+      .let { ids -> movie.movieIds = movieIdsRepo.save(ids) }
+
+    it.genres.forEach { g ->
+      val genre = genreRepository.save(
+        genreRepository.findByGenre(g)
+          ?: Genre(genre = g)
+      )
+      genre.movies.add(savedMovie)
+      savedMovie.genres.add(genre)
+    }
   }
 
   private fun migrateLocationsFromMongo() {

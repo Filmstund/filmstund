@@ -2,10 +2,7 @@
 
 package rocks.didit.sefilm.database
 
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.TicketNumber
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.*
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
@@ -32,5 +29,16 @@ class PhoneNumberConverter : AttributeConverter<PhoneNumber, String> {
 class TicketNumberConverter : AttributeConverter<TicketNumber, String> {
   override fun convertToDatabaseColumn(attribute: TicketNumber?): String? = attribute?.number
   override fun convertToEntityAttribute(dbData: String?): TicketNumber? = dbData?.let { TicketNumber(it) }
+}
 
+@Converter
+class ImdbIdConverter : AttributeConverter<IMDbID, String> {
+  override fun convertToDatabaseColumn(attribute: IMDbID?): String? = attribute?.value
+  override fun convertToEntityAttribute(dbData: String?): IMDbID? = dbData?.let { IMDbID.valueOf(it) }
+}
+
+@Converter
+class TmdbIdConverter : AttributeConverter<TMDbID, Long> {
+  override fun convertToDatabaseColumn(attribute: TMDbID?): Long? = attribute?.value
+  override fun convertToEntityAttribute(dbData: Long?): TMDbID? = dbData?.let { TMDbID.valueOf(it) }
 }

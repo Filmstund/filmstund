@@ -95,3 +95,60 @@ create table gift_certificate
     constraint giftcert_pk primary key (user_id, number)
 );
 --rollback drop table if exists gift_certificate;
+
+--changeset eda:createTableMovie
+create table movie
+(
+    id                      uuid
+        constraint movie_pk primary key,
+    slug                    varchar(100)             null,
+    title                   varchar(100)             not null,
+    synopsis                text                     null,
+    original_title          varchar(100)             null,
+    release_date            date                     null,
+    production_year         integer                  null     default 1900
+        constraint productionyear_nonneg check (production_year >= 1900),
+    runtime                 bigint                            default 0,
+    poster                  varchar(255)             null,
+    popularity              float                    not null default 0.0,
+    popularity_last_updated timestamp                         default timestamp '1970-01-01 00:00:00',
+    archived                boolean                  not null default false,
+    last_modified_date      timestamp with time zone not null default current_timestamp,
+    created_date            timestamp with time zone not null default current_timestamp
+);
+--rollback drop table if exists movie;
+
+--changeset eda:createTableMovieIds
+create table movie_ids
+(
+    movie_id      uuid
+        constraint movie_ids_fk references movie on delete cascade,
+    filmstaden_id varchar(20) null
+        constraint fsId_uniq unique,
+    imdb_id       varchar(20) null,
+    tmdb_id       bigint      null,
+
+    constraint movie_ids_pk primary key (movie_id)
+);
+--rollback drop table if exists movie_ids;
+
+--changeset eda:createTableGenres
+create table genre
+(
+    id    serial
+        constraint genre_pk primary key,
+    genre varchar(100)
+        constraint genre_unique unique
+);
+
+--rollback drop table if exists genre;
+
+--changeset eda:createTableMovieGenres
+create table movie_genres
+(
+    genre_id integer
+        constraint movie_genre_fk references genre,
+    movie_id uuid
+        constraint movie_movie_fk references movie
+);
+--rollback drop table if exists movie_genres;
