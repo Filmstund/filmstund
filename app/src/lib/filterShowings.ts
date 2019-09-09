@@ -6,7 +6,7 @@ import { ShowingsByMovieQuery_publicShowings } from "../__generated__/ShowingsBy
 
 type ShowingFilterFn = (s: ShowingsByMovieQuery_publicShowings) => boolean;
 
-const today = parseISO(format(new Date(), "yyyy-MM-dd"));
+export const today = parseISO(format(new Date(), "yyyy-MM-dd"));
 
 export const showingDate = (
   showing: Pick<ShowingsByMovieQuery_publicShowings, "date" | "time">

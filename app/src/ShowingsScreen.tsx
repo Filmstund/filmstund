@@ -1,19 +1,25 @@
+import isBefore from "date-fns/isBefore";
+import { groupBy } from "lodash";
 import * as React from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { NavigationInjectedProps, StackActions } from "react-navigation";
-import {
-  filterShowingsParticipatedByMeAndAfterToday,
-  filterShowingsParticipatedByMeAndBeforeToday
-} from "./lib/filterShowings";
+import { showingDate, today } from "./lib/filterShowings";
 import { OrderedShowingList } from "./OrderedShowingList";
 import { RedHeader } from "./RedHeader";
 import { ShowingListItemContainer } from "./ShowingListItemContainer";
 import { useShowingsByMovieQuery } from "./useShowingsByMovieQuery";
 
-export const TodayScreen: React.FC<NavigationInjectedProps> = ({
+export const ShowingsScreen: React.FC<NavigationInjectedProps> = ({
   navigation
 }) => {
   const [{ data, fetching, error }, executeQuery] = useShowingsByMovieQuery();
+
+  const showings = data ? data.publicShowings : [];
+
+  const { previous = [], upcoming = [] } = groupBy(
+    showings,
+    s => (isBefore(showingDate(s), today) ? "previous" : "upcoming")
+  );
 
   const onPressShowing = (showingId: string) =>
     navigation.dispatch(
@@ -41,30 +47,23 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
         <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
       }
     >
-      {!fetching &&
-        data && (
-          <ShowingListItemContainer>
-            <RedHeader>Mina kommande besök</RedHeader>
-            <OrderedShowingList
-              order={"asc"}
-              showings={data.publicShowings.filter(
-                filterShowingsParticipatedByMeAndAfterToday(data.me.id)
-              )}
-              onPressShowing={onPressShowing}
-              onPressTicket={onPressTicket}
-            />
+      <ShowingListItemContainer>
+        <RedHeader>Aktuella besök</RedHeader>
+        <OrderedShowingList
+          order={"asc"}
+          showings={upcoming}
+          onPressShowing={onPressShowing}
+          onPressTicket={onPressTicket}
+        />
 
-            <RedHeader>Mina tidigare besök</RedHeader>
-            <OrderedShowingList
-              order={"desc"}
-              showings={data.publicShowings.filter(
-                filterShowingsParticipatedByMeAndBeforeToday(data.me.id)
-              )}
-              onPressShowing={onPressShowing}
-              onPressTicket={onPressTicket}
-            />
-          </ShowingListItemContainer>
-        )}
+        <RedHeader>Tidigare besök</RedHeader>
+        <OrderedShowingList
+          order={"desc"}
+          showings={previous}
+          onPressShowing={onPressShowing}
+          onPressTicket={onPressTicket}
+        />
+      </ShowingListItemContainer>
     </ScrollView>
   );
 };

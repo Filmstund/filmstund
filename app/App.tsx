@@ -3,17 +3,14 @@ import { useEffect, useState } from "react";
 import { Image, SafeAreaView, StatusBar, Text, View } from "react-native";
 import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
-import {
-  createAppContainer,
-  createSwitchNavigator,
-  NavigationInjectedProps
-} from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 // @ts-ignore
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createClient, Provider } from "urql";
 import { getToken, setToken } from "./src/lib/session";
 import { ShowingScreen } from "./src/ShowingScreen";
+import { ShowingsScreen } from "./src/ShowingsScreen";
 import { padding } from "./src/style";
 import { TicketScreen } from "./src/TicketScreen";
 import { TodayScreen } from "./src/TodayScreen";
@@ -26,10 +23,6 @@ GoogleSignin.configure({
 
 const MoviesScreen: React.FC = () => {
   return <Text>Movies</Text>;
-};
-
-const ShowingsScreen: React.FC = () => {
-  return <Text>Showings</Text>;
 };
 
 const ProfileScreen: React.FC = () => {
@@ -51,11 +44,26 @@ const TodayStack = createStackNavigator({
   }
 });
 
+const ShowingsStack = createStackNavigator({
+  Showings: {
+    screen: ShowingsScreen,
+    navigationOptions: options => ({
+      title: "Showings"
+    })
+  },
+  Showing: {
+    screen: ShowingScreen
+  },
+  Ticket: {
+    screen: TicketScreen
+  }
+});
+
 const TabNavigator = createBottomTabNavigator(
   {
     Today: TodayStack,
     Movies: MoviesScreen,
-    Showings: ShowingsScreen,
+    Showings: ShowingsStack,
     Account: ProfileScreen
   },
   {
