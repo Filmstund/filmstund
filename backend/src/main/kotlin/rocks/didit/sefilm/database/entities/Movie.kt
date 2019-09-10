@@ -15,9 +15,6 @@ data class Movie(
   @Id
   val id: UUID = UUID.randomUUID(),
 
-  @OneToOne(mappedBy = "movie", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
-  var movieIds: MovieIds? = null,
-
   val slug: String? = null,
   val title: String = "",
   val synopsis: String? = null,

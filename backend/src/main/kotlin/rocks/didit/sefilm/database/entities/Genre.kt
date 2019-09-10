@@ -31,4 +31,10 @@ data class Genre(
   override fun hashCode(): Int {
     return genre.hashCode()
   }
+
+  override fun toString(): String {
+    return "Genre(id=$id, genre='$genre', movieCount=${movies.size})"
+  }
+
+
 }

@@ -28,4 +28,32 @@ data class UserIds(
   @Column(nullable = true, unique = true)
   @Convert(converter = FSIdConverter::class)
   val filmstadenId: FilmstadenMembershipId? = null
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as UserIds
+
+    if (id != other.id) return false
+    if (user.id != other.user.id) return false
+    if (googleId != other.googleId) return false
+    if (filmstadenId != other.filmstadenId) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = id.hashCode()
+    result = 31 * result + user.id.hashCode()
+    result = 31 * result + googleId.hashCode()
+    result = 31 * result + (filmstadenId?.hashCode() ?: 0)
+    return result
+  }
+
+  override fun toString(): String {
+    return "UserIds(id=$id, userId=${user.id}, googleId=$googleId, filmstadenId=$filmstadenId)"
+  }
+
+
+}

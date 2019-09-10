@@ -46,7 +46,7 @@ create table location
 create table location_alias
 (
     location           varchar(100)
-        constraint location_alias_fk references location,
+        constraint location_alias_fk references location on delete cascade,
     alias              varchar(100)             not null,
     last_modified_date timestamp with time zone not null default current_timestamp
 );
@@ -147,8 +147,86 @@ create table genre
 create table movie_genres
 (
     genre_id integer
-        constraint movie_genre_fk references genre,
+        constraint movie_genre_fk references genre on delete cascade,
     movie_id uuid
-        constraint movie_movie_fk references movie
+        constraint movie_movie_fk references movie on delete cascade
 );
 --rollback drop table if exists movie_genres;
+
+--changeset eda:createTableCinemaScreen
+create table cinema_screen
+(
+    id   varchar(50)
+        constraint cinema_screen_pk primary key,
+    name varchar(255) null default null
+);
+
+--rollback drop table if exists cinema_screen;
+
+--changeset eda:createTableShowing
+create table showing
+(
+    id                    uuid
+        constraint showing_pk primary key,
+    web_id                varchar(10)            not null,
+    slug                  varchar(100)           not null,
+    date                  date                   not null,
+    time                  time without time zone not null,
+    movie_id              uuid                   not null
+        constraint showing_movie_fk references movie on delete no action,
+    location_id           varchar(100)           null
+        constraint showing_location_fk references location on delete set null,
+    cinema_screen_id      varchar(50)            null
+        constraint showing_cs_fk references cinema_screen on delete set null,
+    filmstaden_showing_id varchar(50)            null,
+    price                 integer                not null default 0
+        constraint showing_price_positive check (price >= 0),
+    tickets_bought        boolean                not null default false,
+    admin                 uuid                   not null
+        constraint showing_admin_fk references users,
+    pay_to_user           uuid                   not null
+        constraint showing_paytouser_fk references users,
+    last_modified_date    timestamp              not null default current_timestamp,
+    created_date          timestamp              not null default current_timestamp
+);
+
+--changeset eda:createTableParticipant
+create table participant
+(
+    user_id               uuid        not null
+        constraint participant_user_fk references users on delete cascade,
+    showing_id            uuid        not null
+        constraint participant_showing_fk references showing on delete cascade,
+
+    participant_type      varchar(50) not null default 'SWISH',
+
+    has_paid              boolean     not null default false,
+    amount_owed           integer     not null default 0,
+    gift_certificate_used varchar(15) null
+        constraint participant_giftcert_unique unique,
+
+    constraint participant_giftcert_fk foreign key (user_id, gift_certificate_used) references gift_certificate on delete set null,
+    constraint participant_pk primary key (showing_id, user_id)
+);
+--rollback drop table if exists participant;
+
+--changeset eda:createTableParticipantProperties
+create table participant_properties
+(
+
+    user_id    uuid         not null
+        constraint participant_user_fk references users on delete cascade,
+    showing_id uuid         not null
+        constraint participant_showing_fk references showing on delete cascade,
+
+    key        varchar(50)  not null,
+    value      varchar(255) not null,
+
+    constraint participant_props_pk primary key (showing_id, user_id)
+);
+--rollback drop table if exists participant_properties;
+
+--changeset eda:addColumnHiddenToGiftCert
+alter table gift_certificate
+    add column is_deleted boolean not null default false;
+--rollback alter table gift_certificate drop column is_deleted;

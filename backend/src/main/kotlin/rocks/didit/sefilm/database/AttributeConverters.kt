@@ -42,3 +42,15 @@ class TmdbIdConverter : AttributeConverter<TMDbID, Long> {
   override fun convertToDatabaseColumn(attribute: TMDbID?): Long? = attribute?.value
   override fun convertToEntityAttribute(dbData: Long?): TMDbID? = dbData?.let { TMDbID.valueOf(it) }
 }
+
+@Converter
+class Base64IdConverter : AttributeConverter<Base64ID, String> {
+  override fun convertToDatabaseColumn(attribute: Base64ID?): String? = attribute?.id
+  override fun convertToEntityAttribute(dbData: String?): Base64ID? = dbData?.let { Base64ID(it) }
+}
+
+@Converter
+class SekConverter : AttributeConverter<SEK, Long> {
+  override fun convertToDatabaseColumn(attribute: SEK?): Long? = attribute?.ören
+  override fun convertToEntityAttribute(dbData: Long?): SEK? = dbData?.let { SEK(it) }
+}

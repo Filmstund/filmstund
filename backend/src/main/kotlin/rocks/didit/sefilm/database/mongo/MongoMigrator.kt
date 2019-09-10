@@ -1,18 +1,22 @@
 package rocks.didit.sefilm.database.mongo
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.entities.*
-import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
-import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
+import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
+import rocks.didit.sefilm.database.mongo.repositories.*
 import rocks.didit.sefilm.database.repositories.*
+import rocks.didit.sefilm.domain.FtgBiljettParticipant
+import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.logger
+import java.time.LocalDate
 import java.util.*
 
 @Component
 class MongoMigrator(
-  val locationRepository: LocationRepository,
+  val locationRepo: LocationRepository,
   val locationsMongoRepo: LocationMongoRepository,
   val userRepo: UserRepository,
   val userIdsRepo: UserIdsRepository,
@@ -20,17 +24,89 @@ class MongoMigrator(
   val movieRepo: MovieRepository,
   val mongoMovieRepo: MovieMongoRepository,
   val genreRepository: GenreRepository,
-  val movieIdsRepo: MovieIdsRepository
+  val movieIdsRepo: MovieIdsRepository,
+  val mongoShowingRepo: ShowingMongoRepository,
+  val showingRepo: ShowingRepository,
+  val participantPaymentInfoMongoRepo: ParticipantPaymentInfoMongoRepository,
+  val giftCertificateRepo: GiftCertificateRepository
 ) {
   private val log by logger()
+
   @Transactional
-  fun migrateFromMongo() {
-    migrateLocationsFromMongo()
-    migrateUsersFromMongo()
-    migrateMoviesFromMongo()
+  fun migrateShowingsFromMongo() {
+    if (log.isInfoEnabled) {
+      log.info(
+        "{} showings are eligible for migration from MongoDB. We have {} showings in postgres currently",
+        mongoShowingRepo.count(),
+        showingRepo.count()
+      )
+    }
+
+    mongoShowingRepo.findAll()
+      .filterNot { showingRepo.existsById(it.id) }
+      .forEach {
+        val showing = Showing(
+          id = it.id,
+          webId = it.webId,
+          slug = it.slug,
+          date = it.date,
+          time = it.time,
+          movie = movieRepo.findById(it.movie.id).orElseThrow(),
+          location = it.location?.let { l -> locationRepo.findByIdOrNull(l.name ?: "NON_EXISTANT") },
+          cinemaScreen = it.filmstadenScreen?.let { screen -> CinemaScreen(screen.filmstadenId, screen.name) },
+          filmstadenShowingId = it.filmstadenRemoteEntityId,
+          price = it.price ?: SEK.ZERO,
+          ticketsBought = it.ticketsBought,
+          admin = userIdsRepo.findByGoogleId(it.admin.id)?.user ?: throw AssertionError("${it.admin.id} doesn't exist"),
+          payToUser = userIdsRepo.findByGoogleId(it.payToUser.id)?.user
+            ?: throw AssertionError("${it.payToUser.id} doesn't exist"),
+          lastModifiedDate = it.lastModifiedDate,
+          createdDate = it.createdDate
+        )
+
+        showing.participants.addAll(it.participants.map { p ->
+          val user = userIdsRepo.findByGoogleId(p.userId)?.user ?: throw AssertionError("${p.userId} doesn't exist")
+          val paymentInfo = participantPaymentInfoMongoRepo.findByShowingIdAndUserId(it.id, p.userId)
+            .orElseGet {
+              ParticipantPaymentInfo(
+                userId = p.userId,
+                hasPaid = false,
+                showingId = it.id,
+                amountOwed = it.price ?: SEK.ZERO
+              )
+            }
+
+          when (p) {
+            is SwishParticipant -> Participant(
+              id = ParticipantId(user, showing),
+              hasPaid = paymentInfo.hasPaid,
+              amountOwed = paymentInfo.amountOwed
+            )
+            is FtgBiljettParticipant -> {
+              if (!giftCertificateRepo.existsById_Number(p.ticketNumber)) {
+                val cert =
+                  GiftCertificate(id = GiftCertId(user, p.ticketNumber), expiresAt = LocalDate.EPOCH, isDeleted = true)
+                giftCertificateRepo.save(cert)
+              }
+
+              Participant(
+                id = ParticipantId(user, showing),
+                participantType = Participant.Type.GIFT_CERTIFICATE,
+                giftCertificateUsed = giftCertificateRepo.findById(GiftCertId(user, p.ticketNumber)).orElse(null),
+                hasPaid = paymentInfo.hasPaid,
+                amountOwed = paymentInfo.amountOwed
+              )
+            }
+          }
+        })
+
+        showingRepo.save(showing)
+      }
+
   }
 
-  private fun migrateMoviesFromMongo() {
+  @Transactional
+  fun migrateMoviesFromMongo() {
     if (log.isInfoEnabled) {
       log.info(
         "{} movies are eligible for migration from MongoDB. We have {} movies in postgres currently",
@@ -67,7 +143,7 @@ class MongoMigrator(
     val savedMovie = movieRepo.save(movie)
 
     MovieIds(it.id, movie, it.imdbId, it.tmdbId, it.filmstadenId)
-      .let { ids -> movie.movieIds = movieIdsRepo.save(ids) }
+      .let { ids -> movieIdsRepo.save(ids) }
 
     it.genres.forEach { g ->
       val genre = genreRepository.save(
@@ -79,17 +155,18 @@ class MongoMigrator(
     }
   }
 
-  private fun migrateLocationsFromMongo() {
+  @Transactional
+  fun migrateLocationsFromMongo() {
     if (log.isInfoEnabled) {
       log.info(
         "{} locations are stored in MongoDB and {} are stored in Postgres",
         locationsMongoRepo.count(),
-        locationRepository.count()
+        locationRepo.count()
       )
     }
 
     locationsMongoRepo.findAll()
-      .filterNot { locationRepository.existsById(it.name ?: "NON_EXISTANT") }
+      .filterNot { locationRepo.existsById(it.name ?: "NON_EXISTANT") }
       .filterNot { it.name.isNullOrEmpty() }
       .forEach {
         val pgLoc = Location(
@@ -105,13 +182,13 @@ class MongoMigrator(
           alias = it.alias.map { name -> LocationAlias(name) }
         )
 
-        val savedLoc = locationRepository.save(pgLoc)
+        val savedLoc = locationRepo.save(pgLoc)
         log.debug("{} migrated as {}", it.name, savedLoc)
       }
   }
 
-  private fun migrateUsersFromMongo() {
-    val before = System.currentTimeMillis()
+  @Transactional
+  fun migrateUsersFromMongo() {
     if (log.isInfoEnabled) {
       log.info(
         "{} user(s) eligible for migration in MongoDB, while {} user(s) are stored in Postgres",
@@ -124,9 +201,6 @@ class MongoMigrator(
       .forEach {
         migrateOldUserToNewUser(it)
       }
-
-    val duration = System.currentTimeMillis() - before
-    log.info("User migration complete in {}ms", duration)
   }
 
   private fun migrateOldUserToNewUser(it: rocks.didit.sefilm.database.mongo.entities.User): User {
