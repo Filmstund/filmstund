@@ -11,19 +11,22 @@ import {
 import { NavigationInjectedProps } from "react-navigation";
 import { useQuery } from "urql";
 import {
-  ShowingQuery,
-  ShowingQuery_showing_myTickets,
-  ShowingQueryVariables
-} from "./__generated__/ShowingQuery";
+  ShowingTicketsQuery,
+  ShowingTicketsQuery_showing,
+  ShowingTicketsQuery_showing_myTickets,
+  ShowingTicketsQueryVariables
+} from "./__generated__/ShowingTicketsQuery";
 import { sfSansRegular } from "./lib/assets/fonts";
 import { padding } from "./style";
 
 const Ticket = ({
   ticket,
-  width
+  width,
+  fetching
 }: {
   width: number;
-  ticket: ShowingQuery_showing_myTickets;
+  ticket: ShowingTicketsQuery_showing_myTickets;
+  fetching: boolean;
 }) => (
   <View
     style={{
@@ -51,7 +54,15 @@ const Ticket = ({
           padding: 15
         }}
       >
-        <Image source={{ uri: ticket.barcode, width: 128, height: 128 }} />
+        {fetching ? (
+          <ActivityIndicator
+            size={"large"}
+            color={"black"}
+            style={{ width: 128, height: 128 }}
+          />
+        ) : (
+          <Image source={{ uri: ticket.barcode, width: 128, height: 128 }} />
+        )}
       </View>
       <View style={{ margin: padding * 4, alignItems: "center" }}>
         <Text
@@ -68,7 +79,7 @@ const Ticket = ({
           <Text
             style={{ fontFamily: sfSansRegular, color: "white", fontSize: 20 }}
           >
-            Rad {ticket.seat.row}
+            Rad {ticket.seat.row || "-"}
           </Text>
           <Text
             style={{
@@ -83,7 +94,7 @@ const Ticket = ({
           <Text
             style={{ fontFamily: sfSansRegular, color: "white", fontSize: 20 }}
           >
-            Stolsnr {ticket.seat.number}
+            Stolsnr {ticket.seat.number || "-"}
           </Text>
         </View>
         <Text
@@ -105,6 +116,20 @@ const Ticket = ({
     </View>
   </View>
 );
+
+const emptyTicket: ShowingTicketsQuery_showing_myTickets = {
+  __typename: "Ticket",
+  barcode: "",
+  customerType: "-",
+  id: "",
+  profileId: "-",
+  screen: "-",
+  seat: {
+    __typename: "Seat",
+    number: 0,
+    row: 0
+  }
+};
 
 const useShowingTickets = (showingId: string) =>
   useQuery<ShowingTicketsQuery, ShowingTicketsQueryVariables>({
@@ -136,6 +161,48 @@ const useShowingTickets = (showingId: string) =>
     variables: { showingId }
   });
 
+const TicketDetails = (props: { showing: ShowingTicketsQuery_showing }) => (
+  <View
+    style={{
+      backgroundColor: "#f3f5f8",
+      paddingTop: padding,
+      paddingBottom: padding * 2,
+      paddingHorizontal: padding * 2
+    }}
+  >
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: padding
+      }}
+    >
+      <Text>Biograf</Text>
+      <Text style={{ fontWeight: "600" }}>{props.showing.location.name}</Text>
+    </View>
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: padding
+      }}
+    >
+      <Text>Datum</Text>
+      <Text style={{ fontWeight: "600" }}>{props.showing.date}</Text>
+    </View>
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: padding
+      }}
+    >
+      <Text>Tid</Text>
+      <Text style={{ fontWeight: "600" }}>{props.showing.time}</Text>
+    </View>
+  </View>
+);
+
 export const TicketScreen: React.FC<
   NavigationInjectedProps<{ showingId: string }>
 > = ({ navigation }) => {
@@ -146,59 +213,25 @@ export const TicketScreen: React.FC<
     showingId
   );
 
-  if (!data || fetching) {
-    return <ActivityIndicator />;
-  }
-
-  const { showing } = data;
-
   const { width } = Dimensions.get("window");
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <ScrollView horizontal pagingEnabled>
-        {showing.myTickets.map(ticket => (
-          <Ticket key={ticket.id} width={width} ticket={ticket} />
-        ))}
+        {!data || fetching ? (
+          <Ticket fetching={true} width={width} ticket={emptyTicket} />
+        ) : (
+          data.showing.myTickets.map(ticket => (
+            <Ticket
+              key={ticket.id}
+              width={width}
+              ticket={ticket}
+              fetching={false}
+            />
+          ))
+        )}
       </ScrollView>
-      <View
-        style={{
-          backgroundColor: "#f3f5f8",
-          paddingVertical: padding,
-          paddingHorizontal: padding * 2
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: padding
-          }}
-        >
-          <Text>Biograf</Text>
-          <Text style={{ fontWeight: "600" }}>{showing.location.name}</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: padding
-          }}
-        >
-          <Text>Datum</Text>
-          <Text style={{ fontWeight: "600" }}>{showing.date}</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: padding
-          }}
-        >
-          <Text>Tid</Text>
-          <Text style={{ fontWeight: "600" }}>{showing.time}</Text>
-        </View>
-      </View>
+      {data && <TicketDetails showing={data.showing} />}
     </View>
   );
 };

@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import gql from "graphql-tag";
 import * as React from "react";
 import {
-  ActivityIndicator,
   Image,
   RefreshControl,
   ScrollView,
@@ -109,11 +108,6 @@ export const ShowingScreen: React.FC<
 
   const [{ data, error, fetching }, executeQuery] = useShowingQuery(showingId);
 
-  if (!data) {
-    return <ActivityIndicator />;
-  }
-
-  const { showing } = data;
 
   return (
     <ScrollView
@@ -121,58 +115,67 @@ export const ShowingScreen: React.FC<
         <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
       }
     >
-      <View style={{ padding }}>
-        <View style={{ flexDirection: "row", backgroundColor: "white" }}>
-          <Image
-            source={{
-              uri: showing.movie.poster || moviePoster,
-              height: 199,
-              width: 134
-            }}
-          />
-          <View style={{ padding, flex: 1 }}>
-            <Text style={{ fontSize: 18, fontWeight: "500" }}>
-              {showing.movie.title}
-            </Text>
-            <Text>{format(showingDate(showing), "d MMM HH:mm")}</Text>
-            <Text>{showing.location.name}</Text>
-            <Text>Skapad av {formatUserNick(showing.admin)}</Text>
-          </View>
-        </View>
-        <View style={{ alignItems: "flex-start", marginVertical: padding * 3 }}>
-          <GoldButton text={"Jag hänger på!"} onPress={() => {}} />
-        </View>
-        <View>
-          <Text>{showing.participants.length} deltagare</Text>
-          {showing.participants.map(participant => (
-            <View
-              key={participant.user.id}
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                backgroundColor: "white",
-                shadowRadius: 4,
-                shadowColor: "black",
-                shadowOpacity: 0.5,
-                shadowOffset: { width: 0, height: 2 }
-              }}
-            >
+      {data &&
+        data.showing && (
+          <View style={{ padding }}>
+            <View style={{ flexDirection: "row", backgroundColor: "white" }}>
               <Image
-                source={{ uri: participant.user.avatar, width: 70, height: 70 }}
-              />
-              <Text
-                style={{
-                  padding,
-                  fontSize: 18,
-                  fontWeight: "300"
+                source={{
+                  uri: data.showing.movie.poster || moviePoster,
+                  height: 199,
+                  width: 134
                 }}
-              >
-                {formatUserCompleteName(participant.user)}
-              </Text>
+              />
+              <View style={{ padding, flex: 1 }}>
+                <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                  {data.showing.movie.title}
+                </Text>
+                <Text>{format(showingDate(data.showing), "d MMM HH:mm")}</Text>
+                <Text>{data.showing.location.name}</Text>
+                <Text>Skapad av {formatUserNick(data.showing.admin)}</Text>
+              </View>
             </View>
-          ))}
-        </View>
-      </View>
+            <View
+              style={{ alignItems: "flex-start", marginVertical: padding * 3 }}
+            >
+              <GoldButton text={"Jag hänger på!"} onPress={() => {}} />
+            </View>
+            <View>
+              <Text>{data.showing.participants.length} deltagare</Text>
+              {data.showing.participants.map(participant => (
+                <View
+                  key={participant.user.id}
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                    backgroundColor: "white",
+                    shadowRadius: 4,
+                    shadowColor: "black",
+                    shadowOpacity: 0.5,
+                    shadowOffset: { width: 0, height: 2 }
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri: participant.user.avatar,
+                      width: 70,
+                      height: 70
+                    }}
+                  />
+                  <Text
+                    style={{
+                      padding,
+                      fontSize: 18,
+                      fontWeight: "300"
+                    }}
+                  >
+                    {formatUserCompleteName(participant.user)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
     </ScrollView>
   );
 };

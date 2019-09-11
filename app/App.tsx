@@ -63,7 +63,7 @@ const TodayStack = createStackNavigator(
     Today: {
       screen: TodayScreen,
       navigationOptions: options => ({
-        title: "Today"
+        title: "Idag"
       })
     },
     Showing: {
@@ -81,7 +81,7 @@ const MoviesStack = createStackNavigator(
     Movies: {
       screen: MoviesScreen,
       navigationOptions: options => ({
-        title: "Movies"
+        title: "Filmer"
       })
     }
   },
@@ -93,7 +93,7 @@ const AccountStack = createStackNavigator(
     Account: {
       screen: AccountScreen,
       navigationOptions: options => ({
-        title: "Account"
+        title: "Konto"
       })
     }
   },
@@ -105,7 +105,7 @@ const ShowingsStack = createStackNavigator(
     Showings: {
       screen: ShowingsScreen,
       navigationOptions: options => ({
-        title: "Showings"
+        title: "Besök"
       })
     },
     Showing: {

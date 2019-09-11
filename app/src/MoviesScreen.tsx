@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import * as React from "react";
-import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
+import { FlatList, Image, Text, View } from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
 import { useQuery } from "urql";
 import { AllMoviesQuery } from "./__generated__/AllMoviesQuery";
@@ -38,13 +38,17 @@ export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
   const movies = data ? data.allMovies : [];
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
-      }
-    >
-      {movies.map(movie => (
-        <View key={movie.id} style={{ flexDirection: "row", backgroundColor: "white" }}>
+    <FlatList
+      data={movies}
+      refreshing={fetching}
+      onRefresh={executeQuery}
+      keyExtractor={item => item.id}
+      ListEmptyComponent={!fetching && <EmptyList text={"Inga filmer"} />}
+      renderItem={({ item: movie }) => (
+        <View
+          key={movie.id}
+          style={{ flexDirection: "row", backgroundColor: "white" }}
+        >
           <Image
             source={{
               uri: movie.poster || moviePoster,
@@ -58,8 +62,7 @@ export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
             </Text>
           </View>
         </View>
-      ))}
-      {!fetching && movies.length === 0 && <EmptyList text={"Inga filmer"}/>}
-    </ScrollView>
+      )}
+    />
   );
 };

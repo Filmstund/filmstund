@@ -103,7 +103,7 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
             </View>
           </View>
           {data.currentUser.foretagsbiljetter.map(biljett => (
-            <View style={{ flexDirection: "row" }}>
+            <View key={biljett.number} style={{ flexDirection: "row" }}>
               <View style={{ width: 120 }}>
                 <Text>{biljett.number}</Text>
               </View>
