@@ -1,13 +1,15 @@
+import { orderBy } from "lodash";
 import * as React from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { SectionList } from "react-native";
 import { NavigationInjectedProps, StackActions } from "react-navigation";
 import {
   filterShowingsParticipatedByMeAndAfterToday,
-  filterShowingsParticipatedByMeAndBeforeToday
+  filterShowingsParticipatedByMeAndBeforeToday,
+  showingDate
 } from "./lib/filterShowings";
-import { OrderedShowingList } from "./OrderedShowingList";
 import { RedHeader } from "./RedHeader";
-import { ShowingListItemContainer } from "./ShowingListItemContainer";
+import { ShowingListItem } from "./ShowingListItem";
+import { padding } from "./style";
 import { useShowingsByMovieQuery } from "./useShowingsByMovieQuery";
 
 export const TodayScreen: React.FC<NavigationInjectedProps> = ({
@@ -37,37 +39,41 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
 
   const showings = data ? data.publicShowings : [];
 
-  const meId = data && data.me ? data.me.id :  '';
-
+  const meId = data && data.me ? data.me.id : "";
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
-      }
-    >
-
-          <ShowingListItemContainer>
-            <RedHeader>Mina kommande besök</RedHeader>
-            <OrderedShowingList
-              order={"asc"}
-              showings={showings.filter(
-                filterShowingsParticipatedByMeAndAfterToday(meId)
-              )}
-              onPressShowing={onPressShowing}
-              onPressTicket={onPressTicket}
-            />
-
-            <RedHeader>Mina tidigare besök</RedHeader>
-            <OrderedShowingList
-              order={"desc"}
-              showings={showings.filter(
-                filterShowingsParticipatedByMeAndBeforeToday(meId)
-              )}
-              onPressShowing={onPressShowing}
-              onPressTicket={onPressTicket}
-            />
-          </ShowingListItemContainer>
-    </ScrollView>
+    <SectionList
+      refreshing={fetching}
+      onRefresh={executeQuery}
+      sections={[
+        {
+          title: "Mina kommande besök",
+          data: orderBy(
+            showings.filter(filterShowingsParticipatedByMeAndAfterToday(meId)),
+            [showingDate],
+            ["asc"]
+          )
+        },
+        {
+          title: "Mina tidigare besök",
+          data: orderBy(
+            showings.filter(filterShowingsParticipatedByMeAndBeforeToday(meId)),
+            [showingDate],
+            ["desc"]
+          )
+        }
+      ]}
+      renderSectionHeader={({ section }) => (
+        <RedHeader style={{ padding, paddingBottom: 10 }}>{section.title}</RedHeader>
+      )}
+      renderItem={({ item: showing }) => (
+        <ShowingListItem
+          key={showing.id}
+          showing={showing}
+          onPressShowTicket={() => onPressTicket(showing.id)}
+          onPressShowing={() => onPressShowing(showing.id)}
+        />
+      )}
+    />
   );
 };

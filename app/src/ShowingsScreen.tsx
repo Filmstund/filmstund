@@ -1,12 +1,12 @@
 import isBefore from "date-fns/isBefore";
-import { groupBy } from "lodash";
+import { groupBy, orderBy } from "lodash";
 import * as React from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { SectionList } from "react-native";
 import { NavigationInjectedProps, StackActions } from "react-navigation";
 import { showingDate, today } from "./lib/filterShowings";
-import { OrderedShowingList } from "./OrderedShowingList";
 import { RedHeader } from "./RedHeader";
-import { ShowingListItemContainer } from "./ShowingListItemContainer";
+import { ShowingListItem } from "./ShowingListItem";
+import { padding } from "./style";
 import { useShowingsByMovieQuery } from "./useShowingsByMovieQuery";
 
 export const ShowingsScreen: React.FC<NavigationInjectedProps> = ({
@@ -42,28 +42,32 @@ export const ShowingsScreen: React.FC<NavigationInjectedProps> = ({
     );
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
-      }
-    >
-      <ShowingListItemContainer>
-        <RedHeader>Aktuella besök</RedHeader>
-        <OrderedShowingList
-          order={"asc"}
-          showings={upcoming}
-          onPressShowing={onPressShowing}
-          onPressTicket={onPressTicket}
+    <SectionList
+      refreshing={fetching}
+      onRefresh={executeQuery}
+      sections={[
+        {
+          title: "Aktuella besök",
+          data: orderBy(upcoming, [showingDate], ["asc"])
+        },
+        {
+          title: "Tidigare besök",
+          data: orderBy(previous, [showingDate], ["desc"])
+        }
+      ]}
+      renderSectionHeader={({ section }) => (
+        <RedHeader style={{ padding, paddingBottom: 10 }}>
+          {section.title}
+        </RedHeader>
+      )}
+      renderItem={({ item: showing }) => (
+        <ShowingListItem
+          key={showing.id}
+          showing={showing}
+          onPressShowTicket={() => onPressTicket(showing.id)}
+          onPressShowing={() => onPressShowing(showing.id)}
         />
-
-        <RedHeader>Tidigare besök</RedHeader>
-        <OrderedShowingList
-          order={"desc"}
-          showings={previous}
-          onPressShowing={onPressShowing}
-          onPressTicket={onPressTicket}
-        />
-      </ShowingListItemContainer>
-    </ScrollView>
+      )}
+    />
   );
 };

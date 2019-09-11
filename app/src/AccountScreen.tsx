@@ -105,19 +105,19 @@ const emptyUser: AccountQuery_currentUser = {
   foretagsbiljetter: [],
   calendarFeedUrl: null,
   filmstadenMembershipId: null,
-  lastName: "",
-  firstName: "",
+  lastName: "-",
+  firstName: "-",
   nick: "",
   avatar: null,
-  email: "",
-  phone: ""
+  email: "-",
+  phone: "-"
 };
 
 export const AccountScreen: React.FC<NavigationInjectedProps> = ({
   navigation
 }) => {
   const [{ data, fetching, error }, executeQuery] = useAccountQuery();
-  const signout = useSignOut();
+
 
   const user = data ? data.currentUser : emptyUser;
 
@@ -151,7 +151,7 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
         </ScrollView>
       </View>
       {!fetching && !data && <EmptyList text={"Ingen data"} />}
-      <Button title={"Logga ut"} onPress={signout} />
+
     </View>
   );
 };

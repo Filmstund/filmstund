@@ -44,6 +44,7 @@ export const ShowingListItem: React.FC<{
   <View
     style={{
       padding,
+      paddingBottom: 0,
       backgroundColor: "white",
       borderRadius: 5,
       marginBottom: 8,

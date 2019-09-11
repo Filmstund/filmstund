@@ -1,8 +1,11 @@
 import * as React from "react";
-import { Text, View } from "react-native";
+import { StyleProp, Text, View, ViewStyle } from "react-native";
 
-export const RedHeader: React.FC = ({ children }) => (
-  <View>
+export const RedHeader: React.FC<{ style?: StyleProp<ViewStyle> }> = ({
+  children,
+  style
+}) => (
+  <View style={[{ backgroundColor: "white" }, style]}>
     <Text
       style={{
         color: "#4a4a4a",
@@ -13,6 +16,6 @@ export const RedHeader: React.FC = ({ children }) => (
     >
       {children}
     </Text>
-    <View style={{ backgroundColor: "#d0021b", flex: 1, height: 4 }}/>
+    <View style={{ backgroundColor: "#d0021b", flex: 1, height: 4 }} />
   </View>
 );

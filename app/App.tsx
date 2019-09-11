@@ -7,7 +7,14 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { Image, SafeAreaView, StatusBar, Text, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  View,
+  Button
+} from "react-native";
 import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
 import {
@@ -27,7 +34,7 @@ import { createClient, Provider } from "urql";
 import { AccountScreen } from "./src/AccountScreen";
 import { getToken, setToken } from "./src/lib/session";
 import { MoviesScreen } from "./src/MoviesScreen";
-import { SessionContext } from "./src/session/SessionContext";
+import { SessionContext, useSignOut } from "./src/session/SessionContext";
 import { ShowingScreen } from "./src/ShowingScreen";
 import { ShowingsScreen } from "./src/ShowingsScreen";
 import { padding } from "./src/style";
@@ -54,7 +61,7 @@ const stackConfig: CreateNavigatorConfig<
     headerTitleStyle: {
       color: "white"
     },
-    headerTintColor: 'white'
+    headerTintColor: "white"
   }
 };
 
@@ -88,12 +95,19 @@ const MoviesStack = createStackNavigator(
   stackConfig
 );
 
+const HeaderLogoutButton: React.FC = () => {
+  const signout = useSignOut();
+
+  return <Button title={"Logga ut"} onPress={signout} color={'white'} />;
+};
+
 const AccountStack = createStackNavigator(
   {
     Account: {
       screen: AccountScreen,
       navigationOptions: options => ({
-        title: "Konto"
+        title: "Konto",
+        headerRight: <HeaderLogoutButton/>
       })
     }
   },
