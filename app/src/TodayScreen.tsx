@@ -35,20 +35,24 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
       })
     );
 
+  const showings = data ? data.publicShowings : [];
+
+  const meId = data && data.me ? data.me.id :  '';
+
+
   return (
     <ScrollView
       refreshControl={
         <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
       }
     >
-      {!fetching &&
-        data && (
+
           <ShowingListItemContainer>
             <RedHeader>Mina kommande besök</RedHeader>
             <OrderedShowingList
               order={"asc"}
-              showings={data.publicShowings.filter(
-                filterShowingsParticipatedByMeAndAfterToday(data.me.id)
+              showings={showings.filter(
+                filterShowingsParticipatedByMeAndAfterToday(meId)
               )}
               onPressShowing={onPressShowing}
               onPressTicket={onPressTicket}
@@ -57,14 +61,13 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
             <RedHeader>Mina tidigare besök</RedHeader>
             <OrderedShowingList
               order={"desc"}
-              showings={data.publicShowings.filter(
-                filterShowingsParticipatedByMeAndBeforeToday(data.me.id)
+              showings={showings.filter(
+                filterShowingsParticipatedByMeAndBeforeToday(meId)
               )}
               onPressShowing={onPressShowing}
               onPressTicket={onPressTicket}
             />
           </ShowingListItemContainer>
-        )}
     </ScrollView>
   );
 };

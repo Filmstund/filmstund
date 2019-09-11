@@ -1,9 +1,18 @@
 import gql from "graphql-tag";
 import * as React from "react";
-import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  Button,
+  Image,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View
+} from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
 import { useQuery } from "urql";
 import { AccountQuery } from "./__generated__/AccountQuery";
+import { EmptyList } from "./EmptyList";
+import { useSignOut } from "./session/SessionContext";
 import { padding } from "./style";
 
 export const useAccountQuery = () =>
@@ -33,6 +42,7 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
   navigation
 }) => {
   const [{ data, fetching, error }, executeQuery] = useAccountQuery();
+  const signout = useSignOut();
 
   return (
     <ScrollView
@@ -78,7 +88,9 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
               <Text>{data.currentUser.email}</Text>
             </View>
           </View>
-          <Text style={{ fontWeight: '300', fontSize: 16 }}>Företagsbiljetter</Text>
+          <Text style={{ fontWeight: "300", fontSize: 16 }}>
+            Företagsbiljetter
+          </Text>
           <View style={{ flexDirection: "row", marginVertical: 10 }}>
             <View style={{ width: 120 }}>
               <Text>Nummer</Text>
@@ -105,6 +117,8 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
           ))}
         </View>
       )}
+      {!fetching && !data && <EmptyList text={"Ingen data"} />}
+      <Button title={"Logga ut"} onPress={signout} />
     </ScrollView>
   );
 };

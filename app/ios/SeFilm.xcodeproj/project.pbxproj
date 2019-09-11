@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* SeFilmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* SeFilmTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -16,11 +17,11 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* SeFilmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* SeFilmTests.m */; };
 		3DF641A0FA7DDF5CACD6532F /* libPods-SeFilm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D3FA97C89FF46425066757A /* libPods-SeFilm.a */; };
+		88870F8F30424465BF4912B5 /* sf_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9D3E29C2D81C4D52AD93E018 /* sf_regular.ttf */; };
 		8D8C190349BF5E10FF6C1B48 /* libPods-SeFilm-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 13E188B8F14BB07E2EF6EC3B /* libPods-SeFilm-tvOS.a */; };
 		941E60D913604F4D51A6EAC4 /* libPods-SeFilmTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0497BBAB4DCD45F222D904E7 /* libPods-SeFilmTests.a */; };
-		EC67651CC812C72B3D5964A1 /* libPods-SeFilm-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 441AD21A01202F40DF7B07A9 /* libPods-SeFilm-tvOSTests.a */; };
 		E896FE4E16F941C2842D77F5 /* sf_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 11FD8C9A44AD47E499E7B0B6 /* sf_bold.ttf */; };
-		88870F8F30424465BF4912B5 /* sf_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9D3E29C2D81C4D52AD93E018 /* sf_regular.ttf */; };
+		EC67651CC812C72B3D5964A1 /* libPods-SeFilm-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 441AD21A01202F40DF7B07A9 /* libPods-SeFilm-tvOSTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* SeFilmTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SeFilmTests.m; sourceTree = "<group>"; };
 		0497BBAB4DCD45F222D904E7 /* libPods-SeFilmTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SeFilmTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		11FD8C9A44AD47E499E7B0B6 /* sf_bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = sf_bold.ttf; path = ../assets/fonts/sf_bold.ttf; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* SeFilm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SeFilm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = SeFilm/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = SeFilm/AppDelegate.m; sourceTree = "<group>"; };
@@ -62,14 +64,13 @@
 		4D723E8C3EC6584C069F3305 /* Pods-SeFilm.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SeFilm.release.xcconfig"; path = "Target Support Files/Pods-SeFilm/Pods-SeFilm.release.xcconfig"; sourceTree = "<group>"; };
 		6D3FA97C89FF46425066757A /* libPods-SeFilm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SeFilm.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C3CA7D730858212C4F136D1 /* Pods-SeFilm-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SeFilm-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-SeFilm-tvOSTests/Pods-SeFilm-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		9D3E29C2D81C4D52AD93E018 /* sf_regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = sf_regular.ttf; path = ../assets/fonts/sf_regular.ttf; sourceTree = "<group>"; };
 		B112A8DCE69FBA701A6EE9B7 /* Pods-SeFilm.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SeFilm.debug.xcconfig"; path = "Target Support Files/Pods-SeFilm/Pods-SeFilm.debug.xcconfig"; sourceTree = "<group>"; };
 		DFBCF109A87278E0FAA5E4D4 /* Pods-SeFilm-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SeFilm-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-SeFilm-tvOSTests/Pods-SeFilm-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		F4A1478925F984A26E80C9B8 /* Pods-SeFilm-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SeFilm-tvOS.release.xcconfig"; path = "Target Support Files/Pods-SeFilm-tvOS/Pods-SeFilm-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		FC9BFEBA3361081830DFAC3E /* Pods-SeFilm-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SeFilm-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-SeFilm-tvOS/Pods-SeFilm-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
-		11FD8C9A44AD47E499E7B0B6 /* sf_bold.ttf */ = {isa = PBXFileReference; name = "sf_bold.ttf"; path = "../assets/fonts/sf_bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		9D3E29C2D81C4D52AD93E018 /* sf_regular.ttf */ = {isa = PBXFileReference; name = "sf_regular.ttf"; path = "../assets/fonts/sf_regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +187,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		99F1065451A445D7B0679949 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				11FD8C9A44AD47E499E7B0B6 /* sf_bold.ttf */,
+				9D3E29C2D81C4D52AD93E018 /* sf_regular.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		DA4BBF97C6284A39064BB841 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -200,16 +210,6 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
-		};
-		99F1065451A445D7B0679949 /* Resources */ = {
-			isa = "PBXGroup";
-			children = (
-				11FD8C9A44AD47E499E7B0B6 /* sf_bold.ttf */,
-				9D3E29C2D81C4D52AD93E018 /* sf_regular.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-			path = "";
 		};
 /* End PBXGroup section */
 
@@ -674,7 +674,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = se.lindskogen.sefilm;
+				PRODUCT_BUNDLE_IDENTIFIER = se.lindskogen.filmstund;
 				PRODUCT_NAME = SeFilm;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -694,7 +694,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = se.lindskogen.sefilm;
+				PRODUCT_BUNDLE_IDENTIFIER = se.lindskogen.filmstund;
 				PRODUCT_NAME = SeFilm;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

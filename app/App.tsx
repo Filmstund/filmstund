@@ -1,16 +1,33 @@
+import {
+  faCalendar,
+  faFilm,
+  faTicketAlt,
+  faUser
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Image, SafeAreaView, StatusBar, Text, View } from "react-native";
 import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
+import {
+  createAppContainer,
+  CreateNavigatorConfig,
+  createSwitchNavigator,
+  NavigationStackRouterConfig
+} from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
+import {
+  NavigationStackConfig,
+  NavigationStackOptions
+} from "react-navigation-stack/lib/typescript/types";
 // @ts-ignore
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createClient, Provider } from "urql";
 import { AccountScreen } from "./src/AccountScreen";
 import { getToken, setToken } from "./src/lib/session";
 import { MoviesScreen } from "./src/MoviesScreen";
+import { SessionContext } from "./src/session/SessionContext";
 import { ShowingScreen } from "./src/ShowingScreen";
 import { ShowingsScreen } from "./src/ShowingsScreen";
 import { padding } from "./src/style";
@@ -19,71 +36,136 @@ import { TodayScreen } from "./src/TodayScreen";
 
 GoogleSignin.configure({
   scopes: ["profile", "email", "openid"],
+  webClientId:
+    "692064172675-montab9pi57304e68r932c6lm7111oaf.apps.googleusercontent.com",
   iosClientId:
-    "976792570239-2plt93mmibojvtq3ipngcmk6php2eajq.apps.googleusercontent.com"
+    "692064172675-ef9p2ad7khsr1k9l1pk6qtjc3u1elb4e.apps.googleusercontent.com"
 });
 
-const TodayStack = createStackNavigator({
-  Today: {
-    screen: TodayScreen,
-    navigationOptions: options => ({
-      title: "Today"
-    })
-  },
-  Showing: {
-    screen: ShowingScreen
-  },
-  Ticket: {
-    screen: TicketScreen
+const stackConfig: CreateNavigatorConfig<
+  NavigationStackConfig,
+  NavigationStackRouterConfig,
+  NavigationStackOptions
+> = {
+  defaultNavigationOptions: {
+    headerStyle: {
+      backgroundColor: "#d0021b"
+    },
+    headerTitleStyle: {
+      color: "white"
+    },
+    headerTintColor: 'white'
   }
-});
+};
 
-const MoviesStack = createStackNavigator({
-  Movies: {
-    screen: MoviesScreen,
-    navigationOptions: options => ({
-      title: "Movies"
-    })
-  }
-});
-
-const AccountStack = createStackNavigator({
-  Account: {
-    screen: AccountScreen,
-    navigationOptions: options => ({
-      title: "Account"
-    })
-  }
-});
-
-const ShowingsStack = createStackNavigator({
-  Showings: {
-    screen: ShowingsScreen,
-    navigationOptions: options => ({
-      title: "Showings"
-    })
+const TodayStack = createStackNavigator(
+  {
+    Today: {
+      screen: TodayScreen,
+      navigationOptions: options => ({
+        title: "Today"
+      })
+    },
+    Showing: {
+      screen: ShowingScreen
+    },
+    Ticket: {
+      screen: TicketScreen
+    }
   },
-  Showing: {
-    screen: ShowingScreen
+  stackConfig
+);
+
+const MoviesStack = createStackNavigator(
+  {
+    Movies: {
+      screen: MoviesScreen,
+      navigationOptions: options => ({
+        title: "Movies"
+      })
+    }
   },
-  Ticket: {
-    screen: TicketScreen
-  }
-});
+  stackConfig
+);
+
+const AccountStack = createStackNavigator(
+  {
+    Account: {
+      screen: AccountScreen,
+      navigationOptions: options => ({
+        title: "Account"
+      })
+    }
+  },
+  stackConfig
+);
+
+const ShowingsStack = createStackNavigator(
+  {
+    Showings: {
+      screen: ShowingsScreen,
+      navigationOptions: options => ({
+        title: "Showings"
+      })
+    },
+    Showing: {
+      screen: ShowingScreen
+    },
+    Ticket: {
+      screen: TicketScreen
+    }
+  },
+  stackConfig
+);
 
 const TabNavigator = createBottomTabNavigator(
   {
-    Today: TodayStack,
-    Movies: MoviesStack,
-    Showings: ShowingsStack,
-    Account: AccountStack
+    Today: {
+      screen: TodayStack,
+      navigationOptions: {
+        title: "IDAG",
+        tabBarIcon: ({ tintColor }) => (
+          <FontAwesomeIcon icon={faCalendar} color={tintColor} size={22} />
+        )
+      }
+    },
+    Movies: {
+      screen: MoviesStack,
+      navigationOptions: {
+        title: "FILMER",
+        tabBarIcon: ({ tintColor }) => (
+          <FontAwesomeIcon icon={faFilm} color={tintColor} size={22} />
+        )
+      }
+    },
+    Showings: {
+      screen: ShowingsStack,
+      navigationOptions: {
+        title: "BESÖK",
+        tabBarIcon: ({ tintColor }) => (
+          <FontAwesomeIcon icon={faTicketAlt} color={tintColor} size={22} />
+        )
+      }
+    },
+    Account: {
+      screen: AccountStack,
+      navigationOptions: {
+        title: "KONTO",
+        tabBarIcon: ({ tintColor }) => (
+          <FontAwesomeIcon icon={faUser} color={tintColor} size={22} />
+        )
+      }
+    }
   },
   {
     tabBarOptions: {
       activeTintColor: "#fff",
       inactiveTintColor: "#e6b8be",
+      labelStyle: {
+        fontWeight: "500",
+        color: "white"
+      },
       style: {
-        color: "white",
         backgroundColor: "#d0021b"
       }
     }
@@ -97,7 +179,7 @@ const AppNavigator = createSwitchNavigator({
 const AppContainer = createAppContainer(AppNavigator);
 
 const client = createClient({
-  url: "http://192.168.1.13:8080/graphql",
+  url: "https://sefilm.bio/graphql",
   fetchOptions: () => ({
     headers: {
       Authorization: `Bearer ${getToken()}`
@@ -105,8 +187,10 @@ const client = createClient({
   })
 });
 
-const App = () => {
-  const [signedIn, setSignedIn] = useState(false);
+const App: React.FC<{
+  signedIn: boolean;
+  setSignedIn: (b: boolean) => void;
+}> = ({ signedIn, setSignedIn }) => {
   const [loaded, setLoaded] = useState(false);
   const [isSigninInProgress, setSigninInProgress] = useState(false);
 
@@ -141,6 +225,7 @@ const App = () => {
       }
     } catch (error) {
       setSignedIn(false);
+    } finally {
       setSigninInProgress(false);
     }
   };
@@ -152,6 +237,7 @@ const App = () => {
   if (signedIn) {
     return (
       <Provider value={client}>
+        <StatusBar barStyle={"light-content"} />
         <AppContainer />
       </Provider>
     );
@@ -191,4 +277,19 @@ const App = () => {
   }
 };
 
-export default App;
+const Root = () => {
+  const [signedIn, setSignedIn] = useState(false);
+
+  const signout = useCallback(() => {
+    GoogleSignin.signOut();
+    setSignedIn(false);
+  }, []);
+
+  return (
+    <SessionContext.Provider value={signout}>
+      <App signedIn={signedIn} setSignedIn={setSignedIn} />
+    </SessionContext.Provider>
+  );
+};
+
+export default Root;

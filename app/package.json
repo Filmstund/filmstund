@@ -11,6 +11,9 @@
     "typings": "yarn apollo client:codegen --target typescript --customScalarsPrefix=SeFilm --passthroughCustomScalars --includes \"src/**/*.{js,ts,tsx}\" --globalTypesFile=src/__generated__/globalTypes.ts --endpoint http://localhost:8080/graphql"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.22",
+    "@fortawesome/free-solid-svg-icons": "^5.10.2",
+    "@fortawesome/react-native-fontawesome": "^0.1.0",
     "@react-native-community/async-storage": "^1.6.1",
     "@react-native-community/masked-view": "^0.1.1",
     "@types/lodash": "^4.14.138",
@@ -24,16 +27,12 @@
     "react-native-google-signin": "^2.0.0",
     "react-native-reanimated": "^1.2.0",
     "react-native-screens": "^2.0.0-alpha.3",
+    "react-native-svg": "^9.9.3",
     "react-native-webview": "^7.0.5",
-    "react-navigation": "^4.0.1",
-    "react-navigation-stack": "^2.0.0-alpha.12",
-    "react-navigation-tabs": "^2.4.0",
+    "react-navigation": "^4.0.3",
+    "react-navigation-stack": "^1.5.5",
+    "react-navigation-tabs": "^2.4.2",
     "urql": "^1.5.0"
-  },
-  "rnpm": {
-    "assets": [
-      "./assets/fonts/"
-    ]
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
@@ -43,11 +42,12 @@
     "apollo": "^2.18.1",
     "babel-jest": "^24.9.0",
     "babel-plugin-module-resolver": "^3.2.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^6.3.0",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
     "react-test-renderer": "16.9.0",
-    "typescript": "^3.6.2"
+    "typescript": "^3.6.3"
   },
   "jest": {
     "preset": "react-native"

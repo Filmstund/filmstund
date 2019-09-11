@@ -1,7 +1,7 @@
 import { orderBy } from "lodash";
 import * as React from "react";
-import { Text, View } from "react-native";
 import { ShowingsByMovieQuery_publicShowings } from "./__generated__/ShowingsByMovieQuery";
+import { EmptyList } from "./EmptyList";
 import { showingDate } from "./lib/filterShowings";
 import { ShowingListItem } from "./ShowingListItem";
 
@@ -17,17 +17,7 @@ export const OrderedShowingList = ({
   onPressShowing: (showingId: string) => void;
 }) => {
   if (showings.length === 0) {
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          height: 50
-        }}
-      >
-        <Text style={{ color: "#9b9b9b" }}>Inga besök</Text>
-      </View>
-    );
+    return <EmptyList text={"Inga besök"} />;
   }
 
   return (

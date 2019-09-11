@@ -4,6 +4,7 @@ import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
 import { useQuery } from "urql";
 import { AllMoviesQuery } from "./__generated__/AllMoviesQuery";
+import { EmptyList } from "./EmptyList";
 import { padding } from "./style";
 
 export const useAllMoviesQuery = () =>
@@ -43,7 +44,7 @@ export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
       }
     >
       {movies.map(movie => (
-        <View style={{ flexDirection: "row", backgroundColor: "white" }}>
+        <View key={movie.id} style={{ flexDirection: "row", backgroundColor: "white" }}>
           <Image
             source={{
               uri: movie.poster || moviePoster,
@@ -58,6 +59,7 @@ export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
           </View>
         </View>
       ))}
+      {!fetching && movies.length === 0 && <EmptyList text={"Inga filmer"}/>}
     </ScrollView>
   );
 };
