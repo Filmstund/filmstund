@@ -10,7 +10,10 @@ import {
 } from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
 import { useQuery } from "urql";
-import { AccountQuery } from "./__generated__/AccountQuery";
+import {
+  AccountQuery,
+  AccountQuery_currentUser
+} from "./__generated__/AccountQuery";
 import { EmptyList } from "./EmptyList";
 import { useSignOut } from "./session/SessionContext";
 import { padding } from "./style";
@@ -38,71 +41,101 @@ export const useAccountQuery = () =>
     `
   });
 
+const ForetagsbiljettHeader = () => (
+  <View style={{ flexDirection: "row", marginVertical: 10 }}>
+    <View style={{ width: 120 }}>
+      <Text>Nummer</Text>
+    </View>
+    <View style={{ width: 120 }}>
+      <Text>Utgångsdatum</Text>
+    </View>
+    <View style={{ width: 100 }}>
+      <Text>Status</Text>
+    </View>
+  </View>
+);
+
+const UserAccountDetails = ({
+  currentUser
+}: {
+  currentUser: AccountQuery_currentUser;
+}) => (
+  <View
+    style={{
+      flexDirection: "row",
+      backgroundColor: "white",
+      shadowColor: "black",
+      shadowOpacity: 0.5,
+      shadowOffset: { width: 0, height: 1 },
+      shadowRadius: 3,
+      marginBottom: 20
+    }}
+  >
+    {currentUser.avatar ? (
+      <Image
+        source={{
+          uri: currentUser.avatar,
+          height: 96,
+          width: 96
+        }}
+      />
+    ) : (
+      <View style={{ width: 96, height: 96 }} />
+    )}
+    <View
+      style={{
+        paddingHorizontal: padding,
+        flex: 1,
+        justifyContent: "center"
+      }}
+    >
+      <Text style={{ fontSize: 18, fontWeight: "700" }}>
+        {currentUser.nick}
+      </Text>
+      <Text>
+        {currentUser.firstName} {currentUser.lastName}
+      </Text>
+      <Text>{currentUser.email}</Text>
+    </View>
+  </View>
+);
+
+const emptyUser: AccountQuery_currentUser = {
+  __typename: "CurrentUser",
+  foretagsbiljetter: [],
+  calendarFeedUrl: null,
+  filmstadenMembershipId: null,
+  lastName: "",
+  firstName: "",
+  nick: "",
+  avatar: null,
+  email: "",
+  phone: ""
+};
+
 export const AccountScreen: React.FC<NavigationInjectedProps> = ({
   navigation
 }) => {
   const [{ data, fetching, error }, executeQuery] = useAccountQuery();
   const signout = useSignOut();
 
+  const user = data ? data.currentUser : emptyUser;
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
-      }
-    >
-      {data && (
-        <View style={{ padding }}>
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "white",
-              shadowColor: "black",
-              shadowOpacity: 0.5,
-              shadowOffset: { width: 0, height: 1 },
-              shadowRadius: 3,
-              marginBottom: 20
-            }}
-          >
-            {data.currentUser.avatar && (
-              <Image
-                source={{
-                  uri: data.currentUser.avatar,
-                  height: 96,
-                  width: 96
-                }}
-              />
-            )}
-            <View
-              style={{
-                paddingHorizontal: padding,
-                flex: 1,
-                justifyContent: "center"
-              }}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "700" }}>
-                {data.currentUser.nick}
-              </Text>
-              <Text>
-                {data.currentUser.firstName} {data.currentUser.lastName}
-              </Text>
-              <Text>{data.currentUser.email}</Text>
-            </View>
-          </View>
-          <Text style={{ fontWeight: "300", fontSize: 16 }}>
-            Företagsbiljetter
-          </Text>
-          <View style={{ flexDirection: "row", marginVertical: 10 }}>
-            <View style={{ width: 120 }}>
-              <Text>Nummer</Text>
-            </View>
-            <View style={{ width: 120 }}>
-              <Text>Utgångsdatum</Text>
-            </View>
-            <View style={{ width: 100 }}>
-              <Text>Status</Text>
-            </View>
-          </View>
-          {data.currentUser.foretagsbiljetter.map(biljett => (
+    <View style={{ flex: 1, paddingBottom: padding }}>
+      <View style={{ padding, flex: 1 }}>
+        <UserAccountDetails currentUser={user} />
+        <Text style={{ fontWeight: "300", fontSize: 16 }}>
+          Företagsbiljetter
+        </Text>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
+          }
+          style={{ flex: 1 }}
+        >
+          <ForetagsbiljettHeader />
+          {user.foretagsbiljetter.map(biljett => (
             <View key={biljett.number} style={{ flexDirection: "row" }}>
               <View style={{ width: 120 }}>
                 <Text>{biljett.number}</Text>
@@ -115,10 +148,10 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
               </View>
             </View>
           ))}
-        </View>
-      )}
+        </ScrollView>
+      </View>
       {!fetching && !data && <EmptyList text={"Ingen data"} />}
       <Button title={"Logga ut"} onPress={signout} />
-    </ScrollView>
+    </View>
   );
 };
