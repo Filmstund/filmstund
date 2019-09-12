@@ -33,16 +33,11 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import rocks.didit.sefilm.database.mongo.MongoMigrator
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
-import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
-import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.logging.OutgoingLoggingInterceptor
 import rocks.didit.sefilm.notification.MailSettings
 import rocks.didit.sefilm.notification.PushoverSettings
-import rocks.didit.sefilm.services.SlugService
-import rocks.didit.sefilm.utils.MovieFilterUtil
 import rocks.didit.sefilm.web.controllers.CalendarController
 
 @SpringBootApplication
@@ -108,45 +103,6 @@ class Application {
           .allowCredentials(false)
       }
     }
-  }
-
-  @Bean
-  fun removeUnwantedMovies(movieRepository: MovieMongoRepository, titleExtensions: MovieFilterUtil) =
-    ApplicationRunner { _ ->
-      val unwantedMovies = movieRepository
-        .findAll()
-        .filter { titleExtensions.isMovieUnwantedBasedOnGenre(it.genres) || titleExtensions.isTitleUnwanted(it.title) }
-      log.info("Deleting ${unwantedMovies.size} unwanted movies")
-      movieRepository.deleteAll(unwantedMovies)
-    }
-
-  @Bean
-  fun createSlugsAndWebIds(showingRepository: ShowingMongoRepository, slugService: SlugService) =
-    ApplicationRunner { _ ->
-      val showingsWithMissingWebId = showingRepository
-        .findAll()
-        .filter {
-          it.webId == Base64ID.MISSING
-        }
-
-      val updatedShowings = showingsWithMissingWebId.map {
-        it.copy(webId = Base64ID.random(), slug = slugService.generateSlugFor(it))
-      }
-      showingRepository.saveAll(updatedShowings)
-    }
-
-  @Bean
-  fun trimMovieNames(movieRepository: MovieMongoRepository, titleExtensions: MovieFilterUtil) = ApplicationRunner { _ ->
-    movieRepository.findAll()
-      .filter {
-        titleExtensions.titleRequiresTrimming(it.title)
-      }
-      .forEach {
-        val newTitle = titleExtensions.trimTitle(it.title)
-        val updatedMovie = it.copy(title = newTitle)
-        log.info("Updating title: '${it.title}' -> '$newTitle'")
-        movieRepository.save(updatedMovie)
-      }
   }
 
   @Bean

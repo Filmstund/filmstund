@@ -10,7 +10,7 @@ import java.util.*
 @Repository
 interface ShowingRepository : JpaRepository<Showing, UUID> {
   //fun findByMovieIdOrderByDateDesc(movieId: UUID): List<Showing>
-  fun findByWebId(webId: Base64ID): Showing?
+  fun findByWebId(webId: Base64ID): List<Showing>
 
   @Query("select s from Showing s join fetch s.movie where s.id = :id")
   fun findByIdIncludingMovie(id: UUID): Showing?
