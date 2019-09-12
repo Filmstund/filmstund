@@ -230,3 +230,40 @@ create table participant_properties
 alter table gift_certificate
     add column is_deleted boolean not null default false;
 --rollback alter table gift_certificate drop column is_deleted;
+
+--changeset eda:createTableTicket
+create table ticket
+(
+    id                       varchar(15)
+        constraint ticket_pk primary key,
+    showing_id               uuid
+        constraint ticket_showing_fk references showing on delete cascade,
+    assigned_to_user         uuid
+        constraint ticket_user_fk references users on delete cascade,
+    profile_id               varchar(10)            null,
+    barcode                  text                   not null,
+    customer_type            varchar(50)            not null,
+    customer_type_definition varchar(50)            not null,
+    cinema                   varchar(100)           not null,
+    cinema_city              varchar(50)            null,
+    screen                   varchar(50)            not null,
+    seat_row                 integer                not null default 0
+        constraint ticket_seat_row_positive check (seat_row >= 0),
+    seat_number              integer                not null default 0
+        constraint ticket_seat_number_positive check (seat_number >= 0),
+    date                     date                   not null,
+    time                     time without time zone not null,
+    movie_name               varchar(100)           not null,
+    movie_rating             varchar(30)            not null
+);
+--rollback drop table if exists ticket;
+
+--changeset eda:createTableTicketAttribute
+create table ticket_attribute
+(
+    ticket_id varchar(15)
+        constraint ticket_attributes_ticket_fk references ticket on delete cascade,
+    attribute varchar(50) not null,
+    constraint ticket_attributes_pk primary key (ticket_id, attribute)
+);
+--rollback drop table if exists ticket_attribute;

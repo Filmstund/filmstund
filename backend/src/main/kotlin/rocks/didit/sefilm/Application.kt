@@ -174,6 +174,7 @@ class Application {
     mongoMigrator.migrateUsersFromMongo()
     mongoMigrator.migrateMoviesFromMongo()
     mongoMigrator.migrateShowingsFromMongo()
+    mongoMigrator.migrateTicketsFromMongo()
     val duration = System.currentTimeMillis() - before
     log.info("Data migration complete in {} ms", duration)
   }

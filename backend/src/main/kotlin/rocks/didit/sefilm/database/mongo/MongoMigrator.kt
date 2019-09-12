@@ -28,7 +28,9 @@ class MongoMigrator(
   val mongoShowingRepo: ShowingMongoRepository,
   val showingRepo: ShowingRepository,
   val participantPaymentInfoMongoRepo: ParticipantPaymentInfoMongoRepository,
-  val giftCertificateRepo: GiftCertificateRepository
+  val giftCertificateRepo: GiftCertificateRepository,
+  val mongoTicketRepo: TicketMongoRepository,
+  val ticketRepo: TicketRepository
 ) {
   private val log by logger()
 
@@ -240,5 +242,52 @@ class MongoMigrator(
     )
     savedUser.userIds = userIds
     return user
+  }
+
+  @Transactional
+  fun migrateTicketsFromMongo() {
+    if (log.isInfoEnabled) {
+      log.info(
+        "{} tickets are eligible for migration from MongoDB. We have {} tickets in postgres currently",
+        mongoTicketRepo.count(),
+        ticketRepo.count()
+      )
+    }
+
+    mongoTicketRepo.findAll()
+      .filterNot { ticketRepo.existsById(it.id) }
+      .forEach {
+        val ticket = Ticket(
+          id = it.id,
+          showing = showingRepo.findById(it.showingId).orElseThrow(),
+          assignedToUser = userIdsRepo.findByGoogleId(it.assignedToUser)?.user
+            ?: throw AssertionError("${it.assignedToUser} doesn't exist"),
+          profileId = it.profileId.orNullIfBlank(),
+          barcode = it.barcode,
+          customerType = it.customerType,
+          customerTypeDefinition = it.customerTypeDefinition,
+          cinema = it.cinema,
+          cinemaCity = it.cinemaCity,
+          screen = it.screen,
+          seatRow = it.seat.row,
+          seatNumber = it.seat.number,
+          date = it.date,
+          time = it.time,
+          movieName = it.movieName,
+          movieRating = it.movieRating
+        )
+
+        ticket.showAttributes.addAll(it.showAttributes.map { attrib ->
+          TicketAttribute(TicketAttributeId(ticket, attrib))
+        })
+
+        ticketRepo.save(ticket)
+      }
+  }
+
+  fun String?.orNullIfBlank(): String? {
+    return if (this.isNullOrBlank()) {
+      null
+    } else this
   }
 }
