@@ -19,7 +19,7 @@ jobs:
       run: |
         cd backend
         ./gradlew --no-daemon build jibDockerBuild --image=cthdidit/sefilm-backend:$(git rev-parse --short=8 HEAD)
-        docker tag ${BACKEND_IMG} cthdidit/sefilm-backend:latest
+        docker tag cthdidit/sefilm-backend:$(git rev-parse --short=8 HEAD) cthdidit/sefilm-backend:latest
     - name: Push docker images
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
