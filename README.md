@@ -1,4 +1,4 @@
-# ITBio [![CircleCI](https://circleci.com/gh/cthdidIT/itbio.svg?style=svg)](https://circleci.com/gh/cthdidIT/itbio)
+# ITBio [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FcthdidIT%2Fitbio%2Fbadge&style=popout)](https://actions-badge.atrox.dev/cthdidIT/itbio/goto)
 A web application for making it easier planning to go to the cinema with your friends
 
 ## How to start development
