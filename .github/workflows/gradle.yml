@@ -18,4 +18,6 @@ jobs:
       with:
         java-version: ${{ matrix.java-version }}
     - name: Build with Gradle
-      run: ./gradlew build
+      run: |
+        cd backend
+        ./gradlew build
