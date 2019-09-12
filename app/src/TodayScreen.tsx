@@ -1,7 +1,7 @@
 import { orderBy } from "lodash";
 import * as React from "react";
 import { SectionList } from "react-native";
-import { NavigationInjectedProps, StackActions } from "react-navigation";
+import { NavigationInjectedProps } from "react-navigation";
 import {
   filterShowingsParticipatedByMeAndAfterToday,
   filterShowingsParticipatedByMeAndBeforeToday,
@@ -18,24 +18,20 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
   const [{ data, fetching, error }, executeQuery] = useShowingsByMovieQuery();
 
   const onPressShowing = (showingId: string) =>
-    navigation.dispatch(
-      StackActions.push({
-        routeName: "Showing",
-        params: {
-          showingId
-        }
-      })
-    );
+    navigation.navigate({
+      routeName: "Showing",
+      params: {
+        showingId
+      }
+    });
 
   const onPressTicket = (showingId: string) =>
-    navigation.dispatch(
-      StackActions.push({
-        routeName: "Ticket",
-        params: {
-          showingId
-        }
-      })
-    );
+    navigation.navigate({
+      routeName: "Ticket",
+      params: {
+        showingId
+      }
+    });
 
   const showings = data ? data.publicShowings : [];
 
@@ -64,7 +60,9 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
         }
       ]}
       renderSectionHeader={({ section }) => (
-        <RedHeader style={{ padding, paddingBottom: 10 }}>{section.title}</RedHeader>
+        <RedHeader style={{ padding, paddingBottom: 10 }}>
+          {section.title}
+        </RedHeader>
       )}
       renderItem={({ item: showing }) => (
         <ShowingListItem

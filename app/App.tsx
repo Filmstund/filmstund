@@ -8,12 +8,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
+  Button,
   Image,
   SafeAreaView,
   StatusBar,
   Text,
-  View,
-  Button
+  View
 } from "react-native";
 import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
@@ -98,7 +98,7 @@ const MoviesStack = createStackNavigator(
 const HeaderLogoutButton: React.FC = () => {
   const signout = useSignOut();
 
-  return <Button title={"Logga ut"} onPress={signout} color={'white'} />;
+  return <Button title={"Logga ut"} onPress={signout} color={"white"} />;
 };
 
 const AccountStack = createStackNavigator(
@@ -107,7 +107,7 @@ const AccountStack = createStackNavigator(
       screen: AccountScreen,
       navigationOptions: options => ({
         title: "Konto",
-        headerRight: <HeaderLogoutButton/>
+        headerRight: <HeaderLogoutButton />
       })
     }
   },
@@ -211,13 +211,12 @@ const App: React.FC<{
   useEffect(() => {
     async function restoreToken() {
       try {
-        // await GoogleSignin.signOut()
         const user = await GoogleSignin.signInSilently();
         console.log(user);
 
         if (user.idToken) {
           setToken(user.idToken);
-          //   setSignedIn(true);
+          setSignedIn(true);
         }
       } catch (e) {
         return;

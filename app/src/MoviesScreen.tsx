@@ -30,6 +30,8 @@ export const useAllMoviesQuery = () =>
 const moviePoster =
   "https://catalog.cinema-api.com/images/ncg-images/e1cf3dd601ec4f23b4231f901f7b3c29.jpg?version=11D63C967B3576D4D5DBDE2A3ACFA3AB&width=240";
 
+const movieItemHeight = 199;
+
 export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
   navigation
 }) => {
@@ -43,6 +45,11 @@ export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
       refreshing={fetching}
       onRefresh={executeQuery}
       keyExtractor={item => item.id}
+      getItemLayout={(data, index) => ({
+        index,
+        length: movieItemHeight,
+        offset: index * movieItemHeight
+      })}
       ListEmptyComponent={!fetching && <EmptyList text={"Inga filmer"} />}
       renderItem={({ item: movie }) => (
         <View
@@ -52,7 +59,7 @@ export const MoviesScreen: React.FC<NavigationInjectedProps> = ({
           <Image
             source={{
               uri: movie.poster || moviePoster,
-              height: 199,
+              height: movieItemHeight,
               width: 134
             }}
           />

@@ -22,24 +22,20 @@ export const ShowingsScreen: React.FC<NavigationInjectedProps> = ({
   );
 
   const onPressShowing = (showingId: string) =>
-    navigation.dispatch(
-      StackActions.push({
-        routeName: "Showing",
-        params: {
-          showingId
-        }
-      })
-    );
+    navigation.navigate({
+      routeName: "Showing",
+      params: {
+        showingId
+      }
+    });
 
   const onPressTicket = (showingId: string) =>
-    navigation.dispatch(
-      StackActions.push({
-        routeName: "Ticket",
-        params: {
-          showingId
-        }
-      })
-    );
+    navigation.navigate({
+      routeName: "Ticket",
+      params: {
+        showingId
+      }
+    });
 
   return (
     <SectionList
