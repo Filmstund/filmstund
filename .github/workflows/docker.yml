@@ -10,18 +10,14 @@ jobs:
     - name: Build frontend Docker image
       run: |
         cd frontend
-        docker build -t cthdidit/sefilm-frontend:${TAG} --build-arg TAG=${{ github.sha }} .
-        docker tag cthdidit/sefilm-frontend:${TAG} cthdidit/sefilm-frontend:latest
-      env:
-        - TAG: $(git rev-parse --short=8 HEAD)
+        docker build -t cthdidit/sefilm-frontend:$(git rev-parse --short=8 HEAD) --build-arg TAG=${{ github.sha }} .
+        docker tag cthdidit/sefilm-frontend:$(git rev-parse --short=8 HEAD) cthdidit/sefilm-frontend:latest
     - uses: actions/setup-java@v1
     - name: Build backend Docker image
       run: |
         cd backend
-        ./gradlew --no-daemon build jibDockerBuild --image=cthdidit/sefilm-backend:${TAG}
+        ./gradlew --no-daemon build jibDockerBuild --image=cthdidit/sefilm-backend:$(git rev-parse --short=8 HEAD)
         docker tag ${BACKEND_IMG} ${NAME}-backend:latest
-      env:
-        - TAG: $(git rev-parse --short=8 HEAD)
     - name: Push docker images
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
