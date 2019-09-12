@@ -26,6 +26,6 @@ jobs:
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker push cthdidit/sefilm-frontend
-      	docker push cthdidit/sefilm-backend
+        docker push cthdidit/sefilm-backend
       
       
