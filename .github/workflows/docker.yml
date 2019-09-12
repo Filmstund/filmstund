@@ -13,6 +13,8 @@ jobs:
         docker build -t cthdidit/sefilm-frontend:$(git rev-parse --short=8 HEAD) --build-arg TAG=${{ github.sha }} .
         docker tag cthdidit/sefilm-frontend:$(git rev-parse --short=8 HEAD) cthdidit/sefilm-frontend:latest
     - uses: actions/setup-java@v1
+      with:
+        java-version: 1.11
     - name: Build backend Docker image
       run: |
         cd backend
