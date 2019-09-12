@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.entities.LocationAlias
-import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.math.BigDecimal
@@ -16,7 +15,6 @@ import java.math.BigDecimal
 @Component
 class DataLoader(
   private val locationRepository: LocationRepository,
-  private val locationsMongoRepo: LocationMongoRepository,
   private val filmstadenService: FilmstadenService,
   private val properties: Properties
 ) {

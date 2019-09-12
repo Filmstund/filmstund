@@ -17,7 +17,7 @@ data class UserIds(
   @Id
   val id: UUID,
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = [CascadeType.ALL])
   @MapsId
   var user: User,
 
@@ -52,7 +52,7 @@ data class UserIds(
   }
 
   override fun toString(): String {
-    return "UserIds(id=$id, userId=${user.id}, googleId=$googleId, filmstadenId=$filmstadenId)"
+    return "UserIds(id=$id, googleId=$googleId, filmstadenId=$filmstadenId)"
   }
 
 

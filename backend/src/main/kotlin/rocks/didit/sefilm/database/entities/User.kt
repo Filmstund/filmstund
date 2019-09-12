@@ -11,16 +11,13 @@ import javax.persistence.*
 @Table(name = "users")
 data class User(
   @Id
-  val id: UUID,
-
-  @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
-  var userIds: UserIds? = null,
+  val id: UUID = UUID.randomUUID(),
 
   @Column(nullable = false)
-  val firstName: String,
+  var firstName: String,
 
   @Column(nullable = false)
-  val lastName: String,
+  var lastName: String,
 
   @Column(nullable = false)
   val nick: String,
@@ -33,7 +30,7 @@ data class User(
   val phone: PhoneNumber? = null,
 
   @Column(nullable = true)
-  val avatar: String? = null,
+  var avatar: String? = null,
 
   @OneToMany(orphanRemoval = true, cascade = [CascadeType.ALL], mappedBy = "id.user")
   var giftCertificates: List<GiftCertificate> = mutableListOf(),
@@ -45,7 +42,7 @@ data class User(
   //val notificationSettings: NotificationSettings = NotificationSettings(false, listOf(), listOf()),
 
   @Column(nullable = false)
-  val lastLogin: Instant = Instant.ofEpochSecond(0L),
+  var lastLogin: Instant = Instant.ofEpochSecond(0L),
 
   @Column(nullable = false)
   val signupDate: Instant = Instant.ofEpochSecond(0L),

@@ -17,6 +17,7 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 import org.springframework.http.HttpEntity
@@ -48,6 +49,7 @@ import rocks.didit.sefilm.web.controllers.CalendarController
 @EnableConfigurationProperties(Properties::class)
 @EnableMongoRepositories(basePackages = ["rocks.didit.sefilm.database.mongo.repositories"])
 @EnableJpaRepositories(basePackages = ["rocks.didit.sefilm.database.repositories"])
+@EnableJpaAuditing
 @EnableTransactionManagement
 class Application {
   private val log = LoggerFactory.getLogger(Application::class.java)

@@ -232,7 +232,7 @@ class MongoMigrator(
 
     val savedUser = userRepo.save(user)
 
-    val userIds = userIdsRepo.save(
+    userIdsRepo.save(
       UserIds(
         id = newUserId,
         user = savedUser,
@@ -240,7 +240,6 @@ class MongoMigrator(
         googleId = it.id
       )
     )
-    savedUser.userIds = userIds
     return user
   }
 

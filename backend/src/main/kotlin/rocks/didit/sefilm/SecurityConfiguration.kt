@@ -1,6 +1,5 @@
 package rocks.didit.sefilm
 
-import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,8 +19,10 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.mongo.entities.User
-import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
+import org.springframework.transaction.annotation.Transactional
+import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.entities.UserIds
+import rocks.didit.sefilm.database.repositories.UserIdsRepository
 import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
@@ -34,9 +35,9 @@ class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
   val firstName: String? = userInfo["given_name"] as String
   val lastName: String? = userInfo["family_name"] as String
   val avatarUrl: String? = userInfo["picture"] as String
+  val name: String? get() = "$firstName $lastName"
 
   override fun getUsername(): String? = username
-  fun getName(): String? = "$firstName $lastName"
   override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_USER"))
   override fun getPassword(): String? = null
   override fun isAccountNonExpired(): Boolean = true
@@ -60,9 +61,12 @@ class OpenidUserAuthConverter : UserAuthenticationConverter {
 }
 
 @Component
-class LoginListener(private val userRepository: UserMongoRepository) : ApplicationListener<AuthenticationSuccessEvent> {
-  private val log = LoggerFactory.getLogger(LoginListener::class.java)
+class LoginListener(
+  private val userIdsRepo: UserIdsRepository
+) : ApplicationListener<AuthenticationSuccessEvent> {
+  private val log by logger()
 
+  @Transactional
   override fun onApplicationEvent(event: AuthenticationSuccessEvent) {
     createOrUpdateUser(event.authentication)
   }
@@ -71,32 +75,25 @@ class LoginListener(private val userRepository: UserMongoRepository) : Applicati
     val principal = authentication.principal as OpenIdConnectUserDetails?
       ?: throw IllegalStateException("Successful authentication without a principal")
 
-    val maybeUser: User? = userRepository.findById(UserID(principal.userId)).orElse(null)
+    val maybeUser: UserIds? = userIdsRepo.findByGoogleId(UserID(principal.userId))
     if (maybeUser == null) {
+      log.info("New user")
       val newUser = User(
-        id = UserID(principal.userId),
-        name = "${principal.firstName ?: ""} ${principal.lastName ?: ""}",
-        firstName = principal.firstName,
-        lastName = principal.lastName,
+        firstName = principal.firstName ?: "Bosse",
+        lastName = principal.lastName ?: "Ringholm",
         nick = principal.firstName ?: "Houdini",
         email = principal.username ?: "",
         avatar = principal.avatarUrl,
         lastLogin = Instant.now(),
         signupDate = Instant.now()
       )
-      userRepository.save(newUser)
+      userIdsRepo.save(UserIds(id = newUser.id, user = newUser, googleId = UserID(principal.userId)))
       log.info("Created new user ${newUser.name} (${newUser.id})")
     } else {
-      val updatedUser = maybeUser.copy(
-        name = "${principal.firstName} ${principal.lastName}",
-        firstName = principal.firstName,
-        lastName = principal.lastName,
-        avatar = principal.avatarUrl,
-        lastLogin = Instant.now()
-      )
-      if (maybeUser != updatedUser) {
-        userRepository.save(updatedUser)
-      }
+      maybeUser.user.firstName = principal.firstName ?: "Mr Noname"
+      maybeUser.user.lastName = principal.lastName ?: "Anybody"
+      maybeUser.user.avatar = principal.avatarUrl
+      maybeUser.user.lastLogin = Instant.now()
     }
   }
 }
@@ -120,8 +117,8 @@ class ResourceServerConfig(
       .antMatcher("/**")
       .authorizeRequests()
       .antMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
-            .antMatchers(HttpMethod.GET, "/info").permitAll()
-            .antMatchers(HttpMethod.GET, "/health").permitAll()
+      .antMatchers(HttpMethod.GET, "/info").permitAll()
+      .antMatchers(HttpMethod.GET, "/health").permitAll()
       .antMatchers(HttpMethod.GET, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.HEAD, "${CalendarController.PATH}/**").permitAll()
       .antMatchers(HttpMethod.OPTIONS, "${CalendarController.PATH}/**").permitAll()
