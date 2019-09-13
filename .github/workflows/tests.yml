@@ -1,0 +1,40 @@
+name: Tests CI
+
+on: [push]
+
+jobs:
+  test-frontend:
+    name: Run frontend tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Build frontend
+      run: |
+        cd frontend
+        yarn
+        yarn build
+        yarn test
+      env:
+        CI: true
+   test-backend:
+     name: Run backend tests
+     runs-on: ubuntu-latest
+
+     strategy:
+       matrix:
+         java-version: [1.8, 1.11]
+
+     steps:
+     - uses: actions/checkout@v1
+     - name: Set up JDK ${{ matrix.java-version }}
+       uses: actions/setup-java@v1
+       with:
+         java-version: ${{ matrix.java-version }}
+     - name: Build with Gradle
+       run: |
+         cd backend
+         ./gradlew check
