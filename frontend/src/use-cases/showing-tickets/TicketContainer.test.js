@@ -4,6 +4,10 @@ import { cleanup, render } from "@testing-library/react";
 import { TicketContainer } from "./TicketContainer";
 import { createMockSeat, createMockTicket } from "./__mocks__/ticket";
 import { MemoryRouter as Router } from "react-router";
+import { ApolloProvider } from "react-apollo";
+import { ApolloClient } from "apollo-client";
+import { ApolloLink } from "apollo-link";
+import { InMemoryCache } from "apollo-cache-inmemory";
 
 const mockUserData = {
   id: "this-is-mock-user-id"
@@ -52,21 +56,28 @@ const mockData = {
 
 afterEach(cleanup);
 
+const createEmptyApolloClient = () =>
+  new ApolloClient({ link: ApolloLink.empty(), cache: new InMemoryCache() });
+
 describe("<TicketContainer />", () => {
   it("renders without crashing", () => {
     const { container } = render(
-      <Router>
-        <TicketContainer me={mockUserData} showing={minimalMockData} />
-      </Router>
+      <ApolloProvider client={createEmptyApolloClient()}>
+        <Router>
+          <TicketContainer me={mockUserData} showing={minimalMockData} />
+        </Router>
+      </ApolloProvider>
     );
     expect(container).toMatchSnapshot();
   });
 
   it("renders the correct amount of tickets", () => {
     const { queryAllByText } = render(
-      <Router>
-        <TicketContainer me={mockUserData} showing={mockData} />
-      </Router>
+      <ApolloProvider client={createEmptyApolloClient()}>
+        <Router>
+          <TicketContainer me={mockUserData} showing={mockData} />
+        </Router>
+      </ApolloProvider>
     );
     expect(queryAllByText("mock-cinema")).toHaveLength(4);
   });
