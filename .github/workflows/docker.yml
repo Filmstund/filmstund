@@ -21,7 +21,7 @@ jobs:
         ./gradlew --no-daemon build jibDockerBuild --image=cthdidit/sefilm-backend:$(git describe)
         docker tag cthdidit/sefilm-backend:$(git describe) cthdidit/sefilm-backend:latest
     - name: Push docker images
-      if: github.ref == 'master'
+      if: github.ref == 'refs/heads/master'
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker push cthdidit/sefilm-frontend
