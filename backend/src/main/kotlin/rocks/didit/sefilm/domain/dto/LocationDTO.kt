@@ -1,14 +1,9 @@
-package rocks.didit.sefilm.database.mongo.entities
+package rocks.didit.sefilm.domain.dto
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
 import java.math.BigDecimal
 
-@Document
-@Deprecated(message = "")
-data class Location(
-  @Id
-  val name: String? = null,
+data class LocationDTO(
+  val name: String,
   /** This is the city alias that Filmstaden uses. GB is the alias for Göteborg e.g. */
   val cityAlias: String? = null,
   val city: String? = null,
@@ -20,16 +15,7 @@ data class Location(
   val filmstadenId: String? = null,
   val alias: List<String> = listOf()
 ) {
-
-  fun isFilmstadenLocation() = filmstadenId != null
-
-  fun hasAlias(other: String) = alias.contains(other)
-
   fun formatAddress(): String {
-    if (name == null) {
-      return ""
-    }
-
     return if (streetAddress != null) {
       "$name, $streetAddress"
     } else {
@@ -37,3 +23,4 @@ data class Location(
     }
   }
 }
+

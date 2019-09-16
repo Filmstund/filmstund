@@ -1,40 +1,38 @@
 package rocks.didit.sefilm.services
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.OpenIdConnectUserDetails
-import rocks.didit.sefilm.currentLoggedInUserId
-import rocks.didit.sefilm.database.mongo.entities.User
-import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
+import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.database.entities.GiftCertificate
+import rocks.didit.sefilm.database.entities.User
+import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.Foretagsbiljett
 import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.domain.dto.*
-import rocks.didit.sefilm.notification.MailSettings
-import rocks.didit.sefilm.notification.NotificationSettings
-import rocks.didit.sefilm.notification.PushoverSettings
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
+import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.orElseThrow
-import rocks.didit.sefilm.services.external.PushoverService
-import rocks.didit.sefilm.services.external.PushoverValidationStatus
 import java.util.*
 
 @Service
 class UserService(
-  private val userRepo: UserMongoRepository,
-  private val pushoverService: PushoverService?,
-  private val foretagsbiljettService: ForetagsbiljettService
+  private val userRepo: UserRepository,
+  //private val pushoverService: PushoverService?,
+  private val foretagsbiljettService: GiftCertificateService
 ) {
 
-  private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-  fun allUsers(): List<LimitedUserDTO> = userRepo.findAll().map { it.toLimitedUserDTO() }
-  fun getUser(id: UserID): LimitedUserDTO? = userRepo.findById(id).map { it.toLimitedUserDTO() }.orElse(null)
-  fun getUserOrThrow(id: UserID): LimitedUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
-  fun getUsersThatWantToBeNotified(knownRecipients: List<UserID>): List<User> {
+  private val log by logger()
+
+  fun allUsers(): List<PublicUserDTO> = userRepo.findAllPublicUsers()
+  fun getUser(id: UUID): PublicUserDTO? = userRepo.findPublicUserById(id)
+  fun getUserOrThrow(id: UUID): PublicUserDTO = getUser(id).orElseThrow { NotFoundException("user", id) }
+  fun getUsersThatWantToBeNotified(knownRecipients: List<UUID>): List<User> = emptyList() /*{
     return knownRecipients.let {
       when (it.isEmpty()) {
         true -> userRepo.findAll()
@@ -46,15 +44,14 @@ class UserService(
       }
     }
   }
+  */
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
-  fun getCompleteUser(id: UserID): User = userRepo.findById(id)
+  fun getCompleteUser(id: UUID): User = userRepo.findById(id)
     .orElseThrow { NotFoundException("user", userID = id) }
 
-  fun getCurrentUser(): UserDTO {
-    return currentLoggedInUserId().let {
-      getCompleteUser(it).toDTO()
-    }
+  fun getCurrentUser(): UserDTO = currentLoggedInUser().let {
+    getCompleteUser(it.id).toDTO()
   }
 
   fun currentUserOrNull(): User? {
@@ -63,35 +60,37 @@ class UserService(
       return null
     }
 
-    val principal = authentication.principal as OpenIdConnectUserDetails
-    return getCompleteUser(UserID(principal.userId))
+    val principal = authentication.principal as PublicUserDTO
+    return getCompleteUser(principal.id)
   }
 
-  private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUserId())
-    .orElseThrow { NotFoundException("current user", currentLoggedInUserId()) }
+  private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUser().id)
+    .orElseThrow { NotFoundException("current user", currentLoggedInUser().id) }
 
+  @Transactional
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
     val newFilmstadenMembershipId = when {
-      newDetails.filmstadenMembershipId == null || newDetails.filmstadenMembershipId.isBlank() -> null
+      newDetails.filmstadenMembershipId.isNullOrBlank() -> null
       else -> FilmstadenMembershipId.valueOf(newDetails.filmstadenMembershipId)
     }
 
     val newPhoneNumber = when {
-      newDetails.phone == null || newDetails.phone.isBlank() -> null
+      newDetails.phone.isNullOrBlank() -> null
       else -> PhoneNumber(newDetails.phone)
     }
 
-    val updatedUser = getUserEntityForCurrentUser().copy(
-      phone = newPhoneNumber,
-      nick = newDetails.nick,
-      filmstadenMembershipId = newFilmstadenMembershipId
-    )
+    val user = getUserEntityForCurrentUser()
+    user.filmstadenId = newFilmstadenMembershipId
 
-    return userRepo.save(updatedUser).toDTO()
+    user.phone = newPhoneNumber
+    user.nick = newDetails.nick ?: ""
+
+    log.info("Update user {}", user.id)
+    return user.toDTO()
   }
 
   // TODO: listen for PushoverUserKeyInvalid and disable the key
-  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO {
+  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO = getCurrentUser()/* {
     val currentUser = getUserEntityForCurrentUser()
 
     val mailSettings = notificationInput.mail.let {
@@ -121,6 +120,7 @@ class UserService(
       log.trace("Update notification settings for user={} settings to={}", it.id, it.notificationSettings)
     }.toDTO()
   }
+  */
 
   fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO? = userRepo
     .findByCalendarFeedId(calendarFeedId)
@@ -145,17 +145,18 @@ class UserService(
     this.lastName,
     this.nick,
     this.email,
-    this.filmstadenMembershipId?.value,
     this.phone?.number,
     this.avatar,
-    this.foretagsbiljetter.map { it.toDTO() },
-    this.notificationSettings,
+    this.giftCertificates.map { toDTO(it) },
     this.lastLogin,
     this.signupDate,
     this.calendarFeedId
   )
 
-  private fun Foretagsbiljett.toDTO(): ForetagsbiljettDTO {
-    return ForetagsbiljettDTO(this.number.number, this.expires, foretagsbiljettService.getStatusOfTicket(this))
-  }
+  private fun toDTO(giftCert: GiftCertificate): GiftCertificateDTO = giftCert.toDTO()
+    .let {
+      it.copy(
+        status = foretagsbiljettService.getStatusOfTicket(it)
+      )
+    }
 }

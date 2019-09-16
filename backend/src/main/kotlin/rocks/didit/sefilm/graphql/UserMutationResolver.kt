@@ -6,7 +6,7 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.domain.dto.*
-import rocks.didit.sefilm.services.ForetagsbiljettService
+import rocks.didit.sefilm.services.GiftCertificateService
 import rocks.didit.sefilm.services.ParticipantPaymentInfoService
 import rocks.didit.sefilm.services.UserService
 
@@ -14,7 +14,7 @@ import rocks.didit.sefilm.services.UserService
 class UserMutationResolver(
   private val userService: UserService,
   private val participantPaymentInfoService: ParticipantPaymentInfoService,
-  private val foretagsbiljettService: ForetagsbiljettService
+  private val foretagsbiljettService: GiftCertificateService
 ) : GraphQLMutationResolver {
 
   fun updateUser(newInfo: UserDetailsDTO): UserDTO = userService.updateUser(newInfo)

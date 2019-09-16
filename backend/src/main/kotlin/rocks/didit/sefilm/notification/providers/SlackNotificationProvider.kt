@@ -76,7 +76,7 @@ class SlackNotificationProvider(
       "SeFilm visning för <${event.showing.movie.title}>",
       pretext,
       event.ifIMDbSupplied("IMDb"),
-      event.ifIMDbSupplied("https://www.imdb.com/title/${event.showing.movie.imdbId.value}"),
+      event.ifIMDbSupplied("https://www.imdb.com/title/${event.showing.movie.imdbId?.value}"),
       event.ifIMDbSupplied("https://pbs.twimg.com/profile_images/976507090624589824/0x28al44_400x400.jpg"),
       "grey",
       event.showing.movie.title,
@@ -92,7 +92,7 @@ class SlackNotificationProvider(
   }
 
   private fun ShowingEvent.ifIMDbSupplied(str: String): String? {
-    return if (showing.movie.imdbId.isSupplied()) {
+    return if (showing.movie.imdbId?.isSupplied() == true) {
       str
     } else {
       null

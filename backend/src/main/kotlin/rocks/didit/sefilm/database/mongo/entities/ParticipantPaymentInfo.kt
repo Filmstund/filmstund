@@ -7,6 +7,7 @@ import rocks.didit.sefilm.domain.UserID
 import java.util.*
 
 @Document(collection = "participantInfo")
+@Deprecated(message = "")
 data class ParticipantPaymentInfo(
   @Id
   val id: UUID = UUID.randomUUID(),

@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Document
+@Deprecated(message = "")
 data class Movie(
   @Id
   val id: UUID = UUID.randomUUID(),

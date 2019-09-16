@@ -1,15 +1,15 @@
 package rocks.didit.sefilm.events
 
 import org.springframework.context.ApplicationEvent
-import rocks.didit.sefilm.database.mongo.entities.Showing
-import rocks.didit.sefilm.database.mongo.entities.User
+import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.PaymentType
-import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.notification.NotificationType
+import java.util.*
 
 sealed class ITBioEvent(src: Any) : ApplicationEvent(src)
 
-sealed class NotificationEvent(src: Any, val potentialRecipients: List<UserID> = listOf(), val type: NotificationType) :
+sealed class NotificationEvent(src: Any, val potentialRecipients: List<UUID> = listOf(), val type: NotificationType) :
   ITBioEvent(src)
 
 /** If {@link #potentialRecipients} is empty, all users will be potential recipients */
@@ -18,7 +18,7 @@ sealed class ShowingEvent(
   val showing: Showing,
   val triggeredBy: User,
   satisfiesType: NotificationType,
-  potentialRecipients: List<UserID> = listOf()
+  potentialRecipients: List<UUID> = listOf()
 ) : NotificationEvent(src, potentialRecipients, satisfiesType)
 
 class NewShowingEvent(src: Any, showing: Showing, user: User) :
@@ -42,4 +42,4 @@ class UserUnattendedEvent(src: Any, showing: Showing, user: User) :
 class PushoverUserKeyInvalidEvent(src: Any, val userKey: String) : ITBioEvent(src)
 
 private fun Showing.allParticipants() =
-  this.participants.map { it.userId }
+  this.participants.map { it.user.id }

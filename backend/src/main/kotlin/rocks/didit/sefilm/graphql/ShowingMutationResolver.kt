@@ -6,7 +6,6 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
@@ -40,6 +39,6 @@ class ShowingMutationResolver(
   fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO =
     showingService.updateShowing(showingId, newValues)
 
-  fun promoteToAdmin(showingId: UUID, userToPromote: UserID): ShowingDTO =
+  fun promoteToAdmin(showingId: UUID, userToPromote: UUID): ShowingDTO =
     adminService.promoteToAdmin(showingId, userToPromote)
 }

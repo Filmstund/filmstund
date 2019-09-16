@@ -8,9 +8,10 @@ enum class ValueState {
   Supplied
 }
 
-sealed class ExternalProviderId(val state: ValueState) {
+fun ExternalProviderId?.isMissing() = this == null || state == ValueState.Missing
+fun ExternalProviderId?.isSupplied() = this != null && this.isSupplied()
 
-  fun isMissing() = state == ValueState.Missing
+sealed class ExternalProviderId(val state: ValueState) {
 
   fun isUnknown() = state == ValueState.Unknown
 

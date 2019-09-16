@@ -1,12 +1,35 @@
+@file:Suppress("DEPRECATION")
+
 package rocks.didit.sefilm.database.mongo
 
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import rocks.didit.sefilm.database.entities.*
+import rocks.didit.sefilm.database.entities.CinemaScreen
+import rocks.didit.sefilm.database.entities.GiftCertId
+import rocks.didit.sefilm.database.entities.GiftCertificate
+import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.entities.LocationAlias
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.entities.Participant
+import rocks.didit.sefilm.database.entities.ParticipantId
+import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.entities.Ticket
+import rocks.didit.sefilm.database.entities.TicketAttribute
+import rocks.didit.sefilm.database.entities.TicketAttributeId
+import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
-import rocks.didit.sefilm.database.mongo.repositories.*
-import rocks.didit.sefilm.database.repositories.*
+import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.TicketMongoRepository
+import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
+import rocks.didit.sefilm.database.repositories.GiftCertificateRepository
+import rocks.didit.sefilm.database.repositories.LocationRepository
+import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.database.repositories.TicketRepository
+import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
@@ -19,12 +42,9 @@ class MongoMigrator(
   val locationRepo: LocationRepository,
   val locationsMongoRepo: LocationMongoRepository,
   val userRepo: UserRepository,
-  val userIdsRepo: UserIdsRepository,
   val mongoUserRepo: UserMongoRepository,
   val movieRepo: MovieRepository,
   val mongoMovieRepo: MovieMongoRepository,
-  val genreRepository: GenreRepository,
-  val movieIdsRepo: MovieIdsRepository,
   val mongoShowingRepo: ShowingMongoRepository,
   val showingRepo: ShowingRepository,
   val participantPaymentInfoMongoRepo: ParticipantPaymentInfoMongoRepository,
@@ -53,21 +73,21 @@ class MongoMigrator(
           slug = it.slug,
           date = it.date,
           time = it.time,
-          movie = movieRepo.findById(it.movie.id).orElseThrow(),
-          location = it.location?.let { l -> locationRepo.findByIdOrNull(l.name ?: "NON_EXISTANT") },
+          movie = movieRepo.getOne(it.movie.id),
+          location = it.location?.let { l -> locationRepo.getOne(l.name!!) },
           cinemaScreen = it.filmstadenScreen?.let { screen -> CinemaScreen(screen.filmstadenId, screen.name) },
           filmstadenShowingId = it.filmstadenRemoteEntityId,
           price = it.price ?: SEK.ZERO,
           ticketsBought = it.ticketsBought,
-          admin = userIdsRepo.findByGoogleId(it.admin.id)?.user ?: throw AssertionError("${it.admin.id} doesn't exist"),
-          payToUser = userIdsRepo.findByGoogleId(it.payToUser.id)?.user
+          admin = userRepo.findByGoogleId(it.admin.id) ?: throw AssertionError("${it.admin.id} doesn't exist"),
+          payToUser = userRepo.findByGoogleId(it.payToUser.id)
             ?: throw AssertionError("${it.payToUser.id} doesn't exist"),
           lastModifiedDate = it.lastModifiedDate,
           createdDate = it.createdDate
         )
 
         showing.participants.addAll(it.participants.map { p ->
-          val user = userIdsRepo.findByGoogleId(p.userId)?.user ?: throw AssertionError("${p.userId} doesn't exist")
+          val user = userRepo.findByGoogleId(p.userId) ?: throw AssertionError("${p.userId} doesn't exist")
           val paymentInfo = participantPaymentInfoMongoRepo.findByShowingIdAndUserId(it.id, p.userId)
             .orElseGet {
               ParticipantPaymentInfo(
@@ -81,8 +101,7 @@ class MongoMigrator(
           when (p) {
             is SwishParticipant -> Participant(
               id = ParticipantId(user, showing),
-              hasPaid = paymentInfo.hasPaid,
-              amountOwed = paymentInfo.amountOwed
+              hasPaid = paymentInfo.hasPaid
             )
             is FtgBiljettParticipant -> {
               if (!giftCertificateRepo.existsById_Number(p.ticketNumber)) {
@@ -95,8 +114,7 @@ class MongoMigrator(
                 id = ParticipantId(user, showing),
                 participantType = Participant.Type.GIFT_CERTIFICATE,
                 giftCertificateUsed = giftCertificateRepo.findById(GiftCertId(user, p.ticketNumber)).orElse(null),
-                hasPaid = paymentInfo.hasPaid,
-                amountOwed = paymentInfo.amountOwed
+                hasPaid = paymentInfo.hasPaid
               )
             }
           }
@@ -127,6 +145,9 @@ class MongoMigrator(
   private fun migrateMovieFromMongo(it: rocks.didit.sefilm.database.mongo.entities.Movie) {
     val movie = Movie(
       id = it.id,
+      imdbId = it.imdbId,
+      tmdbId = it.tmdbId,
+      filmstadenId = it.filmstadenId,
       lastModifiedDate = it.lastModifiedDate,
       archived = it.archived,
       createdDate = it.lastModifiedDate,
@@ -139,22 +160,11 @@ class MongoMigrator(
       releaseDate = it.releaseDate,
       runtime = it.runtime,
       synopsis = it.synopsis,
-      title = it.title
+      title = it.title,
+      genres = it.genres.toMutableSet()
     )
 
-    val savedMovie = movieRepo.save(movie)
-
-    MovieIds(it.id, movie, it.imdbId, it.tmdbId, it.filmstadenId)
-      .let { ids -> movieIdsRepo.save(ids) }
-
-    it.genres.forEach { g ->
-      val genre = genreRepository.save(
-        genreRepository.findByGenre(g)
-          ?: Genre(genre = g)
-      )
-      genre.movies.add(savedMovie)
-      savedMovie.genres.add(genre)
-    }
+    movieRepo.save(movie)
   }
 
   @Transactional
@@ -199,7 +209,7 @@ class MongoMigrator(
     }
 
     mongoUserRepo.findAll()
-      .filterNot { userIdsRepo.existsByGoogleId(it.id) }
+      .filterNot { userRepo.existsByGoogleId(it.id) }
       .forEach {
         migrateOldUserToNewUser(it)
       }
@@ -209,6 +219,7 @@ class MongoMigrator(
     val newUserId = UUID.randomUUID()
     val user = User(
       id = newUserId,
+      googleId = it.id,
       calendarFeedId = it.calendarFeedId,
       avatar = it.avatar,
       email = it.email,
@@ -227,20 +238,10 @@ class MongoMigrator(
           ticket.number
         ), expiresAt = ticket.expires
       )
-    }
+    }.toMutableList()
     user.giftCertificates = giftCertificates
 
-    val savedUser = userRepo.save(user)
-
-    userIdsRepo.save(
-      UserIds(
-        id = newUserId,
-        user = savedUser,
-        filmstadenId = it.filmstadenMembershipId,
-        googleId = it.id
-      )
-    )
-    return user
+    return userRepo.save(user)
   }
 
   @Transactional
@@ -259,7 +260,7 @@ class MongoMigrator(
         val ticket = Ticket(
           id = it.id,
           showing = showingRepo.findById(it.showingId).orElseThrow(),
-          assignedToUser = userIdsRepo.findByGoogleId(it.assignedToUser)?.user
+          assignedToUser = userRepo.findByGoogleId(it.assignedToUser)
             ?: throw AssertionError("${it.assignedToUser} doesn't exist"),
           profileId = it.profileId.orNullIfBlank(),
           barcode = it.barcode,

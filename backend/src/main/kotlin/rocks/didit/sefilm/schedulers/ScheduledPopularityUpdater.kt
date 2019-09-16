@@ -6,11 +6,12 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.clients.ImdbClient
-import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import rocks.didit.sefilm.domain.isSupplied
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toImdbId
 import rocks.didit.sefilm.toTmdbId
@@ -26,7 +27,7 @@ import java.util.*
   havingValue = "true"
 )
 class ScheduledPopularityUpdater(
-  private val movieRepository: MovieMongoRepository,
+  private val movieRepository: MovieRepository,
   private val filmstadenService: FilmstadenService,
   private val imdbClient: ImdbClient
 ) {
@@ -107,9 +108,8 @@ class ScheduledPopularityUpdater(
   }
 
   private fun Movie.hasFutureFilmstadenShowings(): Boolean {
-    if (this.filmstadenId == null || this.filmstadenId.isBlank()) return false
-
-    return filmstadenService.getShowingDates(this.filmstadenId).isNotEmpty()
+    if (this.filmstadenId.isNullOrBlank()) return false
+    return filmstadenService.getShowingDates(this.filmstadenId!!).isNotEmpty()
   }
 
   private fun rescheduleNextPopularityUpdate(weeks: Long = 4, movie: Movie) {
@@ -120,24 +120,24 @@ class ScheduledPopularityUpdater(
   }
 
   private fun fetchPopularityByTmdbId(movie: Movie): PopularityAndId? {
-    if (movie.tmdbId.isNotSupplied()) {
+    if (!movie.tmdbId.isSupplied()) {
       log.warn("[TMDb][Popularity] Movie[${movie.id} is missing an TMDb id")
       return null
     }
 
-    val movieDetails = imdbClient.movieDetailsExact(movie.tmdbId)
+    val movieDetails = imdbClient.movieDetailsExact(movie.tmdbId!!)
     return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())
   }
 
   private fun fetchPopularityByImdbId(movie: Movie): PopularityAndId? {
-    if (movie.imdbId.isNotSupplied()) {
+    if (!movie.imdbId.isSupplied()) {
       log.warn("[IMDb][Popularity] Movie[${movie.id} is missing an IMDb id")
       return null
     }
 
     val movieDetails: TmdbMovieDetails
     try {
-      movieDetails = imdbClient.movieDetails(movie.imdbId)
+      movieDetails = imdbClient.movieDetails(movie.imdbId!!)
     } catch (e: ExternalProviderException) {
       return null
     }

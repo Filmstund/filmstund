@@ -5,15 +5,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.KnownException
 import rocks.didit.sefilm.clients.ImdbClient
-import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import rocks.didit.sefilm.domain.isMissing
+import rocks.didit.sefilm.domain.isSupplied
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.Instant
@@ -26,7 +29,7 @@ import java.util.*
   havingValue = "true"
 )
 class AsyncMovieUpdater(
-  private val movieRepository: MovieMongoRepository,
+  private val movieRepository: MovieRepository,
   private val filmstadenClient: FilmstadenService,
   private val imdbClient: ImdbClient
 ) {
@@ -39,10 +42,12 @@ class AsyncMovieUpdater(
   private val log = LoggerFactory.getLogger(AsyncMovieUpdater::class.java)
 
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
+  @Transactional
   fun scheduledMovieUpdates() {
     val moviesThatRequiresUpdate = movieRepository
       .findByArchivedOrderByPopularityDesc()
       .filter(this::isUpdateRequired)
+
     if (moviesThatRequiresUpdate.isNotEmpty()) {
       log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
       synchronousExtendMovieInfo(moviesThatRequiresUpdate)
@@ -50,6 +55,7 @@ class AsyncMovieUpdater(
   }
 
   @Async
+  @Transactional
   fun extendMovieInfo(movies: Iterable<Movie>) {
     synchronousExtendMovieInfo(movies)
   }
@@ -107,14 +113,16 @@ class AsyncMovieUpdater(
       return movieRepository.save(movie.copy(filmstadenId = null))
     }
 
-    val copy = movie.copy(synopsis = updatedMovie.shortDescription,
-      filmstadenSlug = updatedMovie.slug,
+    val copy = movie.copy(
+      synopsis = updatedMovie.shortDescription,
+      slug = updatedMovie.slug,
       originalTitle = updatedMovie.originalTitle,
       releaseDate = updatedMovie.releaseDate ?: movie.releaseDate,
       productionYear = updatedMovie.productionYear,
       runtime = Duration.ofMinutes(updatedMovie.length ?: 0L),
       poster = setWidthTo240(updatedMovie.posterUrl),
-      genres = updatedMovie.genres?.map { it.name } ?: listOf())
+      genres = updatedMovie.genres?.map { g -> g.name }?.toMutableSet() ?: mutableSetOf()
+    )
 
     val saved = movieRepository.save(copy)
     if (saved.needsMoreInfo()) {
@@ -128,31 +136,30 @@ class AsyncMovieUpdater(
   /** The width query parameter on the poster url sometimes causes 403 errors if too large. */
   private fun setWidthTo240(url: String?): String? {
     if (url == null) return null
-    val toUriString = UriComponentsBuilder.fromUriString(url)
+    return UriComponentsBuilder.fromUriString(url)
       .replaceQueryParam("width", 240)
       .toUriString()
-    return toUriString
   }
 
   private fun updateFromTmdbById(movie: Movie) {
-    if (movie.tmdbId.isNotSupplied()) {
-      log.info("[TMDb] ${movie.log()} is missing an TMDb ID. TMDb ID state: ${movie.tmdbId.state}")
+    if (!movie.tmdbId.isSupplied()) {
+      log.info("[TMDb] ${movie.log()} is missing an TMDb ID. TMDb ID state: ${movie.tmdbId?.state}")
       return
     }
 
     log.info("[TMDb] Fetching movie details by TMDb ID=${movie.tmdbId}")
-    val movieDetails = imdbClient.movieDetailsExact(movie.tmdbId)
+    val movieDetails = imdbClient.movieDetailsExact(movie.tmdbId!!)
     movieRepository.save(movie.copyDetails(movieDetails))
   }
 
   private fun updateFromTmdbByImdbId(movie: Movie) {
-    if (movie.imdbId.isNotSupplied()) {
+    if (!movie.imdbId.isSupplied()) {
       log.info("[TMDb] The IMDb ID for ${movie.log()} is not supplied")
       return
     }
 
     log.info("[TMDb] Fetching movie details by IMDb ID=${movie.imdbId}")
-    val movieDetails = imdbClient.movieDetails(movie.imdbId)
+    val movieDetails = imdbClient.movieDetails(movie.imdbId!!)
     val updatedMovie = movie.copyDetails(movieDetails)
     movieRepository.save(updatedMovie)
   }
@@ -211,7 +218,7 @@ class AsyncMovieUpdater(
       originalTitle = movieDetails.original_title,
       synopsis = movieDetails.overview,
       productionYear = movieDetails.release_date?.year,
-      genres = movieDetails.genres.map { it.name },
+      genres = movieDetails.genres.map { it.name }.toMutableSet(),
       poster = movieDetails.fullPosterPath(),
       tmdbId = TMDbID.valueOf(movieDetails.id),
       popularity = movieDetails.popularity,

@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.events.NotificationEvent
 import rocks.didit.sefilm.notification.MailSettings
 import rocks.didit.sefilm.notification.ProviderHelper
+import java.util.*
 
 @Component
 @ConditionalOnProperty(
@@ -22,7 +22,7 @@ class MailNotificationProvider(private val providerHelper: ProviderHelper) : Not
 
   private val log = LoggerFactory.getLogger(MailNotificationProvider::class.java)
 
-  override fun getNotifiableUsers(knownRecipients: List<UserID>): List<NotifiableUser<MailSettings>> =
+  override fun getNotifiableUsers(knownRecipients: List<UUID>): List<NotifiableUser<MailSettings>> =
     providerHelper.getNotifiableUsers(knownRecipients, MailSettings::class)
       .filter { it.notificationSettings.mailAddress != null }
 

@@ -57,6 +57,10 @@ create table users
 (
     id                 uuid
         constraint user_pk primary key,
+    google_id          varchar(25)
+        constraint user_ids_google_uniq unique,
+    filmstaden_id      varchar(7)   null
+        constraint user_ids_fsid_uniq unique,
     first_name         varchar(100) not null,
     last_name          varchar(100) not null,
     nick               varchar(50)  not null,
@@ -70,19 +74,6 @@ create table users
     last_modified_date timestamp    not null default current_timestamp
 );
 --rollback drop table if exists "user";
-
---changeset eda:createTableUserIds
-create table user_ids
-(
-    user_id       uuid
-        constraint user_ids_fk references users on delete cascade,
-    google_id     varchar(25)
-        constraint user_ids_google_uniq unique,
-    filmstaden_id varchar(7) null
-        constraint user_ids_fsid_uniq unique,
-    constraint user_ids_pk primary key (user_id)
-);
---rollback drop table if exists user_ids;
 
 --changeset eda:createTableGiftCert
 create table gift_certificate
@@ -101,6 +92,10 @@ create table movie
 (
     id                      uuid
         constraint movie_pk primary key,
+    filmstaden_id           varchar(20)              null
+        constraint fsId_uniq unique,
+    imdb_id                 varchar(20)              null,
+    tmdb_id                 bigint                   null,
     slug                    varchar(100)             null,
     title                   varchar(100)             not null,
     synopsis                text                     null,
@@ -118,36 +113,10 @@ create table movie
 );
 --rollback drop table if exists movie;
 
---changeset eda:createTableMovieIds
-create table movie_ids
-(
-    movie_id      uuid
-        constraint movie_ids_fk references movie on delete cascade,
-    filmstaden_id varchar(20) null
-        constraint fsId_uniq unique,
-    imdb_id       varchar(20) null,
-    tmdb_id       bigint      null,
-
-    constraint movie_ids_pk primary key (movie_id)
-);
---rollback drop table if exists movie_ids;
-
---changeset eda:createTableGenres
-create table genre
-(
-    id    serial
-        constraint genre_pk primary key,
-    genre varchar(100)
-        constraint genre_unique unique
-);
-
---rollback drop table if exists genre;
-
 --changeset eda:createTableMovieGenres
 create table movie_genres
 (
-    genre_id integer
-        constraint movie_genre_fk references genre on delete cascade,
+    genre    varchar(100) not null,
     movie_id uuid
         constraint movie_movie_fk references movie on delete cascade
 );

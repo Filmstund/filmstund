@@ -1,9 +1,16 @@
 package rocks.didit.sefilm.database.entities
 
 import org.springframework.data.annotation.LastModifiedDate
+import rocks.didit.sefilm.domain.dto.LocationDTO
 import java.math.BigDecimal
 import java.time.Instant
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
 @Table
@@ -53,11 +60,17 @@ data class Location(
     .map { it.alias }
     .contains(other)
 
-  fun formatAddress(): String {
-    return if (streetAddress != null) {
-      "$name, $streetAddress"
-    } else {
-      name
-    }
-  }
+
+  fun toDTO() = LocationDTO(
+    name = name,
+    cityAlias = cityAlias,
+    city = city,
+    streetAddress = streetAddress,
+    postalCode = postalCode,
+    postalAddress = postalAddress,
+    latitude = latitude,
+    longitude = longitude,
+    filmstadenId = filmstadenId,
+    alias = alias.map { it.alias }
+  )
 }

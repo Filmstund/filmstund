@@ -42,7 +42,7 @@ class MetaController(
     return ModelAndView("metaShowing")
       .addObject("movieTitle", movie.title)
       .addObject("movieDescription", movie.synopsis ?: "Come watch ${movie.title} with us")
-      .addObject("date", showing.fullDate().format(DateTimeFormatter.ofPattern("eeee d MMM HH:mm", Locale.ENGLISH)))
+      .addObject("date", showing.datetime.format(DateTimeFormatter.ofPattern("eeee d MMM HH:mm", Locale.ENGLISH)))
       .addObject("hasPoster", movie.poster != null)
       .addObject("posterUrl", movie.poster ?: "")
       .addObject("slug", showing.slug)

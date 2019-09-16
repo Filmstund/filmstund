@@ -8,6 +8,7 @@ import java.time.LocalTime
 import java.util.*
 
 @Document
+@Deprecated(message = "")
 data class Ticket(
   @Id
   val id: String = "",
@@ -28,4 +29,5 @@ data class Ticket(
   val showAttributes: List<String> // "textad", "en" etc
 )
 
+@Deprecated(message = "")
 data class Seat(val row: Int, val number: Int)

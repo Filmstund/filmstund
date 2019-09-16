@@ -1,14 +1,14 @@
 package rocks.didit.sefilm.notification.providers
 
-import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.domain.dto.LimitedUserDTO
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.notification.NotificationType
 import rocks.didit.sefilm.notification.ProviderSettings
+import java.util.*
 
 interface NotificationProvider<out T : ProviderSettings> {
 
   /** Get the user settings related to this provider. I.e. the E-mail addresses we are going to notify */
-  fun getNotifiableUsers(knownRecipients: List<UserID>): List<NotifiableUser<T>>
+  fun getNotifiableUsers(knownRecipients: List<UUID>): List<NotifiableUser<T>>
 
   /** Nice name of the service, i.e. Pushbullet, or E-Mail */
   val name: String
@@ -29,7 +29,7 @@ data class NotificationProviderDTO(
 }
 
 data class NotifiableUser<out T : ProviderSettings>(
-  val user: LimitedUserDTO,
+  val user: PublicUserDTO,
   val notificationSettings: T,
   val enabledTypes: List<NotificationType>
 ) {

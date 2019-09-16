@@ -7,13 +7,21 @@ import biweekly.parameter.CalendarUserType
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Role
-import biweekly.property.*
+import biweekly.property.Attendee
+import biweekly.property.CalendarScale
+import biweekly.property.Categories
+import biweekly.property.Created
+import biweekly.property.LastModified
+import biweekly.property.ProductId
+import biweekly.property.Status
+import biweekly.property.Transparency
+import biweekly.property.Trigger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.repositories.ParticipantRepository
 import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
 import java.time.Duration
@@ -25,6 +33,7 @@ import java.util.*
 class CalendarService(
   private val userService: UserService,
   private val showingService: ShowingService,
+  private val participantRepo: ParticipantRepository,
   private val movieService: MovieService,
   private val properties: Properties
 ) {
@@ -85,17 +94,18 @@ class CalendarService(
     vEvent.lastModified = LastModified(Date.from(this.lastModifiedDate))
     vEvent.transparency = Transparency.opaque()
 
-    val alarmTriggerDate = Date.from(this.getStartDate().minusMillis(properties.calendar.durationBeforeAlert.toMillis()))
+    val alarmTriggerDate =
+      Date.from(this.getStartDate().minusMillis(properties.calendar.durationBeforeAlert.toMillis()))
     vEvent.addAlarm(VAlarm.audio(Trigger(alarmTriggerDate)))
 
     return vEvent
   }
 
-  private fun formatDescription(showingId: UUID, userId: UserID, movie: Movie): String {
+  private fun formatDescription(showingId: UUID, userId: UUID, movie: Movie): String {
     val paymentDetails = showingService.getAttendeePaymentDetailsForUser(userId, showingId)
 
     return if (paymentDetails == null || paymentDetails.hasPaid) {
-      "Kolla på bio!\n${if (movie.imdbId.isSupplied()) "http://www.imdb.com/title/${movie.imdbId.value}/" else ""}"
+      "Kolla på bio!\n${if (movie.imdbId?.isSupplied() == true) "http://www.imdb.com/title/${movie.imdbId?.value}/" else ""}"
     } else {
       val phoneNumber = userService.getUser(paymentDetails.payTo)?.phone
       "Betala ${paymentDetails.amountOwed.toKronor()} kr till $phoneNumber"
@@ -103,19 +113,16 @@ class CalendarService(
   }
 
   private fun VEvent.addParticipants(showingDTO: ShowingDTO, mail: String) {
-    showingDTO.participants.forEach {
-      val user = userService.getUser(it.userId)
-      if (user != null) {
-        val attendee = Attendee("${user.firstName} '${user.nick}' ${user.lastName}", mail)
-        attendee.calendarUserType = CalendarUserType.INDIVIDUAL
-        attendee.participationStatus = ParticipationStatus.ACCEPTED
-        attendee.role = Role.ATTENDEE
-        attendee.participationLevel = ParticipationLevel.REQUIRED
+    participantRepo.findById_Showing_Id(showingDTO.id).forEach {
+      val attendee = Attendee("${it.user.firstName} '${it.user.nick}' ${it.user.lastName}", mail)
+      attendee.calendarUserType = CalendarUserType.INDIVIDUAL
+      attendee.participationStatus = ParticipationStatus.ACCEPTED
+      attendee.role = Role.ATTENDEE
+      attendee.participationLevel = ParticipationLevel.REQUIRED
 
-        this.addAttendee(
-          attendee
-        )
-      }
+      this.addAttendee(
+        attendee
+      )
     }
   }
 

@@ -3,10 +3,24 @@ package rocks.didit.sefilm.database.entities
 import org.hibernate.annotations.JoinColumnOrFormula
 import org.hibernate.annotations.JoinColumnsOrFormulas
 import org.hibernate.annotations.JoinFormula
-import rocks.didit.sefilm.database.SekConverter
 import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.dto.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.PublicParticipantDTO
 import java.io.Serializable
-import javax.persistence.*
+import javax.persistence.CollectionTable
+import javax.persistence.Column
+import javax.persistence.ElementCollection
+import javax.persistence.Embeddable
+import javax.persistence.EmbeddedId
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.MapKeyColumn
+import javax.persistence.MapKeyEnumerated
+import javax.persistence.OneToOne
+import javax.persistence.Table
 
 @Embeddable
 data class ParticipantId(
@@ -52,11 +66,7 @@ data class Participant(
   val participantType: Type = Type.SWISH,
 
   @Column(nullable = false)
-  val hasPaid: Boolean = false,
-
-  @Column(nullable = false)
-  @Convert(converter = SekConverter::class)
-  val amountOwed: SEK = SEK.ZERO,
+  var hasPaid: Boolean = false,
 
   @OneToOne(optional = true, cascade = [])
   @JoinColumnsOrFormulas(
@@ -79,10 +89,32 @@ data class Participant(
   val user: User get() = id.user
   val showing: Showing get() = id.showing
 
-  enum class PropertyKey {
-  }
+  enum class PropertyKey
 
   enum class Type {
     SWISH, GIFT_CERTIFICATE
   }
+
+  fun toDTO() = ParticipantDTO(
+    userId = user.id,
+    showingId = showing.id,
+    userInfo = user.toPublicUserDTO(),
+    hasPaid = hasPaid,
+    amountOwed = when (hasPaid) {
+      true -> SEK.ZERO
+      false -> showing.price
+    },
+    type = when (participantType) {
+      Type.SWISH -> ParticipantDTO.Type.SWISH
+      Type.GIFT_CERTIFICATE -> ParticipantDTO.Type.GIFT_CERTIFIATE
+    },
+    giftCertificateUsed = giftCertificateUsed?.toDTO(),
+    filmstadenMembershipId = user.filmstadenId
+  )
+
+  fun toPublicDTO() = PublicParticipantDTO(
+    userId = user.id,
+    showingId = showing.id,
+    userInfo = user.toPublicUserDTO()
+  )
 }

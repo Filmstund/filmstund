@@ -2,7 +2,15 @@ package rocks.didit.sefilm.database.entities
 
 import java.time.LocalDate
 import java.time.LocalTime
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
+import javax.persistence.OneToOne
+import javax.persistence.Table
 
 @Entity
 @Table
@@ -15,7 +23,7 @@ data class Ticket(
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "assigned_to_user")
-  val assignedToUser: User,
+  var assignedToUser: User,
 
   val profileId: String?,
 

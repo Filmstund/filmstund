@@ -5,12 +5,10 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.MissingParametersException
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.Participant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
-import rocks.didit.sefilm.domain.dto.ShowingDTO
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,6 +16,7 @@ import java.time.LocalTime
 import java.util.*
 
 @Document
+@Deprecated(message = "")
 data class Showing(
   @Id
   val id: UUID = UUID.randomUUID(),
@@ -47,25 +46,4 @@ data class Showing(
 
   val dateTime: LocalDateTime
     get() = LocalDateTime.of(date, time)
-
-  fun toDto() = ShowingDTO(
-    id = id,
-    webId = webId,
-    slug = slug,
-    date = date ?: throw MissingParametersException("date"),
-    time = time ?: throw MissingParametersException("time"),
-    movieId = movie.id,
-    location = location ?: throw MissingParametersException("location"),
-    filmstadenScreen = filmstadenScreen,
-    private = private,
-    price = price,
-    ticketsBought = ticketsBought,
-    admin = admin.id,
-    payToUser = payToUser.id,
-    expectedBuyDate = expectedBuyDate,
-    participants = participants.map { it.toDto() },
-    lastModifiedDate = lastModifiedDate,
-    createdDate = createdDate,
-    filmstadenRemoteEntityId = filmstadenRemoteEntityId
-  )
 }

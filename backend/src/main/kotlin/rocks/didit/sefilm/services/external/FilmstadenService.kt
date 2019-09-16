@@ -9,19 +9,26 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
-import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
-import rocks.didit.sefilm.domain.dto.*
+import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.dto.FilmstadenCinemaWithAddressDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenExtendedMovieDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenLocationItemsDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenMovieDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenMovieItemsDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenShowItemsDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenShowingDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.*
 
 @Service
 class FilmstadenService(
-  private val movieRepo: MovieMongoRepository,
+  private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,
   private val httpEntity: HttpEntity<Void>,
   private val properties: Properties
@@ -121,18 +128,9 @@ class FilmstadenService(
       .plusMinutes(30L * (now.minute / 30L))
   }
 
-  fun getFilmstadenBuyLink(movieId: UUID?): String? {
-    if (movieId == null) {
-      throw IllegalArgumentException("Missing movie ID")
-    }
-    val movie = movieRepo
-      .findById(movieId)
-      .orElseThrow { NotFoundException("movie '$movieId") }
-
-    return when {
-      movie.filmstadenId != null && movie.filmstadenSlug != null -> "https://www.filmstaden.se/film/${movie.filmstadenId}/${movie.filmstadenSlug}"
-      else -> null
-    }
+  fun getFilmstadenBuyLink(filmstadenId: String?, slug: String?): String? = when {
+    filmstadenId != null && slug != null -> "https://www.filmstaden.se/film/${filmstadenId}/${slug}"
+    else -> null
   }
 
   @Cacheable("filmstadenSeatMap")

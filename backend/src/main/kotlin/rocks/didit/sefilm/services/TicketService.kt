@@ -2,22 +2,26 @@ package rocks.didit.sefilm.services
 
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.FilmstadenTicketException
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.currentLoggedInUserId
-import rocks.didit.sefilm.database.mongo.entities.Seat
-import rocks.didit.sefilm.database.mongo.entities.Showing
-import rocks.didit.sefilm.database.mongo.entities.Ticket
-import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
-import rocks.didit.sefilm.database.mongo.repositories.TicketMongoRepository
-import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
+import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.database.entities.CinemaScreen
+import rocks.didit.sefilm.database.entities.Showing
+import rocks.didit.sefilm.database.entities.Ticket
+import rocks.didit.sefilm.database.entities.TicketAttribute
+import rocks.didit.sefilm.database.entities.TicketAttributeId
+import rocks.didit.sefilm.database.repositories.ParticipantRepository
+import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.database.repositories.TicketRepository
+import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
+import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.ZoneId
 import java.util.*
@@ -27,22 +31,23 @@ class TicketService(
   private val properties: Properties,
   private val filmstadenService: FilmstadenService,
   private val locationService: LocationService,
-  private val userRepository: UserMongoRepository,
-  private val ticketRepository: TicketMongoRepository,
-  private val showingRepository: ShowingMongoRepository
+  private val userRepository: UserRepository,
+  private val ticketRepository: TicketRepository,
+  private val showingRepository: ShowingRepository,
+  private val participantRepo: ParticipantRepository
 ) {
+  private val log by logger()
 
+  @Transactional
   fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
-    val user = currentLoggedInUserId()
-    isUserIsParticipant(showingId, user)
-    return ticketRepository.findByShowingIdAndAssignedToUser(showingId, user)
+    return ticketRepository.findByShowingIdAndAssignedToUser_Id(showingId, currentLoggedInUser().id)
   }
 
+  @Transactional
   fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
-    val currentLoggedInUserId = currentLoggedInUserId()
-    val showing =
-      showingRepository.findById(showingId)
-        .orElseThrow { NotFoundException("showing", currentLoggedInUserId, showingId) }
+    val currentLoggedInUserId = currentLoggedInUser().id
+    val showing = showingRepository.findById(showingId)
+      .orElseThrow { NotFoundException("showing", currentLoggedInUserId, showingId) }
 
     if (showing.admin.id != currentLoggedInUserId) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
@@ -62,17 +67,18 @@ class TicketService(
   }
 
   private fun reassignLeftoverTickets(showing: Showing) {
-    val adminAssignedTickets = ticketRepository.findByShowingIdAndAssignedToUser(showing.id, showing.admin.id)
+    val adminAssignedTickets = ticketRepository.findByShowingAndAssignedToUser(showing, showing.admin)
     if (adminAssignedTickets.size > 1) {
-      val allTickets = ticketRepository.findByShowingId(showing.id)
+      val allTickets = ticketRepository.findByShowing(showing)
       val participantsMissingTicket = showing.participants.filter { participant ->
-        allTickets.none { ticket -> ticket.assignedToUser == participant.userId }
+        allTickets.none { ticket -> ticket.assignedToUser.id == participant.user.id }
       }
 
-      val reassigned = adminAssignedTickets.subList(1, adminAssignedTickets.size)
+      adminAssignedTickets.subList(1, adminAssignedTickets.size)
         .zip(participantsMissingTicket)
-        .map { (ticket, participant) -> ticket.copy(assignedToUser = participant.userId) }
-      ticketRepository.saveAll(reassigned)
+        .forEach { (ticket, participant) ->
+          ticket.assignedToUser = participant.user
+        }
     }
   }
 
@@ -81,15 +87,12 @@ class TicketService(
     val fetchFilmstadenShow = filmstadenService.fetchFilmstadenShow(filmstadenRemoteEntityId)
     val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema.title)
     val zonedDateTime = fetchFilmstadenShow.timeUtc.atZone(ZoneId.of("Europe/Stockholm"))
+    val filmstadenLiteScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen()
 
-    val updatedShowing = showing.copy(
-      filmstadenScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen(),
-      time = zonedDateTime.toLocalTime(),
-      date = zonedDateTime.toLocalDate(),
-      location = location
-    )
-
-    showingRepository.save(updatedShowing)
+    showing.cinemaScreen = CinemaScreen(filmstadenLiteScreen.filmstadenId, filmstadenLiteScreen.name)
+    showing.time = zonedDateTime.toLocalTime()
+    showing.date = zonedDateTime.toLocalDate()
+    showing.location = location
   }
 
   private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {
@@ -98,28 +101,24 @@ class TicketService(
 
     val tickets = filmstadenTickets.map {
       val barcode = filmstadenService.fetchBarcode(it.id)
-      if (it.profileId == null || it.profileId.isBlank()) {
+      if (it.profileId.isNullOrBlank()) {
         return@map it.toTicket(showing.id, showing.admin.id, barcode)
       }
 
       val userIdForThatMember =
-        getUserIdFromFilmstadenMembershipId(FilmstadenMembershipId.valueOf(it.profileId), showing)
+        getUserIdFromFilmstadenId(FilmstadenMembershipId.valueOf(it.profileId), showing)
       it.toTicket(showing.id, userIdForThatMember, barcode)
     }
 
     ticketRepository.saveAll(tickets)
   }
 
-  private fun getUserIdFromFilmstadenMembershipId(
-    filmstadenMembershipId: FilmstadenMembershipId,
-    showing: Showing
-  ): UserID {
-    val userIdForThatMember = userRepository
-      .findByFilmstadenMembershipId(filmstadenMembershipId)
-      ?.id
+  private fun getUserIdFromFilmstadenId(filmstadenId: FilmstadenMembershipId, showing: Showing): UUID {
+    val userIdForThatMember = userRepository.findUserIdByFilmstadenId(filmstadenId)
       ?: return showing.admin.id
 
-    if (showing.participants.any { it.userId == userIdForThatMember }) {
+    // Check so that we don't accidentally assign ticket to user not attending showing
+    if (showing.participants.any { it.user.id == userIdForThatMember }) {
       return userIdForThatMember
     }
 
@@ -129,25 +128,24 @@ class TicketService(
   private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {
     val parts = userSuppliedTicketUrl.split('/')
     val ids = parts.subList(parts.size - 3, parts.size)
-    if (ids.size != 3) {
-      throw IllegalArgumentException("$userSuppliedTicketUrl does not contain three ids.")
-    }
+    require(ids.size == 3) { "$userSuppliedTicketUrl does not contain three ids." }
     return Triple(ids[0], ids[1], ids[2])
   }
 
+  @Transactional
   fun deleteTickets(showing: Showing) {
-    val ticketsForShowing = ticketRepository.findByShowingId(showingId = showing.id)
-    ticketRepository.deleteAll(ticketsForShowing)
+    val numDeletedTickets = ticketRepository.deleteAllByShowing(showing)
+    log.info("Deleted {} tickets from showing {}", numDeletedTickets, showing.id)
   }
 
   fun getTicketRange(showingId: UUID): TicketRange? {
-    val currentLoggedInUser = currentLoggedInUserId()
-    if (!isUserIsParticipant(showingId, currentLoggedInUser)) {
+    val currentLoggedInUser = currentLoggedInUser()
+    if (!isUserIsParticipant(showingId, currentLoggedInUser.id)) {
       return null
     }
 
-    val allSeatsForShowing = ticketRepository.findByShowingId(showingId)
-      .map { it.seat }
+    val allSeatsForShowing = ticketRepository.findByShowing_Id(showingId)
+      .map { Seat(it.seatRow, it.seatNumber) }
       .sortedBy { it.number }
 
     val rows = allSeatsForShowing
@@ -161,33 +159,39 @@ class TicketService(
     return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
   }
 
-  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): Ticket {
-    val seat = Seat(this.seat.row, this.seat.number)
-    return Ticket(
+  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UUID, barcode: String): Ticket {
+    val ticket = Ticket(
       id = this.id,
-      showingId = showingId,
-      assignedToUser = assignedToUser,
+      showing = showingRepository.getOne(showingId),
+      assignedToUser = userRepository.getOne(assignedToUser),
       customerType = this.customerType,
       customerTypeDefinition = this.customerTypeDefinition,
       cinema = this.cinema.title,
       cinemaCity = this.cinema.city.name,
       screen = this.screen.title,
-      seat = seat,
+      seatNumber = this.seat.number,
+      seatRow = this.seat.number,
       date = this.show.date,
       time = this.show.time,
       movieName = this.movie.title,
       movieRating = this.movie.rating.displayName,
-      showAttributes = this.show.attributes.map { it.displayName },
       barcode = barcode,
       profileId = this.profileId
     )
+    ticket.showAttributes.addAll(this.show.attributes.map {
+      TicketAttribute(
+        TicketAttributeId(
+          ticket,
+          it.displayName
+        )
+      )
+    })
+
+    return ticket
   }
 
-  private fun isUserIsParticipant(showingId: UUID, currentLoggedInUser: UserID): Boolean {
-    return showingRepository.findById(showingId)
-      .orElseThrow { NotFoundException("showing", currentLoggedInUser, showingId) }
-      .participants
-      .any { it.userId == currentLoggedInUser }
+  private fun isUserIsParticipant(showingId: UUID, currentLoggedInUser: UUID): Boolean {
+    return participantRepo.existsById_Showing_IdAndId_User_Id(showingId, currentLoggedInUser)
   }
 
   private fun validateFilmstadenTicketUrls(links: List<String>) {
@@ -198,4 +202,6 @@ class TicketService(
       }
     }
   }
+
+  data class Seat(val row: Int, val number: Int)
 }

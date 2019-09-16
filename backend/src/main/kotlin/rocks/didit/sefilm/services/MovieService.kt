@@ -3,10 +3,11 @@ package rocks.didit.sefilm.services
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
-import rocks.didit.sefilm.domain.dto.FilmstadenMovieDTO
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -16,7 +17,7 @@ import java.util.*
 
 @Service
 class MovieService(
-  private val movieRepo: MovieMongoRepository,
+  private val movieRepo: MovieRepository,
   private val filmstadenService: FilmstadenService,
   private val filterUtil: MovieFilterUtil,
   private val asyncMovieUpdater: AsyncMovieUpdater?
@@ -31,45 +32,40 @@ class MovieService(
 
   fun archivedMovies() = movieRepo.findByArchivedOrderByPopularityDesc(true)
 
-  fun getMovie(movieId: UUID?): Movie? {
-    if (movieId == null) return null
-    return movieRepo.findById(movieId).orElse(null)
-  }
+  fun getMovie(movieId: UUID?): Movie? = movieId?.let { movieRepo.findById(it).orElse(null) }
 
   fun getMovieOrThrow(movieId: UUID?): Movie =
     getMovie(movieId).orElseThrow { NotFoundException("movie with id: $movieId") }
 
-  fun movieExists(movieId: UUID): Boolean = movieRepo.existsById(movieId)
-
   /** Fetch new movies from Filmstaden, and trigger an async background update of the movies when done */
+  @Transactional
   fun fetchNewMoviesFromFilmstaden(): List<Movie> {
-    val FilmstadenMovies = filmstadenService.allMovies()
+    val filmstadenMovies = filmstadenService.allMovies()
 
-    val ourMovies = movieRepo.findAll()
-    val newMoviesWeHaventPreviouslySeen = FilmstadenMovies
+    val newMoviesWeHaventPreviouslySeen = filmstadenMovies
       .filter {
         filterUtil.isNewerThan(it)
-          && !filterUtil.isMovieUnwantedBasedOnGenre(it.genres.map { it.name })
+          && !filterUtil.isMovieUnwantedBasedOnGenre(it.genres.map { g -> g.name })
           && !filterUtil.isTitleUnwanted(it.title)
-          && ourMovies.isOtherMovieAlreadyKnown(it)
+          && movieRepo.existsByFilmstadenId(FilmstadenMembershipId(it.ncgId))
       }
       .map {
-        Movie(title = filterUtil.trimTitle(it.title),
-          filmstadenId = it.ncgId,
+        Movie(
+          title = filterUtil.trimTitle(it.title),
           releaseDate = it.releaseDate,
           poster = it.posterUrl,
-          filmstadenSlug = it.slug,
+          slug = it.slug,
           runtime = Duration.ofMinutes(it.length?.toLong() ?: 0L),
-          genres = it.genres.map { g -> g.name })
+          filmstadenId = it.ncgId,
+          genres = it.genres.map { g -> g.name }.toMutableSet()
+        )
       }
 
     val savedEntities = movieRepo.saveAll(newMoviesWeHaventPreviouslySeen)
     log.info("Fetched ${savedEntities.count()} new movies from Filmstaden")
 
     asyncMovieUpdater?.extendMovieInfo(savedEntities)
-    return savedEntities.sortedBy { it.releaseDate }
+    return savedEntities // FIXME: -> MovieDTO
+      .sortedBy { it.releaseDate }
   }
-
-  private fun Iterable<Movie>.isOtherMovieAlreadyKnown(other: FilmstadenMovieDTO) =
-    this.firstOrNull { our -> our.filmstadenId == other.ncgId } == null
 }

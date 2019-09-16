@@ -1,11 +1,9 @@
 package rocks.didit.sefilm
 
-import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.core.Authentication
@@ -21,16 +19,16 @@ import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStor
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.entities.UserIds
-import rocks.didit.sefilm.database.repositories.UserIdsRepository
+import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
 import java.time.Instant
 
 class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
 
-  val userId: String = userInfo.getValue("sub") as String
+  val userId: String = userInfo["sub"] as String
   private val username: String? = userInfo["email"] as String
   val firstName: String? = userInfo["given_name"] as String
   val lastName: String? = userInfo["family_name"] as String
@@ -50,52 +48,54 @@ class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
   }
 }
 
-class OpenidUserAuthConverter : UserAuthenticationConverter {
+@Component
+class UserAuthConverter(
+  private val userRepo: UserRepository
+) : UserAuthenticationConverter {
+  private val log by logger()
+
+  @Transactional
   override fun extractAuthentication(map: Map<String, *>): Authentication? {
-    val user = OpenIdConnectUserDetails(map)
-    return UsernamePasswordAuthenticationToken(user, "N/A", user.authorities)
+    val details = OpenIdConnectUserDetails(map)
+
+    val principal: PublicUserDTO = when (userRepo.existsByGoogleId(UserID(details.userId))) {
+      true -> onExistingUser(details)
+      false -> onNewUser(details)
+    }
+
+    return UsernamePasswordAuthenticationToken(principal, "N/A", details.authorities)
+  }
+
+  fun onExistingUser(details: OpenIdConnectUserDetails): PublicUserDTO {
+    val user = userRepo.findByGoogleId(UserID(details.userId)) ?: throw NotFoundException("user")
+
+    user.firstName = details.firstName ?: "Mr Noname"
+    user.lastName = details.lastName ?: "Anybody"
+    user.avatar = details.avatarUrl
+    user.lastLogin = Instant.now()
+
+    return user.toPublicUserDTO()
+  }
+
+  fun onNewUser(details: OpenIdConnectUserDetails): PublicUserDTO {
+    val newUser = User(
+      googleId = UserID(details.userId),
+      firstName = details.firstName ?: "Bosse",
+      lastName = details.lastName ?: "Ringholm",
+      nick = details.firstName ?: "Houdini",
+      email = details.username ?: "",
+      avatar = details.avatarUrl,
+      lastLogin = Instant.now(),
+      signupDate = Instant.now()
+    )
+
+    val savedUser = userRepo.save(newUser)
+    log.info("Created new user ${savedUser.name} (${savedUser.id})")
+    return savedUser.toPublicUserDTO()
   }
 
   override fun convertUserAuthentication(userAuthentication: Authentication) =
     throw UnsupportedOperationException("This operation is not supported")
-}
-
-@Component
-class LoginListener(
-  private val userIdsRepo: UserIdsRepository
-) : ApplicationListener<AuthenticationSuccessEvent> {
-  private val log by logger()
-
-  @Transactional
-  override fun onApplicationEvent(event: AuthenticationSuccessEvent) {
-    createOrUpdateUser(event.authentication)
-  }
-
-  private fun createOrUpdateUser(authentication: Authentication) {
-    val principal = authentication.principal as OpenIdConnectUserDetails?
-      ?: throw IllegalStateException("Successful authentication without a principal")
-
-    val maybeUser: UserIds? = userIdsRepo.findByGoogleId(UserID(principal.userId))
-    if (maybeUser == null) {
-      log.info("New user")
-      val newUser = User(
-        firstName = principal.firstName ?: "Bosse",
-        lastName = principal.lastName ?: "Ringholm",
-        nick = principal.firstName ?: "Houdini",
-        email = principal.username ?: "",
-        avatar = principal.avatarUrl,
-        lastLogin = Instant.now(),
-        signupDate = Instant.now()
-      )
-      userIdsRepo.save(UserIds(id = newUser.id, user = newUser, googleId = UserID(principal.userId)))
-      log.info("Created new user ${newUser.name} (${newUser.id})")
-    } else {
-      maybeUser.user.firstName = principal.firstName ?: "Mr Noname"
-      maybeUser.user.lastName = principal.lastName ?: "Anybody"
-      maybeUser.user.avatar = principal.avatarUrl
-      maybeUser.user.lastLogin = Instant.now()
-    }
-  }
 }
 
 @Configuration
@@ -137,7 +137,4 @@ class ResourceServerConfig(
     default.setUserTokenConverter(userAuthenticationConverter)
     return default
   }
-
-  @Bean
-  fun userAuthenticationConverter() = OpenidUserAuthConverter()
 }

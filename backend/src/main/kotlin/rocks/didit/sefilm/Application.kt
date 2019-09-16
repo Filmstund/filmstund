@@ -92,7 +92,7 @@ class Application {
   }
 
   @Bean
-  fun corsConfigurer(properties: Properties): WebMvcConfigurer {
+  fun corsConfigurerBean(properties: Properties): WebMvcConfigurer {
     return object : WebMvcConfigurer {
       override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/graphql")

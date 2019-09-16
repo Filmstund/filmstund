@@ -2,12 +2,18 @@ package rocks.didit.sefilm.notification
 
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.domain.UserID
-import rocks.didit.sefilm.events.*
+import rocks.didit.sefilm.events.DeletedShowingEvent
+import rocks.didit.sefilm.events.NewShowingEvent
+import rocks.didit.sefilm.events.NotificationEvent
+import rocks.didit.sefilm.events.ShowingEvent
+import rocks.didit.sefilm.events.TicketsBoughtEvent
+import rocks.didit.sefilm.events.UpdatedShowingEvent
+import rocks.didit.sefilm.events.UserAttendedEvent
+import rocks.didit.sefilm.events.UserUnattendedEvent
 import rocks.didit.sefilm.notification.providers.NotifiableUser
 import rocks.didit.sefilm.services.UserService
+import java.util.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.cast
 
 @Service
 class ProviderHelper(
@@ -16,9 +22,9 @@ class ProviderHelper(
 ) {
 
   fun <T : ProviderSettings> getNotifiableUsers(
-    knownRecipients: List<UserID>,
+    knownRecipients: List<UUID>,
     wantedSettingsType: KClass<T>
-  ): List<NotifiableUser<T>> {
+  ): List<NotifiableUser<T>> = emptyList() /*{
     return userService.getUsersThatWantToBeNotified(knownRecipients).mapNotNull {
       val notificationSettings = it.notificationSettings.providerSettings
         .filter { it.enabled && wantedSettingsType.isInstance(it) }
@@ -27,7 +33,7 @@ class ProviderHelper(
       when {
         notificationSettings.size > 1 -> throw IllegalStateException("Found ${notificationSettings.size} enabled notification settings of the same type. Expected 1, got the following '$notificationSettings'")
         notificationSettings.isNotEmpty() -> NotifiableUser(
-          it.toLimitedUserDTO(),
+          it.toPublicUserDTO(),
           notificationSettings.first(),
           it.notificationSettings.enabledTypes
         )
@@ -35,7 +41,7 @@ class ProviderHelper(
       }
     }.filter { it.enabledTypes.isNotEmpty() }
   }
-
+*/
   // TODO: i18n
   fun constructMessageBasedOnEvent(event: NotificationEvent): NotificationMessage {
     return when (event) {
@@ -73,7 +79,7 @@ class ProviderHelper(
   private fun ticketsBoughtMessage(event: TicketsBoughtEvent): NotificationMessage {
     return formatMsg(
       title = "Tickets bought for ${event.showing.movie.title}",
-      msg = "Price ${event.showing.price?.toKronor()} SEK. Pay to ${event.showing.payToUser.phone}", event = event
+      msg = "Price ${event.showing.price.toKronor()} SEK. Pay to ${event.showing.payToUser.phone}", event = event
     )
   }
 

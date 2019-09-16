@@ -5,15 +5,14 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Service
-import rocks.didit.sefilm.database.mongo.entities.Location
-import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
+import rocks.didit.sefilm.database.entities.Location
+import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenCityAliasDTO
-import java.util.*
 
 @Service
-class LocationService(private val locationRepo: LocationMongoRepository) {
+class LocationService(private val locationRepo: LocationRepository) {
   fun allLocations() = locationRepo.findAll().toList()
-  fun getLocation(name: String): Optional<Location> = locationRepo.findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
+  fun getLocation(name: String): Location? = locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(name, name)
 
   fun filmstadenCities(): List<FilmstadenCityAliasDTO> {
     val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
@@ -24,7 +23,7 @@ class LocationService(private val locationRepo: LocationMongoRepository) {
 
   fun getOrCreateNewLocation(name: String): Location {
     return locationRepo
-      .findByNameIgnoreCaseOrAliasIgnoreCase(name, name)
-      .orElseGet { locationRepo.save(Location(name = name)) }
+      .findByNameIgnoreCaseOrAlias_AliasIgnoreCase(name, name)
+      ?: locationRepo.save(Location(name = name))
   }
 }

@@ -9,6 +9,7 @@ import rocks.didit.sefilm.domain.UserID
 import java.util.*
 
 @Repository
+@Deprecated(message = "")
 interface UserMongoRepository : CrudRepository<User, UserID> {
   fun findByFilmstadenMembershipId(filmstadenMembershipId: FilmstadenMembershipId): User?
   fun findByCalendarFeedId(calendarFeedId: UUID): User?

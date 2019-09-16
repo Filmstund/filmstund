@@ -7,6 +7,7 @@ import rocks.didit.sefilm.domain.UserID
 import java.util.*
 
 @Repository
+@Deprecated(message = "")
 interface TicketMongoRepository : CrudRepository<Ticket, String> {
   fun findByShowingIdAndAssignedToUser(showingId: UUID, userId: UserID): List<Ticket>
 

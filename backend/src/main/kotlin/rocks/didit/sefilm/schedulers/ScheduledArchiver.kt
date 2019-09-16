@@ -1,12 +1,12 @@
 package rocks.didit.sefilm.schedulers
 
-import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.mongo.entities.Movie
-import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
-import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
+import rocks.didit.sefilm.database.entities.Movie
+import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.LocalDate
@@ -19,8 +19,8 @@ import java.time.LocalDateTime
   havingValue = "true"
 )
 class ScheduledArchiver(
-  private val movieRepository: MovieMongoRepository,
-  showingRepository: ShowingMongoRepository,
+  private val movieRepository: MovieRepository,
+  showingRepository: ShowingRepository,
   filmstadenClient: FilmstadenService
 ) {
 
@@ -29,7 +29,7 @@ class ScheduledArchiver(
     private const val UPDATE_INTERVAL = 604800000L // 1 week
   }
 
-  private val log = LoggerFactory.getLogger(ScheduledArchiver::class.java)
+  private val log by logger()
   private val archiveRules: List<ArchiveRule> = listOf(ReleaseDateAndShowingsRule(showingRepository, filmstadenClient))
 
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
@@ -59,7 +59,7 @@ class ScheduledArchiver(
 }
 
 private class ReleaseDateAndShowingsRule(
-  private val showingRepository: ShowingMongoRepository,
+  private val showingRepository: ShowingRepository,
   private val filmstadenClient: FilmstadenService
 ) : ArchiveRule {
 
@@ -88,7 +88,7 @@ private class ReleaseDateAndShowingsRule(
     if (this.filmstadenId == null) {
       return false
     }
-    return filmstadenClient.getShowingDates(this.filmstadenId).isNotEmpty()
+    return filmstadenClient.getShowingDates(this.filmstadenId!!).isNotEmpty()
   }
 }
 

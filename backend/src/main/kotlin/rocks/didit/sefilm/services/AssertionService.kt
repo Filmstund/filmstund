@@ -2,48 +2,55 @@ package rocks.didit.sefilm.services
 
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
-import rocks.didit.sefilm.*
-import rocks.didit.sefilm.database.mongo.entities.Showing
-import rocks.didit.sefilm.domain.Foretagsbiljett
+import rocks.didit.sefilm.DuplicateTicketException
+import rocks.didit.sefilm.MissingPhoneNumberException
+import rocks.didit.sefilm.TicketAlreadyUsedException
+import rocks.didit.sefilm.TicketExpiredException
+import rocks.didit.sefilm.TicketNotFoundException
+import rocks.didit.sefilm.TicketsAlreadyBoughtException
+import rocks.didit.sefilm.UserAlreadyAttendedException
+import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.TicketNumber
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.ShowingDTO
+import java.util.*
 
 @Service
 class AssertionService(
   private val userService: UserService,
-  private val foretagsbiljettService: ForetagsbiljettService
+  private val giftCertService: GiftCertificateService
 ) {
 
-  fun assertTicketsNotBought(userID: UserID, showing: Showing) {
+  fun assertTicketsNotBought(userID: UUID, showing: Showing) {
     if (showing.ticketsBought) {
       throw TicketsAlreadyBoughtException(userID, showing.id)
     }
   }
 
-  fun assertUserNotAlreadyAttended(userID: UserID, showing: Showing) {
-    if (showing.participants.any { it.userId == userID }) {
+  fun assertUserNotAlreadyAttended(userID: UUID, showing: Showing) {
+    if (showing.participants.any { it.user.id == userID }) {
       throw UserAlreadyAttendedException(userID)
     }
   }
 
   fun assertLoggedInUserIsAdmin(showing: ShowingDTO) = assertLoggedInUserIsAdmin(showing.admin)
-  fun assertLoggedInUserIsAdmin(showingAdmin: UserID) {
-    if (currentLoggedInUserId() != showingAdmin) {
+  fun assertLoggedInUserIsAdmin(showingAdmin: UUID) {
+    if (currentLoggedInUser().id != showingAdmin) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
   }
 
-  fun assertUserHasPhoneNumber(userID: UserID) {
+  fun assertUserHasPhoneNumber(userID: UUID) {
     val user = userService.getUserOrThrow(userID)
     if (user.phone == null || user.phone.isBlank()) {
       throw MissingPhoneNumberException(userID)
     }
   }
 
-  fun assertForetagsbiljettIsUsable(userId: UserID, suppliedTicket: TicketNumber, showing: Showing) {
-    val matchingTickets = foretagsbiljettService
-      .getForetagsbiljetterForUser(userId)
+  fun assertForetagsbiljettIsUsable(userId: UUID, suppliedTicket: TicketNumber, showing: Showing) {
+    val matchingTickets = giftCertService
+      .getGiftCertsByUserId(userId)
       .filter { it.number == suppliedTicket }
 
     if (matchingTickets.isEmpty()) {
@@ -53,11 +60,11 @@ class AssertionService(
       throw DuplicateTicketException(": $suppliedTicket")
     }
 
-    if (foretagsbiljettService.getStatusOfTicket(matchingTickets.first()) != Foretagsbiljett.Status.Available) {
+    if (giftCertService.getStatusOfTicket(matchingTickets.first()) != GiftCertificateDTO.Status.AVAILABLE) {
       throw TicketAlreadyUsedException(suppliedTicket)
     }
 
-    if (matchingTickets.first().expires.isBefore(showing.expectedBuyDate ?: showing.date)) {
+    if (matchingTickets.first().expiresAt.isBefore(showing.date)) {
       throw TicketExpiredException(suppliedTicket)
     }
   }

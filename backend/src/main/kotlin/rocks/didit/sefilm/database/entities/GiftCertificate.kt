@@ -2,9 +2,16 @@ package rocks.didit.sefilm.database.entities
 
 import rocks.didit.sefilm.database.TicketNumberConverter
 import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import java.io.Serializable
 import java.time.LocalDate
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Embeddable
+import javax.persistence.EmbeddedId
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.Table
 
 @Embeddable
 data class GiftCertId(
@@ -53,4 +60,11 @@ data class GiftCertificate(
 
   @Column(nullable = false)
   val isDeleted: Boolean = false
-)
+) {
+  fun toDTO() = GiftCertificateDTO(
+    userId = id.user.id,
+    number = id.number,
+    expiresAt = expiresAt,
+    status = GiftCertificateDTO.Status.UNKNOWN
+  )
+}

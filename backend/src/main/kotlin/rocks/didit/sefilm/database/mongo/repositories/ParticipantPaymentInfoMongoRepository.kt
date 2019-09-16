@@ -7,6 +7,7 @@ import rocks.didit.sefilm.domain.UserID
 import java.util.*
 
 @Repository
+@Deprecated(message = "")
 interface ParticipantPaymentInfoMongoRepository : CrudRepository<ParticipantPaymentInfo, UUID> {
   fun findByShowingId(showingId: UUID): Collection<ParticipantPaymentInfo>
   fun findByShowingIdAndUserId(showingId: UUID, userId: UserID): Optional<ParticipantPaymentInfo>

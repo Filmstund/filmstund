@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.mongo.entities.Movie
+import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.dto.FilmstadenShowingDTO
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -36,7 +36,7 @@ class FilmstadenShowingResolver(
         ?: "EPOCH"} in city=$city for '${movie.title}' (${movie.id})"
     )
     if (movie.filmstadenId == null) return listOf()
-    return filmstadenService.getShowingDates(movie.filmstadenId, city ?: properties.defaultCity)
+    return filmstadenService.getShowingDates(movie.filmstadenId!!, city ?: properties.defaultCity)
       .filter {
         val after = (afterDate ?: LocalDate.MIN).atStartOfDay().toInstant(ZoneOffset.UTC)
         it.timeUtc.isAfter(after)

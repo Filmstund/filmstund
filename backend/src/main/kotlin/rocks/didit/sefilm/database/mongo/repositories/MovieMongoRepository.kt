@@ -6,6 +6,7 @@ import rocks.didit.sefilm.database.mongo.entities.Movie
 import java.util.*
 
 @Repository
+@Deprecated(message = "")
 interface MovieMongoRepository : CrudRepository<Movie, UUID> {
   fun findByArchivedOrderByPopularityDesc(archived: Boolean = false): List<Movie>
 }
