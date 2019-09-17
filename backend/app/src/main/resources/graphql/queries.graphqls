@@ -9,10 +9,6 @@ type Query {
     publicShowings(afterDate: LocalDate): [Showing!]!
     showingForMovie(movieId: UUID): [Showing!]!
 
-    ## Bio Budord ##
-    allBiobudord: [BioBudord!]!
-    randomBudord: BioBudord!
-
     ## User related ##
     allUsers: [User!]!
     currentUser: CurrentUser!

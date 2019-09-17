@@ -62,6 +62,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   testImplementation("org.mockito:mockito-core:3.0.0")
+  testImplementation("com.opentable.components:otj-pg-embedded:0.13.1")
 }
 
 tasks.register("versionBanner") {
