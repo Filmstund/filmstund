@@ -2,6 +2,7 @@ package rocks.didit.sefilm.domain.dto
 
 import java.time.LocalDate
 
+@Deprecated(message = "User GiftCertificateDTO instead")
 data class ForetagsbiljettDTO(
   val number: String,
   val expires: LocalDate = LocalDate.now().plusYears(1),

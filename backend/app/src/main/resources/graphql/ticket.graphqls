@@ -1,7 +1,7 @@
 # A ticket assigned to a user that allowes access to Filmstaden
 type Ticket {
     id: String!
-    showingId: UUID!
+    #showingId: UUID! FIXME use dto where this exists instead
     assignedToUser: User!
     profileId: String
     barcode: String!
@@ -10,7 +10,8 @@ type Ticket {
     cinema: String!
     cinemaCity: String
     screen: String!
-    seat: Seat!,
+    seatNumber: Int!,
+    seatRow: Int!,
     date: LocalDate!,
     time: String!,
     movieName: String!

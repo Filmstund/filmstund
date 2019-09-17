@@ -10,9 +10,7 @@ input CreateShowingInput {
 
 input UpdateShowingInput {
     price: SEK!
-    private: Boolean!
     payToUser: ID!
-    expectedBuyDate: LocalDate
     location: String!
     filmstadenRemoteEntityId: String
     time: LocalTime!

@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenCityAliasDTO
+import rocks.didit.sefilm.domain.dto.LocationDTO
 
 @Service
 class LocationService(private val locationRepo: LocationRepository) {
-  fun allLocations() = locationRepo.findAll().toList()
-  fun getLocation(name: String): Location? = locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(name, name)
+  fun allLocations() = locationRepo.findAll().toList().map { it.toDTO() }
+  fun getLocation(name: String): LocationDTO? =
+    locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(name, name)?.toDTO()
 
   fun filmstadenCities(): List<FilmstadenCityAliasDTO> {
     val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()

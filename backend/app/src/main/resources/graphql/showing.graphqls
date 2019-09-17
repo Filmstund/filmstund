@@ -7,21 +7,18 @@ type Showing {
     movie: Movie!
     location: Location!
     filmstadenScreen: FilmstadenScreen
-    private: Boolean!
     price: SEK
     ticketsBought: Boolean!
     admin: User!
     payToUser: User!
-    expectedBuyDate: String
-    participants: [Participant!]!
     lastModifiedDate: String!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
     filmstadenRemoteEntityId: String
 }
 
 type Participant {
-    user: User
-    paymentType: String!
+    userId: UUID
+    showingId: UUID
 }
 
 type FilmstadenScreen {

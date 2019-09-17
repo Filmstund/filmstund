@@ -1,8 +1,9 @@
 package rocks.didit.sefilm.database.repositories
 
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
-import rocks.didit.sefilm.database.entities.BioBudord
+import org.jdbi.v3.sqlobject.statement.SqlQuery
+import rocks.didit.sefilm.domain.dto.BioBudordDTO
 
-@Repository
-interface BudordRepository : JpaRepository<BioBudord, Long>
+interface BudordRepository {
+  @SqlQuery("SELECT * FROM bio_budord")
+  fun findAll(): List<BioBudordDTO>
+}

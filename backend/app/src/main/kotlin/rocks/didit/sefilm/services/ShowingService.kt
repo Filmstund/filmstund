@@ -253,7 +253,7 @@ class ShowingService(
     showing: Showing
   ): Participant =
     when (paymentOption.type) {
-      PaymentType.Foretagsbiljett -> {
+      PaymentType.GiftCertificate -> {
         val suppliedTicket = paymentOption.ticketNumber
           ?: throw MissingParametersException("User chose to pay with a gift certificate, but no ticket number were supplied")
         val ticketNumber = TicketNumber(suppliedTicket)

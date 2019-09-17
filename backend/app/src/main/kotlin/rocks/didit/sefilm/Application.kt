@@ -1,6 +1,5 @@
 package rocks.didit.sefilm
 
-import com.coxautodev.graphql.tools.SchemaParserDictionary
 import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -35,8 +34,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import rocks.didit.sefilm.domain.ExternalProviderErrorHandler
 import rocks.didit.sefilm.graphql.GraphqlExceptionHandler
 import rocks.didit.sefilm.logging.OutgoingLoggingInterceptor
-import rocks.didit.sefilm.notification.MailSettings
-import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.web.controllers.CalendarController
 
 @SpringBootApplication
@@ -153,10 +150,10 @@ class Application {
     .objectMapperConfigurer(objConfigurer)
     .build()
 
-  @Bean
-  fun schemaDictionary() = SchemaParserDictionary()
-    .add(MailSettings::class)
-    .add(PushoverSettings::class)
+//  @Bean
+//  fun schemaDictionary() = SchemaParserDictionary()
+//    .add(MailSettings::class)
+//    .add(PushoverSettings::class)
 }
 
 fun main(args: Array<String>) {

@@ -20,8 +20,8 @@ dependencies {
   implementation(project(":mongo"))
 
   implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:5.10.0")
-//  UI for GraphQL queries available at /graphiql
-//  compile("com.graphql-java-kickstart:graphiql-spring-boot-starter:5.10.0")
+  //  UI for GraphQL queries available at /graphiql
+  //  compile("com.graphql-java-kickstart:graphiql-spring-boot-starter:5.10.0")
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-logging")
   implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -46,11 +46,12 @@ dependencies {
   implementation("net.sf.biweekly:biweekly:0.6.3")
 
   /* The following are needed under java 11 */
+  runtime("javax.xml.bind:jaxb-api:2.3.0")
+  runtime("com.sun.xml.bind:jaxb-impl:2.3.0")
+  runtime("com.sun.xml.bind:jaxb-core:2.3.0.1")
+  runtime("javax.activation:activation:1.1.1")
+
   runtime("org.apache.commons:commons-lang3:3.9")
- // runtime("javax.xml.bind:jaxb-api:2.3.0")
- // runtime("com.sun.xml.bind:jaxb-impl:2.3.0")
- // runtime("com.sun.xml.bind:jaxb-core:2.3.0.1")
- // runtime("javax.activation:activation:1.1.1")
   implementation("org.apache.httpcomponents:httpclient:4.5.9")
 
   implementation(kotlin("stdlib-jdk8"))
@@ -83,11 +84,11 @@ tasks.register("versionBanner") {
     val banner =
       "  ┌───────────────┬───────────────────────────────────────────────────────┐\n" +
         "  │ Project       │ $projectNameAndBranch\n" +
-        "  ├───────────────┼───────────────────────────────────────────────────────┤\n"+
-        "  │ Version       │ $projectVersion\n"+
-        "  │ Revision SHA  │ $gitCommitId\n"+
-        "  │ Revision Date │ $gitCommitTime\n"+
-        "  │ Build date    │ $now\n"+
+        "  ├───────────────┼───────────────────────────────────────────────────────┤\n" +
+        "  │ Version       │ $projectVersion\n" +
+        "  │ Revision SHA  │ $gitCommitId\n" +
+        "  │ Revision Date │ $gitCommitTime\n" +
+        "  │ Build date    │ $now\n" +
         "  └───────────────┴───────────────────────────────────────────────────────┘"
     val bannerFile = File("${project.rootDir}/app/build/banner.txt")
     bannerFile.createNewFile()

@@ -13,7 +13,6 @@ import rocks.didit.sefilm.database.repositories.GiftCertificateRepository
 import rocks.didit.sefilm.database.repositories.ParticipantRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.TicketNumber
-import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import java.time.LocalDate
 import java.util.*
@@ -44,22 +43,22 @@ class GiftCertificateService(
   fun getGiftCertsByUserId(userID: UUID): List<GiftCertificateDTO> =
     giftCertRepo.findGiftCertificateDTOByUserId(userID)
 
-  fun addForetagsbiljetterToCurrentUser(biljetter: List<ForetagsbiljettDTO>) {
+  fun addForetagsbiljetterToCurrentUser(biljetter: List<GiftCertificateDTO>) {
     val currentUser = userRepository.findById(currentLoggedInUser().id)
       .orElseThrow { NotFoundException("current user", currentLoggedInUser().id) }
 
     assertForetagsbiljetterNotAlreadyInUse(biljetter, currentUser.giftCertificates)
 
-    val newTickets = biljetter.map { GiftCertificate(GiftCertId(currentUser, TicketNumber(it.number)), it.expires) }
+    val newTickets = biljetter.map { GiftCertificate(GiftCertId(currentUser, TicketNumber(it.number.number)), it.expiresAt) }
     giftCertRepo.saveAll(newTickets)
   }
 
   @Transactional
-  fun deleteTicketFromUser(biljett: ForetagsbiljettDTO) {
+  fun deleteTicketFromUser(biljett: GiftCertificateDTO) {
     val currentUser = userRepository.findById(currentLoggedInUser().id)
       .orElseThrow { NotFoundException("current user", currentLoggedInUser().id) }
 
-    val ticketNumber = TicketNumber(biljett.number)
+    val ticketNumber = TicketNumber(biljett.number.number)
     val giftCert = giftCertRepo.findById(GiftCertId(currentUser, ticketNumber))
       .orElseThrow { throw TicketNotFoundException(ticketNumber) }
 
@@ -70,11 +69,11 @@ class GiftCertificateService(
 
   /** The tickets are allowed to be in use by the current user. */
   private fun assertForetagsbiljetterNotAlreadyInUse(
-    biljetter: List<ForetagsbiljettDTO>,
+    biljetter: List<GiftCertificateDTO>,
     userBiljetter: List<GiftCertificate>
   ) {
     biljetter.forEach {
-      val ticketNumber = TicketNumber(it.number)
+      val ticketNumber = TicketNumber(it.number.number)
       if (!userBiljetter.any { t -> t.id.number == ticketNumber }
         && giftCertRepo.existsById_Number(ticketNumber)) {
         throw TicketAlreadyInUserException(currentLoggedInUser().id)

@@ -23,6 +23,6 @@ type Query {
     filmstadenCities: [FilmstadenCity!]!
 
     ## Notifications ##
-    allNotificationProviders: [NotificationProvider!]!
-    allNotificationTypes: [NotificationType!]!
+    #allNotificationProviders: [NotificationProvider!]!
+    #allNotificationTypes: [NotificationType!]!
 }

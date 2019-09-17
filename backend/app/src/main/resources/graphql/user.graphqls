@@ -5,13 +5,13 @@ type CurrentUser {
     lastName: String
     nick: String
     email: String!
-    filmstadenMembershipId: String
+    filmstadenId: String
     phone: String
     avatar: String
-    foretagsbiljetter: [Foretagsbiljett!]
+    giftCertificates: [GiftCertificate!]
     calendarFeedId: UUID
     calendarFeedUrl: String
-    notificationSettings: NotificationSettings!
+    #notificationSettings: NotificationSettings!
     lastLogin: String!
     signupDate: String!
 }
@@ -26,26 +26,27 @@ type User {
     avatar: String
 }
 
-type Foretagsbiljett {
+type GiftCertificate {
     number: String!
-    expires: LocalDate!
-    status: ForetagsbiljettStatus!
+    expiresAt: LocalDate!
+    status: GiftCertificateStatus!
 }
 
-enum ForetagsbiljettStatus {
-    Available
-    Pending
-    Used
-    Expired
+enum GiftCertificateStatus {
+    AVAILABLE
+    PENDING
+    USED
+    EXPIRED
+    UNKNOWN
 }
 
 input NewUserInfo {
     nick: String
-    filmstadenMembershipId: String
+    filmstadenId: String
     phone: String
 }
 
-input ForetagsbiljettInput {
+input GiftCertificateInput {
     number: String!
     expires: LocalDate
 }

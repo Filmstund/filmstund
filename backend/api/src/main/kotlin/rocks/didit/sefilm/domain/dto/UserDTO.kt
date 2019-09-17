@@ -1,10 +1,12 @@
 package rocks.didit.sefilm.domain.dto
 
+import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import java.time.Instant
 import java.util.*
 
 data class UserDTO(
   val id: UUID,
+  val filmstadenId: FilmstadenMembershipId? = null,
   val name: String? = null,
   val firstName: String? = null,
   val lastName: String? = null,

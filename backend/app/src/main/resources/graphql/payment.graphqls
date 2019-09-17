@@ -1,7 +1,7 @@
 type AdminPaymentDetails {
     filmstadenBuyLink: String
-    filmstadenData: [FilmstadenData!]!
-    participantPaymentInfos: [ParticipantPaymentInfo!]!
+    showingId: UUID
+    #participants: [Participant!]! # FIXME
 }
 
 type AttendeePaymentDetails {
@@ -10,12 +10,6 @@ type AttendeePaymentDetails {
     payTo: User!
     payer: User!
     swishLink: String
-}
-
-type FilmstadenData {
-    user: User!
-    filmstadenMembershipId: String
-    foretagsbiljett: String
 }
 
 type ParticipantPaymentInfo {
@@ -43,7 +37,7 @@ input PaymentOption {
 
 enum PaymentType {
     Swish
-    Foretagsbiljett
+    GiftCertificate
 }
 
 extend type Showing {

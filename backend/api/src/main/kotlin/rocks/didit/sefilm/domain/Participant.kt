@@ -10,7 +10,7 @@ sealed class Participant {
   fun toDto(): ParticipantDTO {
     val paymentType = when (this) {
       is SwishParticipant -> PaymentType.Swish
-      is FtgBiljettParticipant -> PaymentType.Foretagsbiljett
+      is FtgBiljettParticipant -> PaymentType.GiftCertificate
     }
     return ParticipantDTO(this.userId, paymentType)
   }

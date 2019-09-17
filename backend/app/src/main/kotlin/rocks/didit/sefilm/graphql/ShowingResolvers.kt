@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Ticket
+import rocks.didit.sefilm.database.repositories.ParticipantRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
@@ -43,6 +44,7 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 @Component
 class ShowingResolver(
   private val showingService: ShowingService,
+  private val participantRepo: ParticipantRepository,
   private val userService: UserService,
   private val movieService: MovieService,
   private val ticketService: TicketService
@@ -61,6 +63,12 @@ class ShowingResolver(
       .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
   }
 
+  fun participants(showing: ShowingDTO): List<ParticipantDTO> =
+    participantRepo.findById_Showing_Id(showing.id).map { it.toDTO() }
+
+  // FIXME: remove and rename this to filmstadenShowingId instead
+  fun filmstadenRemoteEntityId(showing: ShowingDTO): String? = showing.filmstadenShowingId
+
   fun myTickets(showing: ShowingDTO): List<Ticket> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
   fun ticketRange(showing: ShowingDTO): TicketRange? = ticketService.getTicketRange(showing.id)
@@ -75,9 +83,16 @@ class ShowingResolver(
 }
 
 @Component
-class ParticipantUserResolver(private val userService: UserService) : GraphQLResolver<ParticipantDTO> {
+class ParticipantUserResolver(private val userService: UserService, private val showingService: ShowingService) :
+  GraphQLResolver<ParticipantDTO> {
   fun user(participant: ParticipantDTO): PublicUserDTO = userService
     .getUserOrThrow(participant.userId)
+
+  // TODO: why is this needed?
+  fun id(participant: ParticipantDTO) = participant.userId
+
+  // TODO: why is this needed?
+  fun showing(participant: ParticipantDTO) = showingService.getShowingOrThrow(participant.showingId)
 }
 
 @Component

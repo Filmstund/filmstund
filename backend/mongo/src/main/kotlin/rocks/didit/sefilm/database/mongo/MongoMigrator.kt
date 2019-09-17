@@ -74,7 +74,7 @@ internal class MongoMigrator(
           date = it.date,
           time = it.time,
           movie = movieRepo.getOne(it.movie.id),
-          location = it.location?.let { l -> locationRepo.getOne(l.name!!) },
+          location = it.location?.let { l -> locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(l.name!!, l.name) },
           cinemaScreen = it.filmstadenScreen?.let { screen -> CinemaScreen(screen.filmstadenId, screen.name) },
           filmstadenShowingId = it.filmstadenRemoteEntityId,
           price = it.price ?: SEK.ZERO,

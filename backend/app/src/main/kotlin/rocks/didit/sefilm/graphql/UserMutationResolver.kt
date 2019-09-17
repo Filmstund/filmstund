@@ -4,7 +4,7 @@ package rocks.didit.sefilm.graphql
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.domain.dto.ForetagsbiljettDTO
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
 import rocks.didit.sefilm.domain.dto.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
@@ -26,13 +26,13 @@ class UserMutationResolver(
   fun updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInfoDTO): ParticipantDTO =
     participantPaymentInfoService.updatePaymentInfo(paymentInfo)
 
-  fun addForetagsBiljetter(biljetter: List<ForetagsbiljettDTO>): UserDTO {
-    foretagsbiljettService.addForetagsbiljetterToCurrentUser(biljetter)
+  fun addGiftCertificates(giftCerts: List<GiftCertificateDTO>): UserDTO {
+    foretagsbiljettService.addForetagsbiljetterToCurrentUser(giftCerts)
     return userService.getCurrentUser()
   }
 
-  fun deleteForetagsBiljett(biljett: ForetagsbiljettDTO): UserDTO {
-    foretagsbiljettService.deleteTicketFromUser(biljett)
+  fun deleteGiftCertificate(giftCert: GiftCertificateDTO): UserDTO {
+    foretagsbiljettService.deleteTicketFromUser(giftCert)
     return userService.getCurrentUser()
   }
 
