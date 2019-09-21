@@ -7,10 +7,10 @@ plugins {
 dependencies {
   implementation(project(":api"))
   api("org.springframework.boot:spring-boot-starter-data-jpa")
-  val jdbiVersion = "3.10.1"
-  api("org.jdbi:jdbi3-core:$jdbiVersion")
-  api("org.jdbi:jdbi3-kotlin:$jdbiVersion")
-  api("org.jdbi:jdbi3-kotlin-sqlobject:$jdbiVersion")
+  api("org.jdbi:jdbi3-core")
+  api("org.jdbi:jdbi3-kotlin")
+  api("org.jdbi:jdbi3-kotlin-sqlobject")
+  api("org.jdbi:jdbi3-postgres")
 
 
   implementation(kotlin("stdlib"))

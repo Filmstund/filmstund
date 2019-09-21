@@ -2,7 +2,8 @@ package rocks.didit.sefilm
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import liquibase.integration.spring.SpringLiquibase
-import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.statement.SqlLogger
+import org.jdbi.v3.core.statement.StatementContext
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -28,10 +29,13 @@ class TestConfig {
     return liquibase
   }
 
-  @Bean
-  fun getJdbi(dataSource: DataSource): Jdbi {
-    return Jdbi.create(dataSource)
-      .installPlugins()
-  }
+  private val log by logger()
 
+  @Bean
+  @Primary
+  fun getSqlLogger() = object : SqlLogger {
+    override fun logAfterExecution(context: StatementContext?) {
+      log.info("{}", context?.renderedSql)
+    }
+  }
 }

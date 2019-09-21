@@ -1,12 +1,7 @@
 package rocks.didit.sefilm.services
 
-import com.opentable.db.postgres.embedded.LiquibasePreparer
-import com.opentable.db.postgres.junit.EmbeddedPostgresRules
-import com.opentable.db.postgres.junit.PreparedDbRule
 import org.assertj.core.api.Assertions.assertThat
 import org.jdbi.v3.core.Jdbi
-import org.junit.ClassRule
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,21 +9,17 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit4.SpringRunner
 import rocks.didit.sefilm.TestConfig
+import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.database.repositories.BudordRepository
 import rocks.didit.sefilm.domain.dto.BioBudordDTO
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Jdbi::class, BudordRepository::class, BudordService::class])
-@Import(TestConfig::class)
+@Import(DbConfig::class, TestConfig::class)
 internal class BudordServiceTest {
 
-  @ClassRule
-  val db: PreparedDbRule = EmbeddedPostgresRules.preparedDatabase(
-    LiquibasePreparer.forClasspathLocation("db/changelog/db.changelog-1.0.sql")
-  )
-
   @Autowired
-  lateinit var budordService: BudordService;
+  lateinit var budordService: BudordService
 
   val expectedBudords = listOf(
     BioBudordDTO(1, "Du skall icke spoila"),
@@ -45,8 +36,7 @@ internal class BudordServiceTest {
   )
 
   @Test()
-  @DisplayName("All biobudord are expected")
-  internal fun allBioBudordExpected() {
+  internal fun `all 11 budord are expected from liquibase`() {
     assertThat(budordService.getAll())
       .hasSize(11)
       .containsAll(expectedBudords)

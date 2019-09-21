@@ -6,11 +6,11 @@ import java.util.*
 
 data class UserDTO(
   val id: UUID,
+  val googleId: String? = null,
   val filmstadenId: FilmstadenMembershipId? = null,
-  val name: String? = null,
-  val firstName: String? = null,
-  val lastName: String? = null,
-  val nick: String? = null,
+  val firstName: String = "",
+  val lastName: String = "",
+  val nick: String = "",
   val email: String = "",
   val phone: String? = null,
   val avatar: String? = null,
@@ -20,6 +20,7 @@ data class UserDTO(
   val signupDate: Instant = Instant.ofEpochSecond(0L),
   val calendarFeedId: UUID? = null
 ) {
+  val name: String get() = "$firstName $lastName"
   fun toPublicUserDTO() =
     PublicUserDTO(this.id, this.firstName, this.lastName, this.nick, this.phone, this.avatar)
 }

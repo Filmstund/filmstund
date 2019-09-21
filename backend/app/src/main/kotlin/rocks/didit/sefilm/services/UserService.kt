@@ -145,8 +145,8 @@ class UserService(
 
   fun User.toDTO() = UserDTO(
     this.id,
+    this.googleId.id,
     this.filmstadenId,
-    this.name,
     this.firstName,
     this.lastName,
     this.nick,
