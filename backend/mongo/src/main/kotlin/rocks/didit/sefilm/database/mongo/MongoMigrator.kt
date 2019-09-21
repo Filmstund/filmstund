@@ -2,13 +2,14 @@
 
 package rocks.didit.sefilm.database.mongo
 
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.entities.CinemaScreen
 import rocks.didit.sefilm.database.entities.GiftCertId
 import rocks.didit.sefilm.database.entities.GiftCertificate
-import rocks.didit.sefilm.database.entities.Location
-import rocks.didit.sefilm.database.entities.LocationAlias
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Participant
 import rocks.didit.sefilm.database.entities.ParticipantId
@@ -33,12 +34,14 @@ import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
+import rocks.didit.sefilm.domain.dto.LocationDTO
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
 import java.util.*
 
 @Component
 internal class MongoMigrator(
+  private val jdbi: Jdbi,
   private val locationRepo: LocationRepository,
   private val locationsMongoRepo: LocationMongoRepository,
   private val userRepo: UserRepository,
@@ -74,7 +77,12 @@ internal class MongoMigrator(
           date = it.date,
           time = it.time,
           movie = movieRepo.getOne(it.movie.id),
-          location = it.location?.let { l -> locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(l.name!!, l.name) },
+          location = it.location?.let { l ->
+            locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(
+              l.name!!,
+              l.name
+            )
+          },
           cinemaScreen = it.filmstadenScreen?.let { screen -> CinemaScreen(screen.filmstadenId, screen.name) },
           filmstadenShowingId = it.filmstadenRemoteEntityId,
           price = it.price ?: SEK.ZERO,
@@ -169,34 +177,38 @@ internal class MongoMigrator(
 
   @Transactional
   fun migrateLocationsFromMongo() {
-    if (log.isInfoEnabled) {
-      log.info(
-        "{} locations are stored in MongoDB and {} are stored in Postgres",
-        locationsMongoRepo.count(),
-        locationRepo.count()
-      )
-    }
-
-    locationsMongoRepo.findAll()
-      .filterNot { locationRepo.existsById(it.name ?: "NON_EXISTANT") }
-      .filterNot { it.name.isNullOrEmpty() }
-      .forEach {
-        val pgLoc = Location(
-          name = it.name!!,
-          cityAlias = it.cityAlias,
-          city = it.city,
-          streetAddress = it.streetAddress,
-          postalCode = it.postalCode,
-          postalAddress = it.postalAddress,
-          latitude = it.latitude,
-          longitude = it.longitude,
-          filmstadenId = it.filmstadenId,
-          alias = it.alias.map { name -> LocationAlias(name) }
+    jdbi.useTransactionUnchecked { handle ->
+      val dao = handle.attach(LocationDao::class.java)
+      if (log.isInfoEnabled) {
+        log.info(
+          "{} locations are stored in MongoDB and {} are stored in Postgres",
+          locationsMongoRepo.count(),
+          dao.count()
         )
-
-        val savedLoc = locationRepo.save(pgLoc)
-        log.debug("{} migrated as {}", it.name, savedLoc)
       }
+
+      val pgLocs = locationsMongoRepo.findAll()
+        .filterNot { dao.existsByName(it.name ?: "NON_EXISTANT") }
+        .filterNot { it.name.isNullOrEmpty() }
+        .map {
+          LocationDTO(
+            name = it.name!!,
+            cityAlias = it.cityAlias,
+            city = it.city,
+            streetAddress = it.streetAddress,
+            postalCode = it.postalCode,
+            postalAddress = it.postalAddress,
+            latitude = it.latitude,
+            longitude = it.longitude,
+            filmstadenId = it.filmstadenId,
+            alias = it.alias
+          )
+        }
+      dao.insertLocations(pgLocs)
+      pgLocs.forEach {
+        dao.insertAlias(it.name, it.alias)
+      }
+    }
   }
 
   @Transactional

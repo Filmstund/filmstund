@@ -2,19 +2,20 @@ package rocks.didit.sefilm
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import rocks.didit.sefilm.database.entities.Location
-import rocks.didit.sefilm.database.entities.LocationAlias
-import rocks.didit.sefilm.database.repositories.LocationRepository
+import rocks.didit.sefilm.database.dao.LocationDao
+import rocks.didit.sefilm.domain.dto.LocationDTO
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.math.BigDecimal
 
 @Component
 class DataLoader(
-  private val locationRepository: LocationRepository,
+  private val jdbi: Jdbi,
   private val filmstadenService: FilmstadenService,
   private val properties: Properties
 ) {
@@ -30,10 +31,23 @@ class DataLoader(
 
   private fun seedLocations(objectMapper: ObjectMapper) {
     val locationsResource = ClassPathResource("seeds/locations.json")
-    val locations: List<Location> = objectMapper.readValue(locationsResource.inputStream)
+    val locations: List<LocationDTO> = objectMapper.readValue(locationsResource.inputStream)
 
-    locationRepository.saveAll(locations)
-    log.info("Seeded locations with ${locations.size} values")
+    val savedLocs = storeLocations(locations)
+    log.info("Seeded locations with $savedLocs new values")
+  }
+
+  private fun storeLocations(locations: List<LocationDTO>): Int {
+    return jdbi.inTransactionUnchecked { handle ->
+      val dao = handle.attach(LocationDao::class.java)
+
+      val newLocs = locations.filterNot { dao.existsByName(it.name) }
+      dao.insertLocations(newLocs)
+      newLocs.forEach {
+        dao.insertAlias(it.name, it.alias)
+      }
+      newLocs.size
+    }
   }
 
   private fun seedLocationsFromFilmstaden(objectMapper: ObjectMapper) {
@@ -43,7 +57,7 @@ class DataLoader(
     val defaultCity = properties.defaultCity
     val locationsFromFilmstaden = filmstadenService.getLocationsInCity(properties.defaultCity)
       .map {
-        Location(
+        LocationDTO(
           name = it.title,
           cityAlias = it.address.city["alias"],
           city = it.address.city["name"],
@@ -55,14 +69,12 @@ class DataLoader(
           filmstadenId = it.ncgId,
           alias = locationNameAlias
             .firstOrNull { alias -> alias.filmstadenId == it.ncgId }?.alias
-            ?.map { alias -> LocationAlias(alias) }
             ?: listOf()
         )
       }
 
-
-    val savedRows = locationRepository.saveAll(locationsFromFilmstaden).count()
-    log.info("Seeded $savedRows locations from Filmstaden for city: $defaultCity")
+    val savedRows = storeLocations(locationsFromFilmstaden)
+    log.info("Seeded $savedRows new locations from Filmstaden for city: $defaultCity")
   }
 
   private data class LocationAliasDTO(val filmstadenId: String, val alias: List<String>)

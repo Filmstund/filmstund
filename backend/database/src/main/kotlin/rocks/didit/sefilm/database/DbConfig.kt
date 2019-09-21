@@ -2,14 +2,21 @@ package rocks.didit.sefilm.database
 
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.statement.SqlLogger
+import org.jdbi.v3.core.statement.StatementContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import rocks.didit.sefilm.logger
 import javax.sql.DataSource
 
 @Configuration
 class DbConfig {
+  private val log by logger()
   @Bean
-  fun sqlLogger() = SqlLogger.NOP_SQL_LOGGER
+  fun sqlLogger() = object : SqlLogger {
+    override fun logAfterExecution(context: StatementContext?) {
+      log.info("{}", context?.renderedSql)
+    }
+  }
 
   @Bean
   fun jdbi(dataSource: DataSource, sqlLogger: SqlLogger): Jdbi =

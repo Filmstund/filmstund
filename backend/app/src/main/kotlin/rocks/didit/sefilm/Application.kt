@@ -27,7 +27,6 @@ import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -102,7 +101,6 @@ class Application {
   }
 
   @Bean
-  @Transactional
   fun seedInitialData(
     dataLoader: DataLoader,
     properties: Properties
