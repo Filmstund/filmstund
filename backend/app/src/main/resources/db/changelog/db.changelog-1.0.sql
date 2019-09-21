@@ -5,7 +5,8 @@ create table bio_budord
 (
     number integer
         constraint bioBudord_pk primary key,
-    phrase varchar(255) not null
+    phrase varchar(255)
+        constraint phrase_uniq unique not null
 );
 -- rollback DROP table if exists bio_budord;
 
@@ -47,7 +48,8 @@ create table location_alias
 (
     location           varchar(100)
         constraint location_alias_fk references location on delete cascade,
-    alias              varchar(100)             not null,
+    alias              varchar(100)
+        constraint alias_uniq unique            not null,
     last_modified_date timestamp with time zone not null default current_timestamp
 );
 --rollback drop table if exists location_alias;

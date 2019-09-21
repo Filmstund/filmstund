@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.domain.dto
 
 import java.math.BigDecimal
+import java.time.Instant
 
 data class LocationDTO(
   val name: String,
@@ -13,8 +14,34 @@ data class LocationDTO(
   val latitude: BigDecimal? = null,
   val longitude: BigDecimal? = null,
   val filmstadenId: String? = null,
-  val alias: List<String> = listOf()
+  val alias: List<String> = listOf(),
+  val lastModifiedDate: Instant = Instant.EPOCH
 ) {
+  constructor(
+    name: String,
+    cityAlias: String?,
+    city: String?,
+    streetAddress: String?,
+    postalCode: String?,
+    postalAddress: String?,
+    latitude: BigDecimal?,
+    longitude: BigDecimal?,
+    filmstadenId: String?,
+    lastModifiedDate: Instant
+  ) : this(
+    name,
+    cityAlias,
+    city,
+    streetAddress,
+    postalCode,
+    postalAddress,
+    latitude,
+    longitude,
+    filmstadenId,
+    listOf(),
+    lastModifiedDate
+  )
+
   fun formatAddress(): String {
     return if (streetAddress != null) {
       "$name, $streetAddress"

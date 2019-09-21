@@ -3,6 +3,7 @@ package rocks.didit.sefilm.database
 import org.jdbi.v3.core.result.LinkedHashMapRowReducer
 import org.jdbi.v3.core.result.RowView
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.LocationDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
 import java.util.*
 
@@ -14,6 +15,18 @@ class UserGiftCertReducer : LinkedHashMapRowReducer<UUID, UserDTO> {
     if (rowView.getColumn("user_id", UUID::class.java) != null) {
       val giftCert = rowView.getRow(GiftCertificateDTO::class.java)
       container.replace(id, user.copy(giftCertificates = user.giftCertificates.plus(giftCert)))
+    }
+  }
+}
+
+class LocationAliasReducer : LinkedHashMapRowReducer<String, LocationDTO> {
+  override fun accumulate(container: MutableMap<String, LocationDTO>, rowView: RowView) {
+    val id = rowView.getColumn("name", String::class.java)
+    val location = container.computeIfAbsent(id) { rowView.getRow(LocationDTO::class.java) }
+
+    val alias = rowView.getColumn("laalias", String::class.java)
+    if (alias != null) {
+      container.replace(id, location.copy(alias = location.alias.plus(alias)))
     }
   }
 }

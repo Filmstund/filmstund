@@ -3,7 +3,9 @@ package rocks.didit.sefilm
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.LocationDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
@@ -35,4 +37,23 @@ fun ThreadLocalRandom.nextGiftCert(userId: UUID): GiftCertificateDTO {
 
 fun ThreadLocalRandom.nextGiftCerts(userId: UUID, bound: Int = 10): List<GiftCertificateDTO> = (0..bound).map {
   this.nextGiftCert(userId)
+}
+
+fun ThreadLocalRandom.nextLocation(alias: List<String>): LocationDTO {
+  val nbr = this.nextInt(100, 999)
+  return LocationDTO(
+    name = "locname$nbr",
+    cityAlias = "${this.nextInt(10, 99)}",
+    city = "city$nbr",
+    streetAddress = "streetAddr$nbr",
+    latitude = BigDecimal.valueOf(this.nextLong(1, 10)),
+    longitude = BigDecimal.valueOf(this.nextLong(1, 10)),
+    filmstadenId = "NCG$nbr",
+    alias = alias,
+    lastModifiedDate = Instant.EPOCH
+  )
+}
+
+fun ThreadLocalRandom.nextLocationAlias(bound: Int): List<String> {
+  return (0..bound).map { "alias${this.nextLong(1000)}" }
 }
