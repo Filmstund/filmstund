@@ -1,24 +1,27 @@
 package rocks.didit.sefilm.domain.dto
 
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.PhoneNumber
 import java.time.Instant
 import java.util.*
 
 data class UserDTO(
   val id: UUID,
-  val googleId: String? = null,
+  val googleId: GoogleId? = null,
   val filmstadenId: FilmstadenMembershipId? = null,
+  val calendarFeedId: UUID? = null,
   val firstName: String = "",
   val lastName: String = "",
   val nick: String = "",
   val email: String = "",
-  val phone: String? = null,
+  val phone: PhoneNumber? = null,
   val avatar: String? = null,
   val giftCertificates: List<GiftCertificateDTO> = emptyList(),
   //val notificationSettings: NotificationSettings,
-  val lastLogin: Instant = Instant.ofEpochSecond(0L),
-  val signupDate: Instant = Instant.ofEpochSecond(0L),
-  val calendarFeedId: UUID? = null
+  val lastLogin: Instant = Instant.EPOCH,
+  val signupDate: Instant = Instant.EPOCH,
+  val lastModifiedDate: Instant = Instant.now()
 ) {
   val name: String get() = "$firstName $lastName"
   fun toPublicUserDTO() =

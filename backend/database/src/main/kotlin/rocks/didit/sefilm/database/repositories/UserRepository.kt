@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import java.util.*
 
@@ -21,9 +21,9 @@ interface UserRepository : JpaRepository<User, UUID> {
   fun findByCalendarFeedId(calendarFeedId: UUID): User?
 
   //fun existsByForetagsbiljetterNumber(biljett: TicketNumber): Boolean
-  fun existsByGoogleId(googleId: UserID): Boolean
+  fun existsByGoogleId(googleId: GoogleId): Boolean
 
-  fun findByGoogleId(googleId: UserID): User?
+  fun findByGoogleId(googleId: GoogleId): User?
 
   @Query(value = "select u.id from User u where u.filmstadenId = :filmstadenId")
   fun findUserIdByFilmstadenId(filmstadenId: FilmstadenMembershipId): UUID?

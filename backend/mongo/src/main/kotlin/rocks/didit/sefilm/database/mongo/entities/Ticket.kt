@@ -2,7 +2,7 @@ package rocks.didit.sefilm.database.mongo.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.GoogleId
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -13,7 +13,7 @@ internal data class Ticket(
   @Id
   val id: String = "",
   val showingId: UUID,
-  val assignedToUser: UserID,
+  val assignedToUser: GoogleId,
   val profileId: String?,
   val barcode: String,
   val customerType: String,

@@ -7,6 +7,7 @@ import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.LocationDao
+import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.database.entities.CinemaScreen
 import rocks.didit.sefilm.database.entities.GiftCertId
 import rocks.didit.sefilm.database.entities.GiftCertificate
@@ -17,7 +18,6 @@ import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.entities.TicketAttribute
 import rocks.didit.sefilm.database.entities.TicketAttributeId
-import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
@@ -34,7 +34,9 @@ import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.LocationDTO
+import rocks.didit.sefilm.domain.dto.UserDTO
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
 import java.util.*
@@ -213,23 +215,27 @@ internal class MongoMigrator(
 
   @Transactional
   fun migrateUsersFromMongo() {
-    if (log.isInfoEnabled) {
-      log.info(
-        "{} user(s) eligible for migration in MongoDB, while {} user(s) are stored in Postgres",
-        mongoUserRepo.count(), userRepo.count()
-      )
-    }
+    jdbi.useTransactionUnchecked { handle ->
+      val dao = handle.attach(UserDao::class.java)
 
-    mongoUserRepo.findAll()
-      .filterNot { userRepo.existsByGoogleId(it.id) }
-      .forEach {
-        migrateOldUserToNewUser(it)
+      if (log.isInfoEnabled) {
+        log.info(
+          "{} user(s) eligible for migration in MongoDB, while {} user(s) are stored in Postgres",
+          mongoUserRepo.count(), dao.count()
+        )
       }
+
+      mongoUserRepo.findAll()
+        .filterNot { dao.existsByGoogleId(it.id.id) }
+        .forEach {
+          migrateOldUserToNewUser(dao, it)
+        }
+    }
   }
 
-  private fun migrateOldUserToNewUser(it: rocks.didit.sefilm.database.mongo.entities.User): User {
+  private fun migrateOldUserToNewUser(dao: UserDao, it: rocks.didit.sefilm.database.mongo.entities.User): UserDTO {
     val newUserId = UUID.randomUUID()
-    val user = User(
+    val user = UserDTO(
       id = newUserId,
       googleId = it.id,
       calendarFeedId = it.calendarFeedId,
@@ -241,19 +247,16 @@ internal class MongoMigrator(
       lastLogin = it.lastLogin,
       lastModifiedDate = it.lastModifiedDate,
       signupDate = it.signupDate,
-      phone = it.phone
+      phone = it.phone,
+      filmstadenId = it.filmstadenMembershipId,
+      giftCertificates = it.foretagsbiljetter.map { ticket ->
+        GiftCertificateDTO(newUserId, ticket.number, ticket.expires, false)
+      }
     )
-    val giftCertificates = it.foretagsbiljetter.map { ticket ->
-      GiftCertificate(
-        id = GiftCertId(
-          user,
-          ticket.number
-        ), expiresAt = ticket.expires
-      )
-    }.toMutableList()
-    user.giftCertificates = giftCertificates
+    dao.insertUser(user)
+    dao.insertGiftCertificates(user.giftCertificates)
 
-    return userRepo.save(user)
+    return user
   }
 
   @Transactional

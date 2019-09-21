@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
@@ -58,7 +58,7 @@ class UserAuthConverter(
   override fun extractAuthentication(map: Map<String, *>): Authentication? {
     val details = OpenIdConnectUserDetails(map)
 
-    val principal: PublicUserDTO = when (userRepo.existsByGoogleId(UserID(details.userId))) {
+    val principal: PublicUserDTO = when (userRepo.existsByGoogleId(GoogleId(details.userId))) {
       true -> onExistingUser(details)
       false -> onNewUser(details)
     }
@@ -67,7 +67,7 @@ class UserAuthConverter(
   }
 
   fun onExistingUser(details: OpenIdConnectUserDetails): PublicUserDTO {
-    val user = userRepo.findByGoogleId(UserID(details.userId)) ?: throw NotFoundException("user")
+    val user = userRepo.findByGoogleId(GoogleId(details.userId)) ?: throw NotFoundException("user")
 
     user.firstName = details.firstName ?: "Mr Noname"
     user.lastName = details.lastName ?: "Anybody"
@@ -79,7 +79,7 @@ class UserAuthConverter(
 
   fun onNewUser(details: OpenIdConnectUserDetails): PublicUserDTO {
     val newUser = User(
-      googleId = UserID(details.userId),
+      googleId = GoogleId(details.userId),
       firstName = details.firstName ?: "Bosse",
       lastName = details.lastName ?: "Ringholm",
       nick = details.firstName ?: "Houdini",

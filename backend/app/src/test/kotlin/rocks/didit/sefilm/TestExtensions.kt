@@ -1,6 +1,8 @@
 package rocks.didit.sefilm
 
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.LocationDTO
@@ -16,18 +18,19 @@ fun ThreadLocalRandom.nextUserDTO(
 ): UserDTO {
   return UserDTO(
     id = id,
-    googleId = "gid${this.nextLong(1000L)}",
+    googleId = GoogleId("gid${this.nextLong(1000L)}"),
     filmstadenId = FilmstadenMembershipId("${this.nextInt(100, 999)}-${this.nextInt(100, 999)}"),
+    calendarFeedId = UUID.randomUUID(),
     firstName = "Fname ${this.nextLong(1000)}",
     lastName = "Lname ${this.nextLong(1000)}",
     nick = "Nickan ${this.nextLong(1000)}",
     email = "mail${this.nextLong(1000)}@example.org",
-    phone = "${this.nextLong(1000000000)}",
+    phone = PhoneNumber("073000000${this.nextLong(0, 9)}"),
     avatar = "http://${this.nextLong(1000)}.example.org",
     giftCertificates = giftCerts,
     lastLogin = Instant.EPOCH,
     signupDate = Instant.EPOCH,
-    calendarFeedId = UUID.randomUUID()
+    lastModifiedDate = Instant.EPOCH
   )
 }
 

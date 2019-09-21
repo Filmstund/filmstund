@@ -6,7 +6,7 @@ import rocks.didit.sefilm.database.PhoneNumberConverter
 import rocks.didit.sefilm.database.UserIdConverter
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.UserID
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import java.time.Instant
 import java.util.*
@@ -26,7 +26,7 @@ data class User(
 
   @Column(nullable = false, unique = true)
   @Convert(converter = UserIdConverter::class)
-  val googleId: UserID,
+  val googleId: GoogleId,
 
   @Column(nullable = true, unique = true)
   @Convert(converter = FSIdConverter::class)

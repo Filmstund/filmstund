@@ -37,6 +37,7 @@ class UserService(
       id
     )
   }
+
   fun getUsersThatWantToBeNotified(knownRecipients: List<UUID>): List<User> = emptyList() /*{
     return knownRecipients.let {
       when (it.isEmpty()) {
@@ -145,18 +146,19 @@ class UserService(
 
   fun User.toDTO() = UserDTO(
     this.id,
-    this.googleId.id,
+    this.googleId,
     this.filmstadenId,
+    this.calendarFeedId,
     this.firstName,
     this.lastName,
     this.nick,
     this.email,
-    this.phone?.number,
+    this.phone,
     this.avatar,
     this.giftCertificates.map { toDTO(it) },
     this.lastLogin,
     this.signupDate,
-    this.calendarFeedId
+    this.lastModifiedDate
   )
 
   private fun toDTO(giftCert: GiftCertificate): GiftCertificateDTO = giftCert.toDTO()

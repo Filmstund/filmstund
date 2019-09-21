@@ -2,14 +2,21 @@
 
 package rocks.didit.sefilm.database
 
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.Base64ID
+import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.TicketNumber
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
 @Converter
-class UserIdConverter : AttributeConverter<UserID, String> {
-  override fun convertToDatabaseColumn(attribute: UserID?): String? = attribute?.id
-  override fun convertToEntityAttribute(dbData: String?): UserID? = dbData?.let { UserID(it) }
+class UserIdConverter : AttributeConverter<GoogleId, String> {
+  override fun convertToDatabaseColumn(attribute: GoogleId?): String? = attribute?.id
+  override fun convertToEntityAttribute(dbData: String?): GoogleId? = dbData?.let { GoogleId(it) }
 }
 
 @Converter

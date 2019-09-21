@@ -14,6 +14,7 @@ class DbConfig {
   @Bean
   fun sqlLogger() = object : SqlLogger {
     override fun logAfterExecution(context: StatementContext?) {
+      // TODO: only do this if sql-logging is enabled
       log.info("{}", context?.renderedSql)
     }
   }
@@ -23,8 +24,12 @@ class DbConfig {
     Jdbi.create(dataSource)
       .registerColumnMapper(FilmstadenMembershipIdColumnMapper())
       .registerColumnMapper(TicketNumberColumnMapper())
+      .registerColumnMapper(GoogleIdColumnMapper())
+      .registerColumnMapper(PhoneNumberColumnMapper())
       .registerArgument(FilmstadenMembershipArgumentFactory())
       .registerArgument(TicketNumberArgumentFactory())
+      .registerArgument(GoogleIdArgumentFactory())
+      .registerArgument(PhoneNumberArgumentFactory())
       .setSqlLogger(sqlLogger)
       .installPlugins()
 }

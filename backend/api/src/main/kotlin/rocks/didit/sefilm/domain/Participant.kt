@@ -1,11 +1,11 @@
 package rocks.didit.sefilm.domain
 
 @Deprecated(message = "")
-data class ParticipantDTO(val userId: UserID, val paymentType: PaymentType)
+data class ParticipantDTO(val userId: GoogleId, val paymentType: PaymentType)
 
 @Deprecated(message = "")
 sealed class Participant {
-  abstract val userId: UserID
+  abstract val userId: GoogleId
 
   fun toDto(): ParticipantDTO {
     val paymentType = when (this) {
@@ -18,11 +18,11 @@ sealed class Participant {
 
 @Deprecated(message = "")
 data class SwishParticipant(
-  override val userId: UserID
+  override val userId: GoogleId
 ) : Participant()
 
 @Deprecated(message = "")
 data class FtgBiljettParticipant(
-  override val userId: UserID,
+  override val userId: GoogleId,
   val ticketNumber: TicketNumber
 ) : Participant()

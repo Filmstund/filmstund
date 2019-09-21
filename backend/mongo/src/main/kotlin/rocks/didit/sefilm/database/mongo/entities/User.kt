@@ -6,8 +6,8 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.Foretagsbiljett
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.UserID
 import java.time.Instant
 import java.util.*
 
@@ -15,7 +15,7 @@ import java.util.*
 @Deprecated(message = "")
 internal data class User(
   @Id
-  val id: UserID = UserID("N/A"),
+  val id: GoogleId = GoogleId("N/A"),
   val name: String? = null,
   val firstName: String? = null,
   val lastName: String? = null,

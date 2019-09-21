@@ -6,7 +6,11 @@ import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import rocks.didit.sefilm.domain.*
+import rocks.didit.sefilm.domain.Base64ID
+import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.TMDbID
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -176,20 +180,20 @@ class CustomScalars {
   fun customScalarUserID(): GraphQLScalarType = GraphQLScalarType.newScalar()
     .name("UserID")
     .description("UserID")
-    .coercing(object : Coercing<UserID, String> {
-      override fun parseLiteral(input: Any?): UserID {
+    .coercing(object : Coercing<GoogleId, String> {
+      override fun parseLiteral(input: Any?): GoogleId {
         return when (input) {
-          is StringValue -> UserID(input.value)
-          is String -> UserID(input)
+          is StringValue -> GoogleId(input.value)
+          is String -> GoogleId(input)
           else -> throw IllegalArgumentException("Unablet to convert '$input' to a UserID")
         }
       }
 
-      override fun parseValue(input: Any?): UserID = parseLiteral(input)
+      override fun parseValue(input: Any?): GoogleId = parseLiteral(input)
 
       override fun serialize(input: Any?): String? = when (input) {
         is String -> input
-        is UserID -> input.id
+        is GoogleId -> input.id
         else -> null
       }
     }).build()

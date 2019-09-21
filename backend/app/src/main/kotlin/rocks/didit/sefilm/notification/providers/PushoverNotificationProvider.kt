@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.domain.UserID
 import rocks.didit.sefilm.events.NotificationEvent
 import rocks.didit.sefilm.notification.ProviderHelper
 import rocks.didit.sefilm.notification.PushoverSettings

@@ -11,6 +11,9 @@ import rocks.didit.sefilm.domain.dto.UserDTO
 import java.util.*
 
 interface UserDao {
+  @SqlQuery("SELECT count(1) FROM users")
+  fun count(): Int
+
   @SqlQuery("SELECT * FROM users u LEFT JOIN gift_certificate gc on u.id = gc.user_id")
   @UseRowReducer(UserGiftCertReducer::class)
   fun findAll(): List<UserDTO>
@@ -22,7 +25,10 @@ interface UserDao {
   @SqlQuery("SELECT exists(SELECT 1 FROM users where id = :userId)")
   fun existsById(userId: UUID): Boolean
 
-  @SqlUpdate("INSERT INTO users (id, google_id, filmstaden_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id) VALUES (:id, :googleId, :filmstadenId, :firstName, :lastName, :nick, :email, :phone, :avatar, :calendarFeedId)")
+  @SqlQuery("SELECT exists(SELECT 1 FROM users where google_id = :googleId)")
+  fun existsByGoogleId(googleId: String): Boolean
+
+  @SqlUpdate("INSERT INTO users (id, google_id, filmstaden_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, last_modified_date) VALUES (:id, :googleId, :filmstadenId, :firstName, :lastName, :nick, :email, :phone, :avatar, :calendarFeedId, :lastLogin, :lastModifiedDate)")
   fun insertUser(@BindBean user: UserDTO)
 
   @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at, is_deleted) VALUES (:userId, :number, :expiresAt, false)")

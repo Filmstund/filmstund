@@ -2,9 +2,9 @@ package rocks.didit.sefilm.domain
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-data class UserID(val id: String) {
+data class GoogleId(val id: String) {
   companion object {
-    val MISSING = UserID("N/A")
+    val MISSING = GoogleId("N/A")
   }
 
   init {

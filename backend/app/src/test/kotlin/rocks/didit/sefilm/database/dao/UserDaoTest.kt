@@ -53,7 +53,7 @@ internal class UserDaoTest {
       val userFromDb = it.findById(rndUser.id)
       assertThat(userFromDb)
         .isNotNull
-        .isEqualToIgnoringGivenFields(rndUser, "signupDate", "lastLogin")
+        .isEqualToIgnoringGivenFields(rndUser, "signupDate")
       // LastLogin and SignupDate is set by the db.
     }
   }
@@ -109,7 +109,7 @@ internal class UserDaoTest {
       val dbUser: UserDTO? = usersFromDb.firstOrNull { u -> u.id == rndUser.id }
       assertThat(dbUser)
         .isNotNull
-        .isEqualToIgnoringGivenFields(rndUser, "signupDate", "lastLogin")
+        .isEqualToIgnoringGivenFields(rndUser, "signupDate")
     }
   }
 }
