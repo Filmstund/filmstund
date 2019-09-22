@@ -73,18 +73,7 @@ data class Participant(
     JoinColumnOrFormula(column = JoinColumn(name = "gift_certificate_used")),
     JoinColumnOrFormula(formula = JoinFormula(value = "user_id"))
   )
-  val giftCertificateUsed: GiftCertificate? = null,
-
-  @ElementCollection
-  @MapKeyColumn(name = "key")
-  @MapKeyEnumerated(EnumType.STRING)
-  @Column(name = "value")
-  @CollectionTable(
-    name = "participant_properties",
-    joinColumns = [JoinColumn(name = "showing_id"), JoinColumn(name = "user_id")]
-  )
-  val properties: Map<PropertyKey, String> = mutableMapOf()
-
+  val giftCertificateUsed: GiftCertificate? = null
 ) {
   val user: User get() = id.user
   val showing: Showing get() = id.showing

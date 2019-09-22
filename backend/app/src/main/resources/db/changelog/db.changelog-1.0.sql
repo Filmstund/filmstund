@@ -84,7 +84,8 @@ create table gift_certificate
         constraint giftcert_user_fk references users on delete cascade,
     number     varchar(15)
         constraint giftcert_number_unique unique,
-    expires_at date not null default current_date + interval '1 year',
+    expires_at date    not null default current_date + interval '1 year',
+    is_deleted boolean not null default false,
     constraint giftcert_pk primary key (user_id, number)
 );
 --rollback drop table if exists gift_certificate;
@@ -105,8 +106,9 @@ create table movie
     release_date            date                     null,
     production_year         integer                  null     default 1900
         constraint productionyear_nonneg check (production_year >= 1900),
-    runtime                 bigint                            default 0,
+    runtime                 interval                          default '0h',
     poster                  varchar(255)             null,
+    genres                  varchar(100)[]           not null default '{}',
     popularity              float                    not null default 0.0,
     popularity_last_updated timestamp                         default timestamp '1970-01-01 00:00:00',
     archived                boolean                  not null default false,
@@ -181,27 +183,6 @@ create table participant
 );
 --rollback drop table if exists participant;
 
---changeset eda:createTableParticipantProperties
-create table participant_properties
-(
-
-    user_id    uuid         not null
-        constraint participant_user_fk references users on delete cascade,
-    showing_id uuid         not null
-        constraint participant_showing_fk references showing on delete cascade,
-
-    key        varchar(50)  not null,
-    value      varchar(255) not null,
-
-    constraint participant_props_pk primary key (showing_id, user_id)
-);
---rollback drop table if exists participant_properties;
-
---changeset eda:addColumnHiddenToGiftCert
-alter table gift_certificate
-    add column is_deleted boolean not null default false;
---rollback alter table gift_certificate drop column is_deleted;
-
 --changeset eda:createTableTicket
 create table ticket
 (
@@ -225,10 +206,12 @@ create table ticket
     date                     date                   not null,
     time                     time without time zone not null,
     movie_name               varchar(100)           not null,
-    movie_rating             varchar(30)            not null
+    movie_rating             varchar(30)            not null,
+    attribute                varchar(50)[]          not null default '{}'
 );
 --rollback drop table if exists ticket;
 
+-- FIXME: remove when migrated to TicketDao
 --changeset eda:createTableTicketAttribute
 create table ticket_attribute
 (

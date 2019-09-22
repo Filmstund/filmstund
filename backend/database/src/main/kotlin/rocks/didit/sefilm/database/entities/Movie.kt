@@ -19,6 +19,7 @@ import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.Table
+import javax.persistence.Transient
 
 @Entity
 @Table
@@ -40,6 +41,7 @@ data class Movie(
   var originalTitle: String? = null,
   var releaseDate: LocalDate = LocalDate.now(),
   var productionYear: Int? = null,
+  @Transient
   var runtime: Duration = Duration.ZERO,
   var poster: String? = null,
 

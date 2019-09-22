@@ -7,11 +7,11 @@ import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.LocationDao
+import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.database.entities.CinemaScreen
 import rocks.didit.sefilm.database.entities.GiftCertId
 import rocks.didit.sefilm.database.entities.GiftCertificate
-import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Participant
 import rocks.didit.sefilm.database.entities.ParticipantId
 import rocks.didit.sefilm.database.entities.Showing
@@ -32,10 +32,12 @@ import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.LocationDTO
+import rocks.didit.sefilm.domain.dto.MovieDTO
 import rocks.didit.sefilm.domain.dto.UserDTO
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
@@ -137,44 +139,45 @@ internal class MongoMigrator(
 
   @Transactional
   fun migrateMoviesFromMongo() {
-    if (log.isInfoEnabled) {
-      log.info(
-        "{} movies are eligible for migration from MongoDB. We have {} movies in postgres currently",
-        mongoMovieRepo.count(),
-        movieRepo.count()
-      )
-    }
+    jdbi.useTransactionUnchecked { handle ->
+      val dao = handle.attach(MovieDao::class.java)
 
-    mongoMovieRepo.findAll()
-      .filterNot { movieRepo.existsById(it.id) }
-      .forEach {
-        migrateMovieFromMongo(it)
+      if (log.isInfoEnabled) {
+        log.info(
+          "{} movies are eligible for migration from MongoDB. We have {} movies in postgres currently",
+          mongoMovieRepo.count(), dao.count()
+        )
       }
-  }
+      val pgMovieIds = handle.createQuery("SELECT id FROM movie")
+        .mapTo(UUID::class.java)
+        .list()
 
-  private fun migrateMovieFromMongo(it: rocks.didit.sefilm.database.mongo.entities.Movie) {
-    val movie = Movie(
-      id = it.id,
-      imdbId = it.imdbId,
-      tmdbId = it.tmdbId,
-      filmstadenId = it.filmstadenId,
-      lastModifiedDate = it.lastModifiedDate,
-      archived = it.archived,
-      createdDate = it.lastModifiedDate,
-      slug = it.filmstadenSlug,
-      originalTitle = it.originalTitle,
-      popularity = it.popularity,
-      popularityLastUpdated = it.popularityLastUpdated,
-      poster = it.poster,
-      productionYear = it.productionYear,
-      releaseDate = it.releaseDate,
-      runtime = it.runtime,
-      synopsis = it.synopsis,
-      title = it.title,
-      genres = it.genres.toMutableSet()
-    )
+      val movies = mongoMovieRepo.findByIdNotIn(pgMovieIds)
+        .map {
+          MovieDTO(
+            id = it.id,
+            imdbId = it.imdbId,
+            tmdbId = it.tmdbId,
+            filmstadenId = it.filmstadenId,
+            lastModifiedDate = it.lastModifiedDate,
+            archived = it.archived,
+            createdDate = it.lastModifiedDate, // doesn't exist in mongo...
+            slug = it.filmstadenSlug,
+            originalTitle = it.originalTitle,
+            popularity = it.popularity,
+            popularityLastUpdated = it.popularityLastUpdated,
+            poster = it.poster,
+            productionYear = it.productionYear,
+            releaseDate = it.releaseDate,
+            runtime = it.runtime,
+            synopsis = it.synopsis,
+            title = it.title,
+            genres = it.genres.toSet()
+          )
+        }
 
-    movieRepo.save(movie)
+      dao.insertMovies(movies)
+    }
   }
 
   @Transactional
@@ -225,8 +228,12 @@ internal class MongoMigrator(
         )
       }
 
-      mongoUserRepo.findAll()
-        .filterNot { dao.existsByGoogleId(it.id.id) }
+      val pgGoogleIds = handle.createQuery("SELECT google_id FROM users")
+        .mapTo(String::class.java)
+        .list()
+        .map { GoogleId(it) }
+
+      mongoUserRepo.findByIdNotIn(pgGoogleIds)
         .forEach {
           migrateOldUserToNewUser(dao, it)
         }

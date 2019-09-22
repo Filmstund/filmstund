@@ -7,7 +7,9 @@ import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.TicketNumber
 import java.sql.ResultSet
 import java.sql.Types
@@ -69,5 +71,35 @@ class PhoneNumberColumnMapper : ColumnMapper<PhoneNumber> {
 class PhoneNumberArgumentFactory : AbstractArgumentFactory<PhoneNumber>(Types.VARCHAR) {
   override fun build(value: PhoneNumber?, config: ConfigRegistry?): Argument {
     return Argument { position, statement, _ -> statement.setString(position, value.toString()) }
+  }
+}
+
+class IMDbIDColumnMapper : ColumnMapper<IMDbID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): IMDbID? {
+    return r?.let {
+      val value: String = it.getString(columnNumber) ?: return null
+      return IMDbID(value)
+    }
+  }
+}
+
+class IMDbIDArgumentFactory : AbstractArgumentFactory<IMDbID>(Types.VARCHAR) {
+  override fun build(value: IMDbID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setString(position, value?.value) }
+  }
+}
+
+class TMDbIDColumnMapper : ColumnMapper<TMDbID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): TMDbID? {
+    return r?.let {
+      val value: Long = it.getLong(columnNumber)
+      return TMDbID(value)
+    }
+  }
+}
+
+class TMDbIDArgumentFactory : AbstractArgumentFactory<TMDbID>(Types.BIGINT) {
+  override fun build(value: TMDbID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setLong(position, value?.value ?: 0L) }
   }
 }
