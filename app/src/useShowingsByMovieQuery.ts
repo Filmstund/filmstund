@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { useQuery } from "urql";
 import { ShowingsByMovieQuery } from "./__generated__/ShowingsByMovieQuery";
+import { showingScreenShowing } from "./ShowingScreen";
 
 export const useShowingsByMovieQuery = () =>
   useQuery<ShowingsByMovieQuery>({
@@ -10,24 +11,7 @@ export const useShowingsByMovieQuery = () =>
           id
         }
         publicShowings {
-          id
-          date
-          time
-          myTickets {
-            id
-          }
-          participants {
-            user {
-              id
-              avatar
-              firstName
-              lastName
-              nick
-            }
-          }
-          location {
-            name
-          }
+          ...ShowingScreenShowing
           movie {
             ...MovieListMovie
           }
@@ -42,5 +26,7 @@ export const useShowingsByMovieQuery = () =>
         runtime
         imdbId
       }
+
+      ${showingScreenShowing}
     `
   });

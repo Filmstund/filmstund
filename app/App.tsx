@@ -5,6 +5,11 @@ import {
   faUser
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  GoogleSignin,
+  GoogleSigninButton
+} from "@react-native-community/google-signin";
+import { cacheExchange } from "@urql/exchange-graphcache";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -15,22 +20,23 @@ import {
   Text,
   View
 } from "react-native";
-import { GoogleSignin, GoogleSigninButton } from "react-native-google-signin";
 
 import {
   createAppContainer,
   CreateNavigatorConfig,
   createSwitchNavigator,
+  NavigationRoute,
   NavigationStackRouterConfig
 } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import {
   NavigationStackConfig,
-  NavigationStackOptions
+  NavigationStackOptions,
+  NavigationStackProp
 } from "react-navigation-stack/lib/typescript/types";
 // @ts-ignore
 import { createBottomTabNavigator } from "react-navigation-tabs";
-import { createClient, Provider } from "urql";
+import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
 import { AccountScreen } from "./src/AccountScreen";
 import { getToken, setToken } from "./src/lib/session";
 import { MoviesScreen } from "./src/MoviesScreen";
@@ -40,6 +46,7 @@ import { ShowingsScreen } from "./src/ShowingsScreen";
 import { padding } from "./src/style";
 import { TicketScreen } from "./src/TicketScreen";
 import { TodayScreen } from "./src/TodayScreen";
+import { meQuery } from "./src/useMeQuery";
 
 GoogleSignin.configure({
   scopes: ["profile", "email", "openid"],
@@ -52,7 +59,8 @@ GoogleSignin.configure({
 const stackConfig: CreateNavigatorConfig<
   NavigationStackConfig,
   NavigationStackRouterConfig,
-  NavigationStackOptions
+  NavigationStackOptions,
+  NavigationStackProp<NavigationRoute, any>
 > = {
   defaultNavigationOptions: {
     headerStyle: {
@@ -194,6 +202,27 @@ const AppContainer = createAppContainer(AppNavigator);
 
 const client = createClient({
   url: "https://sefilm.bio/graphql",
+  exchanges: [
+    dedupExchange,
+    cacheExchange({
+      keys: {
+        Participant: () => null,
+        Location: () => null,
+        Foretagsbiljett: data => (data as any).number
+      },
+      updates: {
+        Mutation: {
+          AttendShowing: (result, args, cache, info) => {
+            cache.invalidateQuery(meQuery);
+          },
+          UnattendShowing: (result, args, cache, info) => {
+            cache.invalidateQuery(meQuery);
+          }
+        }
+      }
+    }),
+    fetchExchange
+  ],
   fetchOptions: () => ({
     headers: {
       Authorization: `Bearer ${getToken()}`

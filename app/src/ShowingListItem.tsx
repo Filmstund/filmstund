@@ -1,8 +1,11 @@
 import { faChevronRight, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { format } from "date-fns";
 import * as React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { ShowingsByMovieQuery_publicShowings } from "./__generated__/ShowingsByMovieQuery";
+import { showingDate } from "./lib/filterShowings";
+import { formatUserNick } from "./lib/formatters";
 import { padding } from "./style";
 
 const moviePoster =
@@ -19,10 +22,14 @@ const RedButton: React.FC<{
         backgroundColor: "#d0021b",
         borderRadius: 5,
         padding: 13,
-        flexDirection: 'row'
+        flexDirection: "row"
       }}
     >
-      <FontAwesomeIcon icon={icon} color={"white"} style={{ marginRight: 10 }} />
+      <FontAwesomeIcon
+        icon={icon}
+        color={"white"}
+        style={{ marginRight: 10 }}
+      />
       <Text
         style={{
           color: "white",
@@ -65,10 +72,9 @@ export const ShowingListItem: React.FC<{
         <Text style={{ fontSize: 18, fontWeight: "500" }}>
           {showing.movie.title}
         </Text>
-        <Text>
-          {showing.date} {showing.time}
-        </Text>
+        <Text>{format(showingDate(showing), "d MMM HH:mm")}</Text>
         <Text>{showing.location.name}</Text>
+        <Text>Skapad av {formatUserNick(showing.admin)}</Text>
       </TouchableOpacity>
       {showing.myTickets &&
         showing.myTickets.length > 0 && (
@@ -82,7 +88,7 @@ export const ShowingListItem: React.FC<{
         )}
     </View>
     <View style={{ marginTop: 4 }}>
-      <FontAwesomeIcon icon={faChevronRight} color={'#9b9b9b'} />
+      <FontAwesomeIcon icon={faChevronRight} color={"#9b9b9b"} />
     </View>
   </View>
 );

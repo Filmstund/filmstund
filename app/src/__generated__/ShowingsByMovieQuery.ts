@@ -11,23 +11,12 @@ export interface ShowingsByMovieQuery_me {
   id: SeFilmUserID;
 }
 
-export interface ShowingsByMovieQuery_publicShowings_myTickets {
-  __typename: "Ticket";
-  id: string;
-}
-
-export interface ShowingsByMovieQuery_publicShowings_participants_user {
+export interface ShowingsByMovieQuery_publicShowings_admin {
   __typename: "User";
   id: SeFilmUserID;
-  avatar: string | null;
   firstName: string | null;
   lastName: string | null;
   nick: string | null;
-}
-
-export interface ShowingsByMovieQuery_publicShowings_participants {
-  __typename: "Participant";
-  user: ShowingsByMovieQuery_publicShowings_participants_user | null;
 }
 
 export interface ShowingsByMovieQuery_publicShowings_location {
@@ -38,11 +27,30 @@ export interface ShowingsByMovieQuery_publicShowings_location {
 export interface ShowingsByMovieQuery_publicShowings_movie {
   __typename: "Movie";
   id: SeFilmUUID;
-  poster: string | null;
   title: string;
+  poster: string | null;
+  imdbId: SeFilmIMDbID | null;
   releaseDate: string;
   runtime: string;
-  imdbId: SeFilmIMDbID | null;
+}
+
+export interface ShowingsByMovieQuery_publicShowings_myTickets {
+  __typename: "Ticket";
+  id: string;
+}
+
+export interface ShowingsByMovieQuery_publicShowings_participants_user {
+  __typename: "User";
+  avatar: string | null;
+  firstName: string | null;
+  id: SeFilmUserID;
+  lastName: string | null;
+  nick: string | null;
+}
+
+export interface ShowingsByMovieQuery_publicShowings_participants {
+  __typename: "Participant";
+  user: ShowingsByMovieQuery_publicShowings_participants_user | null;
 }
 
 export interface ShowingsByMovieQuery_publicShowings {
@@ -50,10 +58,11 @@ export interface ShowingsByMovieQuery_publicShowings {
   id: SeFilmUUID;
   date: string;
   time: string;
-  myTickets: ShowingsByMovieQuery_publicShowings_myTickets[] | null;
-  participants: ShowingsByMovieQuery_publicShowings_participants[];
+  admin: ShowingsByMovieQuery_publicShowings_admin;
   location: ShowingsByMovieQuery_publicShowings_location;
   movie: ShowingsByMovieQuery_publicShowings_movie;
+  myTickets: ShowingsByMovieQuery_publicShowings_myTickets[] | null;
+  participants: ShowingsByMovieQuery_publicShowings_participants[];
 }
 
 export interface ShowingsByMovieQuery {

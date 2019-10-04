@@ -1,45 +1,10 @@
-import gql from "graphql-tag";
 import * as React from "react";
-import {
-  Button,
-  Image,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View
-} from "react-native";
+import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
-import { useQuery } from "urql";
-import {
-  AccountQuery,
-  AccountQuery_currentUser
-} from "./__generated__/AccountQuery";
+import { AccountQuery_currentUser } from "./__generated__/AccountQuery";
 import { EmptyList } from "./EmptyList";
-import { useSignOut } from "./session/SessionContext";
 import { padding } from "./style";
-
-export const useAccountQuery = () =>
-  useQuery<AccountQuery>({
-    query: gql`
-      query AccountQuery {
-        currentUser {
-          avatar
-          email
-          firstName
-          lastName
-          nick
-          phone
-          filmstadenMembershipId
-          calendarFeedUrl
-          foretagsbiljetter {
-            expires
-            number
-            status
-          }
-        }
-      }
-    `
-  });
+import { useMeQuery } from "./useMeQuery";
 
 const ForetagsbiljettHeader = () => (
   <View style={{ flexDirection: "row", marginVertical: 10 }}>
@@ -116,8 +81,7 @@ const emptyUser: AccountQuery_currentUser = {
 export const AccountScreen: React.FC<NavigationInjectedProps> = ({
   navigation
 }) => {
-  const [{ data, fetching, error }, executeQuery] = useAccountQuery();
-
+  const [{ data, fetching, error }, executeQuery] = useMeQuery();
 
   const user = data ? data.currentUser : emptyUser;
 
@@ -130,7 +94,10 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
         </Text>
         <ScrollView
           refreshControl={
-            <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
+            <RefreshControl
+              refreshing={fetching}
+              onRefresh={() => executeQuery({ requestPolicy: "network-only" })}
+            />
           }
           style={{ flex: 1 }}
         >
@@ -151,7 +118,6 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
         </ScrollView>
       </View>
       {!fetching && !data && <EmptyList text={"Ingen data"} />}
-
     </View>
   );
 };

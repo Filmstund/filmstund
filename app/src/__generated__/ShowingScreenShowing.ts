@@ -3,10 +3,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: ShowingQuery
+// GraphQL fragment: ShowingScreenShowing
 // ====================================================
 
-export interface ShowingQuery_showing_admin {
+export interface ShowingScreenShowing_admin {
   __typename: "User";
   id: SeFilmUserID;
   firstName: string | null;
@@ -14,12 +14,12 @@ export interface ShowingQuery_showing_admin {
   nick: string | null;
 }
 
-export interface ShowingQuery_showing_location {
+export interface ShowingScreenShowing_location {
   __typename: "Location";
   name: string;
 }
 
-export interface ShowingQuery_showing_movie {
+export interface ShowingScreenShowing_movie {
   __typename: "Movie";
   id: SeFilmUUID;
   title: string;
@@ -27,12 +27,12 @@ export interface ShowingQuery_showing_movie {
   imdbId: SeFilmIMDbID | null;
 }
 
-export interface ShowingQuery_showing_myTickets {
+export interface ShowingScreenShowing_myTickets {
   __typename: "Ticket";
   id: string;
 }
 
-export interface ShowingQuery_showing_participants_user {
+export interface ShowingScreenShowing_participants_user {
   __typename: "User";
   avatar: string | null;
   firstName: string | null;
@@ -41,27 +41,19 @@ export interface ShowingQuery_showing_participants_user {
   nick: string | null;
 }
 
-export interface ShowingQuery_showing_participants {
+export interface ShowingScreenShowing_participants {
   __typename: "Participant";
-  user: ShowingQuery_showing_participants_user | null;
+  user: ShowingScreenShowing_participants_user | null;
 }
 
-export interface ShowingQuery_showing {
+export interface ShowingScreenShowing {
   __typename: "Showing";
   id: SeFilmUUID;
   date: string;
   time: string;
-  admin: ShowingQuery_showing_admin;
-  location: ShowingQuery_showing_location;
-  movie: ShowingQuery_showing_movie;
-  myTickets: ShowingQuery_showing_myTickets[] | null;
-  participants: ShowingQuery_showing_participants[];
-}
-
-export interface ShowingQuery {
-  showing: ShowingQuery_showing | null;
-}
-
-export interface ShowingQueryVariables {
-  showingId: SeFilmUUID;
+  admin: ShowingScreenShowing_admin;
+  location: ShowingScreenShowing_location;
+  movie: ShowingScreenShowing_movie;
+  myTickets: ShowingScreenShowing_myTickets[] | null;
+  participants: ShowingScreenShowing_participants[];
 }
