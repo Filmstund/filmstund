@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import React, { useCallback, useState } from "react";
-import { useRouter } from "../../lib/useRouter";
+import { useHistory } from "react-router-dom";
 import { navigateToEditShowing } from "../common/navigators";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { BuyModal } from "./BuyModal";
@@ -46,7 +46,7 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
     [setState, onBeforeOpenBuyModal]
   );
 
-  const { history } = useRouter();
+  const history = useHistory();
 
   const handlePressEdit = useCallback(
     () => {

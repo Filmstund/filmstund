@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery } from "react-apollo";
 
 import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
-import { useRouter } from "../../../lib/useRouter";
+import { useHistory } from "react-router-dom";
 import { navigateToShowingTickets } from "../../common/navigators";
 import { MissingShowing } from "../../common/showing/MissingShowing";
 import Showing, { oldShowingFragment } from "../../common/showing/Showing";
@@ -41,7 +41,7 @@ const SingleShowingContainer: React.FC<Props> = ({
   error,
   refetch
 }) => {
-  const { history } = useRouter();
+  const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
 
   const promoteToAdmin = usePromoteToAdmin();

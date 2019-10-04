@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { useQuery } from "react-apollo";
 import { ticketFragment } from "../../apollo/mutations/useAddTickets";
-import { useRouter } from "../../lib/useRouter";
+import { useParams } from "react-router-dom";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { TicketQuery, TicketQueryVariables } from "./__generated__/TicketQuery";
 import { TicketContainer } from "./TicketContainer";
@@ -27,8 +27,7 @@ const useTickets = (webId: string) =>
   );
 
 const TicketScreen = () => {
-  const { match } = useRouter<{ webId: string }>();
-  const { webId } = match.params;
+  const { webId } = useParams<{ webId: string }>();
 
   const { data } = useTickets(webId);
 

@@ -3,7 +3,7 @@ import isSameDay from "date-fns/isSameDay";
 import subMinutes from "date-fns/subMinutes";
 import { orderBy } from "lodash-es";
 import * as React from "react";
-import { useRouter } from "../../lib/useRouter";
+import { useHistory } from "react-router-dom";
 import {
   navigateToShowing,
   navigateToShowingTickets
@@ -27,7 +27,7 @@ export const FeaturedShowing: React.FC<FeaturedShowingProps> = ({
   showings,
   meId
 }) => {
-  const { history } = useRouter();
+  const history = useHistory();
 
   const compareTime = subMinutes(new Date(), 30);
 

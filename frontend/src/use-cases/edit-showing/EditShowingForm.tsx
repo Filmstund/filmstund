@@ -8,7 +8,7 @@ import { useDeleteShowing } from "../../apollo/mutations/showings/useDeleteShowi
 import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
 import { formatLocalTime, formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
-import { useRouter } from "../../lib/useRouter";
+import { useHistory } from "react-router-dom";
 import * as navigators from "../common/navigators/index";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
@@ -63,7 +63,7 @@ interface Props {
 }
 
 const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
-  const { history } = useRouter();
+  const history = useHistory();
   const [errors, setErrors] = useState<Error[] | null>(null);
   const [formState, setFormState] = useState<EditShowingFormShowing>(() =>
     getInitialState(showing)

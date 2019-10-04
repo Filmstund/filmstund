@@ -1,6 +1,6 @@
 import { orderBy } from "lodash-es";
 import React from "react";
-import { useRouter } from "../../lib/useRouter";
+import { useHistory } from "react-router-dom";
 import {
   navigateToShowing,
   navigateToShowingTickets
@@ -20,7 +20,7 @@ export const OrderedShowingsList: React.FC<OrderedShowingsListProps> = ({
   showings,
   order
 }) => {
-  const { history } = useRouter();
+  const history = useHistory();
 
   if (showings.length === 0) {
     return <EmptyList />;
