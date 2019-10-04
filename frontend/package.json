@@ -7,8 +7,8 @@
     "source-map-explorer": "2.0.1"
   },
   "dependencies": {
-    "@emotion/core": "10.0.16",
-    "@emotion/styled": "10.0.15",
+    "@emotion/core": "10.0.20",
+    "@emotion/styled": "10.0.17",
     "@fortawesome/fontawesome-free": "5.10.2",
     "@fortawesome/fontawesome-svg-core": "1.2.22",
     "@fortawesome/free-solid-svg-icons": "5.10.2",
