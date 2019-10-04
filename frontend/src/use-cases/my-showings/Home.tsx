@@ -20,7 +20,11 @@ const Home: React.FC = () => {
   const { data } = useHomeScreenData();
 
   const showings = data ? data.showings : [];
-  const me = data ? data.me : { id: "" };
+  const me = data ? data.me : undefined;
+
+  if (!me) {
+    return null;
+  }
 
   return (
     <>
