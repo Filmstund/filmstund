@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.domain.dto
+package rocks.didit.sefilm.domain.dto.core
 
 import java.math.BigDecimal
 import java.time.Instant

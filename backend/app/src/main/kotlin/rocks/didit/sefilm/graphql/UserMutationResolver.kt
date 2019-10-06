@@ -8,7 +8,7 @@ import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
 import rocks.didit.sefilm.domain.dto.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.services.GiftCertificateService
 import rocks.didit.sefilm.services.ParticipantPaymentInfoService

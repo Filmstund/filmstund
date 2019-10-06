@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit4.SpringRunner
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextUserDTO
 import java.util.*

@@ -7,7 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.database.UserGiftCertReducer
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.util.*
 
 interface UserDao {

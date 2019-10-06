@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.database.entities.Location
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenCityAliasDTO
-import rocks.didit.sefilm.domain.dto.LocationDTO
+import rocks.didit.sefilm.domain.dto.core.LocationDTO
 
 @Service
 class LocationService(private val locationRepo: LocationRepository) {

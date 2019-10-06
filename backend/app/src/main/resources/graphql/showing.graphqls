@@ -6,7 +6,7 @@ type Showing {
     time: String!
     movie: Movie!
     location: Location!
-    filmstadenScreen: FilmstadenScreen
+    cinemaScreen: CinemaScreen
     price: SEK
     ticketsBought: Boolean!
     admin: User!
@@ -21,14 +21,14 @@ type Participant {
     showingId: UUID
 }
 
-type FilmstadenScreen {
+type CinemaScreen {
     filmstadenId: ID!
     name: String!
 }
 
 type FilmstadenShowing {
     cinemaName: String!,
-    screen: FilmstadenScreen!,
+    screen: CinemaScreen!,
     seatCount: Int!,
     timeUtc: String!,
     tags: [String!]!,

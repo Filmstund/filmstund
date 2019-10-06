@@ -15,8 +15,8 @@ import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
 import rocks.didit.sefilm.domain.dto.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
-import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService

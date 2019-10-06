@@ -3,7 +3,7 @@ package rocks.didit.sefilm.database.dao
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
-import rocks.didit.sefilm.domain.dto.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import java.util.*
 
 interface MovieDao {

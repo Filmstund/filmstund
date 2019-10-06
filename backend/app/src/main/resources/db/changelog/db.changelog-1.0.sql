@@ -43,6 +43,7 @@ create table location
 );
 --rollback DROP table if exists location;
 
+-- FIXME: remove when JPA is removed
 --changeset eda:createLocationAliasTable
 create table location_alias
 (

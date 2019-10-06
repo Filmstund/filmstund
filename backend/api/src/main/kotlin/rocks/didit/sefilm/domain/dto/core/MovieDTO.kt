@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.domain.dto
+package rocks.didit.sefilm.domain.dto.core
 
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID

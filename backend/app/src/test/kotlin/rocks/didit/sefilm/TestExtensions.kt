@@ -1,19 +1,24 @@
 package rocks.didit.sefilm
 
+import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
-import rocks.didit.sefilm.domain.dto.LocationDTO
-import rocks.didit.sefilm.domain.dto.MovieDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.LocationDTO
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
@@ -47,13 +52,15 @@ fun ThreadLocalRandom.nextGiftCerts(userId: UUID, bound: Int = 10): List<GiftCer
   this.nextGiftCert(userId)
 }
 
-fun ThreadLocalRandom.nextLocation(alias: List<String>): LocationDTO {
+fun ThreadLocalRandom.nextLocation(alias: List<String> = nextLocationAlias(3)): LocationDTO {
   val nbr = this.nextInt(100, 999)
   return LocationDTO(
     name = "locname$nbr",
     cityAlias = "${this.nextInt(10, 99)}",
     city = "city$nbr",
     streetAddress = "streetAddr$nbr",
+    postalAddress = "postalAddr${nextLong()}",
+    postalCode = "${nextLong(1000, 10000)}",
     latitude = BigDecimal.valueOf(this.nextLong(1, 10)),
     longitude = BigDecimal.valueOf(this.nextLong(1, 10)),
     filmstadenId = "NCG$nbr",
@@ -84,6 +91,29 @@ fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
     popularity = nextDouble(0.0, 1000.0),
     popularityLastUpdated = Instant.ofEpochMilli(nextLong(0, 2000000000000)),
     archived = nextBoolean(),
+    lastModifiedDate = Instant.now(),
+    createdDate = Instant.now()
+  )
+}
+
+fun ThreadLocalRandom.nextCinemaScreen() =
+  FilmstadenLiteScreenDTO("NCG${nextLong(1000, 10000000)}", "Salong ${nextInt(1, 100)}")
+
+fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UUID): ShowingDTO {
+  return ShowingDTO(
+    id = UUID.randomUUID(),
+    webId = Base64ID.random(),
+    filmstadenShowingId = "AA-${nextInt(1000, 9999)}-${nextLong(1000, 1000000)}",
+    slug = "slug${nextLong()}",
+    date = LocalDate.of(nextInt(1900, 2020), nextInt(1, 12), nextInt(1, 28)),
+    time = LocalTime.of(nextInt(0, 23), nextInt(0, 59)),
+    movieId = movieId,
+    location = nextLocation(),
+    cinemaScreen = nextCinemaScreen(),
+    price = SEK(nextLong(1000, 10000)),
+    ticketsBought = nextBoolean(),
+    admin = adminId,
+    payToUser = adminId,
     lastModifiedDate = Instant.now(),
     createdDate = Instant.now()
   )

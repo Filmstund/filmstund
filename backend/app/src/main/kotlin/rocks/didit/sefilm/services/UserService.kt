@@ -14,7 +14,7 @@ import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.orElseThrow

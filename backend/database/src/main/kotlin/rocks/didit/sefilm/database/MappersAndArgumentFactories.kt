@@ -5,10 +5,12 @@ import org.jdbi.v3.core.argument.Argument
 import org.jdbi.v3.core.config.ConfigRegistry
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
+import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.TicketNumber
 import java.sql.ResultSet
@@ -101,5 +103,35 @@ class TMDbIDColumnMapper : ColumnMapper<TMDbID> {
 class TMDbIDArgumentFactory : AbstractArgumentFactory<TMDbID>(Types.BIGINT) {
   override fun build(value: TMDbID?, config: ConfigRegistry?): Argument {
     return Argument { position, statement, _ -> statement.setLong(position, value?.value ?: 0L) }
+  }
+}
+
+class Base64IDColumnMapper : ColumnMapper<Base64ID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): Base64ID? {
+    return r?.let {
+      val value: String = it.getString(columnNumber) ?: return null
+      return Base64ID(value)
+    }
+  }
+}
+
+class Base64IDArgumentFactory : AbstractArgumentFactory<Base64ID>(Types.VARCHAR) {
+  override fun build(value: Base64ID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setString(position, value?.id) }
+  }
+}
+
+class SEKColumnMapper : ColumnMapper<SEK> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): SEK? {
+    return r?.let {
+      val value: Long = it.getLong(columnNumber) ?: return null
+      return SEK(value)
+    }
+  }
+}
+
+class SEKArgumentFactory : AbstractArgumentFactory<SEK>(Types.INTEGER) {
+  override fun build(value: SEK?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setLong(position, value?.ören ?: 0L) }
   }
 }

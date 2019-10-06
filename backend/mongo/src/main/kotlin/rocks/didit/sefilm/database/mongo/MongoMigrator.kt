@@ -36,9 +36,9 @@ import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
-import rocks.didit.sefilm.domain.dto.LocationDTO
-import rocks.didit.sefilm.domain.dto.MovieDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.LocationDTO
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
 import java.util.*

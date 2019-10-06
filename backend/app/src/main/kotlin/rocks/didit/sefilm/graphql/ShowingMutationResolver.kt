@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
-import rocks.didit.sefilm.domain.dto.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.services.AdminService
 import rocks.didit.sefilm.services.ShowingService

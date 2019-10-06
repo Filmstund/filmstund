@@ -9,7 +9,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.LocationDao
-import rocks.didit.sefilm.domain.dto.LocationDTO
+import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.math.BigDecimal
 

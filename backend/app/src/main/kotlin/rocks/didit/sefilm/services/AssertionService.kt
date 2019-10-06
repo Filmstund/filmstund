@@ -13,7 +13,7 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
-import rocks.didit.sefilm.domain.dto.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import java.util.*
 
 @Service

@@ -28,8 +28,8 @@ import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenScreenDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
-import rocks.didit.sefilm.domain.dto.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.events.DeletedShowingEvent
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.events.NewShowingEvent
@@ -239,12 +239,12 @@ class ShowingService(
 
   fun fetchSeatMap(showingId: UUID): List<FilmstadenSeatMapDTO> {
     val showing = getShowingOrThrow(showingId)
-    if (showing.location.filmstadenId == null || showing.filmstadenScreen?.filmstadenId == null) {
+    if (showing.location.filmstadenId == null || showing.cinemaScreen?.filmstadenId == null) {
       log.debug("Showing $showingId is not at a Filmstaden location or does not have an associated Filmstaden screen")
       return listOf()
     }
 
-    return filmstadenService.getFilmstadenSeatMap(showing.location.filmstadenId!!, showing.filmstadenScreen?.filmstadenId!!)
+    return filmstadenService.getFilmstadenSeatMap(showing.location.filmstadenId!!, showing.cinemaScreen?.filmstadenId!!)
   }
 
   private fun createParticipantBasedOnPaymentType(
@@ -276,7 +276,7 @@ class ShowingService(
   private fun CreateShowingDTO.toShowing(
     admin: User,
     movie: Movie,
-    filmstadenScreen: FilmstadenScreenDTO?
+    cinemaScreen: FilmstadenScreenDTO?
   ): Showing {
     val location = locationService.getOrCreateNewLocation(this.location)
     val newId = UUID.randomUUID()
@@ -288,7 +288,7 @@ class ShowingService(
       time = this.time,
       movie = movieService.getMovieOrThrow(this.movieId),
       location = location,
-      cinemaScreen = filmstadenScreen?.toCinemaScreen(),
+      cinemaScreen = cinemaScreen?.toCinemaScreen(),
       admin = admin,
       payToUser = admin,
       participants = mutableSetOf(Participant(ParticipantId(admin, showingRepo.getOne(newId)))),

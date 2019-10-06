@@ -1,8 +1,9 @@
-package rocks.didit.sefilm.domain.dto
+package rocks.didit.sefilm.domain.dto.core
 
 import org.jdbi.v3.core.mapper.Nested
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -17,10 +18,10 @@ data class ShowingDTO(
   val date: LocalDate,
   val time: LocalTime,
   val movieId: UUID,
-  @Nested
+  @Nested("l")
   val location: LocationDTO,
-  @Nested
-  val filmstadenScreen: FilmstadenLiteScreenDTO? = null,
+  @Nested("cs")
+  val cinemaScreen: FilmstadenLiteScreenDTO? = null,
   val price: SEK? = SEK.ZERO,
   val ticketsBought: Boolean = false,
   val admin: UUID,

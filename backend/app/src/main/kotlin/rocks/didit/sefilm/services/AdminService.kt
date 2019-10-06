@@ -7,7 +7,7 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.database.repositories.ShowingRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.dto.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import java.util.*
 
 @Service

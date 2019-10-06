@@ -8,7 +8,7 @@ import org.springframework.web.servlet.ModelAndView
 import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.domain.Base64ID
-import rocks.didit.sefilm.domain.dto.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.web.controllers.MetaController.Companion.PATH

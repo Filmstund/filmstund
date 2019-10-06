@@ -6,7 +6,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.services.UserService
 import rocks.didit.sefilm.web.controllers.CalendarController
 

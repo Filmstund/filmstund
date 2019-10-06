@@ -8,7 +8,7 @@ import rocks.didit.sefilm.database.SekConverter
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
-import rocks.didit.sefilm.domain.dto.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -82,7 +82,7 @@ data class Showing(
     time = time ?: throw MissingParametersException("time"),
     movieId = movie.id,
     location = location?.toDTO() ?: throw MissingParametersException("location"),
-    filmstadenScreen = cinemaScreen?.let { FilmstadenLiteScreenDTO(it.id, it.name) },
+    cinemaScreen = cinemaScreen?.let { FilmstadenLiteScreenDTO(it.id, it.name) },
     price = price,
     ticketsBought = ticketsBought,
     admin = admin.id,

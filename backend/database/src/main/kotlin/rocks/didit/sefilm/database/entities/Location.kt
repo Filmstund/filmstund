@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.database.entities
 
 import org.springframework.data.annotation.LastModifiedDate
-import rocks.didit.sefilm.domain.dto.LocationDTO
+import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import java.math.BigDecimal
 import java.time.Instant
 import javax.persistence.CascadeType

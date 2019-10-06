@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.ParticipantRepository
-import rocks.didit.sefilm.domain.dto.ShowingDTO
-import rocks.didit.sefilm.domain.dto.UserDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
