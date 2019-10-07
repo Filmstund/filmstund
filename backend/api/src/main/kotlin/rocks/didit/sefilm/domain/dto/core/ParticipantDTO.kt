@@ -1,7 +1,10 @@
-package rocks.didit.sefilm.domain.dto
+package rocks.didit.sefilm.domain.dto.core
 
+import org.jdbi.v3.core.mapper.Nested
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import java.util.*
 
 class PublicParticipantDTO(
@@ -11,12 +14,15 @@ class PublicParticipantDTO(
 ) {
   constructor(
     userId: UUID, showingId: UUID, firstName: String?, lastName: String?, nick: String?, phone: String?, avatar: String?
-  ) : this(userId, showingId, PublicUserDTO(userId, firstName, lastName, nick, phone, avatar))
+  ) : this(userId, showingId,
+    PublicUserDTO(userId, firstName, lastName, nick, phone, avatar)
+  )
 }
 
 data class ParticipantDTO(
   val userId: UUID,
   val showingId: UUID,
+  @Nested("u")
   val userInfo: PublicUserDTO,
 
   val hasPaid: Boolean = false,
@@ -32,16 +38,16 @@ data class ParticipantDTO(
   constructor(
     userId: UUID,
     showingId: UUID,
-    firstName: String?,
-    lastName: String?,
-    nick: String?,
-    phone: String?,
-    avatar: String?,
+    firstName: String? = null,
+    lastName: String? = null,
+    nick: String? = null,
+    phone: String? = null,
+    avatar: String? = null,
     hasPaid: Boolean,
     amountOwed: SEK,
     type: Type,
-    giftCertificateUsed: GiftCertificateDTO?,
-    filmstadenMembershipId: FilmstadenMembershipId?
+    giftCertificateUsed: GiftCertificateDTO? = null,
+    filmstadenMembershipId: FilmstadenMembershipId? = null
   ) : this(
     userId,
     showingId,

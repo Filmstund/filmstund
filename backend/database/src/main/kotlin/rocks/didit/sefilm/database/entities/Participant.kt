@@ -4,12 +4,10 @@ import org.hibernate.annotations.JoinColumnOrFormula
 import org.hibernate.annotations.JoinColumnsOrFormulas
 import org.hibernate.annotations.JoinFormula
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.ParticipantDTO
-import rocks.didit.sefilm.domain.dto.PublicParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.PublicParticipantDTO
 import java.io.Serializable
-import javax.persistence.CollectionTable
 import javax.persistence.Column
-import javax.persistence.ElementCollection
 import javax.persistence.Embeddable
 import javax.persistence.EmbeddedId
 import javax.persistence.Entity
@@ -17,8 +15,6 @@ import javax.persistence.EnumType
 import javax.persistence.Enumerated
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
-import javax.persistence.MapKeyColumn
-import javax.persistence.MapKeyEnumerated
 import javax.persistence.OneToOne
 import javax.persistence.Table
 

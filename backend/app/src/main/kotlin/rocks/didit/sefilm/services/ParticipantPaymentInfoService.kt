@@ -4,7 +4,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.domain.dto.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 
 @Service

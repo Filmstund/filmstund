@@ -4,6 +4,7 @@ import org.jdbi.v3.core.result.LinkedHashMapRowReducer
 import org.jdbi.v3.core.result.RowView
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.util.*
@@ -43,6 +44,23 @@ class ShowingLocationReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
         location = showing.location.copy(alias = showing.location.alias.plus(alias))
       )
       container.replace(id, copiedShowing)
+    }
+  }
+}
+
+class ParticipantGiftCertReducer : LinkedHashMapRowReducer<Pair<UUID, UUID>, ParticipantDTO> {
+  override fun accumulate(container: MutableMap<Pair<UUID, UUID>, ParticipantDTO>, rowView: RowView) {
+    val userId = rowView.getColumn("user_id", UUID::class.java)
+    val showingId = rowView.getColumn("showing_id", UUID::class.java)
+    val pair = Pair(userId, showingId)
+    val participant = container.computeIfAbsent(pair) {
+      rowView.getRow(ParticipantDTO::class.java)
+    }
+
+    val gcUserId = rowView.getColumn("gc_userId", UUID::class.java)
+    if (gcUserId != null) {
+      val giftCert = rowView.getRow(GiftCertificateDTO::class.java)
+      container.replace(pair, participant.copy(giftCertificateUsed = giftCert))
     }
   }
 }

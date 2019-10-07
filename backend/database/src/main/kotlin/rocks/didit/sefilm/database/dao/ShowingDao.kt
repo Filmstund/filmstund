@@ -19,9 +19,6 @@ interface ShowingDao {
   @UseRowReducer(ShowingLocationReducer::class)
   fun findById(showingId: UUID): ShowingDTO?
 
-  @SqlQuery("SELECT exists(SELECT 1 FROM participant p WHERE p.showing_id = :showingId and p.user_id = :userId)")
-  fun isParticipantOnShowing(userId: UUID, showingId: UUID): Boolean
-
   @SqlUpdate("UPDATE showing s SET admin = :newAdmin, pay_to_user = :newAdmin WHERE s.id = :showingId and s.admin = :currentAdmin")
   fun promoteNewUserToAdmin(showingId: UUID, currentAdmin: UUID, newAdmin: UUID): Int
 

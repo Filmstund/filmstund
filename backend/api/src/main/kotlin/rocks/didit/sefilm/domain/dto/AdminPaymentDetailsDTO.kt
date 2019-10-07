@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.domain.dto
 
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import java.util.*
 
 data class AdminPaymentDetailsDTO(

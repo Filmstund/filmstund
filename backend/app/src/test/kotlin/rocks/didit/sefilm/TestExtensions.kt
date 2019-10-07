@@ -12,6 +12,7 @@ import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.math.BigDecimal
@@ -28,7 +29,7 @@ fun ThreadLocalRandom.nextUserDTO(
 ): UserDTO {
   return UserDTO(
     id = id,
-    googleId = GoogleId("gid${this.nextLong(1000L)}"),
+    googleId = GoogleId("gid${this.nextLong(100000L)}"),
     filmstadenId = FilmstadenMembershipId("${this.nextInt(100, 999)}-${this.nextInt(100, 999)}"),
     calendarFeedId = UUID.randomUUID(),
     firstName = "Fname ${this.nextLong(1000)}",
@@ -70,7 +71,7 @@ fun ThreadLocalRandom.nextLocation(alias: List<String> = nextLocationAlias(3)): 
 }
 
 fun ThreadLocalRandom.nextLocationAlias(bound: Int): List<String> {
-  return (0..bound).map { "alias${this.nextLong(1000)}" }
+  return (0..bound).map { "alias${this.nextLong(100000)}" }
 }
 
 fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
@@ -116,5 +117,20 @@ fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UUID): ShowingDTO {
     payToUser = adminId,
     lastModifiedDate = Instant.now(),
     createdDate = Instant.now()
+  )
+}
+
+fun ThreadLocalRandom.nextParticipant(
+  userId: UUID,
+  showingId: UUID,
+  ticketNumber: TicketNumber? = null
+): ParticipantDTO {
+  return ParticipantDTO(
+    userId = userId,
+    showingId = showingId,
+    amountOwed = SEK(nextLong(0, 1000000)),
+    hasPaid = nextBoolean(),
+    type = if (ticketNumber != null) ParticipantDTO.Type.GIFT_CERTIFIATE else ParticipantDTO.Type.SWISH,
+    giftCertificateUsed = if (ticketNumber != null) GiftCertificateDTO(userId, ticketNumber, LocalDate.of(nextInt(1900, 2021), nextInt(1, 12), nextInt(1,  28)), false) else null
   )
 }

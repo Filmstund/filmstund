@@ -52,5 +52,4 @@ internal class ShowingDaoTest {
         .isEqualToIgnoringGivenFields(rndShowing.location, "lastModifiedDate")
     }
   }
-
 }

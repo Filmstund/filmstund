@@ -13,7 +13,7 @@ import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
-import rocks.didit.sefilm.domain.dto.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO

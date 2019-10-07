@@ -31,6 +31,13 @@ interface UserDao {
   @SqlUpdate("INSERT INTO users (id, google_id, filmstaden_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, last_modified_date) VALUES (:id, :googleId, :filmstadenId, :firstName, :lastName, :nick, :email, :phone, :avatar, :calendarFeedId, :lastLogin, :lastModifiedDate)")
   fun insertUser(@BindBean user: UserDTO)
 
+  fun insertUserAndGiftCerts(user: UserDTO) {
+    insertUser(user)
+    if (user.giftCertificates.isNotEmpty()) {
+      insertGiftCertificates(user.giftCertificates)
+    }
+  }
+
   @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at) VALUES (:userId, :number, :expiresAt)")
   fun insertGiftCertificates(@BindBean giftCerts: Collection<GiftCertificateDTO>): IntArray
 

@@ -6,7 +6,7 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
-import rocks.didit.sefilm.domain.dto.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO

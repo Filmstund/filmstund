@@ -1,10 +1,13 @@
 package rocks.didit.sefilm.database
 
 import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.KotlinMapper
+import org.jdbi.v3.core.mapper.RowMapperFactory
 import org.jdbi.v3.core.statement.SqlLogger
 import org.jdbi.v3.core.statement.StatementContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.logger
 import javax.sql.DataSource
 
@@ -17,6 +20,10 @@ class DbConfig {
       // TODO: only do this if sql-logging is enabled
       log.info("{}", context?.renderedSql)
     }
+  }
+
+  fun rowMapperFactoryWithPrefix(type: Class<*>, prefix: String): RowMapperFactory {
+    return RowMapperFactory.of(type, KotlinMapper(type, prefix))
   }
 
   @Bean
@@ -38,6 +45,7 @@ class DbConfig {
       .registerArgument(TMDbIDArgumentFactory())
       .registerArgument(Base64IDArgumentFactory())
       .registerArgument(SEKArgumentFactory())
+      .registerRowMapper(rowMapperFactoryWithPrefix(GiftCertificateDTO::class.java, "gc"))
       .setSqlLogger(sqlLogger)
       .installPlugins()
 }
