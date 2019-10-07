@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
+import rocks.didit.sefilm.database.dao.TicketDao
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.database.entities.CinemaScreen
 import rocks.didit.sefilm.database.entities.GiftCertId
@@ -15,9 +16,6 @@ import rocks.didit.sefilm.database.entities.GiftCertificate
 import rocks.didit.sefilm.database.entities.Participant
 import rocks.didit.sefilm.database.entities.ParticipantId
 import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.Ticket
-import rocks.didit.sefilm.database.entities.TicketAttribute
-import rocks.didit.sefilm.database.entities.TicketAttributeId
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
@@ -29,7 +27,6 @@ import rocks.didit.sefilm.database.repositories.GiftCertificateRepository
 import rocks.didit.sefilm.database.repositories.LocationRepository
 import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.TicketRepository
 import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.GoogleId
@@ -38,6 +35,7 @@ import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
@@ -56,9 +54,8 @@ internal class MongoMigrator(
   private val showingRepo: ShowingRepository,
   private val participantPaymentInfoMongoRepo: ParticipantPaymentInfoMongoRepository,
   private val giftCertificateRepo: GiftCertificateRepository,
-  private val mongoTicketRepo: TicketMongoRepository,
-  private val ticketRepo: TicketRepository
-) {
+  private val mongoTicketRepo: TicketMongoRepository
+  ) {
   private val log by logger()
 
   @Transactional
@@ -268,43 +265,48 @@ internal class MongoMigrator(
 
   @Transactional
   fun migrateTicketsFromMongo() {
-    if (log.isInfoEnabled) {
-      log.info(
-        "{} tickets are eligible for migration from MongoDB. We have {} tickets in postgres currently",
-        mongoTicketRepo.count(),
-        ticketRepo.count()
-      )
-    }
+    jdbi.useTransactionUnchecked { handle ->
+      val dao = handle.attach(TicketDao::class.java)
+      val userDao = handle.attach(UserDao::class.java)
 
-    mongoTicketRepo.findAll()
-      .filterNot { ticketRepo.existsById(it.id) }
-      .forEach {
-        val ticket = Ticket(
-          id = it.id,
-          showing = showingRepo.findById(it.showingId).orElseThrow(),
-          assignedToUser = userRepo.findByGoogleId(it.assignedToUser)
-            ?: throw AssertionError("${it.assignedToUser} doesn't exist"),
-          profileId = it.profileId.orNullIfBlank(),
-          barcode = it.barcode,
-          customerType = it.customerType,
-          customerTypeDefinition = it.customerTypeDefinition,
-          cinema = it.cinema,
-          cinemaCity = it.cinemaCity,
-          screen = it.screen,
-          seatRow = it.seat.row,
-          seatNumber = it.seat.number,
-          date = it.date,
-          time = it.time,
-          movieName = it.movieName,
-          movieRating = it.movieRating
+      if (log.isInfoEnabled) {
+        log.info(
+          "{} tickets are eligible for migration from MongoDB. We have {} tickets in postgres currently",
+          mongoTicketRepo.count(),
+          dao.count()
         )
-
-        ticket.showAttributes.addAll(it.showAttributes.map { attrib ->
-          TicketAttribute(TicketAttributeId(ticket, attrib))
-        })
-
-        ticketRepo.save(ticket)
       }
+
+
+      val pgTicketIds = handle.createQuery("SELECT id FROM ticket")
+        .mapTo(String::class.java)
+        .list()
+
+      val tickets = mongoTicketRepo.findByIdNotIn(pgTicketIds)
+        .map {
+          TicketDTO(
+            id = it.id,
+            showingId = it.showingId,
+            assignedToUser = userDao.findIdByGoogleId(it.assignedToUser),
+            profileId = it.profileId.orNullIfBlank(),
+            barcode = it.barcode,
+            customerType = it.customerType,
+            customerTypeDefinition = it.customerTypeDefinition,
+            cinema = it.cinema,
+            cinemaCity = it.cinemaCity,
+            screen = it.screen,
+            seatRow = it.seat.row,
+            seatNumber = it.seat.number,
+            date = it.date,
+            time = it.time,
+            movieName = it.movieName,
+            movieRating = it.movieRating,
+            attributes = it.showAttributes.toSet()
+          )
+        }
+
+      dao.insertTickets(tickets)
+    }
   }
 
   fun String?.orNullIfBlank(): String? {

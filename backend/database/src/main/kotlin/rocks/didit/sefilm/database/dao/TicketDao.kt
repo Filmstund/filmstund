@@ -8,6 +8,9 @@ import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import java.util.*
 
 interface TicketDao {
+  @SqlQuery("SELECT count(*) FROM ticket")
+  fun count(): Int
+
   @SqlQuery("SELECT * FROM ticket WHERE id = :id")
   fun findById(id: String): TicketDTO
 

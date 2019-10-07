@@ -6,6 +6,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.database.UserGiftCertReducer
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.util.*
@@ -13,6 +14,9 @@ import java.util.*
 interface UserDao {
   @SqlQuery("SELECT count(1) FROM users")
   fun count(): Int
+
+  @SqlQuery("SELECT id FROM users WHERE google_id = :googleId")
+  fun findIdByGoogleId(googleId: GoogleId): UUID
 
   @SqlQuery("SELECT * FROM users u LEFT JOIN gift_certificate gc on u.id = gc.user_id")
   @UseRowReducer(UserGiftCertReducer::class)
