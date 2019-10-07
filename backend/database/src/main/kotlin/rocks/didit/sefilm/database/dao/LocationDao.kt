@@ -1,8 +1,11 @@
 package rocks.didit.sefilm.database.dao
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.kotlin.RegisterKotlinMapper
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
+import org.jdbi.v3.sqlobject.statement.UseRowReducer
+import rocks.didit.sefilm.database.LocationAliasReducer
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 
 interface LocationDao {
@@ -18,9 +21,13 @@ interface LocationDao {
   fun existsByName(name: String): Boolean
 
   @SqlQuery("SELECT ${SELECTABLE_FIELDS}, la.alias AS la_alias FROM location l LEFT JOIN location_alias la ON l.name = la.location")
+  @UseRowReducer(LocationAliasReducer::class)
+  @RegisterKotlinMapper(LocationDTO::class, "l")
   fun findAll(): List<LocationDTO>
 
   @SqlQuery("SELECT ${SELECTABLE_FIELDS}, la.alias AS la_alias FROM location l LEFT JOIN location_alias la ON l.name = la.location WHERE upper(l.name) = upper(:name) OR l.name = (SELECT location FROM location_alias al WHERE upper(al.alias) = upper(:name))")
+  @UseRowReducer(LocationAliasReducer::class)
+  @RegisterKotlinMapper(LocationDTO::class, "l")
   fun findByNameOrAlias(name: String): LocationDTO?
 
   // TODO: upsert this. Also add method for inserting alias and locations in one go
