@@ -21,5 +21,5 @@ data class TicketDTO(
   val time: LocalTime,
   val movieName: String,
   val movieRating: String, // 15 år, 11 år etc.
-  val showAttributes: Set<String> = setOf() // "textad", "en" etc
+  val attributes: Set<String> = setOf() // "textad", "en" etc
 )

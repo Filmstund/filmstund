@@ -159,7 +159,7 @@ fun ThreadLocalRandom.nextTicket(showingId: UUID, assignedToUser: UUID): TicketD
     time = nextLocalTime(),
     movieName = "movieName${nextLong(1000000)}",
     movieRating = "${nextInt(100)} år",
-    showAttributes = (1..10).map { "attrib${nextLong(1000)}" }.toSet()
+    attributes = (1..10).map { "attrib${nextLong(1000)}" }.toSet()
   )
 }
 
