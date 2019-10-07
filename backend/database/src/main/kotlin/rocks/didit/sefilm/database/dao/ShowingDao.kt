@@ -20,7 +20,7 @@ interface ShowingDao {
   fun findById(showingId: UUID): ShowingDTO?
 
   @SqlUpdate("UPDATE showing s SET admin = :newAdmin, pay_to_user = :newAdmin WHERE s.id = :showingId and s.admin = :currentAdmin")
-  fun promoteNewUserToAdmin(showingId: UUID, currentAdmin: UUID, newAdmin: UUID): Int
+  fun promoteNewUserToAdmin(showingId: UUID, currentAdmin: UUID, newAdmin: UUID): Boolean
 
   @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location.name, :cinemaScreen.filmstadenId, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
   fun insertNewShowing(@BindBean showing: ShowingDTO)
