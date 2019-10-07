@@ -52,4 +52,43 @@ internal class ShowingDaoTest {
         .isEqualToIgnoringGivenFields(rndShowing.location, "lastModifiedDate")
     }
   }
+
+  @Test
+  internal fun `given an existing showing, when promoteNewUserToAdmin(), then that new user is the admin, and the old one is not`() {
+    val rndMovie = rnd.nextMovie()
+    val rndAdmin = rnd.nextUserDTO()
+    val rndNewAdmin = rnd.nextUserDTO()
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+
+    jdbi.useTransactionUnchecked { handle ->
+      val userDao = handle.attach(UserDao::class.java)
+      val movieDao = handle.attach(MovieDao::class.java)
+      val locationDao = handle.attach(LocationDao::class.java)
+      val showingDao = handle.attach(ShowingDao::class.java)
+
+      userDao.insertUserAndGiftCerts(rndAdmin)
+      userDao.insertUserAndGiftCerts(rndNewAdmin)
+      movieDao.insertMovie(rndMovie)
+      locationDao.insertLocationAndAlias(rndShowing.location)
+      showingDao.insertShowingAndCinemaScreen(rndShowing)
+
+      val dbShowing = showingDao.findById(rndShowing.id)
+
+      assertThat(dbShowing?.admin)
+        .isNotNull()
+        .isEqualTo(rndAdmin.id)
+      assertThat(dbShowing?.payToUser)
+        .isNotNull()
+        .isEqualTo(rndAdmin.id)
+      showingDao.promoteNewUserToAdmin(rndShowing.id, rndAdmin.id, rndNewAdmin.id)
+      val dbShowingUpdated = showingDao.findById(rndShowing.id)
+      assertThat(dbShowingUpdated?.admin)
+        .isNotNull()
+        .isNotEqualTo(rndAdmin.id)
+        .isEqualTo(rndNewAdmin.id)
+      assertThat(dbShowingUpdated?.payToUser)
+        .isNotNull()
+        .isEqualTo(rndNewAdmin.id)
+    }
+  }
 }
