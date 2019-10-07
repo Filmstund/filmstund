@@ -14,6 +14,7 @@ import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.math.BigDecimal
 import java.time.Duration
@@ -84,7 +85,7 @@ fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
     title = "title${nextLong()}",
     synopsis = "synopsis${nextLong()}",
     originalTitle = "orgTitle${nextLong()}",
-    releaseDate = LocalDate.of(nextInt(1900, 2020), nextInt(1, 12), nextInt(1, 28)),
+    releaseDate = nextLocalDate(),
     productionYear = nextInt(1900, 2020),
     runtime = Duration.ofHours(nextLong(1, 20)),
     poster = "https://post${nextLong()}.example.org",
@@ -106,8 +107,8 @@ fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UUID): ShowingDTO {
     webId = Base64ID.random(),
     filmstadenShowingId = "AA-${nextInt(1000, 9999)}-${nextLong(1000, 1000000)}",
     slug = "slug${nextLong()}",
-    date = LocalDate.of(nextInt(1900, 2020), nextInt(1, 12), nextInt(1, 28)),
-    time = LocalTime.of(nextInt(0, 23), nextInt(0, 59)),
+    date = nextLocalDate(),
+    time = nextLocalTime(),
     movieId = movieId,
     location = nextLocation(),
     cinemaScreen = nextCinemaScreen(),
@@ -131,6 +132,36 @@ fun ThreadLocalRandom.nextParticipant(
     amountOwed = SEK(nextLong(0, 1000000)),
     hasPaid = nextBoolean(),
     type = if (ticketNumber != null) ParticipantDTO.Type.GIFT_CERTIFIATE else ParticipantDTO.Type.SWISH,
-    giftCertificateUsed = if (ticketNumber != null) GiftCertificateDTO(userId, ticketNumber, LocalDate.of(nextInt(1900, 2021), nextInt(1, 12), nextInt(1,  28)), false) else null
+    giftCertificateUsed = if (ticketNumber != null) GiftCertificateDTO(
+      userId,
+      ticketNumber,
+      nextLocalDate(),
+      false
+    ) else null
   )
 }
+
+fun ThreadLocalRandom.nextTicket(showingId: UUID, assignedToUser: UUID): TicketDTO {
+  return TicketDTO(
+    id = "id${nextLong(0, 10000000)}",
+    showingId = showingId,
+    assignedToUser = assignedToUser,
+    profileId = "pid${nextLong(1000)}",
+    barcode = "barcode${nextLong(1000000)}",
+    customerType = "customerType${nextLong(1000000)}",
+    customerTypeDefinition = "ctd${nextLong(1000000)}",
+    cinema = "cinema${nextLong(10000)}",
+    cinemaCity = "cinemaCity${nextLong(100000)}",
+    screen = "screen${nextLong(100000)}",
+    seatRow = nextInt(0, 100),
+    seatNumber = nextInt(0, 250),
+    date = nextLocalDate(),
+    time = nextLocalTime(),
+    movieName = "movieName${nextLong(1000000)}",
+    movieRating = "${nextInt(100)} år",
+    showAttributes = (1..10).map { "attrib${nextLong(1000)}" }.toSet()
+  )
+}
+
+fun ThreadLocalRandom.nextLocalDate() = LocalDate.of(nextInt(1900, 2020), nextInt(1, 12), nextInt(1, 28))
+fun ThreadLocalRandom.nextLocalTime() = LocalTime.of(nextInt(0, 23), nextInt(0, 59), nextInt(0, 59))

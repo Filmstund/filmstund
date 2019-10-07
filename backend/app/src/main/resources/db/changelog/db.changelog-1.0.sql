@@ -208,7 +208,7 @@ create table ticket
     time                     time without time zone not null,
     movie_name               varchar(100)           not null,
     movie_rating             varchar(30)            not null,
-    attribute                varchar(50)[]          not null default '{}'
+    attributes               varchar(50)[]          not null default '{}'
 );
 --rollback drop table if exists ticket;
 
