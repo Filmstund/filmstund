@@ -10,6 +10,7 @@ import java.util.*
 
 @Suppress("FunctionName")
 @Repository
+@Deprecated(message = "Don't use JPA")
 interface ShowingRepository : JpaRepository<Showing, UUID> {
   fun findByIdAndAdmin_Id(showingId: UUID, adminId: UUID): Showing?
   /**

@@ -9,6 +9,7 @@ import java.util.*
 
 @Suppress("FunctionName")
 @Repository
+@Deprecated(message = "Don't use JPA")
 interface TicketRepository : JpaRepository<Ticket, String> {
   fun findByShowingIdAndAssignedToUser_Id(showingId: UUID, userId: UUID): List<Ticket>
 

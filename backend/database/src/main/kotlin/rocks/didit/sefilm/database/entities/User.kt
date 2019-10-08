@@ -5,8 +5,8 @@ import rocks.didit.sefilm.database.FSIdConverter
 import rocks.didit.sefilm.database.PhoneNumberConverter
 import rocks.didit.sefilm.database.UserIdConverter
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import java.time.Instant
 import java.util.*
@@ -20,6 +20,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "users")
+@Deprecated(message = "Don't use JPA")
 data class User(
   @Id
   val id: UUID = UUID.randomUUID(),

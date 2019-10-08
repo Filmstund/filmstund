@@ -11,6 +11,7 @@ import java.util.*
 
 @Suppress("FunctionName")
 @Repository
+@Deprecated(message = "Don't use JPA")
 interface GiftCertificateRepository : JpaRepository<GiftCertificate, GiftCertId> {
 
   @Query(value = "select new rocks.didit.sefilm.domain.dto.GiftCertificateDTO(gc.id.user.id, gc.id.number) from GiftCertificate gc where gc.id.user.id = :userId")

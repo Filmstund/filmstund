@@ -19,6 +19,7 @@ import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Embeddable
+@Deprecated(message = "Don't use JPA")
 data class ParticipantId(
   @ManyToOne(optional = false, cascade = [])
   val user: User,
@@ -53,6 +54,7 @@ data class ParticipantId(
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 data class Participant(
   @EmbeddedId
   val id: ParticipantId,

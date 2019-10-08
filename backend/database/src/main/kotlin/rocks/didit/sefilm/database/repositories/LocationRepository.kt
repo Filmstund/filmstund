@@ -6,6 +6,7 @@ import rocks.didit.sefilm.database.entities.Location
 
 @Suppress("FunctionName")
 @Repository
+@Deprecated(message = "Don't use JPA")
 interface LocationRepository : JpaRepository<Location, String> {
   fun findByNameIgnoreCaseOrAlias_AliasIgnoreCase(name: String, alias: String): Location?
 }

@@ -7,6 +7,7 @@ import javax.persistence.Table
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 data class CinemaScreen(
   @Id
   val id: String,

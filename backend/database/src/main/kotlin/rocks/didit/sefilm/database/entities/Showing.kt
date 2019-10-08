@@ -26,6 +26,7 @@ import javax.persistence.Table
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 data class Showing(
   @Id
   val id: UUID = UUID.randomUUID(),

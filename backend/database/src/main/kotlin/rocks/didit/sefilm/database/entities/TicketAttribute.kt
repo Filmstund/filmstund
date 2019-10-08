@@ -1,16 +1,23 @@
 package rocks.didit.sefilm.database.entities
 
 import java.io.Serializable
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Embeddable
+import javax.persistence.EmbeddedId
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.Table
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 class TicketAttribute(
   @EmbeddedId
   val id: TicketAttributeId
 )
 
 @Embeddable
+@Deprecated(message = "Don't use JPA")
 data class TicketAttributeId(
   @ManyToOne
   val ticket: Ticket,

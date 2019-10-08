@@ -7,6 +7,7 @@ import rocks.didit.sefilm.domain.TicketNumber
 import java.util.*
 
 @Suppress("FunctionName")
+@Deprecated(message = "Don't use JPA")
 interface ParticipantRepository : JpaRepository<Participant, ParticipantId> {
   fun findById_Showing_Id(showingId: UUID): List<Participant>
 

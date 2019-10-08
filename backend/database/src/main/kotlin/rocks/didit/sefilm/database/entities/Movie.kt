@@ -23,6 +23,7 @@ import javax.persistence.Transient
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 data class Movie(
   @Id
   val id: UUID = UUID.randomUUID(),

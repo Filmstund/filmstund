@@ -10,6 +10,7 @@ import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import java.util.*
 
 @Repository
+@Deprecated(message = "Don't use JPA")
 interface UserRepository : JpaRepository<User, UUID> {
   @Query(value = "select new rocks.didit.sefilm.domain.dto.PublicUserDTO(u.id, u.firstName, u.lastName, u.nick, u.phone, u.avatar) from User u")
   fun findAllPublicUsers(): List<PublicUserDTO>

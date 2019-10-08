@@ -14,6 +14,7 @@ import javax.persistence.Table
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 data class Ticket(
   @Id
   val id: String = "",

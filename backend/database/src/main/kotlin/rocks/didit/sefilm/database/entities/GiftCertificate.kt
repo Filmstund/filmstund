@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Embeddable
+@Deprecated(message = "Don't use JPA")
 data class GiftCertId(
   @ManyToOne
   var user: User,
@@ -51,6 +52,7 @@ data class GiftCertId(
 
 @Entity
 @Table
+@Deprecated(message = "Don't use JPA")
 data class GiftCertificate(
   @EmbeddedId
   val id: GiftCertId,

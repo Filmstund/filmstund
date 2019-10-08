@@ -7,6 +7,7 @@ import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import java.util.*
 
 @Repository
+@Deprecated(message = "Don't use JPA")
 interface MovieRepository : JpaRepository<Movie, UUID> {
   fun findByArchivedOrderByPopularityDesc(archived: Boolean = false): List<Movie>
 
