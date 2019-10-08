@@ -7,6 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.database.UserGiftCertReducer
 import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.util.*
@@ -42,8 +43,14 @@ interface UserDao {
     }
   }
 
-  @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at) VALUES (:userId, :number, :expiresAt)")
+  @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at, is_deleted) VALUES (:userId, :number, :expiresAt, :deleted)")
   fun insertGiftCertificates(@BindBean giftCerts: Collection<GiftCertificateDTO>): IntArray
 
   fun insertGiftCertificate(giftCert: GiftCertificateDTO) = insertGiftCertificates(listOf(giftCert))
+
+  @SqlQuery("SELECT * FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
+  fun findGiftCertByUserAndNumber(userId: UUID, number: TicketNumber): GiftCertificateDTO?
+
+  @SqlQuery("SELECT exists(SELECT 1 FROM gift_certificate gc WHERE gc.number = :number)")
+  fun existGiftCertByNumber(number: TicketNumber): Boolean
 }

@@ -83,7 +83,7 @@ class CalendarService(
     vEvent.setDateStart(Date.from(this.getStartDate()))
     vEvent.setDateEnd(this.getEndDate(movie))
     vEvent.setUid(this.id.toString())
-    vEvent.setLocation(this.location.formatAddress())
+    vEvent.setLocation(this.location?.formatAddress())
     vEvent.setDescription(formatDescription(this.id, user.id, movie) + "\n\n$showingUrl")
     vEvent.setUrl(showingUrl)
     vEvent.addCategories(Categories("bio"))

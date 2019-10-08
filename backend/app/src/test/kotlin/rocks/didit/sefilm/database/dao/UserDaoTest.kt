@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextUserDTO
 import java.util.*
@@ -110,6 +111,27 @@ internal class UserDaoTest {
       assertThat(dbUser)
         .isNotNull
         .isEqualToIgnoringGivenFields(rndUser, "signupDate")
+    }
+  }
+
+  @Test
+  internal fun `given at a gift cert, when findGiftCertByUserAndNumber(), then that gift cert is returned`() {
+    val userId = UUID.randomUUID()
+    val giftCert = rnd.nextGiftCert(userId)
+    val rndUser = rnd.nextUserDTO(userId, listOf(giftCert))
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      assertThat(it.existGiftCertByNumber(giftCert.number)).isTrue()
+      val dbGiftCert = it.findGiftCertByUserAndNumber(userId, giftCert.number)
+      assertThat(dbGiftCert)
+        .isEqualTo(giftCert)
+
+      assertThat(it.findGiftCertByUserAndNumber(UUID.randomUUID(), giftCert.number))
+        .isNull()
+      assertThat(it.findGiftCertByUserAndNumber(userId, rnd.nextGiftCert(UUID.randomUUID()).number))
+        .isNull()
     }
   }
 }

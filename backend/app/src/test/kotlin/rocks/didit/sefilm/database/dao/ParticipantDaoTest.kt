@@ -52,7 +52,7 @@ internal class ParticipantDaoTest {
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       participantDao.insertParticipantsOnShowing(rndParticipants)
 
@@ -95,7 +95,7 @@ internal class ParticipantDaoTest {
       userDao.insertUser(rndAdmin)
       userDao.insertUser(rndUser)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       assertThat(participantDao.isParticipantOnShowing(rndAdmin.id, rndShowing.id))
@@ -124,7 +124,7 @@ internal class ParticipantDaoTest {
       userDao.insertUser(rndAdmin)
       userDao.insertUser(rndUser)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val participant = rnd.nextParticipant(rndUser.id, rndShowing.id)

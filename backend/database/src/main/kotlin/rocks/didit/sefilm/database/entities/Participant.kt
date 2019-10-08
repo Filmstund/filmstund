@@ -91,7 +91,7 @@ data class Participant(
     },
     type = when (participantType) {
       Type.SWISH -> ParticipantDTO.Type.SWISH
-      Type.GIFT_CERTIFICATE -> ParticipantDTO.Type.GIFT_CERTIFIATE
+      Type.GIFT_CERTIFICATE -> ParticipantDTO.Type.GIFT_CERTIFICATE
     },
     giftCertificateUsed = giftCertificateUsed?.toDTO(),
     filmstadenMembershipId = user.filmstadenId

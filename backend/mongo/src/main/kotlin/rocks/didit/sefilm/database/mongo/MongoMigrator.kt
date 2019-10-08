@@ -2,20 +2,17 @@
 
 package rocks.didit.sefilm.database.mongo
 
+import com.github.benmanes.caffeine.cache.Caffeine
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
+import rocks.didit.sefilm.database.dao.ParticipantDao
+import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.TicketDao
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.database.entities.CinemaScreen
-import rocks.didit.sefilm.database.entities.GiftCertId
-import rocks.didit.sefilm.database.entities.GiftCertificate
-import rocks.didit.sefilm.database.entities.Participant
-import rocks.didit.sefilm.database.entities.ParticipantId
-import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.mongo.entities.ParticipantPaymentInfo
 import rocks.didit.sefilm.database.mongo.repositories.LocationMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.MovieMongoRepository
@@ -23,115 +20,134 @@ import rocks.didit.sefilm.database.mongo.repositories.ParticipantPaymentInfoMong
 import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.TicketMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
-import rocks.didit.sefilm.database.repositories.GiftCertificateRepository
-import rocks.didit.sefilm.database.repositories.LocationRepository
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.*
 
 @Component
 internal class MongoMigrator(
   private val jdbi: Jdbi,
-  private val locationRepo: LocationRepository,
   private val locationsMongoRepo: LocationMongoRepository,
-  private val userRepo: UserRepository,
   private val mongoUserRepo: UserMongoRepository,
-  private val movieRepo: MovieRepository,
   private val mongoMovieRepo: MovieMongoRepository,
   private val mongoShowingRepo: ShowingMongoRepository,
-  private val showingRepo: ShowingRepository,
   private val participantPaymentInfoMongoRepo: ParticipantPaymentInfoMongoRepository,
-  private val giftCertificateRepo: GiftCertificateRepository,
   private val mongoTicketRepo: TicketMongoRepository
-  ) {
+) {
   private val log by logger()
 
   @Transactional
   fun migrateShowingsFromMongo() {
-    if (log.isInfoEnabled) {
-      log.info(
-        "{} showings are eligible for migration from MongoDB. We have {} showings in postgres currently",
-        mongoShowingRepo.count(),
-        showingRepo.count()
-      )
-    }
-
-    mongoShowingRepo.findAll()
-      .filterNot { showingRepo.existsById(it.id) }
-      .forEach {
-        val showing = Showing(
-          id = it.id,
-          webId = it.webId,
-          slug = it.slug,
-          date = it.date,
-          time = it.time,
-          movie = movieRepo.getOne(it.movie.id),
-          location = it.location?.let { l ->
-            locationRepo.findByNameIgnoreCaseOrAlias_AliasIgnoreCase(
-              l.name!!,
-              l.name
-            )
-          },
-          cinemaScreen = it.filmstadenScreen?.let { screen -> CinemaScreen(screen.filmstadenId, screen.name) },
-          filmstadenShowingId = it.filmstadenRemoteEntityId,
-          price = it.price ?: SEK.ZERO,
-          ticketsBought = it.ticketsBought,
-          admin = userRepo.findByGoogleId(it.admin.id) ?: throw AssertionError("${it.admin.id} doesn't exist"),
-          payToUser = userRepo.findByGoogleId(it.payToUser.id)
-            ?: throw AssertionError("${it.payToUser.id} doesn't exist"),
-          lastModifiedDate = it.lastModifiedDate,
-          createdDate = it.createdDate
+    jdbi.useTransactionUnchecked { handle ->
+      val dao = handle.attach(ShowingDao::class.java)
+      val userDao = handle.attach(UserDao::class.java)
+      val participantDao = handle.attach(ParticipantDao::class.java)
+      val locationDao = handle.attach(LocationDao::class.java)
+      if (log.isInfoEnabled) {
+        log.info(
+          "{} showings are eligible for migration from MongoDB. We have {} showings in postgres currently",
+          mongoShowingRepo.count(),
+          dao.count()
         )
-
-        showing.participants.addAll(it.participants.map { p ->
-          val user = userRepo.findByGoogleId(p.userId) ?: throw AssertionError("${p.userId} doesn't exist")
-          val paymentInfo = participantPaymentInfoMongoRepo.findByShowingIdAndUserId(it.id, p.userId)
-            .orElseGet {
-              ParticipantPaymentInfo(
-                userId = p.userId,
-                hasPaid = false,
-                showingId = it.id,
-                amountOwed = it.price ?: SEK.ZERO
-              )
-            }
-
-          when (p) {
-            is SwishParticipant -> Participant(
-              id = ParticipantId(user, showing),
-              hasPaid = paymentInfo.hasPaid
-            )
-            is FtgBiljettParticipant -> {
-              if (!giftCertificateRepo.existsById_Number(p.ticketNumber)) {
-                val cert =
-                  GiftCertificate(id = GiftCertId(user, p.ticketNumber), expiresAt = LocalDate.EPOCH, isDeleted = true)
-                giftCertificateRepo.save(cert)
-              }
-
-              Participant(
-                id = ParticipantId(user, showing),
-                participantType = Participant.Type.GIFT_CERTIFICATE,
-                giftCertificateUsed = giftCertificateRepo.findById(GiftCertId(user, p.ticketNumber)).orElse(null),
-                hasPaid = paymentInfo.hasPaid
-              )
-            }
-          }
-        })
-
-        showingRepo.save(showing)
       }
 
+      val pgShowingIds = handle.createQuery("SELECT id FROM showing")
+        .mapTo(UUID::class.java)
+        .list()
+
+      val userCache = Caffeine.newBuilder().build<GoogleId, UUID>()
+      val locationCache = Caffeine.newBuilder().build<String, LocationDTO>()
+      val mongoShowings = mongoShowingRepo.findByIdNotIn(pgShowingIds)
+      mongoShowings
+        .forEach {
+          val showing = ShowingDTO(
+            id = it.id,
+            webId = it.webId,
+            filmstadenShowingId = it.filmstadenRemoteEntityId,
+            slug = it.slug,
+            date = it.date ?: LocalDate.EPOCH,
+            time = it.time ?: LocalTime.MIDNIGHT,
+            movieId = it.movie.id,
+            location = locationCache.get(it.location?.name!!) { name -> locationDao.findByNameOrAlias(name) },
+            cinemaScreen = it.filmstadenScreen,
+            price = it.price ?: SEK.ZERO,
+            ticketsBought = it.ticketsBought,
+            admin = userCache.get(it.admin.id) { gid -> userDao.findIdByGoogleId(gid) }
+              ?: throw AssertionError("${it.admin.id} doesn't exist"),
+            payToUser = userCache.get(it.payToUser.id) { gid -> userDao.findIdByGoogleId(gid) }
+              ?: throw AssertionError("${it.payToUser.id} doesn't exist"),
+            lastModifiedDate = it.lastModifiedDate,
+            createdDate = it.createdDate
+          )
+          showing.cinemaScreen?.let { cs -> dao.maybeInsertCinemaScreen(cs) }
+          dao.insertNewShowing(showing)
+        }
+      val participants: List<ParticipantDTO> = mongoShowings
+        .map { showing ->
+          showing.participants.map { p ->
+            val user = userCache.get(p.userId) { gid -> userDao.findIdByGoogleId(gid) }
+              ?: throw AssertionError("${p.userId} doesn't exist")
+
+            val paymentInfo = participantPaymentInfoMongoRepo.findByShowingIdAndUserId(showing.id, p.userId)
+              .orElseGet {
+                ParticipantPaymentInfo(
+                  userId = p.userId,
+                  hasPaid = false,
+                  showingId = showing.id,
+                  amountOwed = showing.price ?: SEK.ZERO
+                )
+              }
+
+            when (p) {
+              is SwishParticipant -> ParticipantDTO(
+                userId = user,
+                showingId = showing.id,
+                hasPaid = paymentInfo.hasPaid,
+                amountOwed = paymentInfo.amountOwed,
+                type = ParticipantDTO.Type.SWISH,
+                userInfo = PublicUserDTO(id = user)
+              )
+              is FtgBiljettParticipant -> {
+                if (!userDao.existGiftCertByNumber(p.ticketNumber)) {
+                  val cert =
+                    GiftCertificateDTO(
+                      userId = user,
+                      number = p.ticketNumber,
+                      expiresAt = LocalDate.EPOCH,
+                      deleted = true
+                    )
+                  userDao.insertGiftCertificate(cert)
+                }
+
+                ParticipantDTO(
+                  userId = user,
+                  showingId = showing.id,
+                  userInfo = PublicUserDTO(id = user),
+                  hasPaid = paymentInfo.hasPaid,
+                  amountOwed = paymentInfo.amountOwed,
+                  type = ParticipantDTO.Type.GIFT_CERTIFICATE,
+                  giftCertificateUsed = userDao.findGiftCertByUserAndNumber(user, p.ticketNumber)
+                )
+              }
+            }
+          }
+        }
+        .flatten()
+      participantDao.insertParticipantsOnShowing(participants)
+    }
   }
 
   @Transactional
@@ -282,12 +298,14 @@ internal class MongoMigrator(
         .mapTo(String::class.java)
         .list()
 
+      val userCache = Caffeine.newBuilder().build<GoogleId, UUID>()
       val tickets = mongoTicketRepo.findByIdNotIn(pgTicketIds)
         .map {
           TicketDTO(
             id = it.id,
             showingId = it.showingId,
-            assignedToUser = userDao.findIdByGoogleId(it.assignedToUser),
+            assignedToUser = userCache.get(it.assignedToUser) { id -> userDao.findIdByGoogleId(id) }
+              ?: throw AssertionError("User ${it.assignedToUser} not found"),
             profileId = it.profileId.orNullIfBlank(),
             barcode = it.barcode,
             customerType = it.customerType,

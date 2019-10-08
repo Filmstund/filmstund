@@ -39,9 +39,9 @@ class ShowingLocationReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
     val showing = container.computeIfAbsent(id) { rowView.getRow(ShowingDTO::class.java) }
 
     val alias = rowView.getColumn("la_alias", String::class.java)
-    if (alias != null) {
+    if (alias != null && showing.location != null) {
       val copiedShowing = showing.copy(
-        location = showing.location.copy(alias = showing.location.alias.plus(alias))
+        location = showing.location!!.copy(alias = showing.location!!.alias.plus(alias))
       )
       container.replace(id, copiedShowing)
     }

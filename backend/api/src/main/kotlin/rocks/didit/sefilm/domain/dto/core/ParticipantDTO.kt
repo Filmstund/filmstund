@@ -64,6 +64,6 @@ data class ParticipantDTO(
   }
 
   enum class Type {
-    SWISH, GIFT_CERTIFIATE, UNKNOWN
+    SWISH, GIFT_CERTIFICATE, UNKNOWN
   }
 }

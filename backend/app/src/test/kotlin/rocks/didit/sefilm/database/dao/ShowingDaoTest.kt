@@ -39,7 +39,7 @@ internal class ShowingDaoTest {
 
       userDao.insertUser(rndAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val dbShowing = showingDao.findById(rndShowing.id)
@@ -69,7 +69,7 @@ internal class ShowingDaoTest {
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndNewAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val dbShowing = showingDao.findById(rndShowing.id)

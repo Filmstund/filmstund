@@ -19,7 +19,7 @@ data class ShowingDTO(
   val time: LocalTime,
   val movieId: UUID,
   @Nested("l")
-  val location: LocationDTO,
+  val location: LocationDTO?,
   @Nested("cs")
   val cinemaScreen: FilmstadenLiteScreenDTO? = null,
   val price: SEK? = SEK.ZERO,

@@ -9,6 +9,7 @@ import java.util.*
 @Repository
 @Deprecated(message = "")
 internal interface ShowingMongoRepository : CrudRepository<Showing, UUID> {
+  fun findByIdNotIn(ids: List<UUID>): List<Showing>
   fun findByPrivateOrderByDateDesc(isPrivate: Boolean): List<Showing>
   fun findByMovieIdOrderByDateDesc(movieId: UUID): List<Showing>
   fun findByWebId(webId: Base64ID): Optional<Showing>

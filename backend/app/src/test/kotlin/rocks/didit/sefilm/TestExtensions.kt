@@ -131,7 +131,7 @@ fun ThreadLocalRandom.nextParticipant(
     showingId = showingId,
     amountOwed = SEK(nextLong(0, 1000000)),
     hasPaid = nextBoolean(),
-    type = if (ticketNumber != null) ParticipantDTO.Type.GIFT_CERTIFIATE else ParticipantDTO.Type.SWISH,
+    type = if (ticketNumber != null) ParticipantDTO.Type.GIFT_CERTIFICATE else ParticipantDTO.Type.SWISH,
     giftCertificateUsed = if (ticketNumber != null) GiftCertificateDTO(
       userId,
       ticketNumber,
