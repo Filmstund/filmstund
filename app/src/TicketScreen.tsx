@@ -136,12 +136,14 @@ const useShowingTickets = (showingId: string) =>
     query: gql`
       query ShowingTicketsQuery($showingId: UUID!) {
         showing(id: $showingId) {
+          id
           date
           time
           location {
             name
           }
           movie {
+            id
             title
           }
           myTickets {

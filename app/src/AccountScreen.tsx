@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
-import { AccountQuery_currentUser } from "./__generated__/AccountQuery";
+import { ForetagsbiljettStatus } from "./__generated__/globalTypes";
+import { MeQuery_currentUser } from "./__generated__/MeQuery";
 import { EmptyList } from "./EmptyList";
 import { padding } from "./style";
 import { useMeQuery } from "./useMeQuery";
@@ -23,7 +24,7 @@ const ForetagsbiljettHeader = () => (
 const UserAccountDetails = ({
   currentUser
 }: {
-  currentUser: AccountQuery_currentUser;
+  currentUser: MeQuery_currentUser;
 }) => (
   <View
     style={{
@@ -65,8 +66,9 @@ const UserAccountDetails = ({
   </View>
 );
 
-const emptyUser: AccountQuery_currentUser = {
+const emptyUser: MeQuery_currentUser = {
   __typename: "CurrentUser",
+  id: "123",
   foretagsbiljetter: [],
   calendarFeedUrl: null,
   filmstadenMembershipId: null,
@@ -111,7 +113,7 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
                 <Text>{biljett.expires}</Text>
               </View>
               <View style={{ width: 100 }}>
-                <Text>{biljett.status}</Text>
+                <Text>{localizeTicketStatus(biljett.status)}</Text>
               </View>
             </View>
           ))}
@@ -120,4 +122,19 @@ export const AccountScreen: React.FC<NavigationInjectedProps> = ({
       {!fetching && !data && <EmptyList text={"Ingen data"} />}
     </View>
   );
+};
+
+const localizeTicketStatus = (status: ForetagsbiljettStatus) => {
+  switch (status) {
+    case ForetagsbiljettStatus.Available:
+      return "Tillgänglig";
+    case ForetagsbiljettStatus.Pending:
+      return "Upptagen";
+    case ForetagsbiljettStatus.Used:
+      return "Använd";
+    case ForetagsbiljettStatus.Expired:
+      return "Utgången";
+    default:
+      return status;
+  }
 };

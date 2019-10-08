@@ -51,6 +51,7 @@ export interface ShowingQuery_showing {
   id: SeFilmUUID;
   date: string;
   time: string;
+  ticketsBought: boolean;
   admin: ShowingQuery_showing_admin;
   location: ShowingQuery_showing_location;
   movie: ShowingQuery_showing_movie;

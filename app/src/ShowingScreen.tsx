@@ -16,10 +16,24 @@ import {
 } from "react-native";
 import { NavigationInjectedProps } from "react-navigation";
 import { useMutation, useQuery } from "urql";
-import { AttendShowing, AttendShowingVariables } from "./__generated__/AttendShowing";
-import { ForetagsbiljettStatus, PaymentOption, PaymentType } from "./__generated__/globalTypes";
-import { ShowingQuery, ShowingQueryVariables } from "./__generated__/ShowingQuery";
-import { UnattendShowing, UnattendShowingVariables } from "./__generated__/UnattendShowing";
+import {
+  AttendShowing,
+  AttendShowingVariables
+} from "./__generated__/AttendShowing";
+import {
+  ForetagsbiljettStatus,
+  PaymentOption,
+  PaymentType
+} from "./__generated__/globalTypes";
+import { MeQuery_currentUser_foretagsbiljetter } from "./__generated__/MeQuery";
+import {
+  ShowingQuery,
+  ShowingQueryVariables
+} from "./__generated__/ShowingQuery";
+import {
+  UnattendShowing,
+  UnattendShowingVariables
+} from "./__generated__/UnattendShowing";
 import { showingDate } from "./lib/filterShowings";
 import { formatUserCompleteName, formatUserNick } from "./lib/formatters";
 import { padding } from "./style";
@@ -33,6 +47,7 @@ export const showingScreenShowing = gql`
     id
     date
     time
+    ticketsBought
     admin {
       id
       firstName
@@ -125,6 +140,93 @@ const ShowingActionButton = ({
   </TouchableOpacity>
 );
 
+interface ShowingPaymentOptionModalProps {
+  showModal: boolean;
+  loading: boolean;
+  onClose: () => void;
+  showingId: string;
+  tickets: MeQuery_currentUser_foretagsbiljetter[];
+}
+
+const ShowingPaymentOptionModal: React.FC<ShowingPaymentOptionModalProps> = ({
+  showModal,
+  onClose,
+  showingId,
+  loading,
+  tickets
+}) => {
+  const [paymentOption, setPaymentOption] = useState<string>("swish");
+  const [attendRes, attendShowing] = useAttendShowing();
+
+  const isLoadingAttend = attendRes.fetching;
+
+  return (
+    <Modal
+      visible={showModal}
+      onDismiss={onClose}
+      onRequestClose={onClose}
+      animationType={"slide"}
+    >
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <>
+          <View style={{ flex: 1 }} />
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-around" }}
+          >
+            {isLoadingAttend ? (
+              <ActivityIndicator />
+            ) : (
+              <>
+                <ShowingActionButton
+                  text={"Jag hänger på!"}
+                  onPress={() => {
+                    attendShowing({
+                      showingId,
+                      paymentOption:
+                        paymentOption === "swish"
+                          ? swishPaymentOption
+                          : {
+                              type: PaymentType.Foretagsbiljett,
+                              ticketNumber: paymentOption
+                            }
+                    }).then(onClose);
+                  }}
+                />
+                <ShowingActionButton
+                  text={"Avbryt"}
+                  backgroundColor={grayColor}
+                  onPress={onClose}
+                />
+              </>
+            )}
+          </View>
+          <Picker
+            selectedValue={paymentOption}
+            onValueChange={itemValue => {
+              setPaymentOption(itemValue);
+            }}
+          >
+            <Picker.Item label={"Swish"} value={"swish"} />
+            {tickets
+              .filter(
+                ticket => ticket.status === ForetagsbiljettStatus.Available
+              )
+              .map(ticket => (
+                <Picker.Item
+                  key={ticket.number}
+                  label={`Företagsbiljett: ${ticket.number}`}
+                  value={ticket.number}
+                />
+              ))}
+          </Picker>
+        </>
+      )}
+    </Modal>
+  );
+};
+
 const swishPaymentOption: PaymentOption = { type: PaymentType.Swish };
 
 export const ShowingScreen: React.FC<
@@ -136,11 +238,9 @@ export const ShowingScreen: React.FC<
 
   const [showModal, setShowModal] = useState(false);
 
-  const [paymentOption, setPaymentOption] = useState<string>("swish");
-
   const [attendRes, attendShowing] = useAttendShowing();
   const [unattendRes, unattendShowing] = useUnattendShowing();
-  const [{ data: me }] = useMeQuery();
+  const [{ data: me, fetchingMe }, refetchMeQuery] = useMeQuery();
   const [{ data, error, fetching }, executeQuery] = useShowingQuery(showingId);
 
   const isAttending =
@@ -155,12 +255,15 @@ export const ShowingScreen: React.FC<
 
   const handlePressAttendUnattend = () => {
     if (isAttending) {
-      unattendShowing({ showingId });
+      unattendShowing({ showingId }).then(() =>
+        refetchMeQuery({ requestPolicy: "network-only" })
+      );
     } else if (
       me.currentUser.foretagsbiljetter.some(
         ticket => ticket.status === ForetagsbiljettStatus.Available
       )
     ) {
+      refetchMeQuery({ requestPolicy: "network-only" });
       setShowModal(true);
     } else {
       attendShowing({ showingId, paymentOption: swishPaymentOption });
@@ -169,69 +272,19 @@ export const ShowingScreen: React.FC<
 
   return (
     <>
-      <Modal
-        visible={showModal}
-        onDismiss={() => setShowModal(false)}
-        onRequestClose={() => setShowModal(false)}
-        animationType={"slide"}
-      >
-        <View style={{ flex: 1 }} />
-        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-          {isLoadingAttendUnattend ? (
-            <ActivityIndicator />
-          ) : (
-            <>
-
-              <ShowingActionButton
-                text={"Jag hänger på!"}
-                onPress={() => {
-                  attendShowing({
-                    showingId,
-                    paymentOption:
-                      paymentOption === "swish"
-                        ? swishPaymentOption
-                        : {
-                            type: PaymentType.Foretagsbiljett,
-                            ticketNumber: paymentOption
-                          }
-                  }).then(() => setShowModal(false));
-                }}
-              />
-              <ShowingActionButton
-                text={"Avbryt"}
-                backgroundColor={grayColor}
-                onPress={() => setShowModal(false)}
-              />
-            </>
-          )}
-        </View>
-        <Picker
-          selectedValue={paymentOption}
-          onValueChange={itemValue => {
-            setPaymentOption(itemValue);
-          }}
-        >
-          <Picker.Item label={"Swish"} value={"swish"} />
-          {(me && me.currentUser
-            ? me.currentUser.foretagsbiljetter.filter(
-                ticket => ticket.status === ForetagsbiljettStatus.Available
-              )
-            : []
-          ).map(ticket => (
-            <Picker.Item
-              key={ticket.number}
-              label={`Företagsbiljett: ${ticket.number}`}
-              value={ticket.number}
-            />
-          ))}
-        </Picker>
-      </Modal>
+      <ShowingPaymentOptionModal
+        showingId={showingId}
+        onClose={() => setShowModal(false)}
+        showModal={showModal}
+        loading={fetchingMe}
+        tickets={me && me.currentUser ? me.currentUser.foretagsbiljetter : []}
+      />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={fetching} onRefresh={executeQuery} />
         }
       >
-        {data &&
+        {data && me &&
           data.showing && (
             <View style={{ padding }}>
               <View style={{ flexDirection: "row", backgroundColor: "white" }}>
@@ -269,13 +322,26 @@ export const ShowingScreen: React.FC<
                     )
                   }
                 />
-                {isLoadingAttendUnattend ? (
+                {data.showing.ticketsBought ? null : isLoadingAttendUnattend ? (
                   <ActivityIndicator />
                 ) : (
                   <ShowingActionButton
                     backgroundColor={isAttending ? grayColor : goldColor}
                     text={isAttending ? "Avanmäl" : "Jag hänger på!"}
                     onPress={handlePressAttendUnattend}
+                  />
+                )}
+                {data.showing.myTickets.length > 0 && (
+                  <ShowingActionButton
+                    text={"Biljetter"}
+                    onPress={() =>
+                      navigation.navigate({
+                        routeName: "Ticket",
+                        params: {
+                          showingId
+                        }
+                      })
+                    }
                   />
                 )}
               </View>

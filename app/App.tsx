@@ -208,17 +208,8 @@ const client = createClient({
       keys: {
         Participant: () => null,
         Location: () => null,
+        Seat: () => null,
         Foretagsbiljett: data => (data as any).number
-      },
-      updates: {
-        Mutation: {
-          AttendShowing: (result, args, cache, info) => {
-            cache.invalidateQuery(meQuery);
-          },
-          UnattendShowing: (result, args, cache, info) => {
-            cache.invalidateQuery(meQuery);
-          }
-        }
       }
     }),
     fetchExchange
@@ -266,6 +257,8 @@ const App: React.FC<{
         setSignedIn(true);
       }
     } catch (error) {
+      console.log(error);
+
       setSignedIn(false);
     } finally {
       setSigninInProgress(false);

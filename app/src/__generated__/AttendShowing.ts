@@ -53,6 +53,7 @@ export interface AttendShowing_attendShowing {
   id: SeFilmUUID;
   date: string;
   time: string;
+  ticketsBought: boolean;
   admin: AttendShowing_attendShowing_admin;
   location: AttendShowing_attendShowing_location;
   movie: AttendShowing_attendShowing_movie;

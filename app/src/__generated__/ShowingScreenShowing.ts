@@ -51,6 +51,7 @@ export interface ShowingScreenShowing {
   id: SeFilmUUID;
   date: string;
   time: string;
+  ticketsBought: boolean;
   admin: ShowingScreenShowing_admin;
   location: ShowingScreenShowing_location;
   movie: ShowingScreenShowing_movie;

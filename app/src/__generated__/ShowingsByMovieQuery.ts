@@ -58,6 +58,7 @@ export interface ShowingsByMovieQuery_publicShowings {
   id: SeFilmUUID;
   date: string;
   time: string;
+  ticketsBought: boolean;
   admin: ShowingsByMovieQuery_publicShowings_admin;
   location: ShowingsByMovieQuery_publicShowings_location;
   movie: ShowingsByMovieQuery_publicShowings_movie;

@@ -51,6 +51,7 @@ export interface UnattendShowing_unattendShowing {
   id: SeFilmUUID;
   date: string;
   time: string;
+  ticketsBought: boolean;
   admin: UnattendShowing_unattendShowing_admin;
   location: UnattendShowing_unattendShowing_location;
   movie: UnattendShowing_unattendShowing_movie;

@@ -22,7 +22,9 @@ export const meQuery = gql`
     }
   }
 `;
+
 export const useMeQuery = () =>
   useQuery<MeQuery>({
-    query: meQuery
+    query: meQuery,
+    requestPolicy: "cache-and-network"
   });

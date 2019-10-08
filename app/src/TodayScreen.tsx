@@ -40,7 +40,7 @@ export const TodayScreen: React.FC<NavigationInjectedProps> = ({
   return (
     <SectionList
       refreshing={fetching}
-      onRefresh={executeQuery}
+      onRefresh={() => executeQuery({ requestPolicy: 'network-only' })}
       sections={[
         {
           title: "Mina kommande besök",
