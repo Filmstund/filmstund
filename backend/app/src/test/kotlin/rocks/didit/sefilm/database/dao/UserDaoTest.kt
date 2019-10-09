@@ -15,6 +15,7 @@ import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextUserDTO
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
@@ -111,6 +112,63 @@ internal class UserDaoTest {
       assertThat(dbUser)
         .isNotNull
         .isEqualToIgnoringGivenFields(rndUser, "signupDate")
+    }
+  }
+
+  @Test
+  internal fun `given one user, when findPublicUserById(), then the public version of that user is returned`() {
+    val userId = UUID.randomUUID()
+    val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      val publicUser = it.findPublicUserById(userId)
+      assertThat(publicUser)
+        .isNotNull
+        .isEqualTo(rndUser.toPublicUserDTO())
+    }
+  }
+
+  @Test
+  internal fun `given one user, when findPublicUserByGoogleId(), then the public version of that user is returned`() {
+    val userId = UUID.randomUUID()
+    val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      assertThat(rndUser.googleId).isNotNull
+      val publicUser = it.findPublicUserByGoogleId(rndUser.googleId!!)
+      assertThat(publicUser)
+        .isNotNull
+        .isEqualTo(rndUser.toPublicUserDTO())
+    }
+  }
+
+  @Test
+  internal fun `given one user, when updateUserOnLogin(), then the user is updated accordingly`() {
+    val userId = UUID.randomUUID()
+    val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
+      .copy(lastModifiedDate = Instant.now(), lastLogin = Instant.now())
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      val dbUser = it.findById(rndUser.id)
+      it.updateUserOnLogin(userId, "newFirstName", "newLastName", "newAvatar")
+      val updatedDbUser = it.findById(rndUser.id)
+      assertThat(dbUser)
+        .isNotNull
+        .isNotEqualTo(updatedDbUser)
+      assertThat(updatedDbUser).isNotNull
+      assertThat(updatedDbUser?.firstName).isEqualTo("newFirstName")
+      assertThat(updatedDbUser?.lastName).isEqualTo("newLastName")
+      assertThat(updatedDbUser?.avatar).isEqualTo("newAvatar")
+      assertThat(updatedDbUser?.lastLogin)
+        .isNotNull()
+        .isAfter(rndUser.lastLogin)
+        .isEqualTo(updatedDbUser?.lastModifiedDate)
     }
   }
 

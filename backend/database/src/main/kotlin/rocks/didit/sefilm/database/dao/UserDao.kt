@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.database.dao
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.customizer.Timestamped
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
@@ -9,6 +10,7 @@ import rocks.didit.sefilm.database.UserGiftCertReducer
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.util.*
 
@@ -27,6 +29,12 @@ interface UserDao {
   @UseRowReducer(UserGiftCertReducer::class)
   fun findById(userId: UUID): UserDTO?
 
+  @SqlQuery("SELECT u.id, u.first_name, u.last_name, u.nick, u.phone, u.avatar FROM users u WHERE u.id = :userId")
+  fun findPublicUserById(userId: UUID): PublicUserDTO?
+
+  @SqlQuery("SELECT u.id, u.first_name, u.last_name, u.nick, u.phone, u.avatar FROM users u WHERE u.google_id = :googleId")
+  fun findPublicUserByGoogleId(googleId: GoogleId): PublicUserDTO?
+
   @SqlQuery("SELECT exists(SELECT 1 FROM users where id = :userId)")
   fun existsById(userId: UUID): Boolean
 
@@ -42,6 +50,10 @@ interface UserDao {
       insertGiftCertificates(user.giftCertificates)
     }
   }
+
+  @SqlUpdate("UPDATE users SET first_name = :firstName, last_name = :lastName, avatar = :avatar, last_login = :now, last_modified_date = :now WHERE id = :userId")
+  @Timestamped
+  fun updateUserOnLogin(userId: UUID, firstName: String, lastName: String, avatar: String?): Boolean
 
   @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at, is_deleted) VALUES (:userId, :number, :expiresAt, :deleted)")
   fun insertGiftCertificates(@BindBean giftCerts: Collection<GiftCertificateDTO>): IntArray

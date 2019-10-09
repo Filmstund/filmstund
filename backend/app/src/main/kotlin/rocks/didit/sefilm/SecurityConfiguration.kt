@@ -1,5 +1,7 @@
 package rocks.didit.sefilm
 
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -18,13 +20,14 @@ import org.springframework.security.oauth2.provider.token.UserAuthenticationConv
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
 import java.time.Instant
+import java.util.*
 
 class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
 
@@ -50,48 +53,52 @@ class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
 
 @Component
 class UserAuthConverter(
-  private val userRepo: UserRepository
+  private val jdbi: Jdbi
 ) : UserAuthenticationConverter {
   private val log by logger()
 
   @Transactional
   override fun extractAuthentication(map: Map<String, *>): Authentication? {
-    val details = OpenIdConnectUserDetails(map)
+    return jdbi.inTransactionUnchecked {
+      val userDao = it.attach(UserDao::class.java)
+      val details = OpenIdConnectUserDetails(map)
 
-    val principal: PublicUserDTO = when (userRepo.existsByGoogleId(GoogleId(details.userId))) {
-      true -> onExistingUser(details)
-      false -> onNewUser(details)
+      val principal: PublicUserDTO = when (userDao.existsByGoogleId(details.userId)) {
+        true -> onExistingUser(userDao, details)
+        false -> onNewUser(userDao, details)
+      }
+
+      UsernamePasswordAuthenticationToken(principal, "N/A", details.authorities)
     }
-
-    return UsernamePasswordAuthenticationToken(principal, "N/A", details.authorities)
   }
 
-  fun onExistingUser(details: OpenIdConnectUserDetails): PublicUserDTO {
-    val user = userRepo.findByGoogleId(GoogleId(details.userId)) ?: throw NotFoundException("user")
+  fun onExistingUser(userDao: UserDao, details: OpenIdConnectUserDetails): PublicUserDTO {
+    val user = userDao.findPublicUserByGoogleId(GoogleId(details.userId)) ?: throw NotFoundException("user")
+    val firstName = details.firstName ?: "Mr Noname"
+    val lastName = details.lastName ?: "Anybody"
 
-    user.firstName = details.firstName ?: "Mr Noname"
-    user.lastName = details.lastName ?: "Anybody"
-    user.avatar = details.avatarUrl
-    user.lastLogin = Instant.now()
-
-    return user.toPublicUserDTO()
+    userDao.updateUserOnLogin(user.id, firstName, lastName, details.avatarUrl)
+    return user.copy(firstName = firstName, lastName = lastName, avatar = details.avatarUrl)
   }
 
-  fun onNewUser(details: OpenIdConnectUserDetails): PublicUserDTO {
-    val newUser = User(
+  fun onNewUser(userDao: UserDao, details: OpenIdConnectUserDetails): PublicUserDTO {
+    val newUser = UserDTO(
+      id = UUID.randomUUID(),
       googleId = GoogleId(details.userId),
+      calendarFeedId = UUID.randomUUID(),
       firstName = details.firstName ?: "Bosse",
       lastName = details.lastName ?: "Ringholm",
       nick = details.firstName ?: "Houdini",
       email = details.username ?: "",
       avatar = details.avatarUrl,
       lastLogin = Instant.now(),
-      signupDate = Instant.now()
+      signupDate = Instant.now(),
+      lastModifiedDate = Instant.now()
     )
 
-    val savedUser = userRepo.save(newUser)
-    log.info("Created new user ${savedUser.name} (${savedUser.id})")
-    return savedUser.toPublicUserDTO()
+    userDao.insertUser(newUser)
+    log.info("Created new Google user ${newUser.name} (${newUser.id})")
+    return newUser.toPublicUserDTO()
   }
 
   override fun convertUserAuthentication(userAuthentication: Authentication) =
