@@ -1,44 +1,38 @@
 package rocks.didit.sefilm.services
 
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.entities.GiftCertificate
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
-import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.logger
-import rocks.didit.sefilm.orElseThrow
+import rocks.didit.sefilm.maybeCurrentLoggedInUser
+import java.time.Instant
 import java.util.*
 
 @Service
 class UserService(
-  private val userRepo: UserRepository,
+  private val jdbi: Jdbi
   //private val pushoverService: PushoverService?,
-  private val foretagsbiljettService: GiftCertificateService
 ) {
 
   private val log by logger()
+  private val userDao = jdbi.onDemand(UserDao::class.java)
 
-  fun allUsers(): List<PublicUserDTO> = userRepo.findAllPublicUsers()
-  fun getUser(id: UUID): PublicUserDTO? = userRepo.findPublicUserById(id)
-  fun getUserOrThrow(id: UUID): PublicUserDTO = getUser(id).orElseThrow {
-    NotFoundException(
-      "user",
-      id
-    )
-  }
+  fun allUsers(): List<PublicUserDTO> = userDao.findAllPublicUsers()
+  fun getUser(id: UUID): PublicUserDTO? = userDao.findPublicUserById(id)
+  fun getUserOrThrow(id: UUID): PublicUserDTO = getUser(id)
+    ?: throw NotFoundException("user", id)
 
-  fun getUsersThatWantToBeNotified(knownRecipients: List<UUID>): List<User> = emptyList() /*{
+  fun getUsersThatWantToBeNotified(knownRecipients: List<UUID>): List<UserDTO> = emptyList() /*{
     return knownRecipients.let {
       when (it.isEmpty()) {
         true -> userRepo.findAll()
@@ -53,46 +47,25 @@ class UserService(
   */
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
-  fun getCompleteUser(id: UUID): User = userRepo.findById(id)
-    .orElseThrow { NotFoundException("user", userID = id) }
+  fun getCompleteUser(id: UUID): UserDTO = userDao.findById(id)
+    ?: throw NotFoundException("user", userID = id)
 
-  fun getCurrentUser(): UserDTO = currentLoggedInUser().let {
-    getCompleteUser(it.id).toDTO()
-  }
+  fun getCurrentUser(): UserDTO = getCurrentUserOrNull()
+    ?: throw AccessDeniedException("No user logged in")
 
-  fun currentUserOrNull(): User? {
-    val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-    if (authentication?.isAuthenticated != false) {
-      return null
-    }
+  fun getCurrentUserOrNull(): UserDTO? = maybeCurrentLoggedInUser()?.let { u -> getCompleteUser(u.id) }
 
-    val principal = authentication.principal as PublicUserDTO
-    return getCompleteUser(principal.id)
-  }
-
-  private fun getUserEntityForCurrentUser() = userRepo.findById(currentLoggedInUser().id)
-    .orElseThrow { NotFoundException("current user", currentLoggedInUser().id) }
-
-  @Transactional
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
-    val newFilmstadenMembershipId = when {
-      newDetails.filmstadenMembershipId.isNullOrBlank() -> null
-      else -> FilmstadenMembershipId.valueOf(newDetails.filmstadenMembershipId!!)
+    val newFilmstadenMembershipId = newDetails.filmstadenMembershipId?.let { FilmstadenMembershipId.valueOf(it) }
+    val newPhoneNumber = newDetails.phone?.let { PhoneNumber(it) }
+
+    val currentUser = currentLoggedInUser()
+    log.info("Update user {}", currentUser.id)
+    return jdbi.inTransactionUnchecked {
+      val dao = it.attach(UserDao::class.java)
+      dao.updateUser(currentUser.id, newFilmstadenMembershipId, newPhoneNumber, newDetails.nick ?: "")
+      dao.findById(currentUser.id)!!
     }
-
-    val newPhoneNumber = when {
-      newDetails.phone.isNullOrBlank() -> null
-      else -> PhoneNumber(newDetails.phone!!)
-    }
-
-    val user = getUserEntityForCurrentUser()
-    user.filmstadenId = newFilmstadenMembershipId
-
-    user.phone = newPhoneNumber
-    user.nick = newDetails.nick ?: ""
-
-    log.info("Update user {}", user.id)
-    return user.toDTO()
   }
 
   // TODO: listen for PushoverUserKeyInvalid and disable the key
@@ -128,43 +101,23 @@ class UserService(
   }
   */
 
-  fun lookupUserFromCalendarFeedId(calendarFeedId: UUID): UserDTO? = userRepo
-    .findByCalendarFeedId(calendarFeedId)
-    ?.toDTO()
-
   fun invalidateCalendarFeedId(): UserDTO {
-    return getUserEntityForCurrentUser()
-      .copy(calendarFeedId = UUID.randomUUID())
-      .let { userRepo.save(it) }.toDTO()
+    return updateCalendarFeedIdForCurrentUser(UUID.randomUUID())
   }
 
   fun disableCalendarFeed(): UserDTO {
-    return getUserEntityForCurrentUser()
-      .copy(calendarFeedId = null)
-      .let { userRepo.save(it) }.toDTO()
+    return updateCalendarFeedIdForCurrentUser(null)
   }
 
-  fun User.toDTO() = UserDTO(
-    this.id,
-    this.googleId,
-    this.filmstadenId,
-    this.calendarFeedId,
-    this.firstName,
-    this.lastName,
-    this.nick,
-    this.email,
-    this.phone,
-    this.avatar,
-    this.giftCertificates.map { toDTO(it) },
-    this.lastLogin,
-    this.signupDate,
-    this.lastModifiedDate
-  )
+  private fun updateCalendarFeedIdForCurrentUser(newFeedId: UUID?): UserDTO {
+    return jdbi.inTransactionUnchecked {
+      it.createUpdate("UPDATE users SET calendar_feed_id = :newFeedId, last_modified_date = :now WHERE id = :userId")
+        .bind("newFeedId", newFeedId)
+        .bind("now", Instant.now())
+        .bind("userId", currentLoggedInUser().id)
+        .execute()
 
-  private fun toDTO(giftCert: GiftCertificate): GiftCertificateDTO = giftCert.toDTO()
-    .let {
-      it.copy(
-        status = foretagsbiljettService.getStatusOfTicket(it)
-      )
+      it.attach(UserDao::class.java).findById(currentLoggedInUser().id)!!
     }
+  }
 }

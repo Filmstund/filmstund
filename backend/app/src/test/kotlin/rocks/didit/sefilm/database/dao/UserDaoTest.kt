@@ -112,6 +112,10 @@ internal class UserDaoTest {
       assertThat(dbUser)
         .isNotNull
         .isEqualToIgnoringGivenFields(rndUser, "signupDate")
+      val allPublicUsers = it.findAllPublicUsers()
+      assertThat(allPublicUsers)
+        .isNotEmpty
+        .containsExactlyInAnyOrderElementsOf(usersFromDb.map(UserDTO::toPublicUserDTO))
     }
   }
 

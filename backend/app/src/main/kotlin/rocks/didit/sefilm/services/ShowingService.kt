@@ -30,13 +30,8 @@ import rocks.didit.sefilm.domain.dto.FilmstadenScreenDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
-import rocks.didit.sefilm.events.DeletedShowingEvent
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.events.NewShowingEvent
-import rocks.didit.sefilm.events.TicketsBoughtEvent
-import rocks.didit.sefilm.events.UpdatedShowingEvent
-import rocks.didit.sefilm.events.UserAttendedEvent
-import rocks.didit.sefilm.events.UserUnattendedEvent
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -140,7 +135,8 @@ class ShowingService(
     val participant = participantRepo.save(createParticipantBasedOnPaymentType(paymentOption, user.id, showing))
     showing.participants.add(participant)
 
-    eventPublisher.publish(UserAttendedEvent(this, showing, participant.user, paymentOption.type))
+    // TODO re-enable
+    //eventPublisher.publish(UserAttendedEvent(this, showing, participant.user, paymentOption.type))
     return showing.toDTO()
   }
 
@@ -156,7 +152,8 @@ class ShowingService(
     // TODO: will this be cascaded?
     showing.participants.remove(participant)
 
-    eventPublisher.publish(UserUnattendedEvent(this, showing, participant.user))
+    // TODO re-enable
+    //eventPublisher.publish(UserUnattendedEvent(this, showing, participant.user))
     return showing.toDTO()
   }
 
@@ -166,7 +163,7 @@ class ShowingService(
     val filmstadenShow = data.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
     val showing = showingRepo.save(
       data.toShowing(
-        adminUser,
+        userRepo.findById(adminUser.id).orElse(null)!!,
         movieRepo.getOne(data.movieId),
         filmstadenShow?.screen
       )
@@ -188,7 +185,8 @@ class ShowingService(
     showingRepo.delete(showing)
 
     log.info("{} deleted showing {} - {} ({})", showing.admin.id, showing.id, showing.dateTime, showing.movie.title)
-    eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
+    // TODO re-enable
+    //eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
     return getAllPublicShowings()
   }
 
@@ -207,7 +205,8 @@ class ShowingService(
     showing.price = price
     showing.ticketsBought = true
 
-    eventPublisher.publish(TicketsBoughtEvent(this, showing, showing.admin))
+    // TODO re-enable
+    //eventPublisher.publish(TicketsBoughtEvent(this, showing, showing.admin))
     return showing.toDTO()
   }
 
@@ -233,7 +232,8 @@ class ShowingService(
     showing.date = newValues.date
     showingRepo.save(showing)
 
-    eventPublisher.publish(UpdatedShowingEvent(this, showing, originalShowing, showing.admin))
+    // TODO re-enable
+    //eventPublisher.publish(UpdatedShowingEvent(this, showing, originalShowing, showing.admin))
     return showing.toDTO()
   }
 

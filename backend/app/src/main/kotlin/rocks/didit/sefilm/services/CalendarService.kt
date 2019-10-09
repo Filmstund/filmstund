@@ -16,6 +16,9 @@ import biweekly.property.ProductId
 import biweekly.property.Status
 import biweekly.property.Transparency
 import biweekly.property.Trigger
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
+import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -23,7 +26,6 @@ import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.repositories.ParticipantRepository
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
-import rocks.didit.sefilm.domain.dto.core.UserDTO
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -31,7 +33,7 @@ import java.util.*
 
 @Service
 class CalendarService(
-  private val userService: UserService,
+  private val jdbi: Jdbi,
   private val showingService: ShowingService,
   private val participantRepo: ParticipantRepository,
   private val movieService: MovieService,
@@ -48,12 +50,16 @@ class CalendarService(
   }
 
   fun getCalendarFeed(userFeedId: UUID): ICalendar {
-    val user = userService.lookupUserFromCalendarFeedId(userFeedId) ?: return setupCalendar(userFeedId)
+    val (userId, mail) = jdbi.inTransactionUnchecked {
+      it.select("SELECT id, email FROM users WHERE calendar_feed_id = :feedId", userFeedId)
+        .mapTo<Pair<UUID, String>>()
+        .findOne().orElse(null)
+    } ?: return setupCalendar(userFeedId)
 
     val cal = setupCalendar(userFeedId)
     showingService
-      .getShowingByUser(user.id)
-      .map { it.toVEvent(user) }
+      .getShowingByUser(userId)
+      .map { it.toVEvent(userId, mail) }
       .forEach { cal.addEvent(it) }
 
     return cal
@@ -74,7 +80,7 @@ class CalendarService(
     return calendar
   }
 
-  private fun ShowingDTO.toVEvent(user: UserDTO): VEvent {
+  private fun ShowingDTO.toVEvent(userId: UUID, userEmail: String): VEvent {
     val movie = movieService.getMovie(this.movieId) ?: return VEvent()
     val showingUrl = "${properties.baseUrl.frontend}/showings/$webId/$slug"
 
@@ -84,11 +90,11 @@ class CalendarService(
     vEvent.setDateEnd(this.getEndDate(movie))
     vEvent.setUid(this.id.toString())
     vEvent.setLocation(this.location?.formatAddress())
-    vEvent.setDescription(formatDescription(this.id, user.id, movie) + "\n\n$showingUrl")
+    vEvent.setDescription(formatDescription(this.id, userId, movie) + "\n\n$showingUrl")
     vEvent.setUrl(showingUrl)
     vEvent.addCategories(Categories("bio"))
-    vEvent.addParticipants(this, user.email)
-    vEvent.setOrganizer(user.email)
+    vEvent.addParticipants(this, userEmail)
+    vEvent.setOrganizer(userEmail)
     vEvent.status = if (this.ticketsBought) Status.confirmed() else Status.tentative()
     vEvent.created = Created(Date.from(this.createdDate))
     vEvent.lastModified = LastModified(Date.from(this.lastModifiedDate))
@@ -107,8 +113,7 @@ class CalendarService(
     return if (paymentDetails == null || paymentDetails.hasPaid) {
       "Kolla på bio!\n${if (movie.imdbId?.isSupplied() == true) "http://www.imdb.com/title/${movie.imdbId?.value}/" else ""}"
     } else {
-      val phoneNumber = userService.getUser(paymentDetails.payTo)?.phone
-      "Betala ${paymentDetails.amountOwed.toKronor()} kr till $phoneNumber"
+      "Betala ${paymentDetails.amountOwed.toKronor()} kr till ${paymentDetails.payToPhoneNumber}"
     }
   }
 
