@@ -59,6 +59,7 @@ dependencies {
   implementation(kotlin("reflect"))
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
+  testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   testImplementation("org.mockito:mockito-core:3.0.0")

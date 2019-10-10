@@ -121,17 +121,6 @@ internal class MongoMigrator(
                 userInfo = PublicUserDTO(id = user)
               )
               is FtgBiljettParticipant -> {
-                if (!userDao.existGiftCertByNumber(p.ticketNumber)) {
-                  val cert =
-                    GiftCertificateDTO(
-                      userId = user,
-                      number = p.ticketNumber,
-                      expiresAt = LocalDate.EPOCH,
-                      deleted = true
-                    )
-                  userDao.insertGiftCertificate(cert)
-                }
-
                 ParticipantDTO(
                   userId = user,
                   showingId = showing.id,
@@ -270,7 +259,7 @@ internal class MongoMigrator(
       phone = it.phone,
       filmstadenId = it.filmstadenMembershipId,
       giftCertificates = it.foretagsbiljetter.map { ticket ->
-        GiftCertificateDTO(newUserId, ticket.number, ticket.expires, false)
+        GiftCertificateDTO(newUserId, ticket.number, ticket.expires)
       }
     )
     dao.insertUser(user)

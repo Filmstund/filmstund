@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.database.dao
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.customizer.Timestamped
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
@@ -66,7 +67,7 @@ interface UserDao {
     userId: UUID, filmstadenMembershipId: FilmstadenMembershipId?, phoneNumber: PhoneNumber?, nick: String
   ): Boolean
 
-  @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at, is_deleted) VALUES (:userId, :number, :expiresAt, :deleted)")
+  @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at) VALUES (:userId, :number, :expiresAt)")
   fun insertGiftCertificates(@BindBean giftCerts: Collection<GiftCertificateDTO>): IntArray
 
   fun insertGiftCertificate(giftCert: GiftCertificateDTO) = insertGiftCertificates(listOf(giftCert))
@@ -74,6 +75,17 @@ interface UserDao {
   @SqlQuery("SELECT * FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
   fun findGiftCertByUserAndNumber(userId: UUID, number: TicketNumber): GiftCertificateDTO?
 
+  @SqlQuery("SELECT * FROM gift_certificate gc WHERE gc.user_id = :userId")
+  fun findGiftCertByUser(userId: UUID): List<GiftCertificateDTO>
+
   @SqlQuery("SELECT exists(SELECT 1 FROM gift_certificate gc WHERE gc.number = :number)")
   fun existGiftCertByNumber(number: TicketNumber): Boolean
+
+  @SqlQuery("select exists(SELECT 1 FROM gift_certificate gc WHERE gc.number in (<numbers>))")
+  fun existGiftCertsByNumbers(@BindList("numbers") numbers: List<TicketNumber>): Boolean
+
+  @SqlUpdate("DELETE FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
+  // This will also cascade set null on the Participant table if the ticket has been used in a showing
+  fun deleteGiftCertByUserAndNumber(userId: UUID, number: TicketNumber): Boolean
+
 }

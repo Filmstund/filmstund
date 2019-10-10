@@ -51,7 +51,7 @@ class CalendarService(
 
   fun getCalendarFeed(userFeedId: UUID): ICalendar {
     val (userId, mail) = jdbi.inTransactionUnchecked {
-      it.select("SELECT id, email FROM users WHERE calendar_feed_id = :feedId", userFeedId)
+      it.select("SELECT id, email FROM users WHERE calendar_feed_id = ?", userFeedId)
         .mapTo<Pair<UUID, String>>()
         .findOne().orElse(null)
     } ?: return setupCalendar(userFeedId)

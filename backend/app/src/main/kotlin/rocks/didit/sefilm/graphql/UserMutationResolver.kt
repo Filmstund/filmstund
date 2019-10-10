@@ -27,7 +27,7 @@ class UserMutationResolver(
     participantPaymentInfoService.updatePaymentInfo(paymentInfo)
 
   fun addGiftCertificates(giftCerts: List<GiftCertificateDTO>): UserDTO {
-    foretagsbiljettService.addForetagsbiljetterToCurrentUser(giftCerts)
+    foretagsbiljettService.addGiftCertsToCurrentUser(giftCerts)
     return userService.getCurrentUser()
   }
 

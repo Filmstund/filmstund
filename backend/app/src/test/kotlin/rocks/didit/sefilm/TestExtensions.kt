@@ -135,8 +135,7 @@ fun ThreadLocalRandom.nextParticipant(
     giftCertificateUsed = if (ticketNumber != null) GiftCertificateDTO(
       userId,
       ticketNumber,
-      nextLocalDate(),
-      false
+      nextLocalDate()
     ) else null
   )
 }

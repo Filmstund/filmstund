@@ -177,7 +177,7 @@ internal class UserDaoTest {
   }
 
   @Test
-  internal fun `given at a gift cert, when findGiftCertByUserAndNumber(), then that gift cert is returned`() {
+  internal fun `given a gift cert, when findGiftCertByUserAndNumber(), then that gift cert is returned`() {
     val userId = UUID.randomUUID()
     val giftCert = rnd.nextGiftCert(userId)
     val rndUser = rnd.nextUserDTO(userId, listOf(giftCert))
@@ -194,6 +194,64 @@ internal class UserDaoTest {
         .isNull()
       assertThat(it.findGiftCertByUserAndNumber(userId, rnd.nextGiftCert(UUID.randomUUID()).number))
         .isNull()
+    }
+  }
+
+  @Test
+  internal fun `given at least 2 gift certs, when findGiftCertByUser(), then all gift certs for that user is returned`() {
+    val userId = UUID.randomUUID()
+    val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 10))
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      val dbGiftCerts = it.findGiftCertByUser(userId)
+      assertThat(dbGiftCerts)
+        .hasSameSizeAs(rndUser.giftCertificates)
+        .containsExactlyInAnyOrderElementsOf(rndUser.giftCertificates)
+      assertThat(it.findGiftCertByUser(UUID.randomUUID()))
+        .isNotNull
+        .isEmpty()
+    }
+  }
+
+  @Test
+  internal fun `given at least 2 gift certs, when existGiftCertsByNumbers(), then only tickets that exists return true`() {
+    val userId = UUID.randomUUID()
+    val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 10))
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      assertThat(it.existGiftCertsByNumbers(rndUser.giftCertificates.map { gc -> gc.number }))
+        .isTrue()
+      assertThat(it.existGiftCertsByNumbers(listOf(rndUser.giftCertificates.first().number)))
+        .isTrue()
+      assertThat(it.existGiftCertsByNumbers(listOf(rnd.nextGiftCert(userId).number)))
+        .isFalse()
+    }
+  }
+
+  @Test
+  internal fun `given 2 gift certs for a user, when deleteGiftCertByUserAndNumber(), then one gift cert is left`() {
+    val userId = UUID.randomUUID()
+    val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 2))
+
+    jdbi.useExtensionUnchecked(UserDao::class) {
+      it.insertUserAndGiftCerts(rndUser)
+
+      val numbers = rndUser.giftCertificates.map { gc -> gc.number }
+      assertThat(it.existGiftCertsByNumbers(numbers))
+        .describedAs("Numbers exists")
+        .isTrue()
+      assertThat(it.deleteGiftCertByUserAndNumber(userId, numbers.first())).isTrue()
+      assertThat(it.existGiftCertByNumber(numbers.first()))
+        .describedAs("1st ticket is deleted")
+        .isFalse()
+      assertThat(it.deleteGiftCertByUserAndNumber(userId, numbers.last())).isTrue()
+      assertThat(it.existGiftCertByNumber(numbers.last()))
+        .describedAs("2nd ticket is deleted")
+        .isFalse()
     }
   }
 }

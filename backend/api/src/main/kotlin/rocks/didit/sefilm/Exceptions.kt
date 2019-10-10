@@ -21,7 +21,7 @@ class TicketsAlreadyBoughtException(userID: UUID, showingId: UUID) :
   KnownException("The action is not allowed since the tickets for this showing is already bought", userID, showingId)
 
 class TicketAlreadyInUserException(userID: UUID) :
-  KnownException("One or more of your företagsbiljeter is already in use", userID)
+  KnownException("One or more of your gift certs is already in use", userID)
 
 class UserAlreadyAttendedException(userID: UUID) :
   KnownException("The user has already attended this showing", userID)

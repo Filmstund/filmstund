@@ -86,7 +86,6 @@ create table gift_certificate
     number     varchar(15)
         constraint giftcert_number_unique unique,
     expires_at date    not null default current_date + interval '1 year',
-    is_deleted boolean not null default false,
     constraint giftcert_pk primary key (user_id, number)
 );
 --rollback drop table if exists gift_certificate;
@@ -118,6 +117,7 @@ create table movie
 );
 --rollback drop table if exists movie;
 
+-- FIXME remove when jpa is removed
 --changeset eda:createTableMovieGenres
 create table movie_genres
 (

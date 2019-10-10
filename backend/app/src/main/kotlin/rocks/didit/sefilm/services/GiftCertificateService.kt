@@ -1,89 +1,80 @@
 package rocks.didit.sefilm.services
 
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.mapTo
+import org.jdbi.v3.core.kotlin.useTransactionUnchecked
+import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.TicketAlreadyInUserException
 import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.TicketNotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.entities.GiftCertId
-import rocks.didit.sefilm.database.entities.GiftCertificate
-import rocks.didit.sefilm.database.repositories.GiftCertificateRepository
-import rocks.didit.sefilm.database.repositories.ParticipantRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import java.time.LocalDate
 import java.util.*
 
 @Service
-class GiftCertificateService(
-  private val giftCertRepo: GiftCertificateRepository,
-  private val userRepository: UserRepository,
-  private val participantRepo: ParticipantRepository
-) {
+class GiftCertificateService(private val jdbi: Jdbi) {
 
-  @Transactional
   fun getStatusOfTicket(ticket: GiftCertificateDTO): GiftCertificateDTO.Status {
     if (ticket.expiresAt <= LocalDate.now()) {
       return GiftCertificateDTO.Status.EXPIRED
     }
 
-    val participantHasUsedTicket = participantRepo.findByGiftCertificateUsed_Id_Number(ticket.number)
-      ?: return GiftCertificateDTO.Status.AVAILABLE
+    return jdbi.withHandleUnchecked {
+      val hasPaid = it.select("SELECT has_paid FROM participant WHERE gift_certificate_used = ?", ticket.number)
+        .mapTo<Boolean>()
+        .findOne().orElse(null)
 
-    return if (participantHasUsedTicket.showing.ticketsBought) {
-      GiftCertificateDTO.Status.USED
-    } else {
-      GiftCertificateDTO.Status.PENDING
-    }
-  }
-
-  fun getGiftCertsByUserId(userID: UUID): List<GiftCertificateDTO> =
-    giftCertRepo.findGiftCertificateDTOByUserId(userID)
-
-  fun addForetagsbiljetterToCurrentUser(biljetter: List<GiftCertificateDTO>) {
-    val currentUser = userRepository.findById(currentLoggedInUser().id)
-      .orElseThrow { NotFoundException("current user", currentLoggedInUser().id) }
-
-    assertForetagsbiljetterNotAlreadyInUse(biljetter, currentUser.giftCertificates)
-
-    val newTickets = biljetter.map { GiftCertificate(GiftCertId(currentUser, TicketNumber(it.number.number)), it.expiresAt) }
-    giftCertRepo.saveAll(newTickets)
-  }
-
-  @Transactional
-  fun deleteTicketFromUser(biljett: GiftCertificateDTO) {
-    val currentUser = userRepository.findById(currentLoggedInUser().id)
-      .orElseThrow { NotFoundException("current user", currentLoggedInUser().id) }
-
-    val ticketNumber = TicketNumber(biljett.number.number)
-    val giftCert = giftCertRepo.findById(GiftCertId(currentUser, ticketNumber))
-      .orElseThrow { throw TicketNotFoundException(ticketNumber) }
-
-    assertTicketIsntPending(giftCert)
-
-    currentUser.giftCertificates.remove(giftCert)
-  }
-
-  /** The tickets are allowed to be in use by the current user. */
-  private fun assertForetagsbiljetterNotAlreadyInUse(
-    biljetter: List<GiftCertificateDTO>,
-    userBiljetter: List<GiftCertificate>
-  ) {
-    biljetter.forEach {
-      val ticketNumber = TicketNumber(it.number.number)
-      if (!userBiljetter.any { t -> t.id.number == ticketNumber }
-        && giftCertRepo.existsById_Number(ticketNumber)) {
-        throw TicketAlreadyInUserException(currentLoggedInUser().id)
+      when (hasPaid) {
+        null -> // No participant with this ticket
+          GiftCertificateDTO.Status.AVAILABLE
+        true -> // Attached to a participant and bought/used
+          GiftCertificateDTO.Status.USED
+        false -> // Attached to a participant, but not bought yet
+          GiftCertificateDTO.Status.PENDING
       }
     }
   }
 
-  private fun assertTicketIsntPending(ticket: GiftCertificate) {
-    if (getStatusOfTicket(ticket.toDTO()) == GiftCertificateDTO.Status.PENDING) {
-      throw TicketInUseException(ticket.id.number)
+  fun getGiftCertsByUserId(userID: UUID): List<GiftCertificateDTO> {
+    return jdbi.onDemand(UserDao::class.java).findGiftCertByUser(userID)
+  }
+
+  fun addGiftCertsToCurrentUser(newCerts: List<GiftCertificateDTO>) {
+    jdbi.useTransactionUnchecked {
+      val userDao = it.attach(UserDao::class.java)
+
+      assertGiftCertsNotAlreadyInUse(userDao, newCerts)
+      userDao.insertGiftCertificates(newCerts)
+    }
+  }
+
+  @Transactional
+  fun deleteTicketFromUser(giftCert: GiftCertificateDTO) {
+    jdbi.useTransactionUnchecked {
+      val userDao = it.attach(UserDao::class.java)
+
+      val dbGc = userDao.findGiftCertByUserAndNumber(currentLoggedInUser().id, giftCert.number)
+        ?: throw TicketNotFoundException(giftCert.number)
+
+      assertTicketIsntPending(giftCert)
+      userDao.deleteGiftCertByUserAndNumber(currentLoggedInUser().id, dbGc.number)
+    }
+  }
+
+  /** The tickets are allowed to be in use by the current user. */
+  private fun assertGiftCertsNotAlreadyInUse(userDao: UserDao, newGiftCerts: List<GiftCertificateDTO>) {
+    if (userDao.existGiftCertsByNumbers(newGiftCerts.map { it.number })) {
+      throw TicketAlreadyInUserException(currentLoggedInUser().id)
+    }
+  }
+
+  private fun assertTicketIsntPending(giftCert: GiftCertificateDTO) {
+    if (getStatusOfTicket(giftCert) == GiftCertificateDTO.Status.PENDING) {
+      throw TicketInUseException(giftCert.number)
     }
   }
 }
