@@ -2,6 +2,7 @@ package rocks.didit.sefilm.database
 
 import org.jdbi.v3.core.result.LinkedHashMapRowReducer
 import org.jdbi.v3.core.result.RowView
+import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
@@ -33,17 +34,33 @@ class LocationAliasReducer : LinkedHashMapRowReducer<String, LocationDTO> {
   }
 }
 
-class ShowingLocationReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
+class ShowingLocationScreenReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
   override fun accumulate(container: MutableMap<UUID, ShowingDTO>, rowView: RowView) {
     val id = rowView.getColumn("id", UUID::class.java)
-    val showing = container.computeIfAbsent(id) { rowView.getRow(ShowingDTO::class.java) }
+    var showing = container.computeIfAbsent(id) { rowView.getRow(ShowingDTO::class.java) }
+
+    val cinemaScreenId = rowView.getColumn("cs_filmstadenId", String::class.java)
+    if (cinemaScreenId != null && showing.cinemaScreen == null) {
+      val cinemaScreen = rowView.getRow(FilmstadenLiteScreenDTO::class.java)
+
+      showing = showing.copy(cinemaScreen = cinemaScreen)
+      container.replace(id, showing)
+    }
+
+    val locationName = rowView.getColumn("l_name", String::class.java)
+    if (locationName != null && showing.location == null) {
+      val location = rowView.getRow(LocationDTO::class.java)
+
+      showing = showing.copy(location = location)
+      container.replace(id, showing)
+    }
 
     val alias = rowView.getColumn("la_alias", String::class.java)
     if (alias != null && showing.location != null) {
-      val copiedShowing = showing.copy(
+      showing = showing.copy(
         location = showing.location!!.copy(alias = showing.location!!.alias.plus(alias))
       )
-      container.replace(id, copiedShowing)
+      container.replace(id, showing)
     }
   }
 }
