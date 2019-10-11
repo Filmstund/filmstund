@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
-import rocks.didit.sefilm.database.repositories.BudordRepository
+import rocks.didit.sefilm.database.dao.BudordDao
 import rocks.didit.sefilm.domain.dto.BioBudordDTO
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, BudordRepository::class, BudordService::class])
+@SpringBootTest(classes = [Jdbi::class, BudordDao::class, BudordService::class])
 @Import(DbConfig::class, TestConfig::class)
 internal class BudordServiceTest {
 
