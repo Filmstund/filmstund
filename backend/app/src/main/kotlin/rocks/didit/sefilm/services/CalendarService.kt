@@ -19,12 +19,14 @@ import biweekly.property.Trigger
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.jdbi.v3.core.kotlin.mapTo
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.repositories.ParticipantRepository
+import rocks.didit.sefilm.database.dao.MovieDao
+import rocks.didit.sefilm.database.dao.ParticipantDao
+import rocks.didit.sefilm.database.dao.ShowingDao
+import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import java.time.Duration
 import java.time.Instant
@@ -34,31 +36,30 @@ import java.util.*
 @Service
 class CalendarService(
   private val jdbi: Jdbi,
-  private val showingService: ShowingService,
-  private val participantRepo: ParticipantRepository,
-  private val movieService: MovieService,
   private val properties: Properties
 ) {
 
+  private val showingDao = jdbi.onDemand(ShowingDao::class.java)
+  private val movieDao = jdbi.onDemand(MovieDao::class.java)
+  private val participantDao = jdbi.onDemand(ParticipantDao::class.java)
   private val calendarDescription: String = "Dina visningar på $CALENDAR_NAME (${properties.baseUrl.frontend})"
 
   companion object {
     private const val CALENDAR_NAME = "SeFilm"
     private val stockholmZoneId = TimeZone.getTimeZone("Europe/Stockholm").toZoneId()
-
-    private val log: Logger = LoggerFactory.getLogger(CalendarService::class.java)
   }
 
+  data class IdAndMail(val id: UUID, val email: String)
   fun getCalendarFeed(userFeedId: UUID): ICalendar {
     val (userId, mail) = jdbi.inTransactionUnchecked {
       it.select("SELECT id, email FROM users WHERE calendar_feed_id = ?", userFeedId)
-        .mapTo<Pair<UUID, String>>()
+        .mapTo<IdAndMail>()
         .findOne().orElse(null)
     } ?: return setupCalendar(userFeedId)
 
     val cal = setupCalendar(userFeedId)
-    showingService
-      .getShowingByUser(userId)
+    showingDao
+      .findByAdminOrParticipant(userId)
       .map { it.toVEvent(userId, mail) }
       .forEach { cal.addEvent(it) }
 
@@ -81,7 +82,7 @@ class CalendarService(
   }
 
   private fun ShowingDTO.toVEvent(userId: UUID, userEmail: String): VEvent {
-    val movie = movieService.getMovie(this.movieId) ?: return VEvent()
+    val movie = movieDao.findById(this.movieId) ?: return VEvent()
     val showingUrl = "${properties.baseUrl.frontend}/showings/$webId/$slug"
 
     val vEvent = VEvent()
@@ -107,27 +108,34 @@ class CalendarService(
     return vEvent
   }
 
-  private fun formatDescription(showingId: UUID, userId: UUID, movie: Movie): String {
-    val paymentDetails = showingService.getAttendeePaymentDetailsForUser(userId, showingId)
+  data class PaymentDetails(val amountOwed: SEK = SEK.ZERO, val hasPaid: Boolean? = null, val phone: String? = null)
+  private fun formatDescription(showingId: UUID, userId: UUID, movie: MovieDTO): String {
+    val (amountOwed, hasPaid, payToPhone) = jdbi.withHandleUnchecked {
+      it.select(
+        "SELECT p.amount_owed, p.has_paid, u.phone FROM participant p JOIN showing s on p.showing_id = s.id JOIN users u on s.pay_to_user = u.id WHERE p.showing_id = ? AND p.user_id = ?",
+        showingId,
+        userId
+      ).mapTo<PaymentDetails>()
+        .findOne()
+        .orElse(PaymentDetails())
+    }
 
-    return if (paymentDetails == null || paymentDetails.hasPaid) {
+    return if (hasPaid == null || hasPaid) {
       "Kolla på bio!\n${if (movie.imdbId?.isSupplied() == true) "http://www.imdb.com/title/${movie.imdbId?.value}/" else ""}"
     } else {
-      "Betala ${paymentDetails.amountOwed.toKronor()} kr till ${paymentDetails.payToPhoneNumber}"
+      "Betala ${amountOwed.toKronor()} kr till $payToPhone"
     }
   }
 
   private fun VEvent.addParticipants(showingDTO: ShowingDTO, mail: String) {
-    participantRepo.findById_Showing_Id(showingDTO.id).forEach {
-      val attendee = Attendee("${it.user.firstName} '${it.user.nick}' ${it.user.lastName}", mail)
+    participantDao.findAllParticipants(showingDTO.id).forEach {
+      val attendee = Attendee("${it.userInfo.firstName} '${it.userInfo.nick}' ${it.userInfo.lastName}", mail)
       attendee.calendarUserType = CalendarUserType.INDIVIDUAL
       attendee.participationStatus = ParticipationStatus.ACCEPTED
       attendee.role = Role.ATTENDEE
       attendee.participationLevel = ParticipationLevel.REQUIRED
 
-      this.addAttendee(
-        attendee
-      )
+      this.addAttendee(attendee)
     }
   }
 
@@ -137,13 +145,13 @@ class CalendarService(
       .toInstant()
   }
 
-  private fun ShowingDTO.getEndDate(movie: Movie): Date {
+  private fun ShowingDTO.getEndDate(movie: MovieDTO): Date {
     val end = this.getStartDate()
       .plusMillis(movie.getDurationOrDefault2hours().toMillis())
     return Date.from(end)
   }
 
-  private fun Movie.getDurationOrDefault2hours() = when {
+  private fun MovieDTO.getDurationOrDefault2hours() = when {
     this.runtime.isZero -> Duration.ofHours(2).plusMinutes(30)
     else -> this.runtime
   }
