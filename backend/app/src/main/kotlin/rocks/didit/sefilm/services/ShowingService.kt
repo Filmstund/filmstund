@@ -223,7 +223,7 @@ class ShowingService(
     val originalShowing = showing.copy()
     showing.price = SEK(newValues.price)
     showing.payToUser = userRepo.getOne(newValues.payToUser)
-    showing.location = locationService.getOrCreateNewLocation(newValues.location)
+    //showing.location = locationService.getOrCreateNewLocation(newValues.location)
     showing.time = newValues.time
     showing.filmstadenShowingId = newValues.filmstadenRemoteEntityId
     if (showing.cinemaScreen?.id != filmstadenScreen?.ncgId) {
@@ -287,7 +287,7 @@ class ShowingService(
       date = this.date,
       time = this.time,
       movie = movieService.getMovieOrThrow(this.movieId),
-      location = location,
+      //location = location,
       cinemaScreen = cinemaScreen?.toCinemaScreen(),
       admin = admin,
       payToUser = admin,

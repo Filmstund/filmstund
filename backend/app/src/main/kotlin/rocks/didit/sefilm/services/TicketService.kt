@@ -92,7 +92,7 @@ class TicketService(
     showing.cinemaScreen = CinemaScreen(filmstadenLiteScreen.filmstadenId, filmstadenLiteScreen.name)
     showing.time = zonedDateTime.toLocalTime()
     showing.date = zonedDateTime.toLocalDate()
-    showing.location = location
+    //showing.location = location
   }
 
   private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {

@@ -30,7 +30,6 @@ interface LocationDao {
   @RegisterKotlinMapper(LocationDTO::class, "l")
   fun findByNameOrAlias(name: String): LocationDTO?
 
-  // TODO: upsert this. Also add method for inserting alias and locations in one go
   @SqlBatch("INSERT INTO location (name, city_alias, city, street_address, postal_code, postal_address, latitude, longitude, filmstaden_id) VALUES (:name, :cityAlias, :city, :streetAddress, :postalCode, :postalAddress, :latitude, :longitude, :filmstadenId)")
   fun insertLocations(@BindBean location: List<LocationDTO>)
 
