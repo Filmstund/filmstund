@@ -20,12 +20,12 @@ import java.util.*
 
 @Service
 class UserService(
-  private val jdbi: Jdbi
+  private val jdbi: Jdbi,
+  private val userDao: UserDao
   //private val pushoverService: PushoverService?,
 ) {
 
   private val log by logger()
-  private val userDao = jdbi.onDemand(UserDao::class.java)
 
   fun allUsers(): List<PublicUserDTO> = userDao.findAllPublicUsers()
   fun getUser(id: UUID): PublicUserDTO? = userDao.findPublicUserById(id)

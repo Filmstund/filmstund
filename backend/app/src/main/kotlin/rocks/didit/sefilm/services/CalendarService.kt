@@ -36,12 +36,12 @@ import java.util.*
 @Service
 class CalendarService(
   private val jdbi: Jdbi,
+  private val showingDao: ShowingDao,
+  private val movieDao: MovieDao,
+  private val participantDao: ParticipantDao,
   private val properties: Properties
 ) {
 
-  private val showingDao = jdbi.onDemand(ShowingDao::class.java)
-  private val movieDao = jdbi.onDemand(MovieDao::class.java)
-  private val participantDao = jdbi.onDemand(ParticipantDao::class.java)
   private val calendarDescription: String = "Dina visningar på $CALENDAR_NAME (${properties.baseUrl.frontend})"
 
   companion object {
@@ -50,6 +50,7 @@ class CalendarService(
   }
 
   data class IdAndMail(val id: UUID, val email: String)
+
   fun getCalendarFeed(userFeedId: UUID): ICalendar {
     val (userId, mail) = jdbi.inTransactionUnchecked {
       it.select("SELECT id, email FROM users WHERE calendar_feed_id = ?", userFeedId)
@@ -109,6 +110,7 @@ class CalendarService(
   }
 
   data class PaymentDetails(val amountOwed: SEK = SEK.ZERO, val hasPaid: Boolean? = null, val phone: String? = null)
+
   private fun formatDescription(showingId: UUID, userId: UUID, movie: MovieDTO): String {
     val (amountOwed, hasPaid, payToPhone) = jdbi.withHandleUnchecked {
       it.select(

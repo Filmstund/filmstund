@@ -16,7 +16,7 @@ import java.time.LocalDate
 import java.util.*
 
 @Service
-class GiftCertificateService(private val jdbi: Jdbi) {
+class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDao) {
 
   fun getStatusOfTicket(ticket: GiftCertificateDTO): GiftCertificateDTO.Status {
     if (ticket.expiresAt <= LocalDate.now()) {
@@ -40,7 +40,7 @@ class GiftCertificateService(private val jdbi: Jdbi) {
   }
 
   fun getGiftCertsByUserId(userID: UUID): List<GiftCertificateDTO> {
-    return jdbi.onDemand(UserDao::class.java).findGiftCertByUser(userID)
+    return userDao.findGiftCertByUser(userID)
   }
 
   fun addGiftCertsToCurrentUser(newCerts: List<GiftCertificateDTO>) {
