@@ -16,6 +16,7 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -128,6 +129,42 @@ internal class ShowingDaoTest {
       assertThat(dbShowingUpdated?.payToUser)
         .isNotNull()
         .isEqualTo(rndNewAdmin.id)
+    }
+  }
+
+  @Test
+  internal fun `given an existing showing, when promoteNewUserToAdmin() with the wrong current admin, then the promotion does not happen`() {
+    val rndMovie = rnd.nextMovie()
+    val rndAdmin = rnd.nextUserDTO()
+    val rndNewAdmin = rnd.nextUserDTO()
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+
+    jdbi.useTransactionUnchecked { handle ->
+      val userDao = handle.attach(UserDao::class.java)
+      val movieDao = handle.attach(MovieDao::class.java)
+      val locationDao = handle.attach(LocationDao::class.java)
+      val showingDao = handle.attach(ShowingDao::class.java)
+
+      userDao.insertUserAndGiftCerts(rndAdmin)
+      userDao.insertUserAndGiftCerts(rndNewAdmin)
+      movieDao.insertMovie(rndMovie)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      showingDao.insertShowingAndCinemaScreen(rndShowing)
+
+      val dbShowing = showingDao.findById(rndShowing.id)
+
+      assertThat(dbShowing?.admin).isNotNull().isEqualTo(rndAdmin.id)
+      assertThat(dbShowing?.payToUser).isNotNull().isEqualTo(rndAdmin.id)
+      assertThat(showingDao.promoteNewUserToAdmin(rndShowing.id, UUID.randomUUID(), rndNewAdmin.id))
+        .isFalse()
+      val dbShowingUpdated = showingDao.findById(rndShowing.id)
+      assertThat(dbShowingUpdated?.admin)
+        .isNotNull()
+        .isNotEqualTo(rndNewAdmin.id)
+        .isEqualTo(rndAdmin.id)
+      assertThat(dbShowingUpdated?.payToUser)
+        .isNotNull()
+        .isEqualTo(rndAdmin.id)
     }
   }
 

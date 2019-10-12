@@ -1,32 +1,28 @@
 package rocks.didit.sefilm.services
 
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import java.util.*
 
 @Service
-class AdminService(
-  private val showingRepository: ShowingRepository,
-  private val userRepo: UserRepository,
-  private val assertionService: AssertionService
-) {
+class AdminService(private val jdbi: Jdbi) {
 
-  @Transactional
   fun promoteToAdmin(showingId: UUID, userIdToPromote: UUID): ShowingDTO {
-    val showing = showingRepository.findByIdAndAdmin_Id(showingId, currentLoggedInUser().id)
-      ?: throw NotFoundException(what = "showing", showingId = showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
+    return jdbi.inTransactionUnchecked {
+      val showingDao = it.attach(ShowingDao::class.java)
 
-    val userToPromote: User = userRepo.getOne(userIdToPromote)
-    showing.admin = userToPromote
-    showing.payToUser = userToPromote
+      if (!showingDao.promoteNewUserToAdmin(showingId, currentLoggedInUser().id, userIdToPromote)) {
+        throw AccessDeniedException("Only the showing admin is allowed to do that")
+      }
 
-    return showing.toDTO()
+      // If the showing doesn't exist, then an access denied exception will occur
+      // thus we should never get null here.
+      showingDao.findById(showingId)!!
+    }
   }
 }
