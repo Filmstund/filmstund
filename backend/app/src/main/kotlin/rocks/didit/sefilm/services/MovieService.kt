@@ -1,14 +1,12 @@
 package rocks.didit.sefilm.services
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.withExtensionUnchecked
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.orElseThrow
+import rocks.didit.sefilm.database.dao.MovieDao
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.utils.MovieFilterUtil
@@ -17,55 +15,55 @@ import java.util.*
 
 @Service
 class MovieService(
-  private val movieRepo: MovieRepository,
+  private val jdbi: Jdbi,
+  private val onDemandMovieDao: MovieDao,
   private val filmstadenService: FilmstadenService,
   private val filterUtil: MovieFilterUtil,
   private val asyncMovieUpdater: AsyncMovieUpdater?
 ) {
 
-  companion object {
-    private val log: Logger = LoggerFactory.getLogger(MovieService::class.java)
-  }
+  private val log by logger()
 
   /** All movies that aren't archived */
-  fun allMovies() = movieRepo.findByArchivedOrderByPopularityDesc(false)
+  fun allMovies() = onDemandMovieDao.findByArchivedOrderByPopularityDesc(false)
 
-  fun archivedMovies() = movieRepo.findByArchivedOrderByPopularityDesc(true)
+  fun archivedMovies() = onDemandMovieDao.findByArchivedOrderByPopularityDesc(true)
 
-  fun getMovie(movieId: UUID?): Movie? = movieId?.let { movieRepo.findById(it).orElse(null) }
+  fun getMovie(movieId: UUID?): MovieDTO? = movieId?.let(onDemandMovieDao::findById)
 
-  fun getMovieOrThrow(movieId: UUID?): Movie =
-    getMovie(movieId).orElseThrow { NotFoundException("movie with id: $movieId") }
+  fun getMovieOrThrow(movieId: UUID?): MovieDTO = getMovie(movieId) ?: throw NotFoundException("movie with id: $movieId")
 
   /** Fetch new movies from Filmstaden, and trigger an async background update of the movies when done */
-  @Transactional
-  fun fetchNewMoviesFromFilmstaden(): List<Movie> {
+  fun fetchNewMoviesFromFilmstaden(): List<MovieDTO> {
     val filmstadenMovies = filmstadenService.allMovies()
 
+    return jdbi.withExtensionUnchecked(MovieDao::class) { movieDao ->
+      
     val newMoviesWeHaventPreviouslySeen = filmstadenMovies
       .filter {
         filterUtil.isNewerThan(it)
           && !filterUtil.isMovieUnwantedBasedOnGenre(it.genres.map { g -> g.name })
           && !filterUtil.isTitleUnwanted(it.title)
-          && movieRepo.existsByFilmstadenId(FilmstadenMembershipId(it.ncgId))
+          && movieDao.existsByFilmstadenId(it.ncgId)
       }
       .map {
-        Movie(
+        MovieDTO(
+          id = UUID.randomUUID(),
           title = filterUtil.trimTitle(it.title),
           releaseDate = it.releaseDate,
           poster = it.posterUrl,
           slug = it.slug,
           runtime = Duration.ofMinutes(it.length?.toLong() ?: 0L),
           filmstadenId = it.ncgId,
-          genres = it.genres.map { g -> g.name }.toMutableSet()
+          genres = it.genres.map { g -> g.name }.toSet()
         )
       }
 
-    val savedEntities = movieRepo.saveAll(newMoviesWeHaventPreviouslySeen)
-    log.info("Fetched ${savedEntities.count()} new movies from Filmstaden")
+    val savedEntitiesCount = movieDao.insertMovies(newMoviesWeHaventPreviouslySeen).sum()
+    log.info("Saved $savedEntitiesCount new movies from Filmstaden")
 
-    asyncMovieUpdater?.extendMovieInfo(savedEntities)
-    return savedEntities // FIXME: -> MovieDTO
-      .sortedBy { it.releaseDate }
+    asyncMovieUpdater?.extendMovieInfo(newMoviesWeHaventPreviouslySeen)
+    newMoviesWeHaventPreviouslySeen.sortedBy { it.releaseDate }
+    }
   }
 }

@@ -286,7 +286,7 @@ class ShowingService(
       slug = slugService.generateSlugFor(movie),
       date = this.date,
       time = this.time,
-      movie = movieService.getMovieOrThrow(this.movieId),
+      //movie = movieService.getMovieOrThrow(this.movieId),
       //location = location,
       cinemaScreen = cinemaScreen?.toCinemaScreen(),
       admin = admin,

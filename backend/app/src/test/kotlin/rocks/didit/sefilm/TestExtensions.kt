@@ -78,7 +78,7 @@ fun ThreadLocalRandom.nextLocationAlias(bound: Int): List<String> {
 fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
   return MovieDTO(
     id = UUID.randomUUID(),
-    filmstadenId = "fsid${nextLong(1000)}",
+    filmstadenId = "fsid${nextLong(10000000000)}",
     imdbId = IMDbID("tt${nextLong(1000000, 9999999)}"),
     tmdbId = TMDbID(nextLong(0, 1000000)),
     slug = "slug${nextLong()}",

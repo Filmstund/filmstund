@@ -11,8 +11,10 @@ import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.SlugService
+import java.util.*
 
 @RunWith(MockitoJUnitRunner.StrictStubs::class)
 class SlugServiceTest {
@@ -207,9 +209,9 @@ class SlugServiceTest {
 
   @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
   private fun testGenerateSlugForShowing(movieName: String, expectedSlug: String) {
-    val movie = Movie(title = movieName)
+    val movie = MovieDTO(id = UUID.randomUUID(), title = movieName)
     val admin = User(firstName = "adminFirstname", lastName = "adminLastname", nick = "adminNick", googleId = GoogleId("gid"))
-    val showing = Showing(movie = movie, admin = admin)
+    val showing = Showing(movie = Movie(title = movieName), admin = admin)
 
     Mockito.`when`(movieServiceoMock.getMovieOrThrow(Mockito.any())).thenReturn(movie)
 

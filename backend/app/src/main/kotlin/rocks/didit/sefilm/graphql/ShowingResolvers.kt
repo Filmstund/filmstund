@@ -6,16 +6,16 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.ParticipantRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.MovieService
@@ -57,11 +57,7 @@ class ShowingResolver(
     .getUser(showing.payToUser)
     .orElseThrow { NotFoundException("payment receiver user", showing.payToUser, showing.id) }
 
-  fun movie(showing: ShowingDTO): Movie {
-    val id = showing.movieId
-    return movieService.getMovie(id)
-      .orElseThrow { NotFoundException("movie with id: ${showing.movieId}") }
-  }
+  fun movie(showing: ShowingDTO): MovieDTO = movieService.getMovieOrThrow(showing.movieId)
 
   fun participants(showing: ShowingDTO): List<ParticipantDTO> =
     participantRepo.findById_Showing_Id(showing.id).map { it.toDTO() }

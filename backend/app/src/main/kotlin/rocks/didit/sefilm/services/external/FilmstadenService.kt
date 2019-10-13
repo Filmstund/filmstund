@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.repositories.MovieRepository
 import rocks.didit.sefilm.domain.dto.FilmstadenCinemaWithAddressDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenExtendedMovieDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenLocationItemsDTO
@@ -28,7 +27,6 @@ import java.time.temporal.ChronoUnit
 
 @Service
 class FilmstadenService(
-  private val movieRepo: MovieRepository,
   private val restTemplate: RestTemplate,
   private val httpEntity: HttpEntity<Void>,
   private val properties: Properties

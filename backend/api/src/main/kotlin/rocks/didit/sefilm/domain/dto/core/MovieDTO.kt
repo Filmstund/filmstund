@@ -5,6 +5,7 @@ import rocks.didit.sefilm.domain.TMDbID
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 data class MovieDTO(
@@ -28,4 +29,12 @@ data class MovieDTO(
   val archived: Boolean = false,
   val lastModifiedDate: Instant = Instant.now(),
   val createdDate: Instant = Instant.EPOCH
-)
+) {
+  /** Should we do an extended query to find more information about this movie? */
+  fun needsMoreInfo() =
+    synopsis == null || poster == null || (durationUntilRelease().toDays() < 14 && runtime == Duration.ZERO)
+
+  fun isPopularityOutdated() = Duration.between(popularityLastUpdated, Instant.now()).toDays() >= 4
+
+  private fun durationUntilRelease(): Duration = Duration.between(LocalDateTime.now(), releaseDate.atTime(0, 0))
+}
