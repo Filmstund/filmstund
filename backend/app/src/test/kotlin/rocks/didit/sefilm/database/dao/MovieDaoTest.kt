@@ -158,12 +158,17 @@ internal class MovieDaoTest {
     jdbi.useExtensionUnchecked(MovieDao::class) {
       it.insertMovie(rndMovie)
 
-      val movieFromDb = it.updateMovie(rndMovie.copy(title = "newTitle"))
+      val movieFromDb = it.updateMovie(rndMovie.copy(title = "newTitle", genres = rndMovie.genres.plus("genreNEW")))
       assertThat(movieFromDb)
         .isNotNull
-        .isEqualToIgnoringGivenFields(rndMovie, "title", "lastModifiedDate")
+        .isEqualToIgnoringGivenFields(rndMovie, "title", "genres", "lastModifiedDate")
       assertThat(movieFromDb?.title)
         .isEqualTo("newTitle")
+      assertThat(movieFromDb?.genres)
+        .size()
+        .isGreaterThan(rndMovie.genres.size)
+        .returnToIterable()
+        .contains("genreNEW")
       assertThat(movieFromDb?.lastModifiedDate)
         .isAfter(rndMovie.lastModifiedDate)
     }
