@@ -5,6 +5,7 @@ import org.jdbi.v3.core.kotlin.withExtensionUnchecked
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.dao.MovieDao
+import rocks.didit.sefilm.domain.dto.FilmstadenGenreDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
@@ -40,11 +41,11 @@ class MovieService(
     return jdbi.withExtensionUnchecked(MovieDao::class) { movieDao ->
       
     val newMoviesWeHaventPreviouslySeen = filmstadenMovies
-      .filter {
-        filterUtil.isNewerThan(it)
-          && !filterUtil.isMovieUnwantedBasedOnGenre(it.genres.map { g -> g.name })
-          && !filterUtil.isTitleUnwanted(it.title)
-          && movieDao.existsByFilmstadenId(it.ncgId)
+      .filter { fsMovie ->
+        filterUtil.isNewerThan(fsMovie)
+          && !filterUtil.isMovieUnwantedBasedOnGenre(fsMovie.genres.map(FilmstadenGenreDTO::name))
+          && !filterUtil.isTitleUnwanted(fsMovie.title)
+          && movieDao.existsByFilmstadenId(fsMovie.ncgId)
       }
       .map {
         MovieDTO(
