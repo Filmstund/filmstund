@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.managers
+package rocks.didit.sefilm.services
 
 import org.junit.Assert
 import org.junit.Test
@@ -12,8 +12,6 @@ import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.database.entities.User
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import rocks.didit.sefilm.services.MovieService
-import rocks.didit.sefilm.services.SlugService
 import java.util.*
 
 @RunWith(MockitoJUnitRunner.StrictStubs::class)
