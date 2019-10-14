@@ -8,8 +8,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.domain.dto.FilmstadenShowingDTO
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.LocalDate
@@ -27,13 +27,12 @@ class MovieQueryResolver(private val movieService: MovieService) : GraphQLQueryR
 class FilmstadenShowingResolver(
   private val filmstadenService: FilmstadenService,
   private val properties: Properties
-) : GraphQLResolver<Movie> {
+) : GraphQLResolver<MovieDTO> {
 
   private val log: Logger = LoggerFactory.getLogger(FilmstadenShowingResolver::class.java)
-  fun filmstadenShowings(movie: Movie, city: String?, afterDate: LocalDate?): List<FilmstadenShowingDTO> {
+  fun filmstadenShowings(movie: MovieDTO, city: String?, afterDate: LocalDate?): List<FilmstadenShowingDTO> {
     log.info(
-      "Fetching Filmstaden showings after ${afterDate
-        ?: "EPOCH"} in city=$city for '${movie.title}' (${movie.id})"
+      "Fetching Filmstaden showings after ${afterDate ?: "EPOCH"} in city=$city for '${movie.title}' (${movie.id})"
     )
     if (movie.filmstadenId == null) return listOf()
     return filmstadenService.getShowingDates(movie.filmstadenId!!, city ?: properties.defaultCity)
