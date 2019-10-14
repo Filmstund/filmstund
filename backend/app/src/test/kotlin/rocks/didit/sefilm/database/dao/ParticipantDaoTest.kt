@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextParticipant
@@ -136,6 +137,160 @@ internal class ParticipantDaoTest {
       assertThat(participantDao.isParticipantOnShowing(rndUser.id, rndShowing.id))
         .describedAs("Random user is participant")
         .isTrue()
+    }
+  }
+
+  @Test
+  internal fun `given a showing with participants, when updatePaymentInfo(), then only the relevant participant is updated`() {
+    val rndMovie = rnd.nextMovie()
+    val rndAdmin = rnd.nextUserDTO()
+    val rndUsers = (1..10).map {
+      val userId = UUID.randomUUID()
+      rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
+    }
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+    val rndParticipants = rndUsers.map { u ->
+      val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
+      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+    }
+
+    jdbi.useTransactionUnchecked { handle ->
+      val userDao = handle.attach(UserDao::class.java)
+      val movieDao = handle.attach(MovieDao::class.java)
+      val locationDao = handle.attach(LocationDao::class.java)
+      val showingDao = handle.attach(ShowingDao::class.java)
+      val participantDao = handle.attach(ParticipantDao::class.java)
+
+      userDao.insertUser(rndAdmin)
+      rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
+      movieDao.insertMovie(rndMovie)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      showingDao.insertShowingAndCinemaScreen(rndShowing)
+      participantDao.insertParticipantsOnShowing(rndParticipants)
+
+      val allParticipants = participantDao.findAllParticipants(rndShowing.id)
+      val firstParticipant =
+        allParticipants.find { it.userId == rndParticipants.first().userId && it.showingId == rndParticipants.first().showingId }
+
+      val updatedParticipant = participantDao.updatePaymentStatus(
+        firstParticipant?.userId!!,
+        firstParticipant.showingId,
+        rndAdmin.id,
+        true,
+        SEK(1337)
+      )
+      assertThat(updatedParticipant)
+        .isNotNull
+        .isEqualToIgnoringGivenFields(firstParticipant, "hasPaid", "amountOwed")
+      assertThat(updatedParticipant?.hasPaid)
+        .describedAs("has paid")
+        .isTrue()
+      assertThat(updatedParticipant?.amountOwed)
+        .describedAs("amount owed")
+        .isEqualTo(SEK(1337))
+    }
+  }
+
+  @Test
+  internal fun `given a showing with participants, when updatePaymentInfo() with a random admin, then null is returned`() {
+    val rndMovie = rnd.nextMovie()
+    val rndAdmin = rnd.nextUserDTO()
+    val rndUsers = (1..10).map {
+      val userId = UUID.randomUUID()
+      rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
+    }
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+    val rndParticipants = rndUsers.map { u ->
+      val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
+      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+    }
+
+    jdbi.useTransactionUnchecked { handle ->
+      val userDao = handle.attach(UserDao::class.java)
+      val movieDao = handle.attach(MovieDao::class.java)
+      val locationDao = handle.attach(LocationDao::class.java)
+      val showingDao = handle.attach(ShowingDao::class.java)
+      val participantDao = handle.attach(ParticipantDao::class.java)
+
+      userDao.insertUser(rndAdmin)
+      rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
+      movieDao.insertMovie(rndMovie)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      showingDao.insertShowingAndCinemaScreen(rndShowing)
+      participantDao.insertParticipantsOnShowing(rndParticipants)
+
+      val firstParticipant = rndParticipants.first()
+
+      val updatedParticipant = participantDao.updatePaymentStatus(
+        firstParticipant.userId,
+        firstParticipant.showingId,
+        UUID.randomUUID(),
+        true,
+        SEK(1337)
+      )
+      assertThat(updatedParticipant)
+        .isNull()
+
+      val firstParticipantFromDb = participantDao.findAllParticipants(rndShowing.id)
+        .find { it.userId == firstParticipant.userId && it.showingId == firstParticipant.showingId }
+      assertThat(firstParticipantFromDb?.hasPaid)
+        .describedAs("has paid")
+        .isEqualTo(firstParticipant.hasPaid)
+      assertThat(firstParticipantFromDb?.amountOwed)
+        .describedAs("amount owed")
+        .isEqualTo(firstParticipant.amountOwed)
+    }
+  }
+
+  @Test
+  internal fun `given a showing with participants, when updatePaymentInfo() where amountOwed is null, then amountOwed is not updated`() {
+    val rndMovie = rnd.nextMovie()
+    val rndAdmin = rnd.nextUserDTO()
+    val rndUsers = (1..10).map {
+      val userId = UUID.randomUUID()
+      rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
+    }
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+    val rndParticipants = rndUsers.map { u ->
+      val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
+      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+    }
+
+    jdbi.useTransactionUnchecked { handle ->
+      val userDao = handle.attach(UserDao::class.java)
+      val movieDao = handle.attach(MovieDao::class.java)
+      val locationDao = handle.attach(LocationDao::class.java)
+      val showingDao = handle.attach(ShowingDao::class.java)
+      val participantDao = handle.attach(ParticipantDao::class.java)
+
+      userDao.insertUser(rndAdmin)
+      rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
+      movieDao.insertMovie(rndMovie)
+      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      showingDao.insertShowingAndCinemaScreen(rndShowing)
+      participantDao.insertParticipantsOnShowing(rndParticipants)
+
+      val allParticipants = participantDao.findAllParticipants(rndShowing.id)
+      val firstParticipant =
+        allParticipants.find { it.userId == rndParticipants.first().userId && it.showingId == rndParticipants.first().showingId }
+
+      val updatedParticipant = participantDao.updatePaymentStatus(
+        firstParticipant?.userId!!,
+        firstParticipant.showingId,
+        rndAdmin.id,
+        true,
+        null
+      )
+      assertThat(updatedParticipant)
+        .isNotNull
+        .isEqualToIgnoringGivenFields(firstParticipant, "hasPaid")
+      assertThat(updatedParticipant?.hasPaid)
+        .describedAs("has paid")
+        .isTrue()
+      assertThat(updatedParticipant?.amountOwed)
+        .describedAs("amount owed")
+        .isNotNull
+        .isEqualTo(firstParticipant.amountOwed)
     }
   }
 }

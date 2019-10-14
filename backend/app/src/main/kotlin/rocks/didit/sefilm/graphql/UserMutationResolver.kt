@@ -11,13 +11,13 @@ import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.services.GiftCertificateService
-import rocks.didit.sefilm.services.ParticipantPaymentInfoService
+import rocks.didit.sefilm.services.ParticipantPaymentService
 import rocks.didit.sefilm.services.UserService
 
 @Component
 class UserMutationResolver(
   private val userService: UserService,
-  private val participantPaymentInfoService: ParticipantPaymentInfoService,
+  private val participantPaymentInfoService: ParticipantPaymentService,
   private val foretagsbiljettService: GiftCertificateService
 ) : GraphQLMutationResolver {
 

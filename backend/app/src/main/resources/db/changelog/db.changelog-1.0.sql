@@ -85,7 +85,7 @@ create table gift_certificate
         constraint giftcert_user_fk references users on delete cascade,
     number     varchar(15)
         constraint giftcert_number_unique unique,
-    expires_at date    not null default current_date + interval '1 year',
+    expires_at date not null default current_date + interval '1 year',
     constraint giftcert_pk primary key (user_id, number)
 );
 --rollback drop table if exists gift_certificate;
@@ -167,17 +167,19 @@ create table showing
 --changeset eda:createTableParticipant
 create table participant
 (
-    user_id               uuid        not null
+    user_id               uuid                     not null
         constraint participant_user_fk references users on delete cascade,
-    showing_id            uuid        not null
+    showing_id            uuid                     not null
         constraint participant_showing_fk references showing on delete cascade,
 
-    participant_type      varchar(50) not null default 'SWISH',
+    participant_type      varchar(50)              not null default 'SWISH',
 
-    has_paid              boolean     not null default false,
-    amount_owed           integer     not null default 0,
-    gift_certificate_used varchar(15) null
+    has_paid              boolean                  not null default false,
+    amount_owed           integer                  not null default 0,
+    gift_certificate_used varchar(15)              null
         constraint participant_giftcert_unique unique,
+    last_modified_date    timestamp with time zone not null default current_timestamp,
+    created_date          timestamp with time zone not null default current_timestamp,
 
     constraint participant_giftcert_fk foreign key (user_id, gift_certificate_used) references gift_certificate on delete set null,
     constraint participant_pk primary key (showing_id, user_id)

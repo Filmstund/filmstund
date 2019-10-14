@@ -27,7 +27,7 @@ interface MovieDao {
   fun findById(id: UUID): MovieDTO?
 
   @SqlBatch("INSERT INTO movie (id, filmstaden_id, imdb_id, tmdb_id, slug, title, synopsis, original_title, release_date, production_year, runtime, poster, genres, popularity, popularity_last_updated, archived, last_modified_date, created_date) VALUES (:id, :filmstadenId, :imdbId, :tmdbId, :slug, :title, :synopsis, :originalTitle, :releaseDate, :productionYear, :runtime, :poster, :genres, :popularity, :popularityLastUpdated, :archived, :lastModifiedDate, :createdDate)")
-  fun insertMovies(@BindBean movie: List<MovieDTO>): IntArray
+  fun insertMovies(@BindBean movie: Collection<MovieDTO>): IntArray
 
   fun insertMovie(movie: MovieDTO) = insertMovies(listOf(movie))
 
