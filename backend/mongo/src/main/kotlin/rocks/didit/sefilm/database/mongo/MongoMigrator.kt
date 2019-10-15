@@ -81,6 +81,7 @@ internal class MongoMigrator(
             date = it.date ?: LocalDate.EPOCH,
             time = it.time ?: LocalTime.MIDNIGHT,
             movieId = it.movie.id,
+            movieTitle = it.movie.title,
             location = locationCache.get(it.location?.name!!) { name -> locationDao.findByNameOrAlias(name) },
             cinemaScreen = it.filmstadenScreen,
             price = it.price ?: SEK.ZERO,

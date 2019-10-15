@@ -82,6 +82,7 @@ data class Showing(
     date = date ?: throw MissingParametersException("date"),
     time = time ?: throw MissingParametersException("time"),
     movieId = movie.id,
+    movieTitle = movie.title,
     location = location?.toDTO() ?: throw MissingParametersException("location"),
     cinemaScreen = cinemaScreen?.let { FilmstadenLiteScreenDTO(it.id, it.name) },
     price = price,

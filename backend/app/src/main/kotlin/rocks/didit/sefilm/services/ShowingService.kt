@@ -1,23 +1,19 @@
 package rocks.didit.sefilm.services
 
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
+import org.jdbi.v3.core.kotlin.mapTo
+import org.jdbi.v3.sqlobject.kotlin.attach
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.MissingParametersException
 import rocks.didit.sefilm.MissingPhoneNumberException
 import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.TicketsAlreadyBoughtException
+import rocks.didit.sefilm.UserAlreadyAttendedException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.entities.CinemaScreen
-import rocks.didit.sefilm.database.entities.GiftCertId
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.Participant
-import rocks.didit.sefilm.database.entities.ParticipantId
-import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.database.repositories.GiftCertificateRepository
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.ParticipantRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.dao.ParticipantDao
+import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
@@ -28,27 +24,24 @@ import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenScreenDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
+import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.events.EventPublisher
-import rocks.didit.sefilm.events.NewShowingEvent
 import rocks.didit.sefilm.logger
-import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.external.FilmstadenService
+import rocks.didit.sefilm.toDaos
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
 import java.util.*
 
 @Service
 class ShowingService(
-  private val showingRepo: ShowingRepository,
-  private val participantRepo: ParticipantRepository,
-  private val movieService: MovieService,
-  private val movieRepo: MovieRepository,
-  private val userService: UserService,
-  private val userRepo: UserRepository,
-  private val ticketService: TicketService,
-  private val giftCertRepo: GiftCertificateRepository,
+  private val jdbi: Jdbi,
+  private val onDemandShowingDao: ShowingDao,
   private val slugService: SlugService,
   private val filmstadenService: FilmstadenService,
   private val locationService: LocationService,
@@ -57,184 +50,209 @@ class ShowingService(
 ) {
   private val log by logger()
 
-  private fun getShowingEntity(id: UUID): Showing =
-    showingRepo.findById(id).orElseThrow { NotFoundException("showing", showingId = id) }
+  fun getShowing(id: UUID): ShowingDTO? = onDemandShowingDao.findById(id)
 
-  fun getShowing(id: UUID): ShowingDTO? = showingRepo
-    .findById(id)
-    .map { it.toDTO() }
-    .orElse(null)
-
-  fun getShowing(webId: Base64ID): ShowingDTO? = showingRepo
-    .findByWebId(webId)
-    ?.toDTO()
+  fun getShowing(webId: Base64ID): ShowingDTO? = onDemandShowingDao.findByWebId(webId)
 
   fun getShowingOrThrow(id: UUID): ShowingDTO = getShowing(id)
     ?: throw NotFoundException(what = "showing", showingId = id)
 
-  fun getShowingByMovie(movieId: UUID): List<ShowingDTO> = showingRepo
+  fun getShowingByMovie(movieId: UUID): List<ShowingDTO> = onDemandShowingDao
     .findByMovieIdOrderByDateDesc(movieId)
-    .map { it.toDTO() }
 
-  fun getShowingByUser(userId: UUID): List<ShowingDTO> = showingRepo
-    .findByUserId(userId)
-    .map { it.toDTO() }
+  fun getShowingByUser(userId: UUID): List<ShowingDTO> = onDemandShowingDao.findByAdminOrParticipant(userId)
 
-  fun getAllPublicShowings(afterDate: LocalDate = LocalDate.MIN): List<ShowingDTO> =
-    showingRepo.findByDateAfterOrderByDateDesc(afterDate)
-      .map { it.toDTO() }
+  fun getShowingsAfterDate(afterDate: LocalDate = LocalDate.MIN): List<ShowingDTO> =
+    onDemandShowingDao.findByDateAfterOrderByDateDesc(afterDate)
 
   /** Info that is needed before you buy the tickets at Filmstaden */
-  @Transactional
-  fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
-    val showing = getShowingEntity(showingId)
-    if (showing.admin.id != currentLoggedInUser().id) {
-      return null
-    }
+  data class FsIdAndSlug(val filmstadenId: String?, val slug: String?)
 
-    val participants = showing.participants.map { it.toDTO() }
-    val filmstadenBuyLink = filmstadenService.getFilmstadenBuyLink(showing.movie.filmstadenId, showing.movie.slug)
-    return AdminPaymentDetailsDTO(showing.id, filmstadenBuyLink, participants)
+  fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
+    return jdbi.inTransactionUnchecked {
+      if (!it.attach<ShowingDao>().isAdminOnShowing(currentLoggedInUser().id, showingId)) {
+        log.info(
+          "Admin payment details requested by non admin user {} for showing {}",
+          currentLoggedInUser().id,
+          showingId
+        )
+        return@inTransactionUnchecked null
+      }
+
+      val fsIdAndSlug = it.select(
+        "SELECT m.filmstaden_id, m.slug FROM movie m JOIN showing s on s.movie_id = m.id WHERE s.id = ?",
+        showingId
+      ).mapTo<FsIdAndSlug>().one()
+
+      val filmstadenBuyLink = filmstadenService.getFilmstadenBuyLink(fsIdAndSlug.filmstadenId, fsIdAndSlug.slug)
+
+      val participants = it.attach<ParticipantDao>().findAllParticipants(showingId)
+      AdminPaymentDetailsDTO(showingId, filmstadenBuyLink, participants)
+    }
   }
 
   /** Info a user needs for paying the one who bought the tickets */
   fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO? =
     getAttendeePaymentDetailsForUser(currentLoggedInUser().id, showingId)
 
-  @Transactional
   fun getAttendeePaymentDetailsForUser(userId: UUID, showingId: UUID): AttendeePaymentDetailsDTO? {
-    val showing = getShowingEntity(showingId)
-    val payeePhone = showing.payToUser.phone // Only really needed if at least one participant wants to pay via slack...
-      .orElseThrow { MissingPhoneNumberException(showing.payToUser.id) }
-    val participant = showing.participants.find { it.user.id == userId }
-      ?: throw NotFoundException("participant", userId, showingId)
+    return jdbi.inTransactionUnchecked {
+      val showing = getShowingOrThrow(showingId)
+      // Only really needed if at least one participant wants to pay via slack...
+      val payeePhone = showing.payToPhone ?: throw MissingPhoneNumberException()
 
-    val swishTo = when {
-      participant.hasPaid -> null
-      else -> constructSwishUri(showing, payeePhone)
+      val participant = it.attach<ParticipantDao>().findByUserAndShowing(userId, showingId)
+        ?: throw NotFoundException("participant", userId, showingId)
+
+      val swishTo = when {
+        participant.hasPaid -> null
+        else -> constructSwishUri(showing, payeePhone)
+      }
+
+      AttendeePaymentDetailsDTO(
+        participant.hasPaid,
+        showing.price ?: SEK.ZERO,
+        showing.payToUser,
+        swishTo,
+        payeePhone.number,
+        userId
+      )
     }
-
-    return AttendeePaymentDetailsDTO(
-      participant.hasPaid,
-      showing.price,
-      showing.payToUser.id,
-      swishTo,
-      payeePhone.number,
-      userId
-    )
   }
 
   // ToDO: Return a list of PublicParticipantDTO instead ?
-  @Transactional
   fun attendShowing(showingId: UUID, paymentOption: PaymentOption): ShowingDTO {
-    val showing = getShowingEntity(showingId)
-    val user = currentLoggedInUser()
-    assertionService.assertTicketsNotBought(user.id, showing)
-    assertionService.assertUserNotAlreadyAttended(user.id, showing)
+    return jdbi.inTransactionUnchecked {
+      val daos = it.toDaos()
+      val showing = daos.showingDao.findByIdOrThrow(showingId)
 
-    val participant = participantRepo.save(createParticipantBasedOnPaymentType(paymentOption, user.id, showing))
-    showing.participants.add(participant)
+      val user = currentLoggedInUser()
+      assertionService.assertTicketsNotBought(user.id, showing)
+      if (daos.participantDao.isParticipantOnShowing(user.id, showingId)) {
+        throw UserAlreadyAttendedException(user.id)
+      }
 
-    // TODO re-enable
-    //eventPublisher.publish(UserAttendedEvent(this, showing, participant.user, paymentOption.type))
-    return showing.toDTO()
+      val participant = createParticipantBasedOnPaymentType(paymentOption, user.id, showing)
+      daos.participantDao.insertParticipantOnShowing(participant)
+
+      // TODO: reenable
+      //eventPublisher.publish(UserAttendedEvent(this, showing, participant.user, paymentOption.type))
+      showing
+    }
   }
 
-  @Transactional
   fun unattendShowing(showingId: UUID): ShowingDTO {
-    val showing = getShowingEntity(showingId)
-    val currentUser = currentLoggedInUser()
-    assertionService.assertTicketsNotBought(currentUser.id, showing)
+    return jdbi.inTransactionUnchecked {
+      val daos = it.toDaos()
+      val showing = daos.showingDao.findByIdOrThrow(showingId)
+      val currentUser = currentLoggedInUser()
+      assertionService.assertTicketsNotBought(currentUser.id, showing)
 
-    val participant = showing.participants.find { it.user.id == currentUser.id }
-      ?: return showing.toDTO()
+      if (!daos.participantDao.deleteByUserAndShowing(currentUser.id, showingId)) {
+        throw TicketsAlreadyBoughtException(currentUser.id, showing.id)
+      }
 
-    // TODO: will this be cascaded?
-    showing.participants.remove(participant)
-
-    // TODO re-enable
-    //eventPublisher.publish(UserUnattendedEvent(this, showing, participant.user))
-    return showing.toDTO()
+      // TODO re-enable
+      //eventPublisher.publish(UserUnattendedEvent(this, showing, participant.user))
+      showing
+    }
   }
 
-  @Transactional
   fun createShowing(data: CreateShowingDTO): ShowingDTO {
-    val adminUser = userService.getCompleteUser(currentLoggedInUser().id)
-    val filmstadenShow = data.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
-    val showing = showingRepo.save(
-      data.toShowing(
-        userRepo.findById(adminUser.id).orElse(null)!!,
-        movieRepo.getOne(data.movieId),
+    return jdbi.inTransactionUnchecked { handle ->
+      val daos = handle.toDaos()
+      val userId = currentLoggedInUser().id
+
+      val filmstadenShow = data.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
+      val showing = data.toShowing(
+        userId,
+        data.movieId,
+        daos.movieDao.findTitleById(data.movieId) ?: throw NotFoundException("movie"),
         filmstadenShow?.screen
       )
-    )
 
-    log.info("{} created new showing {}", adminUser.id, showing.id)
-    eventPublisher.publish(NewShowingEvent(this, showing, adminUser))
-    return showing.toDTO()
+      daos.showingDao.insertNewShowing(showing)
+      val participant = createParticipantBasedOnPaymentType(PaymentOption(PaymentType.Swish), userId, showing)
+      daos.participantDao.insertParticipantOnShowing(participant)
+
+      log.info("{} created new showing {}", userId, showing.id)
+      // TODO reenable
+      //eventPublisher.publish(NewShowingEvent(this, showing, adminUser))
+      showing
+    }
   }
 
   /** Delete the selected showing and return all public showings */
-  @Transactional
   fun deleteShowing(showingId: UUID): List<ShowingDTO> {
-    val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
-    assertionService.assertTicketsNotBought(showing.admin.id, showing)
+    return jdbi.inTransactionUnchecked {
+      val dao = it.attach<ShowingDao>()
 
-    ticketService.deleteTickets(showing)
-    showingRepo.delete(showing)
+      val showing = dao.findByIdOrThrow(showingId)
+      assertionService.assertLoggedInUserIsAdmin(showing.admin)
+      assertionService.assertTicketsNotBought(showing.admin, showing)
 
-    log.info("{} deleted showing {} - {} ({})", showing.admin.id, showing.id, showing.dateTime, showing.movie.title)
-    // TODO re-enable
-    //eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
-    return getAllPublicShowings()
+      if (!dao.deleteByShowingAndAdmin(showingId, currentLoggedInUser().id)) {
+        throw AccessDeniedException("Only the showing admin is allowed to do that")
+      }
+
+      log.info("{} deleted showing {} - {} ({})", showing.admin, showing.id, showing.datetime, showing.movieTitle)
+      // TODO re-enable
+      //eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
+      dao.findByDateAfterOrderByDateDesc(LocalDate.MIN)
+    }
   }
 
-  @Transactional
   fun markAsBought(showingId: UUID, price: SEK): ShowingDTO {
-    val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
-    assertionService.assertUserHasPhoneNumber(showing.admin.id)
+    return jdbi.inTransactionUnchecked {
+      val dao = it.attach<ShowingDao>()
+      val participantDao = it.attach<ParticipantDao>()
+      val showing = dao.findByIdOrThrow(showingId)
 
-    if (showing.ticketsBought) {
-      log.info("Showing $showingId is already bought")
-      return showing.toDTO()
+      assertionService.assertLoggedInUserIsAdmin(showing.admin)
+      assertionService.assertUserHasPhoneNumber(showing.admin)
+
+      if (showing.ticketsBought) {
+        log.info("Showing $showingId is already bought")
+        return@inTransactionUnchecked showing
+      }
+
+      participantDao.markGCParticipantsAsHavingPaid(showingId, currentLoggedInUser().id)
+      dao.markShowingAsBought(showingId, price)
+
+      // TODO re-enable
+      //eventPublisher.publish(TicketsBoughtEvent(this, showing, showing.admin))
+      showing.copy(ticketsBought = true, price = price)
     }
-
-    markGiftCertParticipantsAsHavingPaid(showing)
-    showing.price = price
-    showing.ticketsBought = true
-
-    // TODO re-enable
-    //eventPublisher.publish(TicketsBoughtEvent(this, showing, showing.admin))
-    return showing.toDTO()
   }
 
-  @Transactional
   fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO {
-    val showing = getShowingEntity(showingId)
-    assertionService.assertLoggedInUserIsAdmin(showing.admin.id)
+    return jdbi.inTransactionUnchecked { handle ->
+      val dao = handle.attach<ShowingDao>()
 
-    log.info("Updating showing ($showingId) to new values: $newValues")
-    val filmstadenShow = newValues.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
-    val filmstadenScreen = filmstadenShow?.screen
+      val showing = dao.findByIdOrThrow(showingId)
+      assertionService.assertLoggedInUserIsAdmin(showing.admin)
+
+      log.info("Updating showing ($showingId) to new values: $newValues")
+      val filmstadenShow = newValues.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
+      val filmstadenScreen = filmstadenShow?.screen
 
 
-    val originalShowing = showing.copy()
-    showing.price = SEK(newValues.price)
-    showing.payToUser = userRepo.getOne(newValues.payToUser)
-    //showing.location = locationService.getOrCreateNewLocation(newValues.location)
-    showing.time = newValues.time
-    showing.filmstadenShowingId = newValues.filmstadenRemoteEntityId
-    if (showing.cinemaScreen?.id != filmstadenScreen?.ncgId) {
-      showing.cinemaScreen = filmstadenScreen.toCinemaScreen()
+      val updatedShowing = showing.copy(
+        price = SEK(newValues.price),
+        payToUser = newValues.payToUser,
+        location = locationService.getOrCreateNewLocation(newValues.location),
+        time = newValues.time,
+        filmstadenShowingId = newValues.filmstadenRemoteEntityId,
+        // TODO: this probaly needs an insert
+        cinemaScreen = if (showing.cinemaScreen?.filmstadenId != filmstadenScreen?.ncgId) filmstadenScreen?.toFilmstadenLiteScreen() else showing.cinemaScreen,
+        date = newValues.date
+      )
+      dao.updateShowing(updatedShowing, currentLoggedInUser().id)
+
+      // TODO re-enable
+      //eventPublisher.publish(UpdatedShowingEvent(this, showing, originalShowing, showing.admin))
+      updatedShowing
     }
-    showing.date = newValues.date
-    showingRepo.save(showing)
-
-    // TODO re-enable
-    //eventPublisher.publish(UpdatedShowingEvent(this, showing, originalShowing, showing.admin))
-    return showing.toDTO()
   }
 
   fun fetchSeatMap(showingId: UUID): List<FilmstadenSeatMapDTO> {
@@ -244,14 +262,17 @@ class ShowingService(
       return listOf()
     }
 
-    return filmstadenService.getFilmstadenSeatMap(showing.location?.filmstadenId!!, showing.cinemaScreen?.filmstadenId!!)
+    return filmstadenService.getFilmstadenSeatMap(
+      showing.location?.filmstadenId!!,
+      showing.cinemaScreen?.filmstadenId!!
+    )
   }
 
   private fun createParticipantBasedOnPaymentType(
     paymentOption: PaymentOption,
     userId: UUID,
-    showing: Showing
-  ): Participant =
+    showing: ShowingDTO
+  ): ParticipantDTO =
     when (paymentOption.type) {
       PaymentType.GiftCertificate -> {
         val suppliedTicket = paymentOption.ticketNumber
@@ -259,57 +280,46 @@ class ShowingService(
         val ticketNumber = TicketNumber(suppliedTicket)
 
         assertionService.assertForetagsbiljettIsUsable(userId, ticketNumber, showing)
-        val userRef = userRepo.getOne(userId)
-        Participant(
-          id = ParticipantId(userRef, showing),
-          participantType = Participant.Type.GIFT_CERTIFICATE,
-          giftCertificateUsed = giftCertRepo.getOne(GiftCertId(userRef, ticketNumber))
+        ParticipantDTO(
+          userId = userId,
+          showingId = showing.id,
+          hasPaid = false,
+          type = ParticipantDTO.Type.GIFT_CERTIFICATE,
+          giftCertificateUsed = GiftCertificateDTO(userId, ticketNumber),
+          amountOwed = SEK.ZERO,
+          userInfo = PublicUserDTO(userId)
         )
       }
-      PaymentType.Swish -> Participant(
-        ParticipantId(userRepo.getOne(userId), showing),
-        participantType = Participant.Type.SWISH
+      PaymentType.Swish -> ParticipantDTO(
+        userId = userId,
+        showingId = showing.id,
+        type = ParticipantDTO.Type.SWISH,
+        userInfo = PublicUserDTO(userId)
       )
     }
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun CreateShowingDTO.toShowing(
-    admin: User,
-    movie: Movie,
+    adminId: UUID,
+    movieId: UUID,
+    movieTitle: String,
     cinemaScreen: FilmstadenScreenDTO?
-  ): Showing {
+  ): ShowingDTO {
     val location = locationService.getOrCreateNewLocation(this.location)
     val newId = UUID.randomUUID()
-    return Showing(
+    return ShowingDTO(
       id = newId,
       webId = Base64ID.random(),
-      slug = slugService.generateSlugFor(movie),
+      slug = slugService.generateSlugFor(movieTitle),
       date = this.date,
       time = this.time,
-      //movie = movieService.getMovieOrThrow(this.movieId),
-      //location = location,
-      cinemaScreen = cinemaScreen?.toCinemaScreen(),
-      admin = admin,
-      payToUser = admin,
-      participants = mutableSetOf(Participant(ParticipantId(admin, showingRepo.getOne(newId)))),
+      movieId = movieId,
+      movieTitle = movieTitle,
+      location = location,
+      cinemaScreen = cinemaScreen?.toFilmstadenLiteScreen(),
+      admin = adminId,
+      payToUser = adminId,
       filmstadenShowingId = this.filmstadenRemoteEntityId
     )
   }
-
-  private fun markGiftCertParticipantsAsHavingPaid(showing: Showing) {
-    showing.participants
-      .filter { it.participantType == Participant.Type.GIFT_CERTIFICATE }
-      .forEach {
-        it.hasPaid = true
-      }
-
-    showing.participants
-      .filter { it.user.id == showing.payToUser.id }
-      .forEach {
-        it.hasPaid = true
-      }
-  }
-
-  fun FilmstadenScreenDTO?.toCinemaScreen() = this?.let { CinemaScreen(it.ncgId, it.title) }
-
 }

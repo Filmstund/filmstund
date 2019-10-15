@@ -8,9 +8,7 @@ import rocks.didit.sefilm.TicketAlreadyUsedException
 import rocks.didit.sefilm.TicketExpiredException
 import rocks.didit.sefilm.TicketNotFoundException
 import rocks.didit.sefilm.TicketsAlreadyBoughtException
-import rocks.didit.sefilm.UserAlreadyAttendedException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.entities.Showing
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
@@ -22,15 +20,9 @@ class AssertionService(
   private val giftCertService: GiftCertificateService
 ) {
 
-  fun assertTicketsNotBought(userID: UUID, showing: Showing) {
+  fun assertTicketsNotBought(userID: UUID, showing: ShowingDTO) {
     if (showing.ticketsBought) {
       throw TicketsAlreadyBoughtException(userID, showing.id)
-    }
-  }
-
-  fun assertUserNotAlreadyAttended(userID: UUID, showing: Showing) {
-    if (showing.participants.any { it.user.id == userID }) {
-      throw UserAlreadyAttendedException(userID)
     }
   }
 
@@ -48,7 +40,7 @@ class AssertionService(
     }
   }
 
-  fun assertForetagsbiljettIsUsable(userId: UUID, suppliedTicket: TicketNumber, showing: Showing) {
+  fun assertForetagsbiljettIsUsable(userId: UUID, suppliedTicket: TicketNumber, showing: ShowingDTO) {
     val matchingTickets = giftCertService
       .getGiftCertsByUserId(userId)
       .filter { it.number == suppliedTicket }

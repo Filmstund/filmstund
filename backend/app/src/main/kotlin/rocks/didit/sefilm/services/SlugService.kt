@@ -1,7 +1,6 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.stereotype.Service
-import rocks.didit.sefilm.database.entities.Movie
 import rocks.didit.sefilm.database.entities.Showing
 
 @Service
@@ -10,7 +9,7 @@ class SlugService {
     const val MAX_LENGTH = 45
   }
 
-  fun generateSlugFor(movie: Movie): String = sluggifyString(movie.originalTitle ?: movie.title)
+  fun generateSlugFor(str: String): String = sluggifyString(str)
 
   fun generateSlugFor(showing: Showing): String {
     val movie = showing.movie

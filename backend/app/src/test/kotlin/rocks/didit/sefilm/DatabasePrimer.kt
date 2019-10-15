@@ -1,14 +1,8 @@
 package rocks.didit.sefilm
 
-import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.dao.LocationDao
-import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.database.dao.ParticipantDao
-import rocks.didit.sefilm.database.dao.ShowingDao
-import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
@@ -48,6 +42,10 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addShowing(testData.init(ThreadLocalRandom.current()))
   }
 
+  fun withShowings(init: TestData.(ThreadLocalRandom) -> List<ShowingDTO>) {
+    testData = testData.addShowings(testData.init(ThreadLocalRandom.current()))
+  }
+
   fun withShowing() {
     if (testData.lastUser == null) {
       withUser()
@@ -70,36 +68,32 @@ class DbTest(private val jdbi: Jdbi) {
     }
   }
 
-  fun afterInsert(init: TestData.(Handle) -> Unit) {
+  fun afterInsert(init: TestData.(Daos) -> Unit) {
     insertNotNullFields()
     jdbi.useTransactionUnchecked { handle ->
-      testData.init(handle)
+      testData.init(handle.toDaos())
     }
   }
 
   private fun insertNotNullFields() {
     return jdbi.useTransactionUnchecked { handle ->
-      val userDao = handle.attach(UserDao::class.java)
-      val movieDao = handle.attach(MovieDao::class.java)
-      val locationDao = handle.attach(LocationDao::class.java)
-      val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val daos = handle.toDaos()
 
       testData.users.forEach {
-        userDao.insertUserAndGiftCerts(it.value)
+        daos.userDao.insertUserAndGiftCerts(it.value)
       }
       if (testData.movies.isNotEmpty()) {
-        movieDao.insertMovies(testData.movies.values)
+        daos.movieDao.insertMovies(testData.movies.values)
       }
       testData.showings.forEach {
         if (it.value.location != null) {
-          locationDao.insertLocationAndAlias(it.value.location!!)
+          daos.locationDao.insertLocationAndAlias(it.value.location!!)
         }
-        showingDao.insertShowingAndCinemaScreen(it.value)
+        daos.showingDao.insertShowingAndCinemaScreen(it.value)
       }
 
       if (testData.participants.isNotEmpty()) {
-        participantDao.insertParticipantsOnShowing(testData.participants)
+        daos.participantDao.insertParticipantsOnShowing(testData.participants)
       }
     }
   }
@@ -127,6 +121,9 @@ data class TestData(
   fun addMovie(movie: MovieDTO): TestData = copy(lastMovie = movie, movies = movies.plus(Pair(movie.id, movie)))
   fun addShowing(showing: ShowingDTO): TestData =
     copy(lastShowing = showing, showings = showings.plus(Pair(showing.id, showing)))
+
+  fun addShowings(showings: List<ShowingDTO>): TestData =
+    copy(lastShowing = showings.last(), showings = this.showings.plus(showings.map { Pair(it.id, it) }))
 
   fun addParticipant(participant: ParticipantDTO): TestData =
     copy(lastParticipant = participant, participants = participants.plus(participant))

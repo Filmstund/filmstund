@@ -15,7 +15,6 @@ import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
-import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
 import rocks.didit.sefilm.nextShowing
@@ -93,8 +92,7 @@ internal class ParticipantPaymentServiceTest {
       withShowing { it.nextShowing(movie.id, adminId = currentLoggedInUser().id) }
       withParticipantOnLastShowing()
       afterInsert {
-        val participantDao = it.attach(ParticipantDao::class.java)
-        val dbParticipantBefore = participantDao.findByUserAndShowing(participant.userId, showing.id)
+        val dbParticipantBefore = it.participantDao.findByUserAndShowing(participant.userId, showing.id)
         assertThat(dbParticipantBefore).isNotNull
 
         val paymentInfo = ParticipantPaymentInfoDTO(
@@ -106,7 +104,7 @@ internal class ParticipantPaymentServiceTest {
 
         participantPaymentService.updatePaymentInfo(paymentInfo)
 
-        val dbParticipant = participantDao.findByUserAndShowing(participant.userId, showing.id)
+        val dbParticipant = it.participantDao.findByUserAndShowing(participant.userId, showing.id)
         assertThat(dbParticipant).isNotNull
         assertThat(dbParticipant?.hasPaid).isNotEqualTo(dbParticipantBefore.hasPaid)
         if (paymentInfo.hasPaid) {

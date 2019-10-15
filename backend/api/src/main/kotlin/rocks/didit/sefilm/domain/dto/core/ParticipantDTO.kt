@@ -23,8 +23,7 @@ data class ParticipantDTO(
   val userId: UUID,
   val showingId: UUID,
   @Nested("u")
-  val userInfo: PublicUserDTO,
-
+  val userInfo: PublicUserDTO = PublicUserDTO(userId),
   val hasPaid: Boolean = false,
   val amountOwed: SEK = SEK.ZERO,
   val type: Type = Type.UNKNOWN,
@@ -34,31 +33,6 @@ data class ParticipantDTO(
   val giftCertificateUsed: GiftCertificateDTO? = null,
   val filmstadenMembershipId: FilmstadenMembershipId? = null
 ) {
-  // This is so we can use DTO projection in JPA. It doesn't support nested classes
-  constructor(
-    userId: UUID,
-    showingId: UUID,
-    firstName: String? = null,
-    lastName: String? = null,
-    nick: String? = null,
-    phone: String? = null,
-    avatar: String? = null,
-    hasPaid: Boolean,
-    amountOwed: SEK,
-    type: Type,
-    giftCertificateUsed: GiftCertificateDTO? = null,
-    filmstadenMembershipId: FilmstadenMembershipId? = null
-  ) : this(
-    userId,
-    showingId,
-    PublicUserDTO(userId, firstName, lastName, nick, phone, avatar),
-    hasPaid,
-    amountOwed,
-    type,
-    giftCertificateUsed,
-    filmstadenMembershipId
-  )
-
   init {
     check(!(type == Type.SWISH && giftCertificateUsed != null)) { "GiftCertificate used on Swish type. UserId=$userId, ShowingId=$showingId" }
   }

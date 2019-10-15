@@ -55,17 +55,16 @@ fun ThreadLocalRandom.nextGiftCerts(userId: UUID, bound: Int = 10): List<GiftCer
 }
 
 fun ThreadLocalRandom.nextLocation(alias: List<String> = nextLocationAlias(3)): LocationDTO {
-  val nbr = this.nextInt(100, 999)
   return LocationDTO(
-    name = "locname$nbr",
+    name = "locname${nextLong(0, 1000000)}",
     cityAlias = "${this.nextInt(10, 99)}",
-    city = "city$nbr",
-    streetAddress = "streetAddr$nbr",
+    city = "city$${nextLong(0, 10000000)}",
+    streetAddress = "streetAddr${nextLong(0, 10000000)}",
     postalAddress = "postalAddr${nextLong()}",
     postalCode = "${nextLong(1000, 10000)}",
     latitude = BigDecimal.valueOf(this.nextLong(1, 10)),
     longitude = BigDecimal.valueOf(this.nextLong(1, 10)),
-    filmstadenId = "NCG$nbr",
+    filmstadenId = "NCG$${nextLong(0, 100000)}",
     alias = alias,
     lastModifiedDate = Instant.EPOCH
   )
@@ -110,6 +109,7 @@ fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UUID): ShowingDTO {
     date = nextLocalDate(),
     time = nextLocalTime(),
     movieId = movieId,
+    movieTitle = "rndMovieTitle${nextLong(0, 100000)}",
     location = nextLocation(),
     cinemaScreen = nextCinemaScreen(),
     price = SEK(nextLong(1000, 10000)),

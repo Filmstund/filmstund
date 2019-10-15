@@ -26,6 +26,10 @@ interface MovieDao {
   @SqlQuery("SELECT * FROM movie WHERE id = :id")
   fun findById(id: UUID): MovieDTO?
 
+  // TODO: Test me
+  @SqlQuery("SELECT COALESCE(original_title, title) FROM movie WHERE id = :id")
+  fun findTitleById(id: UUID): String?
+
   @SqlBatch("INSERT INTO movie (id, filmstaden_id, imdb_id, tmdb_id, slug, title, synopsis, original_title, release_date, production_year, runtime, poster, genres, popularity, popularity_last_updated, archived, last_modified_date, created_date) VALUES (:id, :filmstadenId, :imdbId, :tmdbId, :slug, :title, :synopsis, :originalTitle, :releaseDate, :productionYear, :runtime, :poster, :genres, :popularity, :popularityLastUpdated, :archived, :lastModifiedDate, :createdDate)")
   fun insertMovies(@BindBean movie: Collection<MovieDTO>): IntArray
 

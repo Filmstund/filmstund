@@ -27,7 +27,7 @@ import java.util.*
 
 @Component
 class ShowingQueryResolver(private val showingService: ShowingService) : GraphQLQueryResolver {
-  fun publicShowings(afterDate: LocalDate?) = showingService.getAllPublicShowings(afterDate ?: LocalDate.MIN)
+  fun publicShowings(afterDate: LocalDate?) = showingService.getShowingsAfterDate(afterDate ?: LocalDate.MIN)
 
   fun showing(id: UUID?, webId: Base64ID?): ShowingDTO? {
     return when {

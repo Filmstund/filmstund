@@ -1,9 +1,11 @@
 package rocks.didit.sefilm.database.dao
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.customizer.Timestamped
 import org.jdbi.v3.sqlobject.kotlin.RegisterKotlinMapper
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
+import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.database.ParticipantGiftCertReducer
 import rocks.didit.sefilm.domain.SEK
@@ -48,4 +50,13 @@ interface ParticipantDao {
     hasPaid: Boolean,
     amountOwed: SEK?
   ): ParticipantDTO?
+
+  // TODO test me
+  @SqlUpdate("DELETE FROM participant p USING showing s WHERE p.user_id = :userId AND p.showing_id = :showingId AND s.id = :showingId AND s.tickets_bought = false")
+  fun deleteByUserAndShowing(userId: UUID, showingId: UUID): Boolean
+
+  // TODO test me
+  @Timestamped
+  @SqlUpdate("UPDATE participant p SET has_paid = true, amount_owed = 0, last_modified_date = :now FROM showing s WHERE p.showing_id = s.id AND s.admin = :adminUser AND p.showing_id = :showingId AND (p.gift_certificate_used IS NULL OR p.user_id = :adminUser)")
+  fun markGCParticipantsAsHavingPaid(showingId: UUID, adminUser: UUID): Boolean
 }

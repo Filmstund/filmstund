@@ -9,50 +9,118 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import rocks.didit.sefilm.DatabasePrimer
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
+import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class])
+@SpringBootTest(classes = [Jdbi::class, DatabasePrimer::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class ShowingDaoTest {
   @Autowired
   private lateinit var jdbi: Jdbi
 
+  @Autowired
+  private lateinit var databasePrimer: DatabasePrimer
+
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   @Test
   internal fun `given an existing showing, when findById(), then that showing is returned`() {
-    val rndMovie = rnd.nextMovie()
-    val rndAdmin = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+    databasePrimer.doDbTest {
+      withShowing()
+      afterInsert {
+        val dbShowing = it.showingDao.findById(showing.id)
 
-    jdbi.useTransactionUnchecked { handle ->
-      val userDao = handle.attach(UserDao::class.java)
-      val movieDao = handle.attach(MovieDao::class.java)
-      val locationDao = handle.attach(LocationDao::class.java)
-      val showingDao = handle.attach(ShowingDao::class.java)
+        assertThat(dbShowing)
+          .isNotNull
+          .isEqualToIgnoringGivenFields(showing, "lastModifiedDate", "createdDate", "location", "movieTitle", "payToPhone")
+        assertThat(dbShowing?.location)
+          .isNotNull
+          .isEqualToIgnoringGivenFields(showing.location, "lastModifiedDate")
+        assertThat(dbShowing?.movieTitle)
+          .isNotNull()
+          .isEqualTo(movie.originalTitle)
+        assertThat(dbShowing?.payToPhone)
+          .isNotNull
+          .isEqualTo(user.phone)
+      }
+    }
+  }
 
-      userDao.insertUser(rndAdmin)
-      movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
-      showingDao.insertShowingAndCinemaScreen(rndShowing)
+  @Test
+  internal fun `given an existing showing, when findByWebId(), then that showing is returned`() {
+    databasePrimer.doDbTest {
+      withMovie { it.nextMovie().copy(originalTitle = null) }
+      withShowing()
+      afterInsert {
+        val dbShowing = it.showingDao.findByWebId(showing.webId)
 
-      val dbShowing = showingDao.findById(rndShowing.id)
+        assertThat(dbShowing)
+          .isNotNull
+          .isEqualToIgnoringGivenFields(showing, "lastModifiedDate", "createdDate", "location", "movieTitle", "payToPhone")
+        assertThat(dbShowing?.location)
+          .isNotNull
+          .isEqualToIgnoringGivenFields(showing.location, "lastModifiedDate")
+        assertThat(dbShowing?.movieTitle)
+          .isNotNull()
+          .isEqualTo(movie.title)
+        assertThat(dbShowing?.payToPhone)
+          .isNotNull
+          .isEqualTo(user.phone)
+      }
+    }
+  }
 
-      assertThat(dbShowing)
-        .isNotNull
-        .isEqualToIgnoringGivenFields(rndShowing, "lastModifiedDate", "createdDate", "location")
-      assertThat(dbShowing?.location)
-        .isNotNull
-        .isEqualToIgnoringGivenFields(rndShowing.location, "lastModifiedDate")
+  @Test
+  internal fun `given multiple showings for the same movie, when findByMovieIdOrderByDateDesc(), then all showings for that movie is retured, sorted by date`() {
+    databasePrimer.doDbTest {
+      withMovie()
+      withUser()
+      withShowings { rnd ->
+        (1..5).map { rnd.nextShowing(movie.id, adminId = user.id) }
+      }
+      afterInsert {
+        val dbShowings = it.showingDao.findByMovieIdOrderByDateDesc(movie.id)
+
+        assertThat(dbShowings)
+          .isNotNull
+          .isSortedAccordingTo(compareByDescending(ShowingDTO::date))
+          .size()
+          .isGreaterThanOrEqualTo(5)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given multiple showings with different dates, when findByDateAfterOrderByDateDesc(), then only showings after the supplied date is returned`() {
+    databasePrimer.doDbTest {
+      withMovie()
+      withUser()
+      withShowings { rnd ->
+        (1..5).map { rnd.nextShowing(movie.id, adminId = user.id).copy(date = LocalDate.now().plusDays(it.toLong())) }
+      }
+      withShowings { rnd ->
+        (1..5).map { rnd.nextShowing(movie.id, adminId = user.id).copy(date = LocalDate.now().minusDays(it.toLong())) }
+      }
+      afterInsert {
+        val dbShowings = it.showingDao.findByDateAfterOrderByDateDesc(LocalDate.now())
+
+        assertThat(dbShowings)
+          .isNotNull
+          .isSortedAccordingTo(compareByDescending(ShowingDTO::date))
+          .size()
+          .isGreaterThanOrEqualTo(5)
+      }
     }
   }
 
@@ -78,8 +146,20 @@ internal class ShowingDaoTest {
       locationDao.insertLocationAndAlias(rndShowing2.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       showingDao.insertShowingAndCinemaScreen(rndShowing2)
-      participantDao.insertParticipantOnShowing(ParticipantDTO(rndAdmin.id, rndShowing2.id, PublicUserDTO(rndAdmin.id)))
-      participantDao.insertParticipantOnShowing(ParticipantDTO(rndAdmin.id, rndShowing.id, PublicUserDTO(rndAdmin.id)))
+      participantDao.insertParticipantOnShowing(
+        ParticipantDTO(
+          rndAdmin.id,
+          rndShowing2.id,
+          PublicUserDTO(rndAdmin.id)
+        )
+      )
+      participantDao.insertParticipantOnShowing(
+        ParticipantDTO(
+          rndAdmin.id,
+          rndShowing.id,
+          PublicUserDTO(rndAdmin.id)
+        )
+      )
 
       val dbShowings = showingDao.findByAdminOrParticipant(rndAdmin.id)
       assertThat(dbShowings)
@@ -129,6 +209,8 @@ internal class ShowingDaoTest {
       assertThat(dbShowingUpdated?.payToUser)
         .isNotNull()
         .isEqualTo(rndNewAdmin.id)
+      assertThat(dbShowingUpdated?.lastModifiedDate)
+        .isAfter(rndShowing.lastModifiedDate)
     }
   }
 

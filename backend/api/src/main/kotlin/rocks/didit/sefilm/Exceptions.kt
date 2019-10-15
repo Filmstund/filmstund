@@ -6,7 +6,7 @@ import java.util.*
 class NotFoundException(what: String, userID: UUID? = null, showingId: UUID? = null) :
   KnownException("Could not find $what", userID, showingId)
 
-class MissingPhoneNumberException(userID: UUID) :
+class MissingPhoneNumberException(userID: UUID? = null) :
   KnownException("You are missing a phone number.", userID)
 
 class MissingParametersException(what: String = "") : KnownException("Some required parameters were missing: $what")
