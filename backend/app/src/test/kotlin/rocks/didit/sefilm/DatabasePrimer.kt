@@ -22,28 +22,32 @@ class DatabasePrimer(private val jdbi: Jdbi) {
 class DbTest(private val jdbi: Jdbi) {
   private var testData: TestData = TestData()
 
-  fun withUser(init: TestData.(ThreadLocalRandom) -> UserDTO) {
-    testData = testData.addUser(testData.init(ThreadLocalRandom.current()))
+  fun withUser(generate: TestData.(ThreadLocalRandom) -> UserDTO) {
+    testData = testData.addUser(testData.generate(ThreadLocalRandom.current()))
   }
 
   fun withUser(userId: UUID = UUID.randomUUID()) {
     testData = testData.addUser(ThreadLocalRandom.current().nextUserDTO(userId))
   }
 
-  fun withMovie(init: TestData.(ThreadLocalRandom) -> MovieDTO) {
-    testData = testData.addMovie(testData.init(ThreadLocalRandom.current()))
+  fun withMovie(generate: TestData.(ThreadLocalRandom) -> MovieDTO) {
+    testData = testData.addMovie(testData.generate(ThreadLocalRandom.current()))
+  }
+
+  fun withMovies(generate: TestData.(ThreadLocalRandom) -> Collection<MovieDTO>) {
+    testData = testData.addMovies(testData.generate(ThreadLocalRandom.current()))
   }
 
   fun withMovie() {
     testData = testData.addMovie(ThreadLocalRandom.current().nextMovie())
   }
 
-  fun withShowing(init: TestData.(ThreadLocalRandom) -> ShowingDTO) {
-    testData = testData.addShowing(testData.init(ThreadLocalRandom.current()))
+  fun withShowing(generate: TestData.(ThreadLocalRandom) -> ShowingDTO) {
+    testData = testData.addShowing(testData.generate(ThreadLocalRandom.current()))
   }
 
-  fun withShowings(init: TestData.(ThreadLocalRandom) -> List<ShowingDTO>) {
-    testData = testData.addShowings(testData.init(ThreadLocalRandom.current()))
+  fun withShowings(generate: TestData.(ThreadLocalRandom) -> List<ShowingDTO>) {
+    testData = testData.addShowings(testData.generate(ThreadLocalRandom.current()))
   }
 
   fun withShowing() {
@@ -56,8 +60,8 @@ class DbTest(private val jdbi: Jdbi) {
     withShowing { it.nextShowing(testData.lastMovie?.id!!, testData.lastUser?.id!!) }
   }
 
-  fun withParticipant(init: TestData.(ThreadLocalRandom) -> ParticipantDTO) {
-    testData = testData.addParticipant(testData.init(ThreadLocalRandom.current()))
+  fun withParticipant(generate: TestData.(ThreadLocalRandom) -> ParticipantDTO) {
+    testData = testData.addParticipant(testData.generate(ThreadLocalRandom.current()))
   }
 
   fun withParticipantOnLastShowing() {
@@ -72,6 +76,12 @@ class DbTest(private val jdbi: Jdbi) {
     insertNotNullFields()
     jdbi.useTransactionUnchecked { handle ->
       testData.init(handle.toDaos())
+    }
+  }
+
+  fun withDaos(init: Daos.() -> Unit) {
+    jdbi.useTransactionUnchecked { handle ->
+      handle.toDaos().init()
     }
   }
 
@@ -112,13 +122,19 @@ data class TestData(
   val participants: List<ParticipantDTO> = listOf(),
   val lastParticipant: ParticipantDTO? = null
 ) {
-  val user: UserDTO get() = lastUser ?: throw IllegalStateException()
-  val movie: MovieDTO get() = lastMovie ?: throw IllegalStateException()
-  val showing: ShowingDTO get() = lastShowing ?: throw IllegalStateException()
-  val participant: ParticipantDTO get() = lastParticipant ?: throw IllegalStateException()
+  val user: UserDTO get() = lastUser ?: throw IllegalStateException("No user has been created. See #withUser()")
+  val movie: MovieDTO get() = lastMovie ?: throw IllegalStateException("No movie has been created. See #withMovie()")
+  val showing: ShowingDTO
+    get() = lastShowing ?: throw IllegalStateException("No showing has been created. See #withShowing()")
+  val participant: ParticipantDTO
+    get() = lastParticipant ?: throw IllegalStateException("No participant has been created. See #withParticipant()")
 
   fun addUser(user: UserDTO): TestData = copy(lastUser = user, users = users.plus(Pair(user.id, user)))
   fun addMovie(movie: MovieDTO): TestData = copy(lastMovie = movie, movies = movies.plus(Pair(movie.id, movie)))
+  fun addMovies(movies: Collection<MovieDTO>): TestData = copy(
+    lastMovie = movies.last(), movies = this.movies.plus(movies.map { Pair(it.id, it) })
+  )
+
   fun addShowing(showing: ShowingDTO): TestData =
     copy(lastShowing = showing, showings = showings.plus(Pair(showing.id, showing)))
 

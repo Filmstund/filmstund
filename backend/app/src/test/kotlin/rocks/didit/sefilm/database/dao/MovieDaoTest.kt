@@ -2,13 +2,13 @@ package rocks.didit.sefilm.database.dao
 
 import org.assertj.core.api.Assertions.assertThat
 import org.jdbi.v3.core.Jdbi
-import org.jdbi.v3.core.kotlin.useExtensionUnchecked
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import rocks.didit.sefilm.DatabasePrimer
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
@@ -18,83 +18,83 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class])
+@SpringBootTest(classes = [Jdbi::class, DatabasePrimer::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class MovieDaoTest {
   @Autowired
-  private lateinit var jdbi: Jdbi
+  private lateinit var databasePrimer: DatabasePrimer
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   @Test
   internal fun `given a new movie, when findById(), then same DTO is returned`() {
-    val rndMovie = rnd.nextMovie()
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovie(rndMovie)
-
-      val movieFromDb = it.findById(rndMovie.id)
-      assertThat(movieFromDb)
-        .isNotNull
-        .isEqualTo(rndMovie)
+    databasePrimer.doDbTest {
+      withMovie()
+      afterInsert {
+        val movieFromDb = it.movieDao.findById(movie.id)
+        assertThat(movieFromDb)
+          .isNotNull
+          .isEqualTo(movie)
+      }
     }
   }
 
   @Test
   internal fun `given a movie, when existsById(), then true is returned`() {
-    val rndMovie = rnd.nextMovie()
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovie(rndMovie)
-      assertThat(it.existsById(rndMovie.id)).isTrue()
+    databasePrimer.doDbTest {
+      withMovie()
+      afterInsert {
+        assertThat(it.movieDao.existsById(movie.id)).isTrue()
+      }
     }
   }
 
   @Test
   internal fun `given no movie, when existsById(), then false is returned`() {
-    val rndMovieId = UUID.randomUUID()
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      assertThat(it.existsById(rndMovieId)).isFalse()
+    databasePrimer.doDbTest {
+      withDaos {
+        val rndMovieId = UUID.randomUUID()
+        assertThat(movieDao.existsById(rndMovieId)).isFalse()
+      }
     }
   }
 
   @Test
   internal fun `given a movie, when existsByFilmstadenId(), then true is returned`() {
-    val rndMovie = rnd.nextMovie()
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovie(rndMovie)
-      assertThat(rndMovie.filmstadenId).isNotNull()
-      assertThat(it.existsByFilmstadenId(rndMovie.filmstadenId!!)).isTrue()
+    databasePrimer.doDbTest {
+      withMovie()
+      afterInsert {
+        assertThat(movie.filmstadenId).isNotNull()
+        assertThat(it.movieDao.existsByFilmstadenId(movie.filmstadenId!!)).isTrue()
+      }
     }
   }
 
   @Test
   internal fun `given no movie, when existsByFilmstadenId(), then false is returned`() {
-    val rndFilmstadenId = "fsid${rnd.nextLong(0, 10000000)}"
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      assertThat(it.existsByFilmstadenId(rndFilmstadenId)).isFalse()
+    databasePrimer.doDbTest {
+      withDaos {
+        val rndFilmstadenId = "fsid${rnd.nextLong(0, 10000000)}"
+        assertThat(movieDao.existsByFilmstadenId(rndFilmstadenId)).isFalse()
+      }
     }
   }
 
   @Test
   internal fun `given at least 5 movies, when findAll(), then at least those movies are returned`() {
-    val rndMovies = (0..5).map { rnd.nextMovie() }
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovies(rndMovies)
-
-      val moviesFromDb = it.findAll()
-      assertThat(moviesFromDb)
-        .isNotNull
-        .isNotEmpty
-        .size()
-        .isGreaterThanOrEqualTo(rndMovies.size)
-        .returnToIterable()
-        .containsAll(rndMovies)
-        .isSortedAccordingTo(compareBy(MovieDTO::archived).thenByDescending(MovieDTO::popularity))
+    databasePrimer.doDbTest {
+      withMovies { (0..5).map { rnd.nextMovie() } }
+      afterInsert {
+        val moviesFromDb = it.movieDao.findAll()
+        assertThat(moviesFromDb)
+          .isNotNull
+          .isNotEmpty
+          .size()
+          .isGreaterThanOrEqualTo(movies.values.size)
+          .returnToIterable()
+          .containsAll(movies.values)
+          .isSortedAccordingTo(compareBy(MovieDTO::archived).thenByDescending(MovieDTO::popularity))
+      }
     }
   }
 
@@ -103,18 +103,20 @@ internal class MovieDaoTest {
     val rndUnarchivedMovies = (0..5).map { rnd.nextMovie().copy(archived = false) }
     val rndArchivedMovies = (0..6).map { rnd.nextMovie().copy(archived = true) }
 
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovies(rndUnarchivedMovies.plus(rndArchivedMovies))
-
-      val moviesFromDb = it.findByArchivedOrderByPopularityDesc(false)
-      assertThat(moviesFromDb)
-        .isNotNull
-        .isNotEmpty
-        .size()
-        .isGreaterThanOrEqualTo(rndUnarchivedMovies.size)
-        .returnToIterable()
-        .containsAll(rndUnarchivedMovies)
-        .isSortedAccordingTo(compareByDescending(MovieDTO::popularity))
+    databasePrimer.doDbTest {
+      withMovies { rndUnarchivedMovies }
+      withMovies { rndArchivedMovies }
+      afterInsert {
+        val moviesFromDb = it.movieDao.findByArchivedOrderByPopularityDesc(false)
+        assertThat(moviesFromDb)
+          .isNotNull
+          .isNotEmpty
+          .size()
+          .isGreaterThanOrEqualTo(rndUnarchivedMovies.size)
+          .returnToIterable()
+          .containsAll(rndUnarchivedMovies)
+          .isSortedAccordingTo(compareByDescending(MovieDTO::popularity))
+      }
     }
   }
 
@@ -123,71 +125,97 @@ internal class MovieDaoTest {
     val rndUnarchivedMovies = (0..5).map { rnd.nextMovie().copy(archived = false) }
     val rndArchivedMovies = (0..6).map { rnd.nextMovie().copy(archived = true) }
 
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovies(rndUnarchivedMovies.plus(rndArchivedMovies))
-
-      val moviesFromDb = it.findByArchivedOrderByPopularityDesc(true)
-      assertThat(moviesFromDb)
-        .isNotNull
-        .isNotEmpty
-        .size()
-        .isGreaterThanOrEqualTo(rndArchivedMovies.size)
-        .returnToIterable()
-        .containsAll(rndArchivedMovies)
-        .isSortedAccordingTo(compareByDescending(MovieDTO::popularity))
+    databasePrimer.doDbTest {
+      withMovies { rndUnarchivedMovies }
+      withMovies { rndArchivedMovies }
+      afterInsert {
+        val moviesFromDb = it.movieDao.findByArchivedOrderByPopularityDesc(true)
+        assertThat(moviesFromDb)
+          .isNotNull
+          .isNotEmpty
+          .size()
+          .isGreaterThanOrEqualTo(rndArchivedMovies.size)
+          .returnToIterable()
+          .containsAll(rndArchivedMovies)
+          .isSortedAccordingTo(compareByDescending(MovieDTO::popularity))
+      }
     }
   }
 
   @Test
   internal fun `given a movie with newer lastModifiedDate, when updateMovie(), then null returned`() {
-    val rndMovie = rnd.nextMovie()
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovie(rndMovie)
-
-      val movieFromDb = it.updateMovie(rndMovie.copy(title = "newTitle", lastModifiedDate = Instant.now()))
-      assertThat(movieFromDb)
-        .isNull()
+    databasePrimer.doDbTest {
+      withMovie()
+      afterInsert {
+        val movieFromDb = it.movieDao.updateMovie(movie.copy(title = "newTitle", lastModifiedDate = Instant.now()))
+        assertThat(movieFromDb).isNull()
+      }
     }
   }
 
   @Test
   internal fun `given a movie with same lastModifiedDate, when updateMovie(), then updated movie is returned`() {
-    val rndMovie = rnd.nextMovie()
-
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovie(rndMovie)
-
-      val movieFromDb = it.updateMovie(rndMovie.copy(title = "newTitle", genres = rndMovie.genres.plus("genreNEW")))
-      assertThat(movieFromDb)
-        .isNotNull
-        .isEqualToIgnoringGivenFields(rndMovie, "title", "genres", "lastModifiedDate")
-      assertThat(movieFromDb?.title)
-        .isEqualTo("newTitle")
-      assertThat(movieFromDb?.genres)
-        .size()
-        .isGreaterThan(rndMovie.genres.size)
-        .returnToIterable()
-        .contains("genreNEW")
-      assertThat(movieFromDb?.lastModifiedDate)
-        .isAfter(rndMovie.lastModifiedDate)
+    databasePrimer.doDbTest {
+      withMovie()
+      afterInsert {
+        val movieFromDb =
+          it.movieDao.updateMovie(movie.copy(title = "newTitle", genres = movie.genres.plus("genreNEW")))
+        assertThat(movieFromDb)
+          .isNotNull
+          .isEqualToIgnoringGivenFields(movie, "title", "genres", "lastModifiedDate")
+        assertThat(movieFromDb?.title)
+          .isEqualTo("newTitle")
+        assertThat(movieFromDb?.genres)
+          .size()
+          .isGreaterThan(movie.genres.size)
+          .returnToIterable()
+          .contains("genreNEW")
+        assertThat(movieFromDb?.lastModifiedDate)
+          .isAfter(movie.lastModifiedDate)
+      }
     }
   }
 
   @Test
   internal fun `given an unarchived movie, when archiveMovie(), then the movie is archived`() {
-    val rndMovie = rnd.nextMovie().copy(archived = false)
+    databasePrimer.doDbTest {
+      withMovie { it.nextMovie().copy(archived = false) }
+      afterInsert {
+        val movieFromDb = it.movieDao.archiveMovie(movie)
+        assertThat(movieFromDb?.archived)
+          .isNotNull()
+          .isTrue()
+        assertThat(movieFromDb?.lastModifiedDate)
+          .isNotNull()
+          .isAfter(movie.lastModifiedDate)
 
-    jdbi.useExtensionUnchecked(MovieDao::class) {
-      it.insertMovie(rndMovie)
+      }
+    }
+  }
 
-      val movieFromDb = it.archiveMovie(rndMovie)
-      assertThat(movieFromDb?.archived)
-        .isNotNull()
-        .isTrue()
-      assertThat(movieFromDb?.lastModifiedDate)
-        .isNotNull()
-        .isAfter(rndMovie.lastModifiedDate)
+  @Test
+  internal fun `given a movie without an original title, when findTitleById(), then the title is returned`() {
+    databasePrimer.doDbTest {
+      withMovie { it.nextMovie().copy(originalTitle = null) }
+      afterInsert {
+        val title = it.movieDao.findTitleById(movie.id)
+        assertThat(title)
+          .isNotNull()
+          .isEqualTo(movie.title)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a movie with an original title, when findTitleById(), then the original title is returned`() {
+    databasePrimer.doDbTest {
+      withMovie()
+      afterInsert {
+        val title = it.movieDao.findTitleById(movie.id)
+        assertThat(title)
+          .isNotNull()
+          .isEqualTo(movie.originalTitle)
+      }
     }
   }
 }

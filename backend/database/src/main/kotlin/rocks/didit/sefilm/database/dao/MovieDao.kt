@@ -26,7 +26,6 @@ interface MovieDao {
   @SqlQuery("SELECT * FROM movie WHERE id = :id")
   fun findById(id: UUID): MovieDTO?
 
-  // TODO: Test me
   @SqlQuery("SELECT COALESCE(original_title, title) FROM movie WHERE id = :id")
   fun findTitleById(id: UUID): String?
 
