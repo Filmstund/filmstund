@@ -26,8 +26,18 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addUser(testData.generate(ThreadLocalRandom.current()))
   }
 
+  fun withUsers(count: Int, generate: TestData.(ThreadLocalRandom) -> UserDTO) {
+    repeat(count) {
+      testData = testData.addUser(testData.generate(ThreadLocalRandom.current()))
+    }
+  }
+
   fun withUser(userId: UUID = UUID.randomUUID()) {
     testData = testData.addUser(ThreadLocalRandom.current().nextUserDTO(userId))
+  }
+
+  fun withAdmin(userId: UUID = UUID.randomUUID()) {
+    testData = testData.addAdmin(ThreadLocalRandom.current().nextUserDTO(userId))
   }
 
   fun withMovie(generate: TestData.(ThreadLocalRandom) -> MovieDTO) {
@@ -72,6 +82,12 @@ class DbTest(private val jdbi: Jdbi) {
     }
   }
 
+  fun withParticipantsOnLastShowing(count: Int) {
+    for (i in 0..count) {
+      withParticipantOnLastShowing()
+    }
+  }
+
   fun afterInsert(init: TestData.(Daos) -> Unit) {
     insertNotNullFields()
     jdbi.useTransactionUnchecked { handle ->
@@ -112,6 +128,7 @@ class DbTest(private val jdbi: Jdbi) {
 data class TestData(
   val users: Map<UUID, UserDTO> = mapOf(),
   val lastUser: UserDTO? = null,
+  val lastAdmin: UserDTO? = null,
 
   val movies: Map<UUID, MovieDTO> = mapOf(),
   val lastMovie: MovieDTO? = null,
@@ -123,6 +140,7 @@ data class TestData(
   val lastParticipant: ParticipantDTO? = null
 ) {
   val user: UserDTO get() = lastUser ?: throw IllegalStateException("No user has been created. See #withUser()")
+  val admin: UserDTO get() = lastAdmin ?: throw IllegalStateException("No admin has been created. See #withAdmin()")
   val movie: MovieDTO get() = lastMovie ?: throw IllegalStateException("No movie has been created. See #withMovie()")
   val showing: ShowingDTO
     get() = lastShowing ?: throw IllegalStateException("No showing has been created. See #withShowing()")
@@ -130,6 +148,9 @@ data class TestData(
     get() = lastParticipant ?: throw IllegalStateException("No participant has been created. See #withParticipant()")
 
   fun addUser(user: UserDTO): TestData = copy(lastUser = user, users = users.plus(Pair(user.id, user)))
+  fun addAdmin(admin: UserDTO): TestData =
+    copy(lastUser = admin, lastAdmin = admin, users = users.plus(Pair(admin.id, admin)))
+
   fun addMovie(movie: MovieDTO): TestData = copy(lastMovie = movie, movies = movies.plus(Pair(movie.id, movie)))
   fun addMovies(movies: Collection<MovieDTO>): TestData = copy(
     lastMovie = movies.last(), movies = this.movies.plus(movies.map { Pair(it.id, it) })

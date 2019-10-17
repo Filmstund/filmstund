@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import rocks.didit.sefilm.DatabasePrimer
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
@@ -21,11 +22,14 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class])
+@SpringBootTest(classes = [Jdbi::class, DatabasePrimer::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class ParticipantDaoTest {
   @Autowired
   private lateinit var jdbi: Jdbi
+
+  @Autowired
+  private lateinit var databasePrimer: DatabasePrimer
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
@@ -81,62 +85,35 @@ internal class ParticipantDaoTest {
 
   @Test
   internal fun `given no participants on a showing, when isParticipantOnShowing(), then false is returned`() {
-    val rndMovie = rnd.nextMovie()
-    val rndAdmin = rnd.nextUserDTO()
-    val rndUser = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
-
-    jdbi.useTransactionUnchecked { handle ->
-      val userDao = handle.attach(UserDao::class.java)
-      val movieDao = handle.attach(MovieDao::class.java)
-      val locationDao = handle.attach(LocationDao::class.java)
-      val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
-
-      userDao.insertUser(rndAdmin)
-      userDao.insertUser(rndUser)
-      movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
-      showingDao.insertShowingAndCinemaScreen(rndShowing)
-
-      assertThat(participantDao.isParticipantOnShowing(rndAdmin.id, rndShowing.id))
-        .describedAs("Showing admin is participant")
-        .isFalse()
-      assertThat(participantDao.isParticipantOnShowing(rndUser.id, rndShowing.id))
-        .describedAs("Random user is participant")
-        .isFalse()
+    databasePrimer.doDbTest {
+      withAdmin()
+      withShowing()
+      withUser()
+      afterInsert {
+        assertThat(it.participantDao.isParticipantOnShowing(admin.id, showing.id))
+          .describedAs("Showing admin is participant")
+          .isFalse()
+        assertThat(it.participantDao.isParticipantOnShowing(user.id, showing.id))
+          .describedAs("Random user is participant")
+          .isFalse()
+      }
     }
   }
 
   @Test
   internal fun `given participants on a showing, when isParticipantOnShowing(), then true is returned`() {
-    val rndMovie = rnd.nextMovie()
-    val rndAdmin = rnd.nextUserDTO()
-    val rndUser = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
-
-    jdbi.useTransactionUnchecked { handle ->
-      val userDao = handle.attach(UserDao::class.java)
-      val movieDao = handle.attach(MovieDao::class.java)
-      val locationDao = handle.attach(LocationDao::class.java)
-      val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
-
-      userDao.insertUser(rndAdmin)
-      userDao.insertUser(rndUser)
-      movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
-      showingDao.insertShowingAndCinemaScreen(rndShowing)
-
-      val participant = rnd.nextParticipant(rndUser.id, rndShowing.id)
-      participantDao.insertParticipantOnShowing(participant)
-
-      assertThat(participantDao.isParticipantOnShowing(rndAdmin.id, rndShowing.id))
-        .describedAs("Showing admin is participant")
-        .isFalse()
-      assertThat(participantDao.isParticipantOnShowing(rndUser.id, rndShowing.id))
-        .describedAs("Random user is participant")
-        .isTrue()
+    databasePrimer.doDbTest {
+      withAdmin()
+      withShowing()
+      withParticipantOnLastShowing()
+      afterInsert {
+        assertThat(it.participantDao.isParticipantOnShowing(admin.id, showing.id))
+          .describedAs("Showing admin is participant")
+          .isFalse()
+        assertThat(it.participantDao.isParticipantOnShowing(user.id, showing.id))
+          .describedAs("Random user is participant")
+          .isTrue()
+      }
     }
   }
 
