@@ -279,7 +279,7 @@ class ShowingService(
           ?: throw MissingParametersException("User chose to pay with a gift certificate, but no ticket number were supplied")
         val ticketNumber = TicketNumber(suppliedTicket)
 
-        assertionService.assertForetagsbiljettIsUsable(userId, ticketNumber, showing)
+        assertionService.assertGiftCertIsUsable(userId, ticketNumber, showing)
         ParticipantDTO(
           userId = userId,
           showingId = showing.id,

@@ -28,8 +28,6 @@ class UserAlreadyAttendedException(userID: UUID) :
 
 class TicketNotFoundException(ticketNumber: TicketNumber) : KnownException("Ticket $ticketNumber not found")
 
-class DuplicateTicketException(msg: String = "") : KnownException("Found duplicate tickets$msg")
-
 class TicketAlreadyUsedException(whichTicket: TicketNumber) :
   KnownException("The ticket $whichTicket has already been used")
 

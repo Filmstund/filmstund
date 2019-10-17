@@ -56,6 +56,12 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addShowing(testData.generate(ThreadLocalRandom.current()))
   }
 
+  fun withShowings(count: Int, generate: TestData.(ThreadLocalRandom) -> ShowingDTO) {
+    repeat(count) {
+      testData = testData.addShowing(testData.generate(ThreadLocalRandom.current()))
+    }
+  }
+
   fun withShowings(generate: TestData.(ThreadLocalRandom) -> List<ShowingDTO>) {
     testData = testData.addShowings(testData.generate(ThreadLocalRandom.current()))
   }
