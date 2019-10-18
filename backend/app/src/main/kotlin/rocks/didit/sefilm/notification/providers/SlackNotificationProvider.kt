@@ -46,7 +46,7 @@ class SlackNotificationProvider(
     val dateField = SlackField("Datum", event.showing.date.toString(), true)
     val timeField = SlackField("Tid", event.showing.time.toString(), true)
     val attachement = createAttachement(
-      "<!here> ${event.showing.admin.nick} har ändrat sin visning",
+      "<!here> ${event.admin.nick} har ändrat sin visning",
       showingUrl,
       event,
       listOf(dateField, timeField)
@@ -59,7 +59,7 @@ class SlackNotificationProvider(
   @EventListener
   fun pushOnNewEvent(event: NewShowingEvent) {
     val showingUrl = getShowingUrl(event)
-    val attachement = createAttachement("<!here> ${event.showing.admin.nick} har skapat en ny visning!", showingUrl, event)
+    val attachement = createAttachement("<!here> ${event.admin.nick} har skapat en ny visning!", showingUrl, event)
     pushToSlack(SlackPayload(attachments = listOf(attachement)))
   }
 
@@ -73,26 +73,26 @@ class SlackNotificationProvider(
     fields: List<SlackField> = emptyList()
   ): SlackAttachement {
     return SlackAttachement(
-      "SeFilm visning för <${event.showing.movie.title}>",
+      "SeFilm visning för <${event.movie.title}>",
       pretext,
       event.ifIMDbSupplied("IMDb"),
-      event.ifIMDbSupplied("https://www.imdb.com/title/${event.showing.movie.imdbId?.value}"),
+      event.ifIMDbSupplied("https://www.imdb.com/title/${event.movie.imdbId?.value}"),
       event.ifIMDbSupplied("https://pbs.twimg.com/profile_images/976507090624589824/0x28al44_400x400.jpg"),
       "grey",
-      event.showing.movie.title,
+      event.movie.title,
       showingUrl,
-      event.showing.movie.synopsis ?: "N/A",
+      event.movie.synopsis ?: "N/A",
       event.showing.location?.name ?: "Filmstaden",
       null,
       null,
-      event.showing.movie.poster,
-      event.showing.dateTime.atZone(TimeZone.getTimeZone("Europe/Stockholm").toZoneId()).toEpochSecond(),
+      event.movie.poster,
+      event.showing.datetime.atZone(TimeZone.getTimeZone("Europe/Stockholm").toZoneId()).toEpochSecond(),
       fields
     )
   }
 
   private fun ShowingEvent.ifIMDbSupplied(str: String): String? {
-    return if (showing.movie.imdbId?.isSupplied() == true) {
+    return if (movie.imdbId?.isSupplied() == true) {
       str
     } else {
       null

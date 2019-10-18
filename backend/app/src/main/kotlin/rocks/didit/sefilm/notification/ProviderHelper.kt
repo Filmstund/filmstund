@@ -56,7 +56,7 @@ class ProviderHelper(
 
   private fun newShowingMessage(event: NewShowingEvent): NotificationMessage {
     return formatMsg(
-      title = "A showing for ${event.showing.movie.title} has been created",
+      title = "A showing for movie ${event.showing.movieId} has been created",
       msg = "Time: ${event.showing.date} ${event.showing.time}.\nLocation: ${event.showing.location?.name}",
       event = event
     )
@@ -64,22 +64,22 @@ class ProviderHelper(
 
   private fun updatedShowingMessage(event: UpdatedShowingEvent): NotificationMessage {
     return formatMsg(
-      title = "The showing for ${event.showing.movie.title} has been updated",
+      title = "The showing for movie ${event.showing.movieId} has been updated",
       msg = "Time: ${event.showing.time}.\nLocation: ${event.showing.location?.name}", event = event
     )
   }
 
   private fun deletedShowingMessage(event: DeletedShowingEvent): NotificationMessage {
     return formatMsg(
-      title = "The showing for ${event.showing.movie.title} has been removed",
+      title = "The showing for movie ${event.showing.movieId} has been removed",
       msg = "Sad panda :(", event = event
     )
   }
 
   private fun ticketsBoughtMessage(event: TicketsBoughtEvent): NotificationMessage {
     return formatMsg(
-      title = "Tickets bought for ${event.showing.movie.title}",
-      msg = "Price ${event.showing.price.toKronor()} SEK. Pay to ${event.showing.payToUser.phone}", event = event
+      title = "Tickets bought for movie ${event.showing.movieId}",
+      msg = "Price ${event.showing.price?.toKronor()} SEK. Pay to ${event.showing.payToPhone}", event = event
     )
   }
 
