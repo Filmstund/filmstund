@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.DatabasePrimer
+import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
@@ -21,14 +21,14 @@ import rocks.didit.sefilm.nextShowing
 import java.util.*
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, ParticipantPaymentService::class, DatabasePrimer::class])
+@SpringBootTest(classes = [Jdbi::class, ParticipantPaymentService::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class ParticipantPaymentServiceTest {
   @Autowired
   private lateinit var participantPaymentService: ParticipantPaymentService
 
   @Autowired
-  private lateinit var databasePrimer: DatabasePrimer
+  private lateinit var databaseTest: DatabaseTest
 
   @Test
   internal fun `given null showing id, when updatePaymentInfo(), then an IllegalArgumentException is thrown`() {
@@ -64,7 +64,7 @@ internal class ParticipantPaymentServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given showing with participant, when updatePaymentInfo() but with wrong admin, then an AccessDeniedException is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withUser()
       withShowing { it.nextShowing(movie.id, adminId = user.id) }
@@ -87,7 +87,7 @@ internal class ParticipantPaymentServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given showing with participant, when updatePaymentInfo(), then the participant payment info is updated correctly`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, adminId = currentLoggedInUser().id) }
       withParticipantOnLastShowing()

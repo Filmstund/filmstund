@@ -31,14 +31,14 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [ShowingService::class, Jdbi::class, DatabasePrimer::class, SlugService::class, LocationService::class, AssertionService::class, UserService::class, GiftCertificateService::class])
+@SpringBootTest(classes = [ShowingService::class, Jdbi::class, DatabaseTest::class, SlugService::class, LocationService::class, AssertionService::class, UserService::class, GiftCertificateService::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class ShowingServiceTest {
   @Autowired
   private lateinit var showingService: ShowingService
 
   @Autowired
-  private lateinit var databasePrimer: DatabasePrimer
+  private lateinit var databaseTest: DatabaseTest
 
   @MockBean
   private lateinit var filmstadenServiceMock: FilmstadenService
@@ -48,7 +48,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given a showing, when getShowing, then that showing is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       afterInsert {
         val showingById = showingService.getShowing(showing.id)
@@ -70,7 +70,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given two showings, when getShowingByMovie, then two showings are returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withAdmin()
       withShowings(2) { it.nextShowing(movie.id, admin.id) }
@@ -87,7 +87,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given zero showings, when getShowingByMovie, then zero showings are returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         val dbShowings = showingService.getShowingByMovie(movie.id)
@@ -99,7 +99,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given a showing, when user is admin and getShowingByUser, then that showing is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withAdmin()
       withShowing()
       afterInsert {
@@ -112,7 +112,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given a showing, when user is participant and getShowingByUser, then that showing is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withAdmin()
       withShowing()
       withParticipantOnLastShowing()
@@ -127,7 +127,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given multiple showing with different dates, when getShowingsAfterDate, then only showings after that date is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withUser()
       withShowings { rnd ->
@@ -156,7 +156,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when getAdminPaymentDetails when current user is not the admin, then null is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       afterInsert {
         assertThat(showingService.getAdminPaymentDetails(showing.id))
@@ -168,7 +168,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing with no participants, when getAdminPaymentDetails(), then the payment details with no participants are returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser { it.nextUserDTO(currentLoggedInUser().id) }
       withShowing()
       afterInsert {
@@ -185,7 +185,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing with participants, when getAdminPaymentDetails(), then the payment details including participants are returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser { it.nextUserDTO(currentLoggedInUser().id) }
       withShowing()
       withParticipantsOnLastShowing(5)
@@ -202,7 +202,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given a showing admin without a phone, when getAttendeePaymentDetails(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser { it.nextUserDTO().copy(phone = null) }
       withShowing()
       withParticipantOnLastShowing()
@@ -216,7 +216,7 @@ internal class ShowingServiceTest {
 
   @Test
   internal fun `given a showing and participant, when getAttendeePaymentDetails(), then the correct details are returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withAdmin()
       withShowing()
       withParticipantOnLastShowing()
@@ -240,7 +240,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing and participant, when attendShowing(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
@@ -255,7 +255,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing that has been bought, when attendShowing(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = true) }
       afterInsert {
@@ -269,7 +269,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing and a user, when attendShowing() with a swish payment option, then user is a swish attendee`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
@@ -288,7 +288,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing and a user, when attendShowing() with a gift cert payment option, then user is a gift cert attendee`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
@@ -312,7 +312,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a bought showing with a participant, when unattendShowing(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = true) }
       withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
@@ -329,7 +329,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a logged in user, when createShowing(), then a showing with the current user as admin is created`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         val createShowing = CreateShowingDTO(
@@ -362,7 +362,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when deleteShowing() by a non-admin, then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       afterInsert {
         assertThrows<AccessDeniedException> {
@@ -375,7 +375,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing that has been bought, when deleteShowing() by the admin, then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = true) }
       afterInsert {
@@ -389,7 +389,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when deleteShowing(), then the showing is no more`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
@@ -404,7 +404,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when markAsBought by non-admin, then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       afterInsert {
         assertThrows<AccessDeniedException> {
@@ -417,7 +417,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser(true)
   internal fun `given a showing and the admin doesnt have a phone number, when markAsBought, then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
@@ -431,7 +431,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing with multiple participants, when markAsBought(), then the showing has marked as bought`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       withParticipantsAndUsers(5) {
@@ -474,7 +474,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when updateShowing() when current user is not the admin, then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       withUser()
       afterInsert {
@@ -489,7 +489,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when updateShowing(), then relevant fields are updated`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       withUser()
@@ -521,7 +521,7 @@ internal class ShowingServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing, when updateShowing() where filmstadenRemoteEntityId is null, then fields are updated but the cinema screen is not`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       withUser()

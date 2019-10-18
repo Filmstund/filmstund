@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.DatabasePrimer
+import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
@@ -23,20 +23,20 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, DatabasePrimer::class])
+@SpringBootTest(classes = [Jdbi::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class ShowingDaoTest {
   @Autowired
   private lateinit var jdbi: Jdbi
 
   @Autowired
-  private lateinit var databasePrimer: DatabasePrimer
+  private lateinit var databaseTest: DatabaseTest
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   @Test
   internal fun `given an existing showing, when findById(), then that showing is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       afterInsert {
         val dbShowing = it.showingDao.findById(showing.id)
@@ -59,7 +59,7 @@ internal class ShowingDaoTest {
 
   @Test
   internal fun `given an existing showing, when findByWebId(), then that showing is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie { it.nextMovie().copy(originalTitle = null) }
       withShowing()
       afterInsert {
@@ -83,7 +83,7 @@ internal class ShowingDaoTest {
 
   @Test
   internal fun `given multiple showings for the same movie, when findByMovieIdOrderByDateDesc(), then all showings for that movie is retured, sorted by date`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withUser()
       withShowings { rnd ->
@@ -103,7 +103,7 @@ internal class ShowingDaoTest {
 
   @Test
   internal fun `given multiple showings with different dates, when findByDateAfterOrderByDateDesc(), then only showings after the supplied date is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       withUser()
       withShowings { rnd ->

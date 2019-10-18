@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.DatabasePrimer
+import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.MissingPhoneNumberException
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.TicketAlreadyUsedException
@@ -28,14 +28,14 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [AssertionService::class, GiftCertificateService::class, DatabasePrimer::class])
+@SpringBootTest(classes = [AssertionService::class, GiftCertificateService::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class AssertionServiceTest {
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   @Autowired
-  private lateinit var databasePrimer: DatabasePrimer
+  private lateinit var databaseTest: DatabaseTest
 
   @Autowired
   private lateinit var assertionService: AssertionService
@@ -74,7 +74,7 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a user with null phone number, when assertUserHasPhoneNumber(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser { it.nextUserDTO().copy(phone = null) }
       afterInsert {
         val dbUser = it.userDao.findById(user.id)
@@ -90,7 +90,7 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a user with a phone number, when assertUserHasPhoneNumber(), then no exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser()
       afterInsert {
         val dbUser = it.userDao.findById(user.id)
@@ -114,7 +114,7 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given an expired gift cert, when assertGiftCertIsUsable(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser {
         val userId = UUID.randomUUID()
         it.nextUserDTO(userId, listOf(it.nextGiftCert(userId).copy(expiresAt = LocalDate.now().plusDays(9))))
@@ -133,7 +133,7 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a used gift cert, when assertGiftCertIsUsable(), then an exception is thrown`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withUser {
         val userId = UUID.randomUUID()
         it.nextUserDTO(userId, listOf(it.nextGiftCert(userId).copy(expiresAt = LocalDate.now().plusDays(10))))

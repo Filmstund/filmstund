@@ -11,8 +11,8 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @Component
-class DatabasePrimer(private val jdbi: Jdbi) {
-  fun doDbTest(init: DbTest.() -> Unit): DbTest {
+class DatabaseTest(private val jdbi: Jdbi) {
+  fun start(init: DbTest.() -> Unit): DbTest {
     val dbTest = DbTest(jdbi)
     dbTest.init()
     return dbTest

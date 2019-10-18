@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.DatabasePrimer
+import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
@@ -18,17 +18,17 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, DatabasePrimer::class])
+@SpringBootTest(classes = [Jdbi::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class MovieDaoTest {
   @Autowired
-  private lateinit var databasePrimer: DatabasePrimer
+  private lateinit var databaseTest: DatabaseTest
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   @Test
   internal fun `given a new movie, when findById(), then same DTO is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         val movieFromDb = it.movieDao.findById(movie.id)
@@ -41,7 +41,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given a movie, when existsById(), then true is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         assertThat(it.movieDao.existsById(movie.id)).isTrue()
@@ -51,7 +51,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given no movie, when existsById(), then false is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withDaos {
         val rndMovieId = UUID.randomUUID()
         assertThat(movieDao.existsById(rndMovieId)).isFalse()
@@ -61,7 +61,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given a movie, when existsByFilmstadenId(), then true is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         assertThat(movie.filmstadenId).isNotNull()
@@ -72,7 +72,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given no movie, when existsByFilmstadenId(), then false is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withDaos {
         val rndFilmstadenId = "fsid${rnd.nextLong(0, 10000000)}"
         assertThat(movieDao.existsByFilmstadenId(rndFilmstadenId)).isFalse()
@@ -82,7 +82,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given at least 5 movies, when findAll(), then at least those movies are returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovies { (0..5).map { rnd.nextMovie() } }
       afterInsert {
         val moviesFromDb = it.movieDao.findAll()
@@ -103,7 +103,7 @@ internal class MovieDaoTest {
     val rndUnarchivedMovies = (0..5).map { rnd.nextMovie().copy(archived = false) }
     val rndArchivedMovies = (0..6).map { rnd.nextMovie().copy(archived = true) }
 
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovies { rndUnarchivedMovies }
       withMovies { rndArchivedMovies }
       afterInsert {
@@ -125,7 +125,7 @@ internal class MovieDaoTest {
     val rndUnarchivedMovies = (0..5).map { rnd.nextMovie().copy(archived = false) }
     val rndArchivedMovies = (0..6).map { rnd.nextMovie().copy(archived = true) }
 
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovies { rndUnarchivedMovies }
       withMovies { rndArchivedMovies }
       afterInsert {
@@ -144,7 +144,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given a movie with newer lastModifiedDate, when updateMovie(), then null returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         val movieFromDb = it.movieDao.updateMovie(movie.copy(title = "newTitle", lastModifiedDate = Instant.now()))
@@ -155,7 +155,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given a movie with same lastModifiedDate, when updateMovie(), then updated movie is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         val movieFromDb =
@@ -178,7 +178,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given an unarchived movie, when archiveMovie(), then the movie is archived`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie { it.nextMovie().copy(archived = false) }
       afterInsert {
         val movieFromDb = it.movieDao.archiveMovie(movie)
@@ -195,7 +195,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given a movie without an original title, when findTitleById(), then the title is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie { it.nextMovie().copy(originalTitle = null) }
       afterInsert {
         val title = it.movieDao.findTitleById(movie.id)
@@ -208,7 +208,7 @@ internal class MovieDaoTest {
 
   @Test
   internal fun `given a movie with an original title, when findTitleById(), then the original title is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withMovie()
       afterInsert {
         val title = it.movieDao.findTitleById(movie.id)

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.DatabasePrimer
+import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
@@ -23,14 +23,14 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, DatabasePrimer::class])
+@SpringBootTest(classes = [Jdbi::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class ParticipantDaoTest {
   @Autowired
   private lateinit var jdbi: Jdbi
 
   @Autowired
-  private lateinit var databasePrimer: DatabasePrimer
+  private lateinit var databaseTest: DatabaseTest
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
@@ -86,7 +86,7 @@ internal class ParticipantDaoTest {
 
   @Test
   internal fun `given no participants on a showing, when isParticipantOnShowing(), then false is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withAdmin()
       withShowing()
       withUser()
@@ -103,7 +103,7 @@ internal class ParticipantDaoTest {
 
   @Test
   internal fun `given participants on a showing, when isParticipantOnShowing(), then true is returned`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withAdmin()
       withShowing()
       withParticipantOnLastShowing()
@@ -274,7 +274,7 @@ internal class ParticipantDaoTest {
 
   @Test
   internal fun `given a list of participants, when updateAmountOwedForSwishParticipants, then only swish participants are updated`() {
-    databasePrimer.doDbTest {
+    databaseTest.start {
       withShowing()
       withParticipantsAndUsers(20) {
         val userId = UUID.randomUUID()
