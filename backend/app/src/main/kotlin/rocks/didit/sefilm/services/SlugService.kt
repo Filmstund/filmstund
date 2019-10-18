@@ -1,7 +1,6 @@
 package rocks.didit.sefilm.services
 
 import org.springframework.stereotype.Service
-import rocks.didit.sefilm.database.entities.Showing
 
 @Service
 class SlugService {
@@ -10,11 +9,6 @@ class SlugService {
   }
 
   fun generateSlugFor(str: String): String = sluggifyString(str)
-
-  fun generateSlugFor(showing: Showing): String {
-    val movie = showing.movie
-    return sluggifyString(movie.originalTitle ?: movie.title)
-  }
 
   private fun sluggifyString(str: String): String {
     return str.toLowerCase()

@@ -1,24 +1,13 @@
 package rocks.didit.sefilm.services
 
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.MockitoJUnitRunner
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.User
-import rocks.didit.sefilm.domain.GoogleId
-import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import java.util.*
+import org.mockito.junit.jupiter.MockitoExtension
 
-@RunWith(MockitoJUnitRunner.StrictStubs::class)
-class SlugServiceTest {
-
-  @Mock
-  private lateinit var movieServiceoMock: MovieService
+@ExtendWith(MockitoExtension::class)
+internal class SlugServiceTest {
 
   @InjectMocks
   private lateinit var slugService: SlugService
@@ -205,16 +194,11 @@ class SlugServiceTest {
 
   }
 
-  @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
   private fun testGenerateSlugForShowing(movieName: String, expectedSlug: String) {
-    val movie = MovieDTO(id = UUID.randomUUID(), title = movieName)
-    val admin = User(firstName = "adminFirstname", lastName = "adminLastname", nick = "adminNick", googleId = GoogleId("gid"))
-    val showing = Showing(movie = Movie(title = movieName), admin = admin)
-
-    Mockito.`when`(movieServiceoMock.getMovieOrThrow(Mockito.any())).thenReturn(movie)
-
-    val generatedSlug = slugService.generateSlugFor(showing)
-    Assert.assertEquals("Expected slug to be $expectedSlug for $movieName", expectedSlug, generatedSlug)
+    val generatedSlug = slugService.generateSlugFor(movieName)
+    assertThat(generatedSlug)
+      .describedAs("Generated slug")
+      .isEqualTo(expectedSlug)
   }
 
 }

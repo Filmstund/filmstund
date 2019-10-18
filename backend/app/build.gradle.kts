@@ -62,7 +62,8 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-  testImplementation("org.mockito:mockito-core:3.0.0")
+  testImplementation("org.mockito:mockito-core:3.1.0")
+  testImplementation("org.mockito:mockito-junit-jupiter:3.1.0")
   testImplementation("com.opentable.components:otj-pg-embedded:0.13.1")
 }
 
