@@ -24,7 +24,7 @@ subprojects {
   dependencyManagement {
     imports {
       mavenBom("org.jdbi:jdbi3-bom:3.10.1")
-      mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.8.RELEASE") {
+      mavenBom("org.springframework.boot:spring-boot-dependencies:2.2.0.RELEASE") {
         bomProperty("kotlin.version", "1.3.50")
       }
     }
