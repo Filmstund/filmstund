@@ -13,6 +13,7 @@ import rocks.didit.sefilm.DatabasePrimer
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextParticipant
@@ -268,6 +269,39 @@ internal class ParticipantDaoTest {
         .describedAs("amount owed")
         .isNotNull
         .isEqualTo(firstParticipant.amountOwed)
+    }
+  }
+
+  @Test
+  internal fun `given a list of participants, when updateAmountOwedForSwishParticipants, then only swish participants are updated`() {
+    databasePrimer.doDbTest {
+      withShowing()
+      withParticipantsAndUsers(20) {
+        val userId = UUID.randomUUID()
+        val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
+        val participant =
+          it.nextParticipant(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = it.nextBoolean())
+        Pair(user, participant)
+      }
+      withParticipantsAndUsers(5) {
+        val user = it.nextUserDTO(UUID.randomUUID(), listOf())
+        val participant = it.nextParticipant(user.id, showing.id).copy(hasPaid = false)
+        Pair(user, participant)
+      }
+      afterInsert {
+        it.participantDao.updateAmountOwedForSwishParticipants(showing.id, showing.admin, SEK(1337))
+
+        val dbParticipants = it.participantDao.findAllParticipants(showing.id)
+        assertThat(dbParticipants).hasSize(25)
+        dbParticipants.forEach { p->
+          if (p.hasPaid || p.type == ParticipantDTO.Type.GIFT_CERTIFICATE) {
+            assertThat(p.amountOwed).isNotEqualTo(SEK(1337))
+          } else {
+            assertThat(p.amountOwed).isEqualTo(SEK(1337))
+            // TODO: check last modified date
+          }
+        }
+      }
     }
   }
 }

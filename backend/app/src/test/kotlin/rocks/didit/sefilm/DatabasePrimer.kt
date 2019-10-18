@@ -80,6 +80,14 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addParticipant(testData.generate(ThreadLocalRandom.current()))
   }
 
+  fun withParticipantsAndUsers(count: Int, generate: TestData.(ThreadLocalRandom) -> Pair<UserDTO, ParticipantDTO>) {
+    repeat(count) {
+      val pair = testData.generate(ThreadLocalRandom.current())
+      testData = testData.addUser(pair.first)
+      testData = testData.addParticipant(pair.second)
+    }
+  }
+
   fun withParticipantOnLastShowing() {
     requireNotNull(testData.lastShowing)
     withUser()
@@ -89,7 +97,7 @@ class DbTest(private val jdbi: Jdbi) {
   }
 
   fun withParticipantsOnLastShowing(count: Int) {
-    for (i in 0..count) {
+    repeat(count) {
       withParticipantOnLastShowing()
     }
   }
@@ -112,7 +120,9 @@ class DbTest(private val jdbi: Jdbi) {
       val daos = handle.toDaos()
 
       testData.users.forEach {
-        daos.userDao.insertUserAndGiftCerts(it.value)
+        if (!daos.userDao.existsById(it.value.id)) {
+          daos.userDao.insertUserAndGiftCerts(it.value)
+        }
       }
       if (testData.movies.isNotEmpty()) {
         daos.movieDao.insertMovies(testData.movies.values)

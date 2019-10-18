@@ -85,7 +85,7 @@ class TicketService(
   private fun updateShowingFromTicketUrl(showing: Showing, ticketUrl: String) {
     val (_, filmstadenRemoteEntityId, _) = extractIdsFromUrl(ticketUrl)
     val fetchFilmstadenShow = filmstadenService.fetchFilmstadenShow(filmstadenRemoteEntityId)
-    val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema.title)
+    val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema?.title ?: "N/A")
     val zonedDateTime = fetchFilmstadenShow.timeUtc.atZone(ZoneId.of("Europe/Stockholm"))
     val filmstadenLiteScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen()
 

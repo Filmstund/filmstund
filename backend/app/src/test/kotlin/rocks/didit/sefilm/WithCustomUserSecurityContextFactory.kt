@@ -19,7 +19,10 @@ class WithCustomUserSecurityContextFactory : WithSecurityContextFactory<WithLogg
   override fun createSecurityContext(customUser: WithLoggedInUser): SecurityContext {
     val context = SecurityContextHolder.createEmptyContext()
 
-    val rndUser = rnd.nextUserDTO()
+    var rndUser = rnd.nextUserDTO()
+    if (customUser.skipPhone) {
+      rndUser = rndUser.copy(phone = null)
+    }
     jdbi.onDemand(UserDao::class.java).insertUser(rndUser)
 
     val principal = rndUser.toPublicUserDTO()

@@ -217,6 +217,7 @@ class ShowingService(
       }
 
       participantDao.markGCParticipantsAsHavingPaid(showingId, currentLoggedInUser().id)
+      participantDao.updateAmountOwedForSwishParticipants(showingId, currentLoggedInUser().id, price)
       dao.markShowingAsBought(showingId, price)
 
       // TODO re-enable
@@ -234,8 +235,12 @@ class ShowingService(
 
       log.info("Updating showing ($showingId) to new values: $newValues")
       val filmstadenShow = newValues.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
-      val filmstadenScreen = filmstadenShow?.screen
+      val cinemaScreen = filmstadenShow?.screen?.toFilmstadenLiteScreen()
+        ?: showing.cinemaScreen
 
+      if (cinemaScreen != null && cinemaScreen != showing.cinemaScreen) {
+        dao.maybeInsertCinemaScreen(cinemaScreen)
+      }
 
       val updatedShowing = showing.copy(
         price = SEK(newValues.price),
@@ -243,8 +248,7 @@ class ShowingService(
         location = locationService.getOrCreateNewLocation(newValues.location),
         time = newValues.time,
         filmstadenShowingId = newValues.filmstadenRemoteEntityId,
-        // TODO: this probaly needs an insert
-        cinemaScreen = if (showing.cinemaScreen?.filmstadenId != filmstadenScreen?.ncgId) filmstadenScreen?.toFilmstadenLiteScreen() else showing.cinemaScreen,
+        cinemaScreen = cinemaScreen,
         date = newValues.date
       )
       dao.updateShowing(updatedShowing, currentLoggedInUser().id)

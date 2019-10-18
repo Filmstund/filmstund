@@ -57,6 +57,10 @@ interface ParticipantDao {
 
   // TODO test me
   @Timestamped
-  @SqlUpdate("UPDATE participant p SET has_paid = true, amount_owed = 0, last_modified_date = :now FROM showing s WHERE p.showing_id = s.id AND s.admin = :adminUser AND p.showing_id = :showingId AND (p.gift_certificate_used IS NULL OR p.user_id = :adminUser)")
+  @SqlUpdate("UPDATE participant p SET has_paid = true, amount_owed = 0, last_modified_date = :now FROM showing s WHERE p.showing_id = s.id AND s.admin = :adminUser AND p.showing_id = :showingId AND (p.gift_certificate_used IS NOT NULL OR p.user_id = :adminUser)")
   fun markGCParticipantsAsHavingPaid(showingId: UUID, adminUser: UUID): Boolean
+
+  @Timestamped
+  @SqlUpdate("UPDATE participant p SET amount_owed = :amountOwed, last_modified_date = :now FROM showing s WHERE p.showing_id = s.id AND s.admin = :adminUser AND p.showing_id = :showingId AND p.gift_certificate_used IS NULL AND has_paid = false")
+  fun updateAmountOwedForSwishParticipants(showingId: UUID, adminUser: UUID, amountOwed: SEK): Boolean
 }

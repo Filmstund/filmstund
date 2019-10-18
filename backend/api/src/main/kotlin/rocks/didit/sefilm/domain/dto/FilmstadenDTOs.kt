@@ -81,7 +81,7 @@ data class FilmstadenShowDTO(
   val movie: FilmstadenMovieDTO,
   val movieVersion: Map<String, Any>,
   val attributes: List<FilmstadenAttributeDTO>,
-  val cinema: FilmstadenCinemaWithAddressDTO,
+  val cinema: FilmstadenCinemaWithAddressDTO?,
   val screen: FilmstadenScreenDTO
 )
 
@@ -117,7 +117,7 @@ data class FilmstadenShowingDTO(
 ) {
   companion object {
     fun from(show: FilmstadenShowDTO) = FilmstadenShowingDTO(
-      show.cinema.title,
+      show.cinema?.title ?: "N/A",
       FilmstadenLiteScreenDTO(show.screen.ncgId, show.screen.title),
       show.screen.seatCount,
       show.timeUtc,
