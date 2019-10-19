@@ -83,8 +83,8 @@ internal class UserDaoTest {
     databaseTest.start {
       withUser()
       afterInsert {
-        assertThat(user.filmstadenId).isNotNull
-        val userId = it.userDao.findIdByFilmstadenId(user.filmstadenId!!)
+        assertThat(user.filmstadenMembershipId).isNotNull
+        val userId = it.userDao.findIdByFilmstadenId(user.filmstadenMembershipId!!)
         assertThat(userId).isEqualTo(user.id)
       }
     }

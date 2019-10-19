@@ -29,8 +29,8 @@ interface UserDao {
   @SqlQuery("SELECT id FROM users WHERE google_id = :googleId")
   fun findIdByGoogleId(googleId: GoogleId): UserID?
 
-  @SqlQuery("SELECT id FROM users WHERE filmstaden_id = :filmstadenId")
-  fun findIdByFilmstadenId(filmstadenId: FilmstadenMembershipId): UserID?
+  @SqlQuery("SELECT id FROM users WHERE filmstaden_membership_id = :filmstadenMembershipId")
+  fun findIdByFilmstadenId(filmstadenMembershipId: FilmstadenMembershipId): UserID?
 
   @SqlQuery("SELECT * FROM users u LEFT JOIN gift_certificate gc on u.id = gc.user_id")
   @UseRowReducer(UserGiftCertReducer::class)
@@ -51,7 +51,7 @@ interface UserDao {
   @SqlQuery("SELECT exists(SELECT 1 FROM users where google_id = :googleId)")
   fun existsByGoogleId(googleId: GoogleId): Boolean
 
-  @SqlUpdate("INSERT INTO users (id, google_id, filmstaden_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, last_modified_date) VALUES (:id, :googleId, :filmstadenId, :firstName, :lastName, :nick, :email, :phone, :avatar, :calendarFeedId, :lastLogin, :lastModifiedDate)")
+  @SqlUpdate("INSERT INTO users (id, google_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, last_modified_date) VALUES (:id, :googleId, :filmstadenMembershipId, :firstName, :lastName, :nick, :email, :phone, :avatar, :calendarFeedId, :lastLogin, :lastModifiedDate)")
   fun insertUser(@BindBean user: UserDTO)
 
   fun insertUserAndGiftCerts(user: UserDTO) {
@@ -65,7 +65,7 @@ interface UserDao {
   @Timestamped
   fun updateUserOnLogin(userId: UserID, firstName: String, lastName: String, avatar: String?): Boolean
 
-  @SqlUpdate("UPDATE users SET filmstaden_id = :filmstadenMembershipId, phone = :phoneNumber, nick = :nick, last_modified_date = :now WHERE id = :userId")
+  @SqlUpdate("UPDATE users SET filmstaden_membership_id = :filmstadenMembershipId, phone = :phoneNumber, nick = :nick, last_modified_date = :now WHERE id = :userId")
   @Timestamped
   fun updateUser(
     userId: UserID, filmstadenMembershipId: FilmstadenMembershipId?, phoneNumber: PhoneNumber?, nick: String

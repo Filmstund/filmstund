@@ -263,7 +263,7 @@ internal class MongoMigrator(
       lastModifiedDate = it.lastModifiedDate,
       signupDate = it.signupDate,
       phone = it.phone,
-      filmstadenId = it.filmstadenMembershipId,
+      filmstadenMembershipId = it.filmstadenMembershipId,
       giftCertificates = it.foretagsbiljetter.map { ticket ->
         GiftCertificateDTO(newUserId, ticket.number, ticket.expires)
       }

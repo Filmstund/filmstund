@@ -13,9 +13,9 @@ import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -40,12 +40,12 @@ internal class UserServiceTest {
       .isNotNull()
     assertThat(beforeUpdate?.phone)
       .isNotNull
-    assertThat(beforeUpdate?.filmstadenId)
+    assertThat(beforeUpdate?.filmstadenMembershipId)
       .isNotNull
 
     val afterUpdate = userService.updateUser(userDetails)
     assertThat(afterUpdate)
-      .isEqualToIgnoringGivenFields(beforeUpdate, "nick", "phone", "filmstadenId", "lastModifiedDate")
+      .isEqualToIgnoringGivenFields(beforeUpdate, "nick", "phone", "filmstadenMembershipId", "lastModifiedDate")
     assertThat(afterUpdate.nick)
       .describedAs("nick")
       .isNotNull()
@@ -53,7 +53,7 @@ internal class UserServiceTest {
     assertThat(afterUpdate.phone)
       .describedAs("phone")
       .isNull()
-    assertThat(afterUpdate.filmstadenId)
+    assertThat(afterUpdate.filmstadenMembershipId)
       .describedAs("filmstadenId")
       .isNull()
     assertThat(afterUpdate.lastModifiedDate)
@@ -72,13 +72,13 @@ internal class UserServiceTest {
     assertThat(beforeUpdate?.phone)
       .isNotNull
       .isNotEqualTo("073-0000000")
-    assertThat(beforeUpdate?.filmstadenId)
+    assertThat(beforeUpdate?.filmstadenMembershipId)
       .isNotNull
       .isNotEqualTo("abc-xyz")
 
     val afterUpdate = userService.updateUser(userDetails)
     assertThat(afterUpdate)
-      .isEqualToIgnoringGivenFields(beforeUpdate, "nick", "phone", "filmstadenId", "lastModifiedDate")
+      .isEqualToIgnoringGivenFields(beforeUpdate, "nick", "phone", "filmstadenMembershipId", "lastModifiedDate")
     assertThat(afterUpdate.nick)
       .describedAs("nick")
       .isNotNull()
@@ -87,7 +87,7 @@ internal class UserServiceTest {
       .describedAs("phone")
       .isNotNull
       .isEqualTo(PhoneNumber("073-000 00 00"))
-    assertThat(afterUpdate.filmstadenId)
+    assertThat(afterUpdate.filmstadenMembershipId)
       .describedAs("filmstadenId")
       .isNotNull
       .isEqualTo(FilmstadenMembershipId("ABC-XYZ"))

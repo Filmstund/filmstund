@@ -199,7 +199,7 @@ internal class TicketServiceTest {
           .thenReturn(show)
 
         val tickets = users.values.filter { it.id != currentLoggedInUser().id }
-          .map { rnd.nextObject(FilmstadenTicketDTO::class.java).copy(profileId = it.filmstadenId?.value) }
+          .map { rnd.nextObject(FilmstadenTicketDTO::class.java).copy(profileId = it.filmstadenMembershipId?.value) }
 
         `when`(fsServiceMock.fetchTickets("Sys99-SE", "AA-1036-201908221930", "RE-99RBBT0ZP6"))
           .thenReturn(tickets)

@@ -54,7 +54,7 @@ fun ThreadLocalRandom.nextUserDTO(
   return UserDTO(
     id = id,
     googleId = GoogleId("gid${nextString(18)}"),
-    filmstadenId = FilmstadenMembershipId.valueOf("${nextString(3)}-${nextString(3)}"),
+    filmstadenMembershipId = FilmstadenMembershipId.valueOf("${nextString(3)}-${nextString(3)}"),
     calendarFeedId = UUID.randomUUID(),
     firstName = "Fname ${nextString(20)}",
     lastName = "Lname ${nextString(20)}",

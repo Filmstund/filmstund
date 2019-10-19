@@ -61,7 +61,7 @@ create table users
         constraint user_pk primary key,
     google_id          varchar(25)
         constraint user_ids_google_uniq unique,
-    filmstaden_id      varchar(7)   null
+    filmstaden_membership_id      varchar(7)   null
         constraint user_ids_fsid_uniq unique,
     first_name         varchar(100) not null,
     last_name          varchar(100) not null,

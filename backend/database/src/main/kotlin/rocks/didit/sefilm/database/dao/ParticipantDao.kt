@@ -19,7 +19,7 @@ interface ParticipantDao {
   companion object {
     const val SELECTABLE_FIELDS = "p.user_id, p.showing_id, p.amount_owed, p.has_paid, p.participant_type AS type"
     const val EXTRA_FIELDS =
-      "gc.user_id gc_userId, gc.number gc_number, gc.expires_at gc_expiresAt, u.filmstaden_id filmstadenMembershipId, u.id u_id, u.first_name u_firstName, u.last_name u_lastName, u.nick u_nick, u.phone u_phone, u.avatar u_avatar"
+      "gc.user_id gc_userId, gc.number gc_number, gc.expires_at gc_expiresAt, u.filmstaden_membership_id filmstadenMembershipId, u.id u_id, u.first_name u_firstName, u.last_name u_lastName, u.nick u_nick, u.phone u_phone, u.avatar u_avatar"
   }
 
   @SqlQuery("SELECT $SELECTABLE_FIELDS, $EXTRA_FIELDS FROM participant p LEFT JOIN gift_certificate gc on p.user_id = gc.user_id and p.gift_certificate_used = gc.number JOIN users u on p.user_id = u.id WHERE p.showing_id = :showingId")
@@ -27,7 +27,6 @@ interface ParticipantDao {
   @RegisterKotlinMapper(GiftCertificateDTO::class, "gc")
   fun findAllParticipants(showingId: ShowingID): List<ParticipantDTO>
 
-  // TODO: test this
   @SqlQuery("SELECT $SELECTABLE_FIELDS, $EXTRA_FIELDS FROM participant p LEFT JOIN gift_certificate gc on p.user_id = gc.user_id and p.gift_certificate_used = gc.number JOIN users u on p.user_id = u.id WHERE p.showing_id = :showingId AND p.user_id = :userId")
   @UseRowReducer(ParticipantGiftCertReducer::class)
   @RegisterKotlinMapper(GiftCertificateDTO::class, "gc")
