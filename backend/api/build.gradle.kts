@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-  api("com.googlecode.libphonenumber:libphonenumber:8.10.17")
+  api("com.googlecode.libphonenumber:libphonenumber:8.10.21")
 
   implementation(kotlin("stdlib"))
   implementation("org.springframework.boot:spring-boot-starter-web")

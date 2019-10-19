@@ -28,12 +28,12 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-mustache")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
-  implementation("org.springframework.security:spring-security-jwt:1.0.10.RELEASE")
-  implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.6.RELEASE")
+  implementation("org.springframework.security:spring-security-jwt:1.0.11.RELEASE")
+  implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.7.RELEASE")
   implementation("org.springframework.boot:spring-boot-devtools")
 
   // Database
-  runtime("org.postgresql:postgresql:42.2.6")
+  runtime("org.postgresql:postgresql:42.2.8")
   implementation("org.liquibase:liquibase-core:3.8.0")
 
 
@@ -52,7 +52,7 @@ dependencies {
   runtime("javax.activation:activation:1.1.1")
 
   runtime("org.apache.commons:commons-lang3:3.9")
-  implementation("org.apache.httpcomponents:httpclient:4.5.9")
+  implementation("org.apache.httpcomponents:httpclient:4.5.10")
 
   implementation(kotlin("stdlib-jdk8"))
   implementation(kotlin("stdlib"))
@@ -64,7 +64,7 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   testImplementation("org.mockito:mockito-core:3.1.0")
   testImplementation("org.mockito:mockito-junit-jupiter:3.1.0")
-  testImplementation("com.opentable.components:otj-pg-embedded:0.13.1")
+  testImplementation("com.opentable.components:otj-pg-embedded:0.13.3")
   testImplementation("org.jeasy:easy-random-core:4.0.0")
 }
 
