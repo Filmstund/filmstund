@@ -22,10 +22,6 @@ spring:
     url: ${SEFILM_JDBC_URI:jdbc:postgresql://localhost:5432/sefilm}
     username: ${SEFILM_JDBC_USERNAME:sefilm}
     password: ${SEFILM_JDBC_PASSWORD:}
-  jpa:
-    properties:
-      hibernate.jdbc.lob.non_contextual_creation: true
-    show-sql: false
 management:
   endpoints:
     web:

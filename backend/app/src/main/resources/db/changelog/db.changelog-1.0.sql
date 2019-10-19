@@ -43,7 +43,6 @@ create table location
 );
 --rollback DROP table if exists location;
 
--- FIXME: remove when JPA is removed
 --changeset eda:createLocationAliasTable
 create table location_alias
 (
@@ -117,22 +116,13 @@ create table movie
 );
 --rollback drop table if exists movie;
 
--- FIXME remove when jpa is removed
---changeset eda:createTableMovieGenres
-create table movie_genres
-(
-    genre    varchar(100) not null,
-    movie_id uuid
-        constraint movie_movie_fk references movie on delete cascade
-);
---rollback drop table if exists movie_genres;
-
 --changeset eda:createTableCinemaScreen
 create table cinema_screen
 (
-    id   varchar(50)
+    id           varchar(50)
         constraint cinema_screen_pk primary key,
-    name varchar(255) null default null
+    name         varchar(255)             null     default null,
+    created_date timestamp with time zone not null default current_timestamp
 );
 
 --rollback drop table if exists cinema_screen;
@@ -213,14 +203,3 @@ create table ticket
     attributes               varchar(50)[]          not null default '{}'
 );
 --rollback drop table if exists ticket;
-
--- FIXME: remove when migrated to TicketDao
---changeset eda:createTableTicketAttribute
-create table ticket_attribute
-(
-    ticket_id varchar(15)
-        constraint ticket_attributes_ticket_fk references ticket on delete cascade,
-    attribute varchar(50) not null,
-    constraint ticket_attributes_pk primary key (ticket_id, attribute)
-);
---rollback drop table if exists ticket_attribute;
