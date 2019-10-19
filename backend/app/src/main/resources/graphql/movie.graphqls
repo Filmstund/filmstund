@@ -1,5 +1,5 @@
 type Movie {
-    id: UUID!
+    id: MovieID!
     imdbId: IMDbID
     filmstadenId: String
     slug: String

@@ -6,10 +6,11 @@ import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.IMDbID
-import rocks.didit.sefilm.domain.SEK
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.TMDbID
 import java.time.LocalDate
 import java.time.LocalTime
@@ -36,6 +37,31 @@ class CustomScalars {
         override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
           is String -> dataFetcherResult
           is UUID -> dataFetcherResult.toString()
+          else -> null
+        }
+      })
+      .build()
+  }
+
+  @Bean
+  fun customScalarMovieId(): GraphQLScalarType {
+    return GraphQLScalarType.newScalar()
+      .name("MovieID")
+      .description("Movie ID")
+      .coercing(object : Coercing<MovieID, String> {
+        override fun parseLiteral(input: Any?): MovieID {
+          return when (input) {
+            is StringValue -> MovieID(UUID.fromString(input.value))
+            is String -> MovieID(UUID.fromString(input))
+            else -> throw IllegalArgumentException("Unable to parse MovieID from $input")
+          }
+        }
+
+        override fun parseValue(input: Any?): MovieID = parseLiteral(input)
+
+        override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
+          is String -> dataFetcherResult
+          is MovieID -> dataFetcherResult.toString()
           else -> null
         }
       })
