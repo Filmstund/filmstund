@@ -2,7 +2,6 @@ package rocks.didit.sefilm.domain.dto.core
 
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.MovieID
@@ -23,7 +22,7 @@ data class ShowingDTO(
   val movieId: MovieID,
   val movieTitle: String,
   val location: LocationDTO?,
-  val cinemaScreen: FilmstadenLiteScreenDTO? = null,
+  val cinemaScreen: CinemaScreenDTO? = null,
   val price: SEK? = SEK.ZERO,
   val ticketsBought: Boolean = false,
   val admin: UserID,

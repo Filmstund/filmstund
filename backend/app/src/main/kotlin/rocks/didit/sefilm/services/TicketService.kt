@@ -11,9 +11,9 @@ import rocks.didit.sefilm.database.dao.TicketDao
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
-import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
@@ -88,7 +88,7 @@ class TicketService(
 
     val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema.title)
     val zonedDateTime = fetchFilmstadenShow.timeUtc.atZone(ZoneId.of("Europe/Stockholm"))
-    val cinemaScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen()
+    val cinemaScreen = CinemaScreenDTO(fetchFilmstadenShow.screen.ncgId, fetchFilmstadenShow.screen.title)
     daos.showingDao.maybeInsertCinemaScreen(cinemaScreen)
 
     val updatedShowing = showing.copy(

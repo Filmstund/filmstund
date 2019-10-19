@@ -66,8 +66,6 @@ data class FilmstadenScreenDTO(
   val remoteEntityId: String
 )
 
-fun FilmstadenScreenDTO.toFilmstadenLiteScreen() = FilmstadenLiteScreenDTO(this.ncgId, this.title)
-
 data class FilmstadenShowItemsDTO(val totalNbrOfItems: Int, val items: List<FilmstadenShowDTO>)
 data class FilmstadenLocationItemsDTO(val totalNbrOfItems: Int, val items: List<FilmstadenCinemaWithAddressDTO>)
 data class FilmstadenMovieItemsDTO(val totalNbrOfItems: Int, val items: List<FilmstadenMovieDTO>)

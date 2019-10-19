@@ -22,13 +22,18 @@ type Participant {
 }
 
 type CinemaScreen {
+    id: ID!
+    name: String!
+}
+
+type FilmstadenScreen {
     filmstadenId: ID!
     name: String!
 }
 
 type FilmstadenShowing {
     cinemaName: String!,
-    screen: CinemaScreen!,
+    screen: FilmstadenScreen!,
     seatCount: Int!,
     timeUtc: String!,
     tags: [String!]!,

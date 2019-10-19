@@ -25,9 +25,9 @@ import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
-import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.MovieID
@@ -238,7 +238,7 @@ class ShowingService(
 
       log.info("Updating showing ($showingId) to new values: $newValues")
       val filmstadenShow = newValues.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
-      val cinemaScreen = filmstadenShow?.screen?.toFilmstadenLiteScreen()
+      val cinemaScreen = CinemaScreenDTO.from(filmstadenShow?.screen)
         ?: showing.cinemaScreen
 
       if (cinemaScreen != null && cinemaScreen != showing.cinemaScreen) {
@@ -264,14 +264,14 @@ class ShowingService(
 
   fun fetchSeatMap(showingId: ShowingID): List<FilmstadenSeatMapDTO> {
     val showing = getShowingOrThrow(showingId)
-    if (showing.location?.filmstadenId == null || showing.cinemaScreen?.filmstadenId == null) {
+    if (showing.location?.filmstadenId == null || showing.cinemaScreen?.id == null) {
       log.debug("Showing $showingId is not at a Filmstaden location or does not have an associated Filmstaden screen")
       return listOf()
     }
 
     return filmstadenService.getFilmstadenSeatMap(
       showing.location?.filmstadenId!!,
-      showing.cinemaScreen?.filmstadenId!!
+      showing.cinemaScreen?.id!!
     )
   }
 
@@ -323,7 +323,7 @@ class ShowingService(
       movieId = movieId,
       movieTitle = movieTitle,
       location = location,
-      cinemaScreen = cinemaScreen?.toFilmstadenLiteScreen(),
+      cinemaScreen = CinemaScreenDTO.from(cinemaScreen),
       admin = adminId,
       payToUser = adminId,
       filmstadenShowingId = FilmstadenShowingID.from(this.filmstadenRemoteEntityId)

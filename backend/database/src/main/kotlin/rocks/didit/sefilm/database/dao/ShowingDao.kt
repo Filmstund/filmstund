@@ -10,7 +10,7 @@ import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.ShowingLocationScreenReducer
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.Base64ID
@@ -23,7 +23,7 @@ interface ShowingDao {
   companion object {
     private const val SELECTABLE_FIELDS =
       "s.id, s.web_id, s.slug, s.date, s.time, s.movie_id, s.filmstaden_showing_id, s.price, s.tickets_bought, s.admin, s.pay_to_user, s.last_modified_date, s.created_date"
-    private const val EXTRA_FIELDS = "la.alias la_alias, cs.id cs_filmstadenId, cs.name cs_name, COALESCE(m.original_title, m.title) movieTitle, payee.phone payToPhone"
+    private const val EXTRA_FIELDS = "la.alias la_alias, cs.id cs_id, cs.name cs_name, COALESCE(m.original_title, m.title) movieTitle, payee.phone payToPhone"
     private const val COMMON_JOINS = "LEFT JOIN location l ON s.location_id = l.name LEFT JOIN location_alias la ON l.name = la.location LEFT JOIN cinema_screen cs ON s.cinema_screen_id = cs.id JOIN movie m on s.movie_id = m.id JOIN users payee ON s.pay_to_user = payee.id"
 
     private const val STAR = "$SELECTABLE_FIELDS, ${LocationDao.SELECTABLE_FIELDS}, $EXTRA_FIELDS"
@@ -36,7 +36,7 @@ interface ShowingDao {
   @UseRowReducer(ShowingLocationScreenReducer::class)
   @RegisterKotlinMappers(
     RegisterKotlinMapper(LocationDTO::class, "l"),
-    RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
+    RegisterKotlinMapper(CinemaScreenDTO::class, "cs")
   )
   fun findById(showingId: ShowingID): ShowingDTO?
 
@@ -47,7 +47,7 @@ interface ShowingDao {
   @UseRowReducer(ShowingLocationScreenReducer::class)
   @RegisterKotlinMappers(
     RegisterKotlinMapper(LocationDTO::class, "l"),
-    RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
+    RegisterKotlinMapper(CinemaScreenDTO::class, "cs")
   )
   fun findByWebId(webId: Base64ID): ShowingDTO?
 
@@ -55,7 +55,7 @@ interface ShowingDao {
   @UseRowReducer(ShowingLocationScreenReducer::class)
   @RegisterKotlinMappers(
     RegisterKotlinMapper(LocationDTO::class, "l"),
-    RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
+    RegisterKotlinMapper(CinemaScreenDTO::class, "cs")
   )
   fun findByAdminOrParticipant(userId: UserID): List<ShowingDTO>
 
@@ -63,7 +63,7 @@ interface ShowingDao {
   @UseRowReducer(ShowingLocationScreenReducer::class)
   @RegisterKotlinMappers(
     RegisterKotlinMapper(LocationDTO::class, "l"),
-    RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
+    RegisterKotlinMapper(CinemaScreenDTO::class, "cs")
   )
   fun findByMovieIdOrderByDateDesc(movieId: MovieID): List<ShowingDTO>
 
@@ -71,7 +71,7 @@ interface ShowingDao {
   @UseRowReducer(ShowingLocationScreenReducer::class)
   @RegisterKotlinMappers(
     RegisterKotlinMapper(LocationDTO::class, "l"),
-    RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
+    RegisterKotlinMapper(CinemaScreenDTO::class, "cs")
   )
   fun findByDateAfterOrderByDateDesc(afterDate: LocalDate): List<ShowingDTO>
 
@@ -83,11 +83,11 @@ interface ShowingDao {
   fun promoteNewUserToAdmin(showingId: ShowingID, currentAdmin: UserID, newAdmin: UserID): Boolean
 
   @Suppress("SqlResolve")
-  @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location?.name, :cinemaScreen?.filmstadenId, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
+  @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location?.name, :cinemaScreen?.id, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
   fun insertNewShowing(@BindBean showing: ShowingDTO)
 
-  @SqlUpdate("INSERT INTO cinema_screen (id, name) VALUES (:filmstadenId, :name) ON CONFLICT DO NOTHING")
-  fun maybeInsertCinemaScreen(@BindBean cinemaScreen: FilmstadenLiteScreenDTO): Int
+  @SqlUpdate("INSERT INTO cinema_screen (id, name) VALUES (:id, :name) ON CONFLICT DO NOTHING")
+  fun maybeInsertCinemaScreen(@BindBean cinemaScreen: CinemaScreenDTO): Int
 
   fun insertShowingAndCinemaScreen(showing: ShowingDTO) {
     showing.cinemaScreen?.let { maybeInsertCinemaScreen(it) }
@@ -106,6 +106,6 @@ interface ShowingDao {
   // TODO test this and return updated values
   @Suppress("SqlResolve")
   @Timestamped
-  @SqlUpdate("UPDATE showing s SET price = :price, pay_to_user = :payToUser, location_id = :location?.name, filmstaden_showing_id = :filmstadenShowingId, cinema_screen_id = :cinemaScreen?.filmstadenId, date = :date, time = :time, last_modified_date = :now WHERE s.id = :id AND s.admin = :admin")
+  @SqlUpdate("UPDATE showing s SET price = :price, pay_to_user = :payToUser, location_id = :location?.name, filmstaden_showing_id = :filmstadenShowingId, cinema_screen_id = :cinemaScreen?.id, date = :date, time = :time, last_modified_date = :now WHERE s.id = :id AND s.admin = :admin")
   fun updateShowing(@BindBean updatedShowing: ShowingDTO, admin: UserID): Boolean
 }

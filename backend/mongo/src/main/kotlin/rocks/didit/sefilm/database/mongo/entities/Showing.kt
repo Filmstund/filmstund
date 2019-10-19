@@ -5,9 +5,9 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
+import rocks.didit.sefilm.domain.id.Base64ID
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -25,6 +25,7 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
@@ -89,7 +90,7 @@ internal class MongoMigrator(
             movieId = MovieID(it.movie.id),
             movieTitle = it.movie.title,
             location = locationCache.get(it.location?.name!!) { name -> locationDao.findByNameOrAlias(name) },
-            cinemaScreen = it.filmstadenScreen,
+            cinemaScreen = it.filmstadenScreen?.let { fsScreen -> CinemaScreenDTO(fsScreen.filmstadenId, fsScreen.name) },
             price = it.price ?: SEK.ZERO,
             ticketsBought = it.ticketsBought,
             admin = userCache.get(it.admin.id) { gid -> userDao.findIdByGoogleId(gid) }

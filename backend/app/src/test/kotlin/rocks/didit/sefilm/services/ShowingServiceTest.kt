@@ -25,12 +25,11 @@ import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
-import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
-import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
@@ -352,7 +351,7 @@ internal class ShowingServiceTest {
           LocalTime.MIDNIGHT,
           movie.id,
           "NewLocation",
-          FilmstadenLiteScreenDTO("fsidASDF", "Salong X"),
+          CinemaScreenDTO("fsidASDF", "Salong X"),
           null,
           "remoteEntityId"
         )
@@ -528,7 +527,7 @@ internal class ShowingServiceTest {
           .isEqualToIgnoringGivenFields(updatedShowing, "lastModifiedDate", "payToPhone")
         assertThat(dbShowing?.lastModifiedDate).isAfter(updatedShowing.lastModifiedDate)
         // FIXME: assert that payToPhone has been correctly updated
-        assertThat(dbShowing?.cinemaScreen).isNotNull.isEqualTo(showMock.screen.toFilmstadenLiteScreen())
+        assertThat(dbShowing?.cinemaScreen).isNotNull.isEqualTo(CinemaScreenDTO.from(showMock.screen))
       }
     }
   }

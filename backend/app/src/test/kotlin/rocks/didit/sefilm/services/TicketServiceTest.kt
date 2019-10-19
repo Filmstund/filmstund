@@ -24,8 +24,8 @@ import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
-import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.nextParticipant
 import rocks.didit.sefilm.nextTicket
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -95,7 +95,7 @@ internal class TicketServiceTest {
         ticketService.processTickets(listOf(ticketUrl), showing.id)
 
         val dbShowing = it.showingDao.findById(showing.id)
-        assertThat(dbShowing?.cinemaScreen).isNotNull.isEqualTo(show.screen.toFilmstadenLiteScreen())
+        assertThat(dbShowing?.cinemaScreen).isNotNull.isEqualTo(CinemaScreenDTO.from(show.screen))
         assertThat(dbShowing?.location?.name).isNotNull().isEqualTo(show.cinema.title)
 
         val zonedDateTime = time.atZone(ZoneId.of("Europe/Stockholm"))

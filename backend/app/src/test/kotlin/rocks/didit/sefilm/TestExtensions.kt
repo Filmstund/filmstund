@@ -3,8 +3,8 @@ package rocks.didit.sefilm
 import org.assertj.core.api.ObjectAssert
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
@@ -29,7 +29,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
-import java.util.Locale
 import java.util.concurrent.ThreadLocalRandom
 
 private const val upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -125,7 +124,7 @@ fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
 }
 
 fun ThreadLocalRandom.nextCinemaScreen() =
-  FilmstadenLiteScreenDTO("NCG${nextLong(1000, 10000000)}", "Salong ${nextInt(1, 100)}")
+  CinemaScreenDTO("NCG${nextLong(1000, 10000000)}", "Salong ${nextInt(1, 100)}")
 
 fun ThreadLocalRandom.nextShowing(movieId: MovieID, adminId: UserID): ShowingDTO {
   return ShowingDTO(

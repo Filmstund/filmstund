@@ -2,8 +2,8 @@ package rocks.didit.sefilm.database
 
 import org.jdbi.v3.core.result.LinkedHashMapRowReducer
 import org.jdbi.v3.core.result.RowView
-import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
@@ -40,9 +40,9 @@ class ShowingLocationScreenReducer : LinkedHashMapRowReducer<ShowingID, ShowingD
     val id = rowView.getColumn("id", ShowingID::class.java)
     var showing = container.computeIfAbsent(id) { rowView.getRow(ShowingDTO::class.java) }
 
-    val cinemaScreenId = rowView.getColumn("cs_filmstadenId", String::class.java)
+    val cinemaScreenId = rowView.getColumn("cs_id", String::class.java)
     if (cinemaScreenId != null && showing.cinemaScreen == null) {
-      val cinemaScreen = rowView.getRow(FilmstadenLiteScreenDTO::class.java)
+      val cinemaScreen = rowView.getRow(CinemaScreenDTO::class.java)
 
       showing = showing.copy(cinemaScreen = cinemaScreen)
       container.replace(id, showing)
