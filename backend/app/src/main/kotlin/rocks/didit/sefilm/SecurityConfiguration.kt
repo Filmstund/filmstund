@@ -75,35 +75,42 @@ class UserAuthConverter(
           )
         }
       }
-      .expireAfter(object : Expiry<String, UsernamePasswordAuthenticationToken> {
-        override fun expireAfterUpdate(
-          key: String,
-          value: UsernamePasswordAuthenticationToken,
-          currentTime: Long,
-          currentDuration: Long
-        ): Long {
-          return currentDuration
-        }
-        override fun expireAfterCreate(
-          key: String,
-          value: UsernamePasswordAuthenticationToken,
-          currentTime: Long
-        ): Long {
-          val expiresAt = (value.details as OpenIdConnectUserDetails).expiresAt
-          val durationInNs = Duration.between(Instant.now(), expiresAt).toNanos()
-          log.trace("Cache key {} will expire in {} ns", key, durationInNs)
-          return durationInNs
-        }
-        override fun expireAfterRead(
-          key: String,
-          value: UsernamePasswordAuthenticationToken,
-          currentTime: Long,
-          currentDuration: Long
-        ): Long {
-          return currentDuration
-        }
-      })
+      .expireAfter(TokenExpiration())
       .build<String, UsernamePasswordAuthenticationToken>()
+
+  inner class TokenExpiration : Expiry<String, UsernamePasswordAuthenticationToken> {
+    override fun expireAfterUpdate(
+      jwtId: String,
+      authToken: UsernamePasswordAuthenticationToken,
+      currentTime: Long, currentDuration: Long
+    ): Long {
+      return currentDuration
+    }
+
+    override fun expireAfterCreate(
+      jwtId: String, authToken: UsernamePasswordAuthenticationToken, currentTime: Long
+    ): Long {
+      return authToken.calcTimeUntilExpirationInNanos(jwtId)
+    }
+
+    override fun expireAfterRead(
+      jwtId: String,
+      authToken: UsernamePasswordAuthenticationToken,
+      currentTime: Long, currentDuration: Long
+    ): Long {
+      return currentDuration
+    }
+
+    private fun UsernamePasswordAuthenticationToken.calcTimeUntilExpirationInNanos(jwtId: String): Long {
+      val expiresAt = (details as OpenIdConnectUserDetails).expiresAt
+      val duration = Duration.between(Instant.now(), expiresAt)
+
+      if (log.isTraceEnabled) {
+        log.trace("Cache key {} will expire in {}", jwtId, duration)
+      }
+      return duration.toNanos()
+    }
+  }
 
   override fun extractAuthentication(jwt: Map<String, *>): Authentication? {
     val jwtId: String = jwt["jti"] as String
