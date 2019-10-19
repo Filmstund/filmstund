@@ -1,5 +1,8 @@
 package rocks.didit.sefilm
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.Expiry
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.springframework.context.annotation.Bean
@@ -27,27 +30,33 @@ import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
+import java.time.Duration
 import java.time.Instant
 
-class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
+class OpenIdConnectUserDetails(jwt: Map<String, *>) : UserDetails {
 
-  val userId: String = userInfo["sub"] as String
-  private val username: String? = userInfo["email"] as String
-  val firstName: String? = userInfo["given_name"] as String
-  val lastName: String? = userInfo["family_name"] as String
-  val avatarUrl: String? = userInfo["picture"] as String
+  val issuer: String = jwt["iss"] as String
+  val authorizedParty: String = jwt["azp"] as String
+  val audience: String = jwt["aud"] as String
+  val subject: String = jwt["sub"] as String
+  private val username: String? = jwt["email"] as String
+  val firstName: String? = jwt["given_name"] as String
+  val lastName: String? = jwt["family_name"] as String
+  val avatarUrl: String? = jwt["picture"] as String
   val name: String? get() = "$firstName $lastName"
+  val issuedAt: Instant = Instant.ofEpochSecond((jwt["iat"] as Int).toLong())
+  val expiresAt: Instant = Instant.ofEpochSecond((jwt["exp"] as Long))
+  val jwtId: String = jwt["jti"] as String
 
   override fun getUsername(): String? = username
   override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_USER"))
   override fun getPassword(): String? = null
   override fun isAccountNonExpired(): Boolean = true
   override fun isAccountNonLocked(): Boolean = true
-  override fun isCredentialsNonExpired(): Boolean = true
+  override fun isCredentialsNonExpired(): Boolean = expiresAt.isBefore(Instant.now())
   override fun isEnabled(): Boolean = true
-
   override fun toString(): String {
-    return "OpenIdConnectUserDetails(userId='$userId', username=$username, firstName=$firstName, lastName=$lastName, avatarUrl=$avatarUrl)"
+    return "OpenIdConnectUserDetails(issuer='$issuer', authorizedParty='$authorizedParty', audience='$audience', subject='$subject', username=$username, firstName=$firstName, lastName=$lastName, avatarUrl=$avatarUrl, issuedAt=$issuedAt, expiresAt=$expiresAt, jwtId='$jwtId')"
   }
 }
 
@@ -56,34 +65,83 @@ class UserAuthConverter(
   private val jdbi: Jdbi
 ) : UserAuthenticationConverter {
   private val log by logger()
+  private val authCache: Cache<String, UsernamePasswordAuthenticationToken> =
+    Caffeine.newBuilder()
+      .removalListener { key: String?, value: UsernamePasswordAuthenticationToken?, cause ->
+        if (log.isDebugEnabled && value != null) {
+          val expiresAt = (value.details as OpenIdConnectUserDetails).expiresAt
+          log.debug(
+            "{} has been removed from the auth cache with cause: {}. Expiry time was: {}", key, cause, expiresAt
+          )
+        }
+      }
+      .expireAfter(object : Expiry<String, UsernamePasswordAuthenticationToken> {
+        override fun expireAfterUpdate(
+          key: String,
+          value: UsernamePasswordAuthenticationToken,
+          currentTime: Long,
+          currentDuration: Long
+        ): Long {
+          return currentDuration
+        }
+        override fun expireAfterCreate(
+          key: String,
+          value: UsernamePasswordAuthenticationToken,
+          currentTime: Long
+        ): Long {
+          val expiresAt = (value.details as OpenIdConnectUserDetails).expiresAt
+          val durationInNs = Duration.between(Instant.now(), expiresAt).toNanos()
+          log.trace("Cache key {} will expire in {} ns", key, durationInNs)
+          return durationInNs
+        }
+        override fun expireAfterRead(
+          key: String,
+          value: UsernamePasswordAuthenticationToken,
+          currentTime: Long,
+          currentDuration: Long
+        ): Long {
+          return currentDuration
+        }
+      })
+      .build<String, UsernamePasswordAuthenticationToken>()
 
-  override fun extractAuthentication(map: Map<String, *>): Authentication? {
+  override fun extractAuthentication(jwt: Map<String, *>): Authentication? {
+    val jwtId: String = jwt["jti"] as String
+    return authCache.get(jwtId) {
+      createAuthenticationToken(jwt)
+    }
+  }
+
+  private fun createAuthenticationToken(jwt: Map<String, *>): UsernamePasswordAuthenticationToken {
     return jdbi.inTransactionUnchecked {
       val userDao = it.attach(UserDao::class.java)
-      val details = OpenIdConnectUserDetails(map)
+      val details = OpenIdConnectUserDetails(jwt)
 
-      val principal: PublicUserDTO = when (userDao.existsByGoogleId(GoogleId(details.userId))) {
+      val principal: PublicUserDTO = when (userDao.existsByGoogleId(GoogleId(details.subject))) {
         true -> onExistingUser(userDao, details)
         false -> onNewUser(userDao, details)
       }
 
-      UsernamePasswordAuthenticationToken(principal, "N/A", details.authorities)
+      val authToken = UsernamePasswordAuthenticationToken(principal, "N/A", details.authorities)
+      authToken.details = details
+      authToken
     }
   }
 
   fun onExistingUser(userDao: UserDao, details: OpenIdConnectUserDetails): PublicUserDTO {
-    val user = userDao.findPublicUserByGoogleId(GoogleId(details.userId)) ?: throw NotFoundException("user")
+    val user = userDao.findPublicUserByGoogleId(GoogleId(details.subject)) ?: throw NotFoundException("user")
     val firstName = details.firstName ?: "Mr Noname"
     val lastName = details.lastName ?: "Anybody"
 
     userDao.updateUserOnLogin(user.id, firstName, lastName, details.avatarUrl)
+    log.info("{} user logged in. Expiry time: {}", user.id, details.expiresAt)
     return user.copy(firstName = firstName, lastName = lastName, avatar = details.avatarUrl)
   }
 
   fun onNewUser(userDao: UserDao, details: OpenIdConnectUserDetails): PublicUserDTO {
     val newUser = UserDTO(
       id = UserID.random(),
-      googleId = GoogleId(details.userId),
+      googleId = GoogleId(details.subject),
       calendarFeedId = CalendarFeedID.random(),
       firstName = details.firstName ?: "Bosse",
       lastName = details.lastName ?: "Ringholm",
