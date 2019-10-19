@@ -18,7 +18,7 @@ type Ticket {
     # 15 år, 11 år etc.
     movieRating: String!
     # "textad", "en" etc
-    showAttributes: [String!]
+    attributes: [String!]
 }
 
 # The row and seat number for a ticket
