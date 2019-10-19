@@ -6,11 +6,7 @@ import java.time.LocalTime
 
 data class UpdateShowingDTO(
   val price: Long = 0,
-  // TODO: remove
-  val private: Boolean = false,
   val payToUser: UserID,
-  // TODO: remove
-  val expectedBuyDate: LocalDate? = null,
   val location: String = "Filmstaden Bergakungen",
   val filmstadenRemoteEntityId: String? = null,
   val time: LocalTime = LocalTime.NOON,

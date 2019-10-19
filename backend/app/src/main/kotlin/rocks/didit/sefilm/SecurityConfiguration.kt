@@ -134,7 +134,7 @@ class UserAuthConverter(
     val lastName = details.lastName ?: "Anybody"
 
     userDao.updateUserOnLogin(user.id, firstName, lastName, details.avatarUrl)
-    log.info("{} user logged in. Expiry time: {}", user.id, details.expiresAt)
+    log.info("User {} logged in. Expiry time: {}", user.id, details.expiresAt)
     return user.copy(firstName = firstName, lastName = lastName, avatar = details.avatarUrl)
   }
 
