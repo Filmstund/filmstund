@@ -34,7 +34,7 @@ class ScheduledPopularityUpdater(
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 10L * 60 * 1000L // 10min
-    private const val UPDATE_INTERVAL = 4 * 60 * 60 * 1000L // 4 hours
+    private const val UPDATE_INTERVAL = 24 * 60 * 60 * 1000L // 24 hours
 
     private const val HAS_FILMSTADEN_SHOWINGS_POPULARITY = 500.0
   }
