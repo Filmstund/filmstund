@@ -28,6 +28,7 @@ import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.Duration
 import java.time.Instant
@@ -112,7 +113,7 @@ class CalendarService(
 
   data class PaymentDetails(val amountOwed: SEK = SEK.ZERO, val hasPaid: Boolean? = null, val phone: String? = null)
 
-  private fun formatDescription(showingId: UUID, userId: UserID, movie: MovieDTO): String {
+  private fun formatDescription(showingId: ShowingID, userId: UserID, movie: MovieDTO): String {
     val (amountOwed, hasPaid, payToPhone) = jdbi.withHandleUnchecked {
       it.select(
         "SELECT p.amount_owed, p.has_paid, u.phone FROM participant p JOIN showing s on p.showing_id = s.id JOIN users u on s.pay_to_user = u.id WHERE p.showing_id = ? AND p.user_id = ?",

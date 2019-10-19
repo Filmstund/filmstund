@@ -9,6 +9,7 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.services.AdminService
 import rocks.didit.sefilm.services.ShowingService
@@ -21,25 +22,25 @@ class ShowingMutationResolver(
   private val adminService: AdminService,
   private val ticketService: TicketService
 ) : GraphQLMutationResolver {
-  fun attendShowing(showingId: UUID, paymentOption: PaymentOption): ShowingDTO =
+  fun attendShowing(showingId: ShowingID, paymentOption: PaymentOption): ShowingDTO =
     showingService.attendShowing(showingId, paymentOption)
 
-  fun unattendShowing(showingId: UUID): ShowingDTO = showingService.unattendShowing(showingId)
+  fun unattendShowing(showingId: ShowingID): ShowingDTO = showingService.unattendShowing(showingId)
 
   fun createShowing(showing: CreateShowingDTO): ShowingDTO = showingService.createShowing(showing)
 
-  fun deleteShowing(showingId: UUID): List<ShowingDTO> = showingService.deleteShowing(showingId)
+  fun deleteShowing(showingId: ShowingID): List<ShowingDTO> = showingService.deleteShowing(showingId)
 
-  fun markAsBought(showingId: UUID, price: SEK): ShowingDTO = showingService.markAsBought(showingId, price)
+  fun markAsBought(showingId: ShowingID, price: SEK): ShowingDTO = showingService.markAsBought(showingId, price)
 
-  fun processTicketUrls(showingId: UUID, ticketUrls: List<String>): ShowingDTO {
+  fun processTicketUrls(showingId: ShowingID, ticketUrls: List<String>): ShowingDTO {
     ticketService.processTickets(ticketUrls, showingId)
     return showingService.getShowingOrThrow(showingId)
   }
 
-  fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO =
+  fun updateShowing(showingId: ShowingID, newValues: UpdateShowingDTO): ShowingDTO =
     showingService.updateShowing(showingId, newValues)
 
-  fun promoteToAdmin(showingId: UUID, userToPromote: UserID): ShowingDTO =
+  fun promoteToAdmin(showingId: ShowingID, userToPromote: UserID): ShowingDTO =
     adminService.promoteToAdmin(showingId, userToPromote)
 }

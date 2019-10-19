@@ -8,8 +8,8 @@ import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
-import java.util.*
 
 class UserGiftCertReducer : LinkedHashMapRowReducer<UserID, UserDTO> {
   override fun accumulate(container: MutableMap<UserID, UserDTO>, rowView: RowView) {
@@ -35,9 +35,9 @@ class LocationAliasReducer : LinkedHashMapRowReducer<String, LocationDTO> {
   }
 }
 
-class ShowingLocationScreenReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
-  override fun accumulate(container: MutableMap<UUID, ShowingDTO>, rowView: RowView) {
-    val id = rowView.getColumn("id", UUID::class.java)
+class ShowingLocationScreenReducer : LinkedHashMapRowReducer<ShowingID, ShowingDTO> {
+  override fun accumulate(container: MutableMap<ShowingID, ShowingDTO>, rowView: RowView) {
+    val id = rowView.getColumn("id", ShowingID::class.java)
     var showing = container.computeIfAbsent(id) { rowView.getRow(ShowingDTO::class.java) }
 
     val cinemaScreenId = rowView.getColumn("cs_filmstadenId", String::class.java)
@@ -66,10 +66,10 @@ class ShowingLocationScreenReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
   }
 }
 
-class ParticipantGiftCertReducer : LinkedHashMapRowReducer<Pair<UserID, UUID>, ParticipantDTO> {
-  override fun accumulate(container: MutableMap<Pair<UserID, UUID>, ParticipantDTO>, rowView: RowView) {
+class ParticipantGiftCertReducer : LinkedHashMapRowReducer<Pair<UserID, ShowingID>, ParticipantDTO> {
+  override fun accumulate(container: MutableMap<Pair<UserID, ShowingID>, ParticipantDTO>, rowView: RowView) {
     val userId = rowView.getColumn("user_id", UserID::class.java)
-    val showingId = rowView.getColumn("showing_id", UUID::class.java)
+    val showingId = rowView.getColumn("showing_id", ShowingID::class.java)
     val pair = Pair(userId, showingId)
     val participant = container.computeIfAbsent(pair) {
       rowView.getRow(ParticipantDTO::class.java)

@@ -4,18 +4,19 @@ import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.util.*
 
 data class ShowingDTO(
-  val id: UUID = UUID.randomUUID(),
+  val id: ShowingID = ShowingID.random(),
   val webId: Base64ID = Base64ID.random(),
-  val filmstadenShowingId: String? = null,
+  val filmstadenShowingId: FilmstadenShowingID? = null,
   val slug: String,
   val date: LocalDate,
   val time: LocalTime,

@@ -19,10 +19,10 @@ import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.UserDao
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -47,7 +47,7 @@ internal class AdminServiceTest {
       userDao.insertUserAndGiftCerts(rndNewAdmin)
 
       val e = assertThrows<AccessDeniedException> {
-        adminService.promoteToAdmin(UUID.randomUUID(), rndNewAdmin.id)
+        adminService.promoteToAdmin(ShowingID.random(), rndNewAdmin.id)
       }
       assertThat(e.message)
         .isNotNull()

@@ -17,9 +17,9 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextShowing
-import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [Jdbi::class, ParticipantPaymentService::class, DatabaseTest::class])
@@ -39,7 +39,7 @@ internal class ParticipantPaymentServiceTest {
 
   @Test
   internal fun `given null user id, when updatePaymentInfo(), then an IllegalArgumentException is thrown`() {
-    val participantPaymentInfoDTO = ParticipantPaymentInfoDTO(userId = null, showingId = UUID.randomUUID())
+    val participantPaymentInfoDTO = ParticipantPaymentInfoDTO(userId = null, showingId = ShowingID.random())
     assertThrowsIllegalArgumentException(participantPaymentInfoDTO)
   }
 
@@ -54,7 +54,7 @@ internal class ParticipantPaymentServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given non existent user or showing, when updatePaymentInfo(), then an AccessDeniedException is thrown`() {
-    val participantInfo = ParticipantPaymentInfoDTO(userId = currentLoggedInUser().id, showingId = UUID.randomUUID())
+    val participantInfo = ParticipantPaymentInfoDTO(userId = currentLoggedInUser().id, showingId = ShowingID.random())
     val e = assertThrows<AccessDeniedException> {
       participantPaymentService.updatePaymentInfo(participantInfo)
     }

@@ -15,6 +15,7 @@ import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
 import java.util.*
@@ -192,7 +193,7 @@ data class TestData(
   val movies: Map<MovieID, MovieDTO> = mapOf(),
   val lastMovie: MovieDTO? = null,
 
-  val showings: Map<UUID, ShowingDTO> = mapOf(),
+  val showings: Map<ShowingID, ShowingDTO> = mapOf(),
   val lastShowing: ShowingDTO? = null,
 
   val participants: List<ParticipantDTO> = listOf(),

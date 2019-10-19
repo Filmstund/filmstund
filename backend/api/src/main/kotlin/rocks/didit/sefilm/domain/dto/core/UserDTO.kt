@@ -12,7 +12,9 @@ import java.util.*
 data class UserDTO(
   val id: UserID,
   val googleId: GoogleId? = null,
+  // TODO rename
   val filmstadenId: FilmstadenMembershipId? = null,
+  // TODO: add domain object
   val calendarFeedId: UUID? = null,
   val firstName: String = "",
   val lastName: String = "",

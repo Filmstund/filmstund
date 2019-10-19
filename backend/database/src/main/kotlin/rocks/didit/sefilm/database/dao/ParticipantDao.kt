@@ -11,6 +11,7 @@ import rocks.didit.sefilm.database.ParticipantGiftCertReducer
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
@@ -24,16 +25,16 @@ interface ParticipantDao {
   @SqlQuery("SELECT $SELECTABLE_FIELDS, $EXTRA_FIELDS FROM participant p LEFT JOIN gift_certificate gc on p.user_id = gc.user_id and p.gift_certificate_used = gc.number JOIN users u on p.user_id = u.id WHERE p.showing_id = :showingId")
   @UseRowReducer(ParticipantGiftCertReducer::class)
   @RegisterKotlinMapper(GiftCertificateDTO::class, "gc")
-  fun findAllParticipants(showingId: UUID): List<ParticipantDTO>
+  fun findAllParticipants(showingId: ShowingID): List<ParticipantDTO>
 
   // TODO: test this
   @SqlQuery("SELECT $SELECTABLE_FIELDS, $EXTRA_FIELDS FROM participant p LEFT JOIN gift_certificate gc on p.user_id = gc.user_id and p.gift_certificate_used = gc.number JOIN users u on p.user_id = u.id WHERE p.showing_id = :showingId AND p.user_id = :userId")
   @UseRowReducer(ParticipantGiftCertReducer::class)
   @RegisterKotlinMapper(GiftCertificateDTO::class, "gc")
-  fun findByUserAndShowing(userId: UserID, showingId: UUID): ParticipantDTO?
+  fun findByUserAndShowing(userId: UserID, showingId: ShowingID): ParticipantDTO?
 
   @SqlQuery("SELECT exists(SELECT 1 FROM participant p WHERE p.showing_id = :showingId and p.user_id = :userId)")
-  fun isParticipantOnShowing(userId: UserID, showingId: UUID): Boolean
+  fun isParticipantOnShowing(userId: UserID, showingId: ShowingID): Boolean
 
   @SqlBatch("INSERT INTO participant (user_id, showing_id, amount_owed, has_paid, participant_type, gift_certificate_used) VALUES (:userId, :showingId, :amountOwed, :hasPaid, :type, :giftCertificateUsed?.number)")
   fun insertParticipantsOnShowing(@BindBean participant: List<ParticipantDTO>)
@@ -46,7 +47,7 @@ interface ParticipantDao {
   @RegisterKotlinMapper(GiftCertificateDTO::class, "gc")
   fun updatePaymentStatus(
     userId: UserID,
-    showingId: UUID,
+    showingId: ShowingID,
     adminUser: UserID,
     hasPaid: Boolean,
     amountOwed: SEK?
@@ -54,14 +55,14 @@ interface ParticipantDao {
 
   // TODO test me
   @SqlUpdate("DELETE FROM participant p USING showing s WHERE p.user_id = :userId AND p.showing_id = :showingId AND s.id = :showingId AND s.tickets_bought = false")
-  fun deleteByUserAndShowing(userId: UserID, showingId: UUID): Boolean
+  fun deleteByUserAndShowing(userId: UserID, showingId: ShowingID): Boolean
 
   // TODO test me
   @Timestamped
   @SqlUpdate("UPDATE participant p SET has_paid = true, amount_owed = 0, last_modified_date = :now FROM showing s WHERE p.showing_id = s.id AND s.admin = :adminUser AND p.showing_id = :showingId AND (p.gift_certificate_used IS NOT NULL OR p.user_id = :adminUser)")
-  fun markGCParticipantsAsHavingPaid(showingId: UUID, adminUser: UserID): Boolean
+  fun markGCParticipantsAsHavingPaid(showingId: ShowingID, adminUser: UserID): Boolean
 
   @Timestamped
   @SqlUpdate("UPDATE participant p SET amount_owed = :amountOwed, last_modified_date = :now FROM showing s WHERE p.showing_id = s.id AND s.admin = :adminUser AND p.showing_id = :showingId AND p.gift_certificate_used IS NULL AND has_paid = false")
-  fun updateAmountOwedForSwishParticipants(showingId: UUID, adminUser: UserID, amountOwed: SEK): Boolean
+  fun updateAmountOwedForSwishParticipants(showingId: ShowingID, adminUser: UserID, amountOwed: SEK): Boolean
 }

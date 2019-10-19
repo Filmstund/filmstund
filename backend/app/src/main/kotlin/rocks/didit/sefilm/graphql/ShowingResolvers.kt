@@ -17,20 +17,21 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
 import rocks.didit.sefilm.services.UserService
 import java.time.LocalDate
-import java.util.*
 
 @Component
 class ShowingQueryResolver(private val showingService: ShowingService) : GraphQLQueryResolver {
   fun publicShowings(afterDate: LocalDate?) = showingService.getShowingsAfterDate(afterDate ?: LocalDate.MIN)
 
-  fun showing(id: UUID?, webId: Base64ID?): ShowingDTO? {
+  fun showing(id: ShowingID?, webId: Base64ID?): ShowingDTO? {
     return when {
       id != null -> showingService.getShowing(id)
       webId != null -> showingService.getShowing(webId)
@@ -64,7 +65,7 @@ class ShowingResolver(
     participantDao.findAllParticipants(showing.id)
 
   // FIXME: remove and rename this to filmstadenShowingId instead
-  fun filmstadenRemoteEntityId(showing: ShowingDTO): String? = showing.filmstadenShowingId
+  fun filmstadenRemoteEntityId(showing: ShowingDTO): FilmstadenShowingID? = showing.filmstadenShowingId
 
   fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 

@@ -5,8 +5,8 @@ import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
-import java.util.*
 
 interface TicketDao {
   @SqlQuery("SELECT count(*) FROM ticket")
@@ -19,10 +19,10 @@ interface TicketDao {
   fun existsById(id: String): Boolean
 
   @SqlQuery("SELECT * FROM ticket WHERE showing_id = :showingId")
-  fun findByShowing(showingId: UUID): List<TicketDTO>
+  fun findByShowing(showingId: ShowingID): List<TicketDTO>
 
   @SqlQuery("SELECT * FROM ticket WHERE showing_id = :showingId AND assigned_to_user = :userId")
-  fun findByUserAndShowing(userId: UserID, showingId: UUID): List<TicketDTO>
+  fun findByUserAndShowing(userId: UserID, showingId: ShowingID): List<TicketDTO>
 
   @SqlUpdate("UPDATE ticket SET assigned_to_user = :newAssignee WHERE id = :id AND assigned_to_user = :oldAssignee")
   fun reassignTicket(id: String, oldAssignee: UserID, newAssignee: UserID): Boolean

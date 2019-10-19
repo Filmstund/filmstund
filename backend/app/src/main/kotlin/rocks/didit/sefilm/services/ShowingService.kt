@@ -29,7 +29,9 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
@@ -38,7 +40,6 @@ import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toDaos
 import rocks.didit.sefilm.utils.SwishUtil.Companion.constructSwishUri
 import java.time.LocalDate
-import java.util.*
 
 @Service
 class ShowingService(
@@ -52,11 +53,11 @@ class ShowingService(
 ) {
   private val log by logger()
 
-  fun getShowing(id: UUID): ShowingDTO? = onDemandShowingDao.findById(id)
+  fun getShowing(id: ShowingID): ShowingDTO? = onDemandShowingDao.findById(id)
 
   fun getShowing(webId: Base64ID): ShowingDTO? = onDemandShowingDao.findByWebId(webId)
 
-  fun getShowingOrThrow(id: UUID): ShowingDTO = getShowing(id)
+  fun getShowingOrThrow(id: ShowingID): ShowingDTO = getShowing(id)
     ?: throw NotFoundException(what = "showing", showingId = id)
 
   fun getShowingByMovie(movieId: MovieID): List<ShowingDTO> = onDemandShowingDao
@@ -70,7 +71,7 @@ class ShowingService(
   /** Info that is needed before you buy the tickets at Filmstaden */
   data class FsIdAndSlug(val filmstadenId: String?, val slug: String?)
 
-  fun getAdminPaymentDetails(showingId: UUID): AdminPaymentDetailsDTO? {
+  fun getAdminPaymentDetails(showingId: ShowingID): AdminPaymentDetailsDTO? {
     return jdbi.inTransactionUnchecked {
       if (!it.attach<ShowingDao>().isAdminOnShowing(currentLoggedInUser().id, showingId)) {
         log.info(
@@ -94,10 +95,10 @@ class ShowingService(
   }
 
   /** Info a user needs for paying the one who bought the tickets */
-  fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO? =
+  fun getAttendeePaymentDetails(showingId: ShowingID): AttendeePaymentDetailsDTO? =
     getAttendeePaymentDetailsForUser(currentLoggedInUser().id, showingId)
 
-  fun getAttendeePaymentDetailsForUser(userId: UserID, showingId: UUID): AttendeePaymentDetailsDTO? {
+  fun getAttendeePaymentDetailsForUser(userId: UserID, showingId: ShowingID): AttendeePaymentDetailsDTO? {
     return jdbi.inTransactionUnchecked {
       val showing = getShowingOrThrow(showingId)
       // Only really needed if at least one participant wants to pay via slack...
@@ -123,7 +124,7 @@ class ShowingService(
   }
 
   // ToDO: Return a list of PublicParticipantDTO instead ?
-  fun attendShowing(showingId: UUID, paymentOption: PaymentOption): ShowingDTO {
+  fun attendShowing(showingId: ShowingID, paymentOption: PaymentOption): ShowingDTO {
     return jdbi.inTransactionUnchecked {
       val daos = it.toDaos()
       val showing = daos.showingDao.findByIdOrThrow(showingId)
@@ -143,7 +144,7 @@ class ShowingService(
     }
   }
 
-  fun unattendShowing(showingId: UUID): ShowingDTO {
+  fun unattendShowing(showingId: ShowingID): ShowingDTO {
     return jdbi.inTransactionUnchecked {
       val daos = it.toDaos()
       val showing = daos.showingDao.findByIdOrThrow(showingId)
@@ -185,7 +186,7 @@ class ShowingService(
   }
 
   /** Delete the selected showing and return all public showings */
-  fun deleteShowing(showingId: UUID): List<ShowingDTO> {
+  fun deleteShowing(showingId: ShowingID): List<ShowingDTO> {
     return jdbi.inTransactionUnchecked {
       val dao = it.attach<ShowingDao>()
 
@@ -204,7 +205,7 @@ class ShowingService(
     }
   }
 
-  fun markAsBought(showingId: UUID, price: SEK): ShowingDTO {
+  fun markAsBought(showingId: ShowingID, price: SEK): ShowingDTO {
     return jdbi.inTransactionUnchecked {
       val dao = it.attach<ShowingDao>()
       val participantDao = it.attach<ParticipantDao>()
@@ -228,7 +229,7 @@ class ShowingService(
     }
   }
 
-  fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO {
+  fun updateShowing(showingId: ShowingID, newValues: UpdateShowingDTO): ShowingDTO {
     return jdbi.inTransactionUnchecked { handle ->
       val dao = handle.attach<ShowingDao>()
 
@@ -249,7 +250,7 @@ class ShowingService(
         payToUser = newValues.payToUser,
         location = locationService.getOrCreateNewLocation(newValues.location),
         time = newValues.time,
-        filmstadenShowingId = newValues.filmstadenRemoteEntityId,
+        filmstadenShowingId = FilmstadenShowingID.from(newValues.filmstadenRemoteEntityId),
         cinemaScreen = cinemaScreen,
         date = newValues.date
       )
@@ -261,7 +262,7 @@ class ShowingService(
     }
   }
 
-  fun fetchSeatMap(showingId: UUID): List<FilmstadenSeatMapDTO> {
+  fun fetchSeatMap(showingId: ShowingID): List<FilmstadenSeatMapDTO> {
     val showing = getShowingOrThrow(showingId)
     if (showing.location?.filmstadenId == null || showing.cinemaScreen?.filmstadenId == null) {
       log.debug("Showing $showingId is not at a Filmstaden location or does not have an associated Filmstaden screen")
@@ -312,7 +313,7 @@ class ShowingService(
     cinemaScreen: FilmstadenScreenDTO?
   ): ShowingDTO {
     val location = locationService.getOrCreateNewLocation(this.location)
-    val newId = UUID.randomUUID()
+    val newId = ShowingID.random()
     return ShowingDTO(
       id = newId,
       webId = Base64ID.random(),
@@ -325,7 +326,7 @@ class ShowingService(
       cinemaScreen = cinemaScreen?.toFilmstadenLiteScreen(),
       admin = adminId,
       payToUser = adminId,
-      filmstadenShowingId = this.filmstadenRemoteEntityId
+      filmstadenShowingId = FilmstadenShowingID.from(this.filmstadenRemoteEntityId)
     )
   }
 }

@@ -15,12 +15,12 @@ import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toDaos
 import java.time.ZoneId
-import java.util.*
 
 @Service
 class TicketService(
@@ -32,11 +32,11 @@ class TicketService(
 ) {
   private val log by logger()
 
-  fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<TicketDTO> {
+  fun getTicketsForCurrentUserAndShowing(showingId: ShowingID): List<TicketDTO> {
     return jdbi.onDemand<TicketDao>().findByUserAndShowing(currentLoggedInUser().id, showingId)
   }
 
-  fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<TicketDTO> {
+  fun processTickets(userSuppliedTicketUrl: List<String>, showingId: ShowingID): List<TicketDTO> {
     require(userSuppliedTicketUrl.isNotEmpty()) { "Supply a list of ticket urls" }
 
     return jdbi.inTransactionUnchecked { handle ->
@@ -138,7 +138,7 @@ class TicketService(
     return Triple(ids[0], ids[1], ids[2])
   }
 
-  fun getTicketRange(showingId: UUID): TicketRange? {
+  fun getTicketRange(showingId: ShowingID): TicketRange? {
     return jdbi.inTransactionUnchecked { handle ->
       val daos = handle.toDaos()
       val currentLoggedInUser = currentLoggedInUser()
@@ -163,7 +163,7 @@ class TicketService(
     }
   }
 
-  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): TicketDTO {
+  private fun FilmstadenTicketDTO.toTicket(showingId: ShowingID, assignedToUser: UserID, barcode: String): TicketDTO {
     return TicketDTO(
       id = id,
       showingId = showingId,

@@ -15,9 +15,9 @@ import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
-import java.util.*
 
 interface ShowingDao {
   companion object {
@@ -38,9 +38,9 @@ interface ShowingDao {
     RegisterKotlinMapper(LocationDTO::class, "l"),
     RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
   )
-  fun findById(showingId: UUID): ShowingDTO?
+  fun findById(showingId: ShowingID): ShowingDTO?
 
-  fun findByIdOrThrow(showingId: UUID): ShowingDTO =
+  fun findByIdOrThrow(showingId: ShowingID): ShowingDTO =
     findById(showingId) ?: throw NotFoundException(what = "showing", showingId = showingId)
 
   @SqlQuery("SELECT $STAR FROM showing s $COMMON_JOINS WHERE s.web_id = :webId")
@@ -76,11 +76,11 @@ interface ShowingDao {
   fun findByDateAfterOrderByDateDesc(afterDate: LocalDate): List<ShowingDTO>
 
   @SqlQuery("SELECT exists(SELECT 1 FROM showing s  WHERE s.admin = :adminUserId AND s.id = :showingId)")
-  fun isAdminOnShowing(adminUserId: UserID, showingId: UUID): Boolean
+  fun isAdminOnShowing(adminUserId: UserID, showingId: ShowingID): Boolean
 
   @Timestamped
   @SqlUpdate("UPDATE showing s SET admin = :newAdmin, pay_to_user = :newAdmin, last_modified_date = :now WHERE s.id = :showingId and s.admin = :currentAdmin")
-  fun promoteNewUserToAdmin(showingId: UUID, currentAdmin: UserID, newAdmin: UserID): Boolean
+  fun promoteNewUserToAdmin(showingId: ShowingID, currentAdmin: UserID, newAdmin: UserID): Boolean
 
   @Suppress("SqlResolve")
   @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location?.name, :cinemaScreen?.filmstadenId, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
@@ -96,12 +96,12 @@ interface ShowingDao {
 
   // TODO test this
   @SqlUpdate("DELETE FROM showing s WHERE s.id = :showingId AND s.admin = :admin")
-  fun deleteByShowingAndAdmin(showingId: UUID, admin: UserID): Boolean
+  fun deleteByShowingAndAdmin(showingId: ShowingID, admin: UserID): Boolean
 
   // TODO test this
   @Timestamped
   @SqlUpdate("UPDATE showing s SET tickets_bought = true, price = :price, last_modified_date = :now WHERE s.id = :showingId AND s.tickets_bought = false")
-  fun markShowingAsBought(showingId: UUID, price: SEK): Boolean
+  fun markShowingAsBought(showingId: ShowingID, price: SEK): Boolean
 
   // TODO test this and return updated values
   @Suppress("SqlResolve")

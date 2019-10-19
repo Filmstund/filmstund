@@ -32,8 +32,10 @@ import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.id.FilmstadenNcgID
+import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
@@ -77,9 +79,9 @@ internal class MongoMigrator(
       mongoShowings
         .forEach {
           val showing = ShowingDTO(
-            id = it.id,
+            id = ShowingID(it.id),
             webId = it.webId,
-            filmstadenShowingId = it.filmstadenRemoteEntityId,
+            filmstadenShowingId = FilmstadenShowingID.from(it.filmstadenRemoteEntityId),
             slug = it.slug,
             date = it.date ?: LocalDate.EPOCH,
             time = it.time ?: LocalTime.MIDNIGHT,
@@ -118,7 +120,7 @@ internal class MongoMigrator(
             when (p) {
               is SwishParticipant -> ParticipantDTO(
                 userId = user,
-                showingId = showing.id,
+                showingId = ShowingID(showing.id),
                 hasPaid = paymentInfo.hasPaid,
                 amountOwed = paymentInfo.amountOwed,
                 type = ParticipantDTO.Type.SWISH,
@@ -127,7 +129,7 @@ internal class MongoMigrator(
               is FtgBiljettParticipant -> {
                 ParticipantDTO(
                   userId = user,
-                  showingId = showing.id,
+                  showingId = ShowingID(showing.id),
                   userInfo = PublicUserDTO(id = user),
                   hasPaid = paymentInfo.hasPaid,
                   amountOwed = paymentInfo.amountOwed,
@@ -296,7 +298,7 @@ internal class MongoMigrator(
         .map {
           TicketDTO(
             id = it.id,
-            showingId = it.showingId,
+            showingId = ShowingID(it.showingId),
             assignedToUser = userCache.get(it.assignedToUser) { id -> userDao.findIdByGoogleId(id) }
               ?: throw AssertionError("User ${it.assignedToUser} not found"),
             profileId = it.profileId.orNullIfBlank(),

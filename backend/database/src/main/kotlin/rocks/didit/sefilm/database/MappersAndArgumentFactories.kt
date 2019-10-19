@@ -10,9 +10,11 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.FilmstadenNcgID
+import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
@@ -184,5 +186,36 @@ class FilmstadenNcgIdColumnMapper : ColumnMapper<FilmstadenNcgID> {
 class FilmstadenNcgIdArgumentFactory : AbstractArgumentFactory<FilmstadenNcgID>(Types.VARCHAR) {
   override fun build(value: FilmstadenNcgID?, config: ConfigRegistry?): Argument {
     return Argument { position, statement, _ -> statement.setString(position, value?.ncgId) }
+  }
+}
+
+class ShowingIdColumnMapper : ColumnMapper<ShowingID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): ShowingID? {
+    return r?.let {
+      val uuid = it.getObject(columnNumber, UUID::class.java)
+        ?: return null
+      return ShowingID(uuid)
+    }
+  }
+}
+
+class ShowingIdArgumentFactory : AbstractArgumentFactory<ShowingID>(Types.OTHER) {
+  override fun build(value: ShowingID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setObject(position, value?.id) }
+  }
+}
+
+class FilmstadenShowingIdColumnMapper : ColumnMapper<FilmstadenShowingID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): FilmstadenShowingID? {
+    return r?.let {
+      val value = it.getString(columnNumber)
+      return FilmstadenShowingID.from(value)
+    }
+  }
+}
+
+class FilmstadenShowingIdArgumentFactory : AbstractArgumentFactory<FilmstadenShowingID>(Types.VARCHAR) {
+  override fun build(value: FilmstadenShowingID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setString(position, value?.value) }
   }
 }

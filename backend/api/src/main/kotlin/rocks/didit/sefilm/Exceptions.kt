@@ -1,10 +1,10 @@
 package rocks.didit.sefilm
 
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
-import java.util.*
 
-class NotFoundException(what: String, userID: UserID? = null, showingId: UUID? = null) :
+class NotFoundException(what: String, userID: UserID? = null, showingId: ShowingID? = null) :
   KnownException("Could not find $what", userID, showingId)
 
 class MissingPhoneNumberException(userID: UserID? = null) :
@@ -18,7 +18,7 @@ class ExternalProviderException(msg: String) :
 class MissingAPIKeyException(service: APIService) :
   KnownException("The API key is missing or invalid for the $service service")
 
-class TicketsAlreadyBoughtException(userID: UserID, showingId: UUID) :
+class TicketsAlreadyBoughtException(userID: UserID, showingId: ShowingID) :
   KnownException("The action is not allowed since the tickets for this showing is already bought", userID, showingId)
 
 class TicketAlreadyInUserException(userID: UserID) :
@@ -43,7 +43,7 @@ class FilmstadenTicketException(msg: String) : KnownException(msg)
 open class KnownException(
   msg: String,
   val whichUser: UserID? = null,
-  val whichShowing: UUID? = null
+  val whichShowing: ShowingID? = null
 ) : RuntimeException(msg)
 
 /** Services which uses some form of tokens, and that can cause InvalidTokenException */

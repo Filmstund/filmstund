@@ -9,6 +9,7 @@ import rocks.didit.sefilm.Application
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.web.controllers.MetaController.Companion.PATH
@@ -32,7 +33,7 @@ class MetaController(
   }
 
   @GetMapping("/showings/{showingId}")
-  fun showingMeta(@PathVariable showingId: UUID): ModelAndView {
+  fun showingMeta(@PathVariable showingId: ShowingID): ModelAndView {
     val showing = showingService.getShowingOrThrow(showingId)
     return createViewModelFromShowing(showing)
   }

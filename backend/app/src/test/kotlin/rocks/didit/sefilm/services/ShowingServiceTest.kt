@@ -31,6 +31,7 @@ import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.isRoughlyEqualToShowing
@@ -42,7 +43,6 @@ import rocks.didit.sefilm.nextUserDTO
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -79,7 +79,7 @@ internal class ShowingServiceTest {
   @Test
   internal fun `given no showing, when getShowingOrThrow, then an NotFoundException is thrown`() {
     assertThrows<NotFoundException> {
-      showingService.getShowingOrThrow(UUID.randomUUID())
+      showingService.getShowingOrThrow(ShowingID.random())
     }
   }
 
