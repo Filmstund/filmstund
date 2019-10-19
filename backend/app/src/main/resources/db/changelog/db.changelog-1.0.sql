@@ -3,10 +3,11 @@
 --changeset eda:createBioBudordTable
 create table bio_budord
 (
-    number integer
+    number       integer
         constraint bioBudord_pk primary key,
-    phrase varchar(255)
-        constraint phrase_uniq unique not null
+    phrase       varchar(255)
+        constraint phrase_uniq unique     not null,
+    created_date timestamp with time zone not null default current_timestamp
 );
 -- rollback DROP table if exists bio_budord;
 
@@ -39,7 +40,8 @@ create table location
     longitude          float                    null,
     filmstaden_id      varchar(10)              null
         constraint location_fsId_unique unique,
-    last_modified_date timestamp with time zone not null default current_timestamp
+    last_modified_date timestamp with time zone not null default current_timestamp,
+    created_date       timestamp with time zone not null default current_timestamp
 );
 --rollback DROP table if exists location;
 
@@ -50,42 +52,44 @@ create table location_alias
         constraint location_alias_fk references location on delete cascade,
     alias              varchar(100)
         constraint alias_uniq unique            not null,
-    last_modified_date timestamp with time zone not null default current_timestamp
+    last_modified_date timestamp with time zone not null default current_timestamp,
+    created_date       timestamp with time zone not null default current_timestamp
 );
 --rollback drop table if exists location_alias;
 
 --changeset eda:createTableUsers
 create table users
 (
-    id                 uuid
+    id                       uuid
         constraint user_pk primary key,
-    google_id          varchar(25)
+    google_id                varchar(25)
         constraint user_ids_google_uniq unique,
-    filmstaden_membership_id      varchar(7)   null
+    filmstaden_membership_id varchar(7)   null
         constraint user_ids_fsid_uniq unique,
-    first_name         varchar(100) not null,
-    last_name          varchar(100) not null,
-    nick               varchar(50)  not null,
-    email              varchar(100) not null,
-    phone              varchar(13)  null,
-    avatar             varchar(255) null,
-    calendar_feed_id   uuid
+    first_name               varchar(100) not null,
+    last_name                varchar(100) not null,
+    nick                     varchar(50)  not null,
+    email                    varchar(100) not null,
+    phone                    varchar(13)  null,
+    avatar                   varchar(255) null,
+    calendar_feed_id         uuid
         constraint user_calendarfeedid_unique unique,
-    last_login         timestamp    not null default current_timestamp,
-    signup_date        timestamp    not null default current_timestamp,
-    last_modified_date timestamp    not null default current_timestamp
+    last_login               timestamp    not null default current_timestamp,
+    signup_date              timestamp    not null default current_timestamp,
+    last_modified_date       timestamp    not null default current_timestamp
 );
 --rollback drop table if exists "user";
 
 --changeset eda:createTableGiftCert
 create table gift_certificate
 (
-    user_id    uuid
+    user_id      uuid
         constraint giftcert_user_fk references users on delete cascade,
-    number     varchar(15)
+    number       varchar(15)
         constraint giftcert_number_unique unique,
-    expires_at date not null default current_date + interval '1 year',
-    constraint giftcert_pk primary key (user_id, number)
+    expires_at   date                     not null default current_date + interval '1 year',
+    constraint giftcert_pk primary key (user_id, number),
+    created_date timestamp with time zone not null default current_timestamp
 );
 --rollback drop table if exists gift_certificate;
 
@@ -185,21 +189,23 @@ create table ticket
         constraint ticket_showing_fk references showing on delete cascade,
     assigned_to_user         uuid
         constraint ticket_user_fk references users on delete cascade,
-    profile_id               varchar(10)            null,
-    barcode                  text                   not null,
-    customer_type            varchar(50)            not null,
-    customer_type_definition varchar(50)            not null,
-    cinema                   varchar(100)           not null,
-    cinema_city              varchar(50)            null,
-    screen                   varchar(50)            not null,
-    seat_row                 integer                not null default 0
+    profile_id               varchar(10)              null,
+    barcode                  text                     not null,
+    customer_type            varchar(50)              not null,
+    customer_type_definition varchar(50)              not null,
+    cinema                   varchar(100)             not null,
+    cinema_city              varchar(50)              null,
+    screen                   varchar(50)              not null,
+    seat_row                 integer                  not null default 0
         constraint ticket_seat_row_positive check (seat_row >= 0),
-    seat_number              integer                not null default 0
+    seat_number              integer                  not null default 0
         constraint ticket_seat_number_positive check (seat_number >= 0),
-    date                     date                   not null,
-    time                     time without time zone not null,
-    movie_name               varchar(100)           not null,
-    movie_rating             varchar(30)            not null,
-    attributes               varchar(50)[]          not null default '{}'
+    date                     date                     not null,
+    time                     time without time zone   not null,
+    movie_name               varchar(100)             not null,
+    movie_rating             varchar(30)              not null,
+    attributes               varchar(50)[]            not null default '{}',
+    last_modified_date    timestamp with time zone not null default current_timestamp,
+    created_date             timestamp with time zone not null default current_timestamp
 );
 --rollback drop table if exists ticket;

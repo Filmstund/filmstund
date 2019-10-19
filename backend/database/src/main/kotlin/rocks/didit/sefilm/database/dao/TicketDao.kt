@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.database.dao
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.customizer.Timestamped
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
@@ -24,7 +25,8 @@ interface TicketDao {
   @SqlQuery("SELECT * FROM ticket WHERE showing_id = :showingId AND assigned_to_user = :userId")
   fun findByUserAndShowing(userId: UserID, showingId: ShowingID): List<TicketDTO>
 
-  @SqlUpdate("UPDATE ticket SET assigned_to_user = :newAssignee WHERE id = :id AND assigned_to_user = :oldAssignee")
+  @Timestamped
+  @SqlUpdate("UPDATE ticket SET assigned_to_user = :newAssignee, last_modified_date = :now WHERE id = :id AND assigned_to_user = :oldAssignee")
   fun reassignTicket(id: String, oldAssignee: UserID, newAssignee: UserID): Boolean
 
   @SqlBatch("INSERT INTO ticket (id, showing_id, assigned_to_user, profile_id, barcode, customer_type, customer_type_definition, cinema, cinema_city, screen, seat_row, seat_number, date, time, movie_name, movie_rating, attributes) VALUES (:id, :showingId, :assignedToUser, :profileId, :barcode, :customerType, :customerTypeDefinition, :cinema, :cinemaCity, :screen, :seatRow, :seatNumber, :date, :time, :movieName, :movieRating, :attributes)")
