@@ -66,6 +66,7 @@ sefilm:
         validateUrl: ${pushoverValidateUrl:https://api.pushover.net/1/users/validate.json}
   calendar:
     duration-before-alert: ${calendarDurationBeforeAlert:4h}
+  show-sql: ${SHOW_SQL:false}
 
 graphql:
   servlet:

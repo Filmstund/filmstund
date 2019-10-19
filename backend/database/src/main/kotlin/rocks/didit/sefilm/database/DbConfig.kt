@@ -5,6 +5,7 @@ import org.jdbi.v3.core.kotlin.KotlinMapper
 import org.jdbi.v3.core.mapper.RowMapperFactory
 import org.jdbi.v3.core.statement.SqlLogger
 import org.jdbi.v3.core.statement.StatementContext
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import rocks.didit.sefilm.database.dao.BudordDao
@@ -20,10 +21,14 @@ import javax.sql.DataSource
 @Configuration
 class DbConfig {
   private val log by logger()
+
   @Bean
+  @ConditionalOnProperty(
+    prefix = "sefilm", name = ["show-sql"],
+    matchIfMissing = false, havingValue = "true"
+  )
   fun sqlLogger() = object : SqlLogger {
     override fun logAfterExecution(context: StatementContext?) {
-      // TODO: only do this if sql-logging is enabled
       log.info("{}", context?.renderedSql)
     }
   }
@@ -33,8 +38,8 @@ class DbConfig {
   }
 
   @Bean
-  fun jdbi(dataSource: DataSource, sqlLogger: SqlLogger): Jdbi =
-    Jdbi.create(dataSource)
+  fun jdbi(dataSource: DataSource, sqlLogger: SqlLogger?): Jdbi {
+    val jdbi = Jdbi.create(dataSource)
       .registerColumnMapper(FilmstadenMembershipIdColumnMapper())
       .registerColumnMapper(TicketNumberColumnMapper())
       .registerColumnMapper(GoogleIdColumnMapper())
@@ -64,8 +69,12 @@ class DbConfig {
       .registerArgument(FilmstadenShowingIdArgumentFactory())
       .registerArgument(CalendarFeedIdArgumentFactory())
       .registerRowMapper(rowMapperFactoryWithPrefix(GiftCertificateDTO::class.java, "gc"))
-      .setSqlLogger(sqlLogger)
       .installPlugins()
+    if (sqlLogger != null) {
+      return jdbi.setSqlLogger(sqlLogger)
+    }
+    return jdbi
+  }
 
   @Bean
   fun onDemandLocationDao(jdbi: Jdbi): LocationDao = jdbi.onDemand(LocationDao::class.java)
