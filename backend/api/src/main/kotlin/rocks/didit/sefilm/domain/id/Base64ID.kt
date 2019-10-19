@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.domain.id
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import java.security.SecureRandom
 import java.util.*
@@ -10,6 +11,10 @@ data class Base64ID(val id: String = MISSING_VALUE) {
     const val MISSING_VALUE = "MISSING-BASE64-ID"
 
     val MISSING = Base64ID(MISSING_VALUE)
+
+    @JsonCreator
+    @JvmStatic
+    fun from(value: String?) = value?.let { Base64ID(it) }
 
     fun random(): Base64ID {
       val random = SecureRandom()

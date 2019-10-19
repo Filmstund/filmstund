@@ -7,15 +7,14 @@ import graphql.execution.DataFetcherExceptionHandler
 import graphql.execution.DataFetcherExceptionHandlerParameters
 import graphql.execution.DataFetcherExceptionHandlerResult
 import graphql.language.SourceLocation
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.KnownException
+import rocks.didit.sefilm.logger
 
 @Component
 class GraphqlExceptionHandler : DataFetcherExceptionHandler {
-  private val log: Logger = LoggerFactory.getLogger(GraphqlExceptionHandler::class.java)
+  private val log by logger()
 
   override fun onException(handlerParameters: DataFetcherExceptionHandlerParameters): DataFetcherExceptionHandlerResult {
     val exception = handlerParameters.exception
@@ -34,6 +33,7 @@ class GraphqlExceptionHandler : DataFetcherExceptionHandler {
         ExceptionWhileDataFetching(path, exception, sourceLocation)
       }
     }
+    log.debug("GraphQL error", exception)
     return DataFetcherExceptionHandlerResult.Builder()
       .error(graphqlError)
       .build()
