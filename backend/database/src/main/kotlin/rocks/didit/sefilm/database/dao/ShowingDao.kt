@@ -14,6 +14,7 @@ import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
 import java.util.*
@@ -64,7 +65,7 @@ interface ShowingDao {
     RegisterKotlinMapper(LocationDTO::class, "l"),
     RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
   )
-  fun findByMovieIdOrderByDateDesc(movieId: UUID): List<ShowingDTO>
+  fun findByMovieIdOrderByDateDesc(movieId: MovieID): List<ShowingDTO>
 
   @SqlQuery("SELECT $STAR FROM showing s $COMMON_JOINS WHERE s.date > :afterDate ORDER BY date DESC")
   @UseRowReducer(ShowingLocationScreenReducer::class)

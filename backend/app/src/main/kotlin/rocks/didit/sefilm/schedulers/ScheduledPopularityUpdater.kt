@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.domain.id.IMDbID
-import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
+import rocks.didit.sefilm.domain.id.isNullOrBlank
 import rocks.didit.sefilm.domain.id.isSupplied
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService

@@ -1,16 +1,17 @@
 package rocks.didit.sefilm.domain.dto.core
 
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.TMDbID
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 data class MovieDTO(
-  val id: UUID,
-  val filmstadenId: String? = null,
+  val id: MovieID,
+  val filmstadenId: FilmstadenNcgID? = null,
   val imdbId: IMDbID? = null,
   val tmdbId: TMDbID? = null,
   val slug: String? = null,

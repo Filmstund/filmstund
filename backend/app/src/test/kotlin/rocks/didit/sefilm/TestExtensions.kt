@@ -13,8 +13,10 @@ import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
@@ -85,8 +87,8 @@ fun ThreadLocalRandom.nextLocationAlias(bound: Int): List<String> {
 
 fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
   return MovieDTO(
-    id = UUID.randomUUID(),
-    filmstadenId = "fsid${nextLong(10000000000)}",
+    id = MovieID.random(),
+    filmstadenId = FilmstadenNcgID("fsid${nextLong(10000000000)}"),
     imdbId = IMDbID("tt${nextLong(1000000, 9999999)}"),
     tmdbId = TMDbID(nextLong(0, 1000000)),
     slug = "slug${nextLong()}",
@@ -109,7 +111,7 @@ fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
 fun ThreadLocalRandom.nextCinemaScreen() =
   FilmstadenLiteScreenDTO("NCG${nextLong(1000, 10000000)}", "Salong ${nextInt(1, 100)}")
 
-fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UserID): ShowingDTO {
+fun ThreadLocalRandom.nextShowing(movieId: MovieID, adminId: UserID): ShowingDTO {
   return ShowingDTO(
     id = UUID.randomUUID(),
     webId = Base64ID.random(),

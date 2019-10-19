@@ -4,6 +4,7 @@ import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.Instant
 import java.time.LocalDate
@@ -18,7 +19,7 @@ data class ShowingDTO(
   val slug: String,
   val date: LocalDate,
   val time: LocalTime,
-  val movieId: UUID,
+  val movieId: MovieID,
   val movieTitle: String,
   val location: LocationDTO?,
   val cinemaScreen: FilmstadenLiteScreenDTO? = null,

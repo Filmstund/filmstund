@@ -14,11 +14,9 @@ import rocks.didit.sefilm.UserAlreadyAttendedException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.database.dao.ShowingDao
-import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
@@ -30,6 +28,9 @@ import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.logger
@@ -58,7 +59,7 @@ class ShowingService(
   fun getShowingOrThrow(id: UUID): ShowingDTO = getShowing(id)
     ?: throw NotFoundException(what = "showing", showingId = id)
 
-  fun getShowingByMovie(movieId: UUID): List<ShowingDTO> = onDemandShowingDao
+  fun getShowingByMovie(movieId: MovieID): List<ShowingDTO> = onDemandShowingDao
     .findByMovieIdOrderByDateDesc(movieId)
 
   fun getShowingByUser(userId: UserID): List<ShowingDTO> = onDemandShowingDao.findByAdminOrParticipant(userId)
@@ -306,7 +307,7 @@ class ShowingService(
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun CreateShowingDTO.toShowing(
     adminId: UserID,
-    movieId: UUID,
+    movieId: MovieID,
     movieTitle: String,
     cinemaScreen: FilmstadenScreenDTO?
   ): ShowingDTO {

@@ -7,17 +7,18 @@ import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import java.util.*
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
+import rocks.didit.sefilm.domain.id.MovieID
 
 interface MovieDao {
   @SqlQuery("SELECT count(1) FROM movie")
   fun count(): Int
 
   @SqlQuery("SELECT exists(SELECT 1 FROM movie WHERE id = :id)")
-  fun existsById(id: UUID): Boolean
+  fun existsById(id: MovieID): Boolean
 
   @SqlQuery("SELECT exists(SELECT 1 FROM movie WHERE filmstaden_id = :filmstadenId)")
-  fun existsByFilmstadenId(filmstadenId: String): Boolean
+  fun existsByFilmstadenId(filmstadenId: FilmstadenNcgID): Boolean
 
   @SqlQuery("SELECT * FROM movie m ORDER BY archived, popularity desc")
   fun findAll(): List<MovieDTO>
@@ -26,10 +27,10 @@ interface MovieDao {
   fun findByArchivedOrderByPopularityDesc(archived: Boolean = false): List<MovieDTO>
 
   @SqlQuery("SELECT * FROM movie WHERE id = :id")
-  fun findById(id: UUID): MovieDTO?
+  fun findById(id: MovieID): MovieDTO?
 
   @SqlQuery("SELECT COALESCE(original_title, title) FROM movie WHERE id = :id")
-  fun findTitleById(id: UUID): String?
+  fun findTitleById(id: MovieID): String?
 
   @SqlBatch("INSERT INTO movie (id, filmstaden_id, imdb_id, tmdb_id, slug, title, synopsis, original_title, release_date, production_year, runtime, poster, genres, popularity, popularity_last_updated, archived, last_modified_date, created_date) VALUES (:id, :filmstadenId, :imdbId, :tmdbId, :slug, :title, :synopsis, :originalTitle, :releaseDate, :productionYear, :runtime, :poster, :genres, :popularity, :popularityLastUpdated, :archived, :lastModifiedDate, :createdDate)")
   fun insertMovies(@BindBean movie: Collection<MovieDTO>): IntArray
@@ -42,5 +43,5 @@ interface MovieDao {
 
   @Timestamped
   @SqlUpdate("UPDATE movie m SET archived = true, last_modified_date = :now WHERE m.id IN (<movieIds>)")
-  fun archiveMovies(@BindList("movieIds") movieIds: List<UUID>): Int
+  fun archiveMovies(@BindList("movieIds") movieIds: List<MovieID>): Int
 }

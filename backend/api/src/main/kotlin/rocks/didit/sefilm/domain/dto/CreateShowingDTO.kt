@@ -1,13 +1,13 @@
 package rocks.didit.sefilm.domain.dto
 
+import rocks.didit.sefilm.domain.id.MovieID
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 
 data class CreateShowingDTO(
   val date: LocalDate,
   val time: LocalTime,
-  val movieId: UUID,
+  val movieId: MovieID,
   val location: String,
   val filmstadenScreen: FilmstadenLiteScreenDTO?,
   // TODO: remove

@@ -7,12 +7,13 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.domain.dto.FilmstadenGenreDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.schedulers.AsyncMovieUpdater
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.utils.MovieFilterUtil
 import java.time.Duration
-import java.util.*
 
 @Service
 class MovieService(
@@ -30,9 +31,9 @@ class MovieService(
 
   fun archivedMovies() = onDemandMovieDao.findByArchivedOrderByPopularityDesc(true)
 
-  fun getMovie(movieId: UUID?): MovieDTO? = movieId?.let(onDemandMovieDao::findById)
+  fun getMovie(movieId: MovieID?): MovieDTO? = movieId?.let(onDemandMovieDao::findById)
 
-  fun getMovieOrThrow(movieId: UUID?): MovieDTO = getMovie(movieId) ?: throw NotFoundException("movie with id: $movieId")
+  fun getMovieOrThrow(movieId: MovieID?): MovieDTO = getMovie(movieId) ?: throw NotFoundException("movie with id: $movieId")
 
   /** Fetch new movies from Filmstaden, and trigger an async background update of the movies when done */
   fun fetchNewMoviesFromFilmstaden(): List<MovieDTO> {
@@ -45,17 +46,17 @@ class MovieService(
         filterUtil.isNewerThan(fsMovie)
           && !filterUtil.isMovieUnwantedBasedOnGenre(fsMovie.genres.map(FilmstadenGenreDTO::name))
           && !filterUtil.isTitleUnwanted(fsMovie.title)
-          && movieDao.existsByFilmstadenId(fsMovie.ncgId)
+          && movieDao.existsByFilmstadenId(FilmstadenNcgID(fsMovie.ncgId))
       }
       .map {
         MovieDTO(
-          id = UUID.randomUUID(),
+          id = MovieID.random(),
           title = filterUtil.trimTitle(it.title),
           releaseDate = it.releaseDate,
           poster = it.posterUrl,
           slug = it.slug,
           runtime = Duration.ofMinutes(it.length?.toLong() ?: 0L),
-          filmstadenId = it.ncgId,
+          filmstadenId = FilmstadenNcgID(it.ncgId),
           genres = it.genres.map { g -> g.name }.toSet()
         )
       }

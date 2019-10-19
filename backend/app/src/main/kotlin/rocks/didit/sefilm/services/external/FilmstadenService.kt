@@ -20,6 +20,7 @@ import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenShowItemsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenShowingDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -42,7 +43,7 @@ class FilmstadenService(
   }
 
   @Cacheable("filmstadenDates")
-  fun getShowingDates(filmstadenId: String, cityAlias: String = "GB"): List<FilmstadenShowingDTO> {
+  fun getShowingDates(filmstadenId: FilmstadenNcgID, cityAlias: String = "GB"): List<FilmstadenShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
 
@@ -73,7 +74,7 @@ class FilmstadenService(
     return responseBody.items
   }
 
-  fun fetchExtendedInfo(filmstadenId: String): FilmstadenExtendedMovieDTO? {
+  fun fetchExtendedInfo(filmstadenId: FilmstadenNcgID): FilmstadenExtendedMovieDTO? {
     val body = restTemplate.exchange(
       "$API_URL/v2/movie/sv/{filmstadenId}",
       HttpMethod.GET,

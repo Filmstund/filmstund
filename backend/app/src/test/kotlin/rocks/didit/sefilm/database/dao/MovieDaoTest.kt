@@ -12,9 +12,10 @@ import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.nextMovie
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -53,7 +54,7 @@ internal class MovieDaoTest {
   internal fun `given no movie, when existsById(), then false is returned`() {
     databaseTest.start {
       withDaos {
-        val rndMovieId = UUID.randomUUID()
+        val rndMovieId = MovieID.random()
         assertThat(movieDao.existsById(rndMovieId)).isFalse()
       }
     }
@@ -64,7 +65,7 @@ internal class MovieDaoTest {
     databaseTest.start {
       withMovie()
       afterInsert {
-        assertThat(movie.filmstadenId).isNotNull()
+        assertThat(movie.filmstadenId).isNotNull
         assertThat(it.movieDao.existsByFilmstadenId(movie.filmstadenId!!)).isTrue()
       }
     }
@@ -74,7 +75,7 @@ internal class MovieDaoTest {
   internal fun `given no movie, when existsByFilmstadenId(), then false is returned`() {
     databaseTest.start {
       withDaos {
-        val rndFilmstadenId = "fsid${rnd.nextLong(0, 10000000)}"
+        val rndFilmstadenId = FilmstadenNcgID("fsid${rnd.nextLong(0, 10000000)}")
         assertThat(movieDao.existsByFilmstadenId(rndFilmstadenId)).isFalse()
       }
     }

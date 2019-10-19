@@ -20,13 +20,13 @@ import rocks.didit.sefilm.TicketsAlreadyBoughtException
 import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextParticipant
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
 import java.time.LocalDate
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -44,7 +44,7 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a showing with bought tickets, when assertTicketsNotBought(), then an exception is thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), UserID.random()).copy(ticketsBought = true)
+    val showing = rnd.nextShowing(MovieID.random(), UserID.random()).copy(ticketsBought = true)
     val e = assertThrows<TicketsAlreadyBoughtException> {
       assertionService.assertTicketsNotBought(showing.admin, showing)
     }
@@ -53,14 +53,14 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a showing hasnt been bought, when assertTicketsNotBought(), then an exception is not thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), UserID.random()).copy(ticketsBought = false)
+    val showing = rnd.nextShowing(MovieID.random(), UserID.random()).copy(ticketsBought = false)
     assertionService.assertTicketsNotBought(showing.admin, showing)
   }
 
   @Test
   @WithLoggedInUser
   internal fun `given a showing where current user is not admin, then assertLoggedInUserIsAdmin(), then an exception is thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), UserID.random())
+    val showing = rnd.nextShowing(MovieID.random(), UserID.random())
     val e = assertThrows<AccessDeniedException> {
       assertionService.assertLoggedInUserIsAdmin(showing)
     }
@@ -70,7 +70,7 @@ internal class AssertionServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a showing where current user is admin, when assertLoggedInUserIsAdmin(), then no exception is thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), currentLoggedInUser().id)
+    val showing = rnd.nextShowing(MovieID.random(), currentLoggedInUser().id)
     assertionService.assertLoggedInUserIsAdmin(showing)
   }
 
@@ -109,7 +109,7 @@ internal class AssertionServiceTest {
     val userId = currentLoggedInUser().id
     val ticketNumber = rnd.nextGiftCert(userId).number
     val e = assertThrows<TicketNotFoundException> {
-      assertionService.assertGiftCertIsUsable(userId, ticketNumber, rnd.nextShowing(UUID.randomUUID(), userId))
+      assertionService.assertGiftCertIsUsable(userId, ticketNumber, rnd.nextShowing(MovieID.random(), userId))
     }
     assertThat(e).hasMessage("Ticket $ticketNumber not found")
   }

@@ -7,7 +7,6 @@ import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.dao.ParticipantDao
-import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
@@ -17,6 +16,8 @@ import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
@@ -38,7 +39,7 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
   }
 
   fun showing(webId: Base64ID): ShowingDTO? = showingService.getShowing(webId)
-  fun showingForMovie(movieId: UUID) = showingService.getShowingByMovie(movieId)
+  fun showingForMovie(movieId: MovieID) = showingService.getShowingByMovie(movieId)
 }
 
 @Component

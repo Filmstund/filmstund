@@ -31,7 +31,9 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
@@ -81,7 +83,7 @@ internal class MongoMigrator(
             slug = it.slug,
             date = it.date ?: LocalDate.EPOCH,
             time = it.time ?: LocalTime.MIDNIGHT,
-            movieId = it.movie.id,
+            movieId = MovieID(it.movie.id),
             movieTitle = it.movie.title,
             location = locationCache.get(it.location?.name!!) { name -> locationDao.findByNameOrAlias(name) },
             cinemaScreen = it.filmstadenScreen,
@@ -159,10 +161,10 @@ internal class MongoMigrator(
       val movies = mongoMovieRepo.findByIdNotIn(pgMovieIds)
         .map {
           MovieDTO(
-            id = it.id,
+            id = MovieID(it.id),
             imdbId = it.imdbId,
             tmdbId = it.tmdbId,
-            filmstadenId = it.filmstadenId,
+            filmstadenId = FilmstadenNcgID.from(it.filmstadenId),
             lastModifiedDate = it.lastModifiedDate,
             archived = it.archived,
             createdDate = it.lastModifiedDate, // doesn't exist in mongo...

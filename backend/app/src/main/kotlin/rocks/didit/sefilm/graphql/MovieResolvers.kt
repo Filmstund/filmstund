@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.domain.dto.FilmstadenShowingDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.LocalDate
 import java.time.ZoneOffset
-import java.util.*
 
 @Component
 class MovieQueryResolver(private val movieService: MovieService) : GraphQLQueryResolver {
-  fun getMovie(id: UUID) = movieService.getMovie(id)
+  fun getMovie(id: MovieID) = movieService.getMovie(id)
   fun allMovies() = movieService.allMovies()
   fun archivedMovies() = movieService.archivedMovies()
 }

@@ -9,8 +9,10 @@ import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
@@ -151,5 +153,36 @@ class UserIdColumnMapper : ColumnMapper<UserID> {
 class UserIdArgumentFactory : AbstractArgumentFactory<UserID>(Types.OTHER) {
   override fun build(value: UserID?, config: ConfigRegistry?): Argument {
     return Argument { position, statement, _ -> statement.setObject(position, value?.id) }
+  }
+}
+
+class MovieIdColumnMapper : ColumnMapper<MovieID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): MovieID? {
+    return r?.let {
+      val uuid = it.getObject(columnNumber, UUID::class.java)
+        ?: return null
+      return MovieID(uuid)
+    }
+  }
+}
+
+class MovieIdArgumentFactory : AbstractArgumentFactory<MovieID>(Types.OTHER) {
+  override fun build(value: MovieID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setObject(position, value?.id) }
+  }
+}
+
+class FilmstadenNcgIdColumnMapper : ColumnMapper<FilmstadenNcgID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): FilmstadenNcgID? {
+    return r?.let {
+      val value = it.getString(columnNumber)
+      return FilmstadenNcgID.from(value)
+    }
+  }
+}
+
+class FilmstadenNcgIdArgumentFactory : AbstractArgumentFactory<FilmstadenNcgID>(Types.VARCHAR) {
+  override fun build(value: FilmstadenNcgID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setString(position, value?.ncgId) }
   }
 }
