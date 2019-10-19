@@ -8,6 +8,7 @@ import org.jdbi.v3.core.statement.StatementContext
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.FilmstadenShowingID
@@ -217,5 +218,21 @@ class FilmstadenShowingIdColumnMapper : ColumnMapper<FilmstadenShowingID> {
 class FilmstadenShowingIdArgumentFactory : AbstractArgumentFactory<FilmstadenShowingID>(Types.VARCHAR) {
   override fun build(value: FilmstadenShowingID?, config: ConfigRegistry?): Argument {
     return Argument { position, statement, _ -> statement.setString(position, value?.value) }
+  }
+}
+
+class CalendarFeedIdColumnMapper : ColumnMapper<CalendarFeedID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): CalendarFeedID? {
+    return r?.let {
+      val uuid = it.getObject(columnNumber, UUID::class.java)
+        ?: return null
+      return CalendarFeedID(uuid)
+    }
+  }
+}
+
+class CalendarFeedIdArgumentFactory : AbstractArgumentFactory<CalendarFeedID>(Types.OTHER) {
+  override fun build(value: CalendarFeedID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setObject(position, value?.uuid) }
   }
 }

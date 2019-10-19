@@ -12,6 +12,7 @@ import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.FilmstadenShowingID
@@ -55,7 +56,7 @@ fun ThreadLocalRandom.nextUserDTO(
     id = id,
     googleId = GoogleId("gid${nextString(18)}"),
     filmstadenMembershipId = FilmstadenMembershipId.valueOf("${nextString(3)}-${nextString(3)}"),
-    calendarFeedId = UUID.randomUUID(),
+    calendarFeedId = CalendarFeedID.random(),
     firstName = "Fname ${nextString(20)}",
     lastName = "Lname ${nextString(20)}",
     nick = "Nickan ${nextString(20)}",

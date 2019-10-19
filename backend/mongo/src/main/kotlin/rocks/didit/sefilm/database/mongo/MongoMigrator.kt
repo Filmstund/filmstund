@@ -31,6 +31,7 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.FilmstadenNcgID
 import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.GoogleId
@@ -253,7 +254,7 @@ internal class MongoMigrator(
     val user = UserDTO(
       id = newUserId,
       googleId = it.id,
-      calendarFeedId = it.calendarFeedId,
+      calendarFeedId = CalendarFeedID.from(it.calendarFeedId),
       avatar = it.avatar,
       email = it.email,
       firstName = it.firstName ?: "N/A",

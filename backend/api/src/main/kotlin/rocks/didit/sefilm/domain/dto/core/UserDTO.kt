@@ -3,18 +3,17 @@ package rocks.didit.sefilm.domain.dto.core
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.Instant
-import java.util.*
 
 data class UserDTO(
   val id: UserID,
   val googleId: GoogleId? = null,
   val filmstadenMembershipId: FilmstadenMembershipId? = null,
-  // TODO: add domain object
-  val calendarFeedId: UUID? = null,
+  val calendarFeedId: CalendarFeedID? = null,
   val firstName: String = "",
   val lastName: String = "",
   val nick: String = "",

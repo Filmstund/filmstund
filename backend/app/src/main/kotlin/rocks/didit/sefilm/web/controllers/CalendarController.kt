@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import rocks.didit.sefilm.Application
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.services.CalendarService
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 
-@RestController()
+@RestController
 @RequestMapping(CalendarController.PATH)
 class CalendarController(private val calendarService: CalendarService) {
 
@@ -21,7 +21,7 @@ class CalendarController(private val calendarService: CalendarService) {
   }
 
   @GetMapping(FEED_PATH, produces = ["text/calendar; charset=utf-8"])
-  fun calendarFeedForUser(@PathVariable feedId: UUID, req: HttpServletRequest): String {
+  fun calendarFeedForUser(@PathVariable feedId: CalendarFeedID, req: HttpServletRequest): String {
     log.debug("Calendar request from: ${req.remoteAddr}:${req.remotePort} for $feedId")
     return calendarService.getCalendarFeed(feedId).write()
   }

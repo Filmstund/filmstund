@@ -28,6 +28,7 @@ import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.Duration
@@ -53,7 +54,7 @@ class CalendarService(
 
   data class IdAndMail(val id: UserID, val email: String)
 
-  fun getCalendarFeed(userFeedId: UUID): ICalendar {
+  fun getCalendarFeed(userFeedId: CalendarFeedID): ICalendar {
     val (userId, mail) = jdbi.inTransactionUnchecked {
       it.select("SELECT id, email FROM users WHERE calendar_feed_id = ?", userFeedId)
         .mapTo<IdAndMail>()
@@ -69,7 +70,7 @@ class CalendarService(
     return cal
   }
 
-  private fun setupCalendar(id: UUID): ICalendar {
+  private fun setupCalendar(id: CalendarFeedID): ICalendar {
     val calendar = ICalendar()
     calendar.setUid(id.toString())
     calendar.setExperimentalProperty("X-WR-RECALID", id.toString())

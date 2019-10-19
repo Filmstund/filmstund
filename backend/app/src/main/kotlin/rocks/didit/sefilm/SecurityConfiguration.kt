@@ -22,12 +22,12 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
 import java.time.Instant
-import java.util.*
 
 class OpenIdConnectUserDetails(userInfo: Map<String, *>) : UserDetails {
 
@@ -84,7 +84,7 @@ class UserAuthConverter(
     val newUser = UserDTO(
       id = UserID.random(),
       googleId = GoogleId(details.userId),
-      calendarFeedId = UUID.randomUUID(),
+      calendarFeedId = CalendarFeedID.random(),
       firstName = details.firstName ?: "Bosse",
       lastName = details.lastName ?: "Ringholm",
       nick = details.firstName ?: "Houdini",

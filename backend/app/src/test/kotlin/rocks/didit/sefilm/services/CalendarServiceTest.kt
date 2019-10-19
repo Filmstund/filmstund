@@ -16,11 +16,11 @@ import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.UserDao
+import rocks.didit.sefilm.domain.id.CalendarFeedID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -41,7 +41,7 @@ internal class CalendarServiceTest {
 
   @Test
   fun `given no user with calendar feed, when calendar is requested, then a "empty" calendar is returned`() {
-    val userFeedId = UUID.randomUUID()
+    val userFeedId = CalendarFeedID.random()
     val calendar = calendarService.getCalendarFeed(userFeedId)
     assertThat(calendar).isNotNull
     assertThat(calendar.names.size).isEqualTo(1)
