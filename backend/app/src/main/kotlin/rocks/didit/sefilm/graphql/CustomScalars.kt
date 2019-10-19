@@ -11,6 +11,7 @@ import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.id.MovieID
+import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TMDbID
 import java.time.LocalDate
 import java.time.LocalTime
@@ -62,6 +63,31 @@ class CustomScalars {
         override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
           is String -> dataFetcherResult
           is MovieID -> dataFetcherResult.toString()
+          else -> null
+        }
+      })
+      .build()
+  }
+
+  @Bean
+  fun customScalarShowingId(): GraphQLScalarType {
+    return GraphQLScalarType.newScalar()
+      .name("ShowingID")
+      .description("Showing ID")
+      .coercing(object : Coercing<ShowingID, String> {
+        override fun parseLiteral(input: Any?): ShowingID {
+          return when (input) {
+            is StringValue -> ShowingID(UUID.fromString(input.value))
+            is String -> ShowingID(UUID.fromString(input))
+            else -> throw IllegalArgumentException("Unable to parse ShowingID from $input")
+          }
+        }
+
+        override fun parseValue(input: Any?): ShowingID = parseLiteral(input)
+
+        override fun serialize(dataFetcherResult: Any?): String? = when (dataFetcherResult) {
+          is String -> dataFetcherResult
+          is ShowingID -> dataFetcherResult.toString()
           else -> null
         }
       })

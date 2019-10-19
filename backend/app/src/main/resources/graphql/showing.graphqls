@@ -1,5 +1,5 @@
 type Showing {
-    id: UUID!
+    id: ShowingID!
     webId: Base64ID!
     slug: String!
     date: String!

@@ -1,5 +1,6 @@
 scalar UUID
 scalar MovieID
+scalar ShowingID
 scalar Base64ID
 scalar SEK
 scalar LocalDate
