@@ -7,14 +7,25 @@ import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.services.GiftCertificateService
 import rocks.didit.sefilm.services.UserService
 import rocks.didit.sefilm.web.controllers.CalendarController
 
 @Component
-class UserResolver(private val userService: UserService) : GraphQLQueryResolver {
+class UserResolver(
+  private val userService: UserService,
+  private val giftCertificateService: GiftCertificateService
+) : GraphQLQueryResolver {
+
   fun allUsers() = userService.allUsers()
-  /** The currently logged in user */
-  fun currentUser() = userService.getCurrentUser()
+  fun currentUser(): UserDTO {
+    val currentUser = userService.getCurrentUser()
+
+    val giftCertsWithStatus = currentUser.giftCertificates.map { gc ->
+      gc.copy(status = giftCertificateService.getStatusOfTicket(gc))
+    }
+    return currentUser.copy(giftCertificates = giftCertsWithStatus)
+  }
 }
 
 @Component

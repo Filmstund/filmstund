@@ -9,7 +9,7 @@ type CurrentUser {
     phone: String
     avatar: String
     giftCertificates: [GiftCertificate!]
-    calendarFeedId: UUID
+    calendarFeedId: String
     calendarFeedUrl: String
     #notificationSettings: NotificationSettings!
     lastLogin: String!
