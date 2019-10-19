@@ -4,6 +4,8 @@ package rocks.didit.sefilm.graphql
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
+import org.springframework.cache.annotation.CacheConfig
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.dao.ParticipantDao
@@ -43,6 +45,7 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 }
 
 @Component
+@CacheConfig(cacheNames = ["graphql"], cacheManager = "graphQlCacheManager")
 class ShowingResolver(
   private val showingService: ShowingService,
   private val participantDao: ParticipantDao,
@@ -50,21 +53,26 @@ class ShowingResolver(
   private val movieService: MovieService,
   private val ticketService: TicketService
 ) : GraphQLResolver<ShowingDTO> {
+  @Cacheable
   fun admin(showing: ShowingDTO): PublicUserDTO = userService
     .getUser(showing.admin)
     .orElseThrow { NotFoundException("admin user", showing.admin, showing.id) }
 
+  @Cacheable
   fun payToUser(showing: ShowingDTO): PublicUserDTO = userService
     .getUser(showing.payToUser)
     .orElseThrow { NotFoundException("payment receiver user", showing.payToUser, showing.id) }
 
+  @Cacheable
   fun movie(showing: ShowingDTO): MovieDTO = movieService.getMovieOrThrow(showing.movieId)
 
   fun participants(showing: ShowingDTO): List<ParticipantDTO> =
     participantDao.findAllParticipants(showing.id)
 
+  @Cacheable
   fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
+  @Cacheable
   fun ticketRange(showing: ShowingDTO): TicketRange? = ticketService.getTicketRange(showing.id)
 
   fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO? =
