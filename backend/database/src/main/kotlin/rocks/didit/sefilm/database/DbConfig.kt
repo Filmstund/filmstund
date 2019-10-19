@@ -16,6 +16,7 @@ import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.logger
+import java.time.Duration
 import javax.sql.DataSource
 
 @Configuration
@@ -29,7 +30,9 @@ class DbConfig {
   )
   fun sqlLogger() = object : SqlLogger {
     override fun logAfterExecution(context: StatementContext?) {
-      log.info("{}", context?.renderedSql)
+      val duration = Duration.between(context?.executionMoment, context?.completionMoment ?: context?.executionMoment)
+      val msOrNs = if (duration.toMillis() <= 5) "${duration.toNanos()/1000000F}ms" else "${duration.toMillis()}ms"
+      log.info("{}: {}", msOrNs, context?.renderedSql)
     }
   }
 
