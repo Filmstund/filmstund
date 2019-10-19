@@ -12,10 +12,6 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
-  cache:
-    cache-names: filmstadenDates,filmstadenSeatMap,filmstadenShow
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=43200s
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
   datasource:

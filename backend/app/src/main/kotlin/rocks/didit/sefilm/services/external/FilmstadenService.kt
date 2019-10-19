@@ -1,6 +1,7 @@
 package rocks.didit.sefilm.services.external
 
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
@@ -27,6 +28,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 @Service
+@CacheConfig(cacheNames = ["filmstaden"])
 class FilmstadenService(
   private val restTemplate: RestTemplate,
   private val httpEntity: HttpEntity<Void>,
@@ -42,7 +44,7 @@ class FilmstadenService(
     private val log = LoggerFactory.getLogger(FilmstadenService::class.java)
   }
 
-  @Cacheable("filmstadenDates")
+  @Cacheable
   fun getShowingDates(filmstadenId: FilmstadenNcgID, cityAlias: String = "GB"): List<FilmstadenShowingDTO> {
     val startTime = currentDateTimeTruncatedToNearestHalfHour()
       .format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm"))
@@ -61,12 +63,14 @@ class FilmstadenService(
     return responseBody.items.map { FilmstadenShowingDTO.from(it) }.sortedBy { it.timeUtc }
   }
 
+  @Cacheable
   fun getLocationsInCity(cityAlias: String = properties.defaultCity): List<FilmstadenCinemaWithAddressDTO> {
     val uri = UriComponentsBuilder.fromUriString(CINEMA_URL)
       .queryParam("filter.countryAlias", "se")
       .queryParam("filter.cityAlias", cityAlias)
       .build().toUri()
 
+    log.debug("Fetching locations in {} from Filmstaden API", cityAlias)
     val responseBody = restTemplate
       .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<FilmstadenLocationItemsDTO>() {})
       .body ?: throw ExternalProviderException("[Filmstaden] Response body is null")
@@ -74,6 +78,7 @@ class FilmstadenService(
     return responseBody.items
   }
 
+  @Cacheable
   fun fetchExtendedInfo(filmstadenId: FilmstadenNcgID): FilmstadenExtendedMovieDTO? {
     val body = restTemplate.exchange(
       "$API_URL/v2/movie/sv/{filmstadenId}",
@@ -101,6 +106,7 @@ class FilmstadenService(
   }
 
   // https://www.filmstaden.se/api/v2/ticket/Sys99-SE/AA-1034-201708222100/RE-4HMOMOJFKH?imageContentType=webp
+  @Cacheable
   fun fetchTickets(sysId: String, filmstadenShowingId: String, ticketId: String): List<FilmstadenTicketDTO> {
     val url = "$API_URL/v2/ticket/$sysId/$filmstadenShowingId/$ticketId"
 
@@ -111,6 +117,7 @@ class FilmstadenService(
   }
 
   /** Returns base64 encoding jpeg of the ticket */
+  @Cacheable
   fun fetchBarcode(ticketId: String): String {
     val url = "$API_URL/v2/barcode/{ticketId}/128/128"
     log.debug("Fetching barcode from $url")
@@ -132,7 +139,7 @@ class FilmstadenService(
     else -> null
   }
 
-  @Cacheable("filmstadenSeatMap")
+  @Cacheable
   fun getFilmstadenSeatMap(cinemaId: String, screenId: String): List<FilmstadenSeatMapDTO> {
     log.debug("Fetching seat map from $SEAT_MAP_URL with cinemaId=$cinemaId, screenId=$screenId")
     return restTemplate
@@ -147,7 +154,7 @@ class FilmstadenService(
       .body ?: listOf()
   }
 
-  @Cacheable("filmstadenShow")
+  @Cacheable
   fun fetchFilmstadenShow(filmstadenRemoteEntityId: String): FilmstadenShowDTO {
 
     val filmstadenShowItemsDTO = restTemplate
