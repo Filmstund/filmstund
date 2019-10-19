@@ -1,9 +1,11 @@
 package rocks.didit.sefilm.database.dao
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.customizer.Timestamped
 import org.jdbi.v3.sqlobject.statement.SqlBatch
 import org.jdbi.v3.sqlobject.statement.SqlQuery
+import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import java.util.*
 
@@ -39,6 +41,6 @@ interface MovieDao {
   fun updateMovie(@BindBean movie: MovieDTO): MovieDTO?
 
   @Timestamped
-  @SqlQuery("UPDATE movie m SET archived = true, last_modified_date = :now WHERE m.id = :id AND m.last_modified_date = :lastModifiedDate RETURNING *")
-  fun archiveMovie(@BindBean movie: MovieDTO): MovieDTO?
+  @SqlUpdate("UPDATE movie m SET archived = true, last_modified_date = :now WHERE m.id IN (<movieIds>)")
+  fun archiveMovies(@BindList("movieIds") movieIds: List<UUID>): Int
 }

@@ -1,11 +1,15 @@
 package rocks.didit.sefilm.schedulers
 
+import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.useTransactionUnchecked
+import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.repositories.MovieRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
+import rocks.didit.sefilm.database.dao.MovieDao
+import rocks.didit.sefilm.database.dao.ShowingDao
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
@@ -19,9 +23,8 @@ import java.time.LocalDateTime
   havingValue = "true"
 )
 class ScheduledArchiver(
-  private val movieRepository: MovieRepository,
-  showingRepository: ShowingRepository,
-  filmstadenClient: FilmstadenService
+  private val jdbi: Jdbi,
+  filmstadenService: FilmstadenService
 ) {
 
   companion object {
@@ -30,42 +33,43 @@ class ScheduledArchiver(
   }
 
   private val log by logger()
-  private val archiveRules: List<ArchiveRule> = listOf(ReleaseDateAndShowingsRule(showingRepository, filmstadenClient))
+  private val archiveRules: List<ArchiveRule> = listOf(ReleaseDateAndShowingsRule(filmstadenService))
 
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledArchivations() {
-    val archivableMovies = movieRepository.findAll()
-      .filter { it.isScheduledForArchivation() }
-    log.info("[Archiver] Found ${archivableMovies.size} movies scheduled for archivation")
+    jdbi.useTransactionUnchecked { handle ->
+      val movieDao = handle.attach<MovieDao>()
+      val archivableMovies = movieDao.findByArchivedOrderByPopularityDesc(false)
+        .filter { it.isScheduledForArchivation(handle) }
+      log.info("[Archiver] Found ${archivableMovies.size} movies scheduled for archivation")
 
-    archiveMovies(archivableMovies)
-  }
-
-  private fun archiveMovies(movies: List<Movie>) {
-    val prettyPrintMovies = movies.map { "{title: ${it.title}, id: ${it.id}}" }
-    log.debug("[Archiver] Will archive the following movies: $prettyPrintMovies")
-
-    val archivedMovies = movies.map {
-      it.copy(archived = true)
+      archiveMovies(movieDao, archivableMovies)
     }
-    movieRepository.saveAll(archivedMovies)
   }
 
-  private fun Movie.isScheduledForArchivation(): Boolean {
+  private fun archiveMovies(movieDao: MovieDao, movies: List<MovieDTO>) {
+    if (log.isDebugEnabled) {
+      val prettyPrintMovies = movies.map { "{title: ${it.title}, id: ${it.id}}\n" }
+      log.debug("[Archiver] Will archive the following movies: {}", prettyPrintMovies)
+    }
+
+    val archiveMovieIds = movies.map(MovieDTO::id)
+    val archiveMovieCount = movieDao.archiveMovies(archiveMovieIds)
+    log.info("Successfully archived {} movies", archiveMovieCount)
+  }
+
+  private fun MovieDTO.isScheduledForArchivation(handle: Handle): Boolean {
     return archiveRules
-      .map { it.isEligibleForArchivation(this) }
+      .map { it.isEligibleForArchivation(handle, this) }
       .all { it }
   }
 }
 
-private class ReleaseDateAndShowingsRule(
-  private val showingRepository: ShowingRepository,
-  private val filmstadenClient: FilmstadenService
-) : ArchiveRule {
+private class ReleaseDateAndShowingsRule(private val filmstadenService: FilmstadenService) : ArchiveRule {
 
-  override fun isEligibleForArchivation(movie: Movie): Boolean {
+  override fun isEligibleForArchivation(handle: Handle, movie: MovieDTO): Boolean {
     if (movie.isOlderThan(Duration.ofDays(65))) {
-      val hasActiveShowings = movie.hasActiveShowings()
+      val hasActiveShowings = movie.hasActiveShowings(handle)
       if (!hasActiveShowings) {
         return !movie.hasActiveShowingsOnFilmstaden()
       }
@@ -74,25 +78,25 @@ private class ReleaseDateAndShowingsRule(
     return false
   }
 
-  private fun Movie.hasActiveShowings(): Boolean {
-    val showingsForMovie = showingRepository.findByMovieIdOrderByDateDesc(this.id)
-    return showingsForMovie.any {
-      it.date?.isAfter(LocalDate.now()) ?: false
+  private fun MovieDTO.hasActiveShowings(handle: Handle): Boolean {
+    val showingsForMovie = handle.attach<ShowingDao>().findByMovieIdOrderByDateDesc(this.id)
+    val now = LocalDate.now()
+    return showingsForMovie.any { showing ->
+      showing.date.isAfter(now)
     }
   }
 
-  private fun Movie.isOlderThan(maxAge: Duration) =
+  private fun MovieDTO.isOlderThan(maxAge: Duration) =
     Duration.between(this.releaseDate.atTime(0, 0), LocalDateTime.now()) > maxAge
 
-  private fun Movie.hasActiveShowingsOnFilmstaden(): Boolean {
+  private fun MovieDTO.hasActiveShowingsOnFilmstaden(): Boolean {
     if (this.filmstadenId == null) {
       return false
     }
-    return filmstadenClient.getShowingDates(this.filmstadenId!!).isNotEmpty()
+    return filmstadenService.getShowingDates(this.filmstadenId!!).isNotEmpty()
   }
 }
 
 private interface ArchiveRule {
-
-  fun isEligibleForArchivation(movie: Movie): Boolean
+  fun isEligibleForArchivation(handle: Handle, movie: MovieDTO): Boolean
 }

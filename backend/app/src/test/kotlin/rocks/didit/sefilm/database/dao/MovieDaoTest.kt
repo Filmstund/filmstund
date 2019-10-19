@@ -177,18 +177,23 @@ internal class MovieDaoTest {
   }
 
   @Test
-  internal fun `given an unarchived movie, when archiveMovie(), then the movie is archived`() {
+  internal fun `given 3 unarchived movies and 2 archived, when archiveMovies(), then all movies are archived`() {
     databaseTest.start {
       withMovie { it.nextMovie().copy(archived = false) }
+      withMovie { it.nextMovie().copy(archived = false) }
+      withMovie { it.nextMovie().copy(archived = false) }
+      withMovie { it.nextMovie().copy(archived = true) }
+      withMovie { it.nextMovie().copy(archived = true) }
       afterInsert {
-        val movieFromDb = it.movieDao.archiveMovie(movie)
-        assertThat(movieFromDb?.archived)
-          .isNotNull()
-          .isTrue()
-        assertThat(movieFromDb?.lastModifiedDate)
-          .isNotNull()
-          .isAfter(movie.lastModifiedDate)
+        val unarchived = movies.values.filter { m -> !m.archived }.map(MovieDTO::id)
+        val count = it.movieDao.archiveMovies(unarchived)
 
+        assertThat(count).isEqualTo(3)
+
+        movies.keys.forEach { mid ->
+          val m = it.movieDao.findById(mid)
+          assertThat(m?.archived).isTrue()
+        }
       }
     }
   }

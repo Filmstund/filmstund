@@ -84,7 +84,7 @@ interface UserDao {
   @SqlQuery("SELECT exists(SELECT 1 FROM gift_certificate gc WHERE gc.number = :number)")
   fun existGiftCertByNumber(number: TicketNumber): Boolean
 
-  @SqlQuery("select exists(SELECT 1 FROM gift_certificate gc WHERE gc.number in (<numbers>))")
+  @SqlQuery("select exists(SELECT 1 FROM gift_certificate gc WHERE gc.number IN (<numbers>))")
   fun existGiftCertsByNumbers(@BindList("numbers") numbers: List<TicketNumber>): Boolean
 
   @SqlUpdate("DELETE FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
