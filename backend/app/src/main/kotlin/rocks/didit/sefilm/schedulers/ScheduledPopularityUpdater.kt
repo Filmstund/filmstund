@@ -1,17 +1,20 @@
 package rocks.didit.sefilm.schedulers
 
-import org.slf4j.LoggerFactory
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.useTransactionUnchecked
+import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.clients.ImdbClient
-import rocks.didit.sefilm.database.entities.Movie
-import rocks.didit.sefilm.database.repositories.MovieRepository
+import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.domain.IMDbID
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.isSupplied
+import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toImdbId
 import rocks.didit.sefilm.toTmdbId
@@ -27,10 +30,12 @@ import java.util.*
   havingValue = "true"
 )
 class ScheduledPopularityUpdater(
-  private val movieRepository: MovieRepository,
+  private val jdbi: Jdbi,
   private val filmstadenService: FilmstadenService,
   private val imdbClient: ImdbClient
 ) {
+
+  private val log by logger()
 
   companion object {
     private const val INITIAL_UPDATE_DELAY = 10L * 60 * 1000L // 10min
@@ -39,45 +44,48 @@ class ScheduledPopularityUpdater(
     private const val HAS_FILMSTADEN_SHOWINGS_POPULARITY = 500.0
   }
 
-  private val log = LoggerFactory.getLogger(ScheduledPopularityUpdater::class.java)
-
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledMovieUpdates() {
-    val moviesWithOldPopularity = movieRepository
-      .findByArchivedOrderByPopularityDesc()
-      .filter(Movie::isPopularityOutdated)
-    if (moviesWithOldPopularity.isNotEmpty()) {
-      log.info("[Schedule] Updating popularity for ${moviesWithOldPopularity.count()} movies")
-      updatePopularitys(moviesWithOldPopularity)
+    jdbi.useTransactionUnchecked { handle ->
+      val movieDao = handle.attach<MovieDao>()
+
+      val moviesWithOldPopularity = movieDao
+        .findByArchivedOrderByPopularityDesc(false)
+        .filter(MovieDTO::isPopularityOutdated)
+
+      if (moviesWithOldPopularity.isNotEmpty()) {
+        log.info("[Schedule] Updating popularity for ${moviesWithOldPopularity.count()} movies")
+        updatePopularitys(movieDao, moviesWithOldPopularity)
+      }
     }
   }
 
-  fun updatePopularitys(movies: Iterable<Movie>) {
+  fun updatePopularitys(movieDao: MovieDao, movies: Iterable<MovieDTO>) {
     movies.forEach {
       log.info("[Popularity] Updating popularity for '${it.title}' with id=${it.id}")
       try {
-        updatePopularity(it)
+        updatePopularity(movieDao, it)
       } catch (e: ExternalProviderException) {
         log.warn("[Popularity] Provider error: " + e.message)
-        rescheduleNextPopularityUpdate(movie = it)
+        rescheduleNextPopularityUpdate(movieDao, movie = it)
       } catch (e: Exception) {
         log.warn("[Popularity] An error occurred when updating popularity for '${it.title}' ID=${it.id}", e)
       }
-      randomBackoff()
+      randomBackOff()
     }
   }
 
-  private fun randomBackoff() {
+  private fun randomBackOff() {
     val waitTime = 3000L + Random().nextInt(10000)
     try {
       Thread.sleep(waitTime)
     } catch (e: InterruptedException) {
-      log.info("[Popularity] randomBackoff were interrupted")
+      log.info("[Popularity] randomBackOff were interrupted")
       Thread.currentThread().interrupt()
     }
   }
 
-  private fun updatePopularity(movie: Movie) {
+  private fun updatePopularity(movieDao: MovieDao, movie: MovieDTO) {
     val popularityAndId = when {
       movie.tmdbId.isSupplied() -> fetchPopularityByTmdbId(movie)
       movie.imdbId.isSupplied() -> fetchPopularityByImdbId(movie)
@@ -85,7 +93,7 @@ class ScheduledPopularityUpdater(
     }
 
     if (popularityAndId == null) {
-      rescheduleNextPopularityUpdate(movie = movie)
+      rescheduleNextPopularityUpdate(movieDao, movie = movie)
       return
     }
 
@@ -104,22 +112,22 @@ class ScheduledPopularityUpdater(
       imdbId = popularityAndId.imdbId
     )
     log.info("[Popularity] Popularity updated from ${movie.popularity} → ${updatedMovie.popularity} for '${movie.title}'")
-    movieRepository.save(updatedMovie)
+    movieDao.updateMovie(updatedMovie)
   }
 
-  private fun Movie.hasFutureFilmstadenShowings(): Boolean {
+  private fun MovieDTO.hasFutureFilmstadenShowings(): Boolean {
     if (this.filmstadenId.isNullOrBlank()) return false
     return filmstadenService.getShowingDates(this.filmstadenId!!).isNotEmpty()
   }
 
-  private fun rescheduleNextPopularityUpdate(weeks: Long = 4, movie: Movie) {
+  private fun rescheduleNextPopularityUpdate(movieDao: MovieDao, weeks: Long = 4, movie: MovieDTO) {
     log.warn("[Popularity] No info found for movie with ${movie.title} (${movie.id}). Next check in approximately $weeks weeks")
     val updatedMovie =
       movie.copy(popularityLastUpdated = LocalDateTime.now().plusWeeks(weeks).toInstant(ZoneOffset.UTC))
-    movieRepository.save(updatedMovie)
+    movieDao.updateMovie(updatedMovie)
   }
 
-  private fun fetchPopularityByTmdbId(movie: Movie): PopularityAndId? {
+  private fun fetchPopularityByTmdbId(movie: MovieDTO): PopularityAndId? {
     if (!movie.tmdbId.isSupplied()) {
       log.warn("[TMDb][Popularity] Movie[${movie.id} is missing an TMDb id")
       return null
@@ -129,7 +137,7 @@ class ScheduledPopularityUpdater(
     return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())
   }
 
-  private fun fetchPopularityByImdbId(movie: Movie): PopularityAndId? {
+  private fun fetchPopularityByImdbId(movie: MovieDTO): PopularityAndId? {
     if (!movie.imdbId.isSupplied()) {
       log.warn("[IMDb][Popularity] Movie[${movie.id} is missing an IMDb id")
       return null
@@ -144,7 +152,7 @@ class ScheduledPopularityUpdater(
     return PopularityAndId(movieDetails.popularity, movieDetails.id.toTmdbId(), movieDetails.imdb_id.toImdbId())
   }
 
-  private fun fetchPopularityByTitle(movie: Movie): PopularityAndId? {
+  private fun fetchPopularityByTitle(movie: MovieDTO): PopularityAndId? {
     val title = movie.originalTitle ?: movie.title
     val movieResults = imdbClient.search(title)
 
