@@ -60,6 +60,7 @@ class FilmstadenService(
       .exchange(uri, HttpMethod.GET, httpEntity, object : ParameterizedTypeReference<FilmstadenShowItemsDTO>() {})
       .body ?: throw ExternalProviderException("[Filmstaden] Response body is null")
 
+    log.debug("Found {} showings for {} in {}", responseBody.totalNbrOfItems, filmstadenId, cityAlias)
     return responseBody.items.map { FilmstadenShowingDTO.from(it) }.sortedBy { it.timeUtc }
   }
 
