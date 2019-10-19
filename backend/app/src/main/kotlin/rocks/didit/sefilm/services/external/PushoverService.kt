@@ -68,7 +68,7 @@ class PushoverService(
   } ?: throw MissingAPIKeyException(APIService.Pushover)
 
   private fun postToPushover(url: String, payload: PushoverPayload): PushoverResponse {
-    val pushoverResponse = (restTemplate.postForObject<PushoverResponse>(url, payload)
+    val pushoverResponse = (restTemplate.postForObject<PushoverResponse?>(url, payload)
       ?: throw IllegalArgumentException("Got null response when POST:ing to Pushover"))
     log.trace("Pushover response: {}", pushoverResponse)
     return pushoverResponse

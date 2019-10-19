@@ -5,7 +5,6 @@ import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.TicketAlreadyInUserException
 import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.TicketNotFoundException
@@ -57,7 +56,6 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
     }
   }
 
-  @Transactional
   fun deleteTicketFromUser(giftCert: GiftCertificateDTO) {
     jdbi.useTransactionUnchecked {
       val userDao = it.attach(UserDao::class.java)

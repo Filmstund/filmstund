@@ -6,7 +6,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.repositories.ParticipantRepository
+import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
@@ -44,7 +44,7 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 @Component
 class ShowingResolver(
   private val showingService: ShowingService,
-  private val participantRepo: ParticipantRepository,
+  private val participantDao: ParticipantDao,
   private val userService: UserService,
   private val movieService: MovieService,
   private val ticketService: TicketService
@@ -60,7 +60,7 @@ class ShowingResolver(
   fun movie(showing: ShowingDTO): MovieDTO = movieService.getMovieOrThrow(showing.movieId)
 
   fun participants(showing: ShowingDTO): List<ParticipantDTO> =
-    participantRepo.findById_Showing_Id(showing.id).map { it.toDTO() }
+    participantDao.findAllParticipants(showing.id)
 
   // FIXME: remove and rename this to filmstadenShowingId instead
   fun filmstadenRemoteEntityId(showing: ShowingDTO): String? = showing.filmstadenShowingId

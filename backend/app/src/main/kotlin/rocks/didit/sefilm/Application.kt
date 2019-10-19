@@ -16,8 +16,6 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -41,8 +39,6 @@ import rocks.didit.sefilm.web.controllers.CalendarController
 @EnableAsync
 @EnableScheduling
 @EnableConfigurationProperties(Properties::class)
-@EnableJpaRepositories(basePackages = ["rocks.didit.sefilm.database.repositories"])
-@EnableJpaAuditing
 @EnableTransactionManagement
 class Application {
   private val log = LoggerFactory.getLogger(Application::class.java)
@@ -78,7 +74,7 @@ class Application {
   @Bean
   fun getHttpEntityWithJsonAcceptHeader(): HttpEntity<Void> {
     val httpHeaders = HttpHeaders()
-    httpHeaders.accept = listOf(MediaType.APPLICATION_JSON_UTF8)
+    httpHeaders.accept = listOf(MediaType.APPLICATION_JSON)
     httpHeaders["User-Agent"] =
       listOf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     return HttpEntity(httpHeaders)

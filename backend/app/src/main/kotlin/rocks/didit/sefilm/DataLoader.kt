@@ -7,7 +7,6 @@ import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -21,7 +20,6 @@ class DataLoader(
 ) {
   private val log by logger()
 
-  @Transactional
   fun seedInitialData() {
     val objectMapper: ObjectMapper = Jackson2ObjectMapperBuilder.json().build()
 

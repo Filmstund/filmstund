@@ -124,7 +124,7 @@ class Base64IDArgumentFactory : AbstractArgumentFactory<Base64ID>(Types.VARCHAR)
 class SEKColumnMapper : ColumnMapper<SEK> {
   override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): SEK? {
     return r?.let {
-      val value: Long = it.getLong(columnNumber) ?: return null
+      val value: Long = it.getLong(columnNumber)
       return SEK(value)
     }
   }

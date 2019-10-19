@@ -19,7 +19,6 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
@@ -57,7 +56,6 @@ class UserAuthConverter(
 ) : UserAuthenticationConverter {
   private val log by logger()
 
-  @Transactional
   override fun extractAuthentication(map: Map<String, *>): Authentication? {
     return jdbi.inTransactionUnchecked {
       val userDao = it.attach(UserDao::class.java)
