@@ -17,7 +17,6 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.id.Base64ID
-import rocks.didit.sefilm.domain.id.FilmstadenShowingID
 import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.orElseThrow
@@ -63,9 +62,6 @@ class ShowingResolver(
 
   fun participants(showing: ShowingDTO): List<ParticipantDTO> =
     participantDao.findAllParticipants(showing.id)
-
-  // FIXME: remove and rename this to filmstadenShowingId instead
-  fun filmstadenRemoteEntityId(showing: ShowingDTO): FilmstadenShowingID? = showing.filmstadenShowingId
 
   fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
