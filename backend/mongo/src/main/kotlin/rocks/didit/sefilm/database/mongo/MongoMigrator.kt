@@ -83,7 +83,7 @@ internal class MongoMigrator(
             webId = it.webId,
             filmstadenShowingId = FilmstadenShowingID.from(it.filmstadenRemoteEntityId),
             slug = it.slug,
-            date = it.date ?: LocalDate.EPOCH,
+            date = it.date ?: LocalDate.ofEpochDay(0),
             time = it.time ?: LocalTime.MIDNIGHT,
             movieId = MovieID(it.movie.id),
             movieTitle = it.movie.title,

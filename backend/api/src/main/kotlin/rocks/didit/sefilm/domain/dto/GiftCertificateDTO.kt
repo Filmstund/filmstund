@@ -7,10 +7,10 @@ import java.time.LocalDate
 data class GiftCertificateDTO(
   val userId: UserID,
   val number: TicketNumber,
-  val expiresAt: LocalDate = LocalDate.EPOCH,
+  val expiresAt: LocalDate = LocalDate.ofEpochDay(0),
   val status: Status = Status.UNKNOWN
 ) {
-  constructor(userId: UserID, number: TicketNumber) : this(userId, number, LocalDate.EPOCH, Status.UNKNOWN)
+  constructor(userId: UserID, number: TicketNumber) : this(userId, number, LocalDate.ofEpochDay(0), Status.UNKNOWN)
   constructor(userId: UserID, number: TicketNumber, expiresAt: LocalDate) : this(
     userId,
     number,
