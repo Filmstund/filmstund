@@ -16,6 +16,7 @@ import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.UserDao
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
@@ -51,7 +52,7 @@ internal class CalendarServiceTest {
 
   @Test
   internal fun `given a user with no showings, when calendar is requested, then a  "empty" calendar is returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId)
 
     jdbi.useTransactionUnchecked {

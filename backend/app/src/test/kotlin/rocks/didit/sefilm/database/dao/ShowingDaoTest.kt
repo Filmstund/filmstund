@@ -15,11 +15,11 @@ import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
 import java.time.LocalDate
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -194,20 +194,20 @@ internal class ShowingDaoTest {
       val dbShowing = showingDao.findById(rndShowing.id)
 
       assertThat(dbShowing?.admin)
-        .isNotNull()
+        .isNotNull
         .isEqualTo(rndAdmin.id)
       assertThat(dbShowing?.payToUser)
-        .isNotNull()
+        .isNotNull
         .isEqualTo(rndAdmin.id)
       assertThat(showingDao.promoteNewUserToAdmin(rndShowing.id, rndAdmin.id, rndNewAdmin.id))
         .isTrue()
       val dbShowingUpdated = showingDao.findById(rndShowing.id)
       assertThat(dbShowingUpdated?.admin)
-        .isNotNull()
+        .isNotNull
         .isNotEqualTo(rndAdmin.id)
         .isEqualTo(rndNewAdmin.id)
       assertThat(dbShowingUpdated?.payToUser)
-        .isNotNull()
+        .isNotNull
         .isEqualTo(rndNewAdmin.id)
       assertThat(dbShowingUpdated?.lastModifiedDate)
         .isAfter(rndShowing.lastModifiedDate)
@@ -235,17 +235,17 @@ internal class ShowingDaoTest {
 
       val dbShowing = showingDao.findById(rndShowing.id)
 
-      assertThat(dbShowing?.admin).isNotNull().isEqualTo(rndAdmin.id)
-      assertThat(dbShowing?.payToUser).isNotNull().isEqualTo(rndAdmin.id)
-      assertThat(showingDao.promoteNewUserToAdmin(rndShowing.id, UUID.randomUUID(), rndNewAdmin.id))
+      assertThat(dbShowing?.admin).isNotNull.isEqualTo(rndAdmin.id)
+      assertThat(dbShowing?.payToUser).isNotNull.isEqualTo(rndAdmin.id)
+      assertThat(showingDao.promoteNewUserToAdmin(rndShowing.id, UserID.random(), rndNewAdmin.id))
         .isFalse()
       val dbShowingUpdated = showingDao.findById(rndShowing.id)
       assertThat(dbShowingUpdated?.admin)
-        .isNotNull()
+        .isNotNull
         .isNotEqualTo(rndNewAdmin.id)
         .isEqualTo(rndAdmin.id)
       assertThat(dbShowingUpdated?.payToUser)
-        .isNotNull()
+        .isNotNull
         .isEqualTo(rndAdmin.id)
     }
   }

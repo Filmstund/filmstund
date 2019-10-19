@@ -30,6 +30,7 @@ import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -60,7 +61,7 @@ class ShowingService(
   fun getShowingByMovie(movieId: UUID): List<ShowingDTO> = onDemandShowingDao
     .findByMovieIdOrderByDateDesc(movieId)
 
-  fun getShowingByUser(userId: UUID): List<ShowingDTO> = onDemandShowingDao.findByAdminOrParticipant(userId)
+  fun getShowingByUser(userId: UserID): List<ShowingDTO> = onDemandShowingDao.findByAdminOrParticipant(userId)
 
   fun getShowingsAfterDate(afterDate: LocalDate = LocalDate.MIN): List<ShowingDTO> =
     onDemandShowingDao.findByDateAfterOrderByDateDesc(afterDate)
@@ -95,7 +96,7 @@ class ShowingService(
   fun getAttendeePaymentDetails(showingId: UUID): AttendeePaymentDetailsDTO? =
     getAttendeePaymentDetailsForUser(currentLoggedInUser().id, showingId)
 
-  fun getAttendeePaymentDetailsForUser(userId: UUID, showingId: UUID): AttendeePaymentDetailsDTO? {
+  fun getAttendeePaymentDetailsForUser(userId: UserID, showingId: UUID): AttendeePaymentDetailsDTO? {
     return jdbi.inTransactionUnchecked {
       val showing = getShowingOrThrow(showingId)
       // Only really needed if at least one participant wants to pay via slack...
@@ -274,7 +275,7 @@ class ShowingService(
 
   private fun createParticipantBasedOnPaymentType(
     paymentOption: PaymentOption,
-    userId: UUID,
+    userId: UserID,
     showing: ShowingDTO
   ): ParticipantDTO =
     when (paymentOption.type) {
@@ -304,7 +305,7 @@ class ShowingService(
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
   private fun CreateShowingDTO.toShowing(
-    adminId: UUID,
+    adminId: UserID,
     movieId: UUID,
     movieTitle: String,
     cinemaScreen: FilmstadenScreenDTO?

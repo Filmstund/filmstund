@@ -1,10 +1,10 @@
 package rocks.didit.sefilm.domain.dto
 
 import rocks.didit.sefilm.domain.PhoneNumber
-import java.util.*
+import rocks.didit.sefilm.domain.id.UserID
 
 data class PublicUserDTO(
-  val id: UUID,
+  val id: UserID,
   val firstName: String? = null,
   val lastName: String? = null,
   val nick: String? = null,
@@ -12,7 +12,7 @@ data class PublicUserDTO(
   val avatar: String? = null
 ) {
   constructor(
-    id: UUID,
+    id: UserID,
     firstName: String?,
     lastName: String?,
     nick: String?,

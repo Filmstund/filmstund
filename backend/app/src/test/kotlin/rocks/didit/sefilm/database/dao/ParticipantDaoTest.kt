@@ -14,6 +14,7 @@ import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextMovie
 import rocks.didit.sefilm.nextParticipant
@@ -39,7 +40,7 @@ internal class ParticipantDaoTest {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
-      val userId = UUID.randomUUID()
+      val userId = UserID.random()
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
@@ -123,7 +124,7 @@ internal class ParticipantDaoTest {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
-      val userId = UUID.randomUUID()
+      val userId = UserID.random()
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
@@ -174,7 +175,7 @@ internal class ParticipantDaoTest {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
-      val userId = UUID.randomUUID()
+      val userId = UserID.random()
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
@@ -202,7 +203,7 @@ internal class ParticipantDaoTest {
       val updatedParticipant = participantDao.updatePaymentStatus(
         firstParticipant.userId,
         firstParticipant.showingId,
-        UUID.randomUUID(),
+        UserID.random(),
         true,
         SEK(1337)
       )
@@ -225,7 +226,7 @@ internal class ParticipantDaoTest {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
-      val userId = UUID.randomUUID()
+      val userId = UserID.random()
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
@@ -277,14 +278,14 @@ internal class ParticipantDaoTest {
     databaseTest.start {
       withShowing()
       withParticipantsAndUsers(20) {
-        val userId = UUID.randomUUID()
+        val userId = UserID.random()
         val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
         val participant =
           it.nextParticipant(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = it.nextBoolean())
         Pair(user, participant)
       }
       withParticipantsAndUsers(5) {
-        val user = it.nextUserDTO(UUID.randomUUID(), listOf())
+        val user = it.nextUserDTO(UserID.random(), listOf())
         val participant = it.nextParticipant(user.id, showing.id).copy(hasPaid = false)
         Pair(user, participant)
       }

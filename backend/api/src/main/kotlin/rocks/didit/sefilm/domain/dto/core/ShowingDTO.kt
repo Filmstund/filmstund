@@ -1,9 +1,10 @@
 package rocks.didit.sefilm.domain.dto.core
 
-import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,8 +24,8 @@ data class ShowingDTO(
   val cinemaScreen: FilmstadenLiteScreenDTO? = null,
   val price: SEK? = SEK.ZERO,
   val ticketsBought: Boolean = false,
-  val admin: UUID,
-  val payToUser: UUID,
+  val admin: UserID,
+  val payToUser: UserID,
   val payToPhone: PhoneNumber? = null,
   val lastModifiedDate: Instant = Instant.now(),
   val createdDate: Instant = Instant.now()

@@ -2,6 +2,7 @@ package rocks.didit.sefilm.notification
 
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.DeletedShowingEvent
 import rocks.didit.sefilm.events.NewShowingEvent
 import rocks.didit.sefilm.events.NotificationEvent
@@ -12,7 +13,6 @@ import rocks.didit.sefilm.events.UserAttendedEvent
 import rocks.didit.sefilm.events.UserUnattendedEvent
 import rocks.didit.sefilm.notification.providers.NotifiableUser
 import rocks.didit.sefilm.services.UserService
-import java.util.*
 import kotlin.reflect.KClass
 
 @Service
@@ -22,7 +22,7 @@ class ProviderHelper(
 ) {
 
   fun <T : ProviderSettings> getNotifiableUsers(
-    knownRecipients: List<UUID>,
+    knownRecipients: List<UserID>,
     wantedSettingsType: KClass<T>
   ): List<NotifiableUser<T>> = emptyList() /*{
     return userService.getUsersThatWantToBeNotified(knownRecipients).mapNotNull {

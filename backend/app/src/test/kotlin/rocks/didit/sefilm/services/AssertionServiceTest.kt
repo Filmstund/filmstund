@@ -20,6 +20,7 @@ import rocks.didit.sefilm.TicketsAlreadyBoughtException
 import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextParticipant
 import rocks.didit.sefilm.nextShowing
@@ -43,7 +44,7 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a showing with bought tickets, when assertTicketsNotBought(), then an exception is thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), UUID.randomUUID()).copy(ticketsBought = true)
+    val showing = rnd.nextShowing(UUID.randomUUID(), UserID.random()).copy(ticketsBought = true)
     val e = assertThrows<TicketsAlreadyBoughtException> {
       assertionService.assertTicketsNotBought(showing.admin, showing)
     }
@@ -52,14 +53,14 @@ internal class AssertionServiceTest {
 
   @Test
   internal fun `given a showing hasnt been bought, when assertTicketsNotBought(), then an exception is not thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), UUID.randomUUID()).copy(ticketsBought = false)
+    val showing = rnd.nextShowing(UUID.randomUUID(), UserID.random()).copy(ticketsBought = false)
     assertionService.assertTicketsNotBought(showing.admin, showing)
   }
 
   @Test
   @WithLoggedInUser
   internal fun `given a showing where current user is not admin, then assertLoggedInUserIsAdmin(), then an exception is thrown`() {
-    val showing = rnd.nextShowing(UUID.randomUUID(), UUID.randomUUID())
+    val showing = rnd.nextShowing(UUID.randomUUID(), UserID.random())
     val e = assertThrows<AccessDeniedException> {
       assertionService.assertLoggedInUserIsAdmin(showing)
     }
@@ -117,7 +118,7 @@ internal class AssertionServiceTest {
   internal fun `given an expired gift cert, when assertGiftCertIsUsable(), then an exception is thrown`() {
     databaseTest.start {
       withUser {
-        val userId = UUID.randomUUID()
+        val userId = UserID.random()
         it.nextUserDTO(userId, listOf(it.nextGiftCert(userId).copy(expiresAt = LocalDate.now().plusDays(9))))
       }
       withMovie()
@@ -136,7 +137,7 @@ internal class AssertionServiceTest {
   internal fun `given a used gift cert, when assertGiftCertIsUsable(), then an exception is thrown`() {
     databaseTest.start {
       withUser {
-        val userId = UUID.randomUUID()
+        val userId = UserID.random()
         it.nextUserDTO(userId, listOf(it.nextGiftCert(userId).copy(expiresAt = LocalDate.now().plusDays(10))))
       }
       withMovie()

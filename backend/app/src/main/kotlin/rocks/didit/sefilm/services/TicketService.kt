@@ -8,13 +8,14 @@ import rocks.didit.sefilm.Daos
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.TicketDao
-import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toDaos
@@ -118,7 +119,7 @@ class TicketService(
     daos.ticketDao.insertTickets(tickets)
   }
 
-  private fun getUserIdFromFilmstadenId(daos: Daos, filmstadenId: FilmstadenMembershipId, showing: ShowingDTO): UUID {
+  private fun getUserIdFromFilmstadenId(daos: Daos, filmstadenId: FilmstadenMembershipId, showing: ShowingDTO): UserID {
     val userIdForThatMember = daos.userDao.findIdByFilmstadenId(filmstadenId)
       ?: return showing.admin
 
@@ -162,7 +163,7 @@ class TicketService(
     }
   }
 
-  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UUID, barcode: String): TicketDTO {
+  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UserID, barcode: String): TicketDTO {
     return TicketDTO(
       id = id,
       showingId = showingId,

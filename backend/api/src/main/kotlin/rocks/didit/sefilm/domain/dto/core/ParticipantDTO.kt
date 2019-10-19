@@ -5,22 +5,23 @@ import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
+import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
 class PublicParticipantDTO(
-  val userId: UUID,
+  val userId: UserID,
   val showingId: UUID,
   val userInfo: PublicUserDTO
 ) {
   constructor(
-    userId: UUID, showingId: UUID, firstName: String?, lastName: String?, nick: String?, phone: String?, avatar: String?
+    userId: UserID, showingId: UUID, firstName: String?, lastName: String?, nick: String?, phone: String?, avatar: String?
   ) : this(userId, showingId,
     PublicUserDTO(userId, firstName, lastName, nick, phone, avatar)
   )
 }
 
 data class ParticipantDTO(
-  val userId: UUID,
+  val userId: UserID,
   val showingId: UUID,
   @Nested("u")
   val userInfo: PublicUserDTO = PublicUserDTO(userId),

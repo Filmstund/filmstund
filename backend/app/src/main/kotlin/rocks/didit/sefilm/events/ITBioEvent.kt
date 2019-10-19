@@ -5,12 +5,12 @@ import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.notification.NotificationType
-import java.util.*
 
 sealed class ITBioEvent(src: Any) : ApplicationEvent(src)
 
-sealed class NotificationEvent(src: Any, val potentialRecipients: List<UUID> = listOf(), val type: NotificationType) :
+sealed class NotificationEvent(src: Any, val potentialRecipients: List<UserID> = listOf(), val type: NotificationType) :
   ITBioEvent(src)
 
 /** If {@link #potentialRecipients} is empty, all users will be potential recipients */
@@ -21,7 +21,7 @@ sealed class ShowingEvent(
   val admin: UserDTO,
   val triggeredBy: UserDTO,
   satisfiesType: NotificationType,
-  potentialRecipients: List<UUID> = listOf()
+  potentialRecipients: List<UserID> = listOf()
 ) : NotificationEvent(src, potentialRecipients, satisfiesType)
 
 class NewShowingEvent(src: Any, showing: ShowingDTO, movie: MovieDTO, admin: UserDTO, triggeredBy: UserDTO) :

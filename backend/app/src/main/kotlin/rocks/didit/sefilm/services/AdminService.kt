@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
 @Service
 class AdminService(private val jdbi: Jdbi) {
 
-  fun promoteToAdmin(showingId: UUID, userIdToPromote: UUID): ShowingDTO {
+  fun promoteToAdmin(showingId: UUID, userIdToPromote: UserID): ShowingDTO {
     return jdbi.inTransactionUnchecked {
       val showingDao = it.attach(ShowingDao::class.java)
 

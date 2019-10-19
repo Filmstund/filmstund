@@ -15,6 +15,7 @@ import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
 interface UserDao {
@@ -23,13 +24,13 @@ interface UserDao {
 
   @SqlQuery("SELECT * FROM users u LEFT JOIN gift_certificate gc on u.id = gc.user_id WHERE u.id = :userId")
   @UseRowReducer(UserGiftCertReducer::class)
-  fun findById(userId: UUID): UserDTO?
+  fun findById(userId: UserID): UserDTO?
 
   @SqlQuery("SELECT id FROM users WHERE google_id = :googleId")
-  fun findIdByGoogleId(googleId: GoogleId): UUID?
+  fun findIdByGoogleId(googleId: GoogleId): UserID?
 
   @SqlQuery("SELECT id FROM users WHERE filmstaden_id = :filmstadenId")
-  fun findIdByFilmstadenId(filmstadenId: FilmstadenMembershipId): UUID?
+  fun findIdByFilmstadenId(filmstadenId: FilmstadenMembershipId): UserID?
 
   @SqlQuery("SELECT * FROM users u LEFT JOIN gift_certificate gc on u.id = gc.user_id")
   @UseRowReducer(UserGiftCertReducer::class)
@@ -39,16 +40,16 @@ interface UserDao {
   fun findAllPublicUsers(): List<PublicUserDTO>
 
   @SqlQuery("SELECT u.id, u.first_name, u.last_name, u.nick, u.phone, u.avatar FROM users u WHERE u.id = :userId")
-  fun findPublicUserById(userId: UUID): PublicUserDTO?
+  fun findPublicUserById(userId: UserID): PublicUserDTO?
 
   @SqlQuery("SELECT u.id, u.first_name, u.last_name, u.nick, u.phone, u.avatar FROM users u WHERE u.google_id = :googleId")
   fun findPublicUserByGoogleId(googleId: GoogleId): PublicUserDTO?
 
   @SqlQuery("SELECT exists(SELECT 1 FROM users where id = :userId)")
-  fun existsById(userId: UUID): Boolean
+  fun existsById(userId: UserID): Boolean
 
   @SqlQuery("SELECT exists(SELECT 1 FROM users where google_id = :googleId)")
-  fun existsByGoogleId(googleId: String): Boolean
+  fun existsByGoogleId(googleId: GoogleId): Boolean
 
   @SqlUpdate("INSERT INTO users (id, google_id, filmstaden_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, last_modified_date) VALUES (:id, :googleId, :filmstadenId, :firstName, :lastName, :nick, :email, :phone, :avatar, :calendarFeedId, :lastLogin, :lastModifiedDate)")
   fun insertUser(@BindBean user: UserDTO)
@@ -62,12 +63,12 @@ interface UserDao {
 
   @SqlUpdate("UPDATE users SET first_name = :firstName, last_name = :lastName, avatar = :avatar, last_login = :now, last_modified_date = :now WHERE id = :userId")
   @Timestamped
-  fun updateUserOnLogin(userId: UUID, firstName: String, lastName: String, avatar: String?): Boolean
+  fun updateUserOnLogin(userId: UserID, firstName: String, lastName: String, avatar: String?): Boolean
 
   @SqlUpdate("UPDATE users SET filmstaden_id = :filmstadenMembershipId, phone = :phoneNumber, nick = :nick, last_modified_date = :now WHERE id = :userId")
   @Timestamped
   fun updateUser(
-    userId: UUID, filmstadenMembershipId: FilmstadenMembershipId?, phoneNumber: PhoneNumber?, nick: String
+    userId: UserID, filmstadenMembershipId: FilmstadenMembershipId?, phoneNumber: PhoneNumber?, nick: String
   ): Boolean
 
   @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at) VALUES (:userId, :number, :expiresAt)")
@@ -76,10 +77,10 @@ interface UserDao {
   fun insertGiftCertificate(giftCert: GiftCertificateDTO) = insertGiftCertificates(listOf(giftCert))
 
   @SqlQuery("SELECT * FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
-  fun findGiftCertByUserAndNumber(userId: UUID, number: TicketNumber): GiftCertificateDTO?
+  fun findGiftCertByUserAndNumber(userId: UserID, number: TicketNumber): GiftCertificateDTO?
 
   @SqlQuery("SELECT * FROM gift_certificate gc WHERE gc.user_id = :userId")
-  fun findGiftCertByUser(userId: UUID): List<GiftCertificateDTO>
+  fun findGiftCertByUser(userId: UserID): List<GiftCertificateDTO>
 
   @SqlQuery("SELECT exists(SELECT 1 FROM gift_certificate gc WHERE gc.number = :number)")
   fun existGiftCertByNumber(number: TicketNumber): Boolean
@@ -89,6 +90,6 @@ interface UserDao {
 
   @SqlUpdate("DELETE FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
   // This will also cascade set null on the Participant table if the ticket has been used in a showing
-  fun deleteGiftCertByUserAndNumber(userId: UUID, number: TicketNumber): Boolean
+  fun deleteGiftCertByUserAndNumber(userId: UserID, number: TicketNumber): Boolean
 
 }

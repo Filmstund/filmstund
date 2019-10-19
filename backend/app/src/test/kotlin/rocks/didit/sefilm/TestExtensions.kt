@@ -1,14 +1,8 @@
 package rocks.didit.sefilm
 
 import org.assertj.core.api.ObjectAssert
-import rocks.didit.sefilm.domain.id.Base64ID
-import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.id.GoogleId
-import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.id.TMDbID
-import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
@@ -17,6 +11,13 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
+import rocks.didit.sefilm.domain.id.TicketNumber
+import rocks.didit.sefilm.domain.id.UserID
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
@@ -26,7 +27,7 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 fun ThreadLocalRandom.nextUserDTO(
-  id: UUID = UUID.randomUUID(),
+  id: UserID = UserID.random(),
   giftCerts: List<GiftCertificateDTO> = emptyList()
 ): UserDTO {
   return UserDTO(
@@ -52,13 +53,13 @@ fun ThreadLocalRandom.nextUserDTO(
   )
 }
 
-fun ThreadLocalRandom.nextGiftCert(userId: UUID): GiftCertificateDTO {
+fun ThreadLocalRandom.nextGiftCert(userId: UserID): GiftCertificateDTO {
   return GiftCertificateDTO(userId,
     TicketNumber("${this.nextLong(10000000000, 99999999999)}")
   )
 }
 
-fun ThreadLocalRandom.nextGiftCerts(userId: UUID, bound: Int = 10): List<GiftCertificateDTO> = (0..bound).map {
+fun ThreadLocalRandom.nextGiftCerts(userId: UserID, bound: Int = 10): List<GiftCertificateDTO> = (0..bound).map {
   this.nextGiftCert(userId)
 }
 
@@ -108,7 +109,7 @@ fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
 fun ThreadLocalRandom.nextCinemaScreen() =
   FilmstadenLiteScreenDTO("NCG${nextLong(1000, 10000000)}", "Salong ${nextInt(1, 100)}")
 
-fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UUID): ShowingDTO {
+fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UserID): ShowingDTO {
   return ShowingDTO(
     id = UUID.randomUUID(),
     webId = Base64ID.random(),
@@ -130,7 +131,7 @@ fun ThreadLocalRandom.nextShowing(movieId: UUID, adminId: UUID): ShowingDTO {
 }
 
 fun ThreadLocalRandom.nextParticipant(
-  userId: UUID,
+  userId: UserID,
   showingId: UUID,
   ticketNumber: TicketNumber? = null
 ): ParticipantDTO {
@@ -148,7 +149,7 @@ fun ThreadLocalRandom.nextParticipant(
   )
 }
 
-fun ThreadLocalRandom.nextTicket(showingId: UUID, assignedToUser: UUID): TicketDTO {
+fun ThreadLocalRandom.nextTicket(showingId: UUID, assignedToUser: UserID): TicketDTO {
   return TicketDTO(
     id = "id${nextLong(0, 10000000)}",
     showingId = showingId,

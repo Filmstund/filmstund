@@ -31,6 +31,7 @@ import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
 import rocks.didit.sefilm.isRoughlyEqualToShowing
 import rocks.didit.sefilm.nextGiftCert
@@ -449,14 +450,14 @@ internal class ShowingServiceTest {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       withParticipantsAndUsers(5) {
-        val userId = UUID.randomUUID()
+        val userId = UserID.random()
         val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
         val participant =
           it.nextParticipant(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = false)
         Pair(user, participant)
       }
       withParticipantsAndUsers(5) {
-        val user = it.nextUserDTO(UUID.randomUUID(), listOf())
+        val user = it.nextUserDTO(UserID.random(), listOf())
         val participant = it.nextParticipant(user.id, showing.id).copy(hasPaid = false)
         Pair(user, participant)
       }

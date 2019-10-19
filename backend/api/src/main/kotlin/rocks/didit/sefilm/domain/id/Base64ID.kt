@@ -31,9 +31,7 @@ data class Base64ID(val id: String = MISSING_VALUE) {
   }
 
   init {
-    if (id.isBlank()) {
-      throw IllegalArgumentException("ID may not be blank")
-    }
+    require(id.isNotBlank()) { "ID may not be blank" }
   }
 
   @JsonValue

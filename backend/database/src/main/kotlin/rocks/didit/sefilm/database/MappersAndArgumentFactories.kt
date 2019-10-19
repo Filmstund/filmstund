@@ -5,16 +5,18 @@ import org.jdbi.v3.core.argument.Argument
 import org.jdbi.v3.core.config.ConfigRegistry
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
+import rocks.didit.sefilm.domain.PhoneNumber
+import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.id.IMDbID
-import rocks.didit.sefilm.domain.PhoneNumber
-import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.id.TicketNumber
+import rocks.didit.sefilm.domain.id.UserID
 import java.sql.ResultSet
 import java.sql.Types
+import java.util.*
 
 class FilmstadenMembershipIdColumnMapper : ColumnMapper<FilmstadenMembershipId> {
   override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): FilmstadenMembershipId? {
@@ -133,5 +135,21 @@ class SEKColumnMapper : ColumnMapper<SEK> {
 class SEKArgumentFactory : AbstractArgumentFactory<SEK>(Types.INTEGER) {
   override fun build(value: SEK?, config: ConfigRegistry?): Argument {
     return Argument { position, statement, _ -> statement.setLong(position, value?.ören ?: 0L) }
+  }
+}
+
+class UserIdColumnMapper : ColumnMapper<UserID> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): UserID? {
+    return r?.let {
+      val uuid = it.getObject(columnNumber, UUID::class.java)
+        ?: return null
+      return UserID(uuid)
+    }
+  }
+}
+
+class UserIdArgumentFactory : AbstractArgumentFactory<UserID>(Types.OTHER) {
+  override fun build(value: UserID?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setObject(position, value?.id) }
   }
 }

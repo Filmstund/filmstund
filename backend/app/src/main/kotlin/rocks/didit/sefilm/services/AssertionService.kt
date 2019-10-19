@@ -12,9 +12,10 @@ import rocks.didit.sefilm.TicketExpiredException
 import rocks.didit.sefilm.TicketNotFoundException
 import rocks.didit.sefilm.TicketsAlreadyBoughtException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.TicketNumber
+import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
 @Service
@@ -23,20 +24,20 @@ class AssertionService(
   private val giftCertService: GiftCertificateService
 ) {
 
-  fun assertTicketsNotBought(userID: UUID, showing: ShowingDTO) {
+  fun assertTicketsNotBought(userID: UserID, showing: ShowingDTO) {
     if (showing.ticketsBought) {
       throw TicketsAlreadyBoughtException(userID, showing.id)
     }
   }
 
   fun assertLoggedInUserIsAdmin(showing: ShowingDTO) = assertLoggedInUserIsAdmin(showing.admin)
-  fun assertLoggedInUserIsAdmin(showingAdmin: UUID) {
+  fun assertLoggedInUserIsAdmin(showingAdmin: UserID) {
     if (currentLoggedInUser().id != showingAdmin) {
       throw AccessDeniedException("Only the showing admin is allowed to do that")
     }
   }
 
-  fun assertUserHasPhoneNumber(userID: UUID) {
+  fun assertUserHasPhoneNumber(userID: UserID) {
     val hasPhone = jdbi.withHandleUnchecked {
       it.select("SELECT exists(SELECT 1 FROM users WHERE id = ? AND (phone = '') IS FALSE)", userID)
         .mapTo<Boolean>().one()
@@ -46,7 +47,7 @@ class AssertionService(
     }
   }
 
-  fun assertGiftCertIsUsable(userId: UUID, suppliedTicket: TicketNumber, showing: ShowingDTO) {
+  fun assertGiftCertIsUsable(userId: UserID, suppliedTicket: TicketNumber, showing: ShowingDTO) {
     val matchingTicket = giftCertService.getGiftCertByUserIdAndNUmber(userId, suppliedTicket)
       ?: throw TicketNotFoundException(suppliedTicket)
 

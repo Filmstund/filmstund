@@ -23,6 +23,7 @@ import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextMovie
@@ -46,7 +47,7 @@ internal class GiftCertificateServiceTest {
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   private fun insertRandomParticipant(
-    userId: UUID = UUID.randomUUID(),
+    userId: UserID = UserID.random(),
     hasPaid: Boolean = false,
     skipGiftCert: Boolean = false
   ): Pair<ParticipantDTO, GiftCertificateDTO> {
@@ -120,7 +121,7 @@ internal class GiftCertificateServiceTest {
 
   @Test
   internal fun `given a gift cert, when gift cert expire_at is in the past, then status of the gift cert is expired`() {
-    val giftCertYesterday = rnd.nextGiftCert(UUID.randomUUID()).copy(expiresAt = LocalDate.now().minusDays(1))
+    val giftCertYesterday = rnd.nextGiftCert(UserID.random()).copy(expiresAt = LocalDate.now().minusDays(1))
 
     assertThat(giftCertificateService.getStatusOfTicket(giftCertYesterday))
       .isEqualTo(GiftCertificateDTO.Status.EXPIRED)
@@ -128,7 +129,7 @@ internal class GiftCertificateServiceTest {
 
   @Test
   internal fun `given a gift cert, when gift cert expire_at is today, then status of the gift cert is expired`() {
-    val giftCertToday = rnd.nextGiftCert(UUID.randomUUID()).copy(expiresAt = LocalDate.now())
+    val giftCertToday = rnd.nextGiftCert(UserID.random()).copy(expiresAt = LocalDate.now())
 
     assertThat(giftCertificateService.getStatusOfTicket(giftCertToday))
       .isEqualTo(GiftCertificateDTO.Status.EXPIRED)
@@ -136,7 +137,7 @@ internal class GiftCertificateServiceTest {
 
   @Test
   internal fun `given a gift cert, when gift cert expire_at is tomorrow, then the gift cert status is not expired`() {
-    val giftCertTomorrow = rnd.nextGiftCert(UUID.randomUUID()).copy(expiresAt = LocalDate.now().plusDays(1))
+    val giftCertTomorrow = rnd.nextGiftCert(UserID.random()).copy(expiresAt = LocalDate.now().plusDays(1))
 
     assertThat(giftCertificateService.getStatusOfTicket(giftCertTomorrow))
       .isNotEqualTo(GiftCertificateDTO.Status.EXPIRED)

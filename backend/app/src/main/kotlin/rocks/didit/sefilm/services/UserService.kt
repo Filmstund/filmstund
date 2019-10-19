@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.maybeCurrentLoggedInUser
 import java.time.Instant
@@ -28,8 +29,8 @@ class UserService(
   private val log by logger()
 
   fun allUsers(): List<PublicUserDTO> = userDao.findAllPublicUsers()
-  fun getUser(id: UUID): PublicUserDTO? = userDao.findPublicUserById(id)
-  fun getUserOrThrow(id: UUID): PublicUserDTO = getUser(id)
+  fun getUser(id: UserID): PublicUserDTO? = userDao.findPublicUserById(id)
+  fun getUserOrThrow(id: UserID): PublicUserDTO = getUser(id)
     ?: throw NotFoundException("user", id)
 
   fun getUsersThatWantToBeNotified(knownRecipients: List<UUID>): List<UserDTO> = emptyList() /*{
@@ -47,7 +48,7 @@ class UserService(
   */
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
-  fun getCompleteUser(id: UUID): UserDTO = userDao.findById(id)
+  fun getCompleteUser(id: UserID): UserDTO = userDao.findById(id)
     ?: throw NotFoundException("user", userID = id)
 
   fun getCurrentUser(): UserDTO = getCurrentUserOrNull()

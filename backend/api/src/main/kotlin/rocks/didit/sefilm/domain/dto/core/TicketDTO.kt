@@ -1,5 +1,6 @@
 package rocks.didit.sefilm.domain.dto.core
 
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -7,7 +8,7 @@ import java.util.*
 data class TicketDTO(
   val id: String,
   val showingId: UUID,
-  var assignedToUser: UUID,
+  var assignedToUser: UserID,
   val profileId: String? = null,
   val barcode: String,
   val customerType: String,

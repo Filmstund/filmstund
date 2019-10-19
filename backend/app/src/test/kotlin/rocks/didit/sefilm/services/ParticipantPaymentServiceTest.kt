@@ -17,6 +17,7 @@ import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextShowing
 import java.util.*
 
@@ -32,7 +33,7 @@ internal class ParticipantPaymentServiceTest {
 
   @Test
   internal fun `given null showing id, when updatePaymentInfo(), then an IllegalArgumentException is thrown`() {
-    val participantPaymentInfoDTO = ParticipantPaymentInfoDTO(userId = UUID.randomUUID(), showingId = null)
+    val participantPaymentInfoDTO = ParticipantPaymentInfoDTO(userId = UserID.random(), showingId = null)
     assertThrowsIllegalArgumentException(participantPaymentInfoDTO)
   }
 

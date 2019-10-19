@@ -12,14 +12,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
+import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.id.GoogleId
-import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextUserDTO
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -47,7 +47,7 @@ internal class UserDaoTest {
   @Test
   internal fun `given non existent user, when exist(), then return false`() {
     jdbi.useExtensionUnchecked(UserDao::class) {
-      assertThat(it.existsById(UUID.randomUUID())).isFalse()
+      assertThat(it.existsById(UserID.random())).isFalse()
     }
   }
 
@@ -112,7 +112,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given user with gift certs, when findById(), then user with gift certs are returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -131,7 +131,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `when new user is inserted, then gift certs aren't included in insert`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -147,7 +147,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given at least one user, when findAll(), then at least that user is returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -171,7 +171,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given one user, when findPublicUserById(), then the public version of that user is returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -186,7 +186,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given one user, when findPublicUserByGoogleId(), then the public version of that user is returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -202,7 +202,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given one user, when updateUserOnLogin(), then the user is updated accordingly`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 3))
       .copy(lastModifiedDate = Instant.now(), lastLogin = Instant.now())
 
@@ -228,7 +228,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given a gift cert, when findGiftCertByUserAndNumber(), then that gift cert is returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val giftCert = rnd.nextGiftCert(userId)
     val rndUser = rnd.nextUserDTO(userId, listOf(giftCert))
 
@@ -240,16 +240,16 @@ internal class UserDaoTest {
       assertThat(dbGiftCert)
         .isEqualTo(giftCert)
 
-      assertThat(it.findGiftCertByUserAndNumber(UUID.randomUUID(), giftCert.number))
+      assertThat(it.findGiftCertByUserAndNumber(UserID.random(), giftCert.number))
         .isNull()
-      assertThat(it.findGiftCertByUserAndNumber(userId, rnd.nextGiftCert(UUID.randomUUID()).number))
+      assertThat(it.findGiftCertByUserAndNumber(userId, rnd.nextGiftCert(UserID.random()).number))
         .isNull()
     }
   }
 
   @Test
   internal fun `given at least 2 gift certs, when findGiftCertByUser(), then all gift certs for that user is returned`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 10))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -259,7 +259,7 @@ internal class UserDaoTest {
       assertThat(dbGiftCerts)
         .hasSameSizeAs(rndUser.giftCertificates)
         .containsExactlyInAnyOrderElementsOf(rndUser.giftCertificates)
-      assertThat(it.findGiftCertByUser(UUID.randomUUID()))
+      assertThat(it.findGiftCertByUser(UserID.random()))
         .isNotNull
         .isEmpty()
     }
@@ -267,7 +267,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given at least 2 gift certs, when existGiftCertsByNumbers(), then only tickets that exists return true`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 10))
 
     jdbi.useExtensionUnchecked(UserDao::class) {
@@ -284,7 +284,7 @@ internal class UserDaoTest {
 
   @Test
   internal fun `given 2 gift certs for a user, when deleteGiftCertByUserAndNumber(), then one gift cert is left`() {
-    val userId = UUID.randomUUID()
+    val userId = UserID.random()
     val rndUser = rnd.nextUserDTO(userId, rnd.nextGiftCerts(userId, 2))
 
     jdbi.useExtensionUnchecked(UserDao::class) {

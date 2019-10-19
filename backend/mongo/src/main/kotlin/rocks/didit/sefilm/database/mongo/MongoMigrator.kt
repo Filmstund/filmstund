@@ -21,7 +21,6 @@ import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.TicketMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
-import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
@@ -32,6 +31,8 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.logger
 import java.time.LocalDate
 import java.time.LocalTime
@@ -68,7 +69,7 @@ internal class MongoMigrator(
         .mapTo(UUID::class.java)
         .list()
 
-      val userCache = Caffeine.newBuilder().build<GoogleId, UUID>()
+      val userCache = Caffeine.newBuilder().build<GoogleId, UserID>()
       val locationCache = Caffeine.newBuilder().build<String, LocationDTO>()
       val mongoShowings = mongoShowingRepo.findByIdNotIn(pgShowingIds)
       mongoShowings
@@ -244,7 +245,7 @@ internal class MongoMigrator(
   }
 
   private fun migrateOldUserToNewUser(dao: UserDao, it: rocks.didit.sefilm.database.mongo.entities.User): UserDTO {
-    val newUserId = UUID.randomUUID()
+    val newUserId = UserID.random()
     val user = UserDTO(
       id = newUserId,
       googleId = it.id,
@@ -288,7 +289,7 @@ internal class MongoMigrator(
         .mapTo(String::class.java)
         .list()
 
-      val userCache = Caffeine.newBuilder().build<GoogleId, UUID>()
+      val userCache = Caffeine.newBuilder().build<GoogleId, UserID>()
       val tickets = mongoTicketRepo.findByIdNotIn(pgTicketIds)
         .map {
           TicketDTO(

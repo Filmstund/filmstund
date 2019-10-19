@@ -20,9 +20,10 @@ import org.springframework.security.oauth2.provider.token.UserAuthenticationConv
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.web.controllers.CalendarController
 import rocks.didit.sefilm.web.controllers.MetaController
 import java.time.Instant
@@ -61,7 +62,7 @@ class UserAuthConverter(
       val userDao = it.attach(UserDao::class.java)
       val details = OpenIdConnectUserDetails(map)
 
-      val principal: PublicUserDTO = when (userDao.existsByGoogleId(details.userId)) {
+      val principal: PublicUserDTO = when (userDao.existsByGoogleId(GoogleId(details.userId))) {
         true -> onExistingUser(userDao, details)
         false -> onNewUser(userDao, details)
       }
@@ -81,7 +82,7 @@ class UserAuthConverter(
 
   fun onNewUser(userDao: UserDao, details: OpenIdConnectUserDetails): PublicUserDTO {
     val newUser = UserDTO(
-      id = UUID.randomUUID(),
+      id = UserID.random(),
       googleId = GoogleId(details.userId),
       calendarFeedId = UUID.randomUUID(),
       firstName = details.firstName ?: "Bosse",

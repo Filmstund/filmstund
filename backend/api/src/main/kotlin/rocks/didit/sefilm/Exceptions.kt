@@ -1,12 +1,13 @@
 package rocks.didit.sefilm
 
 import rocks.didit.sefilm.domain.id.TicketNumber
+import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
-class NotFoundException(what: String, userID: UUID? = null, showingId: UUID? = null) :
+class NotFoundException(what: String, userID: UserID? = null, showingId: UUID? = null) :
   KnownException("Could not find $what", userID, showingId)
 
-class MissingPhoneNumberException(userID: UUID? = null) :
+class MissingPhoneNumberException(userID: UserID? = null) :
   KnownException("You are missing a phone number.", userID)
 
 class MissingParametersException(what: String = "") : KnownException("Some required parameters were missing: $what")
@@ -17,13 +18,13 @@ class ExternalProviderException(msg: String) :
 class MissingAPIKeyException(service: APIService) :
   KnownException("The API key is missing or invalid for the $service service")
 
-class TicketsAlreadyBoughtException(userID: UUID, showingId: UUID) :
+class TicketsAlreadyBoughtException(userID: UserID, showingId: UUID) :
   KnownException("The action is not allowed since the tickets for this showing is already bought", userID, showingId)
 
-class TicketAlreadyInUserException(userID: UUID) :
+class TicketAlreadyInUserException(userID: UserID) :
   KnownException("One or more of your gift certs is already in use", userID)
 
-class UserAlreadyAttendedException(userID: UUID) :
+class UserAlreadyAttendedException(userID: UserID) :
   KnownException("The user has already attended this showing", userID)
 
 class TicketNotFoundException(ticketNumber: TicketNumber) : KnownException("Ticket $ticketNumber not found")
@@ -41,7 +42,7 @@ class FilmstadenTicketException(msg: String) : KnownException(msg)
 
 open class KnownException(
   msg: String,
-  val whichUser: UUID? = null,
+  val whichUser: UserID? = null,
   val whichShowing: UUID? = null
 ) : RuntimeException(msg)
 

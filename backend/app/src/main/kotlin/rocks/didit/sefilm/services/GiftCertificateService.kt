@@ -10,10 +10,10 @@ import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.TicketNotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.id.TicketNumber
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
-import java.util.*
 
 @Service
 class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDao) {
@@ -39,11 +39,11 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
     }
   }
 
-  fun getGiftCertsByUserId(userID: UUID): List<GiftCertificateDTO> {
+  fun getGiftCertsByUserId(userID: UserID): List<GiftCertificateDTO> {
     return userDao.findGiftCertByUser(userID)
   }
 
-  fun getGiftCertByUserIdAndNUmber(userID: UUID, number: TicketNumber): GiftCertificateDTO? {
+  fun getGiftCertByUserIdAndNUmber(userID: UserID, number: TicketNumber): GiftCertificateDTO? {
     return userDao.findGiftCertByUserAndNumber(userID, number)
   }
 

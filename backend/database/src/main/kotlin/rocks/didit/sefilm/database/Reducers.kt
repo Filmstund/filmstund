@@ -8,14 +8,15 @@ import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.UserID
 import java.util.*
 
-class UserGiftCertReducer : LinkedHashMapRowReducer<UUID, UserDTO> {
-  override fun accumulate(container: MutableMap<UUID, UserDTO>, rowView: RowView) {
-    val id = rowView.getColumn("id", UUID::class.java)
+class UserGiftCertReducer : LinkedHashMapRowReducer<UserID, UserDTO> {
+  override fun accumulate(container: MutableMap<UserID, UserDTO>, rowView: RowView) {
+    val id = rowView.getColumn("id", UserID::class.java)
     val user = container.computeIfAbsent(id) { rowView.getRow(UserDTO::class.java) }
 
-    if (rowView.getColumn("user_id", UUID::class.java) != null) {
+    if (rowView.getColumn("user_id", UserID::class.java) != null) {
       val giftCert = rowView.getRow(GiftCertificateDTO::class.java)
       container.replace(id, user.copy(giftCertificates = user.giftCertificates.plus(giftCert)))
     }
@@ -65,16 +66,16 @@ class ShowingLocationScreenReducer : LinkedHashMapRowReducer<UUID, ShowingDTO> {
   }
 }
 
-class ParticipantGiftCertReducer : LinkedHashMapRowReducer<Pair<UUID, UUID>, ParticipantDTO> {
-  override fun accumulate(container: MutableMap<Pair<UUID, UUID>, ParticipantDTO>, rowView: RowView) {
-    val userId = rowView.getColumn("user_id", UUID::class.java)
+class ParticipantGiftCertReducer : LinkedHashMapRowReducer<Pair<UserID, UUID>, ParticipantDTO> {
+  override fun accumulate(container: MutableMap<Pair<UserID, UUID>, ParticipantDTO>, rowView: RowView) {
+    val userId = rowView.getColumn("user_id", UserID::class.java)
     val showingId = rowView.getColumn("showing_id", UUID::class.java)
     val pair = Pair(userId, showingId)
     val participant = container.computeIfAbsent(pair) {
       rowView.getRow(ParticipantDTO::class.java)
     }
 
-    val gcUserId = rowView.getColumn("gc_userId", UUID::class.java)
+    val gcUserId = rowView.getColumn("gc_userId", UserID::class.java)
     if (gcUserId != null) {
       val giftCert = rowView.getRow(GiftCertificateDTO::class.java)
       container.replace(pair, participant.copy(giftCertificateUsed = giftCert))

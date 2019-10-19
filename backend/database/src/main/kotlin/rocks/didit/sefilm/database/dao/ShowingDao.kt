@@ -9,11 +9,12 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.ShowingLocationScreenReducer
-import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
 import java.util.*
 
@@ -55,7 +56,7 @@ interface ShowingDao {
     RegisterKotlinMapper(LocationDTO::class, "l"),
     RegisterKotlinMapper(FilmstadenLiteScreenDTO::class, "cs")
   )
-  fun findByAdminOrParticipant(userId: UUID): List<ShowingDTO>
+  fun findByAdminOrParticipant(userId: UserID): List<ShowingDTO>
 
   @SqlQuery("SELECT $STAR FROM showing s $COMMON_JOINS WHERE s.movie_id = :movieId ORDER BY date DESC")
   @UseRowReducer(ShowingLocationScreenReducer::class)
@@ -74,11 +75,11 @@ interface ShowingDao {
   fun findByDateAfterOrderByDateDesc(afterDate: LocalDate): List<ShowingDTO>
 
   @SqlQuery("SELECT exists(SELECT 1 FROM showing s  WHERE s.admin = :adminUserId AND s.id = :showingId)")
-  fun isAdminOnShowing(adminUserId: UUID, showingId: UUID): Boolean
+  fun isAdminOnShowing(adminUserId: UserID, showingId: UUID): Boolean
 
   @Timestamped
   @SqlUpdate("UPDATE showing s SET admin = :newAdmin, pay_to_user = :newAdmin, last_modified_date = :now WHERE s.id = :showingId and s.admin = :currentAdmin")
-  fun promoteNewUserToAdmin(showingId: UUID, currentAdmin: UUID, newAdmin: UUID): Boolean
+  fun promoteNewUserToAdmin(showingId: UUID, currentAdmin: UserID, newAdmin: UserID): Boolean
 
   @Suppress("SqlResolve")
   @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location?.name, :cinemaScreen?.filmstadenId, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
@@ -94,7 +95,7 @@ interface ShowingDao {
 
   // TODO test this
   @SqlUpdate("DELETE FROM showing s WHERE s.id = :showingId AND s.admin = :admin")
-  fun deleteByShowingAndAdmin(showingId: UUID, admin: UUID): Boolean
+  fun deleteByShowingAndAdmin(showingId: UUID, admin: UserID): Boolean
 
   // TODO test this
   @Timestamped
@@ -105,5 +106,5 @@ interface ShowingDao {
   @Suppress("SqlResolve")
   @Timestamped
   @SqlUpdate("UPDATE showing s SET price = :price, pay_to_user = :payToUser, location_id = :location?.name, filmstaden_showing_id = :filmstadenShowingId, cinema_screen_id = :cinemaScreen?.filmstadenId, date = :date, time = :time, last_modified_date = :now WHERE s.id = :id AND s.admin = :admin")
-  fun updateShowing(@BindBean updatedShowing: ShowingDTO, admin: UUID): Boolean
+  fun updateShowing(@BindBean updatedShowing: ShowingDTO, admin: UserID): Boolean
 }

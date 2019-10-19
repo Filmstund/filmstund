@@ -14,6 +14,7 @@ import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
@@ -40,11 +41,11 @@ class DbTest(private val jdbi: Jdbi) {
     }
   }
 
-  fun withUser(userId: UUID = UUID.randomUUID()) {
+  fun withUser(userId: UserID = UserID.random()) {
     testData = testData.addUser(ThreadLocalRandom.current().nextUserDTO(userId))
   }
 
-  fun withAdmin(userId: UUID = UUID.randomUUID()) {
+  fun withAdmin(userId: UserID = UserID.random()) {
     testData = testData.addAdmin(ThreadLocalRandom.current().nextUserDTO(userId))
   }
 
@@ -74,7 +75,7 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addShowings(testData.generate(ThreadLocalRandom.current()))
   }
 
-  fun withShowing(adminId: UUID? = null) {
+  fun withShowing(adminId: UserID? = null) {
     if (testData.lastUser == null && adminId == null) {
       withUser()
     }
@@ -183,7 +184,7 @@ data class TestData(
           ThreadLocalRandom.current().nextInt(0, 100)
         })
   ),
-  val users: Map<UUID, UserDTO> = mapOf(),
+  val users: Map<UserID, UserDTO> = mapOf(),
   val lastUser: UserDTO? = null,
   val lastAdmin: UserDTO? = null,
 

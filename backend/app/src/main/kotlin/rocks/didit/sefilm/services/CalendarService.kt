@@ -28,6 +28,7 @@ import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -49,7 +50,7 @@ class CalendarService(
     private val stockholmZoneId = TimeZone.getTimeZone("Europe/Stockholm").toZoneId()
   }
 
-  data class IdAndMail(val id: UUID, val email: String)
+  data class IdAndMail(val id: UserID, val email: String)
 
   fun getCalendarFeed(userFeedId: UUID): ICalendar {
     val (userId, mail) = jdbi.inTransactionUnchecked {
@@ -82,7 +83,7 @@ class CalendarService(
     return calendar
   }
 
-  private fun ShowingDTO.toVEvent(userId: UUID, userEmail: String): VEvent {
+  private fun ShowingDTO.toVEvent(userId: UserID, userEmail: String): VEvent {
     val movie = movieDao.findById(this.movieId) ?: return VEvent()
     val showingUrl = "${properties.baseUrl.frontend}/showings/$webId/$slug"
 
@@ -111,7 +112,7 @@ class CalendarService(
 
   data class PaymentDetails(val amountOwed: SEK = SEK.ZERO, val hasPaid: Boolean? = null, val phone: String? = null)
 
-  private fun formatDescription(showingId: UUID, userId: UUID, movie: MovieDTO): String {
+  private fun formatDescription(showingId: UUID, userId: UserID, movie: MovieDTO): String {
     val (amountOwed, hasPaid, payToPhone) = jdbi.withHandleUnchecked {
       it.select(
         "SELECT p.amount_owed, p.has_paid, u.phone FROM participant p JOIN showing s on p.showing_id = s.id JOIN users u on s.pay_to_user = u.id WHERE p.showing_id = ? AND p.user_id = ?",

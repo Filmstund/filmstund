@@ -6,12 +6,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.NotificationEvent
 import rocks.didit.sefilm.notification.ProviderHelper
 import rocks.didit.sefilm.notification.PushoverSettings
 import rocks.didit.sefilm.services.external.PushoverService
 import rocks.didit.sefilm.services.external.PushoverValidationStatus
-import java.util.*
 
 @Component
 @ConditionalOnProperty(
@@ -45,7 +45,7 @@ class PushoverNotificationProvider(
     }
   }
 
-  override fun getNotifiableUsers(knownRecipients: List<UUID>): List<NotifiableUser<PushoverSettings>> {
+  override fun getNotifiableUsers(knownRecipients: List<UserID>): List<NotifiableUser<PushoverSettings>> {
     return providerHelper
       .getNotifiableUsers(knownRecipients, PushoverSettings::class)
       .filter { it.notificationSettings.userKeyStatus == PushoverValidationStatus.USER_AND_DEVICE_VALID }

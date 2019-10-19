@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
-import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.services.AdminService
 import rocks.didit.sefilm.services.ShowingService
 import rocks.didit.sefilm.services.TicketService
@@ -39,6 +40,6 @@ class ShowingMutationResolver(
   fun updateShowing(showingId: UUID, newValues: UpdateShowingDTO): ShowingDTO =
     showingService.updateShowing(showingId, newValues)
 
-  fun promoteToAdmin(showingId: UUID, userToPromote: UUID): ShowingDTO =
+  fun promoteToAdmin(showingId: UUID, userToPromote: UserID): ShowingDTO =
     adminService.promoteToAdmin(showingId, userToPromote)
 }
