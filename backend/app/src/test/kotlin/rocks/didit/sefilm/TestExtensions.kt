@@ -28,7 +28,24 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
+import java.util.Locale
 import java.util.concurrent.ThreadLocalRandom
+
+private const val upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+private const val digits = "0123456789"
+private val lower = upper.toLowerCase(Locale.ROOT)
+private val alphanum = upper + lower + digits
+
+fun ThreadLocalRandom.nextString(size: Int) = nextString(size, size+1)
+fun ThreadLocalRandom.nextString(origin: Int = 5, bound: Int = 20): String {
+  val size = nextInt(origin, bound)
+  val sb = StringBuilder()
+
+  repeat(size) {
+    sb.append(alphanum[nextInt(alphanum.count())])
+  }
+  return sb.toString()
+}
 
 fun ThreadLocalRandom.nextUserDTO(
   id: UserID = UserID.random(),
@@ -36,20 +53,15 @@ fun ThreadLocalRandom.nextUserDTO(
 ): UserDTO {
   return UserDTO(
     id = id,
-    googleId = GoogleId("gid${this.nextLong(100000L)}"),
-    filmstadenId = FilmstadenMembershipId(
-      "${this.nextInt(100, 999)}-${this.nextInt(
-        100,
-        999
-      )}"
-    ),
+    googleId = GoogleId("gid${nextString(18)}"),
+    filmstadenId = FilmstadenMembershipId.valueOf("${nextString(3)}-${nextString(3)}"),
     calendarFeedId = UUID.randomUUID(),
-    firstName = "Fname ${this.nextLong(1000)}",
-    lastName = "Lname ${this.nextLong(1000)}",
-    nick = "Nickan ${this.nextLong(1000)}",
-    email = "mail${this.nextLong(1000)}@example.org",
-    phone = PhoneNumber("073000000${this.nextLong(0, 9)}"),
-    avatar = "http://${this.nextLong(1000)}.example.org",
+    firstName = "Fname ${nextString(20)}",
+    lastName = "Lname ${nextString(20)}",
+    nick = "Nickan ${nextString(20)}",
+    email = "mail${nextString(20)}@example.org",
+    phone = PhoneNumber("073000000${nextLong(0, 9)}"),
+    avatar = "http://${nextString(20)}.example.org",
     giftCertificates = giftCerts,
     lastLogin = Instant.EPOCH,
     signupDate = Instant.EPOCH,
@@ -58,7 +70,8 @@ fun ThreadLocalRandom.nextUserDTO(
 }
 
 fun ThreadLocalRandom.nextGiftCert(userId: UserID): GiftCertificateDTO {
-  return GiftCertificateDTO(userId,
+  return GiftCertificateDTO(
+    userId,
     TicketNumber("${this.nextLong(10000000000, 99999999999)}")
   )
 }
@@ -69,22 +82,22 @@ fun ThreadLocalRandom.nextGiftCerts(userId: UserID, bound: Int = 10): List<GiftC
 
 fun ThreadLocalRandom.nextLocation(alias: List<String> = nextLocationAlias(3)): LocationDTO {
   return LocationDTO(
-    name = "locname${nextLong(0, 1000000)}",
+    name = "locname${nextString (50)}",
     cityAlias = "${this.nextInt(10, 99)}",
-    city = "city$${nextLong(0, 10000000)}",
-    streetAddress = "streetAddr${nextLong(0, 10000000)}",
-    postalAddress = "postalAddr${nextLong()}",
+    city = "city$${nextString(20)}",
+    streetAddress = "streetAddr${nextString(20)}",
+    postalAddress = "postalAddr${nextString(20)}",
     postalCode = "${nextLong(1000, 10000)}",
     latitude = BigDecimal.valueOf(this.nextLong(1, 10)),
     longitude = BigDecimal.valueOf(this.nextLong(1, 10)),
-    filmstadenId = "NCG$${nextLong(0, 100000)}",
+    filmstadenId = "NCG${nextString(7)}",
     alias = alias,
     lastModifiedDate = Instant.EPOCH
   )
 }
 
 fun ThreadLocalRandom.nextLocationAlias(bound: Int): List<String> {
-  return (0..bound).map { "alias${this.nextLong(100000)}" }
+  return (0..bound).map { "alias${nextString(20)}" }
 }
 
 fun ThreadLocalRandom.nextMovie(genreBound: Int = 5): MovieDTO {
@@ -158,7 +171,7 @@ fun ThreadLocalRandom.nextTicket(showingId: ShowingID, assignedToUser: UserID): 
     id = "id${nextLong(0, 10000000)}",
     showingId = showingId,
     assignedToUser = assignedToUser,
-    profileId = "pid${nextLong(1000)}",
+    profileId = "${nextString(3)}-${nextString(3)}",
     barcode = "barcode${nextLong(1000000)}",
     customerType = "customerType${nextLong(1000000)}",
     customerTypeDefinition = "ctd${nextLong(1000000)}",
