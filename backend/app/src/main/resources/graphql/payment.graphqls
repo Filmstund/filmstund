@@ -1,6 +1,6 @@
 type AdminPaymentDetails {
     filmstadenBuyLink: String
-    showingId: UUID
+    showingId: ShowingID
     #participants: [Participant!]! # FIXME
 }
 

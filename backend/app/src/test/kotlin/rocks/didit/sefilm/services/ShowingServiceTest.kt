@@ -352,7 +352,6 @@ internal class ShowingServiceTest {
           movie.id,
           "NewLocation",
           CinemaScreenDTO("fsidASDF", "Salong X"),
-          null,
           "remoteEntityId"
         )
         val showing = showingService.createShowing(createShowing)

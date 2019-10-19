@@ -8,3 +8,4 @@ scalar LocalTime
 scalar IMDbID
 scalar TMDbID
 scalar UserID
+scalar GoogleID

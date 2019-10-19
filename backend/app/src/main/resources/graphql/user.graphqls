@@ -1,11 +1,11 @@
 type CurrentUser {
     id: UserID!
+    filmstadenMembershipId: String
     name: String
     firstName: String
     lastName: String
     nick: String
     email: String!
-    filmstadenMembershipId: String
     phone: String
     avatar: String
     giftCertificates: [GiftCertificate!]
@@ -14,6 +14,7 @@ type CurrentUser {
     #notificationSettings: NotificationSettings!
     lastLogin: String!
     signupDate: String!
+    lastModifiedDate: String!
 }
 
 type User {

@@ -13,6 +13,7 @@ import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TMDbID
+import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -232,12 +233,34 @@ class CustomScalars {
   fun customScalarUserID(): GraphQLScalarType = GraphQLScalarType.newScalar()
     .name("UserID")
     .description("UserID")
+    .coercing(object : Coercing<UserID, String> {
+      override fun parseLiteral(input: Any?): UserID {
+        return when (input) {
+          is StringValue -> UserID(UUID.fromString(input.value))
+          is String -> UserID(UUID.fromString(input))
+          else -> throw IllegalArgumentException("Unable to convert '$input' to a UserID")
+        }
+      }
+
+      override fun parseValue(input: Any?): UserID = parseLiteral(input)
+
+      override fun serialize(input: Any?): String? = when (input) {
+        is String -> input
+        is UserID -> input.id.toString()
+        else -> null
+      }
+    }).build()
+
+  @Bean
+  fun customScalarGoogleID(): GraphQLScalarType = GraphQLScalarType.newScalar()
+    .name("GoogleID")
+    .description("GoogleID")
     .coercing(object : Coercing<GoogleId, String> {
       override fun parseLiteral(input: Any?): GoogleId {
         return when (input) {
           is StringValue -> GoogleId(input.value)
           is String -> GoogleId(input)
-          else -> throw IllegalArgumentException("Unablet to convert '$input' to a UserID")
+          else -> throw IllegalArgumentException("Unable to convert '$input' to a GoogleID")
         }
       }
 

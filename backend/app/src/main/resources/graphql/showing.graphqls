@@ -1,9 +1,12 @@
 type Showing {
     id: ShowingID!
     webId: Base64ID!
+    filmstadenShowingId: String
     slug: String!
     date: String!
     time: String!
+    movieId: MovieID!
+    movieTitle: String!
     movie: Movie!
     location: Location!
     cinemaScreen: CinemaScreen
@@ -12,13 +15,13 @@ type Showing {
     admin: User!
     payToUser: User!
     lastModifiedDate: String!
+    createdDate: String!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
-    filmstadenRemoteEntityId: String
 }
 
 type Participant {
     userId: UUID
-    showingId: UUID
+    showingId: ShowingID
 }
 
 type CinemaScreen {
