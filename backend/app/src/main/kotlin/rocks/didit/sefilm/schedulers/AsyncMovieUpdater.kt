@@ -2,6 +2,8 @@ package rocks.didit.sefilm.schedulers
 
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.useTransactionUnchecked
+import org.jdbi.v3.sqlobject.kotlin.attach
+import org.jdbi.v3.sqlobject.kotlin.onDemand
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Async
@@ -11,11 +13,11 @@ import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.KnownException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.domain.id.IMDbID
-import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.id.isMissing
 import rocks.didit.sefilm.domain.id.isSupplied
 import rocks.didit.sefilm.services.external.FilmstadenService
@@ -44,36 +46,34 @@ class AsyncMovieUpdater(
 
   @Scheduled(initialDelay = INITIAL_UPDATE_DELAY, fixedDelay = UPDATE_INTERVAL)
   fun scheduledMovieUpdates() {
-    jdbi.useTransactionUnchecked {
-      val movieDao = it.attach(MovieDao::class.java)
-      val moviesThatRequiresUpdate = movieDao
-        .findByArchivedOrderByPopularityDesc()
-        .filter(this::isUpdateRequired)
+    val movieDao = jdbi.onDemand<MovieDao>()
+    val moviesThatRequiresUpdate = movieDao
+      .findByArchivedOrderByPopularityDesc()
+      .filter(this::isUpdateRequired)
 
-      if (moviesThatRequiresUpdate.isNotEmpty()) {
-        log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
-        synchronousExtendMovieInfo(movieDao, moviesThatRequiresUpdate)
-      }
+    if (moviesThatRequiresUpdate.isNotEmpty()) {
+      log.info("Commencing scheduled update for ${moviesThatRequiresUpdate.count()} movies")
+      synchronousExtendMovieInfo(moviesThatRequiresUpdate)
     }
   }
 
   @Async
   fun extendMovieInfo(movies: Iterable<MovieDTO>) {
-    jdbi.useTransactionUnchecked {
-      val movieDao = it.attach(MovieDao::class.java)
-      synchronousExtendMovieInfo(movieDao, movies)
-    }
+    synchronousExtendMovieInfo(movies)
   }
 
-  fun synchronousExtendMovieInfo(movieDao: MovieDao, movies: Iterable<MovieDTO>) {
+  fun synchronousExtendMovieInfo(movies: Iterable<MovieDTO>) {
     movies.forEach { movie ->
-      log.info("[MovieUpdater] Fetching extended info for ${movie.log()}")
-      try {
-        updateInfo(movieDao, movie)
-      } catch (e: Exception) {
-        log.warn("[MovieUpdater] An error occurred when updating '${movie.title}' ID=${movie.id}, Filmstaden id=${movie.filmstadenId}")
-        if (e !is KnownException) {
-          log.warn("Exception", e)
+      jdbi.useTransactionUnchecked { handle ->
+        log.info("[MovieUpdater] Fetching extended info for ${movie.log()}")
+        try {
+          val movieDao = handle.attach<MovieDao>()
+          updateInfo(movieDao, movie)
+        } catch (e: Exception) {
+          log.warn("[MovieUpdater] An error occurred when updating '${movie.title}' ID=${movie.id}, Filmstaden id=${movie.filmstadenId}")
+          if (e !is KnownException) {
+            log.warn("Exception", e)
+          }
         }
       }
       waitForRandomTime()
