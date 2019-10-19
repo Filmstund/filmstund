@@ -8,7 +8,7 @@ type Showing {
     movieId: MovieID!
     movieTitle: String!
     movie: Movie!
-    location: Location!
+    location: Location
     cinemaScreen: CinemaScreen
     price: SEK
     ticketsBought: Boolean!
