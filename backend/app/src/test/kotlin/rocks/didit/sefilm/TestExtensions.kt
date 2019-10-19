@@ -1,14 +1,14 @@
 package rocks.didit.sefilm
 
 import org.assertj.core.api.ObjectAssert
-import rocks.didit.sefilm.domain.Base64ID
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.GoogleId
-import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.TMDbID
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TMDbID
+import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
@@ -32,7 +32,12 @@ fun ThreadLocalRandom.nextUserDTO(
   return UserDTO(
     id = id,
     googleId = GoogleId("gid${this.nextLong(100000L)}"),
-    filmstadenId = FilmstadenMembershipId("${this.nextInt(100, 999)}-${this.nextInt(100, 999)}"),
+    filmstadenId = FilmstadenMembershipId(
+      "${this.nextInt(100, 999)}-${this.nextInt(
+        100,
+        999
+      )}"
+    ),
     calendarFeedId = UUID.randomUUID(),
     firstName = "Fname ${this.nextLong(1000)}",
     lastName = "Lname ${this.nextLong(1000)}",
@@ -48,7 +53,9 @@ fun ThreadLocalRandom.nextUserDTO(
 }
 
 fun ThreadLocalRandom.nextGiftCert(userId: UUID): GiftCertificateDTO {
-  return GiftCertificateDTO(userId, TicketNumber("${this.nextLong(10000000000, 99999999999)}"))
+  return GiftCertificateDTO(userId,
+    TicketNumber("${this.nextLong(10000000000, 99999999999)}")
+  )
 }
 
 fun ThreadLocalRandom.nextGiftCerts(userId: UUID, bound: Int = 10): List<GiftCertificateDTO> = (0..bound).map {

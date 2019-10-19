@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.domain.dto.core
 
 import org.jdbi.v3.core.mapper.Nested
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO

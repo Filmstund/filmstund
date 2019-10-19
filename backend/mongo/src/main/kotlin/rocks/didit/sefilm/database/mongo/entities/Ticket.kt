@@ -2,7 +2,7 @@ package rocks.didit.sefilm.database.mongo.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.GoogleId
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*

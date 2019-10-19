@@ -2,8 +2,8 @@ package rocks.didit.sefilm.database.mongo
 
 import org.springframework.core.convert.converter.Converter
 import org.springframework.stereotype.Component
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 
 @Component
 internal class ImdbIdConverter : Converter<String, IMDbID> {

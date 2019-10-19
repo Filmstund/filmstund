@@ -6,11 +6,11 @@ import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import rocks.didit.sefilm.domain.Base64ID
-import rocks.didit.sefilm.domain.GoogleId
-import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*

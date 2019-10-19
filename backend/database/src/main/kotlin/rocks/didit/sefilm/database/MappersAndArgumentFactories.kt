@@ -5,14 +5,14 @@ import org.jdbi.v3.core.argument.Argument
 import org.jdbi.v3.core.config.ConfigRegistry
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
-import rocks.didit.sefilm.domain.Base64ID
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.GoogleId
-import rocks.didit.sefilm.domain.IMDbID
+import rocks.didit.sefilm.domain.id.Base64ID
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.IMDbID
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.TMDbID
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TMDbID
+import rocks.didit.sefilm.domain.id.TicketNumber
 import java.sql.ResultSet
 import java.sql.Types
 

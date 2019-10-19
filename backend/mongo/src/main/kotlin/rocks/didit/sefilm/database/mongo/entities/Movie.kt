@@ -3,8 +3,8 @@ package rocks.didit.sefilm.database.mongo.entities
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate

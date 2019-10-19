@@ -3,6 +3,7 @@ package rocks.didit.sefilm.domain
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 
 class FilmstadenMembershipIdTest {
   @Test

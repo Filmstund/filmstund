@@ -2,6 +2,7 @@ package rocks.didit.sefilm.domain
 
 import org.junit.Assert
 import org.junit.jupiter.api.Test
+import rocks.didit.sefilm.domain.id.Base64ID
 
 internal class Base64IDTest {
   companion object {

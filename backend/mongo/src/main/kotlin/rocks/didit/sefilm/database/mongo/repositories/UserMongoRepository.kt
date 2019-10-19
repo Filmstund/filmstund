@@ -3,9 +3,9 @@ package rocks.didit.sefilm.database.mongo.repositories
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import rocks.didit.sefilm.database.mongo.entities.User
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.GoogleId
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.TicketNumber
 import java.util.*
 
 @Repository

@@ -1,8 +1,8 @@
 package rocks.didit.sefilm
 
 import org.slf4j.LoggerFactory
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 
 fun String.toImdbId() = IMDbID.valueOf(this)
 fun Long.toTmdbId() = TMDbID.valueOf(this)

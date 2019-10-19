@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.provider.token.UserAuthenticationConv
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.web.controllers.CalendarController

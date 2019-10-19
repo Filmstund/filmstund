@@ -7,7 +7,7 @@ import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.dao.ParticipantDao
-import rocks.didit.sefilm.domain.Base64ID
+import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO

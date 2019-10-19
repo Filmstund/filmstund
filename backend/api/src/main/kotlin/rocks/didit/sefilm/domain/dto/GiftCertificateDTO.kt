@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.domain.dto
 
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TicketNumber
 import java.time.LocalDate
 import java.util.*
 

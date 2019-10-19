@@ -14,11 +14,11 @@ import rocks.didit.sefilm.UserAlreadyAttendedException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.database.dao.ShowingDao
-import rocks.didit.sefilm.domain.Base64ID
+import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO

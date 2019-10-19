@@ -11,13 +11,13 @@ import org.springframework.web.util.UriComponentsBuilder
 import rocks.didit.sefilm.KnownException
 import rocks.didit.sefilm.clients.ImdbClient
 import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.TmdbMovieDetails
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import rocks.didit.sefilm.domain.isMissing
-import rocks.didit.sefilm.domain.isSupplied
+import rocks.didit.sefilm.domain.id.isMissing
+import rocks.didit.sefilm.domain.id.isSupplied
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Duration
 import java.time.Instant

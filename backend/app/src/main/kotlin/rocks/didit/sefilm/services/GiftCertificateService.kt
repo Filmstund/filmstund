@@ -10,7 +10,7 @@ import rocks.didit.sefilm.TicketInUseException
 import rocks.didit.sefilm.TicketNotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import java.time.LocalDate
 import java.util.*

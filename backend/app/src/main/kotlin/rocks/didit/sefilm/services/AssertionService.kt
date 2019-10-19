@@ -12,7 +12,7 @@ import rocks.didit.sefilm.TicketExpiredException
 import rocks.didit.sefilm.TicketNotFoundException
 import rocks.didit.sefilm.TicketsAlreadyBoughtException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import java.util.*

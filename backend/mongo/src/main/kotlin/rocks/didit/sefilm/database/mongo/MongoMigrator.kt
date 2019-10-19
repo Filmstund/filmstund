@@ -21,7 +21,7 @@ import rocks.didit.sefilm.database.mongo.repositories.ShowingMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.TicketMongoRepository
 import rocks.didit.sefilm.database.mongo.repositories.UserMongoRepository
 import rocks.didit.sefilm.domain.FtgBiljettParticipant
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO

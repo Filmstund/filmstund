@@ -13,7 +13,7 @@ import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.UserDetailsDTO
 import java.util.concurrent.ThreadLocalRandom

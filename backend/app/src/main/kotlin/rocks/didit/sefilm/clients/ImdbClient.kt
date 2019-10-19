@@ -14,9 +14,9 @@ import rocks.didit.sefilm.APIService
 import rocks.didit.sefilm.ExternalProviderException
 import rocks.didit.sefilm.MissingAPIKeyException
 import rocks.didit.sefilm.Properties
-import rocks.didit.sefilm.domain.ExternalProviderId
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.ExternalProviderId
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.dto.ImdbResult
 import rocks.didit.sefilm.domain.dto.ImdbSearchResults
 import rocks.didit.sefilm.domain.dto.TmdbFindExternalResults

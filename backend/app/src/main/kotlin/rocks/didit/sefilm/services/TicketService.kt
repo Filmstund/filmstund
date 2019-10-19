@@ -8,7 +8,7 @@ import rocks.didit.sefilm.Daos
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.TicketDao
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange

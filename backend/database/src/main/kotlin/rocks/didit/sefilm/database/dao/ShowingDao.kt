@@ -9,7 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.database.ShowingLocationScreenReducer
-import rocks.didit.sefilm.domain.Base64ID
+import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO

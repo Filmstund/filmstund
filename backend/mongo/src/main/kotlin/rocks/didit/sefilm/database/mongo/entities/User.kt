@@ -4,9 +4,9 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.Foretagsbiljett
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.PhoneNumber
 import java.time.Instant
 import java.util.*

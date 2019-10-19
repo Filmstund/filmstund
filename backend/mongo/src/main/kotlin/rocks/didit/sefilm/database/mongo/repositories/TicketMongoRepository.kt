@@ -3,7 +3,7 @@ package rocks.didit.sefilm.database.mongo.repositories
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import rocks.didit.sefilm.database.mongo.entities.Ticket
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.GoogleId
 import java.util.*
 
 @Repository

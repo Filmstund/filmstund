@@ -1,6 +1,6 @@
 package rocks.didit.sefilm
 
-import rocks.didit.sefilm.domain.TicketNumber
+import rocks.didit.sefilm.domain.id.TicketNumber
 import java.util.*
 
 class NotFoundException(what: String, userID: UUID? = null, showingId: UUID? = null) :

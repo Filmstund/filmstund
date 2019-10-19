@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.domain.dto.core
 
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO

@@ -12,8 +12,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
-import rocks.didit.sefilm.domain.GoogleId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.GoogleId
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextGiftCerts

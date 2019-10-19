@@ -1,7 +1,7 @@
 package rocks.didit.sefilm.domain.dto.core
 
-import rocks.didit.sefilm.domain.IMDbID
-import rocks.didit.sefilm.domain.TMDbID
+import rocks.didit.sefilm.domain.id.IMDbID
+import rocks.didit.sefilm.domain.id.TMDbID
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate

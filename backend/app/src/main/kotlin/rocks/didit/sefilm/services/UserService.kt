@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.UserDao
-import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.id.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.dto.NotificationSettingsInputDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO

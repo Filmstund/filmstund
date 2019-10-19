@@ -1,5 +1,8 @@
 package rocks.didit.sefilm.domain
 
+import rocks.didit.sefilm.domain.id.GoogleId
+import rocks.didit.sefilm.domain.id.TicketNumber
+
 @Deprecated(message = "")
 data class ParticipantDTO(val userId: GoogleId, val paymentType: PaymentType)
 

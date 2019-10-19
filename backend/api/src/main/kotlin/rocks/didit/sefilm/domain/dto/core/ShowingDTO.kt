@@ -1,6 +1,6 @@
 package rocks.didit.sefilm.domain.dto.core
 
-import rocks.didit.sefilm.domain.Base64ID
+import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO

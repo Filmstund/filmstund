@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.domain.id
 
 import com.fasterxml.jackson.annotation.JsonValue
 

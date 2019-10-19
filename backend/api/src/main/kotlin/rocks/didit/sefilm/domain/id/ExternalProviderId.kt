@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.domain
+package rocks.didit.sefilm.domain.id
 
 import com.fasterxml.jackson.annotation.JsonValue
 
@@ -47,7 +47,8 @@ class IMDbID(
 ) : ExternalProviderId(state) {
 
   companion object {
-    fun valueOf(imdbId: String) = IMDbID(imdbId, ValueState.Supplied)
+    fun valueOf(imdbId: String) =
+      IMDbID(imdbId, ValueState.Supplied)
 
     /** Missing value but may be updated in the future */
     val MISSING = IMDbID()
@@ -92,7 +93,8 @@ class TMDbID(
 ) : ExternalProviderId(state) {
 
   companion object {
-    fun valueOf(tmdbId: Long) = TMDbID(tmdbId, ValueState.Supplied)
+    fun valueOf(tmdbId: Long) =
+      TMDbID(tmdbId, ValueState.Supplied)
 
     /** Missing value but may be updated in the future */
     val MISSING = TMDbID()
