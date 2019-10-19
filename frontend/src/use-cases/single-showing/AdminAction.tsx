@@ -66,7 +66,7 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
           closeModal={() => setState(state => ({ ...state, showModal: false }))}
         />
       )}
-      <CopyHighlightStringButton participants={showing.participants} />
+      <CopyHighlightStringButton meId={showing.admin.id} participants={showing.participants} />
       {adminMessage && <div>{adminMessage}</div>}
       {ticketsBought ? (
         <GrayButton onClick={handleStartBooking}>
