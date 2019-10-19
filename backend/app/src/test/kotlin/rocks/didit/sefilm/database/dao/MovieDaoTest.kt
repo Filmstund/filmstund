@@ -224,4 +224,28 @@ internal class MovieDaoTest {
       }
     }
   }
+
+  @Test
+  internal fun `give a movie without a tmdb id, when findById(), then the movie is returned and the tmdb id is null`() {
+    databaseTest.start {
+      withMovie { it.nextMovie().copy(tmdbId = null) }
+      afterInsert {
+        val dbMovie = it.movieDao.findById(movie.id)
+        assertThat(dbMovie)
+          .isEqualTo(movie)
+      }
+    }
+  }
+
+  @Test
+  internal fun `give a movie without a imdb id, when findById(), then the movie is returned and the imdb id is null`() {
+    databaseTest.start {
+      withMovie { it.nextMovie().copy(imdbId = null) }
+      afterInsert {
+        val dbMovie = it.movieDao.findById(movie.id)
+        assertThat(dbMovie)
+          .isEqualTo(movie)
+      }
+    }
+  }
 }

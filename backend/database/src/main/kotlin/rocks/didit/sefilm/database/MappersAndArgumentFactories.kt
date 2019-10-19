@@ -19,6 +19,7 @@ import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TMDbID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
+import java.math.BigDecimal
 import java.sql.ResultSet
 import java.sql.Types
 import java.util.*
@@ -101,15 +102,19 @@ class IMDbIDArgumentFactory : AbstractArgumentFactory<IMDbID>(Types.VARCHAR) {
 class TMDbIDColumnMapper : ColumnMapper<TMDbID> {
   override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): TMDbID? {
     return r?.let {
-      val value: Long = it.getLong(columnNumber)
-      return TMDbID(value)
+      val value: BigDecimal? = it.getBigDecimal(columnNumber)
+      return value?.let { id -> TMDbID(id.toLong()) }
     }
   }
 }
 
 class TMDbIDArgumentFactory : AbstractArgumentFactory<TMDbID>(Types.BIGINT) {
   override fun build(value: TMDbID?, config: ConfigRegistry?): Argument {
-    return Argument { position, statement, _ -> statement.setLong(position, value?.value ?: 0L) }
+    return Argument { position, statement, _ ->
+      statement.setBigDecimal(
+        position,
+        value?.value?.let { BigDecimal(it) })
+    }
   }
 }
 

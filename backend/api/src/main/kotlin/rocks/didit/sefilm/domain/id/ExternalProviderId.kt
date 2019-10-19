@@ -104,9 +104,7 @@ class TMDbID(
   }
 
   init {
-    if (value != null && value <= 0) {
-      throw IllegalArgumentException("Illegal TMDb ID. Got: $value")
-    }
+    require(!(value != null && value <= 0)) { "Illegal TMDb ID. Got: $value" }
   }
 
   override fun equals(other: Any?): Boolean {
