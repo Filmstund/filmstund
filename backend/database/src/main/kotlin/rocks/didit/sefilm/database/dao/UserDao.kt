@@ -26,7 +26,10 @@ interface UserDao {
   fun findById(userId: UUID): UserDTO?
 
   @SqlQuery("SELECT id FROM users WHERE google_id = :googleId")
-  fun findIdByGoogleId(googleId: GoogleId): UUID
+  fun findIdByGoogleId(googleId: GoogleId): UUID?
+
+  @SqlQuery("SELECT id FROM users WHERE filmstaden_id = :filmstadenId")
+  fun findIdByFilmstadenId(filmstadenId: FilmstadenMembershipId): UUID?
 
   @SqlQuery("SELECT * FROM users u LEFT JOIN gift_certificate gc on u.id = gc.user_id")
   @UseRowReducer(UserGiftCertReducer::class)

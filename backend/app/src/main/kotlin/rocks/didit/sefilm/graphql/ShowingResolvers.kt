@@ -6,7 +6,6 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.entities.Ticket
 import rocks.didit.sefilm.database.repositories.ParticipantRepository
 import rocks.didit.sefilm.domain.Base64ID
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
@@ -17,6 +16,7 @@ import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.orElseThrow
 import rocks.didit.sefilm.services.MovieService
 import rocks.didit.sefilm.services.ShowingService
@@ -65,7 +65,7 @@ class ShowingResolver(
   // FIXME: remove and rename this to filmstadenShowingId instead
   fun filmstadenRemoteEntityId(showing: ShowingDTO): String? = showing.filmstadenShowingId
 
-  fun myTickets(showing: ShowingDTO): List<Ticket> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
+  fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
   fun ticketRange(showing: ShowingDTO): TicketRange? = ticketService.getTicketRange(showing.id)
 
@@ -92,8 +92,7 @@ class ParticipantUserResolver(private val userService: UserService, private val 
 }
 
 @Component
-class TicketUserResolver(private val userService: UserService) : GraphQLResolver<Ticket> {
-  fun assignedToUser(ticket: Ticket): PublicUserDTO = userService
-    .getUserOrThrow(ticket.assignedToUser.id)
+class TicketUserResolver(private val userService: UserService) : GraphQLResolver<TicketDTO> {
+  fun assignedToUser(ticket: TicketDTO): PublicUserDTO = userService.getUserOrThrow(ticket.assignedToUser)
 }
 

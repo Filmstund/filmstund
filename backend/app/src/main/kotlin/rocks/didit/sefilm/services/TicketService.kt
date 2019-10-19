@@ -1,128 +1,133 @@
 package rocks.didit.sefilm.services
 
-import org.springframework.security.access.AccessDeniedException
+import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
+import org.jdbi.v3.sqlobject.kotlin.onDemand
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import rocks.didit.sefilm.FilmstadenTicketException
-import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.Daos
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.entities.CinemaScreen
-import rocks.didit.sefilm.database.entities.Showing
-import rocks.didit.sefilm.database.entities.Ticket
-import rocks.didit.sefilm.database.entities.TicketAttribute
-import rocks.didit.sefilm.database.entities.TicketAttributeId
-import rocks.didit.sefilm.database.repositories.ParticipantRepository
-import rocks.didit.sefilm.database.repositories.ShowingRepository
-import rocks.didit.sefilm.database.repositories.TicketRepository
-import rocks.didit.sefilm.database.repositories.UserRepository
+import rocks.didit.sefilm.database.dao.TicketDao
 import rocks.didit.sefilm.domain.FilmstadenMembershipId
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
+import rocks.didit.sefilm.toDaos
 import java.time.ZoneId
 import java.util.*
 
 @Service
 class TicketService(
+  private val jdbi: Jdbi,
   private val properties: Properties,
   private val filmstadenService: FilmstadenService,
   private val locationService: LocationService,
-  private val userRepository: UserRepository,
-  private val ticketRepository: TicketRepository,
-  private val showingRepository: ShowingRepository,
-  private val participantRepo: ParticipantRepository
+  private val assertionService: AssertionService
 ) {
   private val log by logger()
 
-  @Transactional
-  fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<Ticket> {
-    return ticketRepository.findByShowingIdAndAssignedToUser_Id(showingId, currentLoggedInUser().id)
+  fun getTicketsForCurrentUserAndShowing(showingId: UUID): List<TicketDTO> {
+    return jdbi.onDemand<TicketDao>().findByUserAndShowing(currentLoggedInUser().id, showingId)
   }
 
-  @Transactional
-  fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<Ticket> {
-    val currentLoggedInUserId = currentLoggedInUser().id
-    val showing = showingRepository.findById(showingId)
-      .orElseThrow { NotFoundException("showing", currentLoggedInUserId, showingId) }
+  fun processTickets(userSuppliedTicketUrl: List<String>, showingId: UUID): List<TicketDTO> {
+    require(userSuppliedTicketUrl.isNotEmpty()) { "Supply a list of ticket urls" }
 
-    if (showing.admin.id != currentLoggedInUserId) {
-      throw AccessDeniedException("Only the showing admin is allowed to do that")
+    return jdbi.inTransactionUnchecked { handle ->
+      val daos = handle.toDaos()
+
+      val currentLoggedInUserId = currentLoggedInUser().id
+      val showing = daos.showingDao.findByIdOrThrow(showingId)
+
+      assertionService.assertLoggedInUserIsAdmin(showing)
+      assertionService.validateFilmstadenTicketUrls(userSuppliedTicketUrl)
+
+      val updatedShowing = matchShowingInfoWithTicket(daos, showing, userSuppliedTicketUrl.first())
+      userSuppliedTicketUrl.forEach {
+        processTicketUrl(daos, it, updatedShowing)
+      }
+
+      if (properties.enableReassignment) {
+        reassignLeftoverTickets(daos, updatedShowing)
+      }
+
+      daos.ticketDao.findByUserAndShowing(currentLoggedInUserId, showingId)
     }
-
-    validateFilmstadenTicketUrls(userSuppliedTicketUrl)
-    userSuppliedTicketUrl.firstOrNull()?.let { updateShowingFromTicketUrl(showing, it) }
-    userSuppliedTicketUrl.forEach {
-      processTicketUrl(it, showing)
-    }
-
-    if (properties.enableReassignment) {
-      reassignLeftoverTickets(showing)
-    }
-
-    return getTicketsForCurrentUserAndShowing(showingId)
   }
 
-  private fun reassignLeftoverTickets(showing: Showing) {
-    val adminAssignedTickets = ticketRepository.findByShowingAndAssignedToUser(showing, showing.admin)
+  private fun reassignLeftoverTickets(daos: Daos, showing: ShowingDTO) {
+    val adminAssignedTickets = daos.ticketDao.findByUserAndShowing(showing.admin, showing.id)
     if (adminAssignedTickets.size > 1) {
-      val allTickets = ticketRepository.findByShowing(showing)
-      val participantsMissingTicket = showing.participants.filter { participant ->
-        allTickets.none { ticket -> ticket.assignedToUser.id == participant.user.id }
+      val allTickets = daos.ticketDao.findByShowing(showing.id)
+      val participants = daos.participantDao.findAllParticipants(showing.id)
+      val participantsMissingTicket = participants.filter { participant ->
+        allTickets.none { ticket -> ticket.assignedToUser == participant.userId }
       }
 
       adminAssignedTickets.subList(1, adminAssignedTickets.size)
         .zip(participantsMissingTicket)
         .forEach { (ticket, participant) ->
-          ticket.assignedToUser = participant.user
+          log.info("Re-assigning ticket {} to {} (was assigned to {})", ticket.id, participant.userId, showing.admin)
+          daos.ticketDao.reassignTicket(ticket.id, showing.admin, participant.userId)
         }
     }
   }
 
-  private fun updateShowingFromTicketUrl(showing: Showing, ticketUrl: String) {
+  /**
+   * Make sure that the showing info matches the bought tickets, i.e. the time etc
+   */
+  private fun matchShowingInfoWithTicket(daos: Daos, showing: ShowingDTO, ticketUrl: String): ShowingDTO {
     val (_, filmstadenRemoteEntityId, _) = extractIdsFromUrl(ticketUrl)
     val fetchFilmstadenShow = filmstadenService.fetchFilmstadenShow(filmstadenRemoteEntityId)
-    val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema?.title ?: "N/A")
-    val zonedDateTime = fetchFilmstadenShow.timeUtc.atZone(ZoneId.of("Europe/Stockholm"))
-    val filmstadenLiteScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen()
 
-    showing.cinemaScreen = CinemaScreen(filmstadenLiteScreen.filmstadenId, filmstadenLiteScreen.name)
-    showing.time = zonedDateTime.toLocalTime()
-    showing.date = zonedDateTime.toLocalDate()
-    //showing.location = location
+    val location = locationService.getOrCreateNewLocation(fetchFilmstadenShow.cinema.title)
+    val zonedDateTime = fetchFilmstadenShow.timeUtc.atZone(ZoneId.of("Europe/Stockholm"))
+    val cinemaScreen = fetchFilmstadenShow.screen.toFilmstadenLiteScreen()
+    daos.showingDao.maybeInsertCinemaScreen(cinemaScreen)
+
+    val updatedShowing = showing.copy(
+      cinemaScreen = cinemaScreen,
+      time = zonedDateTime.toLocalTime(),
+      date = zonedDateTime.toLocalDate(),
+      location = location
+    )
+    daos.showingDao.updateShowing(updatedShowing, currentLoggedInUser().id)
+    return updatedShowing
   }
 
-  private fun processTicketUrl(userSuppliedTicketUrl: String, showing: Showing) {
+  private fun processTicketUrl(daos: Daos, userSuppliedTicketUrl: String, showing: ShowingDTO) {
     val (sysId, filmstadenRemoteEntityId, ticketId) = extractIdsFromUrl(userSuppliedTicketUrl)
     val filmstadenTickets = filmstadenService.fetchTickets(sysId, filmstadenRemoteEntityId, ticketId)
 
     val tickets = filmstadenTickets.map {
       val barcode = filmstadenService.fetchBarcode(it.id)
       if (it.profileId.isNullOrBlank()) {
-        return@map it.toTicket(showing.id, showing.admin.id, barcode)
+        return@map it.toTicket(showing.id, showing.admin, barcode)
       }
 
       val userIdForThatMember =
-        getUserIdFromFilmstadenId(FilmstadenMembershipId.valueOf(it.profileId!!), showing)
+        getUserIdFromFilmstadenId(daos, FilmstadenMembershipId.valueOf(it.profileId!!), showing)
       it.toTicket(showing.id, userIdForThatMember, barcode)
     }
 
-    ticketRepository.saveAll(tickets)
+    daos.ticketDao.insertTickets(tickets)
   }
 
-  private fun getUserIdFromFilmstadenId(filmstadenId: FilmstadenMembershipId, showing: Showing): UUID {
-    val userIdForThatMember = userRepository.findUserIdByFilmstadenId(filmstadenId)
-      ?: return showing.admin.id
+  private fun getUserIdFromFilmstadenId(daos: Daos, filmstadenId: FilmstadenMembershipId, showing: ShowingDTO): UUID {
+    val userIdForThatMember = daos.userDao.findIdByFilmstadenId(filmstadenId)
+      ?: return showing.admin
 
     // Check so that we don't accidentally assign ticket to user not attending showing
-    if (showing.participants.any { it.user.id == userIdForThatMember }) {
-      return userIdForThatMember
+    if (!daos.participantDao.isParticipantOnShowing(userIdForThatMember, showing.id)) {
+      return showing.admin
     }
 
-    return showing.admin.id
+    return userIdForThatMember
   }
 
   private fun extractIdsFromUrl(userSuppliedTicketUrl: String): Triple<String, String, String> {
@@ -132,75 +137,51 @@ class TicketService(
     return Triple(ids[0], ids[1], ids[2])
   }
 
-  @Transactional
-  fun deleteTickets(showing: Showing) {
-    val numDeletedTickets = ticketRepository.deleteAllByShowing(showing)
-    log.info("Deleted {} tickets from showing {}", numDeletedTickets, showing.id)
-  }
-
   fun getTicketRange(showingId: UUID): TicketRange? {
-    val currentLoggedInUser = currentLoggedInUser()
-    if (!isUserIsParticipant(showingId, currentLoggedInUser.id)) {
-      return null
-    }
-
-    val allSeatsForShowing = ticketRepository.findByShowing_Id(showingId)
-      .map { Seat(it.seatRow, it.seatNumber) }
-      .sortedBy { it.number }
-
-    val rows = allSeatsForShowing
-      .map { it.row }
-      .distinct()
-      .sorted()
-
-    val groupedSeats = allSeatsForShowing
-      .groupBy({ it.row }, { it.number })
-      .map { SeatRange(it.key, it.value) }
-    return TicketRange(rows, groupedSeats, allSeatsForShowing.size)
-  }
-
-  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UUID, barcode: String): Ticket {
-    val ticket = Ticket(
-      id = this.id,
-      showing = showingRepository.getOne(showingId),
-      assignedToUser = userRepository.getOne(assignedToUser),
-      customerType = this.customerType,
-      customerTypeDefinition = this.customerTypeDefinition,
-      cinema = this.cinema.title,
-      cinemaCity = this.cinema.city.name,
-      screen = this.screen.title,
-      seatNumber = this.seat.number,
-      seatRow = this.seat.number,
-      date = this.show.date,
-      time = this.show.time,
-      movieName = this.movie.title,
-      movieRating = this.movie.rating.displayName,
-      barcode = barcode,
-      profileId = this.profileId
-    )
-    ticket.showAttributes.addAll(this.show.attributes.map {
-      TicketAttribute(
-        TicketAttributeId(
-          ticket,
-          it.displayName
-        )
-      )
-    })
-
-    return ticket
-  }
-
-  private fun isUserIsParticipant(showingId: UUID, currentLoggedInUser: UUID): Boolean {
-    return participantRepo.existsById_Showing_IdAndId_User_Id(showingId, currentLoggedInUser)
-  }
-
-  private fun validateFilmstadenTicketUrls(links: List<String>) {
-    val linkRegex = Regex(".+filmstaden\\.se/bokning/mina-e-biljetter/Sys.+?/AA.+?/RE.+")
-    links.forEach {
-      if (!it.matches(linkRegex)) {
-        throw FilmstadenTicketException("$it does not look like a valid ticket link. The link should look like this: https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6")
+    return jdbi.inTransactionUnchecked { handle ->
+      val daos = handle.toDaos()
+      val currentLoggedInUser = currentLoggedInUser()
+      if (!daos.participantDao.isParticipantOnShowing(currentLoggedInUser.id, showingId)) {
+        return@inTransactionUnchecked null
       }
+
+      val allSeatsForShowing = daos.ticketDao.findByShowing(showingId)
+        .map { Seat(it.seatRow, it.seatNumber) }
+        .sortedBy { it.number }
+
+      val rows = allSeatsForShowing
+        .map { it.row }
+        .distinct()
+        .sorted()
+
+      val groupedSeats = allSeatsForShowing
+        .groupBy({ it.row }, { it.number })
+        .map { SeatRange(it.key, it.value) }
+      TicketRange(rows, groupedSeats, allSeatsForShowing.size)
+
     }
+  }
+
+  private fun FilmstadenTicketDTO.toTicket(showingId: UUID, assignedToUser: UUID, barcode: String): TicketDTO {
+    return TicketDTO(
+      id = id,
+      showingId = showingId,
+      assignedToUser = assignedToUser,
+      customerType = customerType,
+      customerTypeDefinition = customerTypeDefinition,
+      cinema = cinema.title,
+      cinemaCity = cinema.city.name,
+      screen = screen.title,
+      seatNumber = seat.number,
+      seatRow = seat.row,
+      date = show.date,
+      time = show.time,
+      movieName = movie.title,
+      movieRating = movie.rating.displayName,
+      barcode = barcode,
+      profileId = profileId,
+      attributes = show.attributes.map { it.displayName }.toSet()
+    )
   }
 
   data class Seat(val row: Int, val number: Int)

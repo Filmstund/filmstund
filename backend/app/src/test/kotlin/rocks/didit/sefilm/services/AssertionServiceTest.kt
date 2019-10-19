@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import rocks.didit.sefilm.DatabaseTest
+import rocks.didit.sefilm.FilmstadenTicketException
 import rocks.didit.sefilm.MissingPhoneNumberException
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.TicketAlreadyUsedException
@@ -148,5 +149,29 @@ internal class AssertionServiceTest {
         assertThat(e).hasMessage("The ticket ${user.giftCertificates.first().number} has already been used")
       }
     }
+  }
+
+  @Test
+  internal fun `given a malformed ticket url, when validateFilmstadenTicketUrl, then an exception is thrown`() {
+    val url = "https://www.sf.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6"
+    assertThrows<FilmstadenTicketException> {
+      assertionService.validateFilmstadenTicketUrls(listOf(url))
+    }
+  }
+
+  @Test
+  internal fun `given one valid url and one malformed ticket url, when validateFilmstadenTicketUrl, then an exception is thrown`() {
+    val urlOne = "https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6"
+    val urlTwo = "https://www.sf.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6"
+    assertThrows<FilmstadenTicketException> {
+      assertionService.validateFilmstadenTicketUrls(listOf(urlOne, urlTwo))
+    }
+  }
+
+  @Test
+  internal fun `given a valid url, when validateFilmstadenTicketUrl, then no exception is thrown`() {
+    val urlOne = "https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6"
+    val urlTwo = "https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201910161930/RE-99RBBT0ZP6"
+    assertionService.validateFilmstadenTicketUrls(listOf(urlOne, urlTwo))
   }
 }

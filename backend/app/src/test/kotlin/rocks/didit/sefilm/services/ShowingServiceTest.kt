@@ -12,18 +12,32 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.*
+import rocks.didit.sefilm.DatabaseTest
+import rocks.didit.sefilm.MissingPhoneNumberException
+import rocks.didit.sefilm.NotFoundException
+import rocks.didit.sefilm.TestConfig
+import rocks.didit.sefilm.TicketsAlreadyBoughtException
+import rocks.didit.sefilm.UserAlreadyAttendedException
+import rocks.didit.sefilm.WithLoggedInUser
+import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.toFilmstadenLiteScreen
 import rocks.didit.sefilm.events.EventPublisher
+import rocks.didit.sefilm.isRoughlyEqualToShowing
+import rocks.didit.sefilm.nextGiftCert
+import rocks.didit.sefilm.nextGiftCerts
+import rocks.didit.sefilm.nextParticipant
+import rocks.didit.sefilm.nextShowing
+import rocks.didit.sefilm.nextUserDTO
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.LocalDate
 import java.time.LocalTime
@@ -494,7 +508,7 @@ internal class ShowingServiceTest {
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       withUser()
       afterInsert {
-        val showMock = ThreadLocalRandom.current().nextFilmStadenShowDTO()
+        val showMock = rnd.nextObject(FilmstadenShowDTO::class.java)
         `when`(filmstadenServiceMock.fetchFilmstadenShow("fsreid1337"))
           .thenReturn(showMock)
 

@@ -10,10 +10,6 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.TMDbID
 import rocks.didit.sefilm.domain.TicketNumber
 import rocks.didit.sefilm.domain.dto.FilmstadenLiteScreenDTO
-import rocks.didit.sefilm.domain.dto.FilmstadenMovieDTO
-import rocks.didit.sefilm.domain.dto.FilmstadenRatingDTO
-import rocks.didit.sefilm.domain.dto.FilmstadenScreenDTO
-import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
@@ -26,8 +22,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
@@ -169,54 +163,8 @@ fun ThreadLocalRandom.nextTicket(showingId: UUID, assignedToUser: UUID): TicketD
   )
 }
 
-fun ThreadLocalRandom.nextFilmstadenMovieDTO(): FilmstadenMovieDTO {
-  return FilmstadenMovieDTO(
-    ncgId = "ncgid${nextLong(0, 100000)}",
-    title = "title${nextLong(0, 100000)}",
-    releaseDate = nextLocalDate(),
-    rating = FilmstadenRatingDTO(
-      nextInt(0, 100),
-      nextInt(0, 1),
-      "alias${nextLong(0, 1000)}",
-      "dispName${nextLong(0, 1000)}"
-    ),
-    posterUrl = "https://poster${nextLong(0, 1000)}.example.org",
-    slug = "slug${nextLong(0, 1000)}",
-    length = nextInt(14, 314),
-    genres = listOf()
-  )
-
-}
-
-fun ThreadLocalRandom.nextFilmstadenScreenDTO(): FilmstadenScreenDTO {
-  return FilmstadenScreenDTO(
-    ncgId = "ncgid${nextLong(0, 10000)}",
-    title = "title${nextLong(0, 10000)}",
-    slug = "slug${nextLong(0, 10000)}",
-    seatCount = nextInt(14, 140),
-    remoteSystemAlias = "rsa${nextLong(0, 10000)}",
-    remoteEntityId = "reid${nextLong(0, 1000)}"
-  )
-}
-
-fun ThreadLocalRandom.nextFilmStadenShowDTO(): FilmstadenShowDTO {
-  val ofEpochMilli = Instant.ofEpochMilli(nextLong(0, System.currentTimeMillis()))
-  return FilmstadenShowDTO(
-    remoteSystemAlias = "rsa${nextLong(0, 1000000)}",
-    remoteEntityId = "reid${nextLong(0, 1000000)}",
-    unnumbered = nextBoolean(),
-    time = ZonedDateTime.ofInstant(ofEpochMilli, ZoneOffset.UTC),
-    timeUtc = ofEpochMilli,
-    movie = nextFilmstadenMovieDTO(),
-    movieVersion = mapOf(),
-    attributes = listOf(),
-    cinema = null,
-    screen = nextFilmstadenScreenDTO()
-  )
-}
-
-fun ThreadLocalRandom.nextLocalDate() = LocalDate.of(nextInt(1900, 2020), nextInt(1, 12), nextInt(1, 28))
-fun ThreadLocalRandom.nextLocalTime() = LocalTime.of(nextInt(0, 23), nextInt(0, 59), nextInt(0, 59))
+fun ThreadLocalRandom.nextLocalDate(): LocalDate = LocalDate.of(nextInt(1900, 2020), nextInt(1, 12), nextInt(1, 28))
+fun ThreadLocalRandom.nextLocalTime(): LocalTime = LocalTime.of(nextInt(0, 23), nextInt(0, 59), nextInt(0, 59))
 
 internal fun <ACTUAL> ObjectAssert<ACTUAL>.isRoughlyEqualToShowing(showing: ACTUAL): Any {
   return isEqualToIgnoringGivenFields(

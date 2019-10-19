@@ -5,6 +5,7 @@ import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
+import rocks.didit.sefilm.FilmstadenTicketException
 import rocks.didit.sefilm.MissingPhoneNumberException
 import rocks.didit.sefilm.TicketAlreadyUsedException
 import rocks.didit.sefilm.TicketExpiredException
@@ -55,6 +56,15 @@ class AssertionService(
 
     if (giftCertService.getStatusOfTicket(matchingTicket) != GiftCertificateDTO.Status.AVAILABLE) {
       throw TicketAlreadyUsedException(suppliedTicket)
+    }
+  }
+
+  fun validateFilmstadenTicketUrls(links: List<String>) {
+    val linkRegex = Regex(".+filmstaden\\.se/bokning/mina-e-biljetter/Sys.+?/AA.+?/RE.+")
+    links.forEach {
+      if (!it.matches(linkRegex)) {
+        throw FilmstadenTicketException("$it does not look like a valid ticket link. The link should look like this: https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/AA-1036-201908221930/RE-99RBBT0ZP6")
+      }
     }
   }
 }

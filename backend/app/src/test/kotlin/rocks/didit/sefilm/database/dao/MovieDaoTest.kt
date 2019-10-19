@@ -83,7 +83,7 @@ internal class MovieDaoTest {
   @Test
   internal fun `given at least 5 movies, when findAll(), then at least those movies are returned`() {
     databaseTest.start {
-      withMovies { (0..5).map { rnd.nextMovie() } }
+      withMovies { rnd -> (0..5).map { rnd.nextMovie() } }
       afterInsert {
         val moviesFromDb = it.movieDao.findAll()
         assertThat(moviesFromDb)

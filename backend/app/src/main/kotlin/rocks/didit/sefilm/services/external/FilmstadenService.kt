@@ -146,6 +146,7 @@ class FilmstadenService(
       .body ?: listOf()
   }
 
+  @Cacheable("filmstadenShow")
   fun fetchFilmstadenShow(filmstadenRemoteEntityId: String): FilmstadenShowDTO {
 
     val filmstadenShowItemsDTO = restTemplate

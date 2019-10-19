@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
+import rocks.didit.sefilm.domain.FilmstadenMembershipId
+import rocks.didit.sefilm.domain.GoogleId
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.nextGiftCert
 import rocks.didit.sefilm.nextGiftCerts
@@ -20,11 +23,14 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class])
+@SpringBootTest(classes = [DatabaseTest::class, Jdbi::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class UserDaoTest {
   @Autowired
   private lateinit var jdbi: Jdbi
+
+  @Autowired
+  private lateinit var databaseTest: DatabaseTest
 
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
@@ -57,6 +63,50 @@ internal class UserDaoTest {
         .isNotNull
         .isEqualToIgnoringGivenFields(rndUser, "signupDate")
       // LastLogin and SignupDate is set by the db.
+    }
+  }
+
+  @Test
+  internal fun `given a user, when findIdByGoogleId(), then the user id is returned`() {
+    databaseTest.start {
+      withUser()
+      afterInsert {
+        assertThat(user.googleId).isNotNull
+        val userId = it.userDao.findIdByGoogleId(user.googleId!!)
+        assertThat(userId).isEqualTo(user.id)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a user, when findIdByFilmstadenId(), then the user id is returned`() {
+    databaseTest.start {
+      withUser()
+      afterInsert {
+        assertThat(user.filmstadenId).isNotNull
+        val userId = it.userDao.findIdByFilmstadenId(user.filmstadenId!!)
+        assertThat(userId).isEqualTo(user.id)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given no user, when findIdByFilmstadenId(), then null returned`() {
+    databaseTest.start {
+      afterInsert {
+        val userId = it.userDao.findIdByFilmstadenId(FilmstadenMembershipId("ASD-FGH"))
+        assertThat(userId).isNull()
+      }
+    }
+  }
+
+  @Test
+  internal fun `given no user, when findIdByGoogleId(), then null returned`() {
+    databaseTest.start {
+      afterInsert {
+        val userId = it.userDao.findIdByGoogleId(GoogleId("QWERTY123"))
+        assertThat(userId).isNull()
+      }
     }
   }
 

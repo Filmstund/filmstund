@@ -1,6 +1,7 @@
 package rocks.didit.sefilm
 
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -8,6 +9,7 @@ import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
 import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.database.dao.ShowingDao
+import rocks.didit.sefilm.database.dao.TicketDao
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 
@@ -28,15 +30,17 @@ data class Daos(
   val movieDao: MovieDao,
   val locationDao: LocationDao,
   val showingDao: ShowingDao,
-  val participantDao: ParticipantDao
+  val participantDao: ParticipantDao,
+  val ticketDao: TicketDao
 )
 
 fun Handle.toDaos(): Daos {
-  val userDao = attach(UserDao::class.java)
-  val movieDao = attach(MovieDao::class.java)
-  val locationDao = attach(LocationDao::class.java)
-  val showingDao = attach(ShowingDao::class.java)
-  val participantDao = attach(ParticipantDao::class.java)
+  val userDao = attach<UserDao>()
+  val movieDao = attach<MovieDao>()
+  val locationDao = attach<LocationDao>()
+  val showingDao = attach<ShowingDao>()
+  val participantDao = attach<ParticipantDao>()
+  val ticketDao = attach<TicketDao>()
 
-  return Daos(userDao, movieDao, locationDao, showingDao, participantDao)
+  return Daos(userDao, movieDao, locationDao, showingDao, participantDao, ticketDao)
 }

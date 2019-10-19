@@ -2,11 +2,19 @@ package rocks.didit.sefilm
 
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.useTransactionUnchecked
+import org.jeasy.random.EasyRandom
+import org.jeasy.random.EasyRandomParameters
+import org.jeasy.random.FieldPredicates
+import org.jeasy.random.api.Randomizer
 import org.springframework.stereotype.Component
+import rocks.didit.sefilm.domain.dto.FilmstadenSeatDTO
+import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
+import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
+import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
@@ -66,14 +74,14 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addShowings(testData.generate(ThreadLocalRandom.current()))
   }
 
-  fun withShowing() {
-    if (testData.lastUser == null) {
+  fun withShowing(adminId: UUID? = null) {
+    if (testData.lastUser == null && adminId == null) {
       withUser()
     }
     if (testData.lastMovie == null) {
       withMovie()
     }
-    withShowing { it.nextShowing(testData.lastMovie?.id!!, testData.lastUser?.id!!) }
+    withShowing { it.nextShowing(testData.lastMovie?.id!!, adminId ?: testData.lastUser?.id!!) }
   }
 
   fun withParticipant(generate: TestData.(ThreadLocalRandom) -> ParticipantDTO) {
@@ -100,6 +108,10 @@ class DbTest(private val jdbi: Jdbi) {
     repeat(count) {
       withParticipantOnLastShowing()
     }
+  }
+
+  fun withTicket(generate: TestData.(ThreadLocalRandom) -> TicketDTO) {
+    testData = testData.addTicket(testData.generate(ThreadLocalRandom.current()))
   }
 
   fun afterInsert(init: TestData.(Daos) -> Unit) {
@@ -137,11 +149,40 @@ class DbTest(private val jdbi: Jdbi) {
       if (testData.participants.isNotEmpty()) {
         daos.participantDao.insertParticipantsOnShowing(testData.participants)
       }
+
+      if (testData.participants.isNotEmpty()) {
+        daos.ticketDao.insertTickets(testData.tickets)
+      }
     }
   }
 }
 
 data class TestData(
+  val rnd: EasyRandom = EasyRandom(
+    EasyRandomParameters()
+      .seed(ThreadLocalRandom.current().nextLong())
+      .stringLengthRange(5, 15)
+      .dateRange(LocalDate.of(1900, 1, 1), LocalDate.now())
+      .randomize(
+        FieldPredicates.named("profileId").and(FieldPredicates.ofType(String::class.java)).and(
+          FieldPredicates.inClass(FilmstadenTicketDTO::class.java)
+        ), Randomizer<String> {
+          val r = ThreadLocalRandom.current()
+          "${r.nextInt(100, 999)}-${r.nextInt(100, 999)}"
+        })
+      .randomize(
+        FieldPredicates.named("number").and(FieldPredicates.ofType(Int::class.java)).and(
+          FieldPredicates.inClass(FilmstadenSeatDTO::class.java)
+        ), Randomizer<Int> {
+          ThreadLocalRandom.current().nextInt(0, 100)
+        })
+      .randomize(
+        FieldPredicates.named("row").and(FieldPredicates.ofType(Int::class.java)).and(
+          FieldPredicates.inClass(FilmstadenSeatDTO::class.java)
+        ), Randomizer<Int> {
+          ThreadLocalRandom.current().nextInt(0, 100)
+        })
+  ),
   val users: Map<UUID, UserDTO> = mapOf(),
   val lastUser: UserDTO? = null,
   val lastAdmin: UserDTO? = null,
@@ -153,7 +194,10 @@ data class TestData(
   val lastShowing: ShowingDTO? = null,
 
   val participants: List<ParticipantDTO> = listOf(),
-  val lastParticipant: ParticipantDTO? = null
+  val lastParticipant: ParticipantDTO? = null,
+
+  val tickets: List<TicketDTO> = listOf(),
+  val lastTicket: TicketDTO? = null
 ) {
   val user: UserDTO get() = lastUser ?: throw IllegalStateException("No user has been created. See #withUser()")
   val admin: UserDTO get() = lastAdmin ?: throw IllegalStateException("No admin has been created. See #withAdmin()")
@@ -162,6 +206,8 @@ data class TestData(
     get() = lastShowing ?: throw IllegalStateException("No showing has been created. See #withShowing()")
   val participant: ParticipantDTO
     get() = lastParticipant ?: throw IllegalStateException("No participant has been created. See #withParticipant()")
+  val ticket: TicketDTO
+    get() = lastTicket ?: throw IllegalStateException("No ticket has been created. See #withTicket()")
 
   fun addUser(user: UserDTO): TestData = copy(lastUser = user, users = users.plus(Pair(user.id, user)))
   fun addAdmin(admin: UserDTO): TestData =
@@ -180,5 +226,7 @@ data class TestData(
 
   fun addParticipant(participant: ParticipantDTO): TestData =
     copy(lastParticipant = participant, participants = participants.plus(participant))
+
+  fun addTicket(ticket: TicketDTO): TestData = copy(lastTicket = ticket, tickets = tickets.plus(ticket))
 }
 

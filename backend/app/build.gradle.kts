@@ -65,6 +65,7 @@ dependencies {
   testImplementation("org.mockito:mockito-core:3.1.0")
   testImplementation("org.mockito:mockito-junit-jupiter:3.1.0")
   testImplementation("com.opentable.components:otj-pg-embedded:0.13.1")
+  testImplementation("org.jeasy:easy-random-core:4.0.0")
 }
 
 tasks.register("versionBanner") {
