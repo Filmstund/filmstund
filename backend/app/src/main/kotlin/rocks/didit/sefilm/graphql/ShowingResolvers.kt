@@ -8,14 +8,14 @@ import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.database.dao.ParticipantDao
+import rocks.didit.sefilm.database.dao.AttendeeDao
 import rocks.didit.sefilm.domain.dto.AdminPaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.AttendeePaymentDetailsDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.TicketRange
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.id.Base64ID
@@ -48,7 +48,7 @@ class ShowingQueryResolver(private val showingService: ShowingService) : GraphQL
 @CacheConfig(cacheNames = ["graphql"], cacheManager = "graphQlCacheManager")
 class ShowingResolver(
   private val showingService: ShowingService,
-  private val participantDao: ParticipantDao,
+  private val attendeeDao: AttendeeDao,
   private val userService: UserService,
   private val movieService: MovieService,
   private val ticketService: TicketService
@@ -66,8 +66,8 @@ class ShowingResolver(
   @Cacheable
   fun movie(showing: ShowingDTO): MovieDTO = movieService.getMovieOrThrow(showing.movieId)
 
-  fun participants(showing: ShowingDTO): List<ParticipantDTO> =
-    participantDao.findAllParticipants(showing.id)
+  fun attendees(showing: ShowingDTO): List<AttendeeDTO> =
+    attendeeDao.findAllAttendees(showing.id)
 
   @Cacheable
   fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
@@ -85,16 +85,16 @@ class ShowingResolver(
 }
 
 @Component
-class ParticipantUserResolver(private val userService: UserService, private val showingService: ShowingService) :
-  GraphQLResolver<ParticipantDTO> {
-  fun user(participant: ParticipantDTO): PublicUserDTO = userService
-    .getUserOrThrow(participant.userId)
+class AttendeeUserResolver(private val userService: UserService, private val showingService: ShowingService) :
+  GraphQLResolver<AttendeeDTO> {
+  fun user(attendee: AttendeeDTO): PublicUserDTO = userService
+    .getUserOrThrow(attendee.userId)
 
   // TODO: why is this needed?
-  fun id(participant: ParticipantDTO) = participant.userId
+  fun id(attendee: AttendeeDTO) = attendee.userId
 
   // TODO: why is this needed?
-  fun showing(participant: ParticipantDTO) = showingService.getShowingOrThrow(participant.showingId)
+  fun showing(attendee: AttendeeDTO) = showingService.getShowingOrThrow(attendee.showingId)
 }
 
 @Component

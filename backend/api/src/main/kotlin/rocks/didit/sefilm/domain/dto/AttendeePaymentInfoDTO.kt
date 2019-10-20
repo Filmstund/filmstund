@@ -4,7 +4,7 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 
-data class ParticipantPaymentInfoDTO(
+data class AttendeePaymentInfoDTO(
   val userId: UserID? = null,
   val showingId: ShowingID? = null,
   val hasPaid: Boolean = false,

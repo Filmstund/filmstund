@@ -65,16 +65,16 @@ class TicketService(
     val adminAssignedTickets = daos.ticketDao.findByUserAndShowing(showing.admin, showing.id)
     if (adminAssignedTickets.size > 1) {
       val allTickets = daos.ticketDao.findByShowing(showing.id)
-      val participants = daos.participantDao.findAllParticipants(showing.id)
-      val participantsMissingTicket = participants.filter { participant ->
-        allTickets.none { ticket -> ticket.assignedToUser == participant.userId }
+      val attendees = daos.attendeeDao.findAllAttendees(showing.id)
+      val attendeesMissingTickets = attendees.filter { attendee ->
+        allTickets.none { ticket -> ticket.assignedToUser == attendee.userId }
       }
 
       adminAssignedTickets.subList(1, adminAssignedTickets.size)
-        .zip(participantsMissingTicket)
-        .forEach { (ticket, participant) ->
-          log.info("Re-assigning ticket {} to {} (was assigned to {})", ticket.id, participant.userId, showing.admin)
-          daos.ticketDao.reassignTicket(ticket.id, showing.admin, participant.userId)
+        .zip(attendeesMissingTickets)
+        .forEach { (ticket, attendee) ->
+          log.info("Re-assigning ticket {} to {} (was assigned to {})", ticket.id, attendee.userId, showing.admin)
+          daos.ticketDao.reassignTicket(ticket.id, showing.admin, attendee.userId)
         }
     }
   }
@@ -124,7 +124,7 @@ class TicketService(
       ?: return showing.admin
 
     // Check so that we don't accidentally assign ticket to user not attending showing
-    if (!daos.participantDao.isParticipantOnShowing(userIdForThatMember, showing.id)) {
+    if (!daos.attendeeDao.isAttendeeOnShowing(userIdForThatMember, showing.id)) {
       return showing.admin
     }
 
@@ -142,7 +142,7 @@ class TicketService(
     return jdbi.inTransactionUnchecked { handle ->
       val daos = handle.toDaos()
       val currentLoggedInUser = currentLoggedInUser()
-      if (!daos.participantDao.isParticipantOnShowing(currentLoggedInUser.id, showingId)) {
+      if (!daos.attendeeDao.isAttendeeOnShowing(currentLoggedInUser.id, showingId)) {
         return@inTransactionUnchecked null
       }
 

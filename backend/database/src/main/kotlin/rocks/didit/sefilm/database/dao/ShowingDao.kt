@@ -51,13 +51,13 @@ interface ShowingDao {
   )
   fun findByWebId(webId: Base64ID): ShowingDTO?
 
-  @SqlQuery("SELECT $STAR FROM showing s $COMMON_JOINS WHERE s.admin = :userId OR s.id IN (SELECT showing_id FROM participant p WHERE p.user_id = :userId)")
+  @SqlQuery("SELECT $STAR FROM showing s $COMMON_JOINS WHERE s.admin = :userId OR s.id IN (SELECT a.showing_id FROM attendee a WHERE a.user_id = :userId)")
   @UseRowReducer(ShowingLocationScreenReducer::class)
   @RegisterKotlinMappers(
     RegisterKotlinMapper(LocationDTO::class, "l"),
     RegisterKotlinMapper(CinemaScreenDTO::class, "cs")
   )
-  fun findByAdminOrParticipant(userId: UserID): List<ShowingDTO>
+  fun findByAdminOrAttendee(userId: UserID): List<ShowingDTO>
 
   @SqlQuery("SELECT $STAR FROM showing s $COMMON_JOINS WHERE s.movie_id = :movieId ORDER BY date DESC")
   @UseRowReducer(ShowingLocationScreenReducer::class)

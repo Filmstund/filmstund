@@ -1,7 +1,7 @@
 type AdminPaymentDetails {
     filmstadenBuyLink: String
     showingId: ShowingID
-    #participants: [Participant!]! # FIXME
+    #attendees: [Attendee!]! # FIXME, doesn't start with this...
 }
 
 type AttendeePaymentDetails {
@@ -12,7 +12,7 @@ type AttendeePaymentDetails {
     swishLink: String
 }
 
-type ParticipantPaymentInfo {
+type AttendeePaymentInfo {
     id: UUID!
     user: User!
     showing: Showing!
@@ -20,7 +20,7 @@ type ParticipantPaymentInfo {
     amountOwed: SEK!
 }
 
-input ParticipantPaymentInput {
+input AttendeePaymentInput {
     id: UUID!
     userId: String!
     showingId: UUID

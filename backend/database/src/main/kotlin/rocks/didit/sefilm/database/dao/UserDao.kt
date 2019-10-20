@@ -89,7 +89,7 @@ interface UserDao {
   fun existGiftCertsByNumbers(@BindList("numbers") numbers: List<TicketNumber>): Boolean
 
   @SqlUpdate("DELETE FROM gift_certificate gc WHERE gc.user_id = :userId AND gc.number = :number")
-  // This will also cascade set null on the Participant table if the ticket has been used in a showing
+  // This will also cascade set null on the attendee table if the ticket has been used in a showing
   fun deleteGiftCertByUserAndNumber(userId: UserID, number: TicketNumber): Boolean
 
 }

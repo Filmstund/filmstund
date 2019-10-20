@@ -20,8 +20,8 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.CreateShowingDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenShowDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
@@ -112,11 +112,11 @@ internal class ShowingServiceTest {
   }
 
   @Test
-  internal fun `given a showing, when user is participant and getShowingByUser, then that showing is returned`() {
+  internal fun `given a showing, when user is attendee and getShowingByUser, then that showing is returned`() {
     databaseTest.start {
       withAdmin()
       withShowing()
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         val dbShowings = showingService.getShowingByUser(user.id)
         assertThat(dbShowings).hasSize(1)
@@ -168,7 +168,7 @@ internal class ShowingServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with no participants, when getAdminPaymentDetails(), then the payment details with no participants are returned`() {
+  internal fun `given a showing with no attendees, when getAdminPaymentDetails(), then the payment details with no attendees are returned`() {
     databaseTest.start {
       withUser { it.nextUserDTO(currentLoggedInUser().id) }
       withShowing()
@@ -177,7 +177,7 @@ internal class ShowingServiceTest {
         assertThat(adminPaymentDetails).isNotNull
 
         assertThat(adminPaymentDetails?.filmstadenBuyLink).isNull()
-        assertThat(adminPaymentDetails?.participants).isNotNull.isEmpty()
+        assertThat(adminPaymentDetails?.attendees).isNotNull.isEmpty()
         assertThat(adminPaymentDetails?.showingId).isEqualTo(showing.id)
       }
     }
@@ -185,17 +185,17 @@ internal class ShowingServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with participants, when getAdminPaymentDetails(), then the payment details including participants are returned`() {
+  internal fun `given a showing with attendees, when getAdminPaymentDetails(), then the payment details including attendees are returned`() {
     databaseTest.start {
       withUser { it.nextUserDTO(currentLoggedInUser().id) }
       withShowing()
-      withParticipantsOnLastShowing(5)
+      withAttendeesOnLastShowing(5)
       afterInsert {
         val adminPaymentDetails = showingService.getAdminPaymentDetails(showing.id)
         assertThat(adminPaymentDetails).isNotNull
 
         assertThat(adminPaymentDetails?.filmstadenBuyLink).isNull()
-        assertThat(adminPaymentDetails?.participants).isNotNull.hasSize(5)
+        assertThat(adminPaymentDetails?.attendees).isNotNull.hasSize(5)
         assertThat(adminPaymentDetails?.showingId).isEqualTo(showing.id)
       }
     }
@@ -206,7 +206,7 @@ internal class ShowingServiceTest {
     databaseTest.start {
       withUser { it.nextUserDTO().copy(phone = null) }
       withShowing()
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         assertThrows<MissingPhoneNumberException> {
           showingService.getAttendeePaymentDetailsForUser(user.id, showing.id)
@@ -216,20 +216,20 @@ internal class ShowingServiceTest {
   }
 
   @Test
-  internal fun `given a showing and participant, when getAttendeePaymentDetails(), then the correct details are returned`() {
+  internal fun `given a showing and attendee, when getAttendeePaymentDetails(), then the correct details are returned`() {
     databaseTest.start {
       withAdmin()
       withShowing()
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         val attendeePaymentDetails = showingService.getAttendeePaymentDetailsForUser(user.id, showing.id)
         assertThat(attendeePaymentDetails).isNotNull
-        assertThat(attendeePaymentDetails?.hasPaid).isEqualTo(participant.hasPaid)
+        assertThat(attendeePaymentDetails?.hasPaid).isEqualTo(attendee.hasPaid)
         assertThat(attendeePaymentDetails?.amountOwed).isEqualTo(showing.price)
         assertThat(attendeePaymentDetails?.payTo).isEqualTo(admin.id)
         assertThat(attendeePaymentDetails?.payToPhoneNumber).isEqualTo(admin.phone?.number)
-        assertThat(attendeePaymentDetails?.payerUserID).isEqualTo(participant.userId)
-        if (participant.hasPaid) {
+        assertThat(attendeePaymentDetails?.payerUserID).isEqualTo(attendee.userId)
+        if (attendee.hasPaid) {
           assertThat(attendeePaymentDetails?.swishLink).isNull()
         } else {
           assertThat(attendeePaymentDetails?.swishLink).startsWith("swish://payment?data=")
@@ -240,11 +240,11 @@ internal class ShowingServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing and participant, when attendShowing(), then an exception is thrown`() {
+  internal fun `given a showing and attendee, when attendShowing(), then an exception is thrown`() {
     databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       afterInsert {
         assertThrows<UserAlreadyAttendedException> {
           showingService.attendShowing(showing.id, PaymentOption(PaymentType.Swish))
@@ -274,14 +274,14 @@ internal class ShowingServiceTest {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
         showingService.attendShowing(showing.id, PaymentOption(PaymentType.Swish))
-        val participant = it.participantDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
-        assertThat(participant).isNotNull
-        assertThat(participant?.hasPaid).isFalse()
-        assertThat(participant?.amountOwed).isEqualTo(SEK.ZERO)
-        assertThat(participant?.giftCertificateUsed).isNull()
-        assertThat(participant?.type).isEqualTo(ParticipantDTO.Type.SWISH)
+        val attendee = it.attendeeDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
+        assertThat(attendee).isNotNull
+        assertThat(attendee?.hasPaid).isFalse()
+        assertThat(attendee?.amountOwed).isEqualTo(SEK.ZERO)
+        assertThat(attendee?.giftCertificateUsed).isNull()
+        assertThat(attendee?.type).isEqualTo(AttendeeDTO.Type.SWISH)
       }
     }
   }
@@ -297,61 +297,63 @@ internal class ShowingServiceTest {
           .copy(expiresAt = LocalDate.now().plusDays(1))
         it.userDao.insertGiftCertificate(giftCert)
 
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
         showingService.attendShowing(showing.id, PaymentOption(PaymentType.GiftCertificate, giftCert.number.number))
 
-        val participant = it.participantDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
-        assertThat(participant).isNotNull
-        assertThat(participant?.hasPaid).isFalse()
-        assertThat(participant?.amountOwed).isEqualTo(SEK.ZERO)
-        assertThat(participant?.giftCertificateUsed).isEqualTo(giftCert)
-        assertThat(participant?.type).isEqualTo(ParticipantDTO.Type.GIFT_CERTIFICATE)
+        val attendee = it.attendeeDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
+        assertThat(attendee).isNotNull
+        assertThat(attendee?.hasPaid).isFalse()
+        assertThat(attendee?.amountOwed).isEqualTo(SEK.ZERO)
+        assertThat(attendee?.giftCertificateUsed).isEqualTo(giftCert)
+        assertThat(attendee?.type).isEqualTo(AttendeeDTO.Type.GIFT_CERTIFICATE)
       }
     }
   }
 
   @Test
   @WithLoggedInUser
-  internal fun `given a bought showing with a participant, when unattendShowing(), then an exception is thrown`() {
+  internal fun `given a bought showing with a attendee, when unattendShowing(), then an exception is thrown`() {
     databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = true) }
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       afterInsert {
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
         assertThrows<TicketsAlreadyBoughtException> {
           showingService.unattendShowing(showing.id)
         }
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
       }
     }
   }
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing without participant, when unattendShowing(), then an exception is thrown`() {
+  internal fun `given a showing without attendee, when unattendShowing(), then an exception is thrown`() {
     databaseTest.start {
-      withShowing(currentLoggedInUser().id)
+      withMovie()
+      withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
         assertThrows<UnattendedException> {
           showingService.unattendShowing(showing.id)
         }
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
       }
     }
   }
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with a participant, when unattendShowing(), then the user isnt a participant anymore`() {
+  internal fun `given a showing with a attendee, when unattendShowing(), then the user isnt a attendee anymore`() {
     databaseTest.start {
-      withShowing(currentLoggedInUser().id)
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withMovie()
+      withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       afterInsert {
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
         showingService.unattendShowing(showing.id)
-        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
       }
     }
   }
@@ -372,9 +374,9 @@ internal class ShowingServiceTest {
         )
         val showing = showingService.createShowing(createShowing)
 
-        val adminParticipant = it.participantDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
-        assertThat(adminParticipant).isNotNull
-        assertThat(adminParticipant?.type).isEqualTo(ParticipantDTO.Type.SWISH)
+        val adminAttendee = it.attendeeDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
+        assertThat(adminAttendee).isNotNull
+        assertThat(adminAttendee?.type).isEqualTo(AttendeeDTO.Type.SWISH)
         assertThat(it.showingDao.findById(showing.id)).isEqualToIgnoringGivenFields(
           showing,
           "payToPhone",
@@ -459,23 +461,23 @@ internal class ShowingServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with multiple participants, when markAsBought(), then the showing has marked as bought`() {
+  internal fun `given a showing with multiple attendees, when markAsBought(), then the showing has marked as bought`() {
     databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
-      withParticipantsAndUsers(5) {
+      withAttendeesAndUsers(5) {
         val userId = UserID.random()
         val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
-        val participant =
-          it.nextParticipant(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = false)
-        Pair(user, participant)
+        val attendee =
+          it.nextAttendee(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = false)
+        Pair(user, attendee)
       }
-      withParticipantsAndUsers(5) {
+      withAttendeesAndUsers(5) {
         val user = it.nextUserDTO(UserID.random(), listOf())
-        val participant = it.nextParticipant(user.id, showing.id).copy(hasPaid = false)
-        Pair(user, participant)
+        val attendee = it.nextAttendee(user.id, showing.id).copy(hasPaid = false)
+        Pair(user, attendee)
       }
-      withParticipant { it.nextParticipant(showing.admin, showing.id) }
+      withAttendee { it.nextAttendee(showing.admin, showing.id) }
       afterInsert {
         val updatedShowing = showingService.markAsBought(showing.id, SEK(1337))
         assertThat(updatedShowing.ticketsBought).isTrue()
@@ -485,10 +487,10 @@ internal class ShowingServiceTest {
         assertThat(dbShowing?.ticketsBought).isTrue()
         assertThat(dbShowing?.price).isEqualTo(SEK(1337))
 
-        val allParticipants = it.participantDao.findAllParticipants(showing.id)
-        assertThat(allParticipants).hasSize(11)
-        allParticipants.forEach { p ->
-          if (p.type == ParticipantDTO.Type.SWISH && p.userId != currentLoggedInUser().id) {
+        val allAttendees = it.attendeeDao.findAllAttendees(showing.id)
+        assertThat(allAttendees).hasSize(11)
+        allAttendees.forEach { p ->
+          if (p.type == AttendeeDTO.Type.SWISH && p.userId != currentLoggedInUser().id) {
             assertThat(p.hasPaid).isFalse()
             assertThat(p.amountOwed).isEqualTo(SEK(1337))
           } else {

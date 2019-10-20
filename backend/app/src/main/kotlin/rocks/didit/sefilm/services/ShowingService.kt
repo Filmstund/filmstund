@@ -12,7 +12,7 @@ import rocks.didit.sefilm.NotFoundException
 import rocks.didit.sefilm.UnattendedException
 import rocks.didit.sefilm.UserAlreadyAttendedException
 import rocks.didit.sefilm.currentLoggedInUser
-import rocks.didit.sefilm.database.dao.ParticipantDao
+import rocks.didit.sefilm.database.dao.AttendeeDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
@@ -25,8 +25,8 @@ import rocks.didit.sefilm.domain.dto.FilmstadenSeatMapDTO
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
 import rocks.didit.sefilm.domain.dto.UpdateShowingDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.Base64ID
 import rocks.didit.sefilm.domain.id.FilmstadenShowingID
@@ -63,7 +63,7 @@ class ShowingService(
   fun getShowingByMovie(movieId: MovieID): List<ShowingDTO> = onDemandShowingDao
     .findByMovieIdOrderByDateDesc(movieId)
 
-  fun getShowingByUser(userId: UserID): List<ShowingDTO> = onDemandShowingDao.findByAdminOrParticipant(userId)
+  fun getShowingByUser(userId: UserID): List<ShowingDTO> = onDemandShowingDao.findByAdminOrAttendee(userId)
 
   fun getShowingsAfterDate(afterDate: LocalDate = LocalDate.MIN): List<ShowingDTO> =
     onDemandShowingDao.findByDateAfterOrderByDateDesc(afterDate)
@@ -89,8 +89,8 @@ class ShowingService(
 
       val filmstadenBuyLink = filmstadenService.getFilmstadenBuyLink(fsIdAndSlug.filmstadenId, fsIdAndSlug.slug)
 
-      val participants = it.attach<ParticipantDao>().findAllParticipants(showingId)
-      AdminPaymentDetailsDTO(showingId, filmstadenBuyLink, participants)
+      val attendees = it.attach<AttendeeDao>().findAllAttendees(showingId)
+      AdminPaymentDetailsDTO(showingId, filmstadenBuyLink, attendees)
     }
   }
 
@@ -101,19 +101,19 @@ class ShowingService(
   fun getAttendeePaymentDetailsForUser(userId: UserID, showingId: ShowingID): AttendeePaymentDetailsDTO? {
     return jdbi.inTransactionUnchecked {
       val showing = getShowingOrThrow(showingId)
-      // Only really needed if at least one participant wants to pay via slack...
+      // Only really needed if at least one attendee wants to pay via slack...
       val payeePhone = showing.payToPhone ?: throw MissingPhoneNumberException()
 
-      val participant = it.attach<ParticipantDao>().findByUserAndShowing(userId, showingId)
-        ?: throw NotFoundException("participant", userId, showingId)
+      val attendee = it.attach<AttendeeDao>().findByUserAndShowing(userId, showingId)
+        ?: throw NotFoundException("attendee", userId, showingId)
 
       val swishTo = when {
-        participant.hasPaid -> null
+        attendee.hasPaid -> null
         else -> constructSwishUri(showing, payeePhone)
       }
 
       AttendeePaymentDetailsDTO(
-        participant.hasPaid,
+        attendee.hasPaid,
         showing.price ?: SEK.ZERO,
         showing.payToUser,
         swishTo,
@@ -123,7 +123,7 @@ class ShowingService(
     }
   }
 
-  // ToDO: Return a list of PublicParticipantDTO instead ?
+  // ToDO: Return a list of PublicAttendeeDTO instead ?
   fun attendShowing(showingId: ShowingID, paymentOption: PaymentOption): ShowingDTO {
     return jdbi.inTransactionUnchecked {
       val daos = it.toDaos()
@@ -131,15 +131,15 @@ class ShowingService(
 
       val user = currentLoggedInUser()
       assertionService.assertTicketsNotBought(user.id, showing)
-      if (daos.participantDao.isParticipantOnShowing(user.id, showingId)) {
+      if (daos.attendeeDao.isAttendeeOnShowing(user.id, showingId)) {
         throw UserAlreadyAttendedException(user.id)
       }
 
-      val participant = createParticipantBasedOnPaymentType(paymentOption, user.id, showing)
-      daos.participantDao.insertParticipantOnShowing(participant)
+      val attendee = createAttendeeBasedOnPaymentType(paymentOption, user.id, showing)
+      daos.attendeeDao.insertAttendeeOnShowing(attendee)
 
       // TODO: reenable
-      //eventPublisher.publish(UserAttendedEvent(this, showing, participant.user, paymentOption.type))
+      //eventPublisher.publish(UserAttendedEvent(this, showing, attendee.user, paymentOption.type))
       showing
     }
   }
@@ -151,12 +151,12 @@ class ShowingService(
       val currentUser = currentLoggedInUser()
       assertionService.assertTicketsNotBought(currentUser.id, showing)
 
-      if (!daos.participantDao.deleteByUserAndShowing(currentUser.id, showingId)) {
+      if (!daos.attendeeDao.deleteByUserAndShowing(currentUser.id, showingId)) {
         throw UnattendedException(currentUser.id, showing.id)
       }
 
       // TODO re-enable
-      //eventPublisher.publish(UserUnattendedEvent(this, showing, participant.user))
+      //eventPublisher.publish(UserUnattendedEvent(this, showing, attendee.user))
       showing
     }
   }
@@ -175,8 +175,8 @@ class ShowingService(
       )
 
       daos.showingDao.insertNewShowing(showing)
-      val participant = createParticipantBasedOnPaymentType(PaymentOption(PaymentType.Swish), userId, showing)
-      daos.participantDao.insertParticipantOnShowing(participant)
+      val attendee = createAttendeeBasedOnPaymentType(PaymentOption(PaymentType.Swish), userId, showing)
+      daos.attendeeDao.insertAttendeeOnShowing(attendee)
 
       log.info("{} created new showing {}", userId, showing.id)
       // TODO reenable
@@ -208,7 +208,7 @@ class ShowingService(
   fun markAsBought(showingId: ShowingID, price: SEK): ShowingDTO {
     return jdbi.inTransactionUnchecked {
       val dao = it.attach<ShowingDao>()
-      val participantDao = it.attach<ParticipantDao>()
+      val attendeeDao = it.attach<AttendeeDao>()
       val showing = dao.findByIdOrThrow(showingId)
 
       assertionService.assertLoggedInUserIsAdmin(showing.admin)
@@ -219,8 +219,8 @@ class ShowingService(
         return@inTransactionUnchecked showing
       }
 
-      participantDao.markGCParticipantsAsHavingPaid(showingId, currentLoggedInUser().id)
-      participantDao.updateAmountOwedForSwishParticipants(showingId, currentLoggedInUser().id, price)
+      attendeeDao.markGCAttendeesAsHavingPaid(showingId, currentLoggedInUser().id)
+      attendeeDao.updateAmountOwedForSwishAttendees(showingId, currentLoggedInUser().id, price)
       dao.markShowingAsBought(showingId, price)
 
       // TODO re-enable
@@ -275,11 +275,11 @@ class ShowingService(
     )
   }
 
-  private fun createParticipantBasedOnPaymentType(
+  private fun createAttendeeBasedOnPaymentType(
     paymentOption: PaymentOption,
     userId: UserID,
     showing: ShowingDTO
-  ): ParticipantDTO =
+  ): AttendeeDTO =
     when (paymentOption.type) {
       PaymentType.GiftCertificate -> {
         val suppliedTicket = paymentOption.ticketNumber
@@ -287,20 +287,20 @@ class ShowingService(
         val ticketNumber = TicketNumber(suppliedTicket)
 
         assertionService.assertGiftCertIsUsable(userId, ticketNumber, showing)
-        ParticipantDTO(
+        AttendeeDTO(
           userId = userId,
           showingId = showing.id,
           hasPaid = false,
-          type = ParticipantDTO.Type.GIFT_CERTIFICATE,
+          type = AttendeeDTO.Type.GIFT_CERTIFICATE,
           giftCertificateUsed = GiftCertificateDTO(userId, ticketNumber),
           amountOwed = SEK.ZERO,
           userInfo = PublicUserDTO(userId)
         )
       }
-      PaymentType.Swish -> ParticipantDTO(
+      PaymentType.Swish -> AttendeeDTO(
         userId = userId,
         showingId = showing.id,
-        type = ParticipantDTO.Type.SWISH,
+        type = AttendeeDTO.Type.SWISH,
         userInfo = PublicUserDTO(userId)
       )
     }

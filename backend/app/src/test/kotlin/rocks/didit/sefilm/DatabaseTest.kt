@@ -9,8 +9,8 @@ import org.jeasy.random.api.Randomizer
 import org.springframework.stereotype.Component
 import rocks.didit.sefilm.domain.dto.FilmstadenSeatDTO
 import rocks.didit.sefilm.domain.dto.FilmstadenTicketDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
@@ -18,7 +18,6 @@ import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import java.time.LocalDate
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @Component
@@ -87,29 +86,29 @@ class DbTest(private val jdbi: Jdbi) {
     withShowing { it.nextShowing(testData.lastMovie?.id!!, adminId ?: testData.lastUser?.id!!) }
   }
 
-  fun withParticipant(generate: TestData.(ThreadLocalRandom) -> ParticipantDTO) {
-    testData = testData.addParticipant(testData.generate(ThreadLocalRandom.current()))
+  fun withAttendee(generate: TestData.(ThreadLocalRandom) -> AttendeeDTO) {
+    testData = testData.addAttendee(testData.generate(ThreadLocalRandom.current()))
   }
 
-  fun withParticipantsAndUsers(count: Int, generate: TestData.(ThreadLocalRandom) -> Pair<UserDTO, ParticipantDTO>) {
+  fun withAttendeesAndUsers(count: Int, generate: TestData.(ThreadLocalRandom) -> Pair<UserDTO, AttendeeDTO>) {
     repeat(count) {
       val pair = testData.generate(ThreadLocalRandom.current())
       testData = testData.addUser(pair.first)
-      testData = testData.addParticipant(pair.second)
+      testData = testData.addAttendee(pair.second)
     }
   }
 
-  fun withParticipantOnLastShowing() {
+  fun withAttendeesOnLastShowing() {
     requireNotNull(testData.lastShowing)
     withUser()
-    withParticipant {
-      it.nextParticipant(testData.lastUser?.id!!, testData.lastShowing?.id!!)
+    withAttendee {
+      it.nextAttendee(testData.lastUser?.id!!, testData.lastShowing?.id!!)
     }
   }
 
-  fun withParticipantsOnLastShowing(count: Int) {
+  fun withAttendeesOnLastShowing(count: Int) {
     repeat(count) {
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
     }
   }
 
@@ -149,11 +148,11 @@ class DbTest(private val jdbi: Jdbi) {
         daos.showingDao.insertShowingAndCinemaScreen(it.value)
       }
 
-      if (testData.participants.isNotEmpty()) {
-        daos.participantDao.insertParticipantsOnShowing(testData.participants)
+      if (testData.attendees.isNotEmpty()) {
+        daos.attendeeDao.insertAttendeeOnShowing(testData.attendees)
       }
 
-      if (testData.participants.isNotEmpty()) {
+      if (testData.attendees.isNotEmpty()) {
         daos.ticketDao.insertTickets(testData.tickets)
       }
     }
@@ -196,8 +195,8 @@ data class TestData(
   val showings: Map<ShowingID, ShowingDTO> = mapOf(),
   val lastShowing: ShowingDTO? = null,
 
-  val participants: List<ParticipantDTO> = listOf(),
-  val lastParticipant: ParticipantDTO? = null,
+  val attendees: List<AttendeeDTO> = listOf(),
+  val lastAttendees: AttendeeDTO? = null,
 
   val tickets: List<TicketDTO> = listOf(),
   val lastTicket: TicketDTO? = null
@@ -207,8 +206,8 @@ data class TestData(
   val movie: MovieDTO get() = lastMovie ?: throw IllegalStateException("No movie has been created. See #withMovie()")
   val showing: ShowingDTO
     get() = lastShowing ?: throw IllegalStateException("No showing has been created. See #withShowing()")
-  val participant: ParticipantDTO
-    get() = lastParticipant ?: throw IllegalStateException("No participant has been created. See #withParticipant()")
+  val attendee: AttendeeDTO
+    get() = lastAttendees ?: throw IllegalStateException("No attendee has been created. See #withAttendee()")
   val ticket: TicketDTO
     get() = lastTicket ?: throw IllegalStateException("No ticket has been created. See #withTicket()")
 
@@ -227,8 +226,8 @@ data class TestData(
   fun addShowings(showings: List<ShowingDTO>): TestData =
     copy(lastShowing = showings.last(), showings = this.showings.plus(showings.map { Pair(it.id, it) }))
 
-  fun addParticipant(participant: ParticipantDTO): TestData =
-    copy(lastParticipant = participant, participants = participants.plus(participant))
+  fun addAttendee(attendee: AttendeeDTO): TestData =
+    copy(lastAttendees = attendee, attendees = attendees.plus(attendee))
 
   fun addTicket(ticket: TicketDTO): TestData = copy(lastTicket = ticket, tickets = tickets.plus(ticket))
 }

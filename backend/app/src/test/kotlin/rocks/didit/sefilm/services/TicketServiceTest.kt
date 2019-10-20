@@ -26,7 +26,7 @@ import rocks.didit.sefilm.domain.dto.SeatRange
 import rocks.didit.sefilm.domain.dto.TicketRange
 import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
-import rocks.didit.sefilm.nextParticipant
+import rocks.didit.sefilm.nextAttendee
 import rocks.didit.sefilm.nextTicket
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.Instant
@@ -121,10 +121,10 @@ internal class TicketServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with two participants and tickets have random profile ids, when processTickets(), then the tickets are all assigned to the admin`() {
+  internal fun `given a showing with two attendees and tickets have random profile ids, when processTickets(), then the tickets are all assigned to the admin`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         properties.enableReassignment = false
         val time = Instant.now()
@@ -151,10 +151,10 @@ internal class TicketServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with two participants and tickets have random profile ids, when enableReassignment is true and processTickets(), then the tickets are assigned to users without tickets`() {
+  internal fun `given a showing with two attendees and tickets have random profile ids, when enableReassignment is true and processTickets(), then the tickets are assigned to users without tickets`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         properties.enableReassignment = true
         val time = Instant.now()
@@ -185,12 +185,12 @@ internal class TicketServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with three participants and two tickets that have correct profile ids, when enableReassignment is true and processTickets(), then the tickets are assigned to the correct users`() {
+  internal fun `given a showing with three attendees and two tickets that have correct profile ids, when enableReassignment is true and processTickets(), then the tickets are assigned to the correct users`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
-      withParticipantOnLastShowing()
-      withParticipantOnLastShowing()
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
+      withAttendeesOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         properties.enableReassignment = true
         val time = Instant.now()
@@ -226,10 +226,10 @@ internal class TicketServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing with a participant, when processTickets(), then the ticket saved are copied from the filmstaden ticket`() {
+  internal fun `given a showing with a attendee, when processTickets(), then the ticket saved are copied from the filmstaden ticket`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       afterInsert {
         val time = Instant.now()
         val show = rnd.nextObject(FilmstadenShowDTO::class.java).copy(timeUtc = time)
@@ -273,10 +273,10 @@ internal class TicketServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given a showing, when current user isn't a participant and fetchSeatMap(), then null is returned`() {
+  internal fun `given a showing, when current user isn't a attendee and fetchSeatMap(), then null is returned`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
         val seatMap = ticketService.getTicketRange(showing.id)
         assertThat(seatMap).describedAs("seat map").isNull()
@@ -289,7 +289,7 @@ internal class TicketServiceTest {
   internal fun `given a showing and no tickets, when fetchSeatMap(), then an empty ticket range is returned`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       afterInsert {
         val seatMap = ticketService.getTicketRange(showing.id)
         assertThat(seatMap).describedAs("seat map")
@@ -303,7 +303,7 @@ internal class TicketServiceTest {
   internal fun `given a showing and 3 tickets on same row, when fetchSeatMap(), then the seat map matching the tickets are returned`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 5) }
       withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 6) }
       withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 7) }
@@ -320,7 +320,7 @@ internal class TicketServiceTest {
   internal fun `given a showing and 3 tickets on 3 rows, when fetchSeatMap(), then the seat map matching the tickets are returned`() {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
-      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 5) }
       withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 6) }
       withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 7) }

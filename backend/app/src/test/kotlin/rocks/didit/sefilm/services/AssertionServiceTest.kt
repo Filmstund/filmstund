@@ -23,7 +23,7 @@ import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextGiftCert
-import rocks.didit.sefilm.nextParticipant
+import rocks.didit.sefilm.nextAttendee
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
 import java.time.LocalDate
@@ -123,7 +123,7 @@ internal class AssertionServiceTest {
       }
       withMovie()
       withShowing { it.nextShowing(movie.id, user.id).copy(date = LocalDate.now().plusDays(10)) }
-      withParticipant { it.nextParticipant(user.id, showing.id, user.giftCertificates.first().number) }
+      withAttendee { it.nextAttendee(user.id, showing.id, user.giftCertificates.first().number) }
       afterInsert {
         val e = assertThrows<TicketExpiredException> {
           assertionService.assertGiftCertIsUsable(user.id, user.giftCertificates.first().number, showing)
@@ -142,7 +142,7 @@ internal class AssertionServiceTest {
       }
       withMovie()
       withShowing { it.nextShowing(movie.id, user.id).copy(date = LocalDate.now().plusDays(10)) }
-      withParticipant { it.nextParticipant(user.id, showing.id, user.giftCertificates.first().number) }
+      withAttendee { it.nextAttendee(user.id, showing.id, user.giftCertificates.first().number) }
       afterInsert {
         val e = assertThrows<TicketAlreadyUsedException> {
           assertionService.assertGiftCertIsUsable(user.id, user.giftCertificates.first().number, showing)

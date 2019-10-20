@@ -8,10 +8,10 @@ import org.jdbi.v3.core.statement.StatementContext
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import rocks.didit.sefilm.database.dao.AttendeeDao
 import rocks.didit.sefilm.database.dao.BudordDao
 import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.UserDao
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
@@ -92,7 +92,7 @@ class DbConfig {
   fun onDemandMovieDao(jdbi: Jdbi): MovieDao = jdbi.onDemand(MovieDao::class.java)
 
   @Bean
-  fun onDemandParticipantDao(jdbi: Jdbi): ParticipantDao = jdbi.onDemand(ParticipantDao::class.java)
+  fun onDemandAttendeeDao(jdbi: Jdbi): AttendeeDao = jdbi.onDemand(AttendeeDao::class.java)
 
   @Bean
   fun onDemandBudordDao(jdbi: Jdbi): BudordDao = jdbi.onDemand(BudordDao::class.java)

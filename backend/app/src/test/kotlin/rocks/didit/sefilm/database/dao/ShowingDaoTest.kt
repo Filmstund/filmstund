@@ -13,7 +13,7 @@ import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextMovie
@@ -125,7 +125,7 @@ internal class ShowingDaoTest {
   }
 
   @Test
-  internal fun `given a user that is admin on one showing and participant on another, when findByAdminOrParticipant(), then all showings where user is admin or participant on will be returned`() {
+  internal fun `given a user that is admin on one showing and attendee on another, when findByAdminOrAttendee(), then all showings where user is admin or attendee on will be returned`() {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUser = rnd.nextUserDTO()
@@ -137,7 +137,7 @@ internal class ShowingDaoTest {
       val movieDao = handle.attach(MovieDao::class.java)
       val locationDao = handle.attach(LocationDao::class.java)
       val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val attendeeDao = handle.attach(AttendeeDao::class.java)
 
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndUser)
@@ -146,22 +146,22 @@ internal class ShowingDaoTest {
       locationDao.insertLocationAndAlias(rndShowing2.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       showingDao.insertShowingAndCinemaScreen(rndShowing2)
-      participantDao.insertParticipantOnShowing(
-        ParticipantDTO(
+      attendeeDao.insertAttendeeOnShowing(
+        AttendeeDTO(
           rndAdmin.id,
           rndShowing2.id,
           PublicUserDTO(rndAdmin.id)
         )
       )
-      participantDao.insertParticipantOnShowing(
-        ParticipantDTO(
+      attendeeDao.insertAttendeeOnShowing(
+        AttendeeDTO(
           rndAdmin.id,
           rndShowing.id,
           PublicUserDTO(rndAdmin.id)
         )
       )
 
-      val dbShowings = showingDao.findByAdminOrParticipant(rndAdmin.id)
+      val dbShowings = showingDao.findByAdminOrAttendee(rndAdmin.id)
       assertThat(dbShowings)
         .isNotNull
         .isNotEmpty

@@ -3,9 +3,9 @@ package rocks.didit.sefilm.database
 import org.jdbi.v3.core.result.LinkedHashMapRowReducer
 import org.jdbi.v3.core.result.RowView
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
 import rocks.didit.sefilm.domain.id.ShowingID
@@ -66,19 +66,19 @@ class ShowingLocationScreenReducer : LinkedHashMapRowReducer<ShowingID, ShowingD
   }
 }
 
-class ParticipantGiftCertReducer : LinkedHashMapRowReducer<Pair<UserID, ShowingID>, ParticipantDTO> {
-  override fun accumulate(container: MutableMap<Pair<UserID, ShowingID>, ParticipantDTO>, rowView: RowView) {
+class AttendeeGiftCertReducer : LinkedHashMapRowReducer<Pair<UserID, ShowingID>, AttendeeDTO> {
+  override fun accumulate(container: MutableMap<Pair<UserID, ShowingID>, AttendeeDTO>, rowView: RowView) {
     val userId = rowView.getColumn("user_id", UserID::class.java)
     val showingId = rowView.getColumn("showing_id", ShowingID::class.java)
     val pair = Pair(userId, showingId)
-    val participant = container.computeIfAbsent(pair) {
-      rowView.getRow(ParticipantDTO::class.java)
+    val attendee = container.computeIfAbsent(pair) {
+      rowView.getRow(AttendeeDTO::class.java)
     }
 
     val gcUserId = rowView.getColumn("gc_userId", UserID::class.java)
     if (gcUserId != null) {
       val giftCert = rowView.getRow(GiftCertificateDTO::class.java)
-      container.replace(pair, participant.copy(giftCertificateUsed = giftCert))
+      container.replace(pair, attendee.copy(giftCertificateUsed = giftCert))
     }
   }
 }

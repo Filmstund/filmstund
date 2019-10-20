@@ -19,7 +19,7 @@ type Showing {
     filmstadenSeatMap: [FilmstadenSeatMap!]!
 }
 
-type Participant {
+type Attendee {
     userId: UUID
     showingId: ShowingID
 }

@@ -22,8 +22,8 @@ import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.springframework.stereotype.Service
 import rocks.didit.sefilm.Properties
+import rocks.didit.sefilm.database.dao.AttendeeDao
 import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
@@ -41,7 +41,7 @@ class CalendarService(
   private val jdbi: Jdbi,
   private val showingDao: ShowingDao,
   private val movieDao: MovieDao,
-  private val participantDao: ParticipantDao,
+  private val attendeeDao: AttendeeDao,
   private val properties: Properties
 ) {
 
@@ -63,7 +63,7 @@ class CalendarService(
 
     val cal = setupCalendar(userFeedId)
     showingDao
-      .findByAdminOrParticipant(userId)
+      .findByAdminOrAttendee(userId)
       .map { it.toVEvent(userId, mail) }
       .forEach { cal.addEvent(it) }
 
@@ -98,7 +98,7 @@ class CalendarService(
     vEvent.setDescription(formatDescription(this.id, userId, movie) + "\n\n$showingUrl")
     vEvent.setUrl(showingUrl)
     vEvent.addCategories(Categories("bio"))
-    vEvent.addParticipants(this, userEmail)
+    vEvent.addAttendees(this, userEmail)
     vEvent.setOrganizer(userEmail)
     vEvent.status = if (this.ticketsBought) Status.confirmed() else Status.tentative()
     vEvent.created = Created(Date.from(this.createdDate))
@@ -117,7 +117,7 @@ class CalendarService(
   private fun formatDescription(showingId: ShowingID, userId: UserID, movie: MovieDTO): String {
     val (amountOwed, hasPaid, payToPhone) = jdbi.withHandleUnchecked {
       it.select(
-        "SELECT p.amount_owed, p.has_paid, u.phone FROM participant p JOIN showing s on p.showing_id = s.id JOIN users u on s.pay_to_user = u.id WHERE p.showing_id = ? AND p.user_id = ?",
+        "SELECT a.amount_owed, a.has_paid, u.phone FROM attendee a JOIN showing s on a.showing_id = s.id JOIN users u on s.pay_to_user = u.id WHERE a.showing_id = ? AND a.user_id = ?",
         showingId,
         userId
       ).mapTo<PaymentDetails>()
@@ -132,8 +132,8 @@ class CalendarService(
     }
   }
 
-  private fun VEvent.addParticipants(showingDTO: ShowingDTO, mail: String) {
-    participantDao.findAllParticipants(showingDTO.id).forEach {
+  private fun VEvent.addAttendees(showingDTO: ShowingDTO, mail: String) {
+    attendeeDao.findAllAttendees(showingDTO.id).forEach {
       val attendee = Attendee("${it.userInfo.firstName} '${it.userInfo.nick}' ${it.userInfo.lastName}", mail)
       attendee.calendarUserType = CalendarUserType.INDIVIDUAL
       attendee.participationStatus = ParticipationStatus.ACCEPTED

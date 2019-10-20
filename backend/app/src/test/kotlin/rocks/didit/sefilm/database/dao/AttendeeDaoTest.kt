@@ -13,20 +13,19 @@ import rocks.didit.sefilm.DatabaseTest
 import rocks.didit.sefilm.TestConfig
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.id.UserID
+import rocks.didit.sefilm.nextAttendee
 import rocks.didit.sefilm.nextGiftCerts
 import rocks.didit.sefilm.nextMovie
-import rocks.didit.sefilm.nextParticipant
 import rocks.didit.sefilm.nextShowing
 import rocks.didit.sefilm.nextUserDTO
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [Jdbi::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
-internal class ParticipantDaoTest {
+internal class AttendeeDaoTest {
   @Autowired
   private lateinit var jdbi: Jdbi
 
@@ -36,7 +35,7 @@ internal class ParticipantDaoTest {
   private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
 
   @Test
-  internal fun `given a showing with participants, when findAllParticipants(), then all participants are returned`() {
+  internal fun `given a showing with attendees, when findAllAttendees(), then all attendees are returned`() {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
@@ -44,9 +43,9 @@ internal class ParticipantDaoTest {
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
-    val rndParticipants = rndUsers.map { u ->
+    val rndAttendees = rndUsers.map { u ->
       val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
-      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+      rnd.nextAttendee(u.id, rndShowing.id, ticketNumber)
     }
 
     jdbi.useTransactionUnchecked { handle ->
@@ -54,31 +53,31 @@ internal class ParticipantDaoTest {
       val movieDao = handle.attach(MovieDao::class.java)
       val locationDao = handle.attach(LocationDao::class.java)
       val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val attendeeDao = handle.attach(AttendeeDao::class.java)
 
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
       locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
-      participantDao.insertParticipantsOnShowing(rndParticipants)
+      attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
-      val allParticipants = participantDao.findAllParticipants(rndShowing.id)
-      assertThat(allParticipants)
-        .hasSameSizeAs(rndParticipants)
-      allParticipants.forEachIndexed { index, p ->
+      val allAttendees = attendeeDao.findAllAttendees(rndShowing.id)
+      assertThat(allAttendees)
+        .hasSameSizeAs(rndAttendees)
+      allAttendees.forEachIndexed { index, p ->
         assertThat(p)
           .isEqualToIgnoringGivenFields(
-            rndParticipants[index],
+            rndAttendees[index],
             "userInfo",
             "filmstadenMembershipId",
             "giftCertificateUsed"
           )
         if (p.giftCertificateUsed != null) {
           assertThat(p.giftCertificateUsed)
-            .isEqualToIgnoringGivenFields(rndParticipants[index].giftCertificateUsed, "expiresAt")
+            .isEqualToIgnoringGivenFields(rndAttendees[index].giftCertificateUsed, "expiresAt")
         } else {
-          assertThat(rndParticipants[index].giftCertificateUsed)
+          assertThat(rndAttendees[index].giftCertificateUsed)
             .isNull()
         }
       }
@@ -86,41 +85,41 @@ internal class ParticipantDaoTest {
   }
 
   @Test
-  internal fun `given no participants on a showing, when isParticipantOnShowing(), then false is returned`() {
+  internal fun `given no attendees on a showing, when isAttendeeOnShowing(), then false is returned`() {
     databaseTest.start {
       withAdmin()
       withShowing()
       withUser()
       afterInsert {
-        assertThat(it.participantDao.isParticipantOnShowing(admin.id, showing.id))
-          .describedAs("Showing admin is participant")
+        assertThat(it.attendeeDao.isAttendeeOnShowing(admin.id, showing.id))
+          .describedAs("Showing admin is attendee")
           .isFalse()
-        assertThat(it.participantDao.isParticipantOnShowing(user.id, showing.id))
-          .describedAs("Random user is participant")
+        assertThat(it.attendeeDao.isAttendeeOnShowing(user.id, showing.id))
+          .describedAs("Random user is attendee")
           .isFalse()
       }
     }
   }
 
   @Test
-  internal fun `given participants on a showing, when isParticipantOnShowing(), then true is returned`() {
+  internal fun `given attendees on a showing, when isAttendeeOnShowing(), then true is returned`() {
     databaseTest.start {
       withAdmin()
       withShowing()
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
-        assertThat(it.participantDao.isParticipantOnShowing(admin.id, showing.id))
-          .describedAs("Showing admin is participant")
+        assertThat(it.attendeeDao.isAttendeeOnShowing(admin.id, showing.id))
+          .describedAs("Showing admin is attendee")
           .isFalse()
-        assertThat(it.participantDao.isParticipantOnShowing(user.id, showing.id))
-          .describedAs("Random user is participant")
+        assertThat(it.attendeeDao.isAttendeeOnShowing(user.id, showing.id))
+          .describedAs("Random user is attendee")
           .isTrue()
       }
     }
   }
 
   @Test
-  internal fun `given a showing with participants, when updatePaymentInfo(), then only the relevant participant is updated`() {
+  internal fun `given a showing with attendees, when updatePaymentInfo(), then only the relevant attendee is updated`() {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
@@ -128,9 +127,9 @@ internal class ParticipantDaoTest {
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
-    val rndParticipants = rndUsers.map { u ->
+    val rndAttendees = rndUsers.map { u ->
       val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
-      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+      rnd.nextAttendee(u.id, rndShowing.id, ticketNumber)
     }
 
     jdbi.useTransactionUnchecked { handle ->
@@ -138,40 +137,40 @@ internal class ParticipantDaoTest {
       val movieDao = handle.attach(MovieDao::class.java)
       val locationDao = handle.attach(LocationDao::class.java)
       val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val attendeeDao = handle.attach(AttendeeDao::class.java)
 
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
       locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
-      participantDao.insertParticipantsOnShowing(rndParticipants)
+      attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
-      val allParticipants = participantDao.findAllParticipants(rndShowing.id)
-      val firstParticipant =
-        allParticipants.find { it.userId == rndParticipants.first().userId && it.showingId == rndParticipants.first().showingId }
+      val allAttendees = attendeeDao.findAllAttendees(rndShowing.id)
+      val firstAttendee =
+        allAttendees.find { it.userId == rndAttendees.first().userId && it.showingId == rndAttendees.first().showingId }
 
-      val updatedParticipant = participantDao.updatePaymentStatus(
-        firstParticipant?.userId!!,
-        firstParticipant.showingId,
+      val updatedAttendee = attendeeDao.updatePaymentStatus(
+        firstAttendee?.userId!!,
+        firstAttendee.showingId,
         rndAdmin.id,
         true,
         SEK(1337)
       )
-      assertThat(updatedParticipant)
+      assertThat(updatedAttendee)
         .isNotNull
-        .isEqualToIgnoringGivenFields(firstParticipant, "hasPaid", "amountOwed")
-      assertThat(updatedParticipant?.hasPaid)
+        .isEqualToIgnoringGivenFields(firstAttendee, "hasPaid", "amountOwed")
+      assertThat(updatedAttendee?.hasPaid)
         .describedAs("has paid")
         .isTrue()
-      assertThat(updatedParticipant?.amountOwed)
+      assertThat(updatedAttendee?.amountOwed)
         .describedAs("amount owed")
         .isEqualTo(SEK(1337))
     }
   }
 
   @Test
-  internal fun `given a showing with participants, when updatePaymentInfo() with a random admin, then null is returned`() {
+  internal fun `given a showing with attendees, when updatePaymentInfo() with a random admin, then null is returned`() {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
@@ -179,9 +178,9 @@ internal class ParticipantDaoTest {
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
-    val rndParticipants = rndUsers.map { u ->
+    val rndAttendees = rndUsers.map { u ->
       val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
-      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+      rnd.nextAttendee(u.id, rndShowing.id, ticketNumber)
     }
 
     jdbi.useTransactionUnchecked { handle ->
@@ -189,40 +188,40 @@ internal class ParticipantDaoTest {
       val movieDao = handle.attach(MovieDao::class.java)
       val locationDao = handle.attach(LocationDao::class.java)
       val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val attendeeDao = handle.attach(AttendeeDao::class.java)
 
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
       locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
-      participantDao.insertParticipantsOnShowing(rndParticipants)
+      attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
-      val firstParticipant = rndParticipants.first()
+      val firstAttendee = rndAttendees.first()
 
-      val updatedParticipant = participantDao.updatePaymentStatus(
-        firstParticipant.userId,
-        firstParticipant.showingId,
+      val updatedAttendee = attendeeDao.updatePaymentStatus(
+        firstAttendee.userId,
+        firstAttendee.showingId,
         UserID.random(),
         true,
         SEK(1337)
       )
-      assertThat(updatedParticipant)
+      assertThat(updatedAttendee)
         .isNull()
 
-      val firstParticipantFromDb = participantDao.findAllParticipants(rndShowing.id)
-        .find { it.userId == firstParticipant.userId && it.showingId == firstParticipant.showingId }
-      assertThat(firstParticipantFromDb?.hasPaid)
+      val firstAttendeeFromDb = attendeeDao.findAllAttendees(rndShowing.id)
+        .find { it.userId == firstAttendee.userId && it.showingId == firstAttendee.showingId }
+      assertThat(firstAttendeeFromDb?.hasPaid)
         .describedAs("has paid")
-        .isEqualTo(firstParticipant.hasPaid)
-      assertThat(firstParticipantFromDb?.amountOwed)
+        .isEqualTo(firstAttendee.hasPaid)
+      assertThat(firstAttendeeFromDb?.amountOwed)
         .describedAs("amount owed")
-        .isEqualTo(firstParticipant.amountOwed)
+        .isEqualTo(firstAttendee.amountOwed)
     }
   }
 
   @Test
-  internal fun `given a showing with participants, when updatePaymentInfo() where amountOwed is null, then amountOwed is not updated`() {
+  internal fun `given a showing with attendees, when updatePaymentInfo() where amountOwed is null, then amountOwed is not updated`() {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndUsers = (1..10).map {
@@ -230,9 +229,9 @@ internal class ParticipantDaoTest {
       rnd.nextUserDTO(id = userId, giftCerts = rnd.nextGiftCerts(userId, 2))
     }
     val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
-    val rndParticipants = rndUsers.map { u ->
+    val rndAttendees = rndUsers.map { u ->
       val ticketNumber = if (rnd.nextLong(0, 100) < 50) u.giftCertificates.first().number else null
-      rnd.nextParticipant(u.id, rndShowing.id, ticketNumber)
+      rnd.nextAttendee(u.id, rndShowing.id, ticketNumber)
     }
 
     jdbi.useTransactionUnchecked { handle ->
@@ -240,62 +239,62 @@ internal class ParticipantDaoTest {
       val movieDao = handle.attach(MovieDao::class.java)
       val locationDao = handle.attach(LocationDao::class.java)
       val showingDao = handle.attach(ShowingDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val attendeeDao = handle.attach(AttendeeDao::class.java)
 
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
       locationDao.insertLocationAndAlias(rndShowing.location!!)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
-      participantDao.insertParticipantsOnShowing(rndParticipants)
+      attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
-      val allParticipants = participantDao.findAllParticipants(rndShowing.id)
-      val firstParticipant =
-        allParticipants.find { it.userId == rndParticipants.first().userId && it.showingId == rndParticipants.first().showingId }
+      val allAttendees = attendeeDao.findAllAttendees(rndShowing.id)
+      val firstAttendee =
+        allAttendees.find { it.userId == rndAttendees.first().userId && it.showingId == rndAttendees.first().showingId }
 
-      val updatedParticipant = participantDao.updatePaymentStatus(
-        firstParticipant?.userId!!,
-        firstParticipant.showingId,
+      val updatedAttendee = attendeeDao.updatePaymentStatus(
+        firstAttendee?.userId!!,
+        firstAttendee.showingId,
         rndAdmin.id,
         true,
         null
       )
-      assertThat(updatedParticipant)
+      assertThat(updatedAttendee)
         .isNotNull
-        .isEqualToIgnoringGivenFields(firstParticipant, "hasPaid")
-      assertThat(updatedParticipant?.hasPaid)
+        .isEqualToIgnoringGivenFields(firstAttendee, "hasPaid")
+      assertThat(updatedAttendee?.hasPaid)
         .describedAs("has paid")
         .isTrue()
-      assertThat(updatedParticipant?.amountOwed)
+      assertThat(updatedAttendee?.amountOwed)
         .describedAs("amount owed")
         .isNotNull
-        .isEqualTo(firstParticipant.amountOwed)
+        .isEqualTo(firstAttendee.amountOwed)
     }
   }
 
   @Test
-  internal fun `given a list of participants, when updateAmountOwedForSwishParticipants, then only swish participants are updated`() {
+  internal fun `given a list of attendees, when updateAmountOwedForSwishAttendees, then only swish attendees are updated`() {
     databaseTest.start {
       withShowing()
-      withParticipantsAndUsers(20) {
+      withAttendeesAndUsers(20) {
         val userId = UserID.random()
         val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
-        val participant =
-          it.nextParticipant(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = it.nextBoolean())
-        Pair(user, participant)
+        val attendee =
+          it.nextAttendee(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = it.nextBoolean())
+        Pair(user, attendee)
       }
-      withParticipantsAndUsers(5) {
+      withAttendeesAndUsers(5) {
         val user = it.nextUserDTO(UserID.random(), listOf())
-        val participant = it.nextParticipant(user.id, showing.id).copy(hasPaid = false)
-        Pair(user, participant)
+        val attendee = it.nextAttendee(user.id, showing.id).copy(hasPaid = false)
+        Pair(user, attendee)
       }
       afterInsert {
-        it.participantDao.updateAmountOwedForSwishParticipants(showing.id, showing.admin, SEK(1337))
+        it.attendeeDao.updateAmountOwedForSwishAttendees(showing.id, showing.admin, SEK(1337))
 
-        val dbParticipants = it.participantDao.findAllParticipants(showing.id)
-        assertThat(dbParticipants).hasSize(25)
-        dbParticipants.forEach { p->
-          if (p.hasPaid || p.type == ParticipantDTO.Type.GIFT_CERTIFICATE) {
+        val dbAttendees = it.attendeeDao.findAllAttendees(showing.id)
+        assertThat(dbAttendees).hasSize(25)
+        dbAttendees.forEach { p->
+          if (p.hasPaid || p.type == AttendeeDTO.Type.GIFT_CERTIFICATE) {
             assertThat(p.amountOwed).isNotEqualTo(SEK(1337))
           } else {
             assertThat(p.amountOwed).isEqualTo(SEK(1337))

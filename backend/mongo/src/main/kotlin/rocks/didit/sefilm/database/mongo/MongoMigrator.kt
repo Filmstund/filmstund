@@ -7,9 +7,9 @@ import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.useTransactionUnchecked
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import rocks.didit.sefilm.database.dao.AttendeeDao
 import rocks.didit.sefilm.database.dao.LocationDao
 import rocks.didit.sefilm.database.dao.MovieDao
-import rocks.didit.sefilm.database.dao.ParticipantDao
 import rocks.didit.sefilm.database.dao.ShowingDao
 import rocks.didit.sefilm.database.dao.TicketDao
 import rocks.didit.sefilm.database.dao.UserDao
@@ -25,10 +25,10 @@ import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.SwishParticipant
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
 import rocks.didit.sefilm.domain.dto.PublicUserDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
@@ -61,7 +61,7 @@ internal class MongoMigrator(
     jdbi.useTransactionUnchecked { handle ->
       val dao = handle.attach(ShowingDao::class.java)
       val userDao = handle.attach(UserDao::class.java)
-      val participantDao = handle.attach(ParticipantDao::class.java)
+      val attendeeDao = handle.attach(AttendeeDao::class.java)
       val locationDao = handle.attach(LocationDao::class.java)
       if (log.isInfoEnabled) {
         log.info(
@@ -103,7 +103,7 @@ internal class MongoMigrator(
           showing.cinemaScreen?.let { cs -> dao.maybeInsertCinemaScreen(cs) }
           dao.insertNewShowing(showing)
         }
-      val participants: List<ParticipantDTO> = mongoShowings
+      val attendees: List<AttendeeDTO> = mongoShowings
         .map { showing ->
           showing.participants.map { p ->
             val user = userCache.get(p.userId) { gid -> userDao.findIdByGoogleId(gid) }
@@ -120,22 +120,22 @@ internal class MongoMigrator(
               }
 
             when (p) {
-              is SwishParticipant -> ParticipantDTO(
+              is SwishParticipant -> AttendeeDTO(
                 userId = user,
                 showingId = ShowingID(showing.id),
                 hasPaid = paymentInfo.hasPaid,
                 amountOwed = paymentInfo.amountOwed,
-                type = ParticipantDTO.Type.SWISH,
+                type = AttendeeDTO.Type.SWISH,
                 userInfo = PublicUserDTO(id = user)
               )
               is FtgBiljettParticipant -> {
-                ParticipantDTO(
+                AttendeeDTO(
                   userId = user,
                   showingId = ShowingID(showing.id),
                   userInfo = PublicUserDTO(id = user),
                   hasPaid = paymentInfo.hasPaid,
                   amountOwed = paymentInfo.amountOwed,
-                  type = ParticipantDTO.Type.GIFT_CERTIFICATE,
+                  type = AttendeeDTO.Type.GIFT_CERTIFICATE,
                   giftCertificateUsed = userDao.findGiftCertByUserAndNumber(user, p.ticketNumber)
                 )
               }
@@ -143,7 +143,7 @@ internal class MongoMigrator(
           }
         }
         .flatten()
-      participantDao.insertParticipantsOnShowing(participants)
+      attendeeDao.insertAttendeeOnShowing(attendees)
     }
   }
 

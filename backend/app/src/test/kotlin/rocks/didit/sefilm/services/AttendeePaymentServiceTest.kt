@@ -16,36 +16,36 @@ import rocks.didit.sefilm.WithLoggedInUser
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.SEK
-import rocks.didit.sefilm.domain.dto.ParticipantPaymentInfoDTO
+import rocks.didit.sefilm.domain.dto.AttendeePaymentInfoDTO
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.nextShowing
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, ParticipantPaymentService::class, DatabaseTest::class])
+@SpringBootTest(classes = [Jdbi::class, AttendeePaymentService::class, DatabaseTest::class])
 @Import(TestConfig::class, DbConfig::class)
-internal class ParticipantPaymentServiceTest {
+internal class AttendeePaymentServiceTest {
   @Autowired
-  private lateinit var participantPaymentService: ParticipantPaymentService
+  private lateinit var attendeePaymentService: AttendeePaymentService
 
   @Autowired
   private lateinit var databaseTest: DatabaseTest
 
   @Test
   internal fun `given null showing id, when updatePaymentInfo(), then an IllegalArgumentException is thrown`() {
-    val participantPaymentInfoDTO = ParticipantPaymentInfoDTO(userId = UserID.random(), showingId = null)
-    assertThrowsIllegalArgumentException(participantPaymentInfoDTO)
+    val attendeePaymentInfoDTO = AttendeePaymentInfoDTO(userId = UserID.random(), showingId = null)
+    assertThrowsIllegalArgumentException(attendeePaymentInfoDTO)
   }
 
   @Test
   internal fun `given null user id, when updatePaymentInfo(), then an IllegalArgumentException is thrown`() {
-    val participantPaymentInfoDTO = ParticipantPaymentInfoDTO(userId = null, showingId = ShowingID.random())
-    assertThrowsIllegalArgumentException(participantPaymentInfoDTO)
+    val attendeePaymentInfoDTO = AttendeePaymentInfoDTO(userId = null, showingId = ShowingID.random())
+    assertThrowsIllegalArgumentException(attendeePaymentInfoDTO)
   }
 
-  private fun assertThrowsIllegalArgumentException(participantPaymentInfoDTO: ParticipantPaymentInfoDTO) {
+  private fun assertThrowsIllegalArgumentException(attendeePaymentInfoDTO: AttendeePaymentInfoDTO) {
     val e = assertThrows<IllegalArgumentException> {
-      participantPaymentService.updatePaymentInfo(participantPaymentInfoDTO)
+      attendeePaymentService.updatePaymentInfo(attendeePaymentInfoDTO)
     }
     assertThat(e)
       .hasMessage("Missing showing id and/or user id")
@@ -54,9 +54,9 @@ internal class ParticipantPaymentServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given non existent user or showing, when updatePaymentInfo(), then an AccessDeniedException is thrown`() {
-    val participantInfo = ParticipantPaymentInfoDTO(userId = currentLoggedInUser().id, showingId = ShowingID.random())
+    val attendeeInfo = AttendeePaymentInfoDTO(userId = currentLoggedInUser().id, showingId = ShowingID.random())
     val e = assertThrows<AccessDeniedException> {
-      participantPaymentService.updatePaymentInfo(participantInfo)
+      attendeePaymentService.updatePaymentInfo(attendeeInfo)
     }
     assertThat(e)
       .hasMessage("Only the showing admin is allowed to do that")
@@ -64,21 +64,21 @@ internal class ParticipantPaymentServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given showing with participant, when updatePaymentInfo() but with wrong admin, then an AccessDeniedException is thrown`() {
+  internal fun `given showing with attendee, when updatePaymentInfo() but with wrong admin, then an AccessDeniedException is thrown`() {
     databaseTest.start {
       withMovie()
       withUser()
       withShowing { it.nextShowing(movie.id, adminId = user.id) }
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
-        val paymentInfo = ParticipantPaymentInfoDTO(
-          participant.userId,
+        val paymentInfo = AttendeePaymentInfoDTO(
+          attendee.userId,
           showing.id,
           true,
           SEK(1337)
         )
         val e = assertThrows<AccessDeniedException> {
-          participantPaymentService.updatePaymentInfo(paymentInfo)
+          attendeePaymentService.updatePaymentInfo(paymentInfo)
         }
         assertThat(e).hasMessage("Only the showing admin is allowed to do that")
       }
@@ -87,34 +87,34 @@ internal class ParticipantPaymentServiceTest {
 
   @Test
   @WithLoggedInUser
-  internal fun `given showing with participant, when updatePaymentInfo(), then the participant payment info is updated correctly`() {
+  internal fun `given showing with attendee, when updatePaymentInfo(), then the attendee payment info is updated correctly`() {
     databaseTest.start {
       withMovie()
       withShowing { it.nextShowing(movie.id, adminId = currentLoggedInUser().id) }
-      withParticipantOnLastShowing()
+      withAttendeesOnLastShowing()
       afterInsert {
-        val dbParticipantBefore = it.participantDao.findByUserAndShowing(participant.userId, showing.id)
-        assertThat(dbParticipantBefore).isNotNull
+        val dbAttendeeBefore = it.attendeeDao.findByUserAndShowing(attendee.userId, showing.id)
+        assertThat(dbAttendeeBefore).isNotNull
 
-        val paymentInfo = ParticipantPaymentInfoDTO(
-          participant.userId,
+        val paymentInfo = AttendeePaymentInfoDTO(
+          attendee.userId,
           showing.id,
-          !dbParticipantBefore?.hasPaid!!,
+          !dbAttendeeBefore?.hasPaid!!,
           SEK(1337)
         )
 
-        participantPaymentService.updatePaymentInfo(paymentInfo)
+        attendeePaymentService.updatePaymentInfo(paymentInfo)
 
-        val dbParticipant = it.participantDao.findByUserAndShowing(participant.userId, showing.id)
-        assertThat(dbParticipant).isNotNull
-        assertThat(dbParticipant?.hasPaid).isNotEqualTo(dbParticipantBefore.hasPaid)
+        val dbAttendee = it.attendeeDao.findByUserAndShowing(attendee.userId, showing.id)
+        assertThat(dbAttendee).isNotNull
+        assertThat(dbAttendee?.hasPaid).isNotEqualTo(dbAttendeeBefore.hasPaid)
         if (paymentInfo.hasPaid) {
-          assertThat(dbParticipant?.amountOwed)
-            .isNotEqualTo(dbParticipantBefore.amountOwed)
+          assertThat(dbAttendee?.amountOwed)
+            .isNotEqualTo(dbAttendeeBefore.amountOwed)
             .isEqualTo(SEK(0))
         } else {
-          assertThat(dbParticipant?.amountOwed)
-            .isEqualTo(dbParticipantBefore.amountOwed)
+          assertThat(dbAttendee?.amountOwed)
+            .isEqualTo(dbAttendeeBefore.amountOwed)
             .isNotEqualTo(SEK(1337)) // The update does not update take into consideration amountOwed yet...
         }
       }

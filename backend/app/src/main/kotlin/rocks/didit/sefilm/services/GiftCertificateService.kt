@@ -24,16 +24,16 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
     }
 
     return jdbi.withHandleUnchecked {
-      val hasPaid = it.select("SELECT has_paid FROM participant WHERE gift_certificate_used = ?", ticket.number)
+      val hasPaid = it.select("SELECT has_paid FROM attendee WHERE gift_certificate_used = ?", ticket.number)
         .mapTo<Boolean>()
         .findOne().orElse(null)
 
       when (hasPaid) {
-        null -> // No participant with this ticket
+        null -> // No attendee with this ticket
           GiftCertificateDTO.Status.AVAILABLE
-        true -> // Attached to a participant and bought/used
+        true -> // Attached to a attendee and bought/used
           GiftCertificateDTO.Status.USED
-        false -> // Attached to a participant, but not bought yet
+        false -> // Attached to a attendee, but not bought yet
           GiftCertificateDTO.Status.PENDING
       }
     }

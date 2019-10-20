@@ -38,7 +38,7 @@ create table location
     postal_address     varchar(100)             null,
     latitude           float                    null,
     longitude          float                    null,
-    filmstaden_id      varchar(10)              null
+    filmstaden_id      varchar(15)              null
         constraint location_fsId_unique unique,
     last_modified_date timestamp with time zone not null default current_timestamp,
     created_date       timestamp with time zone not null default current_timestamp
@@ -64,7 +64,7 @@ create table users
         constraint user_pk primary key,
     google_id                varchar(25)
         constraint user_ids_google_uniq unique,
-    filmstaden_membership_id varchar(7)   null
+    filmstaden_membership_id varchar(15)  null
         constraint user_ids_fsid_uniq unique,
     first_name               varchar(100) not null,
     last_name                varchar(100) not null,
@@ -85,7 +85,7 @@ create table gift_certificate
 (
     user_id      uuid
         constraint giftcert_user_fk references users on delete cascade,
-    number       varchar(15)
+    number       varchar(25)
         constraint giftcert_number_unique unique,
     expires_at   date                     not null default current_date + interval '1 year',
     constraint giftcert_pk primary key (user_id, number),
@@ -158,27 +158,27 @@ create table showing
     created_date          timestamp              not null default current_timestamp
 );
 
---changeset eda:createTableParticipant
-create table participant
+--changeset eda:createTableAttendee
+create table attendee
 (
     user_id               uuid                     not null
-        constraint participant_user_fk references users on delete cascade,
+        constraint attendee_user_fk references users on delete cascade,
     showing_id            uuid                     not null
-        constraint participant_showing_fk references showing on delete cascade,
+        constraint attendee_showing_fk references showing on delete cascade,
 
-    participant_type      varchar(50)              not null default 'SWISH',
+    attendee_type         varchar(50)              not null default 'SWISH',
 
     has_paid              boolean                  not null default false,
     amount_owed           integer                  not null default 0,
-    gift_certificate_used varchar(15)              null
-        constraint participant_giftcert_unique unique,
+    gift_certificate_used varchar(25)              null
+        constraint attendee_giftcert_unique unique,
     last_modified_date    timestamp with time zone not null default current_timestamp,
     created_date          timestamp with time zone not null default current_timestamp,
 
-    constraint participant_giftcert_fk foreign key (user_id, gift_certificate_used) references gift_certificate on delete set null,
-    constraint participant_pk primary key (showing_id, user_id)
+    constraint attendee_giftcert_fk foreign key (user_id, gift_certificate_used) references gift_certificate on delete set null,
+    constraint attendee_pk primary key (showing_id, user_id)
 );
---rollback drop table if exists participant;
+--rollback drop table if exists attendee;
 
 --changeset eda:createTableTicket
 create table ticket
@@ -189,7 +189,7 @@ create table ticket
         constraint ticket_showing_fk references showing on delete cascade,
     assigned_to_user         uuid
         constraint ticket_user_fk references users on delete cascade,
-    profile_id               varchar(10)              null,
+    profile_id               varchar(15)              null,
     barcode                  text                     not null,
     customer_type            varchar(50)              not null,
     customer_type_definition varchar(50)              not null,
@@ -205,7 +205,7 @@ create table ticket
     movie_name               varchar(100)             not null,
     movie_rating             varchar(30)              not null,
     attributes               varchar(50)[]            not null default '{}',
-    last_modified_date    timestamp with time zone not null default current_timestamp,
+    last_modified_date       timestamp with time zone not null default current_timestamp,
     created_date             timestamp with time zone not null default current_timestamp
 );
 --rollback drop table if exists ticket;

@@ -4,10 +4,10 @@ import org.assertj.core.api.ObjectAssert
 import rocks.didit.sefilm.domain.PhoneNumber
 import rocks.didit.sefilm.domain.SEK
 import rocks.didit.sefilm.domain.dto.GiftCertificateDTO
+import rocks.didit.sefilm.domain.dto.core.AttendeeDTO
 import rocks.didit.sefilm.domain.dto.core.CinemaScreenDTO
 import rocks.didit.sefilm.domain.dto.core.LocationDTO
 import rocks.didit.sefilm.domain.dto.core.MovieDTO
-import rocks.didit.sefilm.domain.dto.core.ParticipantDTO
 import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.dto.core.TicketDTO
 import rocks.didit.sefilm.domain.dto.core.UserDTO
@@ -147,17 +147,17 @@ fun ThreadLocalRandom.nextShowing(movieId: MovieID, adminId: UserID): ShowingDTO
   )
 }
 
-fun ThreadLocalRandom.nextParticipant(
+fun ThreadLocalRandom.nextAttendee(
   userId: UserID,
   showingId: ShowingID,
   ticketNumber: TicketNumber? = null
-): ParticipantDTO {
-  return ParticipantDTO(
+): AttendeeDTO {
+  return AttendeeDTO(
     userId = userId,
     showingId = showingId,
     amountOwed = SEK(nextLong(0, 1000000)),
     hasPaid = nextBoolean(),
-    type = if (ticketNumber != null) ParticipantDTO.Type.GIFT_CERTIFICATE else ParticipantDTO.Type.SWISH,
+    type = if (ticketNumber != null) AttendeeDTO.Type.GIFT_CERTIFICATE else AttendeeDTO.Type.SWISH,
     giftCertificateUsed = if (ticketNumber != null) GiftCertificateDTO(
       userId,
       ticketNumber,

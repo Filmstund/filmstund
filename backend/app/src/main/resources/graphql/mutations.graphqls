@@ -21,7 +21,7 @@ type Mutation {
     # Fetch any new movies from Filmstaden, returns the movies that were added
     fetchNewMoviesFromFilmstaden: [Movie!]
 
-    updateParticipantPaymentInfo(paymentInfo: ParticipantPaymentInput!): ParticipantPaymentInfo!
+    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInput!): AttendeePaymentInfo!
 
     updateUser(newInfo: NewUserInfo!): CurrentUser!
     # Generate a new calendar feed id, invalidating the old one
