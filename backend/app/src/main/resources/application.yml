@@ -7,7 +7,7 @@ spring:
       enabled: ALWAYS
   data:
     mongodb:
-      uri: ${SEFILM_MONGODB_URI:mongodb://localhost/sefilm}
+      uri: ${FILMSTUND_MONGODB_URI:mongodb://localhost/filmstund}
       enabled: true
   jackson:
     serialization:
@@ -15,9 +15,9 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
   datasource:
-    url: ${SEFILM_JDBC_URI:jdbc:postgresql://localhost:5432/sefilm}
-    username: ${SEFILM_JDBC_USERNAME:sefilm}
-    password: ${SEFILM_JDBC_PASSWORD:}
+    url: ${FILMSTUND_JDBC_URI:jdbc:postgresql://localhost:5432/filmstund}
+    username: ${FILMSTUND_JDBC_USERNAME:filmstund}
+    password: ${FILMSTUND_JDBC_PASSWORD:}
 management:
   endpoints:
     web:
@@ -26,7 +26,7 @@ management:
     git:
       mode: "full"
 
-sefilm:
+filmstund:
   baseUrl:
     api: ${apiBaseUrl:http://localhost:8080}
     frontend: ${frontendBaseUrl:http://localhost:3000}
@@ -72,5 +72,5 @@ graphql:
 
 logging:
   level:
-    rocks.didit: ${logLevel:INFO}
-    rocks.didit.sefilm.logging: INFO
+    se.filmstund: ${logLevel:INFO}
+    se.filmstund.logging: INFO

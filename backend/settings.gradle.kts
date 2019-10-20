@@ -1,4 +1,4 @@
-rootProject.name = "sefilm"
+rootProject.name = "filmstund"
 val kotlinVersion: String by settings
 val springBootVersion: String by settings
 val springDepsVersion: String by settings

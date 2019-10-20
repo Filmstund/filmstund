@@ -1,12 +1,13 @@
-# ITBio backend
+# Filmstund backend
 
 ### Requirements
 
 - `gradle`
 - `mongodb`
+- `postgres`
 
 ### Get up and running
-First, start MongoDB.
+First, start MongoDB and postgres
 
 Then start Gradle:
 ```sh
