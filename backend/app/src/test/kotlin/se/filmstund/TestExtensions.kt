@@ -4,6 +4,7 @@ import org.assertj.core.api.ObjectAssert
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.LocationDTO
@@ -66,6 +67,19 @@ fun ThreadLocalRandom.nextUserDTO(
     lastLogin = Instant.EPOCH,
     signupDate = Instant.EPOCH,
     lastModifiedDate = Instant.EPOCH
+  )
+}
+
+fun ThreadLocalRandom.nextPublicUserDTO(
+  id: UserID = UserID.random()
+): PublicUserDTO {
+  return PublicUserDTO(
+    id = id,
+    firstName = "Fname ${nextString(20)}",
+    lastName = "Lname ${nextString(20)}",
+    nick = "Nickan ${nextString(20)}",
+    phone = "073000000${nextLong(0, 9)}",
+    avatar = "http://${nextString(20)}.example.org"
   )
 }
 
