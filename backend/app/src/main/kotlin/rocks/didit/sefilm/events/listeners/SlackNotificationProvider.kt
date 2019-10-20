@@ -1,4 +1,4 @@
-package rocks.didit.sefilm.notification.providers
+package rocks.didit.sefilm.events.listeners
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,10 +11,12 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import rocks.didit.sefilm.Properties
+import rocks.didit.sefilm.domain.dto.core.MovieDTO
 import rocks.didit.sefilm.events.NewShowingEvent
 import rocks.didit.sefilm.events.ShowingEvent
 import rocks.didit.sefilm.events.UpdatedShowingEvent
 import rocks.didit.sefilm.logger
+import rocks.didit.sefilm.services.MovieService
 import java.util.*
 
 @Component
@@ -25,6 +27,7 @@ import java.util.*
   havingValue = "true"
 )
 class SlackNotificationProvider(
+  private val movieService: MovieService,
   private val restTemplate: RestTemplate,
   private val objectMapper: ObjectMapper,
   private val properties: Properties
@@ -37,7 +40,7 @@ class SlackNotificationProvider(
   @Async
   @EventListener
   fun pushOnUpdatedEvent(event: UpdatedShowingEvent) {
-    if (event.showing.date == event.originalShowing.date && event.showing.time == event.originalShowing.time) {
+    if (event.showing.date == event.showingBeforeUpdate.date && event.showing.time == event.showingBeforeUpdate.time) {
       // We only push of date or time has changed.
       return
     }
@@ -46,7 +49,7 @@ class SlackNotificationProvider(
     val dateField = SlackField("Datum", event.showing.date.toString(), true)
     val timeField = SlackField("Tid", event.showing.time.toString(), true)
     val attachement = createAttachement(
-      "<!here> ${event.admin.nick} har ändrat sin visning",
+      "<!here> ${event.triggeredBy?.nick} har ändrat sin visning",
       showingUrl,
       event,
       listOf(dateField, timeField)
@@ -59,7 +62,8 @@ class SlackNotificationProvider(
   @EventListener
   fun pushOnNewEvent(event: NewShowingEvent) {
     val showingUrl = getShowingUrl(event)
-    val attachement = createAttachement("<!here> ${event.admin.nick} har skapat en ny visning!", showingUrl, event)
+    val attachement =
+      createAttachement("<!here> ${event.triggeredBy?.nick} har skapat en ny visning!", showingUrl, event)
     pushToSlack(SlackPayload(attachments = listOf(attachement)))
   }
 
@@ -72,30 +76,30 @@ class SlackNotificationProvider(
     event: ShowingEvent,
     fields: List<SlackField> = emptyList()
   ): SlackAttachement {
+    val movie = movieService.getMovieOrThrow(event.showing.movieId)
     return SlackAttachement(
-      "SeFilm visning för <${event.movie.title}>",
+      "SeFilm visning för <${movie.originalTitle ?: movie.title}>",
       pretext,
-      event.ifIMDbSupplied("IMDb"),
-      event.ifIMDbSupplied("https://www.imdb.com/title/${event.movie.imdbId?.value}"),
-      event.ifIMDbSupplied("https://pbs.twimg.com/profile_images/976507090624589824/0x28al44_400x400.jpg"),
+      movie.ifIMDbSupplied("IMDb"),
+      movie.ifIMDbSupplied("https://www.imdb.com/title/${movie.imdbId?.value}"),
+      movie.ifIMDbSupplied("https://pbs.twimg.com/profile_images/976507090624589824/0x28al44_400x400.jpg"),
       "grey",
-      event.movie.title,
+      movie.title,
       showingUrl,
-      event.movie.synopsis ?: "N/A",
+      movie.synopsis ?: "N/A",
       event.showing.location?.name ?: "Filmstaden",
       null,
       null,
-      event.movie.poster,
+      movie.poster,
       event.showing.datetime.atZone(TimeZone.getTimeZone("Europe/Stockholm").toZoneId()).toEpochSecond(),
       fields
     )
   }
 
-  private fun ShowingEvent.ifIMDbSupplied(str: String): String? {
-    return if (movie.imdbId?.isSupplied() == true) {
-      str
-    } else {
-      null
+  private fun MovieDTO.ifIMDbSupplied(str: String): String? {
+    return when {
+      imdbId?.isSupplied() == true -> str
+      else -> null
     }
   }
 

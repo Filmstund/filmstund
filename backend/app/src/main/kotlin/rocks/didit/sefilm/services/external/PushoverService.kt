@@ -11,8 +11,6 @@ import rocks.didit.sefilm.APIService
 import rocks.didit.sefilm.MissingAPIKeyException
 import rocks.didit.sefilm.Properties
 import rocks.didit.sefilm.events.EventPublisher
-import rocks.didit.sefilm.events.PushoverUserKeyInvalidEvent
-import rocks.didit.sefilm.notification.ProviderHelper
 
 @Service
 @ConditionalOnProperty(
@@ -30,7 +28,9 @@ class PushoverService(
   private val log: Logger = LoggerFactory.getLogger(this.javaClass)
   private val pushoverSettings: Properties.Pushover = properties.notification.provider.pushover
 
-  fun send(msg: ProviderHelper.NotificationMessage, userKey: String, device: String? = null) {
+  fun send(msg: Any, userKey: String, device: String? = null) {
+    TODO("Not implemented yet")
+    /*
     log.debug("About to send $msg")
 
     val payload = payloadWithToken(userKey, device)
@@ -47,6 +47,7 @@ class PushoverService(
       response.status != 1 -> log.warn("Unknown error occurred in Pushover: $response")
       else -> log.debug("Successfully notified {} with Pushover. Request ID: {}", payload.user, response.request)
     }
+     */
   }
 
   fun validateUserKey(userKey: String, device: String?): PushoverValidationStatus {

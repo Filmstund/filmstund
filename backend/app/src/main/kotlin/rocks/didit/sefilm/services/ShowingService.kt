@@ -34,7 +34,13 @@ import rocks.didit.sefilm.domain.id.MovieID
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.TicketNumber
 import rocks.didit.sefilm.domain.id.UserID
+import rocks.didit.sefilm.events.DeletedShowingEvent
 import rocks.didit.sefilm.events.EventPublisher
+import rocks.didit.sefilm.events.NewShowingEvent
+import rocks.didit.sefilm.events.TicketsBoughtEvent
+import rocks.didit.sefilm.events.UpdatedShowingEvent
+import rocks.didit.sefilm.events.UserAttendedEvent
+import rocks.didit.sefilm.events.UserUnattendedEvent
 import rocks.didit.sefilm.logger
 import rocks.didit.sefilm.services.external.FilmstadenService
 import rocks.didit.sefilm.toDaos
@@ -138,9 +144,9 @@ class ShowingService(
       val attendee = createAttendeeBasedOnPaymentType(paymentOption, user.id, showing)
       daos.attendeeDao.insertAttendeeOnShowing(attendee)
 
-      // TODO: reenable
-      //eventPublisher.publish(UserAttendedEvent(this, showing, attendee.user, paymentOption.type))
-      showing
+      showing.also { s ->
+        eventPublisher.publish(UserAttendedEvent(s, attendee, user))
+      }
     }
   }
 
@@ -155,33 +161,34 @@ class ShowingService(
         throw UnattendedException(currentUser.id, showing.id)
       }
 
-      // TODO re-enable
-      //eventPublisher.publish(UserUnattendedEvent(this, showing, attendee.user))
-      showing
+
+      showing.also { s ->
+        eventPublisher.publish(UserUnattendedEvent(s, currentUser))
+      }
     }
   }
 
   fun createShowing(data: CreateShowingDTO): ShowingDTO {
     return jdbi.inTransactionUnchecked { handle ->
       val daos = handle.toDaos()
-      val userId = currentLoggedInUser().id
+      val user = currentLoggedInUser()
 
       val filmstadenShow = data.filmstadenRemoteEntityId?.let { filmstadenService.fetchFilmstadenShow(it) }
       val showing = data.toShowing(
-        userId,
+        user.id,
         data.movieId,
         daos.movieDao.findTitleById(data.movieId) ?: throw NotFoundException("movie"),
         filmstadenShow?.screen
       )
 
       daos.showingDao.insertNewShowing(showing)
-      val attendee = createAttendeeBasedOnPaymentType(PaymentOption(PaymentType.Swish), userId, showing)
+      val attendee = createAttendeeBasedOnPaymentType(PaymentOption(PaymentType.Swish), user.id, showing)
       daos.attendeeDao.insertAttendeeOnShowing(attendee)
 
-      log.info("{} created new showing {}", userId, showing.id)
-      // TODO reenable
-      //eventPublisher.publish(NewShowingEvent(this, showing, adminUser))
-      showing
+      log.info("{} created new showing {}", user.id, showing.id)
+      showing.also { s ->
+        eventPublisher.publish(NewShowingEvent(s, user))
+      }
     }
   }
 
@@ -194,13 +201,13 @@ class ShowingService(
       assertionService.assertLoggedInUserIsAdmin(showing.admin)
       assertionService.assertTicketsNotBought(showing.admin, showing)
 
-      if (!dao.deleteByShowingAndAdmin(showingId, currentLoggedInUser().id)) {
+      val currentUser = currentLoggedInUser()
+      if (!dao.deleteByShowingAndAdmin(showingId, currentUser.id)) {
         throw AccessDeniedException("Only the showing admin is allowed to do that")
       }
 
       log.info("{} deleted showing {} - {} ({})", showing.admin, showing.id, showing.datetime, showing.movieTitle)
-      // TODO re-enable
-      //eventPublisher.publish(DeletedShowingEvent(this, showing, showing.admin))
+      eventPublisher.publish(DeletedShowingEvent(showing, currentUser))
       dao.findByDateAfterOrderByDateDesc(LocalDate.MIN)
     }
   }
@@ -223,9 +230,9 @@ class ShowingService(
       attendeeDao.updateAmountOwedForSwishAttendees(showingId, currentLoggedInUser().id, price)
       dao.markShowingAsBought(showingId, price)
 
-      // TODO re-enable
-      //eventPublisher.publish(TicketsBoughtEvent(this, showing, showing.admin))
-      showing.copy(ticketsBought = true, price = price)
+      showing.copy(ticketsBought = true, price = price).also { s ->
+        eventPublisher.publish(TicketsBoughtEvent(s, currentLoggedInUser()))
+      }
     }
   }
 
@@ -254,11 +261,12 @@ class ShowingService(
         cinemaScreen = cinemaScreen,
         date = newValues.date
       )
-      dao.updateShowing(updatedShowing, currentLoggedInUser().id)
+      val currentUser = currentLoggedInUser()
+      dao.updateShowing(updatedShowing, currentUser.id)
 
-      // TODO re-enable
-      //eventPublisher.publish(UpdatedShowingEvent(this, showing, originalShowing, showing.admin))
-      updatedShowing
+      updatedShowing.also { s ->
+        eventPublisher.publish(UpdatedShowingEvent(s, showing, currentUser))
+      }
     }
   }
 

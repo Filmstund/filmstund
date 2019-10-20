@@ -8,7 +8,7 @@ class EventPublisher(
   private val eventPublisher: ApplicationEventPublisher
 ) {
 
-  fun publish(event: ITBioEvent) {
+  fun publish(event: FilmstundEvent) {
     eventPublisher.publishEvent(event)
   }
 }
