@@ -15,7 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import se.filmstund.*
 import se.filmstund.database.DbConfig
 import se.filmstund.domain.PaymentOption
-import se.filmstund.domain.PaymentType
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.CreateShowingDTO
 import se.filmstund.domain.dto.FilmstadenShowDTO
@@ -247,7 +246,7 @@ internal class ShowingServiceTest {
       withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
       afterInsert {
         assertThrows<UserAlreadyAttendedException> {
-          showingService.attendShowing(showing.id, PaymentOption(PaymentType.Swish))
+          showingService.attendShowing(showing.id, PaymentOption(AttendeeDTO.Type.SWISH))
         }
       }
     }
@@ -261,7 +260,7 @@ internal class ShowingServiceTest {
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = true) }
       afterInsert {
         assertThrows<TicketsAlreadyBoughtException> {
-          showingService.attendShowing(showing.id, PaymentOption(PaymentType.Swish))
+          showingService.attendShowing(showing.id, PaymentOption(AttendeeDTO.Type.SWISH))
         }
       }
     }
@@ -275,7 +274,7 @@ internal class ShowingServiceTest {
       withShowing { it.nextShowing(movie.id, currentLoggedInUser().id).copy(ticketsBought = false) }
       afterInsert {
         assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
-        showingService.attendShowing(showing.id, PaymentOption(PaymentType.Swish))
+        showingService.attendShowing(showing.id, PaymentOption(AttendeeDTO.Type.SWISH))
         val attendee = it.attendeeDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
         assertThat(attendee).isNotNull
         assertThat(attendee?.hasPaid).isFalse()
@@ -298,7 +297,7 @@ internal class ShowingServiceTest {
         it.userDao.insertGiftCertificate(giftCert)
 
         assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
-        showingService.attendShowing(showing.id, PaymentOption(PaymentType.GiftCertificate, giftCert.number.number))
+        showingService.attendShowing(showing.id, PaymentOption(AttendeeDTO.Type.GIFT_CERTIFICATE, giftCert.number.number))
 
         val attendee = it.attendeeDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
         assertThat(attendee).isNotNull

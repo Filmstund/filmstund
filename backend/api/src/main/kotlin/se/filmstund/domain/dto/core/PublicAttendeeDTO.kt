@@ -8,4 +8,9 @@ data class PublicAttendeeDTO(
   val userId: UserID,
   val showingId: ShowingID,
   val userInfo: PublicUserDTO
-)
+) {
+  companion object {
+    fun from(attendee: AttendeeDTO): PublicAttendeeDTO =
+      PublicAttendeeDTO(attendee.userId, attendee.showingId, attendee.userInfo)
+  }
+}

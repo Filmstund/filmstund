@@ -17,11 +17,13 @@ type Showing {
     lastModifiedDate: String!
     createdDate: String!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
+    attendees: [Attendee!]!
 }
 
 type Attendee {
-    userId: UUID
-    showingId: ShowingID
+    userId: UserID!
+    showingId: ShowingID!
+    userInfo: User!
 }
 
 type CinemaScreen {

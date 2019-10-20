@@ -1,7 +1,5 @@
 package se.filmstund.domain
 
-enum class PaymentType {
-  Swish, GiftCertificate
-}
+import se.filmstund.domain.dto.core.AttendeeDTO
 
-data class PaymentOption(val type: PaymentType, val ticketNumber: String? = null)
+data class PaymentOption(val type: AttendeeDTO.Type, val ticketNumber: String? = null)

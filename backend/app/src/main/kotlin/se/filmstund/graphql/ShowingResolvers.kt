@@ -14,8 +14,8 @@ import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
 import se.filmstund.domain.dto.FilmstadenSeatMapDTO
 import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.dto.TicketRange
-import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.MovieDTO
+import se.filmstund.domain.dto.core.PublicAttendeeDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.id.Base64ID
@@ -66,8 +66,8 @@ class ShowingResolver(
   @Cacheable
   fun movie(showing: ShowingDTO): MovieDTO = movieService.getMovieOrThrow(showing.movieId)
 
-  fun attendees(showing: ShowingDTO): List<AttendeeDTO> =
-    attendeeDao.findAllAttendees(showing.id)
+  fun attendees(showing: ShowingDTO): List<PublicAttendeeDTO> =
+    attendeeDao.findAllAttendees(showing.id).map { PublicAttendeeDTO.from(it) }
 
   @Cacheable
   fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
@@ -82,19 +82,6 @@ class ShowingResolver(
     showingService.getAttendeePaymentDetails(showing.id)
 
   fun filmstadenSeatMap(showing: ShowingDTO): List<FilmstadenSeatMapDTO> = showingService.fetchSeatMap(showing.id)
-}
-
-@Component
-class AttendeeUserResolver(private val userService: UserService, private val showingService: ShowingService) :
-  GraphQLResolver<AttendeeDTO> {
-  fun user(attendee: AttendeeDTO): PublicUserDTO = userService
-    .getUserOrThrow(attendee.userId)
-
-  // TODO: why is this needed?
-  fun id(attendee: AttendeeDTO) = attendee.userId
-
-  // TODO: why is this needed?
-  fun showing(attendee: AttendeeDTO) = showingService.getShowingOrThrow(attendee.showingId)
 }
 
 @Component

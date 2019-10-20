@@ -15,7 +15,6 @@ import se.filmstund.currentLoggedInUser
 import se.filmstund.database.dao.AttendeeDao
 import se.filmstund.database.dao.ShowingDao
 import se.filmstund.domain.PaymentOption
-import se.filmstund.domain.PaymentType
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.AdminPaymentDetailsDTO
 import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
@@ -182,7 +181,7 @@ class ShowingService(
       )
 
       daos.showingDao.insertNewShowing(showing)
-      val attendee = createAttendeeBasedOnPaymentType(PaymentOption(PaymentType.Swish), user.id, showing)
+      val attendee = createAttendeeBasedOnPaymentType(PaymentOption(AttendeeDTO.Type.SWISH), user.id, showing)
       daos.attendeeDao.insertAttendeeOnShowing(attendee)
 
       log.info("{} created new showing {}", user.id, showing.id)
@@ -289,7 +288,7 @@ class ShowingService(
     showing: ShowingDTO
   ): AttendeeDTO =
     when (paymentOption.type) {
-      PaymentType.GiftCertificate -> {
+      AttendeeDTO.Type.GIFT_CERTIFICATE -> {
         val suppliedTicket = paymentOption.ticketNumber
           ?: throw MissingParametersException("User chose to pay with a gift certificate, but no ticket number were supplied")
         val ticketNumber = TicketNumber(suppliedTicket)
@@ -305,12 +304,13 @@ class ShowingService(
           userInfo = PublicUserDTO(userId)
         )
       }
-      PaymentType.Swish -> AttendeeDTO(
+      AttendeeDTO.Type.SWISH -> AttendeeDTO(
         userId = userId,
         showingId = showing.id,
         type = AttendeeDTO.Type.SWISH,
         userInfo = PublicUserDTO(userId)
       )
+      else -> throw IllegalArgumentException("Unsupported payment type")
     }
 
   /* Fetch location from db or create it if it does not exist before converting the showing */
