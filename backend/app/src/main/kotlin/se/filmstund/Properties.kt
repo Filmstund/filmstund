@@ -19,6 +19,8 @@ class Properties {
 
   var calendar = Calendar()
 
+  var gwen = Gwen()
+
   class Tmdb {
     var apikey: String? = null
     fun apiKeyExists(): Boolean {
@@ -59,5 +61,10 @@ class Properties {
 
   class Calendar {
     var durationBeforeAlert: Duration = Duration.ofHours(4)
+  }
+
+  class Gwen {
+    var apiUrl: String = ""
+    var secret: String = ""
   }
 }

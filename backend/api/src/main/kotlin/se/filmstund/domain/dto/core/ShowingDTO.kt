@@ -12,6 +12,17 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+data class GwenShowingDTO(
+  val filmstadenShowingId: FilmstadenShowingID? = null,
+  val date: LocalDate,
+  val time: LocalTime,
+  val movieId: MovieID,
+  val movieTitle: String,
+  val location: LocationDTO?,
+  val cinemaScreen: CinemaScreenDTO? = null,
+  val price: SEK? = SEK.ZERO
+)
+
 data class ShowingDTO(
   val id: ShowingID = ShowingID.random(),
   val webId: Base64ID = Base64ID.random(),
@@ -33,4 +44,17 @@ data class ShowingDTO(
 ) {
   val datetime: LocalDateTime
     get() = LocalDateTime.of(date, time)
+
+  fun toGwenShowingDTO(): GwenShowingDTO {
+    return GwenShowingDTO(
+      this.filmstadenShowingId,
+      this.date,
+      this.time,
+      this.movieId,
+      this.movieTitle,
+      this.location,
+      this.cinemaScreen,
+      this.price
+    )
+  }
 }

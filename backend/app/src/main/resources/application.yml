@@ -63,6 +63,9 @@ filmstund:
   calendar:
     duration-before-alert: ${calendarDurationBeforeAlert:4h}
   show-sql: ${SHOW_SQL:false}
+  gwen:
+    apiUrl: ${GWEN_API_URL}
+    secret: ${GWEN_SECRET}
 
 graphql:
   servlet:
