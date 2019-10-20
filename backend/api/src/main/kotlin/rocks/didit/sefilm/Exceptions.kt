@@ -27,6 +27,9 @@ class TicketAlreadyInUserException(userID: UserID) :
 class UserAlreadyAttendedException(userID: UserID) :
   KnownException("The user has already attended this showing", userID)
 
+class UnattendedException(userID: UserID, showingId: ShowingID) :
+  KnownException("The user has already unattended this showing", userID)
+
 class TicketNotFoundException(ticketNumber: TicketNumber) : KnownException("Ticket $ticketNumber not found")
 
 class TicketAlreadyUsedException(whichTicket: TicketNumber) :

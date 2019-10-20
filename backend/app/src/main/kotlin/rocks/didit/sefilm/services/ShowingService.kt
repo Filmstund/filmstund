@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import rocks.didit.sefilm.MissingParametersException
 import rocks.didit.sefilm.MissingPhoneNumberException
 import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.TicketsAlreadyBoughtException
+import rocks.didit.sefilm.UnattendedException
 import rocks.didit.sefilm.UserAlreadyAttendedException
 import rocks.didit.sefilm.currentLoggedInUser
 import rocks.didit.sefilm.database.dao.ParticipantDao
@@ -152,7 +152,7 @@ class ShowingService(
       assertionService.assertTicketsNotBought(currentUser.id, showing)
 
       if (!daos.participantDao.deleteByUserAndShowing(currentUser.id, showingId)) {
-        throw TicketsAlreadyBoughtException(currentUser.id, showing.id)
+        throw UnattendedException(currentUser.id, showing.id)
       }
 
       // TODO re-enable

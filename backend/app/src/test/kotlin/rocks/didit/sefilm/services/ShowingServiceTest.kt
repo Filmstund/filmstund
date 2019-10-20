@@ -12,14 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import rocks.didit.sefilm.DatabaseTest
-import rocks.didit.sefilm.MissingPhoneNumberException
-import rocks.didit.sefilm.NotFoundException
-import rocks.didit.sefilm.TestConfig
-import rocks.didit.sefilm.TicketsAlreadyBoughtException
-import rocks.didit.sefilm.UserAlreadyAttendedException
-import rocks.didit.sefilm.WithLoggedInUser
-import rocks.didit.sefilm.currentLoggedInUser
+import rocks.didit.sefilm.*
 import rocks.didit.sefilm.database.DbConfig
 import rocks.didit.sefilm.domain.PaymentOption
 import rocks.didit.sefilm.domain.PaymentType
@@ -33,12 +26,6 @@ import rocks.didit.sefilm.domain.dto.core.ShowingDTO
 import rocks.didit.sefilm.domain.id.ShowingID
 import rocks.didit.sefilm.domain.id.UserID
 import rocks.didit.sefilm.events.EventPublisher
-import rocks.didit.sefilm.isRoughlyEqualToShowing
-import rocks.didit.sefilm.nextGiftCert
-import rocks.didit.sefilm.nextGiftCerts
-import rocks.didit.sefilm.nextParticipant
-import rocks.didit.sefilm.nextShowing
-import rocks.didit.sefilm.nextUserDTO
 import rocks.didit.sefilm.services.external.FilmstadenService
 import java.time.LocalDate
 import java.time.LocalTime
@@ -336,6 +323,35 @@ internal class ShowingServiceTest {
           showingService.unattendShowing(showing.id)
         }
         assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
+      }
+    }
+  }
+
+  @Test
+  @WithLoggedInUser
+  internal fun `given a showing without participant, when unattendShowing(), then an exception is thrown`() {
+    databaseTest.start {
+      withShowing(currentLoggedInUser().id)
+      afterInsert {
+        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+        assertThrows<UnattendedException> {
+          showingService.unattendShowing(showing.id)
+        }
+        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
+      }
+    }
+  }
+
+  @Test
+  @WithLoggedInUser
+  internal fun `given a showing with a participant, when unattendShowing(), then the user isnt a participant anymore`() {
+    databaseTest.start {
+      withShowing(currentLoggedInUser().id)
+      withParticipant { it.nextParticipant(currentLoggedInUser().id, showing.id) }
+      afterInsert {
+        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isTrue()
+        showingService.unattendShowing(showing.id)
+        assertThat(it.participantDao.isParticipantOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
       }
     }
   }
