@@ -46,7 +46,7 @@ class MovieService(
         filterUtil.isNewerThan(fsMovie)
           && !filterUtil.isMovieUnwantedBasedOnGenre(fsMovie.genres.map(FilmstadenGenreDTO::name))
           && !filterUtil.isTitleUnwanted(fsMovie.title)
-          && movieDao.existsByFilmstadenId(FilmstadenNcgID(fsMovie.ncgId))
+          && !movieDao.existsByFilmstadenId(FilmstadenNcgID(fsMovie.ncgId))
       }
       .map {
         MovieDTO(
@@ -60,7 +60,7 @@ class MovieService(
           genres = it.genres.map { g -> g.name }.toSet()
         )
       }
-
+      
     val savedEntitiesCount = movieDao.insertMovies(newMoviesWeHaventPreviouslySeen).sum()
     log.info("Saved $savedEntitiesCount new movies from Filmstaden")
 
