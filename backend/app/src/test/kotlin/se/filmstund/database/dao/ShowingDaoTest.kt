@@ -295,4 +295,30 @@ internal class ShowingDaoTest {
       assertThat(dbShowing?.location).isNull()
     }
   }
+
+  @Test
+  internal fun `given a showing, when deleteByShowingAndAdmin(), then the showing is deleted`() {
+    databaseTest.start {
+      withAdmin()
+      withShowing()
+      afterInsert {
+        assertThat(it.showingDao.findById(showing.id)).isNotNull
+        assertThat(it.showingDao.deleteByShowingAndAdmin(showing.id, admin.id)).isTrue()
+        assertThat(it.showingDao.findById(showing.id)).isNull()
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing, when deleteByShowingAndAdmin() where admin is not correct, then the showing is not deleted`() {
+    databaseTest.start {
+      withAdmin()
+      withShowing()
+      afterInsert {
+        assertThat(it.showingDao.findById(showing.id)).isNotNull
+        assertThat(it.showingDao.deleteByShowingAndAdmin(showing.id, UserID.random())).isFalse()
+        assertThat(it.showingDao.findById(showing.id)).isNotNull
+      }
+    }
+  }
 }

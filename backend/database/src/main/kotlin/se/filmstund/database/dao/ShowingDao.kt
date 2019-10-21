@@ -94,7 +94,6 @@ interface ShowingDao {
     insertNewShowing(showing)
   }
 
-  // TODO test this
   @SqlUpdate("DELETE FROM showing s WHERE s.id = :showingId AND s.admin = :admin")
   fun deleteByShowingAndAdmin(showingId: ShowingID, admin: UserID): Boolean
 
