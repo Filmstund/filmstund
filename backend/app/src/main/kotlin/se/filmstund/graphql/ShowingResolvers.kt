@@ -5,7 +5,6 @@ package se.filmstund.graphql
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.cache.annotation.CacheConfig
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import se.filmstund.NotFoundException
 import se.filmstund.database.dao.AttendeeDao
@@ -53,26 +52,21 @@ class ShowingResolver(
   private val movieService: MovieService,
   private val ticketService: TicketService
 ) : GraphQLResolver<ShowingDTO> {
-  @Cacheable
   fun admin(showing: ShowingDTO): PublicUserDTO = userService
     .getUser(showing.admin)
     .orElseThrow { NotFoundException("admin user", showing.admin, showing.id) }
 
-  @Cacheable
   fun payToUser(showing: ShowingDTO): PublicUserDTO = userService
     .getUser(showing.payToUser)
     .orElseThrow { NotFoundException("payment receiver user", showing.payToUser, showing.id) }
 
-  @Cacheable
   fun movie(showing: ShowingDTO): MovieDTO = movieService.getMovieOrThrow(showing.movieId)
 
   fun attendees(showing: ShowingDTO): List<PublicAttendeeDTO> =
     attendeeDao.findAllAttendees(showing.id).map { PublicAttendeeDTO.from(it) }
 
-  @Cacheable
   fun myTickets(showing: ShowingDTO): List<TicketDTO> = ticketService.getTicketsForCurrentUserAndShowing(showing.id)
 
-  @Cacheable
   fun ticketRange(showing: ShowingDTO): TicketRange? = ticketService.getTicketRange(showing.id)
 
   fun adminPaymentDetails(showing: ShowingDTO): AdminPaymentDetailsDTO? =
@@ -86,6 +80,6 @@ class ShowingResolver(
 
 @Component
 class TicketUserResolver(private val userService: UserService) : GraphQLResolver<TicketDTO> {
-  fun assignedToUser(ticket: TicketDTO): PublicUserDTO = userService.getUserOrThrow(ticket.assignedToUser)
+  //fun assignedToUser(ticket: TicketDTO): PublicUserDTO = userService.getUserOrThrow(ticket.assignedToUser)
 }
 
