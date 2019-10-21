@@ -225,9 +225,10 @@ class ShowingService(
         return@inTransactionUnchecked showing
       }
 
-      attendeeDao.markGCAttendeesAsHavingPaid(showingId, currentLoggedInUser().id)
-      attendeeDao.updateAmountOwedForSwishAttendees(showingId, currentLoggedInUser().id, price)
-      dao.markShowingAsBought(showingId, price)
+      val adminUser = currentLoggedInUser().id
+      attendeeDao.markGCAttendeesAsHavingPaid(showingId, adminUser)
+      attendeeDao.updateAmountOwedForSwishAttendees(showingId, adminUser, price)
+      dao.markShowingAsBought(showingId, adminUser, price)
 
       showing.copy(ticketsBought = true, price = price).also { s ->
         eventPublisher.publish(TicketsBoughtEvent(s, currentLoggedInUser()))

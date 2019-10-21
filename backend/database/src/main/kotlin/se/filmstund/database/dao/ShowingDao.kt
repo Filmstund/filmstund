@@ -97,10 +97,9 @@ interface ShowingDao {
   @SqlUpdate("DELETE FROM showing s WHERE s.id = :showingId AND s.admin = :admin")
   fun deleteByShowingAndAdmin(showingId: ShowingID, admin: UserID): Boolean
 
-  // TODO test this
   @Timestamped
-  @SqlUpdate("UPDATE showing s SET tickets_bought = true, price = :price, last_modified_date = :now WHERE s.id = :showingId AND s.tickets_bought = false")
-  fun markShowingAsBought(showingId: ShowingID, price: SEK): Boolean
+  @SqlUpdate("UPDATE showing s SET tickets_bought = true, price = :price, last_modified_date = :now WHERE s.id = :showingId AND s.tickets_bought = false AND s.admin = :adminUserId")
+  fun markShowingAsBought(showingId: ShowingID, adminUserId: UserID, price: SEK): Boolean
 
   // TODO test this and return updated values
   @Suppress("SqlResolve")

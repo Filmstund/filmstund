@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import se.filmstund.DatabaseTest
 import se.filmstund.TestConfig
 import se.filmstund.database.DbConfig
+import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.ShowingDTO
@@ -318,6 +319,58 @@ internal class ShowingDaoTest {
         assertThat(it.showingDao.findById(showing.id)).isNotNull
         assertThat(it.showingDao.deleteByShowingAndAdmin(showing.id, UserID.random())).isFalse()
         assertThat(it.showingDao.findById(showing.id)).isNotNull
+      }
+    }
+  }
+
+  @Test
+  internal fun `given showing that hasnt been bought, when markShowingAsBought(), then the showing is bought and the price is set`() {
+    databaseTest.start {
+      withMovie()
+      withAdmin()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = false) }
+      afterInsert {
+        assertThat(showing.ticketsBought).isFalse()
+        assertThat(showing.price).isNotEqualTo(SEK(1337))
+        assertThat(it.showingDao.markShowingAsBought(showing.id, admin.id, SEK(1337))).isTrue()
+        val dbShowing = it.showingDao.findById(showing.id)
+        assertThat(dbShowing?.ticketsBought).isTrue()
+        assertThat(dbShowing?.price).isEqualTo(SEK(1337))
+        assertThat(dbShowing?.lastModifiedDate).isAfter(showing.lastModifiedDate)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given showing that has been bought, when markShowingAsBought(), then the showing is not bought`() {
+    databaseTest.start {
+      withMovie()
+      withAdmin()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      afterInsert {
+        assertThat(showing.ticketsBought).isTrue()
+        assertThat(showing.price).isNotEqualTo(SEK(1337))
+        assertThat(it.showingDao.markShowingAsBought(showing.id, admin.id, SEK(1337))).isFalse()
+        val dbShowing = it.showingDao.findById(showing.id)
+        assertThat(dbShowing?.ticketsBought).isTrue()
+        assertThat(dbShowing?.price).isNotEqualTo(SEK(1337))
+      }
+    }
+  }
+
+  @Test
+  internal fun `given showing that hasnt been bought, when markShowingAsBought() but the admin is wrong, then the showing is not bought`() {
+    databaseTest.start {
+      withMovie()
+      withAdmin()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      afterInsert {
+        assertThat(showing.ticketsBought).isTrue()
+        assertThat(showing.price).isNotEqualTo(SEK(1337))
+        assertThat(it.showingDao.markShowingAsBought(showing.id, UserID.random(), SEK(1337))).isFalse()
+        val dbShowing = it.showingDao.findById(showing.id)
+        assertThat(dbShowing?.ticketsBought).isTrue()
+        assertThat(dbShowing?.price).isNotEqualTo(SEK(1337))
       }
     }
   }
