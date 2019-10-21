@@ -66,5 +66,5 @@ input UserDetailsDTOInput {
 
 input GiftCertificateDTOInput {
     number: String!
-    expires: LocalDate
+    expiresAt: LocalDate
 }
