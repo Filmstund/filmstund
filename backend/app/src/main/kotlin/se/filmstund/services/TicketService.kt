@@ -15,6 +15,7 @@ import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.id.FilmstadenMembershipId
+import se.filmstund.domain.id.FilmstadenShowingID
 import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID
 import se.filmstund.logger
@@ -95,7 +96,8 @@ class TicketService(
       cinemaScreen = cinemaScreen,
       time = zonedDateTime.toLocalTime(),
       date = zonedDateTime.toLocalDate(),
-      location = location
+      location = location,
+      filmstadenShowingId = FilmstadenShowingID(filmstadenRemoteEntityId)
     )
     daos.showingDao.updateShowing(updatedShowing, currentLoggedInUser().id)
     return updatedShowing

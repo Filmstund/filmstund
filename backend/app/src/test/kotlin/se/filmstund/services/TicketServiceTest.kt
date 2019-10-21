@@ -26,6 +26,7 @@ import se.filmstund.domain.dto.SeatRange
 import se.filmstund.domain.dto.TicketRange
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.TicketDTO
+import se.filmstund.domain.id.FilmstadenShowingID
 import se.filmstund.nextAttendee
 import se.filmstund.nextTicket
 import se.filmstund.services.external.FilmstadenService
@@ -102,6 +103,7 @@ internal class TicketServiceTest {
         assertThat(dbShowing?.date).isNotNull().isEqualTo(zonedDateTime.toLocalDate())
         assertThat(dbShowing?.time).isNotNull().isEqualTo(zonedDateTime.toLocalTime())
         assertThat(dbShowing?.lastModifiedDate).isAfter(showing.lastModifiedDate)
+        assertThat(dbShowing?.filmstadenShowingId).isEqualTo(FilmstadenShowingID("AA-1036-201908221930"))
 
         assertThat(dbShowing)
           .isEqualToIgnoringGivenFields(
@@ -113,7 +115,8 @@ internal class TicketServiceTest {
             "lastModifiedDate",
             "movieTitle",
             "payToPhone",
-            "createdDate"
+            "createdDate",
+            "filmstadenShowingId"
           )
       }
     }
