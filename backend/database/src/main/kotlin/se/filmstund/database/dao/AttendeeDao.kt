@@ -39,8 +39,8 @@ interface AttendeeDao {
 
   fun insertAttendeeOnShowing(attendee: AttendeeDTO) = insertAttendeeOnShowing(listOf(attendee))
 
-  // TODO: Add lastModifiedDate
-  @SqlQuery("UPDATE attendee att SET has_paid = :hasPaid, amount_owed = COALESCE(:amountOwed, amount_owed) FROM (SELECT a.user_id, a.showing_id, a.attendee_type AS type, $EXTRA_FIELDS FROM attendee a LEFT JOIN gift_certificate gc on a.user_id = gc.user_id and a.gift_certificate_used = gc.number JOIN users u on a.user_id = u.id WHERE a.showing_id = :showingId AND a.user_id = :userId) AS pu JOIN showing s ON s.id = pu.showing_id AND s.admin = :adminUser WHERE att.showing_id = pu.showing_id AND att.user_id = pu.user_id RETURNING pu.*, has_paid, amount_owed")
+  @Timestamped
+  @SqlQuery("UPDATE attendee att SET has_paid = :hasPaid, amount_owed = COALESCE(:amountOwed, amount_owed), last_modified_date = :now FROM (SELECT a.user_id, a.showing_id, a.attendee_type AS type, $EXTRA_FIELDS FROM attendee a LEFT JOIN gift_certificate gc on a.user_id = gc.user_id and a.gift_certificate_used = gc.number JOIN users u on a.user_id = u.id WHERE a.showing_id = :showingId AND a.user_id = :userId) AS pu JOIN showing s ON s.id = pu.showing_id AND s.admin = :adminUser WHERE att.showing_id = pu.showing_id AND att.user_id = pu.user_id RETURNING pu.*, has_paid, amount_owed")
   @UseRowReducer(AttendeeGiftCertReducer::class)
   @RegisterKotlinMapper(GiftCertificateDTO::class, "gc")
   fun updatePaymentStatus(
