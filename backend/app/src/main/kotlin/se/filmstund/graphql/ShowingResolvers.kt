@@ -78,8 +78,3 @@ class ShowingResolver(
   fun filmstadenSeatMap(showing: ShowingDTO): List<FilmstadenSeatMapDTO> = showingService.fetchSeatMap(showing.id)
 }
 
-@Component
-class TicketUserResolver(private val userService: UserService) : GraphQLResolver<TicketDTO> {
-  //fun assignedToUser(ticket: TicketDTO): PublicUserDTO = userService.getUserOrThrow(ticket.assignedToUser)
-}
-
