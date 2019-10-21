@@ -293,14 +293,43 @@ internal class AttendeeDaoTest {
 
         val dbAttendees = it.attendeeDao.findAllAttendees(showing.id)
         assertThat(dbAttendees).hasSize(25)
-        dbAttendees.forEach { p->
+        dbAttendees.forEach { p ->
           if (p.hasPaid || p.type == AttendeeDTO.Type.GIFT_CERTIFICATE) {
             assertThat(p.amountOwed).isNotEqualTo(SEK(1337))
           } else {
             assertThat(p.amountOwed).isEqualTo(SEK(1337))
-            // TODO: check last modified date
           }
         }
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing that isnt bought and with an attendee, when deleteByUserAndShowing(), then the attendee is deleted`() {
+    databaseTest.start {
+      withMovie()
+      withAdmin()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = false) }
+      withAttendeesOnLastShowing()
+      afterInsert {
+        assertThat(it.attendeeDao.isAttendeeOnShowing(user.id, showing.id)).isTrue()
+        it.attendeeDao.deleteByUserAndShowing(user.id, showing.id)
+        assertThat(it.attendeeDao.isAttendeeOnShowing(user.id, showing.id)).isFalse()
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing that is bought and with an attendee, when deleteByUserAndShowing(), then the attendee is not deleted`() {
+    databaseTest.start {
+      withMovie()
+      withAdmin()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      withAttendeesOnLastShowing()
+      afterInsert {
+        assertThat(it.attendeeDao.isAttendeeOnShowing(user.id, showing.id)).isTrue()
+        assertThat(it.attendeeDao.deleteByUserAndShowing(user.id, showing.id)).isFalse()
+        assertThat(it.attendeeDao.isAttendeeOnShowing(user.id, showing.id)).isTrue()
       }
     }
   }

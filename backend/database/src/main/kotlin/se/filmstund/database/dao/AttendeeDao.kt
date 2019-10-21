@@ -51,7 +51,6 @@ interface AttendeeDao {
     amountOwed: SEK?
   ): AttendeeDTO?
 
-  // TODO test me
   @SqlUpdate("DELETE FROM attendee a USING showing s WHERE a.user_id = :userId AND a.showing_id = :showingId AND s.id = :showingId AND s.tickets_bought = false")
   fun deleteByUserAndShowing(userId: UserID, showingId: ShowingID): Boolean
 

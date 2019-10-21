@@ -542,7 +542,7 @@ internal class ShowingServiceTest {
         assertThat(dbShowing)
           .isEqualToIgnoringGivenFields(updatedShowing, "lastModifiedDate", "payToPhone")
         assertThat(dbShowing?.lastModifiedDate).isAfter(updatedShowing.lastModifiedDate)
-        // FIXME: assert that payToPhone has been correctly updated
+        // FIXME: assert that payToPhone has been correctly updated when updateShowing returns from DB
         assertThat(dbShowing?.cinemaScreen).isNotNull.isEqualTo(CinemaScreenDTO.from(showMock.screen))
       }
     }
