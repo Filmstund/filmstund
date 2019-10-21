@@ -8,7 +8,6 @@ import se.filmstund.NotFoundException
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.dao.UserDao
 import se.filmstund.domain.PhoneNumber
-import se.filmstund.domain.dto.NotificationSettingsInputDTO
 import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.dto.UserDetailsDTO
 import se.filmstund.domain.dto.core.UserDTO
@@ -23,7 +22,6 @@ import java.util.*
 class UserService(
   private val jdbi: Jdbi,
   private val userDao: UserDao
-  //private val pushoverService: PushoverService?,
 ) {
 
   private val log by logger()
@@ -32,20 +30,6 @@ class UserService(
   fun getUser(id: UserID): PublicUserDTO? = userDao.findPublicUserById(id)
   fun getUserOrThrow(id: UserID): PublicUserDTO = getUser(id)
     ?: throw NotFoundException("user", id)
-
-  fun getUsersThatWantToBeNotified(knownRecipients: List<UUID>): List<UserDTO> = emptyList() /*{
-    return knownRecipients.let {
-      when (it.isEmpty()) {
-        true -> userRepo.findAll()
-        false -> userRepo.findAllById(it)
-      }
-    }.filter { user ->
-      user.notificationSettings.let { s ->
-        s.notificationsEnabled && s.providerSettings.any { it.enabled }
-      }
-    }
-  }
-  */
 
   /** Get the full user with all fields. Use with care since this contains sensitive fields */
   fun getCompleteUser(id: UserID): UserDTO = userDao.findById(id)
@@ -68,39 +52,6 @@ class UserService(
       dao.findById(currentUser.id)!!
     }
   }
-
-  // TODO: listen for PushoverUserKeyInvalid and disable the key
-  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO): UserDTO = getCurrentUser()/* {
-    val currentUser = getUserEntityForCurrentUser()
-
-    val mailSettings = notificationInput.mail.let {
-      MailSettings(it?.enabled ?: false, it?.mailAddress ?: "${currentUser.firstName?.toLowerCase()}@example.org")
-    }
-    val pushoverSettings = notificationInput.pushover?.let {
-
-      val validatedUserKeyStatus =
-        when (it.enabled) {
-          true -> pushoverService?.validateUserKey(it.userKey, it.device)
-            ?: PushoverValidationStatus.UNKNOWN
-          false -> PushoverValidationStatus.UNKNOWN
-        }
-
-      PushoverSettings(it.enabled, it.userKey, it.device, validatedUserKeyStatus)
-    } ?: PushoverSettings()
-
-    return currentUser.copy(
-      notificationSettings = NotificationSettings(
-        notificationInput.notificationsEnabled,
-        notificationInput.enabledTypes,
-        listOf(mailSettings, pushoverSettings)
-      )
-    ).let {
-      userRepo.save(it)
-    }.also {
-      log.trace("Update notification settings for user={} settings to={}", it.id, it.notificationSettings)
-    }.toDTO()
-  }
-  */
 
   fun invalidateCalendarFeedId(): UserDTO {
     return updateCalendarFeedIdForCurrentUser(UUID.randomUUID())

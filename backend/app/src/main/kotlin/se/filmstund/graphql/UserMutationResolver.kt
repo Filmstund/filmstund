@@ -6,7 +6,6 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import se.filmstund.domain.dto.AttendeePaymentInfoDTO
 import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.NotificationSettingsInputDTO
 import se.filmstund.domain.dto.UserDetailsDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.UserDTO
@@ -38,7 +37,4 @@ class UserMutationResolver(
 
   fun invalidateCalendarFeed() = userService.invalidateCalendarFeedId()
   fun disableCalendarFeed() = userService.disableCalendarFeed()
-
-  fun updateNotificationSettings(notificationInput: NotificationSettingsInputDTO) =
-    userService.updateNotificationSettings(notificationInput)
 }

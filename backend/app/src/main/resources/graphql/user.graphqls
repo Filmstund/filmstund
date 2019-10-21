@@ -11,7 +11,6 @@ type CurrentUser {
     giftCertificates: [GiftCertificate!]
     calendarFeedId: String
     calendarFeedUrl: String
-    #notificationSettings: NotificationSettings!
     lastLogin: String!
     signupDate: String!
     lastModifiedDate: String!
