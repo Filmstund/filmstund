@@ -1,4 +1,10 @@
-type Location {
+extend type Query {
+    previousLocations: [LocationDTO!]!
+    location(id: String!): LocationDTO
+    filmstadenCities: [FilmstadenCityAliasDTO!]!
+}
+
+type LocationDTO {
     name: String!
     latitude: String
     longitude: String
@@ -10,7 +16,7 @@ type Location {
     alias: [String!]!
 }
 
-type FilmstadenCity {
+type FilmstadenCityAliasDTO {
     name: String!
     alias: String!
 }

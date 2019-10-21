@@ -1,12 +1,12 @@
 ## Bio Budord ##
 # See BioBudordResolver
 
-type Query {
-    allBiobudord: [BioBudord!]!
-    randomBudord: BioBudord!
+extend type Query {
+    allBiobudord: [BioBudordDTO!]!
+    randomBudord: BioBudordDTO!
 }
 
-type BioBudord {
+type BioBudordDTO {
     number: Int!
     phrase: String!
 }

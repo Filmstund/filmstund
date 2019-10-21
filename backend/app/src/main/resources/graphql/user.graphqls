@@ -1,4 +1,22 @@
-type CurrentUser {
+extend type Query  {
+    allUsers: [PublicUserDTO!]!
+    currentUser: UserDTO!
+}
+
+extend type Mutation {
+    updateUser(newInfo: UserDetailsDTOInput!): UserDTO!
+
+    # Generate a new calendar feed id, invalidating the old one
+    invalidateCalendarFeed: UserDTO!
+
+    # Remove the calendar feed for the current user
+    disableCalendarFeed: UserDTO!
+
+    addGiftCertificates(giftCerts: [GiftCertificateDTOInput!]): UserDTO!
+    deleteGiftCertificate(giftCert: GiftCertificateDTOInput!): UserDTO!
+}
+
+type UserDTO {
     id: UserID!
     filmstadenMembershipId: String
     name: String
@@ -8,7 +26,7 @@ type CurrentUser {
     email: String!
     phone: String
     avatar: String
-    giftCertificates: [GiftCertificate!]
+    giftCertificates: [GiftCertificateDTO!]
     calendarFeedId: String
     calendarFeedUrl: String
     lastLogin: String!
@@ -16,7 +34,7 @@ type CurrentUser {
     lastModifiedDate: String!
 }
 
-type User {
+type PublicUserDTO {
     id: UserID!
     name: String
     firstName: String
@@ -26,13 +44,13 @@ type User {
     avatar: String
 }
 
-type GiftCertificate {
+type GiftCertificateDTO {
     number: String!
     expiresAt: LocalDate!
-    status: GiftCertificateStatus!
+    status: GiftCertificateDTO_Status!
 }
 
-enum GiftCertificateStatus {
+enum GiftCertificateDTO_Status {
     AVAILABLE
     PENDING
     USED
@@ -40,13 +58,13 @@ enum GiftCertificateStatus {
     UNKNOWN
 }
 
-input NewUserInfo {
+input UserDetailsDTOInput {
     nick: String
-    filmstadenId: String
+    filmstadenMembershipId: String
     phone: String
 }
 
-input GiftCertificateInput {
+input GiftCertificateDTOInput {
     number: String!
     expires: LocalDate
 }

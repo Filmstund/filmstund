@@ -1,0 +1,31 @@
+type FilmstadenSeatMapDTO {
+    row: Int!
+    number: Int!
+    seatType: String!
+    coordinates: FilmstadenSeatCoordinates!
+    dimensions: FilmstadenSeatDimensions!
+}
+
+type FilmstadenSeatCoordinates {
+    x: Float!
+    y: Float!
+}
+
+type FilmstadenSeatDimensions {
+    width: Int!
+    height: Int!
+}
+
+type FilmstadenLiteScreenDTO {
+    filmstadenId: ID!
+    name: String!
+}
+
+type FilmstadenShowingDTO {
+    cinemaName: String!,
+    screen: FilmstadenLiteScreenDTO!,
+    seatCount: Int!,
+    timeUtc: String!,
+    tags: [String!]!,
+    filmstadenRemoteEntityId: String!
+}

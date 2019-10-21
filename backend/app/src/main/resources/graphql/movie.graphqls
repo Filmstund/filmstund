@@ -1,4 +1,15 @@
-type Movie {
+extend type Query {
+    movie(id: MovieID!): MovieDTO
+    allMovies: [MovieDTO!]!
+    archivedMovies: [MovieDTO!]!
+}
+
+extend type Mutation {
+    # Fetch any new movies from Filmstaden, returns the movies that were added
+    fetchNewMoviesFromFilmstaden: [MovieDTO!]!
+}
+
+type MovieDTO {
     id: MovieID!
     filmstadenId: String
     imdbId: IMDbID
@@ -17,6 +28,5 @@ type Movie {
     archived: Boolean!
     lastModifiedDate: String!
     createdDate: String!
-    filmstadenShowings(city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
+    filmstadenShowings(city: String = "GB", afterDate: LocalDate): [FilmstadenShowingDTO!]!
 }
-

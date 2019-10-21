@@ -1,8 +1,13 @@
+extend type ShowingDTO {
+    myTickets: [TicketDTO!]
+    ticketRange: TicketRange
+}
+
 # A ticket assigned to a user that allowes access to Filmstaden
-type Ticket {
+type TicketDTO {
     id: String!
     #showingId: ShowingID! FIXME use dto where this exists instead
-    assignedToUser: User!
+    assignedToUser: PublicUserDTO!
     profileId: String
     barcode: String!
     customerType: String!
@@ -39,9 +44,4 @@ type TicketRange {
     seatings: [SeatRange!]
     # The total number of tickets for this showing
     totalCount: Int!
-}
-
-extend type Showing {
-    myTickets: [Ticket!]
-    ticketRange: TicketRange
 }

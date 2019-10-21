@@ -1,4 +1,27 @@
-type Showing {
+type Query {
+    showing(id: ShowingID, webId: Base64ID): ShowingDTO
+    publicShowings(afterDate: LocalDate): [ShowingDTO!]!
+    showingForMovie(movieId: MovieID): [ShowingDTO!]!
+}
+
+type Mutation {
+    attendShowing(showingId: ShowingID!, paymentOption: PaymentOption!): ShowingDTO!
+    unattendShowing(showingId: ShowingID!): ShowingDTO!
+
+    createShowing(showing: CreateShowingDTOInput!): ShowingDTO!
+
+    # Delete a showign and return all public showings
+    deleteShowing(showingId: ShowingID!): [ShowingDTO!]
+
+    markAsBought(showingId: ShowingID!, price: SEK!): ShowingDTO!
+    processTicketUrls(showingId: ShowingID!, ticketUrls: [String!]): ShowingDTO!
+
+    updateShowing(showingId: ShowingID!, newValues: UpdateShowingDTOInput): ShowingDTO!
+
+    promoteToAdmin(showingId: ShowingID!, userToPromote: UserID!): ShowingDTO!
+}
+
+type ShowingDTO {
     id: ShowingID!
     webId: Base64ID!
     filmstadenShowingId: String
@@ -7,58 +30,60 @@ type Showing {
     time: String!
     movieId: MovieID!
     movieTitle: String!
-    movie: Movie!
-    location: Location
-    cinemaScreen: CinemaScreen
+    movie: MovieDTO!
+    location: LocationDTO
+    cinemaScreen: CinemaScreenDTO
     price: SEK
     ticketsBought: Boolean!
-    admin: User!
-    payToUser: User!
+    admin: PublicUserDTO!
+    payToUser: PublicUserDTO!
     lastModifiedDate: String!
     createdDate: String!
-    filmstadenSeatMap: [FilmstadenSeatMap!]!
-    attendees: [Attendee!]!
+    filmstadenSeatMap: [FilmstadenSeatMapDTO!]!
+    attendees: [PublicAttendeeDTO!]!
 }
 
-type Attendee {
+type PublicAttendeeDTO {
     userId: UserID!
     showingId: ShowingID!
-    userInfo: User!
+    userInfo: PublicUserDTO!
 }
 
-type CinemaScreen {
+type CinemaScreenDTO {
     id: ID!
     name: String!
 }
 
-type FilmstadenScreen {
-    filmstadenId: ID!
-    name: String!
+input CinemaScreenDTOInput {
+    id: String!
+    name: String
 }
 
-type FilmstadenShowing {
-    cinemaName: String!,
-    screen: FilmstadenScreen!,
-    seatCount: Int!,
-    timeUtc: String!,
-    tags: [String!]!,
-    filmstadenRemoteEntityId: String!
+# Used for supplying how the user will pay, when attending a showing
+input PaymentOption {
+    type: PaymentType!
+    ticketNumber: String
 }
 
-type FilmstadenSeatMap {
-    row: Int!
-    number: Int!
-    seatType: String!
-    coordinates: FilmstadenSeatCoordinates!
-    dimensions: FilmstadenSeatDimensions!
+enum PaymentType {
+    SWISH
+    GIFT_CERTIFICATE
 }
 
-type FilmstadenSeatCoordinates {
-    x: Float!
-    y: Float!
+input CreateShowingDTOInput {
+    date: LocalDate!
+    time: LocalTime!
+    movieId: MovieID!
+    location: String!
+    filmstadenScreen: CinemaScreenDTOInput
+    filmstadenRemoteEntityId: String
 }
 
-type FilmstadenSeatDimensions {
-    width: Int!
-    height: Int!
+input UpdateShowingDTOInput {
+    price: SEK!
+    payToUser: UserID!
+    location: String!
+    filmstadenRemoteEntityId: String
+    time: LocalTime!
+    date: LocalDate!
 }

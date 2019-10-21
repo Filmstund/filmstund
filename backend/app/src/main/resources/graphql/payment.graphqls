@@ -1,47 +1,39 @@
-type AdminPaymentDetails {
-    filmstadenBuyLink: String
-    showingId: ShowingID
-    attendees: [AttendeeAdminInfo!]!
+extend type Mutation {
+    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoDTOInput!): AttendeeDTO!
 }
 
-type AttendeeAdminInfo {
+extend type ShowingDTO {
+    adminPaymentDetails: AdminPaymentDetailsDTO
+    attendeePaymentDetails: AttendeePaymentDetailsDTO
+}
+
+type AdminPaymentDetailsDTO {
+    filmstadenBuyLink: String
+    showingId: ShowingID
+    attendees: [AttendeeDTO!]!
+}
+
+type AttendeePaymentDetailsDTO {
+    hasPaid: Boolean!
+    amountOwed: SEK!
+    payTo: PublicUserDTO!
+    payer: PublicUserDTO!
+    swishLink: String
+}
+
+type AttendeeDTO {
     userId: UserID!
     showingId: ShowingID!
     hasPaid: Boolean!
     amountOwed: SEK!
     type: PaymentType!
-    giftCertificateUsed: GiftCertificate
+    giftCertificateUsed: GiftCertificateDTO
     filmstadenMembershipId: String
 }
 
-type AttendeePaymentDetails {
-    hasPaid: Boolean!
-    amountOwed: SEK!
-    payTo: User!
-    payer: User!
-    swishLink: String
-}
-
-input AttendeePaymentInput {
+input AttendeePaymentInfoDTOInput {
     userId: UserID!
     showingId: ShowingID
     hasPaid: Boolean!
     amountOwed: SEK!
-}
-
-
-# Used for supplying how the user will pay, when attending a showing
-input PaymentOption {
-    type: PaymentType!
-    ticketNumber: String
-}
-
-enum PaymentType {
-    SWISH
-    GIFT_CERTIFICATE
-}
-
-extend type Showing {
-    adminPaymentDetails: AdminPaymentDetails
-    attendeePaymentDetails: AttendeePaymentDetails
 }
