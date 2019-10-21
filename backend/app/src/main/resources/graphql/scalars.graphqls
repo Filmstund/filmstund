@@ -1,4 +1,3 @@
-scalar UUID
 scalar MovieID
 scalar ShowingID
 scalar Base64ID
@@ -8,4 +7,3 @@ scalar LocalTime
 scalar IMDbID
 scalar TMDbID
 scalar UserID
-scalar GoogleID

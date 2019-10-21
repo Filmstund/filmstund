@@ -26,12 +26,6 @@ type TicketDTO {
     attributes: [String!]
 }
 
-# The row and seat number for a ticket
-type Seat {
-    row: Int!
-    number: Int!
-}
-
 type SeatRange {
     row: Int!
     # All numbers for this particular row
