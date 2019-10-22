@@ -333,4 +333,67 @@ internal class AttendeeDaoTest {
       }
     }
   }
+
+  @Test
+  internal fun `given a showing with 5 gift cert attendees and 5 swish attendees, when markGCAttendeesAsHavingPaid() but the admin is wrong, then no update is done`() {
+    databaseTest.start {
+      withAdmin()
+      withShowing()
+      withAttendeesAndUsers(5) {
+        val userId = UserID.random()
+        val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
+        val attendee =
+          it.nextAttendee(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = false)
+        Pair(user, attendee)
+      }
+      withAttendeesAndUsers(5) {
+        val user = it.nextUserDTO(UserID.random(), listOf())
+        val attendee = it.nextAttendee(user.id, showing.id).copy(hasPaid = false)
+        Pair(user, attendee)
+      }
+      afterInsert {
+        val beforeUpdate = it.attendeeDao.findAllAttendees(showing.id)
+        assertThat(it.attendeeDao.markGCAttendeesAsHavingPaid(showing.id, UserID.random())).isFalse()
+        val afterUpdate = it.attendeeDao.findAllAttendees(showing.id)
+        assertThat(afterUpdate).isEqualTo(beforeUpdate)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing with 5 gift cert attendees and 5 swish attendees, when markGCAttendeesAsHavingPaid(), then the gift cert attendees are updated`() {
+    databaseTest.start {
+      withAdmin()
+      withShowing()
+      withAttendeesAndUsers(5) {
+        val userId = UserID.random()
+        val user = it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
+        val attendee =
+          it.nextAttendee(userId, showing.id, user.giftCertificates.first().number).copy(hasPaid = false)
+        Pair(user, attendee)
+      }
+      withAttendeesAndUsers(5) {
+        val user = it.nextUserDTO(UserID.random(), listOf())
+        val attendee = it.nextAttendee(user.id, showing.id).copy(hasPaid = false)
+        Pair(user, attendee)
+      }
+      afterInsert {
+        val beforeUpdate = it.attendeeDao.findAllAttendees(showing.id)
+        assertThat(it.attendeeDao.markGCAttendeesAsHavingPaid(showing.id, admin.id)).isTrue()
+        val afterUpdate = it.attendeeDao.findAllAttendees(showing.id)
+
+        assertThat(afterUpdate.filter { a -> a.giftCertificateUsed == null })
+          .isEqualTo(beforeUpdate.filter { a -> a.giftCertificateUsed == null })
+
+        val gcAttendees = afterUpdate.filter { a -> a.giftCertificateUsed != null }
+        assertThat(gcAttendees)
+          .isNotEqualTo(beforeUpdate.filter { a -> a.giftCertificateUsed != null })
+
+        gcAttendees.forEach {  a ->
+          assertThat(a.amountOwed).isEqualTo(SEK.ZERO)
+          assertThat(a.hasPaid).isTrue()
+        }
+      }
+    }
+  }
 }

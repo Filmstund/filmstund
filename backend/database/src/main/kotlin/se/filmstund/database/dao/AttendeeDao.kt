@@ -54,7 +54,6 @@ interface AttendeeDao {
   @SqlUpdate("DELETE FROM attendee a USING showing s WHERE a.user_id = :userId AND a.showing_id = :showingId AND s.id = :showingId AND s.tickets_bought = false")
   fun deleteByUserAndShowing(userId: UserID, showingId: ShowingID): Boolean
 
-  // TODO test me
   @Timestamped
   @SqlUpdate("UPDATE attendee a SET has_paid = true, amount_owed = 0, last_modified_date = :now FROM showing s WHERE a.showing_id = s.id AND s.admin = :adminUser AND a.showing_id = :showingId AND (a.gift_certificate_used IS NOT NULL OR a.user_id = :adminUser)")
   fun markGCAttendeesAsHavingPaid(showingId: ShowingID, adminUser: UserID): Boolean
