@@ -14,81 +14,6 @@
         "description": "",
         "fields": [
           {
-            "name": "allMovies",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Movie",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "archivedMovies",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Movie",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "movie",
-            "description": "",
-            "args": [
-              {
-                "name": "id",
-                "description": "",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "UUID",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Movie",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "showing",
             "description": "",
             "args": [
@@ -97,7 +22,7 @@
                 "description": "",
                 "type": {
                   "kind": "SCALAR",
-                  "name": "UUID",
+                  "name": "ShowingID",
                   "ofType": null
                 },
                 "defaultValue": null
@@ -115,7 +40,7 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "Showing",
+              "name": "ShowingDTO",
               "ofType": null
             },
             "isDeprecated": false,
@@ -147,42 +72,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "Showing",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "privateShowingsForCurrentUser",
-            "description": "",
-            "args": [
-              {
-                "name": "afterDate",
-                "description": "",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "LocalDate",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Showing",
+                    "name": "ShowingDTO",
                     "ofType": null
                   }
                 }
@@ -200,7 +90,7 @@
                 "description": "",
                 "type": {
                   "kind": "SCALAR",
-                  "name": "UUID",
+                  "name": "MovieID",
                   "ofType": null
                 },
                 "defaultValue": null
@@ -217,7 +107,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "Showing",
+                    "name": "ShowingDTO",
                     "ofType": null
                   }
                 }
@@ -241,7 +131,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "BioBudord",
+                    "name": "BioBudordDTO",
                     "ofType": null
                   }
                 }
@@ -259,47 +149,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "BioBudord",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "allUsers",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "User",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "currentUser",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "CurrentUser",
+                "name": "BioBudordDTO",
                 "ofType": null
               }
             },
@@ -321,7 +171,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "Location",
+                    "name": "LocationDTO",
                     "ofType": null
                   }
                 }
@@ -351,7 +201,7 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "Location",
+              "name": "LocationDTO",
               "ofType": null
             },
             "isDeprecated": false,
@@ -372,7 +222,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "FilmstadenCity",
+                    "name": "FilmstadenCityAliasDTO",
                     "ofType": null
                   }
                 }
@@ -382,7 +232,34 @@
             "deprecationReason": null
           },
           {
-            "name": "allNotificationProviders",
+            "name": "movie",
+            "description": "",
+            "args": [
+              {
+                "name": "id",
+                "description": "",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "MovieID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "MovieDTO",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "allMovies",
             "description": "",
             "args": [],
             "type": {
@@ -396,7 +273,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "NotificationProvider",
+                    "name": "MovieDTO",
                     "ofType": null
                   }
                 }
@@ -406,7 +283,7 @@
             "deprecationReason": null
           },
           {
-            "name": "allNotificationTypes",
+            "name": "archivedMovies",
             "description": "",
             "args": [],
             "type": {
@@ -419,11 +296,51 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "ENUM",
-                    "name": "NotificationType",
+                    "kind": "OBJECT",
+                    "name": "MovieDTO",
                     "ofType": null
                   }
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "allUsers",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "PublicUserDTO",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "currentUser",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "UserDTO",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -436,8 +353,28 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "ShowingID",
+        "description": "",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Base64ID",
+        "description": "",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
-        "name": "Movie",
+        "name": "ShowingDTO",
         "description": "",
         "fields": [
           {
@@ -449,7 +386,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "UUID",
+                "name": "ShowingID",
                 "ofType": null
               }
             },
@@ -457,13 +394,392 @@
             "deprecationReason": null
           },
           {
-            "name": "imdbId",
+            "name": "webId",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Base64ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "filmstadenShowingId",
             "description": "",
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "IMDbID",
+              "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slug",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "date",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "time",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "movieId",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "MovieID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "movieTitle",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "movie",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "MovieDTO",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "location",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "LocationDTO",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cinemaScreen",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "CinemaScreenDTO",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "price",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "SEK",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ticketsBought",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "admin",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PublicUserDTO",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "payToUser",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PublicUserDTO",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "lastModifiedDate",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdDate",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "filmstadenSeatMap",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "FilmstadenSeatMapDTO",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attendees",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "PublicAttendeeDTO",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "adminPaymentDetails",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AdminPaymentDetailsDTO",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "attendeePaymentDetails",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "AttendeePaymentDetailsDTO",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "myTickets",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "TicketDTO",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ticketRange",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "TicketRange",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "String",
+        "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "MovieID",
+        "description": "",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "MovieDTO",
+        "description": "",
+        "fields": [
+          {
+            "name": "id",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "MovieID",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -481,12 +797,12 @@
             "deprecationReason": null
           },
           {
-            "name": "filmstadenSlug",
+            "name": "imdbId",
             "description": "",
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "IMDbID",
               "ofType": null
             },
             "isDeprecated": false,
@@ -499,6 +815,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "TMDbID",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slug",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -625,22 +953,6 @@
             "deprecationReason": null
           },
           {
-            "name": "lastModifiedDate",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "popularity",
             "description": "",
             "args": [],
@@ -689,6 +1001,38 @@
             "deprecationReason": null
           },
           {
+            "name": "lastModifiedDate",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdDate",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "filmstadenShowings",
             "description": "",
             "args": [
@@ -724,7 +1068,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "FilmstadenShowing",
+                    "name": "FilmstadenShowingDTO",
                     "ofType": null
                   }
                 }
@@ -741,28 +1085,8 @@
       },
       {
         "kind": "SCALAR",
-        "name": "UUID",
-        "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
         "name": "IMDbID",
         "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "String",
-        "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -821,7 +1145,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "FilmstadenShowing",
+        "name": "FilmstadenShowingDTO",
         "description": "",
         "fields": [
           {
@@ -849,7 +1173,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "FilmstadenScreen",
+                "name": "FilmstadenLiteScreenDTO",
                 "ofType": null
               }
             },
@@ -936,7 +1260,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "FilmstadenScreen",
+        "name": "FilmstadenLiteScreenDTO",
         "description": "",
         "fields": [
           {
@@ -988,373 +1312,8 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "Base64ID",
-        "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
-        "name": "Showing",
-        "description": "",
-        "fields": [
-          {
-            "name": "id",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "UUID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "webId",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Base64ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "slug",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "date",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "time",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "movie",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Movie",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "location",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Location",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "filmstadenScreen",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "FilmstadenScreen",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "private",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "price",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "SEK",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ticketsBought",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "admin",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "payToUser",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "expectedBuyDate",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "participants",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Participant",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "lastModifiedDate",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "filmstadenSeatMap",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "FilmstadenSeatMap",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "filmstadenRemoteEntityId",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "adminPaymentDetails",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "AdminPaymentDetails",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "attendeePaymentDetails",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "AttendeePaymentDetails",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "myTickets",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Ticket",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ticketRange",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "TicketRange",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "Location",
+        "name": "LocationDTO",
         "description": "",
         "fields": [
           {
@@ -1488,6 +1447,49 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "CinemaScreenDTO",
+        "description": "",
+        "fields": [
+          {
+            "name": "id",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "SCALAR",
         "name": "SEK",
         "description": "",
@@ -1499,7 +1501,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "User",
+        "name": "PublicUserDTO",
         "description": "",
         "fields": [
           {
@@ -1608,46 +1610,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "Participant",
-        "description": "",
-        "fields": [
-          {
-            "name": "user",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "User",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "paymentType",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "FilmstadenSeatMap",
+        "name": "FilmstadenSeatMapDTO",
         "description": "",
         "fields": [
           {
@@ -1824,7 +1787,66 @@
       },
       {
         "kind": "OBJECT",
-        "name": "AdminPaymentDetails",
+        "name": "PublicAttendeeDTO",
+        "description": "",
+        "fields": [
+          {
+            "name": "userId",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "UserID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "showingId",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ShowingID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userInfo",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PublicUserDTO",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AdminPaymentDetailsDTO",
         "description": "",
         "fields": [
           {
@@ -1840,31 +1862,19 @@
             "deprecationReason": null
           },
           {
-            "name": "filmstadenData",
+            "name": "showingId",
             "description": "",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "FilmstadenData",
-                    "ofType": null
-                  }
-                }
-              }
+              "kind": "SCALAR",
+              "name": "ShowingID",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "participantPaymentInfos",
+            "name": "attendees",
             "description": "",
             "args": [],
             "type": {
@@ -1878,7 +1888,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "ParticipantPaymentInfo",
+                    "name": "AttendeeDTO",
                     "ofType": null
                   }
                 }
@@ -1895,62 +1905,11 @@
       },
       {
         "kind": "OBJECT",
-        "name": "FilmstadenData",
+        "name": "AttendeeDTO",
         "description": "",
         "fields": [
           {
-            "name": "user",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "filmstadenMembershipId",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "foretagsbiljett",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "ParticipantPaymentInfo",
-        "description": "",
-        "fields": [
-          {
-            "name": "id",
+            "name": "userId",
             "description": "",
             "args": [],
             "type": {
@@ -1958,7 +1917,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "UUID",
+                "name": "UserID",
                 "ofType": null
               }
             },
@@ -1966,31 +1925,15 @@
             "deprecationReason": null
           },
           {
-            "name": "user",
+            "name": "showingId",
             "description": "",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "showing",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Showing",
+                "kind": "SCALAR",
+                "name": "ShowingID",
                 "ofType": null
               }
             },
@@ -2028,6 +1971,46 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PaymentType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "giftCertificateUsed",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "GiftCertificateDTO",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "filmstadenMembershipId",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -2036,8 +2019,131 @@
         "possibleTypes": null
       },
       {
+        "kind": "ENUM",
+        "name": "PaymentType",
+        "description": "",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "SWISH",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GIFT_CERTIFICATE",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
-        "name": "AttendeePaymentDetails",
+        "name": "GiftCertificateDTO",
+        "description": "",
+        "fields": [
+          {
+            "name": "number",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "expiresAt",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "LocalDate",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "status",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "GiftCertificateDTO_Status",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "GiftCertificateDTO_Status",
+        "description": "",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "AVAILABLE",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PENDING",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USED",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "EXPIRED",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UNKNOWN",
+            "description": "",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AttendeePaymentDetailsDTO",
         "description": "",
         "fields": [
           {
@@ -2081,7 +2187,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "User",
+                "name": "PublicUserDTO",
                 "ofType": null
               }
             },
@@ -2097,7 +2203,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "User",
+                "name": "PublicUserDTO",
                 "ofType": null
               }
             },
@@ -2124,7 +2230,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "Ticket",
+        "name": "TicketDTO",
         "description": "A ticket assigned to a user that allowes access to Filmstaden",
         "fields": [
           {
@@ -2152,7 +2258,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "UUID",
+                "name": "ShowingID",
                 "ofType": null
               }
             },
@@ -2167,8 +2273,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "User",
+                "kind": "SCALAR",
+                "name": "UserID",
                 "ofType": null
               }
             },
@@ -2280,15 +2386,31 @@
             "deprecationReason": null
           },
           {
-            "name": "seat",
+            "name": "seatRow",
             "description": "",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "Seat",
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "seatNumber",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -2360,7 +2482,7 @@
             "deprecationReason": null
           },
           {
-            "name": "showAttributes",
+            "name": "attributes",
             "description": "\"textad\", \"en\" etc",
             "args": [],
             "type": {
@@ -2374,49 +2496,6 @@
                   "name": "String",
                   "ofType": null
                 }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "Seat",
-        "description": "The row and seat number for a ticket",
-        "fields": [
-          {
-            "name": "row",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "number",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -2544,7 +2623,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "BioBudord",
+        "name": "BioBudordDTO",
         "description": "",
         "fields": [
           {
@@ -2587,7 +2666,50 @@
       },
       {
         "kind": "OBJECT",
-        "name": "CurrentUser",
+        "name": "FilmstadenCityAliasDTO",
+        "description": "",
+        "fields": [
+          {
+            "name": "name",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "alias",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "UserDTO",
         "description": "",
         "fields": [
           {
@@ -2602,6 +2724,18 @@
                 "name": "UserID",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "filmstadenMembershipId",
+            "description": "",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -2671,18 +2805,6 @@
             "deprecationReason": null
           },
           {
-            "name": "filmstadenMembershipId",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "phone",
             "description": "",
             "args": [],
@@ -2707,7 +2829,7 @@
             "deprecationReason": null
           },
           {
-            "name": "foretagsbiljetter",
+            "name": "giftCertificates",
             "description": "",
             "args": [],
             "type": {
@@ -2718,7 +2840,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "Foretagsbiljett",
+                  "name": "GiftCertificateDTO",
                   "ofType": null
                 }
               }
@@ -2732,7 +2854,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "UUID",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -2746,22 +2868,6 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "notificationSettings",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "NotificationSettings",
-                "ofType": null
-              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -2797,20 +2903,9 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "Foretagsbiljett",
-        "description": "",
-        "fields": [
+          },
           {
-            "name": "number",
+            "name": "lastModifiedDate",
             "description": "",
             "args": [],
             "type": {
@@ -2819,315 +2914,6 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "expires",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "LocalDate",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "status",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ForetagsbiljettStatus",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "ForetagsbiljettStatus",
-        "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "Available",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "Pending",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "Used",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "Expired",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "NotificationSettings",
-        "description": "",
-        "fields": [
-          {
-            "name": "notificationsEnabled",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "enabledTypes",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "ENUM",
-                    "name": "NotificationType",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "providerSettings",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ProviderSettings",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "NotificationType",
-        "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "UpdateShowing",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "NewShowing",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DeletedShowing",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "TicketsBought",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "UserAttended",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "UserUnattended",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "INTERFACE",
-        "name": "ProviderSettings",
-        "description": "",
-        "fields": [
-          {
-            "name": "enabled",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "MailSettings",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "PushoverSettings",
-            "ofType": null
-          }
-        ]
-      },
-      {
-        "kind": "OBJECT",
-        "name": "FilmstadenCity",
-        "description": "",
-        "fields": [
-          {
-            "name": "name",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "alias",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "NotificationProvider",
-        "description": "",
-        "fields": [
-          {
-            "name": "name",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "isSubscribable",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
                 "ofType": null
               }
             },
@@ -3157,7 +2943,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3183,7 +2969,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3202,7 +2988,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3214,7 +3000,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3233,7 +3019,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CreateShowingInput",
+                    "name": "CreateShowingDTOInput",
                     "ofType": null
                   }
                 },
@@ -3245,7 +3031,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3264,7 +3050,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3279,7 +3065,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "Showing",
+                  "name": "ShowingDTO",
                   "ofType": null
                 }
               }
@@ -3299,7 +3085,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3325,7 +3111,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3344,7 +3130,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3374,7 +3160,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3393,7 +3179,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3404,7 +3190,7 @@
                 "description": "",
                 "type": {
                   "kind": "INPUT_OBJECT",
-                  "name": "UpdateShowingInput",
+                  "name": "UpdateShowingDTOInput",
                   "ofType": null
                 },
                 "defaultValue": null
@@ -3415,7 +3201,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3434,7 +3220,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "SCALAR",
-                    "name": "UUID",
+                    "name": "ShowingID",
                     "ofType": null
                   }
                 },
@@ -3460,7 +3246,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Showing",
+                "name": "ShowingDTO",
                 "ofType": null
               }
             },
@@ -3472,15 +3258,19 @@
             "description": "Fetch any new movies from Filmstaden, returns the movies that were added",
             "args": [],
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Movie",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "MovieDTO",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -3488,7 +3278,7 @@
             "deprecationReason": null
           },
           {
-            "name": "updateParticipantPaymentInfo",
+            "name": "updateAttendeePaymentInfo",
             "description": "",
             "args": [
               {
@@ -3499,7 +3289,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ParticipantPaymentInput",
+                    "name": "AttendeePaymentInfoDTOInput",
                     "ofType": null
                   }
                 },
@@ -3511,7 +3301,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ParticipantPaymentInfo",
+                "name": "AttendeeDTO",
                 "ofType": null
               }
             },
@@ -3530,7 +3320,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "NewUserInfo",
+                    "name": "UserDetailsDTOInput",
                     "ofType": null
                   }
                 },
@@ -3542,7 +3332,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CurrentUser",
+                "name": "UserDTO",
                 "ofType": null
               }
             },
@@ -3558,7 +3348,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CurrentUser",
+                "name": "UserDTO",
                 "ofType": null
               }
             },
@@ -3574,7 +3364,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CurrentUser",
+                "name": "UserDTO",
                 "ofType": null
               }
             },
@@ -3582,42 +3372,11 @@
             "deprecationReason": null
           },
           {
-            "name": "updateNotificationSettings",
+            "name": "addGiftCertificates",
             "description": "",
             "args": [
               {
-                "name": "notificationSettings",
-                "description": "",
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "NotificationSettingsInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "CurrentUser",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "addForetagsBiljetter",
-            "description": "",
-            "args": [
-              {
-                "name": "biljetter",
+                "name": "giftCerts",
                 "description": "",
                 "type": {
                   "kind": "LIST",
@@ -3627,7 +3386,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "ForetagsbiljettInput",
+                      "name": "GiftCertificateDTOInput",
                       "ofType": null
                     }
                   }
@@ -3640,7 +3399,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CurrentUser",
+                "name": "UserDTO",
                 "ofType": null
               }
             },
@@ -3648,18 +3407,18 @@
             "deprecationReason": null
           },
           {
-            "name": "deleteForetagsBiljett",
+            "name": "deleteGiftCertificate",
             "description": "",
             "args": [
               {
-                "name": "biljett",
+                "name": "giftCert",
                 "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ForetagsbiljettInput",
+                    "name": "GiftCertificateDTOInput",
                     "ofType": null
                   }
                 },
@@ -3671,7 +3430,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CurrentUser",
+                "name": "UserDTO",
                 "ofType": null
               }
             },
@@ -3687,7 +3446,7 @@
       {
         "kind": "INPUT_OBJECT",
         "name": "PaymentOption",
-        "description": "Used for supplying how the use will pay, when attending a showing",
+        "description": "Used for supplying how the user will pay, when attending a showing",
         "fields": null,
         "inputFields": [
           {
@@ -3720,31 +3479,8 @@
         "possibleTypes": null
       },
       {
-        "kind": "ENUM",
-        "name": "PaymentType",
-        "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "Swish",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "Foretagsbiljett",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
         "kind": "INPUT_OBJECT",
-        "name": "CreateShowingInput",
+        "name": "CreateShowingDTOInput",
         "description": "",
         "fields": null,
         "inputFields": [
@@ -3784,7 +3520,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "UUID",
+                "name": "MovieID",
                 "ofType": null
               }
             },
@@ -3809,17 +3545,7 @@
             "description": "",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "FilmstadenScreenInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "expectedBuyDate",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "LocalDate",
+              "name": "CinemaScreenDTOInput",
               "ofType": null
             },
             "defaultValue": null
@@ -3851,12 +3577,12 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "FilmstadenScreenInput",
+        "name": "CinemaScreenDTOInput",
         "description": "",
         "fields": null,
         "inputFields": [
           {
-            "name": "filmstadenId",
+            "name": "id",
             "description": "",
             "type": {
               "kind": "NON_NULL",
@@ -3886,7 +3612,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "UpdateShowingInput",
+        "name": "UpdateShowingDTOInput",
         "description": "",
         "fields": null,
         "inputFields": [
@@ -3905,20 +3631,6 @@
             "defaultValue": null
           },
           {
-            "name": "private",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "payToUser",
             "description": "",
             "type": {
@@ -3926,19 +3638,9 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "ID",
+                "name": "UserID",
                 "ofType": null
               }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "expectedBuyDate",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "LocalDate",
-              "ofType": null
             },
             "defaultValue": null
           },
@@ -4001,24 +3703,10 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "ParticipantPaymentInput",
+        "name": "AttendeePaymentInfoDTOInput",
         "description": "",
         "fields": null,
         "inputFields": [
-          {
-            "name": "id",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "UUID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
           {
             "name": "userId",
             "description": "",
@@ -4027,7 +3715,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "UserID",
                 "ofType": null
               }
             },
@@ -4038,7 +3726,7 @@
             "description": "",
             "type": {
               "kind": "SCALAR",
-              "name": "UUID",
+              "name": "ShowingID",
               "ofType": null
             },
             "defaultValue": null
@@ -4078,7 +3766,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "NewUserInfo",
+        "name": "UserDetailsDTOInput",
         "description": "",
         "fields": null,
         "inputFields": [
@@ -4119,158 +3807,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "NotificationSettingsInput",
-        "description": "",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "notificationsEnabled",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "enabledTypes",
-            "description": "",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "ENUM",
-                  "name": "NotificationType",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "pushover",
-            "description": "",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "InputPushoverSettings",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "mail",
-            "description": "",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "InputMailSettings",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "InputPushoverSettings",
-        "description": "",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "enabled",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "userKey",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "device",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "InputMailSettings",
-        "description": "",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "enabled",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "mailAddress",
-            "description": "",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ForetagsbiljettInput",
+        "name": "GiftCertificateDTOInput",
         "description": "",
         "fields": null,
         "inputFields": [
@@ -4289,7 +3826,7 @@
             "defaultValue": null
           },
           {
-            "name": "expires",
+            "name": "expiresAt",
             "description": "",
             "type": {
               "kind": "SCALAR",
@@ -5098,169 +4635,6 @@
           }
         ],
         "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "MailSettings",
-        "description": "",
-        "fields": [
-          {
-            "name": "enabled",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "mailAddress",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "ProviderSettings",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "PushoverSettings",
-        "description": "",
-        "fields": [
-          {
-            "name": "enabled",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "userKey",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "device",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "userKeyStatus",
-            "description": "",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "PushoverValidationStatus",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "ProviderSettings",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "PushoverValidationStatus",
-        "description": "",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "USER_AND_DEVICE_VALID",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "USER_VALID_DEVICE_INVALID",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "USER_INVALID",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "TOKEN_INVALID",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "UNKNOWN",
-            "description": "",
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
       }
     ],
     "directives": [
@@ -5313,14 +4687,6 @@
             "defaultValue": null
           }
         ]
-      },
-      {
-        "name": "defer",
-        "description": "This directive allows results to be deferred during execution",
-        "locations": [
-          "FIELD"
-        ],
-        "args": []
       }
     ]
   }
