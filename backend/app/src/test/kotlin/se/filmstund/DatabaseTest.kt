@@ -76,14 +76,19 @@ class DbTest(private val jdbi: Jdbi) {
     testData = testData.addShowings(testData.generate(ThreadLocalRandom.current()))
   }
 
-  fun withShowing(adminId: UserID? = null) {
+  fun withShowing(adminId: UserID? = null, ticketsBought: Boolean = ThreadLocalRandom.current().nextBoolean()) {
     if (testData.lastUser == null && adminId == null) {
       withUser()
     }
     if (testData.lastMovie == null) {
       withMovie()
     }
-    withShowing { it.nextShowing(testData.lastMovie?.id!!, adminId ?: testData.lastUser?.id!!) }
+    withShowing {
+      it.nextShowing(
+        testData.lastMovie?.id!!,
+        adminId ?: testData.lastUser?.id!!
+      ).copy(ticketsBought = ticketsBought)
+    }
   }
 
   fun withAttendee(generate: TestData.(ThreadLocalRandom) -> AttendeeDTO) {
@@ -160,6 +165,7 @@ class DbTest(private val jdbi: Jdbi) {
 }
 
 data class TestData(
+  val tlrnd: ThreadLocalRandom = ThreadLocalRandom.current(),
   val rnd: EasyRandom = EasyRandom(
     EasyRandomParameters()
       .seed(ThreadLocalRandom.current().nextLong())

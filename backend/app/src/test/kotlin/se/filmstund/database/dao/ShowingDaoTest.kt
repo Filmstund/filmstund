@@ -15,12 +15,19 @@ import se.filmstund.database.DbConfig
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
+import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.LocationDTO
 import se.filmstund.domain.dto.core.ShowingDTO
+import se.filmstund.domain.id.FilmstadenShowingID
 import se.filmstund.domain.id.UserID
+import se.filmstund.isRoughlyEqualToShowing
+import se.filmstund.nextCinemaScreen
+import se.filmstund.nextLocation
 import se.filmstund.nextMovie
 import se.filmstund.nextShowing
 import se.filmstund.nextUserDTO
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
@@ -44,7 +51,14 @@ internal class ShowingDaoTest {
 
         assertThat(dbShowing)
           .isNotNull
-          .isEqualToIgnoringGivenFields(showing, "lastModifiedDate", "createdDate", "location", "movieTitle", "payToPhone")
+          .isEqualToIgnoringGivenFields(
+            showing,
+            "lastModifiedDate",
+            "createdDate",
+            "location",
+            "movieTitle",
+            "payToPhone"
+          )
         assertThat(dbShowing?.location)
           .isNotNull
           .isEqualToIgnoringGivenFields(showing.location, "lastModifiedDate")
@@ -68,7 +82,14 @@ internal class ShowingDaoTest {
 
         assertThat(dbShowing)
           .isNotNull
-          .isEqualToIgnoringGivenFields(showing, "lastModifiedDate", "createdDate", "location", "movieTitle", "payToPhone")
+          .isEqualToIgnoringGivenFields(
+            showing,
+            "lastModifiedDate",
+            "createdDate",
+            "location",
+            "movieTitle",
+            "payToPhone"
+          )
         assertThat(dbShowing?.location)
           .isNotNull
           .isEqualToIgnoringGivenFields(showing.location, "lastModifiedDate")
@@ -328,7 +349,7 @@ internal class ShowingDaoTest {
     databaseTest.start {
       withMovie()
       withAdmin()
-      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = false) }
+      withShowing(ticketsBought = false)
       afterInsert {
         assertThat(showing.ticketsBought).isFalse()
         assertThat(showing.price).isNotEqualTo(SEK(1337))
@@ -346,7 +367,7 @@ internal class ShowingDaoTest {
     databaseTest.start {
       withMovie()
       withAdmin()
-      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      withShowing(ticketsBought = true)
       afterInsert {
         assertThat(showing.ticketsBought).isTrue()
         assertThat(showing.price).isNotEqualTo(SEK(1337))
@@ -363,7 +384,7 @@ internal class ShowingDaoTest {
     databaseTest.start {
       withMovie()
       withAdmin()
-      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      withShowing(ticketsBought = true)
       afterInsert {
         assertThat(showing.ticketsBought).isTrue()
         assertThat(showing.price).isNotEqualTo(SEK(1337))
@@ -371,6 +392,59 @@ internal class ShowingDaoTest {
         val dbShowing = it.showingDao.findById(showing.id)
         assertThat(dbShowing?.ticketsBought).isTrue()
         assertThat(dbShowing?.price).isNotEqualTo(SEK(1337))
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing with old values, then updateShowing() with the wrong admin, then no update is done`() {
+    databaseTest.start {
+      withShowing(ticketsBought = false)
+      afterInsert {
+        val updatedShowing = showing.copy(price = SEK(1337), date = LocalDate.now().plusDays(120))
+        assertThat(it.showingDao.updateShowing(updatedShowing, UserID.random())).isFalse()
+        val dbShowing = it.showingDao.findById(showing.id)
+        assertThat(dbShowing).isRoughlyEqualToShowing(showing)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing with old values, then updateShowing(), then the update is done`() {
+    databaseTest.start {
+      withAdmin()
+      withShowing(ticketsBought = false)
+      withUser()
+      afterInsert {
+        val rndNewLocation = tlrnd.nextLocation()
+        it.locationDao.insertLocationAndAlias(rndNewLocation)
+        val rndNewCinemaScreen =tlrnd.nextCinemaScreen()
+        it.showingDao.maybeInsertCinemaScreen(rndNewCinemaScreen)
+
+        val dbShowingBefore = it.showingDao.findById(showing.id)
+        val updatedShowing = showing.copy(
+          price = SEK(1337),
+          payToUser = user.id,
+          location = rndNewLocation,
+          filmstadenShowingId = FilmstadenShowingID("HEJHOPP"),
+          cinemaScreen = rndNewCinemaScreen,
+          date = LocalDate.now().plusDays(120),
+          time = LocalTime.NOON
+          )
+        assertThat(it.showingDao.updateShowing(updatedShowing, admin.id)).isTrue()
+
+        val dbShowingAfter = it.showingDao.findById(showing.id)
+        assertThat(dbShowingBefore).isRoughlyEqualToShowing(showing)
+        assertThat(dbShowingAfter).isRoughlyEqualToShowing(updatedShowing)
+        assertThat(dbShowingAfter?.lastModifiedDate).isNotNull().isAfter(dbShowingBefore?.lastModifiedDate)
+
+        assertThat(dbShowingAfter?.price).isEqualTo(SEK(1337))
+        assertThat(dbShowingAfter?.payToUser).isEqualTo(user.id)
+        assertThat(dbShowingAfter?.location).isEqualToIgnoringGivenFields(rndNewLocation, "lastModifiedDate")
+        assertThat(dbShowingAfter?.filmstadenShowingId).isEqualTo(FilmstadenShowingID("HEJHOPP"))
+        assertThat(dbShowingAfter?.cinemaScreen).isEqualTo(rndNewCinemaScreen)
+        assertThat(dbShowingAfter?.date).isEqualTo(LocalDate.now().plusDays(120))
+        assertThat(dbShowingAfter?.time).isEqualTo(LocalTime.NOON)
       }
     }
   }

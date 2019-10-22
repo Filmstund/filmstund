@@ -101,7 +101,6 @@ interface ShowingDao {
   @SqlUpdate("UPDATE showing s SET tickets_bought = true, price = :price, last_modified_date = :now WHERE s.id = :showingId AND s.tickets_bought = false AND s.admin = :adminUserId")
   fun markShowingAsBought(showingId: ShowingID, adminUserId: UserID, price: SEK): Boolean
 
-  // TODO test this and return updated values
   @Suppress("SqlResolve")
   @Timestamped
   @SqlUpdate("UPDATE showing s SET price = :price, pay_to_user = :payToUser, location_id = :location?.name, filmstaden_showing_id = :filmstadenShowingId, cinema_screen_id = :cinemaScreen?.id, date = :date, time = :time, last_modified_date = :now WHERE s.id = :id AND s.admin = :admin")
