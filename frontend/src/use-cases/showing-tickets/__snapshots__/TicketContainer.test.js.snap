@@ -22,18 +22,18 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
       class="css-18sytmz"
     >
       <div
-        class="css-9pmse3-CompanyHeader"
+        class="css-kxhk2b-CompanyHeader"
       >
         <img
           alt="FS logo"
-          class="css-i7pjdl-CompanyHeader"
+          class="css-x7d99d-CompanyHeader"
           src="fslogo.png"
         />
         <div
           class="css-deizzc"
         >
           <div
-            class="css-4a70mz-CompanyHeader"
+            class="css-15wq1tr-CompanyHeader"
           >
             mock-cinema
           </div>
@@ -45,10 +45,10 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         </div>
       </div>
       <div
-        class="css-15u87be-TicketHeader"
+        class="css-1d99se3-TicketHeader"
       >
         <div
-          class="css-1n9hk9g-TicketHeader"
+          class="css-1k4w5qa-TicketHeader"
         >
           mock-movie-name
         </div>
@@ -68,10 +68,10 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         </div>
       </div>
       <div
-        class="css-1620thc-TicketDateTime"
+        class="css-1dvy66q-TicketDateTime"
       >
         <div
-          class="css-1qgvna1-TicketValueWithLabel"
+          class="css-18notvi-TicketValueWithLabel"
         >
           <div
             class="css-e2s1aj"
@@ -85,7 +85,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
           </div>
         </div>
         <div
-          class="css-1qgvna1-TicketValueWithLabel"
+          class="css-18notvi-TicketValueWithLabel"
         >
           <div
             class="css-e2s1aj"
@@ -100,10 +100,10 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         </div>
       </div>
       <div
-        class="css-5o7u20-TicketPlacement"
+        class="css-okouzr-TicketPlacement"
       >
         <div
-          class="css-1qgvna1-TicketValueWithLabel"
+          class="css-18notvi-TicketValueWithLabel"
         >
           <div
             class="css-e2s1aj"
@@ -117,7 +117,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
           </div>
         </div>
         <div
-          class="css-1qgvna1-TicketValueWithLabel"
+          class="css-18notvi-TicketValueWithLabel"
         >
           <div
             class="css-e2s1aj"
@@ -131,7 +131,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
           </div>
         </div>
         <div
-          class="css-1qgvna1-TicketValueWithLabel"
+          class="css-18notvi-TicketValueWithLabel"
         >
           <div
             class="css-e2s1aj"
@@ -146,15 +146,15 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         </div>
       </div>
       <div
-        class="css-dzndwn-TicketCustomerType"
+        class="css-fpbkz6-TicketCustomerType"
       >
         mock-customer-type
       </div>
       <div
-        class="css-193o8vu-TicketCode"
+        class="css-1vldiem-TicketCode"
       >
         <div
-          class="css-1cysn4r-TicketCode"
+          class="css-11v75ym-TicketCode"
         >
           <img
             alt="1"
