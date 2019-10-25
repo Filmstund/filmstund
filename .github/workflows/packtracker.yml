@@ -7,7 +7,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Report to packtracker.io
-      uses: packtracker/report@master
+      uses: packtracker/report@2.2.4
       env:
         PT_PROJECT_ROOT: ./frontend
         PT_PROJECT_TOKEN: ${{ secrets.PT_PROJECT_TOKEN }}
