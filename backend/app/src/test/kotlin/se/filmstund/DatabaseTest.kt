@@ -147,9 +147,7 @@ class DbTest(private val jdbi: Jdbi) {
         daos.movieDao.insertMovies(testData.movies.values)
       }
       testData.showings.forEach {
-        if (it.value.location != null) {
-          daos.locationDao.insertLocationAndAlias(it.value.location!!)
-        }
+        daos.locationDao.insertLocationAndAlias(it.value.location)
         daos.showingDao.insertShowingAndCinemaScreen(it.value)
       }
 

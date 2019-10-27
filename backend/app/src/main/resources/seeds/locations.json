@@ -10,5 +10,13 @@
     "alias": [
       "Hubben"
     ]
+  },
+  {
+    "name": "Unknown",
+    "latitude": 90,
+    "longitude": 90,
+    "alias": [
+      "South Pole"
+    ]
   }
 ]

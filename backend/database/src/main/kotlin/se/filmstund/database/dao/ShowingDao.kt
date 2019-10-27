@@ -24,7 +24,7 @@ interface ShowingDao {
     private const val SELECTABLE_FIELDS =
       "s.id, s.web_id, s.slug, s.date, s.time, s.movie_id, s.filmstaden_showing_id, s.price, s.tickets_bought, s.admin, s.pay_to_user, s.last_modified_date, s.created_date"
     private const val EXTRA_FIELDS = "la.alias la_alias, cs.id cs_id, cs.name cs_name, COALESCE(m.original_title, m.title) movieTitle, payee.phone payToPhone"
-    private const val COMMON_JOINS = "LEFT JOIN location l ON s.location_id = l.name LEFT JOIN location_alias la ON l.name = la.location LEFT JOIN cinema_screen cs ON s.cinema_screen_id = cs.id JOIN movie m on s.movie_id = m.id JOIN users payee ON s.pay_to_user = payee.id"
+    private const val COMMON_JOINS = "JOIN location l ON s.location_id = l.name LEFT JOIN location_alias la ON l.name = la.location LEFT JOIN cinema_screen cs ON s.cinema_screen_id = cs.id JOIN movie m on s.movie_id = m.id JOIN users payee ON s.pay_to_user = payee.id"
 
     private const val STAR = "$SELECTABLE_FIELDS, ${LocationDao.SELECTABLE_FIELDS}, $EXTRA_FIELDS"
   }
@@ -83,7 +83,7 @@ interface ShowingDao {
   fun promoteNewUserToAdmin(showingId: ShowingID, currentAdmin: UserID, newAdmin: UserID): Boolean
 
   @Suppress("SqlResolve")
-  @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location?.name, :cinemaScreen?.id, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
+  @SqlUpdate("INSERT INTO showing(id, web_id, slug, date, time, movie_id, location_id, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user) values (:id, :webId, :slug, :date, :time, :movieId, :location.name, :cinemaScreen?.id, :filmstadenShowingId, :price, :ticketsBought, :admin, :payToUser)")
   fun insertNewShowing(@BindBean showing: ShowingDTO)
 
   @SqlUpdate("INSERT INTO cinema_screen (id, name) VALUES (:id, :name) ON CONFLICT DO NOTHING")
@@ -103,6 +103,6 @@ interface ShowingDao {
 
   @Suppress("SqlResolve")
   @Timestamped
-  @SqlUpdate("UPDATE showing s SET price = :price, pay_to_user = :payToUser, location_id = :location?.name, filmstaden_showing_id = :filmstadenShowingId, cinema_screen_id = :cinemaScreen?.id, date = :date, time = :time, last_modified_date = :now WHERE s.id = :id AND s.admin = :admin")
+  @SqlUpdate("UPDATE showing s SET price = :price, pay_to_user = :payToUser, location_id = :location.name, filmstaden_showing_id = :filmstadenShowingId, cinema_screen_id = :cinemaScreen?.id, date = :date, time = :time, last_modified_date = :now WHERE s.id = :id AND s.admin = :admin")
   fun updateShowing(@BindBean updatedShowing: ShowingDTO, admin: UserID): Boolean
 }

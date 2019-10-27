@@ -58,7 +58,7 @@ internal class AttendeeDaoTest {
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
@@ -142,7 +142,7 @@ internal class AttendeeDaoTest {
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
@@ -193,7 +193,7 @@ internal class AttendeeDaoTest {
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       attendeeDao.insertAttendeeOnShowing(rndAttendees)
 
@@ -244,7 +244,7 @@ internal class AttendeeDaoTest {
       userDao.insertUser(rndAdmin)
       rndUsers.forEach { u -> userDao.insertUserAndGiftCerts(u) }
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       attendeeDao.insertAttendeeOnShowing(rndAttendees)
 

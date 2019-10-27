@@ -48,18 +48,10 @@ class ShowingLocationScreenReducer : LinkedHashMapRowReducer<ShowingID, ShowingD
       container.replace(id, showing)
     }
 
-    val locationName = rowView.getColumn("l_name", String::class.java)
-    if (locationName != null && showing.location == null) {
-      val location = rowView.getRow(LocationDTO::class.java)
-
-      showing = showing.copy(location = location)
-      container.replace(id, showing)
-    }
-
     val alias = rowView.getColumn("la_alias", String::class.java)
-    if (alias != null && showing.location != null) {
+    if (alias != null) {
       showing = showing.copy(
-        location = showing.location!!.copy(alias = showing.location!!.alias.plus(alias))
+        location = showing.location.copy(alias = showing.location.alias.plus(alias))
       )
       container.replace(id, showing)
     }

@@ -142,8 +142,8 @@ create table showing
     time                  time without time zone not null,
     movie_id              uuid                   not null
         constraint showing_movie_fk references movie on delete no action,
-    location_id           varchar(100)           null
-        constraint showing_location_fk references location on delete set null,
+    location_id           varchar(100)           not null
+        constraint showing_location_fk references location on delete CASCADE,
     cinema_screen_id      varchar(50)            null
         constraint showing_cs_fk references cinema_screen on delete set null,
     filmstaden_showing_id varchar(50)            null,

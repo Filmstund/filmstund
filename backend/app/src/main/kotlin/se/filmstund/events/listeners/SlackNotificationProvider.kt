@@ -87,7 +87,7 @@ class SlackNotificationProvider(
       movie.title,
       showingUrl,
       movie.synopsis ?: "N/A",
-      event.showing.location?.name ?: "Filmstaden",
+      event.showing.location.name,
       null,
       null,
       movie.poster,

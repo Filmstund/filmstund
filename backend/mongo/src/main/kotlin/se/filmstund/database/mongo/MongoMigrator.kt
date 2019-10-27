@@ -40,6 +40,7 @@ import se.filmstund.domain.id.MovieID
 import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID
 import se.filmstund.logger
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -89,8 +90,15 @@ internal class MongoMigrator(
             time = it.time ?: LocalTime.MIDNIGHT,
             movieId = MovieID(it.movie.id),
             movieTitle = it.movie.title,
-            location = locationCache.get(it.location?.name!!) { name -> locationDao.findByNameOrAlias(name) },
-            cinemaScreen = it.filmstadenScreen?.let { fsScreen -> CinemaScreenDTO(fsScreen.filmstadenId, fsScreen.name) },
+            location = locationCache.get(it.location?.name!!) { name ->
+              locationDao.findByNameOrAlias(name) ?: LocationDTO(name = "Unknown")
+            }!!,
+            cinemaScreen = it.filmstadenScreen?.let { fsScreen ->
+              CinemaScreenDTO(
+                fsScreen.filmstadenId,
+                fsScreen.name
+              )
+            },
             price = it.price ?: SEK.ZERO,
             ticketsBought = it.ticketsBought,
             admin = userCache.get(it.admin.id) { gid -> userDao.findIdByGoogleId(gid) }
@@ -222,6 +230,16 @@ internal class MongoMigrator(
       dao.insertLocations(pgLocs)
       pgLocs.forEach {
         dao.insertAlias(it.name, it.alias)
+      }
+      if (!dao.existsByName("Unknown")) {
+        dao.insertLocationAndAlias(
+          LocationDTO(
+            name = "Unknown",
+            latitude = BigDecimal.valueOf(90L),
+            longitude = BigDecimal.valueOf(90L),
+            alias = listOf("South Pole")
+          )
+        )
       }
     }
   }

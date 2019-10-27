@@ -272,13 +272,13 @@ class ShowingService(
 
   fun fetchSeatMap(showingId: ShowingID): List<FilmstadenSeatMapDTO> {
     val showing = getShowingOrThrow(showingId)
-    if (showing.location?.filmstadenId == null || showing.cinemaScreen?.id == null) {
+    if (showing.location.filmstadenId == null || showing.cinemaScreen?.id == null) {
       log.debug("Showing $showingId is not at a Filmstaden location or does not have an associated Filmstaden screen")
       return listOf()
     }
 
     return filmstadenService.getFilmstadenSeatMap(
-      showing.location?.filmstadenId!!,
+      showing.location.filmstadenId!!,
       showing.cinemaScreen?.id!!
     )
   }

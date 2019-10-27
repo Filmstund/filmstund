@@ -84,8 +84,8 @@ internal class CalendarServiceTest {
 
       userDao.insertUserAndGiftCerts(rndAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
-      locationDao.insertLocationAndAlias(rndShowing2.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing2.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       showingDao.insertShowingAndCinemaScreen(rndShowing2)
 

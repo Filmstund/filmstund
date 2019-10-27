@@ -42,7 +42,7 @@ internal class TicketDaoTest {
 
       userDao.insertUserAndGiftCerts(rndAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       assertThat(ticketDao.existsById(rndTicket.id)).isFalse()
@@ -67,7 +67,7 @@ internal class TicketDaoTest {
 
       userDao.insertUserAndGiftCerts(rndAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       ticketDao.insertTicket(rndTicket)
 
@@ -101,7 +101,7 @@ internal class TicketDaoTest {
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndUser)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       ticketDao.insertTickets(rndTickets)
       ticketDao.insertTickets(rndUserTickets)
@@ -137,7 +137,7 @@ internal class TicketDaoTest {
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndUser)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       ticketDao.insertTicket(rndTicket)
 

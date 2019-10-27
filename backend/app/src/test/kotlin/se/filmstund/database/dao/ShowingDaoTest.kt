@@ -15,8 +15,6 @@ import se.filmstund.database.DbConfig
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
-import se.filmstund.domain.dto.core.CinemaScreenDTO
-import se.filmstund.domain.dto.core.LocationDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.id.FilmstadenShowingID
 import se.filmstund.domain.id.UserID
@@ -164,8 +162,8 @@ internal class ShowingDaoTest {
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndUser)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
-      locationDao.insertLocationAndAlias(rndShowing2.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
+      locationDao.insertLocationAndAlias(rndShowing2.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
       showingDao.insertShowingAndCinemaScreen(rndShowing2)
       attendeeDao.insertAttendeeOnShowing(
@@ -210,7 +208,7 @@ internal class ShowingDaoTest {
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndNewAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val dbShowing = showingDao.findById(rndShowing.id)
@@ -252,7 +250,7 @@ internal class ShowingDaoTest {
       userDao.insertUserAndGiftCerts(rndAdmin)
       userDao.insertUserAndGiftCerts(rndNewAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val dbShowing = showingDao.findById(rndShowing.id)
@@ -286,35 +284,13 @@ internal class ShowingDaoTest {
 
       userDao.insertUserAndGiftCerts(rndAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       assertThat(rndShowing.cinemaScreen).isNull()
       val dbShowing = showingDao.findById(rndShowing.id)
       assertThat(dbShowing).isNotNull
       assertThat(dbShowing?.cinemaScreen).isNull()
-    }
-  }
-
-  @Test
-  internal fun `given a showing without a location, when findBy*, then the location is null`() {
-    val rndMovie = rnd.nextMovie()
-    val rndAdmin = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id).copy(location = null)
-
-    jdbi.useTransactionUnchecked { handle ->
-      val userDao = handle.attach(UserDao::class.java)
-      val movieDao = handle.attach(MovieDao::class.java)
-      val showingDao = handle.attach(ShowingDao::class.java)
-
-      userDao.insertUserAndGiftCerts(rndAdmin)
-      movieDao.insertMovie(rndMovie)
-      showingDao.insertShowingAndCinemaScreen(rndShowing)
-
-      assertThat(rndShowing.location).isNull()
-      val dbShowing = showingDao.findById(rndShowing.id)
-      assertThat(dbShowing).isNotNull
-      assertThat(dbShowing?.location).isNull()
     }
   }
 

@@ -1,5 +1,6 @@
 package se.filmstund.domain.dto.core
 
+import org.jdbi.v3.core.mapper.Nested
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.SEK
 import se.filmstund.domain.id.Base64ID
@@ -21,7 +22,8 @@ data class ShowingDTO(
   val time: LocalTime,
   val movieId: MovieID,
   val movieTitle: String,
-  val location: LocationDTO?,
+  @Nested("l")
+  val location: LocationDTO,
   val cinemaScreen: CinemaScreenDTO? = null,
   val price: SEK? = SEK.ZERO,
   val ticketsBought: Boolean = false,

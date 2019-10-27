@@ -31,7 +31,7 @@ type ShowingDTO {
     movieId: MovieID!
     movieTitle: String!
     movie: MovieDTO!
-    location: LocationDTO
+    location: LocationDTO!
     cinemaScreen: CinemaScreenDTO
     price: SEK
     ticketsBought: Boolean!

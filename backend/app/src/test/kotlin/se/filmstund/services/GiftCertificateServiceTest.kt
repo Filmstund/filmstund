@@ -74,7 +74,7 @@ internal class GiftCertificateServiceTest {
         userDao.insertGiftCertificates(user.giftCertificates)
       }
       movieDao.insertMovie(movie)
-      locationDao.insertLocationAndAlias(showing.location!!)
+      locationDao.insertLocationAndAlias(showing.location)
       showingDao.insertShowingAndCinemaScreen(showing)
       attendeeDao.insertAttendeeOnShowing(attendee)
 

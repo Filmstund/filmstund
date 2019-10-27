@@ -71,7 +71,7 @@ internal class AdminServiceTest {
 
       userDao.insertUserAndGiftCerts(rndNewAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val dbShowing = showingDao.findById(rndShowing.id)
@@ -108,7 +108,7 @@ internal class AdminServiceTest {
       userDao.insertUserAndGiftCerts(rndNewAdmin)
       userDao.insertUserAndGiftCerts(rndAdmin)
       movieDao.insertMovie(rndMovie)
-      locationDao.insertLocationAndAlias(rndShowing.location!!)
+      locationDao.insertLocationAndAlias(rndShowing.location)
       showingDao.insertShowingAndCinemaScreen(rndShowing)
 
       val dbShowing = showingDao.findById(rndShowing.id)
