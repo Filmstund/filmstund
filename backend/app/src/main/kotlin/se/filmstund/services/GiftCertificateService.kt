@@ -49,6 +49,8 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
   }
 
   fun addGiftCertsToCurrentUser(newCerts: List<GiftCertificateInputDTO>) {
+    require(newCerts.isNotEmpty()) { "Please provide new gift certificates" }
+
     jdbi.useTransactionUnchecked {
       val userDao = it.attach(UserDao::class.java)
       val user = currentLoggedInUser()
