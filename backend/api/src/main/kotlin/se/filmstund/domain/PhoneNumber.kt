@@ -1,5 +1,6 @@
 package se.filmstund.domain
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
@@ -8,6 +9,10 @@ import com.google.i18n.phonenumbers.Phonenumber
 
 data class PhoneNumber(var number: String = "") {
   companion object {
+    @JsonCreator
+    @JvmStatic
+    fun from(str: String?) = str?.let { PhoneNumber(parsePhoneNumber(it)) }
+
     private fun parsePhoneNumber(number: String): String {
       val phoneUtil = PhoneNumberUtil.getInstance()
       val parsedPhoneNumber: Phonenumber.PhoneNumber
