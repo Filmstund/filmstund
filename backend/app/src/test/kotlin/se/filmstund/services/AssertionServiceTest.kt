@@ -21,6 +21,7 @@ import se.filmstund.WithLoggedInUser
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.DbConfig
 import se.filmstund.domain.id.MovieID
+import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID
 import se.filmstund.nextAttendee
 import se.filmstund.nextGiftCert
@@ -55,6 +56,38 @@ internal class AssertionServiceTest {
   internal fun `given a showing hasnt been bought, when assertTicketsNotBought(), then an exception is not thrown`() {
     val showing = rnd.nextShowing(MovieID.random(), UserID.random()).copy(ticketsBought = false)
     assertionService.assertTicketsNotBought(showing.admin, showing)
+  }
+
+  @Test
+  internal fun `given a showing with bought tickets, when assertTicketsNotBought(showingId), then an exception is thrown`() {
+    databaseTest.start {
+      withAdmin()
+      withMovie()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      afterInsert {
+        val e = assertThrows<TicketsAlreadyBoughtException> {
+          assertionService.assertTicketsNotBought(showing.admin, showing.id)
+        }
+        assertThat(e).hasMessage("The action is not allowed since the tickets for this showing is already bought")
+      }
+    }
+  }
+
+  @Test
+  internal fun `given a showing hasnt been bought, when assertTicketsNotBought(showingId), then an exception is not thrown`() {
+    databaseTest.start {
+      withAdmin()
+      withMovie()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = false) }
+      afterInsert {
+        assertionService.assertTicketsNotBought(showing.admin, showing.id)
+      }
+    }
+  }
+
+  @Test
+  internal fun `given missing showing, when assertTicketsNotBought(showingId), then an exception is not thrown`() {
+    assertionService.assertTicketsNotBought(UserID.random(), ShowingID.random())
   }
 
   @Test

@@ -14,6 +14,7 @@ import se.filmstund.TicketsAlreadyBoughtException
 import se.filmstund.currentLoggedInUser
 import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.ShowingDTO
+import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID
 import java.time.LocalDate
@@ -27,6 +28,17 @@ class AssertionService(
   fun assertTicketsNotBought(userID: UserID, showing: ShowingDTO) {
     if (showing.ticketsBought) {
       throw TicketsAlreadyBoughtException(userID, showing.id)
+    }
+  }
+
+  fun assertTicketsNotBought(userID: UserID, showingId: ShowingID) {
+    jdbi.withHandleUnchecked {
+      val ticketsBought = it.select("SELECT tickets_bought FROM showing s WHERE s.id = ?", showingId)
+        .mapTo<Boolean>().findOne().orElse(null)
+
+      if (ticketsBought == true) {
+        throw TicketsAlreadyBoughtException(userID, showingId)
+      }
     }
   }
 
