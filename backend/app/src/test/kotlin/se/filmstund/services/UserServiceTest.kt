@@ -77,6 +77,9 @@ internal class UserServiceTest {
     assertThat(beforeUpdate?.filmstadenMembershipId)
       .isNotNull
       .isNotEqualTo("abc-xyz")
+    beforeUpdate?.giftCertificates?.forEach { gc ->
+      assertThat(gc.status).isEqualTo(GiftCertificateDTO.Status.UNKNOWN)
+    }
 
     val afterUpdate = userService.updateUser(userDetails)
     assertThat(afterUpdate)
@@ -95,6 +98,14 @@ internal class UserServiceTest {
       .isEqualTo(FilmstadenMembershipId("abc-xyz"))
     assertThat(afterUpdate.lastModifiedDate)
       .isAfter(beforeUpdate?.lastModifiedDate)
+
+    afterUpdate.giftCertificates.forEach {
+      if (it.expiresAt.isBefore(LocalDate.now())) {
+        assertThat(it.status).isEqualTo(GiftCertificateDTO.Status.EXPIRED)
+      } else {
+        assertThat(it.status).isEqualTo(GiftCertificateDTO.Status.AVAILABLE)
+      }
+    }
   }
 
   @Test

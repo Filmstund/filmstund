@@ -49,7 +49,7 @@ class UserService(
     return jdbi.inTransactionUnchecked {
       val dao = it.attach(UserDao::class.java)
       dao.updateUser(currentUser.id, newDetails.filmstadenMembershipId, newDetails.phone, newDetails.nick ?: Nick(""))
-      dao.findById(currentUser.id)!!
+      getCurrentUser()
     }
   }
 
