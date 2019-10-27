@@ -1,40 +1,59 @@
-import React from "react";
 import { cleanup, render } from "@testing-library/react";
-
-import { TicketContainer } from "./TicketContainer";
-import { createMockSeat, createMockTicket } from "./__mocks__/ticket";
-import { MemoryRouter as Router } from "react-router";
-import { ApolloProvider } from "react-apollo";
+import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import { ApolloLink } from "apollo-link";
-import { InMemoryCache } from "apollo-cache-inmemory";
+import React from "react";
+import { ApolloProvider } from "react-apollo";
+import { MemoryRouter as Router } from "react-router";
+import {
+  TicketQuery_me,
+  TicketQuery_showing,
+  TicketQuery_showing_admin
+} from "./__generated__/TicketQuery";
+import { createMockSeat, createMockTicket } from "./__mocks__/ticket";
 
-const mockUserData = {
+import { TicketContainer } from "./TicketContainer";
+
+const mockUserData: TicketQuery_me = {
+  __typename: "UserDTO",
   id: "this-is-mock-user-id"
 };
 
-const minimalMockData = {
+const mockAdminUserData: TicketQuery_showing_admin = {
+  __typename: "PublicUserDTO",
+  id: "this-is-mock-user-id"
+};
+
+const minimalMockData: TicketQuery_showing = {
+  __typename: "ShowingDTO",
   id: "this-is-mock-showing-id",
-  admin: mockUserData,
+  admin: mockAdminUserData,
   ticketRange: {
+    __typename: "TicketRange",
     rows: [],
     seatings: []
   },
   filmstadenSeatMap: [],
-  myTickets: [createMockTicket(1, 2, 3)]
+  myTickets: [createMockTicket("1", 2, 3)],
+  slug: "this-is-mock-showing-id",
+  webId: "ajshdgaljkdhsg"
 };
 
-const mockData = {
+const mockData: TicketQuery_showing = {
+  __typename: "ShowingDTO",
   id: "this-is-mock-showing-id",
-  admin: mockUserData,
+  admin: mockAdminUserData,
   ticketRange: {
+    __typename: "TicketRange",
     rows: [2, 3],
     seatings: [
       {
+        __typename: "SeatRange",
         row: 2,
         numbers: [3, 4]
       },
       {
+        __typename: "SeatRange",
         row: 3,
         numbers: [5, 6]
       }
@@ -47,11 +66,13 @@ const mockData = {
     createMockSeat(3, 6, 10, 5)
   ],
   myTickets: [
-    createMockTicket(1, 2, 3),
-    createMockTicket(2, 2, 4),
-    createMockTicket(3, 3, 5),
-    createMockTicket(4, 3, 6)
-  ]
+    createMockTicket("1", 2, 3),
+    createMockTicket("2", 2, 4),
+    createMockTicket("3", 3, 5),
+    createMockTicket("4", 3, 6)
+  ],
+  slug: "this-is-mock-showing-id",
+  webId: "ajshdgaljkdhsg"
 };
 
 afterEach(cleanup);
