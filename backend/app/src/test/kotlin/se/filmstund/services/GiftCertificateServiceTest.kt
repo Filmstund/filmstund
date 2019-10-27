@@ -16,18 +16,19 @@ import se.filmstund.TicketInUseException
 import se.filmstund.WithLoggedInUser
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.DbConfig
+import se.filmstund.database.dao.AttendeeDao
 import se.filmstund.database.dao.LocationDao
 import se.filmstund.database.dao.MovieDao
-import se.filmstund.database.dao.AttendeeDao
 import se.filmstund.database.dao.ShowingDao
 import se.filmstund.database.dao.UserDao
 import se.filmstund.domain.dto.GiftCertificateDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
+import se.filmstund.domain.dto.input.GiftCertificateInputDTO
 import se.filmstund.domain.id.UserID
+import se.filmstund.nextAttendee
 import se.filmstund.nextGiftCert
 import se.filmstund.nextGiftCerts
 import se.filmstund.nextMovie
-import se.filmstund.nextAttendee
 import se.filmstund.nextShowing
 import se.filmstund.nextUserDTO
 import java.time.LocalDate
@@ -147,11 +148,12 @@ internal class GiftCertificateServiceTest {
   fun `given a user, when addGiftCertsToCurrentUser(), then those gift certs are added to the user`() {
     val userId = currentLoggedInUser().id
     val giftCerts = rnd.nextGiftCerts(userId, 10)
+    val giftCertsInput = giftCerts.map { gc -> GiftCertificateInputDTO(gc.number, gc.expiresAt) }
 
     assertThat(giftCertificateService.getGiftCertsByUserId(userId))
       .isNotNull
       .isEmpty()
-    giftCertificateService.addGiftCertsToCurrentUser(giftCerts)
+    giftCertificateService.addGiftCertsToCurrentUser(giftCertsInput)
     assertThat(giftCertificateService.getGiftCertsByUserId(userId))
       .isNotNull
       .isNotEmpty
@@ -163,12 +165,13 @@ internal class GiftCertificateServiceTest {
   fun `given a user with gift certs, when addGiftCertsToCurrentUser() with existing gift certs, then an exception is thrown`() {
     val userId = currentLoggedInUser().id
     val giftCerts = rnd.nextGiftCerts(userId, 2)
+    val giftCertsInput = giftCerts.map { gc -> GiftCertificateInputDTO(gc.number, gc.expiresAt) }
 
     assertThat(giftCertificateService.getGiftCertsByUserId(userId)).isNotNull.isEmpty()
-    giftCertificateService.addGiftCertsToCurrentUser(giftCerts)
+    giftCertificateService.addGiftCertsToCurrentUser(giftCertsInput)
 
     val e = assertThrows<TicketAlreadyInUserException> {
-      giftCertificateService.addGiftCertsToCurrentUser(giftCerts)
+      giftCertificateService.addGiftCertsToCurrentUser(giftCertsInput)
     }
     assertThat(e.message)
       .isNotNull()
@@ -180,14 +183,16 @@ internal class GiftCertificateServiceTest {
   fun `given a user with a gift cert, when deleteTicketFromUser(), then gift cert is deleted`() {
     val userId = currentLoggedInUser().id
     val giftCerts = rnd.nextGiftCerts(userId, 0)
+    val giftCertsInput = giftCerts.map { gc -> GiftCertificateInputDTO(gc.number, gc.expiresAt) }
 
     assertThat(giftCertificateService.getGiftCertsByUserId(userId)).isNotNull.isEmpty()
-    giftCertificateService.addGiftCertsToCurrentUser(giftCerts)
+    giftCertificateService.addGiftCertsToCurrentUser(giftCertsInput)
     assertThat(giftCertificateService.getGiftCertsByUserId(userId)).isNotNull.isNotEmpty
       .hasSize(1)
       .containsExactlyInAnyOrderElementsOf(giftCerts)
 
-    giftCertificateService.deleteTicketFromUser(giftCerts.first())
+    val firstGc = giftCerts.first()
+    giftCertificateService.deleteTicketFromUser(GiftCertificateInputDTO(firstGc.number, firstGc.expiresAt))
     assertThat(giftCertificateService.getGiftCertsByUserId(userId)).isNotNull.isEmpty()
   }
 
@@ -201,7 +206,7 @@ internal class GiftCertificateServiceTest {
 
     assertThat(giftCertificateService.getStatusOfTicket(attendee.second)).isEqualTo(GiftCertificateDTO.Status.PENDING)
     assertThrows<TicketInUseException> {
-      giftCertificateService.deleteTicketFromUser(attendee.second)
+      giftCertificateService.deleteTicketFromUser(GiftCertificateInputDTO(attendee.second.number, attendee.second.expiresAt))
     }
     assertThat(jdbi.onDemand(UserDao::class.java).existGiftCertByNumber(attendee.second.number))
       .describedAs("Gift cert still exists")

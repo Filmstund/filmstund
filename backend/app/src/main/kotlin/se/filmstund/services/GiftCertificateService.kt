@@ -11,6 +11,7 @@ import se.filmstund.TicketNotFoundException
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.dao.UserDao
 import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.input.GiftCertificateInputDTO
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID
 import java.time.LocalDate
@@ -47,24 +48,27 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
     return userDao.findGiftCertByUserAndNumber(userID, number)
   }
 
-  fun addGiftCertsToCurrentUser(newCerts: List<GiftCertificateDTO>) {
+  fun addGiftCertsToCurrentUser(newCerts: List<GiftCertificateInputDTO>) {
     jdbi.useTransactionUnchecked {
       val userDao = it.attach(UserDao::class.java)
+      val user = currentLoggedInUser()
+      val gcs = newCerts.map { gc -> gc.toGiftCertificateDTO(user.id) }
 
-      assertGiftCertsNotAlreadyInUse(userDao, newCerts)
-      userDao.insertGiftCertificates(newCerts)
+      assertGiftCertsNotAlreadyInUse(userDao, gcs)
+      userDao.insertGiftCertificates(gcs)
     }
   }
 
-  fun deleteTicketFromUser(giftCert: GiftCertificateDTO) {
+  fun deleteTicketFromUser(giftCert: GiftCertificateInputDTO) {
     jdbi.useTransactionUnchecked {
       val userDao = it.attach(UserDao::class.java)
 
-      val dbGc = userDao.findGiftCertByUserAndNumber(currentLoggedInUser().id, giftCert.number)
+      val currentUserId = currentLoggedInUser().id
+      val dbGc = userDao.findGiftCertByUserAndNumber(currentUserId, giftCert.number)
         ?: throw TicketNotFoundException(giftCert.number)
 
-      assertTicketIsntPending(giftCert)
-      userDao.deleteGiftCertByUserAndNumber(currentLoggedInUser().id, dbGc.number)
+      assertTicketIsntPending(giftCert.toGiftCertificateDTO(currentUserId))
+      userDao.deleteGiftCertByUserAndNumber(currentUserId, dbGc.number)
     }
   }
 

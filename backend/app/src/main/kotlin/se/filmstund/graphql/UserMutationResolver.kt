@@ -9,6 +9,7 @@ import se.filmstund.domain.dto.GiftCertificateDTO
 import se.filmstund.domain.dto.UserDetailsDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.UserDTO
+import se.filmstund.domain.dto.input.GiftCertificateInputDTO
 import se.filmstund.services.AttendeePaymentService
 import se.filmstund.services.GiftCertificateService
 import se.filmstund.services.UserService
@@ -25,12 +26,12 @@ class UserMutationResolver(
   fun updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoDTO): AttendeeDTO =
     attendeePaymentInfoService.updatePaymentInfo(paymentInfo)
 
-  fun addGiftCertificates(giftCerts: List<GiftCertificateDTO>): UserDTO {
+  fun addGiftCertificates(giftCerts: List<GiftCertificateInputDTO>): UserDTO {
     giftCertificateService.addGiftCertsToCurrentUser(giftCerts)
     return userService.getCurrentUser()
   }
 
-  fun deleteGiftCertificate(giftCert: GiftCertificateDTO): UserDTO {
+  fun deleteGiftCertificate(giftCert: GiftCertificateInputDTO): UserDTO {
     giftCertificateService.deleteTicketFromUser(giftCert)
     return userService.getCurrentUser()
   }
