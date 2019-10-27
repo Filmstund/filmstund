@@ -5,6 +5,7 @@ import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -385,6 +386,35 @@ internal class ShowingServiceTest {
         assertThat(showing.admin).isEqualTo(currentLoggedInUser().id)
         assertThat(showing.payToUser).isEqualTo(currentLoggedInUser().id)
         //assertThat(showing.payToPhone?.number).isEqualTo(currentLoggedInUser().phone)
+      }
+    }
+  }
+
+  @Test
+  @WithLoggedInUser
+  internal fun `given a logged in user, when createShowing() but the cinema screen doesn't exist, then a showing with the correct cinema screen is inserted`() {
+    databaseTest.start {
+      withMovie()
+      afterInsert {
+        val cinemaScreen = rnd.nextObject(CinemaScreenDTO::class.java)
+        val createShowing = CreateShowingDTO(
+          LocalDate.now(),
+          LocalTime.MIDNIGHT,
+          movie.id,
+          "NewLocation",
+          cinemaScreen,
+          "remoteEntityId"
+        )
+        val showMock = rnd.nextObject(FilmstadenShowDTO::class.java)
+        `when`(filmstadenServiceMock.fetchFilmstadenShow(ArgumentMatchers.anyString()))
+          .thenReturn(showMock)
+
+        val showing = showingService.createShowing(createShowing)
+        val dbShowing = it.showingDao.findById(showing.id)
+
+        assertThat(dbShowing).isNotNull
+        assertThat(dbShowing?.cinemaScreen).isNotNull
+        assertThat(dbShowing?.cinemaScreen).isEqualTo(CinemaScreenDTO(showMock.screen.ncgId, showMock.screen.title))
       }
     }
   }

@@ -180,7 +180,7 @@ class ShowingService(
         filmstadenShow?.screen
       )
 
-      daos.showingDao.insertNewShowing(showing)
+      daos.showingDao.insertShowingAndCinemaScreen(showing)
       val attendee = createAttendeeBasedOnPaymentType(PaymentOption(AttendeeDTO.Type.SWISH), user.id, showing)
       daos.attendeeDao.insertAttendeeOnShowing(attendee)
 
