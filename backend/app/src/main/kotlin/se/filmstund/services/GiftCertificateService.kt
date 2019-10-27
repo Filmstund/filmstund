@@ -55,7 +55,6 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
       val gcs = newCerts.map { gc -> gc.toGiftCertificateDTO(user.id) }
 
       assertGiftCertsNotAlreadyInUse(userDao, gcs)
-      // FIXME: calculate GC status before returning
       userDao.insertGiftCertificates(gcs)
     }
   }
@@ -72,6 +71,9 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
       userDao.deleteGiftCertByUserAndNumber(currentUserId, dbGc.number)
     }
   }
+
+  fun attachStatusToGiftCertificates(giftCerts: List<GiftCertificateDTO>) =
+    giftCerts.map { gc -> gc.copy(status = getStatusOfTicket(gc)) }
 
   /** The tickets are allowed to be in use by the current user. */
   private fun assertGiftCertsNotAlreadyInUse(userDao: UserDao, newGiftCerts: List<GiftCertificateDTO>) {

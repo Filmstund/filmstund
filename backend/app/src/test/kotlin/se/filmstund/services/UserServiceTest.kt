@@ -15,11 +15,15 @@ import se.filmstund.database.DbConfig
 import se.filmstund.database.dao.UserDao
 import se.filmstund.domain.Nick
 import se.filmstund.domain.PhoneNumber
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.input.UserDetailsDTO
 import se.filmstund.domain.id.FilmstadenMembershipId
+import se.filmstund.nextGiftCerts
+import java.time.LocalDate
+import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, UserService::class])
+@SpringBootTest(classes = [Jdbi::class, UserService::class, GiftCertificateService::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class UserServiceTest {
   @Autowired
@@ -117,5 +121,24 @@ internal class UserServiceTest {
       .isNotNull
     assertThat(afterUpdate.calendarFeedId)
       .isNull()
+  }
+
+  @Test
+  @WithLoggedInUser
+  internal fun `given a logged in user, when getCurrentUser(), then the gift cert statuses are not unknown`() {
+    val nextGiftCerts = ThreadLocalRandom.current().nextGiftCerts(currentLoggedInUser().id)
+    userDao.insertGiftCertificates(nextGiftCerts)
+
+    nextGiftCerts.forEach {
+      assertThat(it.status).isEqualTo(GiftCertificateDTO.Status.UNKNOWN)
+    }
+    val currentUser = userService.getCurrentUser()
+    currentUser.giftCertificates.forEach {
+      if (it.expiresAt.isBefore(LocalDate.now())) {
+        assertThat(it.status).isEqualTo(GiftCertificateDTO.Status.EXPIRED)
+      } else {
+        assertThat(it.status).isEqualTo(GiftCertificateDTO.Status.AVAILABLE)
+      }
+    }
   }
 }

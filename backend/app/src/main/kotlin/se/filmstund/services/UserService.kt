@@ -20,7 +20,8 @@ import java.util.*
 @Service
 class UserService(
   private val jdbi: Jdbi,
-  private val userDao: UserDao
+  private val userDao: UserDao,
+  private val giftCertificateService: GiftCertificateService
 ) {
 
   private val log by logger()
@@ -34,8 +35,11 @@ class UserService(
   fun getCompleteUser(id: UserID): UserDTO = userDao.findById(id)
     ?: throw NotFoundException("user", userID = id)
 
-  fun getCurrentUser(): UserDTO = getCurrentUserOrNull()
-    ?: throw AccessDeniedException("No user logged in")
+  fun getCurrentUser(): UserDTO {
+    val currentUser = getCurrentUserOrNull()
+      ?: throw AccessDeniedException("No user logged in")
+    return currentUser.copy(giftCertificates = giftCertificateService.attachStatusToGiftCertificates(currentUser.giftCertificates))
+  }
 
   fun getCurrentUserOrNull(): UserDTO? = maybeCurrentLoggedInUser()?.let { u -> getCompleteUser(u.id) }
 
