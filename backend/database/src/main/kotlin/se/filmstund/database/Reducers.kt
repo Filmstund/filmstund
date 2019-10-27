@@ -2,7 +2,7 @@ package se.filmstund.database
 
 import org.jdbi.v3.core.result.LinkedHashMapRowReducer
 import org.jdbi.v3.core.result.RowView
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.LocationDTO

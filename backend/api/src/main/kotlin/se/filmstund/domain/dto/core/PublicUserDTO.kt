@@ -1,4 +1,4 @@
-package se.filmstund.domain.dto
+package se.filmstund.domain.dto.core
 
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.id.UserID

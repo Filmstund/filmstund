@@ -12,11 +12,10 @@ import se.filmstund.domain.id.FilmstadenMembershipId
 import se.filmstund.domain.id.GoogleId
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.id.TicketNumber
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.UserDTO
 import se.filmstund.domain.id.UserID
-import java.util.*
 
 interface UserDao {
   @SqlQuery("SELECT count(1) FROM users")

@@ -10,7 +10,7 @@ import se.filmstund.TicketInUseException
 import se.filmstund.TicketNotFoundException
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.dao.UserDao
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.input.GiftCertificateInputDTO
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID

@@ -1,8 +1,6 @@
 package se.filmstund.domain.dto.core
 
 import se.filmstund.domain.PhoneNumber
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.id.CalendarFeedID
 import se.filmstund.domain.id.FilmstadenMembershipId
 import se.filmstund.domain.id.GoogleId

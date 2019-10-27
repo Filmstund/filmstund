@@ -1,4 +1,4 @@
-package se.filmstund.domain.dto
+package se.filmstund.domain.dto.core
 
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID
@@ -10,7 +10,9 @@ data class GiftCertificateDTO(
   val expiresAt: LocalDate = LocalDate.ofEpochDay(0),
   val status: Status = Status.UNKNOWN
 ) {
-  constructor(userId: UserID, number: TicketNumber) : this(userId, number, LocalDate.ofEpochDay(0), Status.UNKNOWN)
+  constructor(userId: UserID, number: TicketNumber) : this(userId, number, LocalDate.ofEpochDay(0),
+    Status.UNKNOWN
+  )
   constructor(userId: UserID, number: TicketNumber, expiresAt: LocalDate) : this(
     userId,
     number,

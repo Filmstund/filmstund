@@ -1,6 +1,6 @@
 package se.filmstund.events
 
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import java.time.Instant

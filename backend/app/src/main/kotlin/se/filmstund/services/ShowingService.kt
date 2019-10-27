@@ -18,12 +18,12 @@ import se.filmstund.domain.PaymentOption
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.AdminPaymentDetailsDTO
 import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
-import se.filmstund.domain.dto.CreateShowingDTO
+import se.filmstund.domain.dto.input.CreateShowingDTO
 import se.filmstund.domain.dto.FilmstadenScreenDTO
 import se.filmstund.domain.dto.FilmstadenSeatMapDTO
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.PublicUserDTO
-import se.filmstund.domain.dto.UpdateShowingDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
+import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.ShowingDTO

@@ -5,7 +5,7 @@ package se.filmstund.graphql
 import com.coxautodev.graphql.tools.GraphQLResolver
 import org.springframework.stereotype.Component
 import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.services.UserService
 
 @Component

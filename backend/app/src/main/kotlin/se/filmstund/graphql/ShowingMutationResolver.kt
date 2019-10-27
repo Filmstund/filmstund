@@ -6,15 +6,14 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import se.filmstund.domain.PaymentOption
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.CreateShowingDTO
-import se.filmstund.domain.dto.UpdateShowingDTO
+import se.filmstund.domain.dto.input.CreateShowingDTO
+import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID
 import se.filmstund.services.AdminService
 import se.filmstund.services.ShowingService
 import se.filmstund.services.TicketService
-import java.util.*
 
 @Component
 class ShowingMutationResolver(

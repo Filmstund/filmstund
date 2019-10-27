@@ -14,7 +14,7 @@ import se.filmstund.database.dao.LocationDao
 import se.filmstund.database.dao.MovieDao
 import se.filmstund.database.dao.ShowingDao
 import se.filmstund.database.dao.UserDao
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.logger
 import java.time.Duration
 import javax.sql.DataSource

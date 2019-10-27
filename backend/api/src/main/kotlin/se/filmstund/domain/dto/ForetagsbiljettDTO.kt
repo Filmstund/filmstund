@@ -12,5 +12,3 @@ data class ForetagsbiljettDTO(
     Available, Pending, Used, Expired, Unknown
   }
 }
-
-data class UserDetailsDTO(val nick: String?, val phone: String?, val filmstadenMembershipId: String?)

@@ -1,4 +1,4 @@
-package se.filmstund.domain.dto
+package se.filmstund.domain.dto.input
 
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.id.MovieID

@@ -3,8 +3,8 @@ package se.filmstund
 import org.assertj.core.api.ObjectAssert
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.LocationDTO

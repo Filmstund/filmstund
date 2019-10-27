@@ -5,8 +5,7 @@ package se.filmstund.graphql
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.springframework.stereotype.Component
 import se.filmstund.domain.dto.AttendeePaymentInfoDTO
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.UserDetailsDTO
+import se.filmstund.domain.dto.input.UserDetailsDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.UserDTO
 import se.filmstund.domain.dto.input.GiftCertificateInputDTO

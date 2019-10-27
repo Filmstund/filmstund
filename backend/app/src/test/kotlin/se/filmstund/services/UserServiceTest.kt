@@ -14,7 +14,7 @@ import se.filmstund.currentLoggedInUser
 import se.filmstund.database.DbConfig
 import se.filmstund.database.dao.UserDao
 import se.filmstund.domain.PhoneNumber
-import se.filmstund.domain.dto.UserDetailsDTO
+import se.filmstund.domain.dto.input.UserDetailsDTO
 import se.filmstund.domain.id.FilmstadenMembershipId
 import java.util.concurrent.ThreadLocalRandom
 

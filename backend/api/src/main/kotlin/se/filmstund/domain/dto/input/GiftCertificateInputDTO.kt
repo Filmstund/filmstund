@@ -1,6 +1,6 @@
 package se.filmstund.domain.dto.input
 
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID
 import java.time.LocalDate

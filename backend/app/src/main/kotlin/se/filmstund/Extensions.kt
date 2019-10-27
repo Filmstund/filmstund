@@ -11,7 +11,7 @@ import se.filmstund.database.dao.MovieDao
 import se.filmstund.database.dao.ShowingDao
 import se.filmstund.database.dao.TicketDao
 import se.filmstund.database.dao.UserDao
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 
 internal fun maybeCurrentLoggedInUser(): PublicUserDTO? {
   val authentication: Authentication? = SecurityContextHolder.getContext().authentication

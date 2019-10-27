@@ -11,7 +11,7 @@ import se.filmstund.database.dao.AttendeeDao
 import se.filmstund.domain.dto.AdminPaymentDetailsDTO
 import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
 import se.filmstund.domain.dto.FilmstadenSeatMapDTO
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.TicketRange
 import se.filmstund.domain.dto.core.MovieDTO
 import se.filmstund.domain.dto.core.PublicAttendeeDTO

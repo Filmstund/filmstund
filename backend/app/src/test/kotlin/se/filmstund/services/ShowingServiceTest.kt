@@ -17,9 +17,9 @@ import se.filmstund.*
 import se.filmstund.database.DbConfig
 import se.filmstund.domain.PaymentOption
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.CreateShowingDTO
+import se.filmstund.domain.dto.input.CreateShowingDTO
 import se.filmstund.domain.dto.FilmstadenShowDTO
-import se.filmstund.domain.dto.UpdateShowingDTO
+import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.ShowingDTO

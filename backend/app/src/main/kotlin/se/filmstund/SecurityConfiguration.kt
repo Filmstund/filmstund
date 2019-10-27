@@ -23,7 +23,7 @@ import org.springframework.security.oauth2.provider.token.UserAuthenticationConv
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
 import se.filmstund.database.dao.UserDao
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.UserDTO
 import se.filmstund.domain.id.CalendarFeedID
 import se.filmstund.domain.id.GoogleId

@@ -23,8 +23,8 @@ import se.filmstund.database.mongo.repositories.ShowingMongoRepository
 import se.filmstund.database.mongo.repositories.TicketMongoRepository
 import se.filmstund.database.mongo.repositories.UserMongoRepository
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.LocationDTO

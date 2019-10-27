@@ -21,7 +21,7 @@ import se.filmstund.database.dao.LocationDao
 import se.filmstund.database.dao.MovieDao
 import se.filmstund.database.dao.ShowingDao
 import se.filmstund.database.dao.UserDao
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.input.GiftCertificateInputDTO
 import se.filmstund.domain.id.UserID

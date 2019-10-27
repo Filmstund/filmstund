@@ -13,7 +13,7 @@ import se.filmstund.DatabaseTest
 import se.filmstund.TestConfig
 import se.filmstund.database.DbConfig
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.PublicUserDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.id.FilmstadenShowingID

@@ -1,4 +1,4 @@
-package se.filmstund.domain.dto
+package se.filmstund.domain.dto.input
 
 import se.filmstund.domain.id.UserID
 import java.time.LocalDate

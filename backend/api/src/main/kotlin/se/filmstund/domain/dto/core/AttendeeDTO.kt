@@ -2,8 +2,6 @@ package se.filmstund.domain.dto.core
 
 import org.jdbi.v3.core.mapper.Nested
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.GiftCertificateDTO
-import se.filmstund.domain.dto.PublicUserDTO
 import se.filmstund.domain.id.FilmstadenMembershipId
 import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID

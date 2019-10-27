@@ -9,7 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import se.filmstund.database.AttendeeGiftCertReducer
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID

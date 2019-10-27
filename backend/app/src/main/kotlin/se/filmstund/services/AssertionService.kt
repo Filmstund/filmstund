@@ -12,11 +12,10 @@ import se.filmstund.TicketExpiredException
 import se.filmstund.TicketNotFoundException
 import se.filmstund.TicketsAlreadyBoughtException
 import se.filmstund.currentLoggedInUser
-import se.filmstund.domain.dto.GiftCertificateDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID
-import java.util.*
 
 @Service
 class AssertionService(
