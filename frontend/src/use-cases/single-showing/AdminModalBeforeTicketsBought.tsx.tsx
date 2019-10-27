@@ -4,6 +4,7 @@ import styled from "@emotion/styled";
 import { ApolloError } from "apollo-client";
 import * as React from "react";
 import { FormEventHandler, useState } from "react";
+import { GiftCertificateDTO_Status } from "../../__generated__/globalTypes";
 import { useMarkAsBought } from "../../apollo/mutations/showings/useMarkAsBought";
 import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 import Field from "../../use-cases/common/ui/Field";
@@ -35,12 +36,10 @@ const TicketListRow = styled.div`
   width: 100%;
   transition: background-color 0.1s ease;
   background: #f8f8f8;
+  max-width: 900px;
 
   @media (min-width: 500px) {
     max-width: 100%;
-  }
-  @media (min-width: 700px) {
-    max-width: 48%;
   }
 
   &:nth-of-type(even) {
@@ -60,14 +59,21 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
         <div css={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
         </div>
-        {ticket.giftCertificateUsed && (
-          <div css={{ width: 100, textAlign: "right" }}>
-            <CopyValue useStricken text={ticket.giftCertificateUsed.number} />
-          </div>
-        )}
-        <div css={{ width: 100, textAlign: "right" }}>
+        <div css={{ width: 200, textAlign: "right" }}>
           <CopyValue useStricken text={ticket.filmstadenMembershipId || ""} />
         </div>
+        {ticket.giftCertificateUsed && (
+          <div css={{ width: 200, textAlign: "right" }}>
+            {ticket.giftCertificateUsed.status ===
+            GiftCertificateDTO_Status.EXPIRED ? (
+              <span css={{ color: "red" }}>
+                {ticket.giftCertificateUsed.number} Utgången
+              </span>
+            ) : (
+              <CopyValue useStricken text={ticket.giftCertificateUsed.number} />
+            )}
+          </div>
+        )}
       </TicketListRow>
     ))}
   </div>
@@ -146,7 +152,11 @@ export const AdminModalBeforeTicketsBought: React.FC<
           Öppna Filmstaden-länk i nytt fönster
         </a>
       )}
-      <ParticipantsList participants={showing.attendees} showPhone={true} isBought={showing.ticketsBought} />
+      <ParticipantsList
+        participants={showing.attendees}
+        showPhone={true}
+        isBought={showing.ticketsBought}
+      />
       <TicketList tickets={attendees} />
       <StatusMessageBox
         errors={mutationErrors.length > 0 ? mutationErrors : null}

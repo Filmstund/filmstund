@@ -83,7 +83,7 @@ const EditableForetagsbiljettList: React.FC = () => {
   );
   const handleSetExpires = useCallback((id: string, value: Date) => {
     setTickets(tickets => {
-      return tickets.map(t => (t.id === id ? { ...t, expires: value } : t));
+      return tickets.map(t => (t.id === id ? { ...t, expiresAt: value } : t));
     });
   }, []);
   const handlePressRemove = useCallback((id: string) => {

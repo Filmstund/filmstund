@@ -55,6 +55,7 @@ export interface SingleShowing_showing_payToUser {
 export interface SingleShowing_showing_adminPaymentDetails_attendees_giftCertificateUsed {
   __typename: "GiftCertificateDTO";
   number: string;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface SingleShowing_showing_adminPaymentDetails_attendees_user {

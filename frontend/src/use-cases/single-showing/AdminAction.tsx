@@ -110,6 +110,7 @@ export const adminActionFragments = gql`
         filmstadenMembershipId
         giftCertificateUsed {
           number
+          status
         }
         user {
           id

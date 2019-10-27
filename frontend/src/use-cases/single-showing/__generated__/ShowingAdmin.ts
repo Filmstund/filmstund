@@ -2,6 +2,8 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
+import { GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL fragment: ShowingAdmin
 // ====================================================
@@ -20,6 +22,7 @@ export interface ShowingAdmin_payToUser {
 export interface ShowingAdmin_adminPaymentDetails_attendees_giftCertificateUsed {
   __typename: "GiftCertificateDTO";
   number: string;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface ShowingAdmin_adminPaymentDetails_attendees_user {
