@@ -1,4 +1,4 @@
-# ITBio [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FcthdidIT%2Fitbio%2Fbadge&style=popout)](https://actions-badge.atrox.dev/cthdidIT/itbio/goto)
+# Filmstund [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FcthdidIT%2Fitbio%2Fbadge&style=popout)](https://actions-badge.atrox.dev/cthdidIT/filmstund/goto)
 A web application for making it easier planning to go to the cinema with your friends
 
 ## How to start development
