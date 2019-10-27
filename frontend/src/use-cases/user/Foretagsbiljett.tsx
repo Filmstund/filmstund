@@ -2,9 +2,13 @@ import styled from "@emotion/styled";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, lazy } from "react";
-import { GiftCertificateDTOInput } from "../../__generated__/globalTypes";
+import {
+  GiftCertificateDTO_Status,
+  GiftCertificateDTOInput
+} from "../../__generated__/globalTypes";
 import { formatYMD } from "../../lib/dateTools";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
+import { exhaustSwitchCase } from "../../types";
 
 import Field from "../../use-cases/common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
@@ -35,18 +39,20 @@ const BiljettField = styled(Field)`
   padding: 0 0.5em;
 `;
 
-const localizeTicketStatus = (status: string) => {
+const localizeTicketStatus = (status: GiftCertificateDTO_Status) => {
   switch (status) {
-    case "Available":
+    case GiftCertificateDTO_Status.AVAILABLE:
       return "Tillgänglig";
-    case "Pending":
+    case GiftCertificateDTO_Status.PENDING:
       return "Upptagen";
-    case "Used":
+    case GiftCertificateDTO_Status.USED:
       return "Använd";
-    case "Expired":
+    case GiftCertificateDTO_Status.EXPIRED:
       return "Utgången";
+    case GiftCertificateDTO_Status.UNKNOWN:
+      throw new Error("Unknown GiftCertificate Status");
     default:
-      return status;
+      return exhaustSwitchCase(status);
   }
 };
 
@@ -108,12 +114,11 @@ const Foretagsbiljett: React.FC<Props> = props => (
         <ValueField>{formatYMD(props.biljett.expiresAt)}</ValueField>
       )}
     </BiljettField>
-    {"status" in props.biljett &&
-      props.biljett.status && (
-        <BiljettField text="Status">
-          <ValueField>{localizeTicketStatus(props.biljett.status)}</ValueField>
-        </BiljettField>
-      )}
+    {"status" in props.biljett && (
+      <BiljettField text="Status">
+        <ValueField>{localizeTicketStatus(props.biljett.status)}</ValueField>
+      </BiljettField>
+    )}
 
     <div onClick={props.handleRemoveForetagsbiljett}>
       <IconButton size="2x" icon={faTrash} />
