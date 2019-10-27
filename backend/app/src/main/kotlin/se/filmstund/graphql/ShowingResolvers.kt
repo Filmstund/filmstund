@@ -11,10 +11,10 @@ import se.filmstund.database.dao.AttendeeDao
 import se.filmstund.domain.dto.AdminPaymentDetailsDTO
 import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
 import se.filmstund.domain.dto.FilmstadenSeatMapDTO
-import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.TicketRange
 import se.filmstund.domain.dto.core.MovieDTO
 import se.filmstund.domain.dto.core.PublicAttendeeDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.id.Base64ID
@@ -29,7 +29,7 @@ import java.time.LocalDate
 
 @Component
 class ShowingQueryResolver(private val showingService: ShowingService) : GraphQLQueryResolver {
-  fun publicShowings(afterDate: LocalDate?) = showingService.getShowingsAfterDate(afterDate ?: LocalDate.MIN)
+  fun publicShowings(afterDate: LocalDate?) = showingService.getShowingsAfterDate(afterDate ?: LocalDate.now().minusMonths(6))
 
   fun showing(id: ShowingID?, webId: Base64ID?): ShowingDTO? {
     return when {
