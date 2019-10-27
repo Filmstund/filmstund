@@ -18,15 +18,15 @@ import se.filmstund.domain.PaymentOption
 import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.AdminPaymentDetailsDTO
 import se.filmstund.domain.dto.AttendeePaymentDetailsDTO
-import se.filmstund.domain.dto.input.CreateShowingDTO
 import se.filmstund.domain.dto.FilmstadenScreenDTO
 import se.filmstund.domain.dto.FilmstadenSeatMapDTO
-import se.filmstund.domain.dto.core.GiftCertificateDTO
-import se.filmstund.domain.dto.core.PublicUserDTO
-import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.ShowingDTO
+import se.filmstund.domain.dto.input.CreateShowingDTO
+import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.id.Base64ID
 import se.filmstund.domain.id.FilmstadenShowingID
 import se.filmstund.domain.id.MovieID
@@ -110,7 +110,7 @@ class ShowingService(
       val payeePhone = showing.payToPhone ?: throw MissingPhoneNumberException()
 
       val attendee = it.attach<AttendeeDao>().findByUserAndShowing(userId, showingId)
-        ?: throw NotFoundException("attendee", userId, showingId)
+        ?: return@inTransactionUnchecked null
 
       val swishTo = when {
         attendee.hasPaid -> null

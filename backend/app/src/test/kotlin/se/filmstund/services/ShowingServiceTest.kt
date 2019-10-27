@@ -17,12 +17,12 @@ import se.filmstund.*
 import se.filmstund.database.DbConfig
 import se.filmstund.domain.PaymentOption
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.input.CreateShowingDTO
 import se.filmstund.domain.dto.FilmstadenShowDTO
-import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.ShowingDTO
+import se.filmstund.domain.dto.input.CreateShowingDTO
+import se.filmstund.domain.dto.input.UpdateShowingDTO
 import se.filmstund.domain.id.ShowingID
 import se.filmstund.domain.id.UserID
 import se.filmstund.events.EventPublisher
@@ -234,6 +234,19 @@ internal class ShowingServiceTest {
         } else {
           assertThat(attendeePaymentDetails?.swishLink).startsWith("swish://payment?data=")
         }
+      }
+    }
+  }
+
+  @Test
+  @WithLoggedInUser
+  internal fun `given a showing and no attendee, when getAttendeePaymentDetails(), then null is returned`() {
+    databaseTest.start {
+      withAdmin()
+      withShowing()
+      afterInsert {
+        val attendeePaymentDetails = showingService.getAttendeePaymentDetails(showing.id)
+        assertThat(attendeePaymentDetails).isNull()
       }
     }
   }
