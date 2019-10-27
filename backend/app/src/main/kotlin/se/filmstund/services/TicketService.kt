@@ -12,6 +12,7 @@ import se.filmstund.domain.dto.FilmstadenTicketDTO
 import se.filmstund.domain.dto.SeatRange
 import se.filmstund.domain.dto.TicketRange
 import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.Seat
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.id.FilmstadenMembershipId
@@ -149,7 +150,7 @@ class TicketService(
       }
 
       val allSeatsForShowing = daos.ticketDao.findByShowing(showingId)
-        .map { Seat(it.seatRow, it.seatNumber) }
+        .map(TicketDTO::seat)
         .sortedBy { it.number }
 
       val rows = allSeatsForShowing
@@ -175,8 +176,7 @@ class TicketService(
       cinema = cinema.title,
       cinemaCity = cinema.city.name,
       screen = screen.title,
-      seatNumber = seat.number,
-      seatRow = seat.row,
+      seat = Seat(seat.row, seat.number),
       date = show.date,
       time = show.time,
       movieName = movie.title,
@@ -186,6 +186,4 @@ class TicketService(
       attributes = show.attributes.map { it.displayName }.toSet()
     )
   }
-
-  data class Seat(val row: Int, val number: Int)
 }

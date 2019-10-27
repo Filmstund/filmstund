@@ -9,6 +9,7 @@ import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.LocationDTO
 import se.filmstund.domain.dto.core.MovieDTO
+import se.filmstund.domain.dto.core.Seat
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.dto.core.UserDTO
@@ -192,8 +193,7 @@ fun ThreadLocalRandom.nextTicket(showingId: ShowingID, assignedToUser: UserID): 
     cinema = "cinema${nextLong(10000)}",
     cinemaCity = "cinemaCity${nextLong(100000)}",
     screen = "screen${nextLong(100000)}",
-    seatRow = nextInt(0, 100),
-    seatNumber = nextInt(0, 250),
+    seat = Seat(nextInt(0, 100), nextInt(0, 250)),
     date = nextLocalDate(),
     time = nextLocalTime(),
     movieName = "movieName${nextLong(1000000)}",

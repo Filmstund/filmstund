@@ -29,6 +29,7 @@ import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
 import se.filmstund.domain.dto.core.LocationDTO
 import se.filmstund.domain.dto.core.MovieDTO
+import se.filmstund.domain.dto.core.Seat
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.dto.core.UserDTO
@@ -328,8 +329,7 @@ internal class MongoMigrator(
             cinema = it.cinema,
             cinemaCity = it.cinemaCity,
             screen = it.screen,
-            seatRow = it.seat.row,
-            seatNumber = it.seat.number,
+            seat = Seat(it.seat.row, it.seat.number),
             date = it.date,
             time = it.time,
             movieName = it.movieName,

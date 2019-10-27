@@ -25,6 +25,7 @@ import se.filmstund.domain.dto.FilmstadenTicketDTO
 import se.filmstund.domain.dto.SeatRange
 import se.filmstund.domain.dto.TicketRange
 import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.Seat
 import se.filmstund.domain.dto.core.TicketDTO
 import se.filmstund.domain.id.FilmstadenShowingID
 import se.filmstund.nextAttendee
@@ -86,7 +87,7 @@ internal class TicketServiceTest {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
       afterInsert {
-        assertThat(showing.filmstadenShowingId).isNotNull()
+        assertThat(showing.filmstadenShowingId).isNotNull
         val time = Instant.now()
         val show = rnd.nextObject(FilmstadenShowDTO::class.java).copy(timeUtc = time)
         `when`(fsServiceMock.fetchFilmstadenShow("AA-1036-201908221930"))
@@ -267,8 +268,8 @@ internal class TicketServiceTest {
         assertThat(dbTicket.movieRating).isEqualTo(ticket.movie.rating.displayName)
         assertThat(dbTicket.profileId).isEqualTo(ticket.profileId)
         assertThat(dbTicket.screen).isEqualTo(ticket.screen.title)
-        assertThat(dbTicket.seatNumber).isEqualTo(ticket.seat.number)
-        assertThat(dbTicket.seatRow).isEqualTo(ticket.seat.row)
+        assertThat(dbTicket.seat.number).isEqualTo(ticket.seat.number)
+        assertThat(dbTicket.seat.row).isEqualTo(ticket.seat.row)
         assertThat(dbTicket.showingId).isEqualTo(showing.id)
       }
     }
@@ -307,9 +308,9 @@ internal class TicketServiceTest {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
       withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 5) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 6) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 7) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(5, 5)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(5, 6)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(5, 7)) }
       afterInsert {
         val seatMap = ticketService.getTicketRange(showing.id)
         assertThat(seatMap).describedAs("seat map")
@@ -324,12 +325,12 @@ internal class TicketServiceTest {
     databaseTest.start {
       withShowing(currentLoggedInUser().id)
       withAttendee { it.nextAttendee(currentLoggedInUser().id, showing.id) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 5) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 6) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 5, seatNumber = 7) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 6, seatNumber = 5) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 6, seatNumber = 6) }
-      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seatRow = 6, seatNumber = 7) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(5, 5)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(5, 6)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(5, 7)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(6, 5)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(6, 6)) }
+      withTicket { it.nextTicket(showing.id, currentLoggedInUser().id).copy(seat = Seat(6, 7)) }
       afterInsert {
         val seatMap = ticketService.getTicketRange(showing.id)
         assertThat(seatMap).describedAs("seat map")

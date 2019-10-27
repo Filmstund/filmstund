@@ -15,8 +15,7 @@ type TicketDTO {
     cinema: String!
     cinemaCity: String
     screen: String!
-    seatRow: Int!,
-    seatNumber: Int!,
+    seat: Seat!
     date: LocalDate!,
     time: String!,
     movieName: String!
@@ -24,6 +23,11 @@ type TicketDTO {
     movieRating: String!
     # "textad", "en" etc
     attributes: [String!]
+}
+
+type Seat {
+    row: Int!
+    number: Int!
 }
 
 type SeatRange {
