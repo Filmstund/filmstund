@@ -39,7 +39,9 @@ class TicketService(
   }
 
   fun processTickets(userSuppliedTicketUrl: List<String>, showingId: ShowingID): List<TicketDTO> {
-    require(userSuppliedTicketUrl.isNotEmpty()) { "Supply a list of ticket urls" }
+    if (userSuppliedTicketUrl.isEmpty()) {
+      return listOf()
+    }
 
     return jdbi.inTransactionUnchecked { handle ->
       val daos = handle.toDaos()
