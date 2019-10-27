@@ -20,6 +20,7 @@ import se.filmstund.domain.SEK
 import se.filmstund.domain.dto.FilmstadenShowDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.input.CreateShowingDTO
 import se.filmstund.domain.dto.input.UpdateShowingDTO
@@ -190,13 +191,27 @@ internal class ShowingServiceTest {
       withUser { it.nextUserDTO(currentLoggedInUser().id) }
       withShowing()
       withAttendeesOnLastShowing(5)
+      withUser {
+        val userId = UserID.random()
+        it.nextUserDTO(userId, it.nextGiftCerts(userId, 1))
+      }
+      withAttendee { it.nextAttendee(user.id, showing.id, user.giftCertificates.first().number) }
       afterInsert {
         val adminPaymentDetails = showingService.getAdminPaymentDetails(showing.id)
         assertThat(adminPaymentDetails).isNotNull
 
         assertThat(adminPaymentDetails?.filmstadenBuyLink).isNull()
-        assertThat(adminPaymentDetails?.attendees).isNotNull.hasSize(5)
+        assertThat(adminPaymentDetails?.attendees).isNotNull.hasSize(6)
         assertThat(adminPaymentDetails?.showingId).isEqualTo(showing.id)
+
+        val gcAttendee = adminPaymentDetails?.attendees?.last()
+        assertThat(gcAttendee?.giftCertificateUsed).isNotNull
+        assertThat(gcAttendee?.giftCertificateUsed?.number).isEqualTo(user.giftCertificates.first().number)
+        if (gcAttendee?.giftCertificateUsed!!.expiresAt.isBefore(LocalDate.now())) {
+          assertThat(gcAttendee.giftCertificateUsed?.status).isEqualTo(GiftCertificateDTO.Status.EXPIRED)
+        } else {
+          assertThat(gcAttendee.giftCertificateUsed?.status).isEqualTo(GiftCertificateDTO.Status.AVAILABLE)
+        }
       }
     }
   }
@@ -311,7 +326,10 @@ internal class ShowingServiceTest {
         it.userDao.insertGiftCertificate(giftCert)
 
         assertThat(it.attendeeDao.isAttendeeOnShowing(currentLoggedInUser().id, showing.id)).isFalse()
-        showingService.attendShowing(showing.id, PaymentOption(AttendeeDTO.Type.GIFT_CERTIFICATE, giftCert.number.number))
+        showingService.attendShowing(
+          showing.id,
+          PaymentOption(AttendeeDTO.Type.GIFT_CERTIFICATE, giftCert.number.number)
+        )
 
         val attendee = it.attendeeDao.findByUserAndShowing(currentLoggedInUser().id, showing.id)
         assertThat(attendee).isNotNull

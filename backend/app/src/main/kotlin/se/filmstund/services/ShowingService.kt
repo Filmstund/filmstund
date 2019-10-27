@@ -53,6 +53,7 @@ class ShowingService(
   private val slugService: SlugService,
   private val filmstadenService: FilmstadenService,
   private val locationService: LocationService,
+  private val giftCertificateService: GiftCertificateService,
   private val eventPublisher: EventPublisher,
   private val assertionService: AssertionService
 ) {
@@ -95,6 +96,17 @@ class ShowingService(
       val filmstadenBuyLink = filmstadenService.getFilmstadenBuyLink(fsIdAndSlug.filmstadenId, fsIdAndSlug.slug)
 
       val attendees = it.attach<AttendeeDao>().findAllAttendees(showingId)
+        .map { attendee ->
+          if (attendee.giftCertificateUsed != null) {
+            attendee.copy(
+              giftCertificateUsed = attendee.giftCertificateUsed!!.copy(
+                status = giftCertificateService.getStatusOfTicket(attendee.giftCertificateUsed!!)
+              )
+            )
+          } else {
+            attendee
+          }
+        }
       AdminPaymentDetailsDTO(showingId, filmstadenBuyLink, attendees)
     }
   }
