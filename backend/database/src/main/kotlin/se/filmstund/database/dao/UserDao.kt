@@ -8,6 +8,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import se.filmstund.database.UserGiftCertReducer
+import se.filmstund.domain.Nick
 import se.filmstund.domain.id.FilmstadenMembershipId
 import se.filmstund.domain.id.GoogleId
 import se.filmstund.domain.PhoneNumber
@@ -67,7 +68,7 @@ interface UserDao {
   @SqlUpdate("UPDATE users SET filmstaden_membership_id = :filmstadenMembershipId, phone = :phoneNumber, nick = :nick, last_modified_date = :now WHERE id = :userId")
   @Timestamped
   fun updateUser(
-    userId: UserID, filmstadenMembershipId: FilmstadenMembershipId?, phoneNumber: PhoneNumber?, nick: String
+    userId: UserID, filmstadenMembershipId: FilmstadenMembershipId?, phoneNumber: PhoneNumber?, nick: Nick
   ): Boolean
 
   @SqlBatch("INSERT INTO gift_certificate (user_id, number, expires_at) VALUES (:userId, :number, :expiresAt)")

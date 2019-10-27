@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.provider.token.UserAuthenticationConv
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore
 import org.springframework.stereotype.Component
 import se.filmstund.database.dao.UserDao
+import se.filmstund.domain.Nick
 import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.UserDTO
 import se.filmstund.domain.id.CalendarFeedID
@@ -152,7 +153,7 @@ class UserAuthConverter(
       calendarFeedId = CalendarFeedID.random(),
       firstName = details.firstName ?: "Bosse",
       lastName = details.lastName ?: "Ringholm",
-      nick = details.firstName ?: "Houdini",
+      nick = Nick(details.firstName ?: "Houdini"),
       email = details.username ?: "",
       avatar = details.avatarUrl,
       lastLogin = Instant.now(),

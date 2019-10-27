@@ -55,6 +55,7 @@ class GiftCertificateService(private val jdbi: Jdbi, private val userDao: UserDa
       val gcs = newCerts.map { gc -> gc.toGiftCertificateDTO(user.id) }
 
       assertGiftCertsNotAlreadyInUse(userDao, gcs)
+      // FIXME: calculate GC status before returning
       userDao.insertGiftCertificates(gcs)
     }
   }

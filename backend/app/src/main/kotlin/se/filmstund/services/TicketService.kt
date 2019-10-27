@@ -117,7 +117,7 @@ class TicketService(
       }
 
       val userIdForThatMember =
-        getUserIdFromFilmstadenId(daos, FilmstadenMembershipId.valueOf(it.profileId!!), showing)
+        getUserIdFromFilmstadenId(daos, FilmstadenMembershipId.from(it.profileId!!), showing)
       it.toTicket(showing.id, userIdForThatMember, barcode)
     }
 

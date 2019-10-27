@@ -1,14 +1,15 @@
 package se.filmstund
 
 import org.assertj.core.api.ObjectAssert
+import se.filmstund.domain.Nick
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.core.GiftCertificateDTO
-import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.LocationDTO
 import se.filmstund.domain.dto.core.MovieDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.Seat
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
@@ -56,11 +57,11 @@ fun ThreadLocalRandom.nextUserDTO(
   return UserDTO(
     id = id,
     googleId = GoogleId("gid${nextString(18)}"),
-    filmstadenMembershipId = FilmstadenMembershipId.valueOf("${nextString(3)}-${nextString(3)}"),
+    filmstadenMembershipId = FilmstadenMembershipId.from("${nextString(3)}-${nextString(3)}"),
     calendarFeedId = CalendarFeedID.random(),
     firstName = "Fname ${nextString(20)}",
     lastName = "Lname ${nextString(20)}",
-    nick = "Nickan ${nextString(20)}",
+    nick = Nick("Nickan ${nextString(20)}"),
     email = "mail${nextString(20)}@example.org",
     phone = PhoneNumber("073000000${nextLong(0, 9)}"),
     avatar = "http://${nextString(20)}.example.org",
@@ -78,7 +79,7 @@ fun ThreadLocalRandom.nextPublicUserDTO(
     id = id,
     firstName = "Fname ${nextString(20)}",
     lastName = "Lname ${nextString(20)}",
-    nick = "Nickan ${nextString(20)}",
+    nick = Nick("Nickan ${nextString(20)}"),
     phone = "073000000${nextLong(0, 9)}",
     avatar = "http://${nextString(20)}.example.org"
   )

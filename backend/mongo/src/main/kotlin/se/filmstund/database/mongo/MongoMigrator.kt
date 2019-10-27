@@ -22,13 +22,14 @@ import se.filmstund.database.mongo.repositories.ParticipantPaymentInfoMongoRepos
 import se.filmstund.database.mongo.repositories.ShowingMongoRepository
 import se.filmstund.database.mongo.repositories.TicketMongoRepository
 import se.filmstund.database.mongo.repositories.UserMongoRepository
+import se.filmstund.domain.Nick
 import se.filmstund.domain.SEK
-import se.filmstund.domain.dto.core.GiftCertificateDTO
-import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.AttendeeDTO
 import se.filmstund.domain.dto.core.CinemaScreenDTO
+import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.LocationDTO
 import se.filmstund.domain.dto.core.MovieDTO
+import se.filmstund.domain.dto.core.PublicUserDTO
 import se.filmstund.domain.dto.core.Seat
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.dto.core.TicketDTO
@@ -279,7 +280,7 @@ internal class MongoMigrator(
       email = it.email,
       firstName = it.firstName ?: "N/A",
       lastName = it.lastName ?: "N/A",
-      nick = it.nick ?: it.lastName ?: "N/A",
+      nick = Nick(it.nick ?: it.lastName ?: "N/A"),
       lastLogin = it.lastLogin,
       lastModifiedDate = it.lastModifiedDate,
       signupDate = it.signupDate,

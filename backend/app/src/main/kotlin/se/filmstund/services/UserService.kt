@@ -7,11 +7,10 @@ import org.springframework.stereotype.Service
 import se.filmstund.NotFoundException
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.dao.UserDao
-import se.filmstund.domain.PhoneNumber
+import se.filmstund.domain.Nick
 import se.filmstund.domain.dto.core.PublicUserDTO
-import se.filmstund.domain.dto.input.UserDetailsDTO
 import se.filmstund.domain.dto.core.UserDTO
-import se.filmstund.domain.id.FilmstadenMembershipId
+import se.filmstund.domain.dto.input.UserDetailsDTO
 import se.filmstund.domain.id.UserID
 import se.filmstund.logger
 import se.filmstund.maybeCurrentLoggedInUser
@@ -41,14 +40,11 @@ class UserService(
   fun getCurrentUserOrNull(): UserDTO? = maybeCurrentLoggedInUser()?.let { u -> getCompleteUser(u.id) }
 
   fun updateUser(newDetails: UserDetailsDTO): UserDTO {
-    val newFilmstadenMembershipId = newDetails.filmstadenMembershipId?.let { FilmstadenMembershipId.valueOf(it) }
-    val newPhoneNumber = newDetails.phone?.let { PhoneNumber(it) }
-
     val currentUser = currentLoggedInUser()
     log.info("Update user {}", currentUser.id)
     return jdbi.inTransactionUnchecked {
       val dao = it.attach(UserDao::class.java)
-      dao.updateUser(currentUser.id, newFilmstadenMembershipId, newPhoneNumber, newDetails.nick ?: "")
+      dao.updateUser(currentUser.id, newDetails.filmstadenMembershipId, newDetails.phone, newDetails.nick ?: Nick(""))
       dao.findById(currentUser.id)!!
     }
   }

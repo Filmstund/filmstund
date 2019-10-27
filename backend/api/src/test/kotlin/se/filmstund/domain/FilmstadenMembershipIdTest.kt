@@ -35,14 +35,14 @@ class FilmstadenMembershipIdTest {
   @Test
   fun testValueOfWithoutDash() {
     val profileId = "asdfgh"
-    val membershipId = FilmstadenMembershipId.valueOf(profileId)
+    val membershipId = FilmstadenMembershipId.from(profileId)
     assertThat(membershipId.value).isEqualTo("ASD-FGH")
   }
 
   @Test
   fun testValueOfWithDash() {
     val profileId = "asd-fgh"
-    val membershipId = FilmstadenMembershipId.valueOf(profileId)
+    val membershipId = FilmstadenMembershipId.from(profileId)
     assertThat(membershipId.value).isEqualTo("ASD-FGH")
   }
 }

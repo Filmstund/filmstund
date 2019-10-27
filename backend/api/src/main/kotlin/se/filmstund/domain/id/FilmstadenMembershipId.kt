@@ -1,10 +1,13 @@
 package se.filmstund.domain.id
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 
 data class FilmstadenMembershipId(val value: String) {
   companion object {
-    fun valueOf(profileId: String): FilmstadenMembershipId {
+    @JsonCreator
+    @JvmStatic
+    fun from(profileId: String): FilmstadenMembershipId {
       if (profileId[3] == '-' && profileId.length == 7) {
         return FilmstadenMembershipId(profileId.toUpperCase())
       }
@@ -22,9 +25,7 @@ data class FilmstadenMembershipId(val value: String) {
   }
 
   init {
-    if (value.length < 6 || value.length > 7) {
-      throw IllegalArgumentException("The Filmstaden membership id has wrong size. Expected 6-7, got ${value.length}")
-    }
+    require(!(value.length < 6 || value.length > 7)) { "The Filmstaden membership id has wrong size. Expected 6-7, got ${value.length}" }
   }
 
   @JsonValue

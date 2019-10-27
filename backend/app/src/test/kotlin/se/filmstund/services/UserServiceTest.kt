@@ -13,10 +13,10 @@ import se.filmstund.WithLoggedInUser
 import se.filmstund.currentLoggedInUser
 import se.filmstund.database.DbConfig
 import se.filmstund.database.dao.UserDao
+import se.filmstund.domain.Nick
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.dto.input.UserDetailsDTO
 import se.filmstund.domain.id.FilmstadenMembershipId
-import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [Jdbi::class, UserService::class])
@@ -28,8 +28,6 @@ internal class UserServiceTest {
   @Autowired
   private lateinit var userDao: UserDao
 
-  private val rnd: ThreadLocalRandom = ThreadLocalRandom.current()
-
   @Test
   @WithLoggedInUser
   internal fun `given a logged in user, when updateUser(null, null, null), then all values are removed`() {
@@ -37,7 +35,7 @@ internal class UserServiceTest {
 
     val beforeUpdate = userDao.findById(currentLoggedInUser().id)
     assertThat(beforeUpdate?.nick)
-      .isNotNull()
+      .isNotNull
     assertThat(beforeUpdate?.phone)
       .isNotNull
     assertThat(beforeUpdate?.filmstadenMembershipId)
@@ -48,8 +46,8 @@ internal class UserServiceTest {
       .isEqualToIgnoringGivenFields(beforeUpdate, "nick", "phone", "filmstadenMembershipId", "lastModifiedDate")
     assertThat(afterUpdate.nick)
       .describedAs("nick")
-      .isNotNull()
-      .isEqualTo("")
+      .isNotNull
+      .isEqualTo(Nick(""))
     assertThat(afterUpdate.phone)
       .describedAs("phone")
       .isNull()
@@ -63,11 +61,11 @@ internal class UserServiceTest {
   @Test
   @WithLoggedInUser
   internal fun `given a logged in user, when updateUser(), then all values are updated`() {
-    val userDetails = UserDetailsDTO("newNick", "073-0000000", "abc-xyz")
+    val userDetails = UserDetailsDTO(Nick("newNick"), PhoneNumber("073-0000000"), FilmstadenMembershipId("abc-xyz"))
 
     val beforeUpdate = userDao.findById(currentLoggedInUser().id)
     assertThat(beforeUpdate?.nick)
-      .isNotNull()
+      .isNotNull
       .isNotEqualTo("newNick")
     assertThat(beforeUpdate?.phone)
       .isNotNull
@@ -81,8 +79,8 @@ internal class UserServiceTest {
       .isEqualToIgnoringGivenFields(beforeUpdate, "nick", "phone", "filmstadenMembershipId", "lastModifiedDate")
     assertThat(afterUpdate.nick)
       .describedAs("nick")
-      .isNotNull()
-      .isEqualTo("newNick")
+      .isNotNull
+      .isEqualTo(Nick("newNick"))
     assertThat(afterUpdate.phone)
       .describedAs("phone")
       .isNotNull
@@ -90,7 +88,7 @@ internal class UserServiceTest {
     assertThat(afterUpdate.filmstadenMembershipId)
       .describedAs("filmstadenId")
       .isNotNull
-      .isEqualTo(FilmstadenMembershipId("ABC-XYZ"))
+      .isEqualTo(FilmstadenMembershipId("abc-xyz"))
     assertThat(afterUpdate.lastModifiedDate)
       .isAfter(beforeUpdate?.lastModifiedDate)
   }
@@ -116,7 +114,7 @@ internal class UserServiceTest {
     assertThat(afterUpdate)
       .isEqualToIgnoringGivenFields(beforeUpdate, "calendarFeedId", "lastModifiedDate")
     assertThat(beforeUpdate?.calendarFeedId)
-      .isNotNull()
+      .isNotNull
     assertThat(afterUpdate.calendarFeedId)
       .isNull()
   }

@@ -1,3 +1,7 @@
 package se.filmstund.domain.dto.input
 
-data class UserDetailsDTO(val nick: String?, val phone: String?, val filmstadenMembershipId: String?)
+import se.filmstund.domain.Nick
+import se.filmstund.domain.PhoneNumber
+import se.filmstund.domain.id.FilmstadenMembershipId
+
+data class UserDetailsDTO(val nick: Nick?, val phone: PhoneNumber?, val filmstadenMembershipId: FilmstadenMembershipId?)

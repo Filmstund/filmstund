@@ -57,6 +57,7 @@ class DbConfig {
       .registerColumnMapper(ShowingIdColumnMapper())
       .registerColumnMapper(FilmstadenShowingIdColumnMapper())
       .registerColumnMapper(CalendarFeedIdColumnMapper())
+      .registerColumnMapper(NickColumnMapper())
       .registerArgument(FilmstadenMembershipArgumentFactory())
       .registerArgument(TicketNumberArgumentFactory())
       .registerArgument(GoogleIdArgumentFactory())
@@ -71,6 +72,7 @@ class DbConfig {
       .registerArgument(ShowingIdArgumentFactory())
       .registerArgument(FilmstadenShowingIdArgumentFactory())
       .registerArgument(CalendarFeedIdArgumentFactory())
+      .registerArgument(NickArgumentFactory())
       .registerRowMapper(rowMapperFactoryWithPrefix(GiftCertificateDTO::class.java, "gc"))
       .installPlugins()
     if (sqlLogger != null) {

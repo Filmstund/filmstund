@@ -18,9 +18,7 @@ data class PhoneNumber(var number: String = "") {
       }
 
       val numberType = phoneUtil.getNumberType(parsedPhoneNumber)
-      if (numberType != MOBILE) {
-        throw IllegalArgumentException("'$number' is not a mobile number. Got: $numberType type")
-      }
+      require(numberType == MOBILE) { "'$number' is not a mobile number. Got: $numberType type" }
 
       return phoneUtil.format(parsedPhoneNumber, PhoneNumberUtil.PhoneNumberFormat.NATIONAL)
     }

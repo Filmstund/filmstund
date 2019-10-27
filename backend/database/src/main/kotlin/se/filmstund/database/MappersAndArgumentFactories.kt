@@ -5,6 +5,7 @@ import org.jdbi.v3.core.argument.Argument
 import org.jdbi.v3.core.config.ConfigRegistry
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
+import se.filmstund.domain.Nick
 import se.filmstund.domain.PhoneNumber
 import se.filmstund.domain.SEK
 import se.filmstund.domain.id.Base64ID
@@ -241,3 +242,19 @@ class CalendarFeedIdArgumentFactory : AbstractArgumentFactory<CalendarFeedID>(Ty
     return Argument { position, statement, _ -> statement.setObject(position, value?.uuid) }
   }
 }
+
+class NickColumnMapper : ColumnMapper<Nick> {
+  override fun map(r: ResultSet?, columnNumber: Int, ctx: StatementContext?): Nick? {
+    return r?.let {
+      val value: String = it.getString(columnNumber) ?: return null
+      return Nick(value)
+    }
+  }
+}
+
+class NickArgumentFactory : AbstractArgumentFactory<Nick>(Types.VARCHAR) {
+  override fun build(value: Nick?, config: ConfigRegistry?): Argument {
+    return Argument { position, statement, _ -> statement.setString(position, value.toString()) }
+  }
+}
+
