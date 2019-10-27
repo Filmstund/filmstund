@@ -11,7 +11,7 @@ type Mutation {
     createShowing(showing: CreateShowingDTOInput!): ShowingDTO!
 
     # Delete a showign and return all public showings
-    deleteShowing(showingId: ShowingID!): [ShowingDTO!]
+    deleteShowing(showingId: ShowingID!): [ShowingDTO!]!
 
     markAsBought(showingId: ShowingID!, price: SEK!): ShowingDTO!
     processTicketUrls(showingId: ShowingID!, ticketUrls: [String!]): ShowingDTO!

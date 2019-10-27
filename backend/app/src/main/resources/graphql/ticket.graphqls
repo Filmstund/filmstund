@@ -1,5 +1,5 @@
 extend type ShowingDTO {
-    myTickets: [TicketDTO!]
+    myTickets: [TicketDTO!]!
     ticketRange: TicketRange
 }
 
@@ -22,7 +22,7 @@ type TicketDTO {
     # 15 år, 11 år etc.
     movieRating: String!
     # "textad", "en" etc
-    attributes: [String!]
+    attributes: [String!]!
 }
 
 type Seat {
@@ -33,13 +33,13 @@ type Seat {
 type SeatRange {
     row: Int!
     # All numbers for this particular row
-    numbers: [Int!]
+    numbers: [Int!]!
 }
 
 # In what range is the seating assigned for each row
 type TicketRange {
-    rows: [Int!]
-    seatings: [SeatRange!]
+    rows: [Int!]!
+    seatings: [SeatRange!]!
     # The total number of tickets for this showing
     totalCount: Int!
 }
