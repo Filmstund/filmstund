@@ -60,9 +60,9 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
         <div css={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
         </div>
-        {ticket.filmstadenMembershipId && (
+        {ticket.giftCertificateUsed && (
           <div css={{ width: 100, textAlign: "right" }}>
-            <CopyValue useStricken text={ticket.filmstadenMembershipId} />
+            <CopyValue useStricken text={ticket.giftCertificateUsed.number} />
           </div>
         )}
         <div css={{ width: 100, textAlign: "right" }}>
@@ -159,7 +159,7 @@ export const AdminModalBeforeTicketsBought: React.FC<
           onChange={handlePriceChange}
         />
       </Field>
-      <Field text="SF-biljettlänkar: (en per rad)">
+      <Field text="Filmstaden-biljettlänkar: (en per rad)">
         <TicketURLInput
           cinemaTicketUrls={cinemaTicketUrls}
           onChange={setCinemaTicketUrls}

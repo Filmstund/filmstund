@@ -115,8 +115,8 @@ const TicketDateTime: React.FC<
 );
 
 const TicketPlacement: React.FC<
-  Pick<TicketQuery_showing_myTickets, "screen" | "seatNumber" | "seatRow">
-> = ({ screen, seatNumber, seatRow }) => (
+  Pick<TicketQuery_showing_myTickets, "screen" | "seat">
+> = ({ screen, seat: { row, number } }) => (
   <FlexRowPaddingContainer
     css={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
   >
@@ -125,8 +125,8 @@ const TicketPlacement: React.FC<
       value={screen}
       css={{ width: "50%" }}
     />
-    <TicketValueWithLabel label="Rad" value={seatRow} />
-    <TicketValueWithLabel label="Stolsnr" value={seatNumber} />
+    <TicketValueWithLabel label="Rad" value={row} />
+    <TicketValueWithLabel label="Stolsnr" value={number} />
   </FlexRowPaddingContainer>
 );
 
@@ -180,8 +180,7 @@ export const Ticket: React.FC<Props> = ({
     customerType,
     attributes,
     profileId,
-    seatNumber,
-    seatRow,
+    seat,
     barcode
   }
 }) => (
@@ -193,11 +192,7 @@ export const Ticket: React.FC<Props> = ({
       movieRating={movieRating}
     />
     <TicketDateTime date={date} time={time} />
-    <TicketPlacement
-      screen={screen}
-      seatNumber={seatNumber}
-      seatRow={seatRow}
-    />
+    <TicketPlacement screen={screen} seat={seat} />
     <TicketCustomerType customerType={customerType} />
     <TicketCode id={id} profileId={profileId} src={barcode} />
   </TicketWrapper>

@@ -39,8 +39,10 @@ export const ticketFragment = gql`
       cinema
       screen
       profileId
-      seatNumber
-      seatRow
+      seat {
+        number
+        row
+      }
       date
       time
       movieName

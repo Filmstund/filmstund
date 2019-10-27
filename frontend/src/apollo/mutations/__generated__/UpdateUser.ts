@@ -26,7 +26,7 @@ export interface UpdateUser_editedUser {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  giftCertificates: UpdateUser_editedUser_giftCertificates[] | null;
+  giftCertificates: UpdateUser_editedUser_giftCertificates[];
   calendarFeedUrl: string | null;
 }
 

@@ -116,7 +116,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
     const { filmstadenRemoteEntityId, cinemaName, timeUtc } = sfShowing;
     setFormState(state => ({
       ...state,
-      filmstadenRemoteEntityId,
+      filmstadenShowingId: filmstadenRemoteEntityId,
       location: cinemaName,
       time: formatLocalTime(timeUtc)
     }));

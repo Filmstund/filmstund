@@ -18,7 +18,7 @@ export interface DeleteForetagsbiljett_deleteGiftCertificate_giftCertificates {
 export interface DeleteForetagsbiljett_deleteGiftCertificate {
   __typename: "UserDTO";
   id: FilmstundUserID;
-  giftCertificates: DeleteForetagsbiljett_deleteGiftCertificate_giftCertificates[] | null;
+  giftCertificates: DeleteForetagsbiljett_deleteGiftCertificate_giftCertificates[];
 }
 
 export interface DeleteForetagsbiljett {

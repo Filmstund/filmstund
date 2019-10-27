@@ -69,7 +69,7 @@ const App: React.FC<Props> = ({ signout }) => {
 
   return (
     <>
-      <PageTitleTemplate titleTemplate="%s | sefilm">
+      <PageTitleTemplate titleTemplate="%s | Filmstund">
         <WelcomeModal me={me} />
         <NavBar signout={signout} />
         <MainGridContainer>

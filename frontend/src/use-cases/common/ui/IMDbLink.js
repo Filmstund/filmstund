@@ -1,12 +1,12 @@
 import React from "react";
 import { GrayButton } from "./MainButton";
 
+const GrayButtonLink = GrayButton.withComponent("a");
+
 const IMDbLink = ({ imdbId }) => (
-  <GrayButton
-    onClick={() => window.open(`http://www.imdb.com/title/${imdbId}/`)}
-  >
+  <GrayButtonLink target="_blank" href={`http://www.imdb.com/title/${imdbId}/`}>
     IMDb
-  </GrayButton>
+  </GrayButtonLink>
 );
 
 export default IMDbLink;

@@ -37,7 +37,7 @@ export interface ShowingsQuery_showings {
   webId: FilmstundBase64ID;
   slug: string;
   movie: ShowingsQuery_showings_movie;
-  myTickets: ShowingsQuery_showings_myTickets[] | null;
+  myTickets: ShowingsQuery_showings_myTickets[];
   attendees: ShowingsQuery_showings_attendees[];
 }
 

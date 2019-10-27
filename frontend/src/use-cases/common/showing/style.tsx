@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { largeMargin, margin, SMALL_FONT_SIZE } from "../../../lib/style-vars";
-import alfons from "../../../assets/alfons.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import alfons from "../../../assets/alfons.jpg";
+import { largeMargin, margin, SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
 export const Box = styled.div`
   height: 220px;
@@ -19,7 +19,7 @@ export const Box = styled.div`
   }
 `;
 
-export const Poster = styled.div`
+export const Poster = styled.div<{ src: string }>`
   min-width: 120px;
   max-width: 120px;
   background-image: url(${props => props.src}), url(${alfons});
@@ -100,7 +100,7 @@ export const PlusUsers = styled.div`
   color: #9b9b9b;
 `;
 
-export const UserHead = styled.div`
+export const UserHead = styled.div<{ src: string; last: boolean }>`
   display: inline-block;
   background-image: url(${props => props.src});
   background-size: cover;

@@ -18,7 +18,7 @@ export interface AddForetagsbiljett_addGiftCertificates_giftCertificates {
 export interface AddForetagsbiljett_addGiftCertificates {
   __typename: "UserDTO";
   id: FilmstundUserID;
-  giftCertificates: AddForetagsbiljett_addGiftCertificates_giftCertificates[] | null;
+  giftCertificates: AddForetagsbiljett_addGiftCertificates_giftCertificates[];
 }
 
 export interface AddForetagsbiljett {

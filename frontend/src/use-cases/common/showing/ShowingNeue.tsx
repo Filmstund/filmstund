@@ -1,34 +1,32 @@
-import React from "react";
-import { Header } from "../ui/RedHeader";
-import { faQrcode } from "@fortawesome/free-solid-svg-icons/faQrcode";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons/faChevronRight";
+import { faQrcode } from "@fortawesome/free-solid-svg-icons/faQrcode";
+import React from "react";
 import { formatShowingDateTime } from "../../../lib/dateTools";
-import {
-  Box,
-  ButtonText,
-  CenterColumn,
-  Column,
-  Content,
-  Description,
-  FaIcon,
-  Poster,
-  RedButton
-} from "./style";
+import { Header } from "../ui/RedHeader";
+import { ShowingNeue as ShowingNeueType } from "./__generated__/ShowingNeue";
+import { Box, ButtonText, CenterColumn, Column, Content, Description, FaIcon, Poster, RedButton } from "./style";
 import { UserHeads } from "./UserHeads";
 
-export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
+interface Props {
+  showing: ShowingNeueType;
+  onClick: () => void;
+  onClickTickets?: () => void;
+}
+
+
+export const ShowingNeue: React.FC<Props> = ({ showing, onClick, onClickTickets }) => {
   const showingHasTickets = showing.myTickets.length > 0;
 
   return (
     <Box onClick={onClick}>
-      <Poster src={showing.movie.poster} />
+      <Poster src={showing.movie.poster || ''} />
       <CenterColumn>
         <Content>
           <Header>{showing.movie.title}</Header>
           <Description>
             {formatShowingDateTime(showing.date + " " + showing.time)}
           </Description>
-          <UserHeads users={showing.participants.map(p => p.user)} />
+          <UserHeads users={showing.attendees.map(p => p.userInfo)} />
         </Content>
         {showingHasTickets && (
           <RedButton

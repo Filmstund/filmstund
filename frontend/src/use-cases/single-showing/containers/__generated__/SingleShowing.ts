@@ -17,7 +17,7 @@ export interface SingleShowing_me_giftCertificates {
 
 export interface SingleShowing_me {
   __typename: "UserDTO";
-  giftCertificates: SingleShowing_me_giftCertificates[] | null;
+  giftCertificates: SingleShowing_me_giftCertificates[];
   id: FilmstundUserID;
 }
 
@@ -136,7 +136,7 @@ export interface SingleShowing_showing {
   cinemaScreen: SingleShowing_showing_cinemaScreen | null;
   payToUser: SingleShowing_showing_payToUser;
   adminPaymentDetails: SingleShowing_showing_adminPaymentDetails | null;
-  myTickets: SingleShowing_showing_myTickets[] | null;
+  myTickets: SingleShowing_showing_myTickets[];
   attendeePaymentDetails: SingleShowing_showing_attendeePaymentDetails | null;
   attendees: SingleShowing_showing_attendees[];
 }

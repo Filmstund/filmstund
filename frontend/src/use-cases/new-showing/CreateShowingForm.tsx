@@ -32,7 +32,7 @@ interface ShowingState {
   time: string;
   location: string;
   filmstadenRemoteEntityId: string | null;
-  filmstadenScreen: { id: string; name: string; } | null;
+  filmstadenScreen: { id: string; name: string } | null;
   movieId: string;
   admin: CreateShowingQuery_me;
 }
@@ -90,19 +90,15 @@ export const CreateShowingForm: React.FC<Props> = props => {
 
     const { name, filmstadenId } = screen!;
 
-    setShowingState(state => {
-      const newState: ShowingState = {
-        ...state,
-        filmstadenRemoteEntityId,
-        time: formatLocalTime(timeUtc),
-        location: cinemaName,
-        filmstadenScreen: { name, id: filmstadenId }
-      };
+    const newState: ShowingState = {
+      ...showing,
+      filmstadenRemoteEntityId,
+      time: formatLocalTime(timeUtc),
+      location: cinemaName,
+      filmstadenScreen: { name, id: filmstadenId }
+    };
 
-      handleSubmit(newState);
-
-      return newState;
-    });
+    handleSubmit(newState);
   };
 
   const setShowingValueFromEvent = (

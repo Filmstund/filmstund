@@ -37,6 +37,6 @@ export interface ShowingNeue {
   webId: FilmstundBase64ID;
   slug: string;
   movie: ShowingNeue_movie;
-  myTickets: ShowingNeue_myTickets[] | null;
+  myTickets: ShowingNeue_myTickets[];
   attendees: ShowingNeue_attendees[];
 }

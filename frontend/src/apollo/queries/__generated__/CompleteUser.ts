@@ -26,5 +26,5 @@ export interface CompleteUser {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  giftCertificates: CompleteUser_giftCertificates[] | null;
+  giftCertificates: CompleteUser_giftCertificates[];
 }

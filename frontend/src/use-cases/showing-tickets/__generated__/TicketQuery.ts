@@ -22,13 +22,13 @@ export interface TicketQuery_showing_ticketRange_seatings {
   /**
    * All numbers for this particular row
    */
-  numbers: number[] | null;
+  numbers: number[];
 }
 
 export interface TicketQuery_showing_ticketRange {
   __typename: "TicketRange";
-  rows: number[] | null;
-  seatings: TicketQuery_showing_ticketRange_seatings[] | null;
+  rows: number[];
+  seatings: TicketQuery_showing_ticketRange_seatings[];
 }
 
 export interface TicketQuery_showing_filmstadenSeatMap_coordinates {
@@ -52,6 +52,12 @@ export interface TicketQuery_showing_filmstadenSeatMap {
   dimensions: TicketQuery_showing_filmstadenSeatMap_dimensions;
 }
 
+export interface TicketQuery_showing_myTickets_seat {
+  __typename: "Seat";
+  number: number;
+  row: number;
+}
+
 export interface TicketQuery_showing_myTickets {
   __typename: "TicketDTO";
   id: string;
@@ -61,8 +67,7 @@ export interface TicketQuery_showing_myTickets {
   cinema: string;
   screen: string;
   profileId: string | null;
-  seatNumber: number;
-  seatRow: number;
+  seat: TicketQuery_showing_myTickets_seat;
   date: FilmstundLocalDate;
   time: string;
   movieName: string;
@@ -73,7 +78,7 @@ export interface TicketQuery_showing_myTickets {
   /**
    * "textad", "en" etc
    */
-  attributes: string[] | null;
+  attributes: string[];
 }
 
 export interface TicketQuery_showing {
@@ -84,7 +89,7 @@ export interface TicketQuery_showing {
   admin: TicketQuery_showing_admin;
   ticketRange: TicketQuery_showing_ticketRange | null;
   filmstadenSeatMap: TicketQuery_showing_filmstadenSeatMap[];
-  myTickets: TicketQuery_showing_myTickets[] | null;
+  myTickets: TicketQuery_showing_myTickets[];
 }
 
 export interface TicketQuery {

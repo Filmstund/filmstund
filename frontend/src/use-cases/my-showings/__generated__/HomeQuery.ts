@@ -43,7 +43,7 @@ export interface HomeQuery_showings {
   webId: FilmstundBase64ID;
   slug: string;
   movie: HomeQuery_showings_movie;
-  myTickets: HomeQuery_showings_myTickets[] | null;
+  myTickets: HomeQuery_showings_myTickets[];
   attendees: HomeQuery_showings_attendees[];
   admin: HomeQuery_showings_admin;
 }

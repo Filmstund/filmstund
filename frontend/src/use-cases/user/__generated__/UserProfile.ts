@@ -26,7 +26,7 @@ export interface UserProfile_me {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  giftCertificates: UserProfile_me_giftCertificates[] | null;
+  giftCertificates: UserProfile_me_giftCertificates[];
   calendarFeedUrl: string | null;
 }
 

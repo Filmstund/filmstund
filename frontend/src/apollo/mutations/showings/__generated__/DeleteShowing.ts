@@ -15,7 +15,7 @@ export interface DeleteShowing {
   /**
    * Delete a showign and return all public showings
    */
-  deleteShowing: DeleteShowing_deleteShowing[] | null;
+  deleteShowing: DeleteShowing_deleteShowing[];
 }
 
 export interface DeleteShowingVariables {

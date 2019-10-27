@@ -26,7 +26,7 @@ export interface AppQuery_me {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  giftCertificates: AppQuery_me_giftCertificates[] | null;
+  giftCertificates: AppQuery_me_giftCertificates[];
 }
 
 export interface AppQuery {

@@ -30,6 +30,6 @@ export interface BoughtShowing_attendeePaymentDetails {
 
 export interface BoughtShowing {
   __typename: "ShowingDTO";
-  myTickets: BoughtShowing_myTickets[] | null;
+  myTickets: BoughtShowing_myTickets[];
   attendeePaymentDetails: BoughtShowing_attendeePaymentDetails | null;
 }

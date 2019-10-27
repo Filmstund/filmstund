@@ -17,5 +17,5 @@ export interface PendingShowing_giftCertificates {
 
 export interface PendingShowing {
   __typename: "UserDTO";
-  giftCertificates: PendingShowing_giftCertificates[] | null;
+  giftCertificates: PendingShowing_giftCertificates[];
 }

@@ -56,7 +56,7 @@ export interface MarkShowingAsBought_markAsBought {
   payToUser: MarkShowingAsBought_markAsBought_payToUser;
   date: string;
   time: string;
-  myTickets: MarkShowingAsBought_markAsBought_myTickets[] | null;
+  myTickets: MarkShowingAsBought_markAsBought_myTickets[];
   attendeePaymentDetails: MarkShowingAsBought_markAsBought_attendeePaymentDetails | null;
   adminPaymentDetails: MarkShowingAsBought_markAsBought_adminPaymentDetails | null;
 }
