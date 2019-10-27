@@ -5,15 +5,19 @@ services:
         image: cthdidit/sefilm-backend:latest
         restart: always
         environment:
-            - SEFILM_MONGODB_URI=mongodb://mongodb/sefilm
+            - SEFILM_MONGODB_URI=mongodb://mongodb/filmstund
             - defaultCity=GB
             - apiBaseUrl=http://localhost:3000
             - frontendBaseUrl=http://localhost:3000
+            - FILMSTUND_JDBC_URI=jdbc:postgresql://postgres:5432/filmstund
+            - FILMSTUND_JDBC_USERNAME:filmstund
+            - FILMSTUND_JDBC_PASSWORD:filmstund
         env_file: backend.env
         ports:
             - 8080:8080
         depends_on: 
             - mongodb
+            - postgres
 
     frontend:
         container_name: 'sefilm-frontend'
@@ -24,6 +28,18 @@ services:
         depends_on:
             - backend
 
+    postgres:
+        container_name: 'filmstund-postgres'
+        image: postgres:12
+        restart: always
+        ports:
+            - 5432
+        environment:
+            POSTGRES_USER: filmstund
+            POSTGRES_PASSWORD: filmstund
+        volumes:
+          - postgres-data:/var/lib/postgresql/data
+
     mongodb:
         container_name: 'sefilm-mongodb'
         image: mongo:4
@@ -32,8 +48,9 @@ services:
             - mongo-data:/data/db
             - mongo-config:/data/configdb
         ports:
-            - 27016:27017
+            - 27017
 
 volumes:
     mongo-data:
     mongo-config:
+    postgres-data:
