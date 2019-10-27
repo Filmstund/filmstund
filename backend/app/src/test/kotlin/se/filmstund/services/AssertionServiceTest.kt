@@ -22,8 +22,8 @@ import se.filmstund.currentLoggedInUser
 import se.filmstund.database.DbConfig
 import se.filmstund.domain.id.MovieID
 import se.filmstund.domain.id.UserID
-import se.filmstund.nextGiftCert
 import se.filmstund.nextAttendee
+import se.filmstund.nextGiftCert
 import se.filmstund.nextShowing
 import se.filmstund.nextUserDTO
 import java.time.LocalDate
@@ -119,7 +119,7 @@ internal class AssertionServiceTest {
     databaseTest.start {
       withUser {
         val userId = UserID.random()
-        it.nextUserDTO(userId, listOf(it.nextGiftCert(userId).copy(expiresAt = LocalDate.now().plusDays(9))))
+        it.nextUserDTO(userId, listOf(it.nextGiftCert(userId).copy(expiresAt = LocalDate.now().minusDays(1))))
       }
       withMovie()
       withShowing { it.nextShowing(movie.id, user.id).copy(date = LocalDate.now().plusDays(10)) }

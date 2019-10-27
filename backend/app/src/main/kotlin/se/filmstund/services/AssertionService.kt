@@ -16,6 +16,7 @@ import se.filmstund.domain.dto.core.GiftCertificateDTO
 import se.filmstund.domain.dto.core.ShowingDTO
 import se.filmstund.domain.id.TicketNumber
 import se.filmstund.domain.id.UserID
+import java.time.LocalDate
 
 @Service
 class AssertionService(
@@ -50,7 +51,7 @@ class AssertionService(
     val matchingTicket = giftCertService.getGiftCertByUserIdAndNUmber(userId, suppliedTicket)
       ?: throw TicketNotFoundException(suppliedTicket)
 
-    if (matchingTicket.expiresAt.isBefore(showing.date)) {
+    if (matchingTicket.expiresAt.isBefore(LocalDate.now().plusDays(1))) {
       throw TicketExpiredException(suppliedTicket)
     }
 
