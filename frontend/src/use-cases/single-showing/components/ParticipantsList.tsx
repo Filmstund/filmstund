@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import gql from "graphql-tag";
 import * as React from "react";
 import { SmallHeader } from "../../common/ui/Header";
-import { SingleShowing_showing_participants } from "../containers/__generated__/SingleShowing";
+import { SingleShowing_showing_attendees } from "../containers/__generated__/SingleShowing";
 
 import UserItem, { fragments as userItemFragments } from "./UserItem";
 
@@ -19,7 +19,7 @@ const ParticipantContainer = styled.div`
 interface Props {
   meId?: string;
   isAdmin?: boolean;
-  participants: SingleShowing_showing_participants[];
+  participants: SingleShowing_showing_attendees[];
   showPhone?: boolean;
   onClickItem?: (userId: string) => void;
 }
@@ -36,7 +36,7 @@ const ParticipantsList: React.FC<Props> = ({
       <SmallHeader>{participants.length} Deltagare</SmallHeader>
       <ParticipantContainer>
         {participants.map(participant => {
-          const user = participant.user!;
+          const user = participant.userInfo;
 
           return (
             <UserItem key={user.id} showPhone={showPhone} user={user}>

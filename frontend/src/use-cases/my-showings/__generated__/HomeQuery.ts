@@ -8,7 +8,7 @@
 
 export interface HomeQuery_showings_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   poster: string | null;
   title: string;
 }
@@ -20,27 +20,27 @@ export interface HomeQuery_showings_myTickets {
 
 export interface HomeQuery_showings_attendees_userInfo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   avatar: string | null;
 }
 
 export interface HomeQuery_showings_attendees {
   __typename: "PublicAttendeeDTO";
   userInfo: HomeQuery_showings_attendees_userInfo;
-  userId: any;
+  userId: FilmstundUserID;
 }
 
 export interface HomeQuery_showings_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface HomeQuery_showings {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
   date: string;
   time: string;
-  webId: any;
+  webId: FilmstundBase64ID;
   slug: string;
   movie: HomeQuery_showings_movie;
   myTickets: HomeQuery_showings_myTickets[] | null;
@@ -50,7 +50,7 @@ export interface HomeQuery_showings {
 
 export interface HomeQuery_me {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface HomeQuery {

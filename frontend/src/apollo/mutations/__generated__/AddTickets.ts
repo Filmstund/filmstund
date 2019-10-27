@@ -8,7 +8,7 @@
 
 export interface AddTickets_processTicketUrls_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface AddTickets_processTicketUrls_ticketRange_seatings {
@@ -58,7 +58,7 @@ export interface AddTickets_processTicketUrls_myTickets {
   profileId: string | null;
   seatNumber: number;
   seatRow: number;
-  date: any;
+  date: FilmstundLocalDate;
   time: string;
   movieName: string;
   /**
@@ -73,8 +73,8 @@ export interface AddTickets_processTicketUrls_myTickets {
 
 export interface AddTickets_processTicketUrls {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   admin: AddTickets_processTicketUrls_admin;
   ticketRange: AddTickets_processTicketUrls_ticketRange | null;
@@ -87,6 +87,6 @@ export interface AddTickets {
 }
 
 export interface AddTicketsVariables {
-  showingId: any;
+  showingId: FilmstundShowingID;
   tickets?: string[] | null;
 }

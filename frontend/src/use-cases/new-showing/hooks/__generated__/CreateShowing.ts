@@ -15,26 +15,26 @@ export interface CreateShowing_showing_location {
 
 export interface CreateShowing_showing_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   title: string;
   poster: string | null;
 }
 
 export interface CreateShowing_showing_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   name: string | null;
   nick: string | null;
 }
 
 export interface CreateShowing_showing {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   date: string;
   time: string;
-  location: CreateShowing_showing_location | null;
+  location: CreateShowing_showing_location;
   ticketsBought: boolean;
   movie: CreateShowing_showing_movie;
   admin: CreateShowing_showing_admin;

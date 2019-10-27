@@ -19,6 +19,9 @@ $ yarn start
 # Remove old typings
 $ find src -name __generated__ -exec rm -r {} \;
 
+# Fetch schema
+yarn apollo schema:download --endpoint=http://localhost:8080/graphql graphql.schema.json --header 'Authorization: Bearer token_here'
+
 # Fetch new typings unauthorized
 $ yarn apollo client:codegen --target typescript --customScalarsPrefix=SeFilm --passthroughCustomScalars --includes "src/**/*.{js,ts,tsx}" --globalTypesFile=src/__generated__/globalTypes.ts --endpoint http://localhost:8080/graphql
 

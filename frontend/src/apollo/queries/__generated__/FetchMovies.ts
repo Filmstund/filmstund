@@ -8,7 +8,7 @@
 
 export interface FetchMovies_fetchNewMoviesFromFilmstaden {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   poster: string | null;
   title: string;
   releaseDate: string;

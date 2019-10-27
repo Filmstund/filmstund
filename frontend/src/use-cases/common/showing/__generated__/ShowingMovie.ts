@@ -8,7 +8,7 @@
 
 export interface ShowingMovie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   title: string;
   poster: string | null;
 }

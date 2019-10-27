@@ -1,7 +1,6 @@
 import {
   SingleShowing_me,
-  SingleShowing_showing,
-  SingleShowing_showing_participants
+  SingleShowing_showing, SingleShowing_showing_attendees,
 } from "../containers/__generated__/SingleShowing";
 
 export const userIsAdmin = (
@@ -12,8 +11,8 @@ export const userIsAdmin = (
 };
 
 export const userIsParticipating = (
-  participants: SingleShowing_showing_participants[],
+  participants: SingleShowing_showing_attendees[],
   user: SingleShowing_me
 ): boolean => {
-  return participants.some(p => !!p.user && p.user.id === user.id);
+  return participants.some(p => p.userInfo.id === user.id);
 };

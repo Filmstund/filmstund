@@ -10,16 +10,16 @@ import { UpdateShowingDTOInput } from "./../../../../__generated__/globalTypes";
 
 export interface UpdateShowing_updateShowing_payToUser {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface UpdateShowing_updateShowing {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
   time: string;
   date: string;
   ticketsBought: boolean;
-  price: any | null;
+  price: FilmstundSEK | null;
   payToUser: UpdateShowing_updateShowing_payToUser;
 }
 
@@ -28,6 +28,6 @@ export interface UpdateShowing {
 }
 
 export interface UpdateShowingVariables {
-  showingId: any;
+  showingId: FilmstundShowingID;
   showing: UpdateShowingDTOInput;
 }

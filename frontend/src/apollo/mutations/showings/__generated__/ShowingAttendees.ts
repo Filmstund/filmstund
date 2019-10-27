@@ -8,7 +8,7 @@
 
 export interface ShowingAttendees_attendees_userInfo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -22,6 +22,6 @@ export interface ShowingAttendees_attendees {
 
 export interface ShowingAttendees {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
   attendees: ShowingAttendees_attendees[];
 }

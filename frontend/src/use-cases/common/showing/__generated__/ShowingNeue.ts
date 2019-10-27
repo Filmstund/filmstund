@@ -8,7 +8,7 @@
 
 export interface ShowingNeue_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   poster: string | null;
   title: string;
 }
@@ -20,7 +20,7 @@ export interface ShowingNeue_myTickets {
 
 export interface ShowingNeue_attendees_userInfo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   avatar: string | null;
 }
 
@@ -31,10 +31,10 @@ export interface ShowingNeue_attendees {
 
 export interface ShowingNeue {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
   date: string;
   time: string;
-  webId: any;
+  webId: FilmstundBase64ID;
   slug: string;
   movie: ShowingNeue_movie;
   myTickets: ShowingNeue_myTickets[] | null;

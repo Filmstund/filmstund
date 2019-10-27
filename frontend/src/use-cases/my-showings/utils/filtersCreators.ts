@@ -18,7 +18,7 @@ export const filterShowingsCreatedByMe = (meId: string): ShowingFilterFn => s =>
 export const filterShowingsParticipatedByMe = (
   meId: string
 ): ShowingFilterFn => s =>
-  s.participants.some(p => p.user && p.user.id === meId);
+  s.attendees.some(p => p.userId === meId);
 
 export const filterShowingsParticipatedByMeAndAfterToday = (
   meId: string

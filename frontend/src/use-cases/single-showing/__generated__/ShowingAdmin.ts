@@ -14,7 +14,7 @@ export interface ShowingAdmin_cinemaScreen {
 
 export interface ShowingAdmin_payToUser {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface ShowingAdmin_adminPaymentDetails_attendees_giftCertificateUsed {
@@ -24,16 +24,19 @@ export interface ShowingAdmin_adminPaymentDetails_attendees_giftCertificateUsed 
 
 export interface ShowingAdmin_adminPaymentDetails_attendees_user {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
+  firstName: string | null;
+  lastName: string | null;
   name: string | null;
   phone: string | null;
 }
 
 export interface ShowingAdmin_adminPaymentDetails_attendees {
   __typename: "AttendeeDTO";
+  userId: FilmstundUserID;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
   filmstadenMembershipId: string | null;
   giftCertificateUsed: ShowingAdmin_adminPaymentDetails_attendees_giftCertificateUsed | null;
   user: ShowingAdmin_adminPaymentDetails_attendees_user;
@@ -47,8 +50,8 @@ export interface ShowingAdmin_adminPaymentDetails {
 
 export interface ShowingAdmin {
   __typename: "ShowingDTO";
-  id: any;
-  price: any | null;
+  id: FilmstundShowingID;
+  price: FilmstundSEK | null;
   filmstadenShowingId: string | null;
   cinemaScreen: ShowingAdmin_cinemaScreen | null;
   payToUser: ShowingAdmin_payToUser;

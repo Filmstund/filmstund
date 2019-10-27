@@ -8,7 +8,7 @@
 
 export interface NewShowingQuery_movies {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   poster: string | null;
   title: string;
   releaseDate: string;

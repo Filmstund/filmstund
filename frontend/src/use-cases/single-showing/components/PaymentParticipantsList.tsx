@@ -5,8 +5,8 @@ import * as React from "react";
 
 import Header from "../../common/ui/Header";
 import {
-  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos,
-  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user
+  SingleShowing_showing_adminPaymentDetails_attendees,
+  SingleShowing_showing_adminPaymentDetails_attendees_user
 } from "../containers/__generated__/SingleShowing";
 
 const UserActiveStatus = styled.div<{ active: boolean }>`
@@ -14,7 +14,7 @@ const UserActiveStatus = styled.div<{ active: boolean }>`
 `;
 
 interface UserWithPriceItemProps {
-  user: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user;
+  user: SingleShowing_showing_adminPaymentDetails_attendees_user;
   active: boolean;
   onPaidChange: () => void;
   hasPaid: boolean;
@@ -36,9 +36,9 @@ const UserWithPriceItem: React.FC<UserWithPriceItemProps> = ({
 );
 
 interface UserWithPriceItemListProps {
-  participantPaymentInfos: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
+  participantPaymentInfos: SingleShowing_showing_adminPaymentDetails_attendees[];
   handlePaidChange: (
-    info: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
+    info: SingleShowing_showing_adminPaymentDetails_attendees
   ) => void;
   paid: boolean;
 }
@@ -65,9 +65,9 @@ const UserWithPriceItemList: React.FC<UserWithPriceItemListProps> = ({
 
 interface PaymentParticipantsListProps {
   handlePaidChange: (
-    info: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
+    info: SingleShowing_showing_adminPaymentDetails_attendees
   ) => void;
-  participants: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
+  participants: SingleShowing_showing_adminPaymentDetails_attendees[];
 }
 
 export const PaymentParticipantsList: React.FC<

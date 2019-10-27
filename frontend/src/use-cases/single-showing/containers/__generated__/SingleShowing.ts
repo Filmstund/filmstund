@@ -10,7 +10,7 @@ import { GiftCertificateDTO_Status } from "./../../../../__generated__/globalTyp
 
 export interface SingleShowing_me_giftCertificates {
   __typename: "GiftCertificateDTO";
-  expiresAt: any;
+  expiresAt: FilmstundLocalDate;
   number: string;
   status: GiftCertificateDTO_Status;
 }
@@ -18,7 +18,7 @@ export interface SingleShowing_me_giftCertificates {
 export interface SingleShowing_me {
   __typename: "UserDTO";
   giftCertificates: SingleShowing_me_giftCertificates[] | null;
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface SingleShowing_showing_location {
@@ -28,15 +28,15 @@ export interface SingleShowing_showing_location {
 
 export interface SingleShowing_showing_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   title: string;
   poster: string | null;
-  imdbId: any | null;
+  imdbId: FilmstundIMDbID | null;
 }
 
 export interface SingleShowing_showing_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   name: string | null;
   nick: string | null;
 }
@@ -49,7 +49,7 @@ export interface SingleShowing_showing_cinemaScreen {
 
 export interface SingleShowing_showing_payToUser {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface SingleShowing_showing_adminPaymentDetails_attendees_giftCertificateUsed {
@@ -59,16 +59,19 @@ export interface SingleShowing_showing_adminPaymentDetails_attendees_giftCertifi
 
 export interface SingleShowing_showing_adminPaymentDetails_attendees_user {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
+  firstName: string | null;
+  lastName: string | null;
   name: string | null;
   phone: string | null;
 }
 
 export interface SingleShowing_showing_adminPaymentDetails_attendees {
   __typename: "AttendeeDTO";
+  userId: FilmstundUserID;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
   filmstadenMembershipId: string | null;
   giftCertificateUsed: SingleShowing_showing_adminPaymentDetails_attendees_giftCertificateUsed | null;
   user: SingleShowing_showing_adminPaymentDetails_attendees_user;
@@ -87,7 +90,7 @@ export interface SingleShowing_showing_myTickets {
 
 export interface SingleShowing_showing_attendeePaymentDetails_payTo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   phone: string | null;
   firstName: string | null;
   nick: string | null;
@@ -96,7 +99,7 @@ export interface SingleShowing_showing_attendeePaymentDetails_payTo {
 
 export interface SingleShowing_showing_attendeePaymentDetails {
   __typename: "AttendeePaymentDetailsDTO";
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
   swishLink: string | null;
   hasPaid: boolean;
   payTo: SingleShowing_showing_attendeePaymentDetails_payTo;
@@ -109,7 +112,7 @@ export interface SingleShowing_showing_attendees_userInfo {
   nick: string | null;
   lastName: string | null;
   phone: string | null;
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface SingleShowing_showing_attendees {
@@ -119,16 +122,16 @@ export interface SingleShowing_showing_attendees {
 
 export interface SingleShowing_showing {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   date: string;
   time: string;
-  location: SingleShowing_showing_location | null;
+  location: SingleShowing_showing_location;
   ticketsBought: boolean;
   movie: SingleShowing_showing_movie;
   admin: SingleShowing_showing_admin;
-  price: any | null;
+  price: FilmstundSEK | null;
   filmstadenShowingId: string | null;
   cinemaScreen: SingleShowing_showing_cinemaScreen | null;
   payToUser: SingleShowing_showing_payToUser;
@@ -144,5 +147,5 @@ export interface SingleShowing {
 }
 
 export interface SingleShowingVariables {
-  webId: any;
+  webId: FilmstundBase64ID;
 }

@@ -8,7 +8,7 @@
 
 export interface DeleteShowing_deleteShowing {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
 }
 
 export interface DeleteShowing {
@@ -19,5 +19,5 @@ export interface DeleteShowing {
 }
 
 export interface DeleteShowingVariables {
-  showingId: any;
+  showingId: FilmstundShowingID;
 }

@@ -11,13 +11,13 @@ import { GiftCertificateDTOInput, GiftCertificateDTO_Status } from "./../../../_
 export interface DeleteForetagsbiljett_deleteGiftCertificate_giftCertificates {
   __typename: "GiftCertificateDTO";
   number: string;
-  expiresAt: any;
+  expiresAt: FilmstundLocalDate;
   status: GiftCertificateDTO_Status;
 }
 
 export interface DeleteForetagsbiljett_deleteGiftCertificate {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
   giftCertificates: DeleteForetagsbiljett_deleteGiftCertificate_giftCertificates[] | null;
 }
 

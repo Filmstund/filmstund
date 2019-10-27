@@ -8,7 +8,7 @@
 
 export interface CreateShowingQuery_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   title: string;
   poster: string | null;
   releaseDate: string;
@@ -16,7 +16,7 @@ export interface CreateShowingQuery_movie {
 
 export interface CreateShowingQuery_me {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
   name: string | null;
 }
@@ -40,5 +40,5 @@ export interface CreateShowingQuery {
 }
 
 export interface CreateShowingQueryVariables {
-  movieId: any;
+  movieId: FilmstundMovieID;
 }

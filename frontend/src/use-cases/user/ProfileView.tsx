@@ -125,7 +125,7 @@ const Profile: React.FC<Props> = ({ me }) => {
         {me.calendarFeedUrl && <CopyValue text={me.calendarFeedUrl} />}
       </FieldWithoutMaxWidth>
       <MainButton onClick={handleSubmit}>Spara användare</MainButton>
-      <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter || []} />
+      <ForetagsbiljettList foretagsbiljetter={me.giftCertificates || []} />
     </PageWidthWrapper>
   );
 };

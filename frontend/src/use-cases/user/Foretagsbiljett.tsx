@@ -2,14 +2,14 @@ import styled from "@emotion/styled";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, lazy } from "react";
-import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
+import { GiftCertificateDTOInput } from "../../__generated__/globalTypes";
 import { formatYMD } from "../../lib/dateTools";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
 import Field from "../../use-cases/common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
 import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
-import { UserProfile_me_foretagsbiljetter } from "./__generated__/UserProfile";
+import { UserProfile_me_giftCertificates } from "./__generated__/UserProfile";
 
 const DatePickerInput = lazy(() =>
   import("../../use-cases/common/ui/date-picker/DatePickerInput")
@@ -67,7 +67,7 @@ const DateInput = ({ onChange, ...props }: any) => {
 };
 
 interface EditableForetagsbiljettProps {
-  biljett: ForetagsbiljettInput;
+  biljett: GiftCertificateDTOInput;
   editable: true;
   handleChangeForetagsbiljett: (event: ChangeEvent<HTMLInputElement>) => void;
   handleSetExpiresForetagsbiljett: (value: Date) => void;
@@ -75,7 +75,7 @@ interface EditableForetagsbiljettProps {
 }
 
 interface ForetagsbiljettProps {
-  biljett: UserProfile_me_foretagsbiljetter;
+  biljett: UserProfile_me_giftCertificates;
   editable: false;
   handleChangeForetagsbiljett?: undefined;
   handleSetExpiresForetagsbiljett?: undefined;
@@ -84,7 +84,7 @@ interface ForetagsbiljettProps {
 
 type Props = EditableForetagsbiljettProps | ForetagsbiljettProps;
 
-const Foretagsbiljett: React.FC<Props> = (props) => (
+const Foretagsbiljett: React.FC<Props> = props => (
   <ForetagsbiljettWrapper>
     <BiljettField text="Nummer">
       {props.editable ? (
@@ -101,11 +101,11 @@ const Foretagsbiljett: React.FC<Props> = (props) => (
     <BiljettField text="Utgångsdatum">
       {props.editable ? (
         <DateInput
-          value={props.biljett.expires}
+          value={props.biljett.expiresAt}
           onChange={props.handleSetExpiresForetagsbiljett}
         />
       ) : (
-        <ValueField>{formatYMD(props.biljett.expires)}</ValueField>
+        <ValueField>{formatYMD(props.biljett.expiresAt)}</ValueField>
       )}
     </BiljettField>
     {"status" in props.biljett &&

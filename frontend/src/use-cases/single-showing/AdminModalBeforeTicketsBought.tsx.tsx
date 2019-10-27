@@ -19,13 +19,13 @@ import ParticipantsList from "./components/ParticipantsList";
 import {
   SingleShowing_showing,
   SingleShowing_showing_adminPaymentDetails,
-  SingleShowing_showing_adminPaymentDetails_filmstadenData,
-  SingleShowing_showing_adminPaymentDetails_filmstadenData_user
+  SingleShowing_showing_adminPaymentDetails_attendees,
+  SingleShowing_showing_adminPaymentDetails_attendees_user
 } from "./containers/__generated__/SingleShowing";
 import { InputSpinner } from "./InputSpinner";
 
 interface TicketListProps {
-  tickets: SingleShowing_showing_adminPaymentDetails_filmstadenData[];
+  tickets: SingleShowing_showing_adminPaymentDetails_attendees[];
 }
 
 const TicketListRow = styled.div`
@@ -60,9 +60,9 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
         <div css={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
         </div>
-        {ticket.foretagsbiljett && (
+        {ticket.filmstadenMembershipId && (
           <div css={{ width: 100, textAlign: "right" }}>
-            <CopyValue useStricken text={ticket.foretagsbiljett} />
+            <CopyValue useStricken text={ticket.filmstadenMembershipId} />
           </div>
         )}
         <div css={{ width: 100, textAlign: "right" }}>
@@ -74,7 +74,7 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
 );
 
 interface UserFullNameProps {
-  user: SingleShowing_showing_adminPaymentDetails_filmstadenData_user;
+  user: SingleShowing_showing_adminPaymentDetails_attendees_user;
 }
 
 const UserFullName: React.FC<UserFullNameProps> = ({ user }) => (
@@ -134,7 +134,7 @@ export const AdminModalBeforeTicketsBought: React.FC<
       });
   };
 
-  const { filmstadenBuyLink, filmstadenData } = adminPaymentDetails;
+  const { filmstadenBuyLink, attendees } = adminPaymentDetails;
 
   return (
     <form onSubmit={onFormSubmit}>
@@ -146,8 +146,8 @@ export const AdminModalBeforeTicketsBought: React.FC<
           Öppna Filmstaden-länk i nytt fönster
         </a>
       )}
-      <ParticipantsList participants={showing.participants} showPhone={true} />
-      <TicketList tickets={filmstadenData} />
+      <ParticipantsList participants={showing.attendees} showPhone={true} />
+      <TicketList tickets={attendees} />
       <StatusMessageBox
         errors={mutationErrors.length > 0 ? mutationErrors : null}
       />

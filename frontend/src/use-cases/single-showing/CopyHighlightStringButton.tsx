@@ -3,22 +3,18 @@ import copy from "../../lib/copy";
 import { useFadeState } from "../common/hooks/useFadeState";
 import { GrayButton } from "../common/ui/MainButton";
 import {
-  SingleShowing_showing_participants,
-  SingleShowing_showing_participants_user
+  SingleShowing_showing_adminPaymentDetails_attendees,
+  SingleShowing_showing_adminPaymentDetails_attendees_user,
 } from "./containers/__generated__/SingleShowing";
 
 const mapToUserAndFilterMe = (
-  participants: SingleShowing_showing_participants[],
-  meId: SeFilmUserID
-): SingleShowing_showing_participants_user[] =>
-  participants
-    .map(p => p.user)
-    .filter(
-      f => !!f && f.id !== meId
-    ) as SingleShowing_showing_participants_user[];
+  participants: SingleShowing_showing_adminPaymentDetails_attendees[],
+  meId: FilmstundUserID
+): SingleShowing_showing_adminPaymentDetails_attendees_user[] =>
+  participants.map(p => p.user).filter(f => f.id !== meId);
 
 const formatParticipants = (
-  users: SingleShowing_showing_participants_user[]
+  users: SingleShowing_showing_adminPaymentDetails_attendees_user[]
 ): string => {
   const nicks = users.map(
     user => user.nick || `${user.firstName} ${user.lastName}`
@@ -30,8 +26,8 @@ const formatParticipants = (
 };
 
 export const CopyHighlightStringButton: React.FC<{
-  meId: SeFilmUserID;
-  participants: SingleShowing_showing_participants[];
+  meId: FilmstundUserID;
+  participants: SingleShowing_showing_adminPaymentDetails_attendees[];
 }> = ({ participants, meId }) => {
   const [active, bump] = useFadeState();
 

@@ -50,7 +50,7 @@ const getInitialState = (
   showing: EditShowing_showing
 ): EditShowingFormShowing => ({
   date: showing.date,
-  filmstadenShowingId: showing.filmstadenRemoteEntityId,
+  filmstadenShowingId: showing.filmstadenShowingId,
   expectedBuyDate: addDays(today, 7),
   location: showing.location.name,
   time: showing.time,
@@ -90,11 +90,10 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
   const handleSubmit = () => {
     updateShowing(showing.id, {
       date: formState.date,
-      expectedBuyDate: formatYMD(formState.expectedBuyDate),
       payToUser: showing.payToUser.id,
       location: formState.location,
       time: formState.time,
-      filmstadenRemoteEntityId: formState.filmstadenRemoteEntityId,
+      filmstadenRemoteEntityId: formState.filmstadenShowingId,
       price: (parseInt(formState.price, 10) || 0) * 100
     })
       .then(() => {
@@ -147,7 +146,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
           onSelectShowing={handleSfTimeSelect}
           movieId={movie.id}
           date={formState.date}
-          filmstadenRemoteEntityId={formState.filmstadenRemoteEntityId}
+          filmstadenRemoteEntityId={formState.filmstadenShowingId}
           city={showing.location.cityAlias || "GB"}
         />
         <SmallHeader>...eller skapa egen tid</SmallHeader>

@@ -20,10 +20,10 @@ export enum PaymentType {
 }
 
 export interface AttendeePaymentInfoDTOInput {
-  userId: any;
-  showingId?: any | null;
+  userId: FilmstundUserID;
+  showingId?: FilmstundShowingID | null;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
 }
 
 export interface CinemaScreenDTOInput {
@@ -32,9 +32,9 @@ export interface CinemaScreenDTOInput {
 }
 
 export interface CreateShowingDTOInput {
-  date: any;
-  time: any;
-  movieId: any;
+  date: FilmstundLocalDate;
+  time: FilmstundLocalTime;
+  movieId: FilmstundMovieID;
   location: string;
   filmstadenScreen?: CinemaScreenDTOInput | null;
   filmstadenRemoteEntityId?: string | null;
@@ -42,7 +42,7 @@ export interface CreateShowingDTOInput {
 
 export interface GiftCertificateDTOInput {
   number: string;
-  expiresAt?: any | null;
+  expiresAt?: FilmstundLocalDate | null;
 }
 
 /**
@@ -54,12 +54,12 @@ export interface PaymentOption {
 }
 
 export interface UpdateShowingDTOInput {
-  price: any;
-  payToUser: any;
+  price: FilmstundSEK;
+  payToUser: FilmstundUserID;
   location: string;
   filmstadenRemoteEntityId?: string | null;
-  time: any;
-  date: any;
+  time: FilmstundLocalTime;
+  date: FilmstundLocalDate;
 }
 
 export interface UserDetailsDTOInput {

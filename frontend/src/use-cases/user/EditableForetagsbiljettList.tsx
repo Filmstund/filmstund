@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addYears from "date-fns/addYears";
 import { uniqueId } from "lodash-es";
 import React, { ChangeEvent, useCallback, useState } from "react";
-import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
+import { GiftCertificateDTOInput } from "../../__generated__/globalTypes";
 import { formatYMD } from "../../lib/dateTools";
 
 import { margin } from "../../lib/style-vars";
@@ -30,16 +30,16 @@ const AddForetagsbiljettContainer = styled.div`
 
 const transformDraftToInput = ({
   number,
-  expires
-}: ForetagsbiljettInputDraft): ForetagsbiljettInput => ({
+  expiresAt
+}: ForetagsbiljettInputDraft): GiftCertificateDTOInput => ({
   number,
-  expires: formatYMD(expires)
+  expiresAt: formatYMD(expiresAt)
 });
 
 interface ForetagsbiljettInputDraft {
   id: string;
   number: string;
-  expires: Date;
+  expiresAt: Date;
 }
 
 const EditableForetagsbiljettList: React.FC = () => {
@@ -67,7 +67,7 @@ const EditableForetagsbiljettList: React.FC = () => {
     const foretagsbiljett: ForetagsbiljettInputDraft = {
       id: uniqueId("ftg-"),
       number: "",
-      expires: DEFAULT_DATE
+      expiresAt: DEFAULT_DATE
     };
     setTickets(tickets => [...tickets, foretagsbiljett]);
   }, []);

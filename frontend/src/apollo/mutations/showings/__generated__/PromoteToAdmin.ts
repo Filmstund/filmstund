@@ -8,17 +8,17 @@
 
 export interface PromoteToAdmin_promoteToAdmin_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface PromoteToAdmin_promoteToAdmin_payToUser {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface PromoteToAdmin_promoteToAdmin_attendeePaymentDetails_payTo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -30,7 +30,7 @@ export interface PromoteToAdmin_promoteToAdmin_attendeePaymentDetails {
   payTo: PromoteToAdmin_promoteToAdmin_attendeePaymentDetails_payTo;
   swishLink: string | null;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
 }
 
 export interface PromoteToAdmin_promoteToAdmin {
@@ -45,6 +45,6 @@ export interface PromoteToAdmin {
 }
 
 export interface PromoteToAdminVariables {
-  showingId: any;
-  userId: any;
+  showingId: FilmstundShowingID;
+  userId: FilmstundUserID;
 }

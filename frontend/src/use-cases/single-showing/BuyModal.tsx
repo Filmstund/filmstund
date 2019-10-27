@@ -58,7 +58,7 @@ export const BuyModal: React.FC<BuyModalProps> = ({
           {ticketsBought && (
             <AdminModalAfterTicketsBought
               participantPaymentInfos={
-                adminPaymentDetails.participantPaymentInfos
+                adminPaymentDetails.attendees
               }
               showingId={showing.id}
             />

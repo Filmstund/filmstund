@@ -13,26 +13,26 @@ export interface OldShowing_location {
 
 export interface OldShowing_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   title: string;
   poster: string | null;
 }
 
 export interface OldShowing_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   name: string | null;
   nick: string | null;
 }
 
 export interface OldShowing {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   date: string;
   time: string;
-  location: OldShowing_location | null;
+  location: OldShowing_location;
   ticketsBought: boolean;
   movie: OldShowing_movie;
   admin: OldShowing_admin;

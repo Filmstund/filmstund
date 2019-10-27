@@ -11,13 +11,13 @@ import { UserDetailsDTOInput, GiftCertificateDTO_Status } from "./../../../__gen
 export interface UpdateUser_editedUser_giftCertificates {
   __typename: "GiftCertificateDTO";
   number: string;
-  expiresAt: any;
+  expiresAt: FilmstundLocalDate;
   status: GiftCertificateDTO_Status;
 }
 
 export interface UpdateUser_editedUser {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
   name: string | null;
   firstName: string | null;
   lastName: string | null;

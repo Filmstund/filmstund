@@ -9,7 +9,9 @@ import Modal from "../../use-cases/common/ui/Modal";
 
 import { SmallHeader } from "../common/ui/Header";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
-import { SingleShowing_me_foretagsbiljetter } from "./containers/__generated__/SingleShowing";
+import {
+  SingleShowing_me_giftCertificates
+} from "./containers/__generated__/SingleShowing";
 
 import createPaymentOptions, {
   DisplayPaymentOption,
@@ -19,7 +21,7 @@ import createPaymentOptions, {
 interface Props {
   showingId: string;
   isParticipating: boolean;
-  foretagsbiljetter: SingleShowing_me_foretagsbiljetter[];
+  foretagsbiljetter: SingleShowing_me_giftCertificates[];
 }
 
 export const PendingShowing: React.FC<Props> = ({

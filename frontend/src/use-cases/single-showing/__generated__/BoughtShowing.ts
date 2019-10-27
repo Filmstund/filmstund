@@ -13,7 +13,7 @@ export interface BoughtShowing_myTickets {
 
 export interface BoughtShowing_attendeePaymentDetails_payTo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   phone: string | null;
   firstName: string | null;
   nick: string | null;
@@ -22,7 +22,7 @@ export interface BoughtShowing_attendeePaymentDetails_payTo {
 
 export interface BoughtShowing_attendeePaymentDetails {
   __typename: "AttendeePaymentDetailsDTO";
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
   swishLink: string | null;
   hasPaid: boolean;
   payTo: BoughtShowing_attendeePaymentDetails_payTo;

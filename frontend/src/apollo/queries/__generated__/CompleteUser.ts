@@ -11,13 +11,13 @@ import { GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes"
 export interface CompleteUser_giftCertificates {
   __typename: "GiftCertificateDTO";
   number: string;
-  expiresAt: any;
+  expiresAt: FilmstundLocalDate;
   status: GiftCertificateDTO_Status;
 }
 
 export interface CompleteUser {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
   name: string | null;
   firstName: string | null;
   lastName: string | null;

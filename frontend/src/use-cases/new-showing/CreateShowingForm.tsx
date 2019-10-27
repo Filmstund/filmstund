@@ -1,6 +1,6 @@
 import isAfter from "date-fns/isAfter";
 import React, { ChangeEvent, useState } from "react";
-import { CreateShowingInput } from "../../__generated__/globalTypes";
+import { CreateShowingDTOInput } from "../../__generated__/globalTypes";
 import { formatLocalTime, formatYMD, parseDate } from "../../lib/dateTools";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
@@ -32,7 +32,7 @@ interface ShowingState {
   time: string;
   location: string;
   filmstadenRemoteEntityId: string | null;
-  filmstadenScreen: { name: string; filmstadenId: string } | null;
+  filmstadenScreen: { id: string; name: string; } | null;
   movieId: string;
   admin: CreateShowingQuery_me;
 }
@@ -96,7 +96,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
         filmstadenRemoteEntityId,
         time: formatLocalTime(timeUtc),
         location: cinemaName,
-        filmstadenScreen: { name, filmstadenId }
+        filmstadenScreen: { name, id: filmstadenId }
       };
 
       handleSubmit(newState);
@@ -119,13 +119,13 @@ export const CreateShowingForm: React.FC<Props> = props => {
     location,
     filmstadenScreen
   }: ShowingState) => {
-    const showing: CreateShowingInput = {
+    const showing: CreateShowingDTOInput = {
       time,
       movieId,
       filmstadenRemoteEntityId,
       date: formatYMD(date),
-      filmstadenScreen,
-      location
+      location,
+      filmstadenScreen
     };
 
     createShowing({ variables: { showing } })

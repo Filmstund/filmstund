@@ -8,12 +8,12 @@
 
 export interface TicketQuery_me {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface TicketQuery_showing_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface TicketQuery_showing_ticketRange_seatings {
@@ -63,7 +63,7 @@ export interface TicketQuery_showing_myTickets {
   profileId: string | null;
   seatNumber: number;
   seatRow: number;
-  date: any;
+  date: FilmstundLocalDate;
   time: string;
   movieName: string;
   /**
@@ -78,8 +78,8 @@ export interface TicketQuery_showing_myTickets {
 
 export interface TicketQuery_showing {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   admin: TicketQuery_showing_admin;
   ticketRange: TicketQuery_showing_ticketRange | null;
@@ -93,5 +93,5 @@ export interface TicketQuery {
 }
 
 export interface TicketQueryVariables {
-  webId: any;
+  webId: FilmstundBase64ID;
 }

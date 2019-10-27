@@ -10,7 +10,7 @@ import { AttendeePaymentInfoDTOInput } from "./../../../../__generated__/globalT
 
 export interface TogglePaidChange_updateAttendeePaymentInfo {
   __typename: "AttendeeDTO";
-  userId: any;
+  userId: FilmstundUserID;
   hasPaid: boolean;
 }
 

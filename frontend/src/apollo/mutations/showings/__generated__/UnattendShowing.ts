@@ -8,7 +8,7 @@
 
 export interface UnattendShowing_unattendShowing_attendees_userInfo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -22,7 +22,7 @@ export interface UnattendShowing_unattendShowing_attendees {
 
 export interface UnattendShowing_unattendShowing {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
   attendees: UnattendShowing_unattendShowing_attendees[];
 }
 
@@ -31,5 +31,5 @@ export interface UnattendShowing {
 }
 
 export interface UnattendShowingVariables {
-  showingId: any;
+  showingId: FilmstundShowingID;
 }

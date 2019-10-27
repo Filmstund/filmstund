@@ -8,7 +8,7 @@
 
 export interface EditShowing_me {
   __typename: "UserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface EditShowing_showing_location {
@@ -19,35 +19,35 @@ export interface EditShowing_showing_location {
 
 export interface EditShowing_showing_movie {
   __typename: "MovieDTO";
-  id: any;
+  id: FilmstundMovieID;
   title: string;
   poster: string | null;
 }
 
 export interface EditShowing_showing_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   name: string | null;
   nick: string | null;
 }
 
 export interface EditShowing_showing_payToUser {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface EditShowing_showing {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   date: string;
   time: string;
-  location: EditShowing_showing_location | null;
+  location: EditShowing_showing_location;
   ticketsBought: boolean;
   movie: EditShowing_showing_movie;
   admin: EditShowing_showing_admin;
-  price: any | null;
+  price: FilmstundSEK | null;
   filmstadenShowingId: string | null;
   payToUser: EditShowing_showing_payToUser;
 }
@@ -64,5 +64,5 @@ export interface EditShowing {
 }
 
 export interface EditShowingVariables {
-  webId: any;
+  webId: FilmstundBase64ID;
 }

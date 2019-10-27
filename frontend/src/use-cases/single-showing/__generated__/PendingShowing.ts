@@ -10,7 +10,7 @@ import { GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes"
 
 export interface PendingShowing_giftCertificates {
   __typename: "GiftCertificateDTO";
-  expiresAt: any;
+  expiresAt: FilmstundLocalDate;
   number: string;
   status: GiftCertificateDTO_Status;
 }

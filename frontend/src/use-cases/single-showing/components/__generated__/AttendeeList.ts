@@ -13,7 +13,7 @@ export interface AttendeeList_userInfo {
   nick: string | null;
   lastName: string | null;
   phone: string | null;
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface AttendeeList {

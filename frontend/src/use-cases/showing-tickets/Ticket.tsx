@@ -72,14 +72,14 @@ const CompanyHeader: React.FC<{ cinema: string }> = ({ cinema }) => (
 const TicketHeader: React.FC<
   Pick<
     TicketQuery_showing_myTickets,
-    "movieName" | "movieRating" | "showAttributes"
+    "movieName" | "movieRating" | "attributes"
   >
-> = ({ movieName, movieRating, showAttributes }) => (
+> = ({ movieName, movieRating, attributes }) => (
   <FlexColumnContainer css={{ marginBottom: "1rem" }}>
     <HeaderText css={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
     <FlexSpaceRowContainer>
       <FlexRowContainer>
-        {(showAttributes || []).map(attr => (
+        {(attributes || []).map(attr => (
           <ShowAttribute key={attr}>{attr}</ShowAttribute>
         ))}
       </FlexRowContainer>
@@ -115,8 +115,8 @@ const TicketDateTime: React.FC<
 );
 
 const TicketPlacement: React.FC<
-  Pick<TicketQuery_showing_myTickets, "screen" | "seat">
-> = ({ screen, seat }) => (
+  Pick<TicketQuery_showing_myTickets, "screen" | "seatNumber" | "seatRow">
+> = ({ screen, seatNumber, seatRow }) => (
   <FlexRowPaddingContainer
     css={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
   >
@@ -125,8 +125,8 @@ const TicketPlacement: React.FC<
       value={screen}
       css={{ width: "50%" }}
     />
-    <TicketValueWithLabel label="Rad" value={seat.row} />
-    <TicketValueWithLabel label="Stolsnr" value={seat.number} />
+    <TicketValueWithLabel label="Rad" value={seatRow} />
+    <TicketValueWithLabel label="Stolsnr" value={seatNumber} />
   </FlexRowPaddingContainer>
 );
 
@@ -178,21 +178,26 @@ export const Ticket: React.FC<Props> = ({
     movieRating,
     screen,
     customerType,
-    showAttributes,
+    attributes,
     profileId,
-    seat,
+    seatNumber,
+    seatRow,
     barcode
   }
 }) => (
   <TicketWrapper>
     <CompanyHeader cinema={cinema} />
     <TicketHeader
-      showAttributes={showAttributes}
+      attributes={attributes}
       movieName={movieName}
       movieRating={movieRating}
     />
     <TicketDateTime date={date} time={time} />
-    <TicketPlacement screen={screen} seat={seat} />
+    <TicketPlacement
+      screen={screen}
+      seatNumber={seatNumber}
+      seatRow={seatRow}
+    />
     <TicketCustomerType customerType={customerType} />
     <TicketCode id={id} profileId={profileId} src={barcode} />
   </TicketWrapper>

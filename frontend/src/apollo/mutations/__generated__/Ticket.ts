@@ -8,7 +8,7 @@
 
 export interface Ticket_admin {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface Ticket_ticketRange_seatings {
@@ -58,7 +58,7 @@ export interface Ticket_myTickets {
   profileId: string | null;
   seatNumber: number;
   seatRow: number;
-  date: any;
+  date: FilmstundLocalDate;
   time: string;
   movieName: string;
   /**
@@ -73,8 +73,8 @@ export interface Ticket_myTickets {
 
 export interface Ticket {
   __typename: "ShowingDTO";
-  id: any;
-  webId: any;
+  id: FilmstundShowingID;
+  webId: FilmstundBase64ID;
   slug: string;
   admin: Ticket_admin;
   ticketRange: Ticket_ticketRange | null;

@@ -66,7 +66,7 @@ const SingleShowingContainer: React.FC<Props> = ({
   }
 
   const isAdmin = userIsAdmin(showing, me);
-  const isParticipating = userIsParticipating(showing.participants, me);
+  const isParticipating = userIsParticipating(showing.attendees, me);
 
   const { attendeePaymentDetails } = showing;
 
@@ -95,7 +95,7 @@ const SingleShowingContainer: React.FC<Props> = ({
         <ShowingPaymentContainer
           showing={showing}
           isAdmin={isAdmin}
-          foretagsbiljetter={me.foretagsbiljetter}
+          foretagsbiljetter={me.giftCertificates}
           isParticipating={isParticipating}
           onClickTickets={navigateToTickets}
           openSwish={openSwish}
@@ -104,7 +104,7 @@ const SingleShowingContainer: React.FC<Props> = ({
       <ParticipantList
         meId={me.id}
         isAdmin={isAdmin}
-        participants={showing.participants}
+        participants={showing.attendees}
         onClickItem={userId => promoteToAdmin(showing.id, userId)}
       />
     </PageWidthWrapper>

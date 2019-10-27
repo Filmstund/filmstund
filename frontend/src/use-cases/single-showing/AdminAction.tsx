@@ -66,7 +66,14 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
           closeModal={() => setState(state => ({ ...state, showModal: false }))}
         />
       )}
-      <CopyHighlightStringButton meId={showing.admin.id} participants={showing.participants} />
+      <CopyHighlightStringButton
+        meId={showing.admin.id}
+        participants={
+          showing.adminPaymentDetails
+            ? showing.adminPaymentDetails.attendees
+            : []
+        }
+      />
       {adminMessage && <div>{adminMessage}</div>}
       {ticketsBought ? (
         <GrayButton onClick={handleStartBooking}>
@@ -97,6 +104,7 @@ export const adminActionFragments = gql`
     adminPaymentDetails {
       filmstadenBuyLink
       attendees {
+        userId
         hasPaid
         amountOwed
         filmstadenMembershipId
@@ -106,6 +114,8 @@ export const adminActionFragments = gql`
         user {
           id
           nick
+          firstName
+          lastName
           name
           phone
         }

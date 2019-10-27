@@ -10,7 +10,7 @@ import { PaymentType } from "./../../../../__generated__/globalTypes";
 
 export interface MarkShowingAsBought_markAsBought_payToUser {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
 }
 
 export interface MarkShowingAsBought_markAsBought_myTickets {
@@ -20,7 +20,7 @@ export interface MarkShowingAsBought_markAsBought_myTickets {
 
 export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo {
   __typename: "PublicUserDTO";
-  id: any;
+  id: FilmstundUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -32,15 +32,15 @@ export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails {
   payTo: MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo;
   swishLink: string | null;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
 }
 
 export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_attendees {
   __typename: "AttendeeDTO";
-  userId: any;
+  userId: FilmstundUserID;
   type: PaymentType;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: FilmstundSEK;
 }
 
 export interface MarkShowingAsBought_markAsBought_adminPaymentDetails {
@@ -50,9 +50,9 @@ export interface MarkShowingAsBought_markAsBought_adminPaymentDetails {
 
 export interface MarkShowingAsBought_markAsBought {
   __typename: "ShowingDTO";
-  id: any;
+  id: FilmstundShowingID;
   ticketsBought: boolean;
-  price: any | null;
+  price: FilmstundSEK | null;
   payToUser: MarkShowingAsBought_markAsBought_payToUser;
   date: string;
   time: string;
@@ -66,6 +66,6 @@ export interface MarkShowingAsBought {
 }
 
 export interface MarkShowingAsBoughtVariables {
-  showingId: any;
-  price: any;
+  showingId: FilmstundShowingID;
+  price: FilmstundSEK;
 }

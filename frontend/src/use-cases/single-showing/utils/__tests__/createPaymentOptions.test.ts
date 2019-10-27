@@ -11,12 +11,13 @@ describe("createPaymentOptions", () => {
 
     it("should map each option to an additional extra alternative", () => {
       const today = new Date();
-      const expires = formatYMD(addYears(today, 1));
+      const expiresAt = formatYMD(addYears(today, 1));
 
       expect(
         createPaymentOptions([
           {
-            expires: expires,
+            __typename: "GiftCertificateDTO",
+            expiresAt: expiresAt,
             number: "123456",
             status: GiftCertificateDTO_Status.AVAILABLE
           }
