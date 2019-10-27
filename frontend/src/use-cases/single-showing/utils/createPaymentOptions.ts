@@ -1,6 +1,6 @@
 import isAfter from "date-fns/isAfter";
 import isSameDay from "date-fns/isSameDay";
-import { ForetagsbiljettStatus, PaymentOption, PaymentType } from "../../../__generated__/globalTypes";
+import { GiftCertificateDTO_Status, PaymentOption, PaymentType } from "../../../__generated__/globalTypes";
 
 import { formatYMD, parseDate } from "../../../lib/dateTools";
 
@@ -14,7 +14,7 @@ export interface DisplayPaymentOption extends PaymentOption {
 export interface SingleShowing_me_foretagsbiljetter {
   expires: string;
   number: string;
-  status: ForetagsbiljettStatus;
+  status: GiftCertificateDTO_Status;
 }
 
 const createPaymentOption = (
@@ -37,13 +37,13 @@ const createForetagsbiljetter = (
   return foretagsbiljetter
     .filter(
       ({ status, expires }) =>
-        status === "Available" &&
+        status === "AVAILABLE" &&
         (isSameDay(parseDate(expires), parseDate(now)) || isAfter(parseDate(expires), parseDate(now)))
     )
     .map(({ number, expires }) =>
       createPaymentOption(
         "Företagsbiljett",
-        PaymentType.Foretagsbiljett,
+        PaymentType.GIFT_CERTIFICATE,
         number,
         expires
       )
@@ -60,6 +60,6 @@ export const stringifyOption = (option: DisplayPaymentOption): string => {
 };
 
 export default (biljetter: SingleShowing_me_foretagsbiljetter[]) => [
-  createPaymentOption("Swish", PaymentType.Swish),
+  createPaymentOption("Swish", PaymentType.SWISH),
   ...createForetagsbiljetter(biljetter)
 ];

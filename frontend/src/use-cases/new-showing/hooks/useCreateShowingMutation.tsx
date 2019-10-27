@@ -6,7 +6,7 @@ import { CreateShowing, CreateShowingVariables } from "./__generated__/CreateSho
 export const useCreateShowingMutation = () =>
 useMutation<CreateShowing, CreateShowingVariables>(
   gql`
-      mutation CreateShowing($showing: CreateShowingInput!) {
+      mutation CreateShowing($showing: CreateShowingDTOInput!) {
           showing: createShowing(showing: $showing) {
               ...OldShowing
           }

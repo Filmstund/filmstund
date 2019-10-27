@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 export const showingFragment = gql`
-  fragment ShowingNeue on Showing {
+  fragment ShowingNeue on ShowingDTO {
     id
     date
     time
@@ -15,8 +15,8 @@ export const showingFragment = gql`
     myTickets {
       id
     }
-    participants {
-      user {
+    attendees {
+      userInfo {
         id
         avatar
       }

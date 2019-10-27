@@ -53,7 +53,7 @@ const UserItem: React.FC<Props> = ({
 
 export const fragments = {
   user: gql`
-    fragment UserItem on User {
+    fragment UserItem on PublicUserDTO {
       avatar
       firstName
       nick

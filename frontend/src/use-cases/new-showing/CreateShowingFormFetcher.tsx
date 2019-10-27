@@ -39,7 +39,7 @@ export const CreateShowingFormFetcher: React.FC<FetcherProps> = ({
 const useCreateShowingData = (movieId: string) =>
   useQuery<CreateShowingQuery, CreateShowingQueryVariables>(
     gql`
-      query CreateShowingQuery($movieId: UUID!) {
+      query CreateShowingQuery($movieId: MovieID!) {
         movie(id: $movieId) {
           ...ShowingMovie
           releaseDate

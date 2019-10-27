@@ -7,36 +7,36 @@
 // ====================================================
 
 export interface ShowingNeue_movie {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   poster: string | null;
   title: string;
 }
 
 export interface ShowingNeue_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
 }
 
-export interface ShowingNeue_participants_user {
-  __typename: "User";
-  id: SeFilmUserID;
+export interface ShowingNeue_attendees_userInfo {
+  __typename: "PublicUserDTO";
+  id: any;
   avatar: string | null;
 }
 
-export interface ShowingNeue_participants {
-  __typename: "Participant";
-  user: ShowingNeue_participants_user | null;
+export interface ShowingNeue_attendees {
+  __typename: "PublicAttendeeDTO";
+  userInfo: ShowingNeue_attendees_userInfo;
 }
 
 export interface ShowingNeue {
-  __typename: "Showing";
-  id: SeFilmUUID;
+  __typename: "ShowingDTO";
+  id: any;
   date: string;
   time: string;
-  webId: SeFilmBase64ID;
+  webId: any;
   slug: string;
   movie: ShowingNeue_movie;
   myTickets: ShowingNeue_myTickets[] | null;
-  participants: ShowingNeue_participants[];
+  attendees: ShowingNeue_attendees[];
 }

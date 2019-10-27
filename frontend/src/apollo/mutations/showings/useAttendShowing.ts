@@ -11,11 +11,11 @@ import {
 } from "./__generated__/UnattendShowing";
 
 const participantsFragment = gql`
-  fragment ShowingParticipant on Showing {
+  fragment ShowingAttendees on ShowingDTO {
     id
-    participants {
-      paymentType
-      user {
+    attendees {
+      # paymentType - not available for regular users
+      userInfo {
         id
         nick
         firstName
@@ -27,18 +27,18 @@ const participantsFragment = gql`
 `;
 
 const attendShowingMutation = gql`
-  mutation AttendShowing($showingId: UUID!, $paymentOption: PaymentOption!) {
+  mutation AttendShowing($showingId: ShowingID!, $paymentOption: PaymentOption!) {
     attendShowing(showingId: $showingId, paymentOption: $paymentOption) {
-      ...ShowingParticipant
+      ...ShowingAttendees
     }
   }
   ${participantsFragment}
 `;
 
 const unattendShowingMutation = gql`
-  mutation UnattendShowing($showingId: UUID!) {
+  mutation UnattendShowing($showingId: ShowingID!) {
     unattendShowing(showingId: $showingId) {
-      ...ShowingParticipant
+      ...ShowingAttendees
     }
   }
   ${participantsFragment}

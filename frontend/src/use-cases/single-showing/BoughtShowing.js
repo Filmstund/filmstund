@@ -43,7 +43,7 @@ export const BoughtShowing = ({
 
 BoughtShowing.fragments = {
   showing: gql`
-    fragment BoughtShowing on Showing {
+    fragment BoughtShowing on ShowingDTO {
       myTickets {
         id
       }

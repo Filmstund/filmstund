@@ -126,12 +126,11 @@ const useSingleShowingData = (webId: string) =>
           webId
           slug
           price
-          private
           movie {
             imdbId
           }
-          participants {
-            ...ParticipantsList
+          attendees {
+            ...AttendeeList
           }
         }
       }

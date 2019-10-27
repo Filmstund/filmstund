@@ -6,62 +6,51 @@
 // GraphQL fragment: ShowingAdmin
 // ====================================================
 
-export interface ShowingAdmin_filmstadenScreen {
-  __typename: "FilmstadenScreen";
-  filmstadenId: string;
+export interface ShowingAdmin_cinemaScreen {
+  __typename: "CinemaScreenDTO";
+  id: string;
   name: string;
 }
 
 export interface ShowingAdmin_payToUser {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
-export interface ShowingAdmin_adminPaymentDetails_filmstadenData_user {
-  __typename: "User";
-  id: SeFilmUserID;
-  nick: string | null;
-  firstName: string | null;
-  lastName: string | null;
+export interface ShowingAdmin_adminPaymentDetails_attendees_giftCertificateUsed {
+  __typename: "GiftCertificateDTO";
+  number: string;
 }
 
-export interface ShowingAdmin_adminPaymentDetails_filmstadenData {
-  __typename: "FilmstadenData";
-  user: ShowingAdmin_adminPaymentDetails_filmstadenData_user;
-  filmstadenMembershipId: string | null;
-  foretagsbiljett: string | null;
-}
-
-export interface ShowingAdmin_adminPaymentDetails_participantPaymentInfos_user {
-  __typename: "User";
-  id: SeFilmUserID;
+export interface ShowingAdmin_adminPaymentDetails_attendees_user {
+  __typename: "PublicUserDTO";
+  id: any;
   nick: string | null;
   name: string | null;
   phone: string | null;
 }
 
-export interface ShowingAdmin_adminPaymentDetails_participantPaymentInfos {
-  __typename: "ParticipantPaymentInfo";
-  id: SeFilmUUID;
+export interface ShowingAdmin_adminPaymentDetails_attendees {
+  __typename: "AttendeeDTO";
   hasPaid: boolean;
-  amountOwed: SeFilmSEK;
-  user: ShowingAdmin_adminPaymentDetails_participantPaymentInfos_user;
+  amountOwed: any;
+  filmstadenMembershipId: string | null;
+  giftCertificateUsed: ShowingAdmin_adminPaymentDetails_attendees_giftCertificateUsed | null;
+  user: ShowingAdmin_adminPaymentDetails_attendees_user;
 }
 
 export interface ShowingAdmin_adminPaymentDetails {
-  __typename: "AdminPaymentDetails";
+  __typename: "AdminPaymentDetailsDTO";
   filmstadenBuyLink: string | null;
-  filmstadenData: ShowingAdmin_adminPaymentDetails_filmstadenData[];
-  participantPaymentInfos: ShowingAdmin_adminPaymentDetails_participantPaymentInfos[];
+  attendees: ShowingAdmin_adminPaymentDetails_attendees[];
 }
 
 export interface ShowingAdmin {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  price: SeFilmSEK | null;
-  private: boolean;
-  filmstadenRemoteEntityId: string | null;
-  filmstadenScreen: ShowingAdmin_filmstadenScreen | null;
+  __typename: "ShowingDTO";
+  id: any;
+  price: any | null;
+  filmstadenShowingId: string | null;
+  cinemaScreen: ShowingAdmin_cinemaScreen | null;
   payToUser: ShowingAdmin_payToUser;
   adminPaymentDetails: ShowingAdmin_adminPaymentDetails | null;
 }

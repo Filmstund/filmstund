@@ -7,8 +7,8 @@
 // ====================================================
 
 export interface FetchMovies_fetchNewMoviesFromFilmstaden {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   poster: string | null;
   title: string;
   releaseDate: string;
@@ -19,5 +19,5 @@ export interface FetchMovies {
   /**
    * Fetch any new movies from Filmstaden, returns the movies that were added
    */
-  fetchNewMoviesFromFilmstaden: FetchMovies_fetchNewMoviesFromFilmstaden[] | null;
+  fetchNewMoviesFromFilmstaden: FetchMovies_fetchNewMoviesFromFilmstaden[];
 }

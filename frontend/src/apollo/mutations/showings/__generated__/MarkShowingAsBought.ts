@@ -2,23 +2,25 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
+import { PaymentType } from "./../../../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: MarkShowingAsBought
 // ====================================================
 
 export interface MarkShowingAsBought_markAsBought_payToUser {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface MarkShowingAsBought_markAsBought_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
 }
 
 export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -26,42 +28,32 @@ export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo {
 }
 
 export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails {
-  __typename: "AttendeePaymentDetails";
+  __typename: "AttendeePaymentDetailsDTO";
   payTo: MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo;
   swishLink: string | null;
   hasPaid: boolean;
-  amountOwed: SeFilmSEK;
+  amountOwed: any;
 }
 
-export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos_user {
-  __typename: "User";
-  id: SeFilmUserID;
-  nick: string | null;
-  name: string | null;
-  phone: string | null;
-}
-
-export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos {
-  __typename: "ParticipantPaymentInfo";
-  id: SeFilmUUID;
+export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_attendees {
+  __typename: "AttendeeDTO";
+  userId: any;
+  type: PaymentType;
   hasPaid: boolean;
-  amountOwed: SeFilmSEK;
-  user: MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos_user;
+  amountOwed: any;
 }
 
 export interface MarkShowingAsBought_markAsBought_adminPaymentDetails {
-  __typename: "AdminPaymentDetails";
-  participantPaymentInfos: MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos[];
+  __typename: "AdminPaymentDetailsDTO";
+  attendees: MarkShowingAsBought_markAsBought_adminPaymentDetails_attendees[];
 }
 
 export interface MarkShowingAsBought_markAsBought {
-  __typename: "Showing";
-  id: SeFilmUUID;
+  __typename: "ShowingDTO";
+  id: any;
   ticketsBought: boolean;
-  price: SeFilmSEK | null;
-  private: boolean;
+  price: any | null;
   payToUser: MarkShowingAsBought_markAsBought_payToUser;
-  expectedBuyDate: string | null;
   date: string;
   time: string;
   myTickets: MarkShowingAsBought_markAsBought_myTickets[] | null;
@@ -74,6 +66,6 @@ export interface MarkShowingAsBought {
 }
 
 export interface MarkShowingAsBoughtVariables {
-  showingId: SeFilmUUID;
-  price: SeFilmSEK;
+  showingId: any;
+  price: any;
 }

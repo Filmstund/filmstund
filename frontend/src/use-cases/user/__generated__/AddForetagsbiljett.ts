@@ -2,29 +2,29 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettInput, ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
+import { GiftCertificateDTOInput, GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: AddForetagsbiljett
 // ====================================================
 
-export interface AddForetagsbiljett_addForetagsBiljetter_foretagsbiljetter {
-  __typename: "Foretagsbiljett";
+export interface AddForetagsbiljett_addGiftCertificates_giftCertificates {
+  __typename: "GiftCertificateDTO";
   number: string;
-  expires: SeFilmLocalDate;
-  status: ForetagsbiljettStatus;
+  expiresAt: any;
+  status: GiftCertificateDTO_Status;
 }
 
-export interface AddForetagsbiljett_addForetagsBiljetter {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
-  foretagsbiljetter: AddForetagsbiljett_addForetagsBiljetter_foretagsbiljetter[] | null;
+export interface AddForetagsbiljett_addGiftCertificates {
+  __typename: "UserDTO";
+  id: any;
+  giftCertificates: AddForetagsbiljett_addGiftCertificates_giftCertificates[] | null;
 }
 
 export interface AddForetagsbiljett {
-  addForetagsBiljetter: AddForetagsbiljett_addForetagsBiljetter;
+  addGiftCertificates: AddForetagsbiljett_addGiftCertificates;
 }
 
 export interface AddForetagsbiljettVariables {
-  tickets?: ForetagsbiljettInput[] | null;
+  tickets?: GiftCertificateDTOInput[] | null;
 }

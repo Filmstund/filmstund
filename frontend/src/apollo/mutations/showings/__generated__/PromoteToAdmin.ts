@@ -7,18 +7,18 @@
 // ====================================================
 
 export interface PromoteToAdmin_promoteToAdmin_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface PromoteToAdmin_promoteToAdmin_payToUser {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface PromoteToAdmin_promoteToAdmin_attendeePaymentDetails_payTo {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -26,15 +26,15 @@ export interface PromoteToAdmin_promoteToAdmin_attendeePaymentDetails_payTo {
 }
 
 export interface PromoteToAdmin_promoteToAdmin_attendeePaymentDetails {
-  __typename: "AttendeePaymentDetails";
+  __typename: "AttendeePaymentDetailsDTO";
   payTo: PromoteToAdmin_promoteToAdmin_attendeePaymentDetails_payTo;
   swishLink: string | null;
   hasPaid: boolean;
-  amountOwed: SeFilmSEK;
+  amountOwed: any;
 }
 
 export interface PromoteToAdmin_promoteToAdmin {
-  __typename: "Showing";
+  __typename: "ShowingDTO";
   admin: PromoteToAdmin_promoteToAdmin_admin;
   payToUser: PromoteToAdmin_promoteToAdmin_payToUser;
   attendeePaymentDetails: PromoteToAdmin_promoteToAdmin_attendeePaymentDetails | null;
@@ -45,6 +45,6 @@ export interface PromoteToAdmin {
 }
 
 export interface PromoteToAdminVariables {
-  showingId: SeFilmUUID;
-  userId: SeFilmUserID;
+  showingId: any;
+  userId: any;
 }

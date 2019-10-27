@@ -6,16 +6,14 @@ import {
 } from "./__generated__/MarkShowingAsBought";
 
 const markAsBoughtMutation = gql`
-  mutation MarkShowingAsBought($showingId: UUID!, $price: SEK!) {
+  mutation MarkShowingAsBought($showingId: ShowingID!, $price: SEK!) {
     markAsBought(showingId: $showingId, price: $price) {
       id
       ticketsBought
       price
-      private
       payToUser {
         id
       }
-      expectedBuyDate
       date
       time
       myTickets {
@@ -34,16 +32,11 @@ const markAsBoughtMutation = gql`
         amountOwed
       }
       adminPaymentDetails {
-        participantPaymentInfos {
-          id
+        attendees {
+          userId
+          type
           hasPaid
           amountOwed
-          user {
-            id
-            nick
-            name
-            phone
-          }
         }
       }
     }

@@ -2,22 +2,22 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettStatus } from "./globalTypes";
+import { GiftCertificateDTO_Status } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: AppQuery
 // ====================================================
 
-export interface AppQuery_me_foretagsbiljetter {
-  __typename: "Foretagsbiljett";
+export interface AppQuery_me_giftCertificates {
+  __typename: "GiftCertificateDTO";
   number: string;
-  expires: SeFilmLocalDate;
-  status: ForetagsbiljettStatus;
+  expiresAt: any;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface AppQuery_me {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
   name: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -26,7 +26,7 @@ export interface AppQuery_me {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  foretagsbiljetter: AppQuery_me_foretagsbiljetter[] | null;
+  giftCertificates: AppQuery_me_giftCertificates[] | null;
 }
 
 export interface AppQuery {

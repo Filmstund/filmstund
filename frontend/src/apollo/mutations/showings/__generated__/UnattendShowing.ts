@@ -6,25 +6,24 @@
 // GraphQL mutation operation: UnattendShowing
 // ====================================================
 
-export interface UnattendShowing_unattendShowing_participants_user {
-  __typename: "User";
-  id: SeFilmUserID;
+export interface UnattendShowing_unattendShowing_attendees_userInfo {
+  __typename: "PublicUserDTO";
+  id: any;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
   avatar: string | null;
 }
 
-export interface UnattendShowing_unattendShowing_participants {
-  __typename: "Participant";
-  paymentType: string;
-  user: UnattendShowing_unattendShowing_participants_user | null;
+export interface UnattendShowing_unattendShowing_attendees {
+  __typename: "PublicAttendeeDTO";
+  userInfo: UnattendShowing_unattendShowing_attendees_userInfo;
 }
 
 export interface UnattendShowing_unattendShowing {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  participants: UnattendShowing_unattendShowing_participants[];
+  __typename: "ShowingDTO";
+  id: any;
+  attendees: UnattendShowing_unattendShowing_attendees[];
 }
 
 export interface UnattendShowing {
@@ -32,5 +31,5 @@ export interface UnattendShowing {
 }
 
 export interface UnattendShowingVariables {
-  showingId: SeFilmUUID;
+  showingId: any;
 }

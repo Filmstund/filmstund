@@ -5,12 +5,12 @@ import { DeleteForetagsbiljett, DeleteForetagsbiljettVariables } from "./__gener
 export const useDeleteForetagsbiljett = () =>
 useMutation<DeleteForetagsbiljett, DeleteForetagsbiljettVariables>(
   gql`
-      mutation DeleteForetagsbiljett($ticket: ForetagsbiljettInput!) {
-          deleteForetagsBiljett(biljett: $ticket) {
+      mutation DeleteForetagsbiljett($ticket: GiftCertificateDTOInput!) {
+          deleteGiftCertificate(giftCert: $ticket) {
               id
-              foretagsbiljetter {
+              giftCertificates {
                   number
-                  expires
+                  expiresAt
                   status
               }
           }

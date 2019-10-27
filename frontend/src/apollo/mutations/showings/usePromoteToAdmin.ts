@@ -6,7 +6,7 @@ import {
 } from "./__generated__/PromoteToAdmin";
 
 const promoteToAdminMutation = gql`
-  mutation PromoteToAdmin($showingId: UUID!, $userId: UserID!) {
+  mutation PromoteToAdmin($showingId: ShowingID!, $userId: UserID!) {
     promoteToAdmin(showingId: $showingId, userToPromote: $userId) {
       admin {
         id

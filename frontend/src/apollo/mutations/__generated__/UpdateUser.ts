@@ -2,22 +2,22 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { NewUserInfo, ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
+import { UserDetailsDTOInput, GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateUser
 // ====================================================
 
-export interface UpdateUser_editedUser_foretagsbiljetter {
-  __typename: "Foretagsbiljett";
+export interface UpdateUser_editedUser_giftCertificates {
+  __typename: "GiftCertificateDTO";
   number: string;
-  expires: SeFilmLocalDate;
-  status: ForetagsbiljettStatus;
+  expiresAt: any;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface UpdateUser_editedUser {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
   name: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -26,7 +26,7 @@ export interface UpdateUser_editedUser {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  foretagsbiljetter: UpdateUser_editedUser_foretagsbiljetter[] | null;
+  giftCertificates: UpdateUser_editedUser_giftCertificates[] | null;
   calendarFeedUrl: string | null;
 }
 
@@ -35,5 +35,5 @@ export interface UpdateUser {
 }
 
 export interface UpdateUserVariables {
-  user: NewUserInfo;
+  user: UserDetailsDTOInput;
 }

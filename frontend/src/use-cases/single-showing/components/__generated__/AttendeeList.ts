@@ -3,20 +3,20 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: ParticipantsList
+// GraphQL fragment: AttendeeList
 // ====================================================
 
-export interface ParticipantsList_user {
-  __typename: "User";
+export interface AttendeeList_userInfo {
+  __typename: "PublicUserDTO";
   avatar: string | null;
   firstName: string | null;
   nick: string | null;
   lastName: string | null;
   phone: string | null;
-  id: SeFilmUserID;
+  id: any;
 }
 
-export interface ParticipantsList {
-  __typename: "Participant";
-  user: ParticipantsList_user | null;
+export interface AttendeeList {
+  __typename: "PublicAttendeeDTO";
+  userInfo: AttendeeList_userInfo;
 }

@@ -7,7 +7,7 @@
 // ====================================================
 
 export interface BioordQuery_allBiobudord {
-  __typename: "BioBudord";
+  __typename: "BioBudordDTO";
   number: number;
   phrase: string;
 }

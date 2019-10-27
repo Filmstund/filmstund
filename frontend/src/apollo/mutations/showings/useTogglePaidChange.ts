@@ -6,9 +6,9 @@ import {
 } from "./__generated__/TogglePaidChange";
 
 const togglePaidChangeMutation = gql`
-  mutation TogglePaidChange($paymentInfo: ParticipantPaymentInput!) {
-    updateParticipantPaymentInfo(paymentInfo: $paymentInfo) {
-      id
+  mutation TogglePaidChange($paymentInfo: AttendeePaymentInfoDTOInput!) {
+    updateAttendeePaymentInfo(paymentInfo: $paymentInfo) {
+      userId
       hasPaid
     }
   }

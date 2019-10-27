@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 export const completeUserFragment = gql`
-  fragment CompleteUser on CurrentUser {
+  fragment CompleteUser on UserDTO {
     id
     name
     firstName
@@ -11,9 +11,9 @@ export const completeUserFragment = gql`
     filmstadenMembershipId
     phone
     avatar
-    foretagsbiljetter {
+    giftCertificates {
       number
-      expires
+      expiresAt
       status
     }
   }

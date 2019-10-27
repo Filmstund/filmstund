@@ -35,7 +35,7 @@ const Movie = ({
 );
 
 export const movieFragment = gql`
-  fragment Movie on Movie {
+  fragment Movie on MovieDTO {
     id
     poster
     title

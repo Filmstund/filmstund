@@ -6,7 +6,7 @@ import {
 } from "./__generated__/DeleteShowing";
 
 const deleteShowingMutation = gql`
-  mutation DeleteShowing($showingId: UUID!) {
+  mutation DeleteShowing($showingId: ShowingID!) {
     deleteShowing(showingId: $showingId) {
       id
     }

@@ -70,8 +70,8 @@ const ParticipantsList: React.FC<Props> = ({
 };
 
 export const participantsListFragment = gql`
-  fragment ParticipantsList on Participant {
-    user {
+  fragment AttendeeList on PublicAttendeeDTO {
+    userInfo {
       ...UserItem
       id
       nick

@@ -4,7 +4,7 @@ import { useMutation } from "react-apollo";
 import { AddTickets, AddTicketsVariables } from "./__generated__/AddTickets";
 
 export const ticketFragment = gql`
-  fragment Ticket on Showing {
+  fragment Ticket on ShowingDTO {
     id
     webId
     slug
@@ -39,21 +39,19 @@ export const ticketFragment = gql`
       cinema
       screen
       profileId
-      seat {
-        row
-        number
-      }
+      seatNumber
+      seatRow
       date
       time
       movieName
       movieRating
-      showAttributes
+      attributes
     }
   }
 `;
 
 const addTicketsMutation = gql`
-  mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
+  mutation AddTickets($showingId: ShowingID!, $tickets: [String!]) {
     processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
       ...Ticket
     }

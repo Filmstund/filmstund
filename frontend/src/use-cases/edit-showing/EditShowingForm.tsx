@@ -40,7 +40,7 @@ type SetShowingValueFn = <K extends keyof EditShowingFormShowing>(
 interface EditShowingFormShowing {
   date: string;
   expectedBuyDate: Date;
-  filmstadenRemoteEntityId: string | null;
+  filmstadenShowingId: string | null;
   location: string;
   time: string;
   price: string;
@@ -50,7 +50,7 @@ const getInitialState = (
   showing: EditShowing_showing
 ): EditShowingFormShowing => ({
   date: showing.date,
-  filmstadenRemoteEntityId: showing.filmstadenRemoteEntityId,
+  filmstadenShowingId: showing.filmstadenRemoteEntityId,
   expectedBuyDate: addDays(today, 7),
   location: showing.location.name,
   time: showing.time,
@@ -91,7 +91,6 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
     updateShowing(showing.id, {
       date: formState.date,
       expectedBuyDate: formatYMD(formState.expectedBuyDate),
-      private: showing.private,
       payToUser: showing.payToUser.id,
       location: formState.location,
       time: formState.time,

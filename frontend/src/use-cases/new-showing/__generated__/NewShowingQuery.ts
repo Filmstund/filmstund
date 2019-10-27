@@ -7,8 +7,8 @@
 // ====================================================
 
 export interface NewShowingQuery_movies {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   poster: string | null;
   title: string;
   releaseDate: string;

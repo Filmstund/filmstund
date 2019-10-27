@@ -72,10 +72,8 @@ const useHomeScreenData = () =>
           admin {
             id
           }
-          participants {
-            user {
-              id
-            }
+          attendees {
+            userId
           }
         }
         me: currentUser {

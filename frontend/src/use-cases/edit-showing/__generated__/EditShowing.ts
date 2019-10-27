@@ -7,54 +7,53 @@
 // ====================================================
 
 export interface EditShowing_me {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
 }
 
 export interface EditShowing_showing_location {
-  __typename: "Location";
+  __typename: "LocationDTO";
   name: string;
   cityAlias: string | null;
 }
 
 export interface EditShowing_showing_movie {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   title: string;
   poster: string | null;
 }
 
 export interface EditShowing_showing_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
   name: string | null;
   nick: string | null;
 }
 
 export interface EditShowing_showing_payToUser {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface EditShowing_showing {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  webId: SeFilmBase64ID;
+  __typename: "ShowingDTO";
+  id: any;
+  webId: any;
   slug: string;
   date: string;
   time: string;
-  location: EditShowing_showing_location;
+  location: EditShowing_showing_location | null;
   ticketsBought: boolean;
   movie: EditShowing_showing_movie;
   admin: EditShowing_showing_admin;
-  price: SeFilmSEK | null;
-  private: boolean;
-  filmstadenRemoteEntityId: string | null;
+  price: any | null;
+  filmstadenShowingId: string | null;
   payToUser: EditShowing_showing_payToUser;
 }
 
 export interface EditShowing_previousLocations {
-  __typename: "Location";
+  __typename: "LocationDTO";
   name: string;
 }
 
@@ -65,5 +64,5 @@ export interface EditShowing {
 }
 
 export interface EditShowingVariables {
-  webId: SeFilmBase64ID;
+  webId: any;
 }

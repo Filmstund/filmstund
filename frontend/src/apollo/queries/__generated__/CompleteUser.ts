@@ -2,22 +2,22 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
+import { GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: CompleteUser
 // ====================================================
 
-export interface CompleteUser_foretagsbiljetter {
-  __typename: "Foretagsbiljett";
+export interface CompleteUser_giftCertificates {
+  __typename: "GiftCertificateDTO";
   number: string;
-  expires: SeFilmLocalDate;
-  status: ForetagsbiljettStatus;
+  expiresAt: any;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface CompleteUser {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
   name: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -26,5 +26,5 @@ export interface CompleteUser {
   filmstadenMembershipId: string | null;
   phone: string | null;
   avatar: string | null;
-  foretagsbiljetter: CompleteUser_foretagsbiljetter[] | null;
+  giftCertificates: CompleteUser_giftCertificates[] | null;
 }

@@ -19,7 +19,7 @@ export const useSfShowings = (
 ): [GroupedFilmstadenShowings | null, boolean] => {
   const { data, loading } = useQuery<SfShowingsQuery, SfShowingsQueryVariables>(
     gql`
-      query SfShowingsQuery($movieId: UUID!, $city: String) {
+      query SfShowingsQuery($movieId: MovieID!, $city: String) {
         movie(id: $movieId) {
           showings: filmstadenShowings(city: $city) {
             cinemaName

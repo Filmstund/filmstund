@@ -7,13 +7,13 @@
 // ====================================================
 
 export interface SfShowingsQuery_movie_showings_screen {
-  __typename: "FilmstadenScreen";
+  __typename: "FilmstadenLiteScreenDTO";
   filmstadenId: string;
   name: string;
 }
 
 export interface SfShowingsQuery_movie_showings {
-  __typename: "FilmstadenShowing";
+  __typename: "FilmstadenShowingDTO";
   cinemaName: string;
   screen: SfShowingsQuery_movie_showings_screen;
   timeUtc: string;
@@ -22,7 +22,7 @@ export interface SfShowingsQuery_movie_showings {
 }
 
 export interface SfShowingsQuery_movie {
-  __typename: "Movie";
+  __typename: "MovieDTO";
   showings: SfShowingsQuery_movie_showings[];
 }
 
@@ -31,6 +31,6 @@ export interface SfShowingsQuery {
 }
 
 export interface SfShowingsQueryVariables {
-  movieId: SeFilmUUID;
+  movieId: any;
   city?: string | null;
 }

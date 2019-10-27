@@ -2,22 +2,22 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ParticipantPaymentInput } from "./../../../../__generated__/globalTypes";
+import { AttendeePaymentInfoDTOInput } from "./../../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: TogglePaidChange
 // ====================================================
 
-export interface TogglePaidChange_updateParticipantPaymentInfo {
-  __typename: "ParticipantPaymentInfo";
-  id: SeFilmUUID;
+export interface TogglePaidChange_updateAttendeePaymentInfo {
+  __typename: "AttendeeDTO";
+  userId: any;
   hasPaid: boolean;
 }
 
 export interface TogglePaidChange {
-  updateParticipantPaymentInfo: TogglePaidChange_updateParticipantPaymentInfo;
+  updateAttendeePaymentInfo: TogglePaidChange_updateAttendeePaymentInfo;
 }
 
 export interface TogglePaidChangeVariables {
-  paymentInfo: ParticipantPaymentInput;
+  paymentInfo: AttendeePaymentInfoDTOInput;
 }

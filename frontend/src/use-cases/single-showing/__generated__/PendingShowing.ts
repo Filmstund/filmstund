@@ -2,20 +2,20 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
+import { GiftCertificateDTO_Status } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: PendingShowing
 // ====================================================
 
-export interface PendingShowing_foretagsbiljetter {
-  __typename: "Foretagsbiljett";
-  expires: SeFilmLocalDate;
+export interface PendingShowing_giftCertificates {
+  __typename: "GiftCertificateDTO";
+  expiresAt: any;
   number: string;
-  status: ForetagsbiljettStatus;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface PendingShowing {
-  __typename: "CurrentUser";
-  foretagsbiljetter: PendingShowing_foretagsbiljetter[] | null;
+  __typename: "UserDTO";
+  giftCertificates: PendingShowing_giftCertificates[] | null;
 }

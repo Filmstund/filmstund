@@ -7,13 +7,13 @@
 // ====================================================
 
 export interface TicketQuery_me {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
 }
 
 export interface TicketQuery_showing_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface TicketQuery_showing_ticketRange_seatings {
@@ -44,7 +44,7 @@ export interface TicketQuery_showing_filmstadenSeatMap_dimensions {
 }
 
 export interface TicketQuery_showing_filmstadenSeatMap {
-  __typename: "FilmstadenSeatMap";
+  __typename: "FilmstadenSeatMapDTO";
   row: number;
   number: number;
   seatType: string;
@@ -52,14 +52,8 @@ export interface TicketQuery_showing_filmstadenSeatMap {
   dimensions: TicketQuery_showing_filmstadenSeatMap_dimensions;
 }
 
-export interface TicketQuery_showing_myTickets_seat {
-  __typename: "Seat";
-  row: number;
-  number: number;
-}
-
 export interface TicketQuery_showing_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
   barcode: string;
   customerType: string;
@@ -67,8 +61,9 @@ export interface TicketQuery_showing_myTickets {
   cinema: string;
   screen: string;
   profileId: string | null;
-  seat: TicketQuery_showing_myTickets_seat;
-  date: SeFilmLocalDate;
+  seatNumber: number;
+  seatRow: number;
+  date: any;
   time: string;
   movieName: string;
   /**
@@ -78,13 +73,13 @@ export interface TicketQuery_showing_myTickets {
   /**
    * "textad", "en" etc
    */
-  showAttributes: string[] | null;
+  attributes: string[] | null;
 }
 
 export interface TicketQuery_showing {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  webId: SeFilmBase64ID;
+  __typename: "ShowingDTO";
+  id: any;
+  webId: any;
   slug: string;
   admin: TicketQuery_showing_admin;
   ticketRange: TicketQuery_showing_ticketRange | null;
@@ -98,5 +93,5 @@ export interface TicketQuery {
 }
 
 export interface TicketQueryVariables {
-  webId: SeFilmBase64ID;
+  webId: any;
 }

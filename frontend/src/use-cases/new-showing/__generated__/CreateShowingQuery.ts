@@ -7,27 +7,27 @@
 // ====================================================
 
 export interface CreateShowingQuery_movie {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   title: string;
   poster: string | null;
   releaseDate: string;
 }
 
 export interface CreateShowingQuery_me {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
   nick: string | null;
   name: string | null;
 }
 
 export interface CreateShowingQuery_previousLocations {
-  __typename: "Location";
+  __typename: "LocationDTO";
   name: string;
 }
 
 export interface CreateShowingQuery_filmstadenCities {
-  __typename: "FilmstadenCity";
+  __typename: "FilmstadenCityAliasDTO";
   name: string;
   alias: string;
 }
@@ -40,5 +40,5 @@ export interface CreateShowingQuery {
 }
 
 export interface CreateShowingQueryVariables {
-  movieId: SeFilmUUID;
+  movieId: any;
 }

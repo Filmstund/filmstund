@@ -5,12 +5,12 @@ import { AddForetagsbiljett, AddForetagsbiljettVariables } from "./__generated__
 export const useAddForetagsbiljett = () =>
 useMutation<AddForetagsbiljett, AddForetagsbiljettVariables>(
   gql`
-      mutation AddForetagsbiljett($tickets: [ForetagsbiljettInput!]) {
-          addForetagsBiljetter(biljetter: $tickets) {
+      mutation AddForetagsbiljett($tickets: [GiftCertificateDTOInput!]) {
+          addGiftCertificates(giftCerts: $tickets) {
               id
-              foretagsbiljetter {
+              giftCertificates {
                   number
-                  expires
+                  expiresAt
                   status
               }
           }

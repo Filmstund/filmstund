@@ -83,13 +83,12 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
 };
 
 export const adminActionFragments = gql`
-  fragment ShowingAdmin on Showing {
+  fragment ShowingAdmin on ShowingDTO {
     id
     price
-    private
-    filmstadenRemoteEntityId
-    filmstadenScreen {
-      filmstadenId
+    filmstadenShowingId
+    cinemaScreen {
+      id
       name
     }
     payToUser {
@@ -97,20 +96,13 @@ export const adminActionFragments = gql`
     }
     adminPaymentDetails {
       filmstadenBuyLink
-      filmstadenData {
-        user {
-          id
-          nick
-          firstName
-          lastName
-        }
-        filmstadenMembershipId
-        foretagsbiljett
-      }
-      participantPaymentInfos {
-        id
+      attendees {
         hasPaid
         amountOwed
+        filmstadenMembershipId
+        giftCertificateUsed {
+          number
+        }
         user {
           id
           nick

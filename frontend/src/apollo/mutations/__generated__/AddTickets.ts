@@ -7,8 +7,8 @@
 // ====================================================
 
 export interface AddTickets_processTicketUrls_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface AddTickets_processTicketUrls_ticketRange_seatings {
@@ -39,7 +39,7 @@ export interface AddTickets_processTicketUrls_filmstadenSeatMap_dimensions {
 }
 
 export interface AddTickets_processTicketUrls_filmstadenSeatMap {
-  __typename: "FilmstadenSeatMap";
+  __typename: "FilmstadenSeatMapDTO";
   row: number;
   number: number;
   seatType: string;
@@ -47,14 +47,8 @@ export interface AddTickets_processTicketUrls_filmstadenSeatMap {
   dimensions: AddTickets_processTicketUrls_filmstadenSeatMap_dimensions;
 }
 
-export interface AddTickets_processTicketUrls_myTickets_seat {
-  __typename: "Seat";
-  row: number;
-  number: number;
-}
-
 export interface AddTickets_processTicketUrls_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
   barcode: string;
   customerType: string;
@@ -62,8 +56,9 @@ export interface AddTickets_processTicketUrls_myTickets {
   cinema: string;
   screen: string;
   profileId: string | null;
-  seat: AddTickets_processTicketUrls_myTickets_seat;
-  date: SeFilmLocalDate;
+  seatNumber: number;
+  seatRow: number;
+  date: any;
   time: string;
   movieName: string;
   /**
@@ -73,13 +68,13 @@ export interface AddTickets_processTicketUrls_myTickets {
   /**
    * "textad", "en" etc
    */
-  showAttributes: string[] | null;
+  attributes: string[] | null;
 }
 
 export interface AddTickets_processTicketUrls {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  webId: SeFilmBase64ID;
+  __typename: "ShowingDTO";
+  id: any;
+  webId: any;
   slug: string;
   admin: AddTickets_processTicketUrls_admin;
   ticketRange: AddTickets_processTicketUrls_ticketRange | null;
@@ -92,6 +87,6 @@ export interface AddTickets {
 }
 
 export interface AddTicketsVariables {
-  showingId: SeFilmUUID;
+  showingId: any;
   tickets?: string[] | null;
 }

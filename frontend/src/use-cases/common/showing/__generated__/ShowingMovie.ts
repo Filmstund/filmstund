@@ -7,8 +7,8 @@
 // ====================================================
 
 export interface ShowingMovie {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   title: string;
   poster: string | null;
 }

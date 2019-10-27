@@ -7,8 +7,8 @@
 // ====================================================
 
 export interface Ticket_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface Ticket_ticketRange_seatings {
@@ -39,7 +39,7 @@ export interface Ticket_filmstadenSeatMap_dimensions {
 }
 
 export interface Ticket_filmstadenSeatMap {
-  __typename: "FilmstadenSeatMap";
+  __typename: "FilmstadenSeatMapDTO";
   row: number;
   number: number;
   seatType: string;
@@ -47,14 +47,8 @@ export interface Ticket_filmstadenSeatMap {
   dimensions: Ticket_filmstadenSeatMap_dimensions;
 }
 
-export interface Ticket_myTickets_seat {
-  __typename: "Seat";
-  row: number;
-  number: number;
-}
-
 export interface Ticket_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
   barcode: string;
   customerType: string;
@@ -62,8 +56,9 @@ export interface Ticket_myTickets {
   cinema: string;
   screen: string;
   profileId: string | null;
-  seat: Ticket_myTickets_seat;
-  date: SeFilmLocalDate;
+  seatNumber: number;
+  seatRow: number;
+  date: any;
   time: string;
   movieName: string;
   /**
@@ -73,13 +68,13 @@ export interface Ticket_myTickets {
   /**
    * "textad", "en" etc
    */
-  showAttributes: string[] | null;
+  attributes: string[] | null;
 }
 
 export interface Ticket {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  webId: SeFilmBase64ID;
+  __typename: "ShowingDTO";
+  id: any;
+  webId: any;
   slug: string;
   admin: Ticket_admin;
   ticketRange: Ticket_ticketRange | null;

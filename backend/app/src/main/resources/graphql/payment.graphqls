@@ -23,6 +23,7 @@ type AttendeePaymentDetailsDTO {
 
 type AttendeeDTO {
     userId: UserID!
+    user: PublicUserDTO!
     showingId: ShowingID!
     hasPaid: Boolean!
     amountOwed: SEK!

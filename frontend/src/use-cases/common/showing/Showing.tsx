@@ -86,7 +86,7 @@ const Showing: React.FC<Props> = ({
 );
 
 export const movieFragment = gql`
-  fragment ShowingMovie on Movie {
+  fragment ShowingMovie on MovieDTO {
     id
     title
     poster
@@ -94,7 +94,7 @@ export const movieFragment = gql`
 `;
 
 export const oldShowingFragment = gql`
-  fragment OldShowing on Showing {
+  fragment OldShowing on ShowingDTO {
     id
     webId
     slug

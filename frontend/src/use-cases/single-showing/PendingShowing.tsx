@@ -119,9 +119,9 @@ const ModalPaymentOptions: React.FC<ModalPaymentOptionsProps> = ({
 
 (PendingShowing as any).fragments = {
   currentUser: gql`
-    fragment PendingShowing on CurrentUser {
-      foretagsbiljetter {
-        expires
+    fragment PendingShowing on UserDTO {
+      giftCertificates {
+        expiresAt
         number
         status
       }

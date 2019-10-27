@@ -1,5 +1,5 @@
 import { addYears } from "date-fns";
-import { ForetagsbiljettStatus } from "../../../../__generated__/globalTypes";
+import { GiftCertificateDTO_Status } from "../../../../__generated__/globalTypes";
 import { formatYMD } from "../../../../lib/dateTools";
 import createPaymentOptions from "../createPaymentOptions";
 
@@ -18,7 +18,7 @@ describe("createPaymentOptions", () => {
           {
             expires: expires,
             number: "123456",
-            status: ForetagsbiljettStatus.Available
+            status: GiftCertificateDTO_Status.AVAILABLE
           }
         ])
       ).toHaveLength(2);

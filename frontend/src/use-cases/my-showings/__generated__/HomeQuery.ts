@@ -7,49 +7,50 @@
 // ====================================================
 
 export interface HomeQuery_showings_movie {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   poster: string | null;
   title: string;
 }
 
 export interface HomeQuery_showings_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
 }
 
-export interface HomeQuery_showings_participants_user {
-  __typename: "User";
-  id: SeFilmUserID;
+export interface HomeQuery_showings_attendees_userInfo {
+  __typename: "PublicUserDTO";
+  id: any;
   avatar: string | null;
 }
 
-export interface HomeQuery_showings_participants {
-  __typename: "Participant";
-  user: HomeQuery_showings_participants_user | null;
+export interface HomeQuery_showings_attendees {
+  __typename: "PublicAttendeeDTO";
+  userInfo: HomeQuery_showings_attendees_userInfo;
+  userId: any;
 }
 
 export interface HomeQuery_showings_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
 export interface HomeQuery_showings {
-  __typename: "Showing";
-  id: SeFilmUUID;
+  __typename: "ShowingDTO";
+  id: any;
   date: string;
   time: string;
-  webId: SeFilmBase64ID;
+  webId: any;
   slug: string;
   movie: HomeQuery_showings_movie;
   myTickets: HomeQuery_showings_myTickets[] | null;
-  participants: HomeQuery_showings_participants[];
+  attendees: HomeQuery_showings_attendees[];
   admin: HomeQuery_showings_admin;
 }
 
 export interface HomeQuery_me {
-  __typename: "CurrentUser";
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  id: any;
 }
 
 export interface HomeQuery {

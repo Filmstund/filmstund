@@ -17,8 +17,7 @@ const useEditShowingData = (webId: string) =>
         showing(webId: $webId) {
           ...OldShowing
           price
-          private
-          filmstadenRemoteEntityId
+          filmstadenShowingId
           location {
             cityAlias
           }

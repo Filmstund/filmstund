@@ -7,7 +7,7 @@
 // ====================================================
 
 export interface UserItem {
-  __typename: "User";
+  __typename: "PublicUserDTO";
   avatar: string | null;
   firstName: string | null;
   nick: string | null;

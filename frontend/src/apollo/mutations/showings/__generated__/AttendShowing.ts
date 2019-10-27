@@ -8,25 +8,24 @@ import { PaymentOption } from "./../../../../__generated__/globalTypes";
 // GraphQL mutation operation: AttendShowing
 // ====================================================
 
-export interface AttendShowing_attendShowing_participants_user {
-  __typename: "User";
-  id: SeFilmUserID;
+export interface AttendShowing_attendShowing_attendees_userInfo {
+  __typename: "PublicUserDTO";
+  id: any;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
   avatar: string | null;
 }
 
-export interface AttendShowing_attendShowing_participants {
-  __typename: "Participant";
-  paymentType: string;
-  user: AttendShowing_attendShowing_participants_user | null;
+export interface AttendShowing_attendShowing_attendees {
+  __typename: "PublicAttendeeDTO";
+  userInfo: AttendShowing_attendShowing_attendees_userInfo;
 }
 
 export interface AttendShowing_attendShowing {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  participants: AttendShowing_attendShowing_participants[];
+  __typename: "ShowingDTO";
+  id: any;
+  attendees: AttendShowing_attendShowing_attendees[];
 }
 
 export interface AttendShowing {
@@ -34,6 +33,6 @@ export interface AttendShowing {
 }
 
 export interface AttendShowingVariables {
-  showingId: SeFilmUUID;
+  showingId: any;
   paymentOption: PaymentOption;
 }

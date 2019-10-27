@@ -7,18 +7,16 @@ import {
 } from "./__generated__/UpdateShowing";
 
 const updateShowingMutation = gql`
-  mutation UpdateShowing($showingId: UUID!, $showing: UpdateShowingInput!) {
+  mutation UpdateShowing($showingId: ShowingID!, $showing: UpdateShowingDTOInput!) {
     updateShowing(showingId: $showingId, newValues: $showing) {
       id
       time
       date
       ticketsBought
       price
-      private
       payToUser {
         id
       }
-      expectedBuyDate
     }
   }
 `;

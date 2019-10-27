@@ -2,102 +2,92 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettStatus } from "./../../../../__generated__/globalTypes";
+import { GiftCertificateDTO_Status } from "./../../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: SingleShowing
 // ====================================================
 
-export interface SingleShowing_me_foretagsbiljetter {
-  __typename: "Foretagsbiljett";
-  expires: SeFilmLocalDate;
+export interface SingleShowing_me_giftCertificates {
+  __typename: "GiftCertificateDTO";
+  expiresAt: any;
   number: string;
-  status: ForetagsbiljettStatus;
+  status: GiftCertificateDTO_Status;
 }
 
 export interface SingleShowing_me {
-  __typename: "CurrentUser";
-  foretagsbiljetter: SingleShowing_me_foretagsbiljetter[] | null;
-  id: SeFilmUserID;
+  __typename: "UserDTO";
+  giftCertificates: SingleShowing_me_giftCertificates[] | null;
+  id: any;
 }
 
 export interface SingleShowing_showing_location {
-  __typename: "Location";
+  __typename: "LocationDTO";
   name: string;
 }
 
 export interface SingleShowing_showing_movie {
-  __typename: "Movie";
-  id: SeFilmUUID;
+  __typename: "MovieDTO";
+  id: any;
   title: string;
   poster: string | null;
-  imdbId: SeFilmIMDbID | null;
+  imdbId: any | null;
 }
 
 export interface SingleShowing_showing_admin {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
   name: string | null;
   nick: string | null;
 }
 
-export interface SingleShowing_showing_filmstadenScreen {
-  __typename: "FilmstadenScreen";
-  filmstadenId: string;
+export interface SingleShowing_showing_cinemaScreen {
+  __typename: "CinemaScreenDTO";
+  id: string;
   name: string;
 }
 
 export interface SingleShowing_showing_payToUser {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
 }
 
-export interface SingleShowing_showing_adminPaymentDetails_filmstadenData_user {
-  __typename: "User";
-  id: SeFilmUserID;
-  nick: string | null;
-  firstName: string | null;
-  lastName: string | null;
+export interface SingleShowing_showing_adminPaymentDetails_attendees_giftCertificateUsed {
+  __typename: "GiftCertificateDTO";
+  number: string;
 }
 
-export interface SingleShowing_showing_adminPaymentDetails_filmstadenData {
-  __typename: "FilmstadenData";
-  user: SingleShowing_showing_adminPaymentDetails_filmstadenData_user;
-  filmstadenMembershipId: string | null;
-  foretagsbiljett: string | null;
-}
-
-export interface SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user {
-  __typename: "User";
-  id: SeFilmUserID;
+export interface SingleShowing_showing_adminPaymentDetails_attendees_user {
+  __typename: "PublicUserDTO";
+  id: any;
   nick: string | null;
   name: string | null;
   phone: string | null;
 }
 
-export interface SingleShowing_showing_adminPaymentDetails_participantPaymentInfos {
-  __typename: "ParticipantPaymentInfo";
-  id: SeFilmUUID;
+export interface SingleShowing_showing_adminPaymentDetails_attendees {
+  __typename: "AttendeeDTO";
   hasPaid: boolean;
-  amountOwed: SeFilmSEK;
-  user: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user;
+  amountOwed: any;
+  filmstadenMembershipId: string | null;
+  giftCertificateUsed: SingleShowing_showing_adminPaymentDetails_attendees_giftCertificateUsed | null;
+  user: SingleShowing_showing_adminPaymentDetails_attendees_user;
 }
 
 export interface SingleShowing_showing_adminPaymentDetails {
-  __typename: "AdminPaymentDetails";
+  __typename: "AdminPaymentDetailsDTO";
   filmstadenBuyLink: string | null;
-  filmstadenData: SingleShowing_showing_adminPaymentDetails_filmstadenData[];
-  participantPaymentInfos: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
+  attendees: SingleShowing_showing_adminPaymentDetails_attendees[];
 }
 
 export interface SingleShowing_showing_myTickets {
-  __typename: "Ticket";
+  __typename: "TicketDTO";
   id: string;
 }
 
 export interface SingleShowing_showing_attendeePaymentDetails_payTo {
-  __typename: "User";
-  id: SeFilmUserID;
+  __typename: "PublicUserDTO";
+  id: any;
   phone: string | null;
   firstName: string | null;
   nick: string | null;
@@ -105,48 +95,47 @@ export interface SingleShowing_showing_attendeePaymentDetails_payTo {
 }
 
 export interface SingleShowing_showing_attendeePaymentDetails {
-  __typename: "AttendeePaymentDetails";
-  amountOwed: SeFilmSEK;
+  __typename: "AttendeePaymentDetailsDTO";
+  amountOwed: any;
   swishLink: string | null;
   hasPaid: boolean;
   payTo: SingleShowing_showing_attendeePaymentDetails_payTo;
 }
 
-export interface SingleShowing_showing_participants_user {
-  __typename: "User";
+export interface SingleShowing_showing_attendees_userInfo {
+  __typename: "PublicUserDTO";
   avatar: string | null;
   firstName: string | null;
   nick: string | null;
   lastName: string | null;
   phone: string | null;
-  id: SeFilmUserID;
+  id: any;
 }
 
-export interface SingleShowing_showing_participants {
-  __typename: "Participant";
-  user: SingleShowing_showing_participants_user | null;
+export interface SingleShowing_showing_attendees {
+  __typename: "PublicAttendeeDTO";
+  userInfo: SingleShowing_showing_attendees_userInfo;
 }
 
 export interface SingleShowing_showing {
-  __typename: "Showing";
-  id: SeFilmUUID;
-  webId: SeFilmBase64ID;
+  __typename: "ShowingDTO";
+  id: any;
+  webId: any;
   slug: string;
   date: string;
   time: string;
-  location: SingleShowing_showing_location;
+  location: SingleShowing_showing_location | null;
   ticketsBought: boolean;
   movie: SingleShowing_showing_movie;
   admin: SingleShowing_showing_admin;
-  price: SeFilmSEK | null;
-  private: boolean;
-  filmstadenRemoteEntityId: string | null;
-  filmstadenScreen: SingleShowing_showing_filmstadenScreen | null;
+  price: any | null;
+  filmstadenShowingId: string | null;
+  cinemaScreen: SingleShowing_showing_cinemaScreen | null;
   payToUser: SingleShowing_showing_payToUser;
   adminPaymentDetails: SingleShowing_showing_adminPaymentDetails | null;
   myTickets: SingleShowing_showing_myTickets[] | null;
   attendeePaymentDetails: SingleShowing_showing_attendeePaymentDetails | null;
-  participants: SingleShowing_showing_participants[];
+  attendees: SingleShowing_showing_attendees[];
 }
 
 export interface SingleShowing {
@@ -155,5 +144,5 @@ export interface SingleShowing {
 }
 
 export interface SingleShowingVariables {
-  webId: SeFilmBase64ID;
+  webId: any;
 }
