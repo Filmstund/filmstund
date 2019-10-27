@@ -79,7 +79,7 @@ interface ShowingDao {
   fun isAdminOnShowing(adminUserId: UserID, showingId: ShowingID): Boolean
 
   @Timestamped
-  @SqlUpdate("UPDATE showing s SET admin = :newAdmin, pay_to_user = :newAdmin, last_modified_date = :now WHERE s.id = :showingId and s.admin = :currentAdmin")
+  @SqlUpdate("UPDATE showing s SET admin = :newAdmin, pay_to_user = :newAdmin, last_modified_date = :now WHERE s.id = :showingId AND s.admin = :currentAdmin AND s.tickets_bought = false")
   fun promoteNewUserToAdmin(showingId: ShowingID, currentAdmin: UserID, newAdmin: UserID): Boolean
 
   @Suppress("SqlResolve")

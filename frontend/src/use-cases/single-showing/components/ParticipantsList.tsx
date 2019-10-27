@@ -19,6 +19,7 @@ const ParticipantContainer = styled.div`
 interface Props {
   meId?: string;
   isAdmin?: boolean;
+  isBought?: boolean;
   participants: SingleShowing_showing_attendees[];
   showPhone?: boolean;
   onClickItem?: (userId: string) => void;
@@ -27,6 +28,7 @@ interface Props {
 const ParticipantsList: React.FC<Props> = ({
   meId,
   isAdmin = false,
+  isBought = false,
   participants,
   showPhone = false,
   onClickItem
@@ -41,7 +43,7 @@ const ParticipantsList: React.FC<Props> = ({
           return (
             <UserItem key={user.id} showPhone={showPhone} user={user}>
               {isAdmin &&
-                user.id !== meId && (
+                user.id !== meId && !isBought && (
                   <div
                     css={{
                       display: "inline-block",

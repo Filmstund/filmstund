@@ -146,7 +146,7 @@ export const AdminModalBeforeTicketsBought: React.FC<
           Öppna Filmstaden-länk i nytt fönster
         </a>
       )}
-      <ParticipantsList participants={showing.attendees} showPhone={true} />
+      <ParticipantsList participants={showing.attendees} showPhone={true} isBought={showing.ticketsBought} />
       <TicketList tickets={attendees} />
       <StatusMessageBox
         errors={mutationErrors.length > 0 ? mutationErrors : null}

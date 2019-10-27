@@ -197,7 +197,7 @@ internal class ShowingDaoTest {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndNewAdmin = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id).copy(ticketsBought = false)
 
     jdbi.useTransactionUnchecked { handle ->
       val userDao = handle.attach(UserDao::class.java)

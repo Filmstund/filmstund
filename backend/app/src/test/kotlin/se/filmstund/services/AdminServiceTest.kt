@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import se.filmstund.DatabaseTest
 import se.filmstund.TestConfig
 import se.filmstund.WithLoggedInUser
 import se.filmstund.currentLoggedInUser
@@ -26,12 +27,15 @@ import se.filmstund.nextUserDTO
 import java.util.concurrent.ThreadLocalRandom
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Jdbi::class, AdminService::class])
+@SpringBootTest(classes = [DatabaseTest::class, Jdbi::class, AdminService::class])
 @Import(TestConfig::class, DbConfig::class)
 internal class AdminServiceTest {
 
   @Autowired
   private lateinit var jdbi: Jdbi
+
+  @Autowired
+  private lateinit var databaseTest: DatabaseTest
 
   @Autowired
   private lateinit var adminService: AdminService
@@ -61,7 +65,7 @@ internal class AdminServiceTest {
     val currentUserId = currentLoggedInUser().id
     val rndMovie = rnd.nextMovie()
     val rndNewAdmin = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, currentUserId)
+    val rndShowing = rnd.nextShowing(rndMovie.id, currentUserId).copy(ticketsBought = false)
 
     jdbi.useTransactionUnchecked { handle ->
       val userDao = handle.attach(UserDao::class.java)
@@ -76,8 +80,8 @@ internal class AdminServiceTest {
 
       val dbShowing = showingDao.findById(rndShowing.id)
 
-      assertThat(dbShowing?.admin).isNotNull().isEqualTo(currentUserId)
-      assertThat(dbShowing?.payToUser).isNotNull().isEqualTo(currentUserId)
+      assertThat(dbShowing?.admin).isNotNull.isEqualTo(currentUserId)
+      assertThat(dbShowing?.payToUser).isNotNull.isEqualTo(currentUserId)
 
 
       val dbShowingUpdated = adminService.promoteToAdmin(rndShowing.id, rndNewAdmin.id)
@@ -97,7 +101,7 @@ internal class AdminServiceTest {
     val rndMovie = rnd.nextMovie()
     val rndAdmin = rnd.nextUserDTO()
     val rndNewAdmin = rnd.nextUserDTO()
-    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id)
+    val rndShowing = rnd.nextShowing(rndMovie.id, rndAdmin.id).copy(ticketsBought = false)
 
     jdbi.useTransactionUnchecked { handle ->
       val userDao = handle.attach(UserDao::class.java)
@@ -113,12 +117,33 @@ internal class AdminServiceTest {
 
       val dbShowing = showingDao.findById(rndShowing.id)
 
-      assertThat(dbShowing?.admin).isNotNull().isEqualTo(rndAdmin.id)
-      assertThat(dbShowing?.payToUser).isNotNull().isEqualTo(rndAdmin.id)
+      assertThat(dbShowing?.admin).isNotNull.isEqualTo(rndAdmin.id)
+      assertThat(dbShowing?.payToUser).isNotNull.isEqualTo(rndAdmin.id)
 
 
       assertThrows<AccessDeniedException> {
         adminService.promoteToAdmin(rndShowing.id, rndNewAdmin.id)
+      }
+    }
+  }
+
+  @Test
+  @WithLoggedInUser
+  internal fun `given a showing that has been bought, when promoteToAdmin(), then an AccessDeniedException is thrown`() {
+    databaseTest.start {
+      withAdmin()
+      withMovie()
+      withShowing { it.nextShowing(movie.id, admin.id).copy(ticketsBought = true) }
+      afterInsert {
+        val rndNewAdmin = tlrnd.nextUserDTO()
+        val dbShowing = it.showingDao.findById(showing.id)
+
+        assertThat(dbShowing?.admin).isNotNull.isEqualTo(admin.id)
+        assertThat(dbShowing?.payToUser).isNotNull.isEqualTo(admin.id)
+
+        assertThrows<AccessDeniedException> {
+          adminService.promoteToAdmin(showing.id, rndNewAdmin.id)
+        }
       }
     }
   }

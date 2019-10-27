@@ -104,6 +104,7 @@ const SingleShowingContainer: React.FC<Props> = ({
       <ParticipantList
         meId={me.id}
         isAdmin={isAdmin}
+        isBought={showing.ticketsBought}
         participants={showing.attendees}
         onClickItem={userId => promoteToAdmin(showing.id, userId)}
       />
