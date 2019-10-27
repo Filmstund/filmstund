@@ -2,21 +2,18 @@ import gql from "graphql-tag";
 import React, { useCallback } from "react";
 import { useQuery } from "react-apollo";
 import { useFetchMovies } from "../../apollo/queries/movies";
-import { useRouter } from "../../lib/useRouter";
 import { navigateToShowing } from "../common/navigators";
 
 import { movieFragment } from "../common/showing/Movie";
 import { NewShowingQuery } from "./__generated__/NewShowingQuery";
 import { CreateShowingFormFetcher } from "./CreateShowingFormFetcher";
 import MovieSelector from "./MovieSelector";
+import { useParams, useHistory } from "react-router-dom";
 
 const NewShowing = () => {
-  const {
-    history,
-    match: {
-      params: { movieId }
-    }
-  } = useRouter();
+  const history = useHistory();
+  const { movieId } = useParams<{ movieId: string }>();
+
 
   const { data } = useAllMovies();
   const [fetchMovies] = useFetchMovies();

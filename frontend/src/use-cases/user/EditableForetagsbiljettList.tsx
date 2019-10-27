@@ -1,17 +1,17 @@
-import React, { useCallback, useState } from "react";
-
 import styled from "@emotion/styled";
-import { uniqueId } from "lodash-es";
-
-import MainButton from "../../use-cases/common/ui/MainButton";
-import { formatYMD } from "../../lib/dateTools";
-import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons/faPlusCircle";
-
-import { margin } from "../../lib/style-vars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import addYears from "date-fns/addYears";
+import { uniqueId } from "lodash-es";
+import React, { ChangeEvent, useCallback, useState } from "react";
+import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
+import { formatYMD } from "../../lib/dateTools";
+
+import { margin } from "../../lib/style-vars";
+
+import MainButton from "../../use-cases/common/ui/MainButton";
+import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import Foretagsbiljett from "./Foretagsbiljett";
 import { useAddForetagsbiljett } from "./useAddForetagsbiljett";
 
@@ -28,8 +28,22 @@ const AddForetagsbiljettContainer = styled.div`
   padding-bottom: 2em;
 `;
 
-const EditableForetagsbiljettList = props => {
-  const [tickets, setTickets] = useState([]);
+const transformDraftToInput = ({
+  number,
+  expires
+}: ForetagsbiljettInputDraft): ForetagsbiljettInput => ({
+  number,
+  expires: formatYMD(expires)
+});
+
+interface ForetagsbiljettInputDraft {
+  id: string;
+  number: string;
+  expires: Date;
+}
+
+const EditableForetagsbiljettList: React.FC = () => {
+  const [tickets, setTickets] = useState<ForetagsbiljettInputDraft[]>([]);
   const [
     saveForetagsBiljetter,
     { called, loading, error }
@@ -40,20 +54,17 @@ const EditableForetagsbiljettList = props => {
     () => {
       const ticketsToSubmit = tickets
         .filter(({ number }) => number && number.trim())
-        .map(({ number, expires }) => ({
-          number,
-          expires: formatYMD(expires)
-        }));
+        .map(transformDraftToInput);
 
       return saveForetagsBiljetter({
-        variables: { biljetter: ticketsToSubmit }
+        variables: { tickets: ticketsToSubmit }
       }).then(() => setTickets([]));
     },
     [saveForetagsBiljetter, tickets]
   );
 
   const addForetagsbiljett = useCallback(() => {
-    const foretagsbiljett = {
+    const foretagsbiljett: ForetagsbiljettInputDraft = {
       id: uniqueId("ftg-"),
       number: "",
       expires: DEFAULT_DATE
@@ -61,18 +72,21 @@ const EditableForetagsbiljettList = props => {
     setTickets(tickets => [...tickets, foretagsbiljett]);
   }, []);
 
-  const handleChange = useCallback((id, event) => {
-    const { value } = event.target;
-    setTickets(tickets => {
-      return tickets.map(t => (t.id === id ? { ...t, number: value } : t));
-    });
-  }, []);
-  const handleSetExpires = useCallback((id, value) => {
+  const handleChange = useCallback(
+    (id: string, event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setTickets(tickets => {
+        return tickets.map(t => (t.id === id ? { ...t, number: value } : t));
+      });
+    },
+    []
+  );
+  const handleSetExpires = useCallback((id: string, value: Date) => {
     setTickets(tickets => {
       return tickets.map(t => (t.id === id ? { ...t, expires: value } : t));
     });
   }, []);
-  const handlePressRemove = useCallback(id => {
+  const handlePressRemove = useCallback((id: string) => {
     setTickets(tickets => {
       return tickets.filter(t => t.id !== id);
     });
@@ -84,7 +98,7 @@ const EditableForetagsbiljettList = props => {
         {tickets.map(biljett => (
           <Foretagsbiljett
             key={biljett.id}
-            biljett={biljett}
+            biljett={transformDraftToInput(biljett)}
             editable={true}
             handleChangeForetagsbiljett={v => handleChange(biljett.id, v)}
             handleSetExpiresForetagsbiljett={v =>

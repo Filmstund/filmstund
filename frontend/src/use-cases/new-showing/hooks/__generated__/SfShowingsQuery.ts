@@ -31,6 +31,6 @@ export interface SfShowingsQuery {
 }
 
 export interface SfShowingsQueryVariables {
-  movieId: any;
+  movieId: SeFilmUUID;
   city?: string | null;
 }

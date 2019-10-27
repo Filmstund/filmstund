@@ -14,12 +14,12 @@ export interface ShowingAdmin_filmstadenScreen {
 
 export interface ShowingAdmin_payToUser {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface ShowingAdmin_adminPaymentDetails_filmstadenData_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -34,7 +34,7 @@ export interface ShowingAdmin_adminPaymentDetails_filmstadenData {
 
 export interface ShowingAdmin_adminPaymentDetails_participantPaymentInfos_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   name: string | null;
   phone: string | null;
@@ -42,9 +42,9 @@ export interface ShowingAdmin_adminPaymentDetails_participantPaymentInfos_user {
 
 export interface ShowingAdmin_adminPaymentDetails_participantPaymentInfos {
   __typename: "ParticipantPaymentInfo";
-  id: any;
+  id: SeFilmUUID;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: SeFilmSEK;
   user: ShowingAdmin_adminPaymentDetails_participantPaymentInfos_user;
 }
 
@@ -57,8 +57,8 @@ export interface ShowingAdmin_adminPaymentDetails {
 
 export interface ShowingAdmin {
   __typename: "Showing";
-  id: any;
-  price: any | null;
+  id: SeFilmUUID;
+  price: SeFilmSEK | null;
   private: boolean;
   filmstadenRemoteEntityId: string | null;
   filmstadenScreen: ShowingAdmin_filmstadenScreen | null;

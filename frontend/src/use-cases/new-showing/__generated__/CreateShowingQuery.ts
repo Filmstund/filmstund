@@ -8,7 +8,7 @@
 
 export interface CreateShowingQuery_movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   title: string;
   poster: string | null;
   releaseDate: string;
@@ -16,7 +16,7 @@ export interface CreateShowingQuery_movie {
 
 export interface CreateShowingQuery_me {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   name: string | null;
 }
@@ -40,5 +40,5 @@ export interface CreateShowingQuery {
 }
 
 export interface CreateShowingQueryVariables {
-  movieId: any;
+  movieId: SeFilmUUID;
 }

@@ -8,7 +8,7 @@
 
 export interface ShowingParticipant_participants_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -23,6 +23,6 @@ export interface ShowingParticipant_participants {
 
 export interface ShowingParticipant {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   participants: ShowingParticipant_participants[];
 }

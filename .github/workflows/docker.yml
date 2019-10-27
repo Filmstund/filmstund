@@ -1,0 +1,30 @@
+name: Docker Image CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build frontend Docker image
+      run: |
+        cd frontend
+        docker build -t cthdidit/sefilm-frontend:$(git describe) --build-arg TAG=${{ github.sha }} .
+        docker tag cthdidit/sefilm-frontend:$(git describe) cthdidit/sefilm-frontend:latest
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.11
+    - name: Build backend Docker image
+      run: |
+        cd backend
+        ./gradlew --no-daemon build jibDockerBuild --image=cthdidit/sefilm-backend:$(git describe)
+        docker tag cthdidit/sefilm-backend:$(git describe) cthdidit/sefilm-backend:latest
+    - name: Push docker images
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push cthdidit/sefilm-frontend
+        docker push cthdidit/sefilm-backend
+      
+      

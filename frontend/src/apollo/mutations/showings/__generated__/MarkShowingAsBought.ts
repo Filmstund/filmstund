@@ -8,7 +8,7 @@
 
 export interface MarkShowingAsBought_markAsBought_payToUser {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface MarkShowingAsBought_markAsBought_myTickets {
@@ -18,7 +18,7 @@ export interface MarkShowingAsBought_markAsBought_myTickets {
 
 export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -30,12 +30,12 @@ export interface MarkShowingAsBought_markAsBought_attendeePaymentDetails {
   payTo: MarkShowingAsBought_markAsBought_attendeePaymentDetails_payTo;
   swishLink: string | null;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: SeFilmSEK;
 }
 
 export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   nick: string | null;
   name: string | null;
   phone: string | null;
@@ -43,9 +43,9 @@ export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_participan
 
 export interface MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos {
   __typename: "ParticipantPaymentInfo";
-  id: any;
+  id: SeFilmUUID;
   hasPaid: boolean;
-  amountOwed: any;
+  amountOwed: SeFilmSEK;
   user: MarkShowingAsBought_markAsBought_adminPaymentDetails_participantPaymentInfos_user;
 }
 
@@ -56,9 +56,9 @@ export interface MarkShowingAsBought_markAsBought_adminPaymentDetails {
 
 export interface MarkShowingAsBought_markAsBought {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   ticketsBought: boolean;
-  price: any | null;
+  price: SeFilmSEK | null;
   private: boolean;
   payToUser: MarkShowingAsBought_markAsBought_payToUser;
   expectedBuyDate: string | null;
@@ -74,6 +74,6 @@ export interface MarkShowingAsBought {
 }
 
 export interface MarkShowingAsBoughtVariables {
-  showingId: any;
-  price: any;
+  showingId: SeFilmUUID;
+  price: SeFilmSEK;
 }

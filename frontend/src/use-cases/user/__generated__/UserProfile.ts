@@ -11,13 +11,13 @@ import { ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
 export interface UserProfile_me_foretagsbiljetter {
   __typename: "Foretagsbiljett";
   number: string;
-  expires: any;
+  expires: SeFilmLocalDate;
   status: ForetagsbiljettStatus;
 }
 
 export interface UserProfile_me {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
   name: string | null;
   firstName: string | null;
   lastName: string | null;

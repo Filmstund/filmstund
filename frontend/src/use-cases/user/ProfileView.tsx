@@ -4,6 +4,7 @@ import { useUpdateUserMutation } from "../../apollo/mutations/user";
 import alfons from "../../assets/alfons.jpg";
 
 import { trim } from "../../lib/Utils";
+import { useFadeState } from "../common/hooks/useFadeState";
 import Field, { FieldWithoutMaxWidth } from "../common/ui/Field";
 import Input from "../common/ui/Input";
 import MainButton from "../common/ui/MainButton";
@@ -11,7 +12,6 @@ import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import CopyValue from "../common/utils/CopyValue";
 import { PageTitle } from "../common/utils/PageTitle";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
-import { useApolloMutationResult } from "../common/utils/useApolloMutationResult";
 import { UserProfile_me } from "./__generated__/UserProfile";
 
 import ForetagsbiljettList from "./ForetagsbiljettList";
@@ -46,11 +46,10 @@ interface Props {
 }
 
 const Profile: React.FC<Props> = ({ me }) => {
-  const updateUser = useUpdateUserMutation();
+  const [showSuccessMessage, bump] = useFadeState();
+  const [mutate, { error, loading, called }] = useUpdateUserMutation();
 
-  const { success, errors, clearState, mutate } = useApolloMutationResult(
-    updateUser
-  );
+  const success = called && !loading && !error && showSuccessMessage;
 
   const [
     { phone, filmstadenMembershipId, nick },
@@ -62,27 +61,27 @@ const Profile: React.FC<Props> = ({ me }) => {
     filmstadenMembershipId: me.filmstadenMembershipId || ""
   });
 
-  const handleSubmit = useCallback(
-    () => {
-      const trimmedValues = trim({
-        nick,
-        phone,
-        filmstadenMembershipId
-      });
+  const handleSubmit = () => {
+    const trimmedValues = trim({
+      nick,
+      phone,
+      filmstadenMembershipId
+    });
 
-      mutate(trimmedValues).then(({ data }) => {
-        const { nick, phone, filmstadenMembershipId } = data!.editedUser;
+    mutate({ variables: { user: trimmedValues } }).then(({ data }) => {
+      if (data) {
+        const { nick, phone, filmstadenMembershipId } = data.editedUser;
 
         setEditedUser({
           nick: nick || "",
           phone: phone || "",
           filmstadenMembershipId: filmstadenMembershipId || ""
         });
-        setTimeout(clearState, 5000);
-      });
-    },
-    [clearState, mutate, nick, phone, setEditedUser, filmstadenMembershipId]
-  );
+
+        bump();
+      }
+    });
+  };
 
   return (
     <PageWidthWrapper>
@@ -96,7 +95,7 @@ const Profile: React.FC<Props> = ({ me }) => {
         </UserInfo>
       </Box>
       <StatusMessageBox
-        errors={errors}
+        errors={error ? error.graphQLErrors : null}
         success={success}
         successMessage="Uppdaterades!"
       />

@@ -7,13 +7,19 @@ import {
   SingleShowing_showing_participants_user
 } from "./containers/__generated__/SingleShowing";
 
-const formatParticipants = (
-  participants: SingleShowing_showing_participants[]
-): string => {
-  const users = participants
+const mapToUserAndFilterMe = (
+  participants: SingleShowing_showing_participants[],
+  meId: SeFilmUserID
+): SingleShowing_showing_participants_user[] =>
+  participants
     .map(p => p.user)
-    .filter(f => !!f) as SingleShowing_showing_participants_user[];
+    .filter(
+      f => !!f && f.id !== meId
+    ) as SingleShowing_showing_participants_user[];
 
+const formatParticipants = (
+  users: SingleShowing_showing_participants_user[]
+): string => {
   const nicks = users.map(
     user => user.nick || `${user.firstName} ${user.lastName}`
   );
@@ -24,12 +30,13 @@ const formatParticipants = (
 };
 
 export const CopyHighlightStringButton: React.FC<{
+  meId: SeFilmUserID;
   participants: SingleShowing_showing_participants[];
-}> = ({ participants }) => {
+}> = ({ participants, meId }) => {
   const [active, bump] = useFadeState();
 
   const handleClick = () => {
-    copy(formatParticipants(participants) + " ");
+    copy(formatParticipants(mapToUserAndFilterMe(participants, meId)) + " ");
     bump();
   };
 

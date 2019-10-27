@@ -11,13 +11,13 @@ import { NewUserInfo, ForetagsbiljettStatus } from "./../../../__generated__/glo
 export interface UpdateUser_editedUser_foretagsbiljetter {
   __typename: "Foretagsbiljett";
   number: string;
-  expires: any;
+  expires: SeFilmLocalDate;
   status: ForetagsbiljettStatus;
 }
 
 export interface UpdateUser_editedUser {
   __typename: "CurrentUser";
-  id: any;
+  id: SeFilmUserID;
   name: string | null;
   firstName: string | null;
   lastName: string | null;

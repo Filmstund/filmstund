@@ -8,7 +8,7 @@
 
 export interface ShowingNeue_movie {
   __typename: "Movie";
-  id: any;
+  id: SeFilmUUID;
   poster: string | null;
   title: string;
 }
@@ -20,7 +20,7 @@ export interface ShowingNeue_myTickets {
 
 export interface ShowingNeue_participants_user {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
   avatar: string | null;
 }
 
@@ -31,10 +31,10 @@ export interface ShowingNeue_participants {
 
 export interface ShowingNeue {
   __typename: "Showing";
-  id: any;
+  id: SeFilmUUID;
   date: string;
   time: string;
-  webId: any;
+  webId: SeFilmBase64ID;
   slug: string;
   movie: ShowingNeue_movie;
   myTickets: ShowingNeue_myTickets[] | null;

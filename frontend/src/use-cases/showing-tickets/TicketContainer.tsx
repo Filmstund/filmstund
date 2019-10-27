@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAddTickets } from "../../apollo/mutations/useAddTickets";
-import { useRouter } from "../../lib/useRouter";
+import { useHistory } from "react-router-dom";
 import MainButton from "../../use-cases/common/ui/MainButton";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
-  const { history } = useRouter();
+  const history = useHistory();
 
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
   const [addTickets, { error, called, loading }] = useAddTickets();

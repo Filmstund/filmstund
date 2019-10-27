@@ -8,7 +8,7 @@
 
 export interface Ticket_admin {
   __typename: "User";
-  id: any;
+  id: SeFilmUserID;
 }
 
 export interface Ticket_ticketRange_seatings {
@@ -63,7 +63,7 @@ export interface Ticket_myTickets {
   screen: string;
   profileId: string | null;
   seat: Ticket_myTickets_seat;
-  date: any;
+  date: SeFilmLocalDate;
   time: string;
   movieName: string;
   /**
@@ -78,8 +78,8 @@ export interface Ticket_myTickets {
 
 export interface Ticket {
   __typename: "Showing";
-  id: any;
-  webId: any;
+  id: SeFilmUUID;
+  webId: SeFilmBase64ID;
   slug: string;
   admin: Ticket_admin;
   ticketRange: Ticket_ticketRange | null;

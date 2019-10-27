@@ -3,15 +3,15 @@ import Modal from "../ui/Modal";
 
 import Header from "../ui/Header";
 import MainButton, { ButtonContainer } from "../ui/MainButton";
-import { useRouter } from "../../../lib/useRouter";
 import { AppQuery_me } from "../../../__generated__/AppQuery";
+import { useHistory } from "react-router-dom";
 
 interface Props {
   me: AppQuery_me;
 }
 
 export const WelcomeModal: React.FC<Props> = ({ me: { filmstadenMembershipId } }) => {
-  const { history } = useRouter();
+  const history = useHistory();
 
   const [modalOpen, setModalOpen] = useState(true);
 
