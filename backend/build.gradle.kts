@@ -18,7 +18,7 @@ plugins {
   id("org.ajoberstar.grgit") version "3.1.1" apply true
   id("net.researchgate.release") version "2.8.1"
   id("com.google.cloud.tools.jib") version "1.8.0"
-  id("com.github.ben-manes.versions") version "0.22.0"
+  id("com.github.ben-manes.versions") version "0.27.0"
   id("com.gorylenko.gradle-git-properties") version "2.1.0"
 }
 
