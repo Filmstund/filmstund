@@ -19,7 +19,7 @@ plugins {
   id("net.researchgate.release") version "2.8.1"
   id("com.google.cloud.tools.jib") version "1.8.0"
   id("com.github.ben-manes.versions") version "0.27.0"
-  id("com.gorylenko.gradle-git-properties") version "2.1.0"
+  id("com.gorylenko.gradle-git-properties") version "2.2.0"
 }
 
 tasks.withType<KotlinCompile> {
