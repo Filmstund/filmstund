@@ -62,7 +62,7 @@ dependencies {
 
   /* The following are needed under java 11 */
   runtime("org.apache.commons:commons-lang3:3.9")
-  runtime("javax.xml.bind:jaxb-api:2.3.0")
+  runtime("javax.xml.bind:jaxb-api:2.3.1")
   runtime("com.sun.xml.bind:jaxb-impl:2.3.0")
   runtime("com.sun.xml.bind:jaxb-core:2.3.0.1")
   runtime("javax.activation:activation:1.1.1")
