@@ -34,7 +34,7 @@ tasks.withType<Test> {
 }
 
 dependencies {
-  implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:5.10.0")
+  implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:5.11.1")
 //  UI for GraphQL queries available at /graphiql
 //  compile("com.graphql-java-kickstart:graphiql-spring-boot-starter:5.10.0")
   implementation("org.springframework.boot:spring-boot-starter-web-services")
