@@ -81,8 +81,8 @@ tasks.register("versionBanner") {
     val gitCommitTime = addPipeToTheEndOfStr(gitHead.dateTime)
     val gitBranch = git.branch.current().name
     val now = addPipeToTheEndOfStr(ZonedDateTime.now())
-    val projectNameAndBranch = addPipeToTheEndOfStr("${project.name} ($gitBranch)")
-    val projectVersion = addPipeToTheEndOfStr(version)
+    val projectNameAndBranch = addPipeToTheEndOfStr("${rootProject.name} ($gitBranch)")
+    val projectVersion = addPipeToTheEndOfStr(git.describe())
     val banner =
       "  ┌───────────────┬───────────────────────────────────────────────────────┐\n" +
         "  │ Project       │ $projectNameAndBranch\n" +

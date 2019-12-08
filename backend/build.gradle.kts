@@ -29,13 +29,6 @@ plugins {
   id("com.github.ben-manes.versions")
 }
 
-tasks.register("printVersion") {
-  description = "Prints the current version"
-  doLast {
-    println("Current version: $version")
-  }
-}
-
 dependencies {
   val springBootVersion: String by project
 
@@ -51,7 +44,6 @@ dependencies {
     api("org.jeasy:easy-random-core:4.1.0")
     api("net.sf.biweekly:biweekly:0.6.3")
     api("org.apache.commons:commons-lang3:3.9")
-    api("org.apache.httpcomponents:httpclient:4.5.10")
     api("com.github.ben-manes.caffeine:caffeine:2.+")
     api("org.springframework.security:spring-security-jwt:1.1.0.RELEASE")
     api("org.springframework.security.oauth:spring-security-oauth2:2.4.0.RELEASE")
