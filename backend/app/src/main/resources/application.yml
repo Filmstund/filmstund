@@ -24,12 +24,17 @@ management:
   endpoints:
     web:
       base-path: "/"
+      exposure:
+        include: health,info,prometheus
   info:
     git:
       mode: "full"
   endpoint:
     health:
       show-details: always
+    prometheus:
+      enabled: true
+
 
 filmstund:
   baseUrl:

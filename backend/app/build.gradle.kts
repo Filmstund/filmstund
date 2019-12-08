@@ -25,10 +25,11 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-mustache")
-  implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.security:spring-security-jwt")
   implementation("org.springframework.security.oauth:spring-security-oauth2")
   implementation("org.springframework.boot:spring-boot-devtools")
+  implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("io.micrometer:micrometer-registry-prometheus")
 
   // Database
   runtimeOnly("org.postgresql:postgresql")
