@@ -27,6 +27,9 @@ management:
   info:
     git:
       mode: "full"
+  endpoint:
+    health:
+      show-details: always
 
 filmstund:
   baseUrl:
