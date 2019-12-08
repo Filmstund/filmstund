@@ -4,7 +4,7 @@ import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import graphql.execution.AsyncExecutionStrategy
-import graphql.servlet.config.ObjectMapperConfigurer
+import graphql.kickstart.execution.config.ObjectMapperConfigurer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.apache.http.client.HttpClient
 import org.apache.http.impl.client.HttpClientBuilder

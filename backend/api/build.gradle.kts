@@ -1,15 +1,12 @@
-plugins {
-  kotlin("jvm")
-  id("org.jetbrains.kotlin.plugin.spring")
-}
-
 dependencies {
-  api("com.googlecode.libphonenumber:libphonenumber:8.10.21")
+  api(platform(rootProject))
+
+  api("com.googlecode.libphonenumber:libphonenumber")
 
   implementation(kotlin("stdlib"))
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-  implementation("com.google.guava:guava:28.1-jre")
+  implementation("com.google.guava:guava")
   implementation("org.jdbi:jdbi3-core")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")

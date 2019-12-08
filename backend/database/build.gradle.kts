@@ -1,10 +1,7 @@
-plugins {
-  kotlin("jvm")
-  id("org.jetbrains.kotlin.plugin.spring")
-}
-
 dependencies {
+  api(platform(rootProject))
   implementation(project(":api"))
+
   api("org.springframework:spring-context")
   api("org.springframework:spring-tx")
   api("org.springframework.boot:spring-boot-starter-jdbc")

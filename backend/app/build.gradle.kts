@@ -3,11 +3,7 @@ import java.time.ZonedDateTime
 import kotlin.math.abs
 
 plugins {
-  kotlin("jvm")
-  id("org.jetbrains.kotlin.plugin.spring")
-  id("org.jetbrains.kotlin.plugin.jpa")
   id("org.springframework.boot")
-  id("io.spring.dependency-management")
   id("org.ajoberstar.grgit")
   id("com.gorylenko.gradle-git-properties")
   id("com.google.cloud.tools.jib")
@@ -15,11 +11,13 @@ plugins {
 
 
 dependencies {
+  api(platform(rootProject))
+
   implementation(project(":api"))
   implementation(project(":database"))
   implementation(project(":mongo"))
 
-  implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:5.10.0")
+  implementation("com.graphql-java-kickstart:graphql-spring-boot-starter")
   //  UI for GraphQL queries available at /graphiql
   //  compile("com.graphql-java-kickstart:graphiql-spring-boot-starter:5.10.0")
   implementation("org.springframework.boot:spring-boot-starter-web")
@@ -28,31 +26,31 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-mustache")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
-  implementation("org.springframework.security:spring-security-jwt:1.0.11.RELEASE")
-  implementation("org.springframework.security.oauth:spring-security-oauth2:2.3.7.RELEASE")
+  implementation("org.springframework.security:spring-security-jwt")
+  implementation("org.springframework.security.oauth:spring-security-oauth2")
   implementation("org.springframework.boot:spring-boot-devtools")
 
   // Database
-  runtime("org.postgresql:postgresql:42.2.8")
-  implementation("org.liquibase:liquibase-core:3.8.0")
+  runtimeOnly("org.postgresql:postgresql")
+  implementation("org.liquibase:liquibase-core")
 
 
   implementation("org.springframework.data:spring-data-commons")
 
-  implementation("com.github.ben-manes.caffeine:caffeine:2.+")
+  implementation("com.github.ben-manes.caffeine:caffeine")
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-  implementation("com.google.guava:guava:28.1-jre")
-  implementation("net.sf.biweekly:biweekly:0.6.3")
+  implementation("com.google.guava:guava")
+  implementation("net.sf.biweekly:biweekly")
 
   /* The following are needed under java 11 */
-  runtime("javax.xml.bind:jaxb-api:2.3.0")
-  runtime("com.sun.xml.bind:jaxb-impl:2.3.0")
-  runtime("com.sun.xml.bind:jaxb-core:2.3.0.1")
-  runtime("javax.activation:activation:1.1.1")
+  runtimeOnly("javax.xml.bind:jaxb-api")
+  runtimeOnly("com.sun.xml.bind:jaxb-impl")
+  runtimeOnly("com.sun.xml.bind:jaxb-core")
+  runtimeOnly("javax.activation:activation")
 
-  runtime("org.apache.commons:commons-lang3:3.9")
-  implementation("org.apache.httpcomponents:httpclient:4.5.10")
+  runtimeOnly("org.apache.commons:commons-lang3")
+  implementation("org.apache.httpcomponents:httpclient")
 
   implementation(kotlin("stdlib-jdk8"))
   implementation(kotlin("stdlib"))
@@ -62,10 +60,10 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-  testImplementation("org.mockito:mockito-core:3.1.0")
-  testImplementation("org.mockito:mockito-junit-jupiter:3.1.0")
-  testImplementation("com.opentable.components:otj-pg-embedded:0.13.3")
-  testImplementation("org.jeasy:easy-random-core:4.0.0")
+  testImplementation("org.mockito:mockito-core")
+  testImplementation("org.mockito:mockito-junit-jupiter")
+  testImplementation("com.opentable.components:otj-pg-embedded")
+  testImplementation("org.jeasy:easy-random-core")
 }
 
 tasks.register("versionBanner") {
