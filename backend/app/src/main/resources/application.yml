@@ -19,6 +19,8 @@ spring:
     username: ${FILMSTUND_JDBC_USERNAME:filmstund}
     password: ${FILMSTUND_JDBC_PASSWORD:}
 management:
+  server:
+    port: ${FILMSUND_MGMT_PORT:8081}
   endpoints:
     web:
       base-path: "/"
