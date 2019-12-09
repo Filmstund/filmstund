@@ -6,7 +6,6 @@ plugins {
   id("org.springframework.boot")
   id("org.ajoberstar.grgit")
   id("com.gorylenko.gradle-git-properties")
-  id("com.google.cloud.tools.jib")
 }
 
 
@@ -116,11 +115,4 @@ gitProperties {
 
 springBoot {
   buildInfo()
-}
-
-jib {
-  container {
-    jvmFlags = listOf("-Duser.language=sv-SE", "-Dfile.encoding=UTF-8", "-Duser.timezone=UTC")
-    ports = listOf("8080")
-  }
 }
