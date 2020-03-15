@@ -75,7 +75,7 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-  testImplementation("org.mockito:mockito-core:3.0.0")
+  testImplementation("org.mockito:mockito-core:3.3.3")
 }
 
 tasks.register("versionBanner") {
