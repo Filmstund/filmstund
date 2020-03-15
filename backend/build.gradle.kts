@@ -66,7 +66,7 @@ dependencies {
   runtime("com.sun.xml.bind:jaxb-impl:2.3.0")
   runtime("com.sun.xml.bind:jaxb-core:2.3.0.1")
   runtime("javax.activation:activation:1.1.1")
-  implementation("org.apache.httpcomponents:httpclient:4.5.9")
+  implementation("org.apache.httpcomponents:httpclient:4.5.12")
 
   implementation(kotlin("stdlib-jdk8"))
   implementation(kotlin("stdlib"))
