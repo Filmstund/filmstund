@@ -13,7 +13,7 @@ plugins {
   kotlin("jvm") version kotlinVersion
   id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion apply true
   //id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-  id("org.springframework.boot") version "2.1.7.RELEASE"
+  id("org.springframework.boot") version "2.2.6.RELEASE"
   id("io.spring.dependency-management") version "1.0.8.RELEASE" apply true
   id("org.ajoberstar.grgit") version "3.1.1" apply true
   id("net.researchgate.release") version "2.8.1"
