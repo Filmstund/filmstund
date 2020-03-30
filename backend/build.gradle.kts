@@ -56,7 +56,7 @@ dependencies {
   implementation("com.github.ben-manes.caffeine:caffeine:2.+")
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.+")
-  implementation("com.googlecode.libphonenumber:libphonenumber:8.11.0")
+  implementation("com.googlecode.libphonenumber:libphonenumber:8.12.1")
   implementation("com.google.guava:guava:28.1-jre")
   implementation("net.sf.biweekly:biweekly:0.6.3")
 
