@@ -1,4 +1,0 @@
-type BioBudord {
-    number: Int!
-    phrase: String!
-}
