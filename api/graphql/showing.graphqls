@@ -1,0 +1,89 @@
+type Query {
+    showing(id: ShowingID, webId: Base64ID): ShowingDTO
+    publicShowings(afterDate: LocalDate): [ShowingDTO!]!
+    showingForMovie(movieId: MovieID): [ShowingDTO!]!
+}
+
+type Mutation {
+    attendShowing(showingId: ShowingID!, paymentOption: PaymentOption!): ShowingDTO!
+    unattendShowing(showingId: ShowingID!): ShowingDTO!
+
+    createShowing(showing: CreateShowingDTOInput!): ShowingDTO!
+
+    # Delete a showign and return all public showings
+    deleteShowing(showingId: ShowingID!): [ShowingDTO!]!
+
+    markAsBought(showingId: ShowingID!, price: SEK!): ShowingDTO!
+    processTicketUrls(showingId: ShowingID!, ticketUrls: [String!]): ShowingDTO!
+
+    updateShowing(showingId: ShowingID!, newValues: UpdateShowingDTOInput): ShowingDTO!
+
+    promoteToAdmin(showingId: ShowingID!, userToPromote: UserID!): ShowingDTO!
+}
+
+type ShowingDTO {
+    id: ShowingID!
+    webId: Base64ID!
+    filmstadenShowingId: String
+    slug: String!
+    date: String!
+    time: String!
+    movieId: MovieID!
+    movieTitle: String!
+    movie: MovieDTO!
+    location: LocationDTO!
+    cinemaScreen: CinemaScreenDTO
+    price: SEK
+    ticketsBought: Boolean!
+    admin: PublicUserDTO!
+    payToUser: PublicUserDTO!
+    lastModifiedDate: String!
+    createdDate: String!
+    filmstadenSeatMap: [FilmstadenSeatMapDTO!]!
+    attendees: [PublicAttendeeDTO!]!
+}
+
+type PublicAttendeeDTO {
+    userId: UserID!
+    showingId: ShowingID!
+    userInfo: PublicUserDTO!
+}
+
+type CinemaScreenDTO {
+    id: ID!
+    name: String!
+}
+
+input CinemaScreenDTOInput {
+    id: String!
+    name: String
+}
+
+# Used for supplying how the user will pay, when attending a showing
+input PaymentOption {
+    type: PaymentType!
+    ticketNumber: String
+}
+
+enum PaymentType {
+    SWISH
+    GIFT_CERTIFICATE
+}
+
+input CreateShowingDTOInput {
+    date: LocalDate!
+    time: LocalTime!
+    movieId: MovieID!
+    location: String!
+    filmstadenScreen: CinemaScreenDTOInput
+    filmstadenRemoteEntityId: String
+}
+
+input UpdateShowingDTOInput {
+    price: SEK!
+    payToUser: UserID!
+    location: String!
+    filmstadenRemoteEntityId: String
+    time: LocalTime!
+    date: LocalDate!
+}

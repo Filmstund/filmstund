@@ -1,0 +1,70 @@
+extend type Query  {
+    allUsers: [PublicUserDTO!]!
+    currentUser: UserDTO!
+}
+
+extend type Mutation {
+    updateUser(newInfo: UserDetailsDTOInput!): UserDTO!
+
+    # Generate a new calendar feed id, invalidating the old one
+    invalidateCalendarFeed: UserDTO!
+
+    # Remove the calendar feed for the current user
+    disableCalendarFeed: UserDTO!
+
+    addGiftCertificates(giftCerts: [GiftCertificateDTOInput!]): UserDTO!
+    deleteGiftCertificate(giftCert: GiftCertificateDTOInput!): UserDTO!
+}
+
+type UserDTO {
+    id: UserID!
+    filmstadenMembershipId: String
+    name: String
+    firstName: String
+    lastName: String
+    nick: String
+    email: String!
+    phone: String
+    avatar: String
+    giftCertificates: [GiftCertificateDTO!]!
+    calendarFeedId: String
+    calendarFeedUrl: String
+    lastLogin: String!
+    signupDate: String!
+    lastModifiedDate: String!
+}
+
+type PublicUserDTO {
+    id: UserID!
+    name: String
+    firstName: String
+    lastName: String
+    nick: String
+    phone: String
+    avatar: String
+}
+
+type GiftCertificateDTO {
+    number: String!
+    expiresAt: LocalDate!
+    status: GiftCertificateDTO_Status!
+}
+
+enum GiftCertificateDTO_Status {
+    AVAILABLE
+    PENDING
+    USED
+    EXPIRED
+    UNKNOWN
+}
+
+input UserDetailsDTOInput {
+    nick: String
+    filmstadenMembershipId: String
+    phone: String
+}
+
+input GiftCertificateDTOInput {
+    number: String!
+    expiresAt: LocalDate
+}

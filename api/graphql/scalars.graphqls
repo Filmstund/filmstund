@@ -1,0 +1,9 @@
+scalar MovieID
+scalar ShowingID
+scalar Base64ID
+scalar SEK
+scalar LocalDate
+scalar LocalTime
+scalar IMDbID
+scalar TMDbID
+scalar UserID
