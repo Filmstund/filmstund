@@ -28,7 +28,7 @@ const Footer = () => {
           <Bioord />
         </FlexGrow>
         <a
-          href="https://github.com/cthdidIT/itbio"
+          href="https://github.com/Filmstund/filmstund"
           rel="noopener noreferrer"
           target="_blank"
         >

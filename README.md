@@ -1,4 +1,5 @@
-# ITBio [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FcthdidIT%2Fitbio%2Fbadge&style=popout)](https://actions-badge.atrox.dev/cthdidIT/itbio/goto)
+# Filmstund [![Java CI](https://github.com/Filmstund/filmstund/actions/workflows/gradle.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/gradle.yml) [![Node CI](https://github.com/Filmstund/filmstund/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/nodejs.yml)
+
 A web application for making it easier planning to go to the cinema with your friends
 
 ## How to start development

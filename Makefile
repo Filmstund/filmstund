@@ -1,4 +1,5 @@
 .PHONY: all frontend backend docker login push
+# TODO: rename this (requires updating the docker registry)
 NAME         := cthdidit/sefilm
 TAG          := $$(git rev-parse --short=8 HEAD)
 FRONTEND_IMG := ${NAME}-frontend:${TAG}

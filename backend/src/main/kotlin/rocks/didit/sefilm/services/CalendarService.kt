@@ -55,7 +55,7 @@ class CalendarService(
     calendar.setUid(id.toString())
     calendar.setExperimentalProperty("X-WR-RECALID", id.toString())
     calendar.setMethod("PUBLISH")
-    calendar.productId = ProductId("-//cthdidIT//itbio//EN")
+    calendar.productId = ProductId("-//Filmstund//filmstund//EN")
     calendar.calendarScale = CalendarScale.gregorian()
     calendar.addName(CALENDAR_NAME)
     calendar.addExperimentalProperty("X-WR-CALNAME", CALENDAR_NAME)
