@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "apollo": "2.21.0",
-    "source-map-explorer": "2.1.0"
+    "source-map-explorer": "2.5.2"
   },
   "dependencies": {
     "@emotion/core": "10.0.22",
