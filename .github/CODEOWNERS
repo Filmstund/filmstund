@@ -2,5 +2,13 @@
 # the repo. Unless a later match takes precedence,
 * @Filmstund/backend @Filmstund/frontend 
 
-/frontend/ @Filmstund/frontend
-/backend/ @Filmstund/backend
+# Frontend
+/web/ @Filmstund/frontend
+
+# Backend
+Makefile @Filmstund/backend
+go.mod @Filmstund/backend
+*.go @Filmstund/backend
+internal @Filmstund/backend
+cmd @Filmstund/backend
+pkg @Filmstund/backend
