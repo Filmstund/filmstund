@@ -1,26 +1,62 @@
-.PHONY: all frontend backend docker login push
-# TODO: rename this (requires updating the docker registry)
-NAME         := cthdidit/sefilm
-TAG          := $$(git rev-parse --short=8 HEAD)
-FRONTEND_IMG := ${NAME}-frontend:${TAG}
-BACKEND_IMG  := ${NAME}-backend:${TAG}
-DIRECTORY    := $$(pwd)
+PROJECT_NAME := filmstund
 
-frontend:
-	cd ${DIRECTORY}/frontend; docker build -t ${FRONTEND_IMG} --build-arg TAG=$$(git rev-parse HEAD) .
-	docker tag ${FRONTEND_IMG} ${NAME}-frontend:latest
+GOFMT_FILES = $(shell go list -f '{{.Dir}}' ./... | grep -v '/pb')
 
-backend:
-	cd ${DIRECTORY}/backend; ./gradlew --no-daemon build jibDockerBuild --image=${BACKEND_IMG}
-	docker tag ${BACKEND_IMG} ${NAME}-backend:latest
+backend:\
+	lint \
+	fmt  \
+	test \
+	mod-tidy \
+	mod-verify \
+	verify-nodiff
+.PHONY: backend
 
-docker: frontend backend
+lint:
+	$(info [$@] linting $(PROJECT_NAME)...)
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@golangci-lint run --config .golangci.yaml
+.PHONY: lint
 
-push:
-	docker push ${NAME}-frontend
-	docker push ${NAME}-backend
+verify-nodiff:
+	$(info [$@] verifying no git diff...)
+	@git update-index --refresh && git diff-index --quiet HEAD --
+.PHONY: verify-nodiff
 
-login:
-	@docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+# Format all files
+fmt:
+	$(info [$@] formatting all Go files...)
+	@go install mvdan.cc/gofumpt@latest
+	@gofumpt -w $(GOFMT_FILES)
+.PHONY: fmt
 
-all: frontend backend
+mod-tidy:
+	$(info [$@] tidying up...)
+	@go mod tidy
+.PHONY: mod-tidy
+
+mod-verify:
+	$(info [$@] verifying modules...)
+	@go mod verify
+.PHONY: mod-verify
+
+test:
+	$(info [$@] running the tests...)
+	@go test \
+		-shuffle=on \
+		-count=1 \
+		-short \
+		-timeout=5m \
+		./...
+.PHONY: test
+
+clean:
+	@rm -rf ./build
+.PHONY: clean
+
+build: clean
+	$(info [$@] building ${PROJECT_NAME}...)
+	go build -o build/${PROJECT_NAME} ./cmd/${PROJECT_NAME}
+.PHONY: build
+
+run: build
+	@./build/${PROJECT_NAME}

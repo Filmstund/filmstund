@@ -1,15 +1,15 @@
 version: 2
 updates:
-#  - package-ecosystem: "gomod"
-#    directory: "/backend"
-#    schedule:
-#      interval: "weekly"
-#    commit-message:
-#      prefix: chore
-#      include: scope
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: chore
+      include: scope
 
   - package-ecosystem: "npm"
-    directory: "/frontend"
+    directory: "/web"
     schedule:
       interval: "weekly"
     commit-message:

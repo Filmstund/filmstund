@@ -12,10 +12,10 @@ jobs:
       with:
         node-version: 14.x
         cache: 'yarn'
-        cache-dependency-path: 'frontend/yarn.lock'
+        cache-dependency-path: 'web/yarn.lock'
     - name: Build frontend
       run: |
-        cd frontend
+        cd web
         yarn
         yarn build
         yarn test
