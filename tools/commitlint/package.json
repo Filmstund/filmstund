@@ -1,0 +1,10 @@
+{
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0"
+  },
+  "dependencies": {
+    "package.json": "^2.0.1"
+  }
+}

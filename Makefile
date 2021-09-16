@@ -2,14 +2,20 @@ PROJECT_NAME := filmstund
 
 GOFMT_FILES = $(shell go list -f '{{.Dir}}' ./... | grep -v '/pb')
 
-backend:\
+## Default make target
+checks:\
 	lint \
 	fmt  \
 	test \
 	mod-tidy \
 	mod-verify \
+	commitlint \
 	verify-nodiff
-.PHONY: backend
+.PHONY: checks
+
+# Include tooling here
+include tools/commitlint/rules.mk
+# TODO: add graphql linter?
 
 lint:
 	$(info [$@] linting $(PROJECT_NAME)...)
