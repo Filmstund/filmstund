@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
 	"os/signal"
 	"syscall"
 
 	"github.com/filmstund/filmstund/internal/logging"
+	"github.com/filmstund/filmstund/internal/server"
 	"go.uber.org/zap"
 )
 
@@ -16,6 +16,7 @@ func main() {
 
 	logger := logging.NewLogger()
 	defer logger.Sync() //nolint:errcheck
+	ctx = logging.WithLogger(ctx, logger)
 
 	defer func() {
 		stop()
@@ -30,7 +31,6 @@ func main() {
 }
 
 func realMain(ctx context.Context) error {
-	log.Println("hello world, until ctrl+c!")
-	<-ctx.Done()
-	return ctx.Err()
+	filmstund := server.New(":8080", "./web/build")
+	return filmstund.ServeHTTP(ctx)
 }
