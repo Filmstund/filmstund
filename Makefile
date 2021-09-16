@@ -17,7 +17,7 @@ checks:\
 include tools/golangci-lint/rules.mk
 include tools/gofumpt/rules.mk
 include tools/commitlint/rules.mk
-# TODO: add graphql linter?
+include tools/sqlc/rules.mk
 
 lint: $(golangci-lint_bin)
 	$(info [$@] linting $(PROJECT_NAME)...)
