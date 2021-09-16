@@ -3,8 +3,8 @@
 A web application for making it easier planning to go to the cinema with your friends
 
 [![Sanity checks](https://github.com/Filmstund/filmstund/actions/workflows/checks.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/checks.yml)
-[![Frontend](https://github.com/Filmstund/filmstund/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/nodejs.yml)
-[![Backend](https://github.com/Filmstund/filmstund/actions/workflows/golang.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/golang.yml)
+[![Frontend](https://github.com/Filmstund/filmstund/actions/workflows/frontend.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/frontend.yml)
+[![Backend](https://github.com/Filmstund/filmstund/actions/workflows/backend.yml/badge.svg)](https://github.com/Filmstund/filmstund/actions/workflows/backend.yml)
 
 ## React frontend
 
