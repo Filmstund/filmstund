@@ -14,6 +14,7 @@ checks:\
 .PHONY: checks
 
 # Include tooling here
+include tools/gofumpt/rules.mk
 include tools/commitlint/rules.mk
 # TODO: add graphql linter?
 
@@ -29,10 +30,9 @@ verify-nodiff:
 .PHONY: verify-nodiff
 
 # Format all files
-fmt:
+fmt: $(gofumpt_bin)
 	$(info [$@] formatting all Go files...)
-	@go install mvdan.cc/gofumpt@latest
-	@gofumpt -w $(GOFMT_FILES)
+	@$< -w $(GOFMT_FILES)
 .PHONY: fmt
 
 mod-tidy:
