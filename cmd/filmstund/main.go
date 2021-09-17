@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os/signal"
 	"syscall"
 
+	"github.com/filmstund/filmstund/internal/fileserver"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/server"
 	"go.uber.org/zap"
@@ -26,11 +28,20 @@ func main() {
 	}()
 
 	if err := realMain(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Fatal("Fork, main borked", zap.Error(err))
+		logger.Fatalf("application error: %v", err)
 	}
 }
 
 func realMain(ctx context.Context) error {
-	filmstund := server.New(":8080", "./web/build")
-	return filmstund.ServeHTTP(ctx)
+	srv, err := server.New(":8080")
+	if err != nil {
+		return fmt.Errorf("server.New: %w", err)
+	}
+
+	fs, err := fileserver.NewServer("./web/build")
+	if err != nil {
+		return fmt.Errorf("fileserver.New: %w", err)
+	}
+
+	return srv.ServeHTTPHandler(ctx, fs.Routes(ctx))
 }
