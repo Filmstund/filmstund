@@ -3,7 +3,7 @@ commitlint_bin := $(commitlint_cwd)/node_modules/.bin/commitlint
 
 $(commitlint_bin): $(commitlint_cwd)/package.json $(commitlint_cwd)/rules.mk
 	$(info [commitlint] downloading...)
-	@cd $(commitlint_cwd) && yarn add --no-lockfile --silent package.json
+	@yarn install --no-lockfile --silent --cwd $(commitlint_cwd)
 	@touch $@
 
 commitlint: $(commitlint_cwd)/.commitlintrc.js $(commitlint_bin)
