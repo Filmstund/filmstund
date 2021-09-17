@@ -14,14 +14,14 @@ checks:\
 .PHONY: checks
 
 # Include tooling here
+include tools/golangci-lint/rules.mk
 include tools/gofumpt/rules.mk
 include tools/commitlint/rules.mk
 # TODO: add graphql linter?
 
-lint:
+lint: $(golangci-lint_bin)
 	$(info [$@] linting $(PROJECT_NAME)...)
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@golangci-lint run --config .golangci.yaml
+	@$< run --config .golangci.yaml
 .PHONY: lint
 
 verify-nodiff:
