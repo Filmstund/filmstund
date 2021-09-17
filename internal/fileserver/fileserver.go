@@ -9,24 +9,32 @@ import (
 	"github.com/filmstund/filmstund/internal/logging"
 )
 
-type Server struct {
-	path string
+type Config struct {
+	ListenAddr string `env:"LISTEN_ADDR,default=:8080"`
+	ServePath  string `env:"SERVE_PATH,default=./web/build"`
 }
 
-func NewServer(filePath string) (*Server, error) {
-	if _, err := os.Stat(filePath); err != nil {
-		return nil, fmt.Errorf("unable to stat %q: %w", filePath, err)
+type Server struct {
+	cfg *Config
+}
+
+func NewServer(cfg *Config) (*Server, error) {
+	stat, err := os.Stat(cfg.ServePath)
+	if err != nil {
+		return nil, err
+	}
+	if !stat.IsDir() {
+		return nil, fmt.Errorf("not a directory: %s", cfg.ServePath)
 	}
 
-	// TODO: use config
 	return &Server{
-		path: filePath,
+		cfg: cfg,
 	}, nil
 }
 
 func (s *Server) Routes(ctx context.Context) http.Handler {
 	logger := logging.FromContext(ctx)
-	logger.Debugf("setting up routes for fileserver: %s", s.path)
+	logger.Debugf("routing / to file://%s", s.cfg.ServePath)
 
-	return http.FileServer(http.Dir(s.path))
+	return http.FileServer(http.Dir(s.cfg.ServePath))
 }

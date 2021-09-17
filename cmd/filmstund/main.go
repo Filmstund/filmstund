@@ -10,6 +10,7 @@ import (
 	"github.com/filmstund/filmstund/internal/fileserver"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/server"
+	"github.com/filmstund/filmstund/internal/setup"
 	"go.uber.org/zap"
 )
 
@@ -28,17 +29,22 @@ func main() {
 	}()
 
 	if err := realMain(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Fatalf("application error: %v", err)
+		logger.Fatalw("application error", "err", err)
 	}
 }
 
 func realMain(ctx context.Context) error {
-	srv, err := server.New(":8080")
+	var cfg fileserver.Config
+	if err := setup.Setup(ctx, &cfg); err != nil {
+		return fmt.Errorf("failed to setup server environment: %w", err)
+	}
+
+	srv, err := server.New(cfg.ListenAddr)
 	if err != nil {
 		return fmt.Errorf("server.New: %w", err)
 	}
 
-	fs, err := fileserver.NewServer("./web/build")
+	fs, err := fileserver.NewServer(&cfg)
 	if err != nil {
 		return fmt.Errorf("fileserver.New: %w", err)
 	}

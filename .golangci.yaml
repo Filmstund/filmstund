@@ -40,7 +40,7 @@ linters:
     - "staticcheck"
     - "structcheck"
     - "stylecheck"
-    - "typecheck"
+#    - "typecheck"
     - "unconvert"
     - "unused"
     - "varcheck"
