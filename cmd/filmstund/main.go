@@ -34,16 +34,19 @@ func main() {
 
 func realMain(ctx context.Context) error {
 	var cfg fileserver.Config
-	if err := setup.Setup(ctx, &cfg); err != nil {
+
+	env, err := setup.Setup(ctx, &cfg)
+	if err != nil {
 		return fmt.Errorf("failed to setup server environment: %w", err)
 	}
+	defer env.Close(ctx)
 
 	srv, err := server.New(cfg.ListenAddr)
 	if err != nil {
 		return fmt.Errorf("server.New: %w", err)
 	}
 
-	fs, err := fileserver.NewServer(&cfg)
+	fs, err := fileserver.NewServer(&cfg, env)
 	if err != nil {
 		return fmt.Errorf("fileserver.New: %w", err)
 	}

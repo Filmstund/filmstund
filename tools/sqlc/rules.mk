@@ -19,5 +19,5 @@ $(sqlc_bin): $(sqlc_cwd)/rules.mk
 	@touch $@
 
 sqlc-generate: $(sqlc_bin)
-	@$(sqlc_bin) generate --file ./configs/sqlc/sqlc.yaml
+	@$(sqlc_bin) generate --file ./configs/database/sqlc/sqlc.yaml
 .PHONY: sqlc

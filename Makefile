@@ -9,6 +9,7 @@ checks:\
 	test \
 	mod-tidy \
 	mod-verify \
+	sqlc-generate \
 	commitlint \
 	verify-nodiff
 .PHONY: checks

@@ -20,7 +20,7 @@ yarn test
 ### Requirements
 
 - `go` >1.17
-- ~~postgres~~ (_not yet implemented_)
+- postgres
 
 ### Linting and sanity checks
 
@@ -40,4 +40,27 @@ make build
 
 ```shell
 make run
+```
+
+### Database
+
+Start Postgres using Docker:
+
+```shell
+docker run --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund -d -p 5432:5432 postgres:13
+```
+
+After that we need to run the migrations. These are done with [migrate-go](https://github.com/golang-migrate/migrate):
+
+```shell
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+migrate -path configs/database/migrations -database 'postgres://filmstund:filmstund@localhost:5432/filmstund?sslmode=disable' up
+```
+
+#### Add new migration
+
+To add a new migration, do the following:
+
+```shell
+migrate create -ext sql -dir configs/database/migrations migration_name_goes_here
 ```

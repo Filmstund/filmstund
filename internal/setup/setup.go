@@ -4,17 +4,38 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/logging"
+	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/sethvargo/go-envconfig"
 )
 
-func Setup(ctx context.Context, cfg interface{}) error {
+type DatabaseConfigProvider interface {
+	DatabaseConfig() *database.Config
+}
+
+func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	logger := logging.FromContext(ctx)
 
+	// Populate the config with variables from the current env
 	if err := envconfig.Process(ctx, cfg); err != nil {
-		return fmt.Errorf("failed to process config: %w", err)
+		return nil, fmt.Errorf("failed to process config: %w", err)
 	}
 	logger.Debugw("using config", "config", cfg)
 
-	return nil
+	options := make([]serverenv.Option, 0, 1)
+
+	if provider, ok := cfg.(DatabaseConfigProvider); ok {
+		dbCfg := provider.DatabaseConfig()
+		db, err := database.New(ctx, dbCfg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't setup database: %w", err)
+		}
+
+		options = append(options, serverenv.WithDatabase(db))
+	} else {
+		return nil, fmt.Errorf("provided config isn't a database config")
+	}
+
+	return serverenv.New(ctx, options...), nil
 }
