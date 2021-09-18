@@ -63,7 +63,17 @@ clean:
 build: clean
 	$(info [$@] building ${PROJECT_NAME}...)
 	go build -o build/${PROJECT_NAME} ./cmd/${PROJECT_NAME}
+	go build -o build/migrate ./cmd/migrate
 .PHONY: build
 
-run: build
+build-website:
+	$(info [$@] building website...)
+	@yarn --cwd ./web --silent install
+	@yarn --cwd ./web --silent build
+
+migrate: build
+	@./build/migrate
+
+run: build build-website migrate
 	@./build/${PROJECT_NAME}
+.PHONY: run

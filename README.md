@@ -50,17 +50,21 @@ Start Postgres using Docker:
 docker run --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund -d -p 5432:5432 postgres:13
 ```
 
-After that we need to run the migrations. These are done with [migrate-go](https://github.com/golang-migrate/migrate):
+Our database migrations are written in [migrate-go](https://github.com/golang-migrate/migrate) format.
+To run the migrations, do the following:
 
 ```shell
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-migrate -path configs/database/migrations -database 'postgres://filmstund:filmstund@localhost:5432/filmstund?sslmode=disable' up
+go run ./cmd/migrate --path configs/database/migrations
 ```
+
+_Note that the username, password etc are configured using environment, and the same rules as the normal backend applies._
 
 #### Add new migration
 
 To add a new migration, do the following:
 
 ```shell
+# Skip the first step if you already have migrate installed and in your $PATH
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 migrate create -ext sql -dir configs/database/migrations migration_name_goes_here
 ```
