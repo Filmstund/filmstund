@@ -11,7 +11,6 @@ import (
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/server"
 	"github.com/filmstund/filmstund/internal/setup"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -24,12 +23,12 @@ func main() {
 	defer func() {
 		stop()
 		if r := recover(); r != nil {
-			logger.Fatalw("application panic", zap.Any("panic-info", r))
+			logger.Fatalw("application panic", "panic", r)
 		}
 	}()
 
 	if err := realMain(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Fatalw("application error", "err", err)
+		logger.Errorw("application error", "err", err)
 	}
 }
 
