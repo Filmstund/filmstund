@@ -3,12 +3,12 @@ package database
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/sethvargo/go-envconfig"
+	"gotest.tools/assert"
 )
 
 func TestConfig_PGXConnectionString(t *testing.T) {
@@ -82,14 +82,11 @@ func TestConfig_PGXConnectionString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			if tt.cfg != nil {
-				if err := envconfig.ProcessWith(context.TODO(), tt.cfg, envconfig.MapLookuper(nil)); err != nil {
-					t.Fatalf("Couldn't process env: %v", err)
-				}
+				err := envconfig.ProcessWith(context.TODO(), tt.cfg, envconfig.MapLookuper(nil))
+				assert.NilError(t, err)
 			}
 
-			if got := tt.cfg.PGXConnectionString(); got != tt.want {
-				t.Errorf("PGXConnectionString() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.cfg.PGXConnectionString(), tt.want)
 		})
 	}
 }
@@ -133,8 +130,8 @@ func Test_joinTogether(t *testing.T) {
 
 			spaceCount := strings.Count(got, " ")
 			wantCount := len(tt.args) - 1
-			if wantCount >= 0 && spaceCount != wantCount {
-				t.Fatalf("wrong space count, got %d, want %d", spaceCount, wantCount)
+			if wantCount >= 0 {
+				assert.Equal(t, spaceCount, wantCount, "amount of spaces")
 			}
 
 			for key, val := range tt.args {
@@ -228,14 +225,11 @@ func TestConfig_dsnMap(t *testing.T) {
 			t.Parallel()
 
 			if tt.cfg != nil {
-				if err := envconfig.ProcessWith(context.TODO(), tt.cfg, envconfig.MapLookuper(nil)); err != nil {
-					t.Fatalf("unable to process environment %v", err)
-				}
+				err := envconfig.ProcessWith(context.TODO(), tt.cfg, envconfig.MapLookuper(nil))
+				assert.NilError(t, err)
 			}
 
-			if got := tt.cfg.dsnMap(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("dsnMap() = %v, want %v", got, tt.want)
-			}
+			assert.DeepEqual(t, tt.cfg.dsnMap(), tt.want)
 		})
 	}
 }
@@ -295,13 +289,10 @@ func TestConfig_overrides(t *testing.T) {
 			t.Parallel()
 
 			var got Config
-			if err := envconfig.ProcessWith(context.TODO(), &got, envconfig.MapLookuper(tt.env)); err != nil {
-				t.Fatalf("unable to process environment %v", err)
-			}
+			err := envconfig.ProcessWith(context.TODO(), &got, envconfig.MapLookuper(tt.env))
+			assert.NilError(t, err)
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("overrided config = %v, want %v", got, tt.want)
-			}
+			assert.DeepEqual(t, got, tt.want)
 		})
 	}
 }
