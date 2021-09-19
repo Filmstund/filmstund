@@ -1,4 +1,9 @@
--- name: ListBioBudord :many
+-- name: ListCommandments :many
 SELECT number, phrase
-FROM bio_budord
+FROM commandment
 ORDER BY number;
+
+-- name: RandomCommandment :one
+SELECT number, phrase
+FROM commandment
+ORDER BY random() limit 1;

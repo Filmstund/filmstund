@@ -1,0 +1,11 @@
+## Bio Budord / Commandments ##
+
+extend type Query {
+    allCommandments: [Commandments!]!
+    randomCommandment: Commandments!
+}
+
+type Commandments {
+    number: Int!
+    phrase: String!
+}

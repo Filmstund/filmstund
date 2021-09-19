@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-create table if not exists bio_budord
+create table if not exists commandment
 (
     number       integer
         constraint bioBudord_pk primary key,
@@ -9,7 +9,7 @@ create table if not exists bio_budord
     created_date timestamp with time zone not null default current_timestamp
 );
 
-insert into bio_budord (number, phrase)
+insert into commandment (number, phrase)
 values (1, 'Du skall icke spoila'),
        (2, 'Låt din nästa se på bio såsom du själv skulle vilja se på bio'),
        (3, 'Du skall icke späda din cola'),

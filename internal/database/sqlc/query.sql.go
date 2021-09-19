@@ -7,26 +7,26 @@ import (
 	"context"
 )
 
-const listBioBudord = `-- name: ListBioBudord :many
+const listCommandments = `-- name: ListCommandments :many
 SELECT number, phrase
-FROM bio_budord
+FROM commandment
 ORDER BY number
 `
 
-type ListBioBudordRow struct {
+type ListCommandmentsRow struct {
 	Number int32  `json:"number"`
 	Phrase string `json:"phrase"`
 }
 
-func (q *Queries) ListBioBudord(ctx context.Context) ([]ListBioBudordRow, error) {
-	rows, err := q.db.Query(ctx, listBioBudord)
+func (q *Queries) ListCommandments(ctx context.Context) ([]ListCommandmentsRow, error) {
+	rows, err := q.db.Query(ctx, listCommandments)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListBioBudordRow
+	var items []ListCommandmentsRow
 	for rows.Next() {
-		var i ListBioBudordRow
+		var i ListCommandmentsRow
 		if err := rows.Scan(&i.Number, &i.Phrase); err != nil {
 			return nil, err
 		}
@@ -36,4 +36,22 @@ func (q *Queries) ListBioBudord(ctx context.Context) ([]ListBioBudordRow, error)
 		return nil, err
 	}
 	return items, nil
+}
+
+const randomCommandment = `-- name: RandomCommandment :one
+SELECT number, phrase
+FROM commandment
+ORDER BY random() limit 1
+`
+
+type RandomCommandmentRow struct {
+	Number int32  `json:"number"`
+	Phrase string `json:"phrase"`
+}
+
+func (q *Queries) RandomCommandment(ctx context.Context) (RandomCommandmentRow, error) {
+	row := q.db.QueryRow(ctx, randomCommandment)
+	var i RandomCommandmentRow
+	err := row.Scan(&i.Number, &i.Phrase)
+	return i, err
 }

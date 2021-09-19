@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS bio_budord;
