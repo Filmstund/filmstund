@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -34,7 +35,22 @@ func New(ctx context.Context, cfg *Config) (*DB, error) {
 	}, nil
 }
 
-func (d *DB) Close(ctx context.Context) {
+type QueryFunc func(ctx context.Context, q *sqlc.Queries) error
+
+// DoQuery retrieves a connection from the DB pool, and executes the
+// given func with a sqlc.Queries.
+func (db *DB) DoQuery(ctx context.Context, f QueryFunc) error {
+	conn, err := db.Pool.Acquire(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to acquire DB connection: %w", err)
+	}
+	defer conn.Release()
+
+	queries := sqlc.New(conn)
+	return f(ctx, queries)
+}
+
+func (db *DB) Close(ctx context.Context) {
 	logging.FromContext(ctx).Infof("closing database connection pool...")
-	d.Pool.Close()
+	db.Pool.Close()
 }
