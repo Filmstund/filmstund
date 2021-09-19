@@ -4,6 +4,9 @@
 
 ## How has this been tested?
 
-  <!--- Please describe in detail how you tested your changes. -->
+- [ ] Unit tests
+- [ ] Manually
+
+<!-- add description if necessary -->
 
 ## Screenshots (if appropriate):
