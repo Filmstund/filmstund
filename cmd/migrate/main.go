@@ -12,7 +12,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/database/pgx"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/sethvargo/go-envconfig"
 	"github.com/spf13/pflag"
@@ -57,7 +57,7 @@ func realMain(ctx context.Context) error {
 	logger.Infow("using database config", "config", cfg)
 
 	file := fmt.Sprintf("file://%s", *pathToMigrations)
-	mig, err := migrate.New(file, cfg.ConnectionString())
+	mig, err := migrate.New(file, cfg.PGXConnectionString())
 	if err != nil {
 		return fmt.Errorf("unable to setup migrate: %w", err)
 	}
