@@ -5,11 +5,12 @@ GOFMT_FILES = $(shell go list -f '{{.Dir}}' ./... | grep -v '/pb')
 ## Default make target
 checks:\
 	lint \
+	sqlc-generate \
+	generate \
 	fmt  \
 	test \
 	mod-tidy \
 	mod-verify \
-	sqlc-generate \
 	commitlint \
 	verify-nodiff
 .PHONY: checks
@@ -45,6 +46,10 @@ mod-verify:
 	$(info [$@] verifying modules...)
 	@go mod verify
 .PHONY: mod-verify
+
+generate:
+	$(info [$@] codegen...)
+	@go generate ./...
 
 test:
 	$(info [$@] running the tests...)

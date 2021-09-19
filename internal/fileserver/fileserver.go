@@ -2,13 +2,14 @@ package fileserver
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/graph"
+	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/serverenv"
@@ -62,39 +63,19 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	r := mux.NewRouter()
 
 	// Middleware
+	r.Use(middleware.AttachAppLogger(logger))
 	r.Use(middleware.ProcessMaintenance(s.cfg))
 
-	r.HandleFunc("/poc/biobudord", func(w http.ResponseWriter, r *http.Request) {
-		// TODO: convenience method for getting a "queries"
-		conn, err := s.env.Database().Pool.Acquire(ctx)
-		if err != nil {
-			logger.Warnw("Couldn't acquire DB con", "err", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		defer conn.Release()
-
-		queries := sqlc.New(conn)
-		budord, err := queries.ListBioBudord(ctx)
-		if err != nil {
-			logger.Warnw("unable to list biobudord", "err", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		marshal, err := json.Marshal(budord)
-		if err != nil {
-			logger.Warnw("failed to marshal biobudord", "budord", budord)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if _, err := w.Write(marshal); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			logger.Warnw("failed to write payload", "err", err)
-		}
-	})
+	// GraphQL setup
+	gqlConfig := gql.Config{
+		Resolvers: &graph.Resolver{
+			DB: s.env.Database(),
+		},
+	}
+	gqlHandler := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 
 	// Routing table
+	r.Handle("/query", gqlHandler).Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(s.cfg.ServePath)))
 
 	return r
