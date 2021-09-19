@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/filmstund/filmstund/internal/fileserver"
+	"github.com/filmstund/filmstund/internal/cinema"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/server"
 	"github.com/filmstund/filmstund/internal/setup"
@@ -33,7 +33,7 @@ func main() {
 }
 
 func realMain(ctx context.Context) error {
-	var cfg fileserver.Config
+	var cfg cinema.Config
 
 	env, err := setup.Setup(ctx, &cfg)
 	if err != nil {
@@ -46,9 +46,9 @@ func realMain(ctx context.Context) error {
 		return fmt.Errorf("server.New: %w", err)
 	}
 
-	fs, err := fileserver.NewServer(&cfg, env)
+	fs, err := cinema.NewServer(&cfg, env)
 	if err != nil {
-		return fmt.Errorf("fileserver.New: %w", err)
+		return fmt.Errorf("cinema.New: %w", err)
 	}
 
 	return srv.ServeHTTPHandler(ctx, fs.Routes(ctx))

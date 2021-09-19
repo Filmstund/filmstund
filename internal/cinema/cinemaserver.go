@@ -1,4 +1,4 @@
-package fileserver
+package cinema
 
 import (
 	"context"
