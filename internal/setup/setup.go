@@ -6,12 +6,17 @@ import (
 
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/logging"
+	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/sethvargo/go-envconfig"
 )
 
 type DatabaseConfigProvider interface {
 	DatabaseConfig() *database.Config
+}
+
+type SecurityConfigProvider interface {
+	SecurityConfig() *security.Config
 }
 
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {

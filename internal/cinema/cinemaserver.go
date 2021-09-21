@@ -12,16 +12,21 @@ import (
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/middleware"
+	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/gorilla/mux"
 )
 
 // Assertion for making sure the config implements these interfaces.
-var _ setup.DatabaseConfigProvider = (*Config)(nil)
+var (
+	_ setup.DatabaseConfigProvider = (*Config)(nil)
+	_ setup.SecurityConfigProvider = (*Config)(nil)
+)
 
 type Config struct {
 	Database database.Config
+	Security security.Config
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
 	ServePath   string `env:"SERVE_PATH,default=./web/build"`
@@ -30,6 +35,10 @@ type Config struct {
 
 func (c *Config) DatabaseConfig() *database.Config {
 	return &c.Database
+}
+
+func (c *Config) SecurityConfig() *security.Config {
+	return &c.Security
 }
 
 func (c *Config) MaintenanceMode() bool {
@@ -63,8 +72,13 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	r := mux.NewRouter()
 
 	// Middleware
+	// TODO: request id?
+	r.Use(middleware.RecoverPanic())
 	r.Use(middleware.AttachAppLogger(logger))
 	r.Use(middleware.ProcessMaintenance(s.cfg))
+	r.Use(middleware.ApplyAuthorization(s.cfg))
+	r.Use(middleware.ApplyAuthentication())
+	// TODO: CORS, security headers?
 
 	// GraphQL setup
 	gqlConfig := gql.Config{

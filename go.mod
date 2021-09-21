@@ -4,6 +4,8 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.14.0
+	github.com/MicahParks/keyfunc v0.8.2
+	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang-migrate/migrate/v4 v4.15.0-beta.3
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgconn v1.10.0
@@ -18,6 +20,8 @@ require (
 require (
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
