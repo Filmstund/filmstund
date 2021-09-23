@@ -17,7 +17,9 @@ type Config struct {
 	Algorithm string `env:"JWT_EXPECTED_ALG, default=RS256"` // expected signing algorithm
 	Audience  string `env:"JWT_EXPECTED_AUD, required"`      // expected audience (who, or what is the tokens intended for)
 	Issuer    string `env:"JWT_EXPECTED_ISS, required"`      // the expected issuer (who created and signed our tokens)
-	JwksURL   string `env:"JWT_JWKS_URL, default=${JWT_EXPECTED_ISS}.well-known/jwks.json"`
+
+	JwksURL     string `env:"JWT_JWKS_URL, default=${JWT_EXPECTED_ISS}.well-known/jwks.json"`
+	UserinfoURL string `env:"JWT_USERINFO_URL, default=${JWT_EXPECTED_ISS}userinfo"`
 	// TODO client secret etc?
 
 	jwks     *keyfunc.JWKs
