@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/signal"
 	"syscall"
 
@@ -19,6 +20,10 @@ func main() {
 	logger := logging.NewLogger()
 	defer logger.Sync() //nolint:errcheck
 	ctx = logging.WithLogger(ctx, logger)
+
+	if err := os.Setenv("TZ", "UTC"); err != nil {
+		logger.Warnw("failed to change timezone to UTC", "err", err)
+	}
 
 	defer func() {
 		stop()
