@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/filmstund/filmstund/internal/httputils"
+	"github.com/filmstund/filmstund/internal/idtoken"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/setup"
-	"github.com/filmstund/filmstund/internal/users"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 )
@@ -27,7 +27,7 @@ func ApplyAuthorization(confProvider setup.SecurityConfigProvider) mux.Middlewar
 			if token := verifyAuthorization(w, r, cfg); token != nil {
 				if idToken := fetchIDToken(token, w, r, cfg); idToken != nil {
 					ctx := security.WithToken(r.Context(), token)
-					ctx = users.WithIDToken(ctx, idToken)
+					ctx = idtoken.WithIDToken(ctx, idToken)
 
 					next.ServeHTTP(w, r.Clone(ctx))
 				}
@@ -90,7 +90,7 @@ func verifyAuthorization(w http.ResponseWriter, r *http.Request, cfg *security.C
 	return token
 }
 
-func fetchIDToken(token *jwt.Token, w http.ResponseWriter, r *http.Request, cfg *security.Config) *users.IDToken {
+func fetchIDToken(token *jwt.Token, w http.ResponseWriter, r *http.Request, cfg *security.Config) *idtoken.IDToken {
 	logger := logging.FromContext(r.Context()).
 		With("url", r.URL.String()).
 		With("from", r.RemoteAddr)
@@ -136,7 +136,7 @@ func fetchIDToken(token *jwt.Token, w http.ResponseWriter, r *http.Request, cfg 
 		return nil
 	}
 
-	var idToken users.IDToken
+	var idToken idtoken.IDToken
 	if err := json.Unmarshal(buf, &idToken); err != nil {
 		logger.Infow("failed to unmarshal ID token", "err", err)
 		httputils.Unauthorized(w, r)

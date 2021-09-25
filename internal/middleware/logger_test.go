@@ -7,7 +7,7 @@ import (
 
 	"github.com/filmstund/filmstund/internal/logging"
 	"go.uber.org/zap"
-	"gotest.tools/assert"
+	"gotest.tools/v3/assert"
 )
 
 func TestAttachAppLogger(t *testing.T) {

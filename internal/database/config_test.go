@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/sethvargo/go-envconfig"
-	"gotest.tools/assert"
+	"gotest.tools/v3/assert"
 )
 
 func TestConfig_PGXConnectionString(t *testing.T) {

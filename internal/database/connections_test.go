@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"gotest.tools/assert"
+	"gotest.tools/v3/assert"
 )
 
 func TestNew_invalid_connection(t *testing.T) {

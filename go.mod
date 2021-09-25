@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/99designs/gqlgen v0.14.0
 	github.com/MicahParks/keyfunc v0.8.2
+	github.com/benbjohnson/clock v1.1.0
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang-migrate/migrate/v4 v4.15.0-beta.3
 	github.com/gorilla/mux v1.8.0
@@ -14,7 +15,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/vektah/gqlparser/v2 v2.2.0
 	go.uber.org/zap v1.19.1
-	gotest.tools v2.2.0+incompatible
+	gotest.tools/v3 v3.0.3
 )
 
 require (
