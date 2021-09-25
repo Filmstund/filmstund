@@ -83,7 +83,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	r.Use(middleware.RecoverPanic())
 	r.Use(middleware.AttachAppLogger(logger))
 	r.Use(middleware.ProcessMaintenance(s.cfg))
-	r.Use(middleware.ApplyAuthorization(s.cfg))
+	r.Use(middleware.ApplyAuthorization(s.env.IDTokenCache(), s.cfg))
 	// TODO: authentication, CORS, security headers?
 
 	// GraphQL setup
