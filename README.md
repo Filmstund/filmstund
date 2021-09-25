@@ -44,11 +44,23 @@ make run
 
 ### Database
 
-Start Postgres using Docker:
+To run the app you will need to have access to a Postgres instance.
+
+#### Docker
 
 ```shell
 docker run --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund -d -p 5432:5432 postgres:13
 ```
+
+#### Podman
+
+If you want, you can use `podman` instead of docker:
+
+```shell
+sudo podman run -d --rm -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund postgres:13
+```
+
+#### Migrations
 
 Our database migrations are written in [migrate-go](https://github.com/golang-migrate/migrate) format.
 To run the migrations, do the following:
@@ -59,7 +71,7 @@ go run ./cmd/migrate --path configs/database/migrations
 
 _Note that the username, password etc are configured using environment, and the same rules as the normal backend applies._
 
-#### Add new migration
+##### Add new migration
 
 To add a new migration, do the following:
 
