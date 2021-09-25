@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/idtoken"
 )
 
 type ServerEnv struct {
-	db *database.DB
+	db           *database.DB
+	idTokenCache *idtoken.Cache
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -33,6 +35,17 @@ func (e *ServerEnv) Database() *database.DB {
 	return e.db
 }
 
+func WithIDTokenCache(cache *idtoken.Cache) Option {
+	return func(env *ServerEnv) *ServerEnv {
+		env.idTokenCache = cache
+		return env
+	}
+}
+
+func (e *ServerEnv) IDTokenCache() *idtoken.Cache {
+	return e.idTokenCache
+}
+
 func (e *ServerEnv) Close(ctx context.Context) error {
 	if e == nil {
 		return nil
@@ -41,5 +54,10 @@ func (e *ServerEnv) Close(ctx context.Context) error {
 	if e.db != nil {
 		e.db.Close(ctx)
 	}
+
+	if e.idTokenCache != nil {
+		e.idTokenCache.StopBackgroundExpiration()
+	}
+
 	return nil
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/gql"
+	"github.com/filmstund/filmstund/internal/idtoken"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/security"
@@ -20,13 +21,15 @@ import (
 
 // Assertion for making sure the config implements these interfaces.
 var (
-	_ setup.DatabaseConfigProvider = (*Config)(nil)
-	_ setup.SecurityConfigProvider = (*Config)(nil)
+	_ setup.DatabaseConfigProvider     = (*Config)(nil)
+	_ setup.SecurityConfigProvider     = (*Config)(nil)
+	_ setup.IDTokenCacheConfigProvider = (*Config)(nil)
 )
 
 type Config struct {
-	Database database.Config
-	Security security.Config
+	Database     database.Config
+	Security     security.Config
+	IDTokenCache idtoken.Config
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
 	ServePath   string `env:"SERVE_PATH,default=./web/build"`
@@ -39,6 +42,10 @@ func (c *Config) DatabaseConfig() *database.Config {
 
 func (c *Config) SecurityConfig() *security.Config {
 	return &c.Security
+}
+
+func (c *Config) IDTokenCacheConfig() idtoken.Config {
+	return c.IDTokenCache
 }
 
 func (c *Config) MaintenanceMode() bool {

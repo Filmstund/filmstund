@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/idtoken"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/serverenv"
@@ -19,6 +20,10 @@ type SecurityConfigProvider interface {
 	SecurityConfig() *security.Config
 }
 
+type IDTokenCacheConfigProvider interface {
+	IDTokenCacheConfig() idtoken.Config
+}
+
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	logger := logging.FromContext(ctx)
 
@@ -30,6 +35,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 
 	options := make([]serverenv.Option, 0, 1)
 
+	// Database connection pooling
 	if provider, ok := cfg.(DatabaseConfigProvider); ok {
 		dbCfg := provider.DatabaseConfig()
 		db, err := database.New(ctx, dbCfg)
@@ -38,8 +44,16 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 		}
 
 		options = append(options, serverenv.WithDatabase(db))
-	} else {
-		return nil, fmt.Errorf("provided config isn't a database config")
+	}
+
+	// ID token cache
+	if provider, ok := cfg.(IDTokenCacheConfigProvider); ok {
+		cacheConfig := provider.IDTokenCacheConfig()
+
+		cache := idtoken.NewCache(cacheConfig)
+		cache.StartExpiration(ctx)
+
+		options = append(options, serverenv.WithIDTokenCache(cache))
 	}
 
 	return serverenv.New(ctx, options...), nil

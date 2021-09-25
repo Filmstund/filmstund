@@ -68,6 +68,9 @@ func (s *Server) ServeHTTP(ctx context.Context, srv *http.Server) error {
 func (s *Server) ServeHTTPHandler(ctx context.Context, handler http.Handler) error {
 	return s.ServeHTTP(ctx, &http.Server{
 		Handler: handler,
+		// ReadTimeout:  0, // TODO: configure
+		// WriteTimeout: 0, // TODO: configure
+		// IdleTimeout:  0, // TODO: configure
 	})
 }
 
