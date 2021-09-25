@@ -15,6 +15,7 @@ func AttachAppLogger(logger *zap.SugaredLogger) mux.MiddlewareFunc {
 
 			// TODO: add request_id header?
 
+			logger := logger
 			ctx = logging.WithLogger(ctx, logger)
 			r = r.Clone(ctx)
 
