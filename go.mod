@@ -6,7 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.14.0
 	github.com/MicahParks/keyfunc v0.8.2
 	github.com/benbjohnson/clock v1.1.0
-	github.com/golang-jwt/jwt/v4 v4.0.0
+	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang-migrate/migrate/v4 v4.15.0-beta.3
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgconn v1.10.0

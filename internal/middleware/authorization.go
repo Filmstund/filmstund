@@ -66,7 +66,7 @@ func (v *jwtVerifier) authorization() *jwt.Token {
 	jwks := v.cfg.JWKs(v.r.Context())
 
 	// Parse and validate the token
-	token, err := jwt.Parse(rawToken, jwks.Keyfunc)
+	token, err := jwt.ParseWithClaims(rawToken, &security.Auth0Claims{}, jwks.Keyfunc)
 	if err != nil {
 		logger.Debugw("[token] broken/invalid token supplied", "err", err, "claims", token.Claims)
 		httputils.Unauthorized(v.w, v.r)
@@ -82,14 +82,15 @@ func (v *jwtVerifier) authorization() *jwt.Token {
 	}
 
 	// Verify token has the expected issuer and audience claims
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*security.Auth0Claims); ok && token.Valid {
 		if !claims.VerifyAudience(v.cfg.Audience, true) ||
-			!claims.VerifyIssuer(v.cfg.Issuer, true) ||
-			!claims.VerifyExpiresAt(time.Now().Unix(), true) { // verify that this claim actually exists
+			!claims.VerifyIssuer(v.cfg.Issuer) ||
+			!claims.VerifyExpiresAt(time.Now(), true) { // verify that this claim actually exists // TODO: use timefunc
 			logger.Debugw(
 				"[token] couldn't verify audience/issuer",
-				"audience", claims["aud"],
-				"issuer", claims["iss"],
+				"audience", claims.Audience,
+				"issuer", claims.Issuer,
+				"expiresAt", claims.ExpiresAt,
 			)
 			httputils.Unauthorized(v.w, v.r)
 			return nil
@@ -115,9 +116,11 @@ func (v *jwtVerifier) fetchIDToken(token *jwt.Token) *idtoken.IDToken {
 		return nil
 	}
 
+	// we panic here if it is the wrong type - should've been checked earlier
+	claims := token.Claims.(*security.Auth0Claims) //nolint:forcetypeassert
+
 	// return early if we have the current subject in cache.
-	// TODO: make this more safe...
-	sub := idtoken.Subject(token.Claims.(jwt.MapClaims)["sub"].(string))
+	sub := idtoken.Subject(claims.Subject)
 	if idToken := v.cache.Get(sub); idToken != nil {
 		logger.Debugf("token fetched from cache for %s: %v", sub, idToken)
 		return idToken
@@ -163,9 +166,8 @@ func (v *jwtVerifier) fetchIDToken(token *jwt.Token) *idtoken.IDToken {
 		return nil
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		// TODO: make this safer
-		exp := time.Unix(int64(claims["exp"].(float64)), 0)
+	if claims.ExpiresAt != nil {
+		exp := claims.ExpiresAt.Time
 		logger.Debugf("caching %q until %s", idToken.Sub, exp)
 		v.cache.PutOrUpdate(&idToken, exp)
 	}
