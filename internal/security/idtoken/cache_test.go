@@ -22,9 +22,9 @@ func newFixture() (*Cache, *clock.Mock) {
 	return newWithClock(defaultConfig, mock), mock
 }
 
-func preloadCache(c map[Subject]cachedUser, load []cachedUser) {
-	for _, user := range load {
-		c[user.idToken.Sub] = user
+func preloadCache(c map[Subject]cachedToken, load []cachedToken) {
+	for _, cache := range load {
+		c[cache.idToken.Sub] = cache
 	}
 }
 
@@ -34,7 +34,7 @@ func TestCache_Get(t *testing.T) {
 		name             string
 		timeOffset       time.Duration
 		wantedSubject    Subject
-		preLoad          []cachedUser
+		preLoad          []cachedToken
 		wantPreLoadIndex int
 	}{
 		{
@@ -53,7 +53,7 @@ func TestCache_Get(t *testing.T) {
 			name:          "Expired token",
 			timeOffset:    2 * time.Second,
 			wantedSubject: "hello",
-			preLoad: []cachedUser{
+			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0),
 					idToken:  &IDToken{Sub: "hello"},
@@ -65,7 +65,7 @@ func TestCache_Get(t *testing.T) {
 			name:          "Expiry equals now()",
 			timeOffset:    time.Hour,
 			wantedSubject: "hello",
-			preLoad: []cachedUser{
+			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
 					idToken:  &IDToken{Sub: "hello"},
@@ -77,7 +77,7 @@ func TestCache_Get(t *testing.T) {
 			name:          "Valid token",
 			timeOffset:    0,
 			wantedSubject: "valid",
-			preLoad: []cachedUser{
+			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
 					idToken:  &IDToken{Sub: "valid"},
@@ -89,7 +89,7 @@ func TestCache_Get(t *testing.T) {
 			name:          "Multiple tokens",
 			timeOffset:    0,
 			wantedSubject: "valid2",
-			preLoad: []cachedUser{
+			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
 					idToken:  &IDToken{Sub: "valid"},
@@ -127,7 +127,7 @@ func TestCache_GetOrSet(t *testing.T) {
 		name             string
 		timeOffset       time.Duration
 		wantedSubject    Subject
-		preLoad          []cachedUser
+		preLoad          []cachedToken
 		mappingFunc      MappingFunc
 		wantPreLoadIndex int
 	}{
@@ -135,7 +135,7 @@ func TestCache_GetOrSet(t *testing.T) {
 			name:          "Nil mapping func, existing token",
 			timeOffset:    0,
 			wantedSubject: "apabepa",
-			preLoad: []cachedUser{
+			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
 					idToken: &IDToken{
@@ -150,7 +150,7 @@ func TestCache_GetOrSet(t *testing.T) {
 			name:             "Nil mapping func, missing token",
 			timeOffset:       0,
 			wantedSubject:    "apabepa",
-			preLoad:          []cachedUser{},
+			preLoad:          []cachedToken{},
 			mappingFunc:      nil,
 			wantPreLoadIndex: -1,
 		},
@@ -158,7 +158,7 @@ func TestCache_GetOrSet(t *testing.T) {
 			name:          "Mapping func, existing token",
 			timeOffset:    0,
 			wantedSubject: "apabepa",
-			preLoad: []cachedUser{
+			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
 					idToken: &IDToken{
@@ -187,8 +187,8 @@ func TestCache_GetOrSet(t *testing.T) {
 				if tt.mappingFunc != nil {
 					expectedToken, _ := tt.mappingFunc()
 					assert.Equal(t, token, expectedToken)
-					for _, user := range tt.preLoad {
-						assert.Check(t, func() bool { return expectedToken != user.idToken })
+					for _, cache := range tt.preLoad {
+						assert.Check(t, func() bool { return expectedToken != cache.idToken })
 					}
 				} else {
 					assert.Assert(t, cmp.Nil(token))
@@ -206,7 +206,7 @@ func TestCache_GetOrSet_mappingFunc(t *testing.T) {
 	// Given
 	c, _ := newFixture()
 
-	preloadCache(c.tokens, []cachedUser{
+	preloadCache(c.tokens, []cachedToken{
 		{
 			expireAt: time.UnixMilli(0),
 			idToken: &IDToken{
@@ -282,10 +282,10 @@ func TestCache_deleteExpiredTokens_halfExpiredTokens(t *testing.T) {
 	assert.Assert(t, cmp.Len(c.tokens, 7))
 }
 
-func genTokens(amount int, expireAt time.Time) []cachedUser {
-	users := make([]cachedUser, 0, amount)
+func genTokens(amount int, expireAt time.Time) []cachedToken {
+	tokens := make([]cachedToken, 0, amount)
 	for i := 0; i < amount; i++ {
-		users = append(users, cachedUser{
+		tokens = append(tokens, cachedToken{
 			expireAt: expireAt,
 			idToken: &IDToken{
 				Sub: Subject(fmt.Sprintf("%d", rand.Int())), //nolint:gosec
@@ -293,7 +293,7 @@ func genTokens(amount int, expireAt time.Time) []cachedUser {
 		})
 	}
 
-	return users
+	return tokens
 }
 
 func TestCache_expireTokens_cancelledContext(t *testing.T) {

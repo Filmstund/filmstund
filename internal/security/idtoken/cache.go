@@ -15,18 +15,18 @@ type Config struct {
 	ExpiryInterval   time.Duration `env:"TOKEN_EXPIRY_INTERVAL,default=7s"`
 }
 
-type cachedUser struct {
+type cachedToken struct {
 	expireAt time.Time
 	idToken  *IDToken
 }
 
-func (cu *cachedUser) String() string {
+func (cu *cachedToken) String() string {
 	return fmt.Sprintf("{expires: %s, subject: %s}", cu.expireAt, cu.idToken.Sub)
 }
 
 type Cache struct {
 	cfg                Config
-	tokens             map[Subject]cachedUser // the key is the subject (sub) from the token.
+	tokens             map[Subject]cachedToken // the key is the subject (sub) from the token.
 	stopExpirationFunc context.CancelFunc
 	clock              clock.Clock
 	mu                 sync.RWMutex
@@ -41,7 +41,7 @@ func NewCache(cfg Config) *Cache {
 func newWithClock(cfg Config, clock clock.Clock) *Cache {
 	c := &Cache{
 		cfg:    cfg,
-		tokens: make(map[Subject]cachedUser, cfg.DefaultCacheSize),
+		tokens: make(map[Subject]cachedToken, cfg.DefaultCacheSize),
 		clock:  clock,
 		mu:     sync.RWMutex{},
 	}
@@ -82,7 +82,7 @@ func (c *Cache) PutOrUpdate(token *IDToken, expireAt time.Time) {
 	defer c.mu.Unlock()
 	// TODO: check expiry?
 
-	c.tokens[token.Sub] = cachedUser{
+	c.tokens[token.Sub] = cachedToken{
 		expireAt: expireAt,
 		idToken:  token,
 	}
