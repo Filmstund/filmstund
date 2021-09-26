@@ -1,4 +1,4 @@
-package idtoken
+package principal
 
 import (
 	"context"
@@ -15,9 +15,10 @@ type Config struct {
 	ExpiryInterval   time.Duration `env:"TOKEN_EXPIRY_INTERVAL,default=7s"`
 }
 
+// TODO: remove.
 type cachedToken struct {
 	expireAt time.Time
-	idToken  *IDToken
+	idToken  *Principal
 }
 
 func (cu *cachedToken) String() string {
@@ -32,7 +33,7 @@ type Cache struct {
 	mu                 sync.RWMutex
 }
 
-type MappingFunc func() (*IDToken, time.Time)
+type MappingFunc func() (*Principal, time.Time)
 
 func NewCache(cfg Config) *Cache {
 	return newWithClock(cfg, clock.New())
@@ -50,7 +51,7 @@ func newWithClock(cfg Config, clock clock.Clock) *Cache {
 }
 
 // Get returns the cached token if it exists and hasn't expired, else nil.
-func (c *Cache) Get(sub Subject) *IDToken {
+func (c *Cache) Get(sub Subject) *Principal {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -60,7 +61,7 @@ func (c *Cache) Get(sub Subject) *IDToken {
 	return nil
 }
 
-func (c *Cache) GetOrSet(sub Subject, mappingFunc MappingFunc) *IDToken {
+func (c *Cache) GetOrSet(sub Subject, mappingFunc MappingFunc) *Principal {
 	if token := c.Get(sub); token != nil {
 		return token
 	}
@@ -77,7 +78,7 @@ func (c *Cache) GetOrSet(sub Subject, mappingFunc MappingFunc) *IDToken {
 
 // PutOrUpdate adds the token to the cache, or updates it if the expiry time is after
 // the current expiry time.
-func (c *Cache) PutOrUpdate(token *IDToken, expireAt time.Time) {
+func (c *Cache) PutOrUpdate(token *Principal, expireAt time.Time) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	// TODO: check expiry?

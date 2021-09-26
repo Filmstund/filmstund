@@ -13,7 +13,7 @@ import (
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/security"
-	"github.com/filmstund/filmstund/internal/security/idtoken"
+	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/gorilla/mux"
@@ -29,7 +29,7 @@ var (
 type Config struct {
 	Database     database.Config
 	Security     security.Config
-	IDTokenCache idtoken.Config
+	IDTokenCache principal.Config
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
 	ServePath   string `env:"SERVE_PATH,default=./web/build"`
@@ -44,7 +44,7 @@ func (c *Config) SecurityConfig() *security.Config {
 	return &c.Security
 }
 
-func (c *Config) IDTokenCacheConfig() idtoken.Config {
+func (c *Config) IDTokenCacheConfig() principal.Config {
 	return c.IDTokenCache
 }
 

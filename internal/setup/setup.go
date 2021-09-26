@@ -7,7 +7,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
-	"github.com/filmstund/filmstund/internal/security/idtoken"
+	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/sethvargo/go-envconfig"
 )
@@ -21,7 +21,7 @@ type SecurityConfigProvider interface {
 }
 
 type IDTokenCacheConfigProvider interface {
-	IDTokenCacheConfig() idtoken.Config
+	IDTokenCacheConfig() principal.Config
 }
 
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
@@ -50,7 +50,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	if provider, ok := cfg.(IDTokenCacheConfigProvider); ok {
 		cacheConfig := provider.IDTokenCacheConfig()
 
-		cache := idtoken.NewCache(cacheConfig)
+		cache := principal.NewCache(cacheConfig)
 		cache.StartExpiration(ctx)
 
 		options = append(options, serverenv.WithIDTokenCache(cache))

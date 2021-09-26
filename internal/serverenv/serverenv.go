@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/security/idtoken"
+	"github.com/filmstund/filmstund/internal/security/principal"
 )
 
 type ServerEnv struct {
 	db           *database.DB
-	idTokenCache *idtoken.Cache
+	idTokenCache *principal.Cache
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -35,14 +35,14 @@ func (e *ServerEnv) Database() *database.DB {
 	return e.db
 }
 
-func WithIDTokenCache(cache *idtoken.Cache) Option {
+func WithIDTokenCache(cache *principal.Cache) Option {
 	return func(env *ServerEnv) *ServerEnv {
 		env.idTokenCache = cache
 		return env
 	}
 }
 
-func (e *ServerEnv) IDTokenCache() *idtoken.Cache {
+func (e *ServerEnv) IDTokenCache() *principal.Cache {
 	return e.idTokenCache
 }
 

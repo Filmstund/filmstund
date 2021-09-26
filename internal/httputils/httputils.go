@@ -2,6 +2,7 @@ package httputils
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -9,10 +10,30 @@ import (
 	"github.com/filmstund/filmstund/internal/logging"
 )
 
+var (
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrForbidden    = errors.New("forbidden")
+	ErrInternal     = errors.New("internal server error")
+)
+
 type ErrorResponse struct {
 	Error   string    `json:"error"`
 	Details string    `json:"details,omitempty"`
 	Time    time.Time `json:"time,omitempty"`
+}
+
+func RespondBasedOnErr(err error, w http.ResponseWriter, r *http.Request) {
+	if err == nil {
+		InternalServerError(w, r)
+	}
+
+	if errors.Is(err, ErrUnauthorized) {
+		Unauthorized(w, r)
+	} else if errors.Is(err, ErrForbidden) {
+		Forbidden(w, r)
+	} else {
+		InternalServerError(w, r)
+	}
 }
 
 func InternalServerError(w http.ResponseWriter, r *http.Request) {

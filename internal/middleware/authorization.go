@@ -1,175 +1,200 @@
 package middleware
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/filmstund/filmstund/internal/httputils"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
-	"github.com/filmstund/filmstund/internal/security/idtoken"
+	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 )
 
 type jwtVerifier struct {
-	cache *idtoken.Cache
-	cfg   *security.Config
-	w     http.ResponseWriter
-	r     *http.Request
+	cache  *principal.Cache
+	cfg    *security.Config
+	logger *zap.SugaredLogger
 }
 
 // ApplyAuthorization validates the JWT token in the "Authorization" header.
 // If valid, it fetches the id_token and affixes the tokens to the request context.
 // TODO: document and test.
-func ApplyAuthorization(idTokenCache *idtoken.Cache, confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
-	cfg := confProvider.SecurityConfig()
-
+func ApplyAuthorization(idTokenCache *principal.Cache, confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			verifier := jwtVerifier{
 				cache: idTokenCache,
-				cfg:   cfg,
-				w:     w,
-				r:     r,
+				cfg:   confProvider.SecurityConfig(),
+				logger: logging.FromContext(r.Context()).
+					With("url", r.URL.String()).
+					With("from", r.RemoteAddr),
 			}
 
-			if token := verifier.authorization(); token != nil {
-				if idToken := verifier.fetchIDToken(token); idToken != nil {
-					ctx := security.WithToken(r.Context(), token)
-					ctx = idtoken.WithIDToken(ctx, idToken)
-
-					next.ServeHTTP(w, r.Clone(ctx))
-				}
+			token, err := verifier.doAuthorization(r)
+			if err != nil {
+				httputils.RespondBasedOnErr(err, w, r)
+				return
 			}
+
+			p, err := verifier.getPrincipal(r.Context(), token)
+			if err != nil {
+				httputils.RespondBasedOnErr(err, w, r)
+				return
+			}
+
+			ctx := principal.WithPrincipal(r.Context(), p)
+			next.ServeHTTP(w, r.Clone(ctx))
 		})
 	}
 }
 
-func (v *jwtVerifier) authorization() *jwt.Token {
-	logger := logging.FromContext(v.r.Context()).
-		With("url", v.r.URL.String()).
-		With("from", v.r.RemoteAddr)
-
-	rawToken, exists := httputils.ExtractTokenFromHeader(v.r)
+// doAuthorization extracts the JWT token from the Authorization header and
+// parses it, checks the signature, and the included claims for validity.
+// If everything checks out, then a valid, parsed token is returned, else an error.
+func (v *jwtVerifier) doAuthorization(r *http.Request) (*jwt.Token, error) {
+	rawToken, exists := httputils.ExtractTokenFromHeader(r)
 	if !exists {
-		logger.Debugf("[token] missing authorization header")
-		httputils.Unauthorized(v.w, v.r)
-		return nil
+		v.logger.Debugf("[token] missing doAuthorization header")
+		return nil, httputils.ErrUnauthorized
 	}
 
-	// Fetch the jwks (this might hang indefinitely...)
-	jwks := v.cfg.JWKs(v.r.Context())
+	// Get the JWKS (this might hang indefinitely...)
+	jwks := v.cfg.JWKs(r.Context())
 
 	// Parse and validate the token
 	token, err := jwt.ParseWithClaims(rawToken, &security.Auth0Claims{}, jwks.Keyfunc)
 	if err != nil {
-		logger.Debugw("[token] broken/invalid token supplied", "err", err, "claims", token.Claims)
-		httputils.Unauthorized(v.w, v.r)
-		return nil
+		v.logger.Debugw("[token] invalid token", "err", err, "claims", token.Claims)
+		return nil, httputils.ErrUnauthorized
 	}
 
 	// Verify token is signed with expected algorithm
 	// https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/
 	if token.Header["alg"] != v.cfg.Algorithm {
-		logger.Debugw("[token] signed with wrong alg", "alg", token.Header["alg"])
-		httputils.Unauthorized(v.w, v.r)
-		return nil
+		v.logger.Debugw("[token] signed with wrong alg", "alg", token.Header["alg"])
+		return nil, httputils.ErrUnauthorized
 	}
 
-	// Verify token has the expected issuer and audience claims
-	if claims, ok := token.Claims.(*security.Auth0Claims); ok && token.Valid {
-		if !claims.VerifyAudience(v.cfg.Audience, true) ||
-			!claims.VerifyIssuer(v.cfg.Issuer) ||
-			!claims.VerifyExpiresAt(time.Now(), true) { // verify that this claim actually exists // TODO: use timefunc
-			logger.Debugw(
-				"[token] couldn't verify audience/issuer",
-				"audience", claims.Audience,
-				"issuer", claims.Issuer,
-				"expiresAt", claims.ExpiresAt,
-			)
-			httputils.Unauthorized(v.w, v.r)
-			return nil
-		}
-	} else {
-		logger.Warnw(
-			"[token] invalid claim type and/or invalid token")
-		httputils.Unauthorized(v.w, v.r)
-		return nil
+	// Verify token has the expected issuer, audience, expires at claims
+	claims, castOK := token.Claims.(*security.Auth0Claims)
+	if !castOK {
+		v.logger.Errorf("failed to cast claims, got type %T", token.Claims)
+		return nil, httputils.ErrInternal
 	}
 
-	return token
+	if !claims.VerifyAudience(v.cfg.Audience, true) {
+		v.logger.Debugw("[token] couldn't verify audience", "audience", claims.Audience, "expected", v.cfg.Audience)
+		return nil, httputils.ErrUnauthorized
+	}
+
+	if !claims.VerifyIssuer(v.cfg.Issuer) {
+		v.logger.Debugw("[token] couldn't verify issuer", "issuer", claims.Issuer, "expected", v.cfg.Issuer)
+		return nil, httputils.ErrUnauthorized
+	}
+
+	// verify that this claim actually exists TODO: use timefunc instead of time.Now()
+	if !claims.VerifyExpiresAt(time.Now(), true) {
+		v.logger.Debugw("[token] token has expired or doesn't have expire at claim", "expiresAt", claims.ExpiresAt)
+		return nil, httputils.ErrUnauthorized
+	}
+
+	return token, nil
 }
 
-func (v *jwtVerifier) fetchIDToken(token *jwt.Token) *idtoken.IDToken {
-	logger := logging.FromContext(v.r.Context()).
-		With("url", v.r.URL.String()).
-		With("from", v.r.RemoteAddr)
-
-	if token == nil {
-		logger.Errorf("no token supplied. Missing authorization?")
-		httputils.InternalServerError(v.w, v.r)
-		return nil
+// getPrincipal fetches the principal from cache _or_ downloads the ID token
+// from the userinfo endpoint and parses the principal. If everything checks out
+// you will have valid principal that is put into the cache, else an error.
+func (v *jwtVerifier) getPrincipal(ctx context.Context, token *jwt.Token) (*principal.Principal, error) {
+	if token == nil || !token.Valid {
+		v.logger.Errorf("no/invalid token supplied. Missing doAuthorization?")
+		return nil, httputils.ErrInternal
 	}
 
 	// we panic here if it is the wrong type - should've been checked earlier
 	claims := token.Claims.(*security.Auth0Claims) //nolint:forcetypeassert
 
 	// return early if we have the current subject in cache.
-	sub := idtoken.Subject(claims.Subject)
-	if idToken := v.cache.Get(sub); idToken != nil {
-		logger.Debugf("token fetched from cache for %s: %v", sub, idToken)
-		return idToken
+	if p := v.cache.Get(claims.Subject); p != nil {
+		// TODO: remove log line
+		v.logger.Debugf("principal fetched from cache for %s: %v", claims.Subject, p)
+		return p, nil
 	}
 
-	userinfoReq, err := http.NewRequestWithContext(v.r.Context(), http.MethodGet, v.cfg.UserinfoURL, nil)
+	userinfoReq, err := http.NewRequestWithContext(ctx, http.MethodGet, v.cfg.UserinfoURL, nil)
 	if err != nil {
-		logger.Infow("failed to construct request to /userinfo", "err", err, "url", v.cfg.UserinfoURL)
-		httputils.InternalServerError(v.w, v.r)
-		return nil
+		v.logger.Infow("failed to construct request to /userinfo", "err", err, "url", v.cfg.UserinfoURL)
+		return nil, httputils.ErrInternal
 	}
 	userinfoReq.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.Raw))
 
-	userinfoResp, err := http.DefaultClient.Do(userinfoReq)
+	resp, err := http.DefaultClient.Do(userinfoReq)
 	if err != nil {
-		logger.Infow("failure fetching /userinfo", "err", err, "url", v.cfg.UserinfoURL)
-		httputils.InternalServerError(v.w, v.r)
-		return nil
+		v.logger.Infow("GET /userinfo failed", "err", err, "url", v.cfg.UserinfoURL)
+		return nil, httputils.ErrInternal
 	}
-	defer userinfoResp.Body.Close()
+	defer resp.Body.Close()
 
-	if userinfoResp.StatusCode != http.StatusOK {
-		logger.Infow("non-200 status code when fetching /userinfo", "code", userinfoResp.Status)
-		if userinfoResp.StatusCode == http.StatusUnauthorized {
-			httputils.Unauthorized(v.w, v.r)
-		} else {
-			httputils.InternalServerError(v.w, v.r)
+	if resp.StatusCode != http.StatusOK {
+		v.logger.Infow("non-200 status code when fetching /userinfo", "code", resp.Status)
+		if resp.StatusCode == http.StatusUnauthorized {
+			return nil, httputils.ErrUnauthorized
 		}
-		return nil
+		return nil, httputils.ErrInternal
 	}
 
-	buf, err := io.ReadAll(userinfoResp.Body)
+	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logger.Infow("failed to read response body", "err", err)
-		httputils.InternalServerError(v.w, v.r)
-		return nil
+		v.logger.Infow("failed to read response body", "err", err)
+		return nil, httputils.ErrInternal
 	}
 
-	var idToken idtoken.IDToken
+	var idToken idToken
 	if err := json.Unmarshal(buf, &idToken); err != nil {
-		logger.Infow("failed to unmarshal ID token", "err", err)
-		httputils.Unauthorized(v.w, v.r)
-		return nil
+		v.logger.Infow("failed to unmarshal ID token", "err", err)
+		return nil, httputils.ErrInternal
 	}
 
-	if claims.ExpiresAt != nil {
-		exp := claims.ExpiresAt.Time
-		logger.Debugf("caching %q until %s", idToken.Sub, exp)
-		v.cache.PutOrUpdate(&idToken, exp)
+	p := idToken.toPrincipal(claims)
+	exp := claims.ExpiresAt.Time
+	v.logger.Debugf("caching %q until %s", p.Sub, exp)
+	v.cache.PutOrUpdate(&p, exp)
+	return &p, nil
+}
+
+// idToken as returned by the /userinfo endpoint.
+type idToken struct {
+	Sub           string    `json:"sub"`
+	GivenName     string    `json:"given_name"`
+	FamilyName    string    `json:"family_name"`
+	Nickname      string    `json:"nickname"`
+	Name          string    `json:"name"`
+	Picture       string    `json:"picture"`
+	Locale        string    `json:"locale"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	Email         string    `json:"email"`
+	EmailVerified bool      `json:"email_verified"`
+}
+
+// toPrincipal converts an ID token together with our claims to the principal.
+func (t *idToken) toPrincipal(claims *security.Auth0Claims) principal.Principal {
+	return principal.Principal{
+		Sub:        principal.Subject(t.Sub),
+		GivenName:  t.GivenName,
+		FamilyName: t.FamilyName,
+		Nickname:   t.Nickname,
+		Picture:    t.Picture,
+		Email:      t.Email,
+		Scopes:     strings.Split(claims.Scope, " "),
+		UpdatedAt:  t.UpdatedAt,
+		ExpiresAt:  claims.ExpiresAt.Time,
 	}
-	return &idToken
 }

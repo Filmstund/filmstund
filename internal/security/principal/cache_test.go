@@ -1,4 +1,4 @@
-package idtoken
+package principal
 
 import (
 	"context"
@@ -56,7 +56,7 @@ func TestCache_Get(t *testing.T) {
 			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0),
-					idToken:  &IDToken{Sub: "hello"},
+					idToken:  &Principal{Sub: "hello"},
 				},
 			},
 			wantPreLoadIndex: -1,
@@ -68,7 +68,7 @@ func TestCache_Get(t *testing.T) {
 			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
-					idToken:  &IDToken{Sub: "hello"},
+					idToken:  &Principal{Sub: "hello"},
 				},
 			},
 			wantPreLoadIndex: -1,
@@ -80,7 +80,7 @@ func TestCache_Get(t *testing.T) {
 			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
-					idToken:  &IDToken{Sub: "valid"},
+					idToken:  &Principal{Sub: "valid"},
 				},
 			},
 			wantPreLoadIndex: 0,
@@ -92,11 +92,11 @@ func TestCache_Get(t *testing.T) {
 			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
-					idToken:  &IDToken{Sub: "valid"},
+					idToken:  &Principal{Sub: "valid"},
 				},
 				{
 					expireAt: time.UnixMilli(0).Add(2 * time.Hour),
-					idToken:  &IDToken{Sub: "valid2"},
+					idToken:  &Principal{Sub: "valid2"},
 				},
 			},
 			wantPreLoadIndex: 1,
@@ -138,7 +138,7 @@ func TestCache_GetOrSet(t *testing.T) {
 			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
-					idToken: &IDToken{
+					idToken: &Principal{
 						Sub: "apabepa",
 					},
 				},
@@ -161,12 +161,12 @@ func TestCache_GetOrSet(t *testing.T) {
 			preLoad: []cachedToken{
 				{
 					expireAt: time.UnixMilli(0).Add(time.Hour),
-					idToken: &IDToken{
+					idToken: &Principal{
 						Sub: "apabepa",
 					},
 				},
 			},
-			mappingFunc: func() (*IDToken, time.Time) {
+			mappingFunc: func() (*Principal, time.Time) {
 				t.Fail()
 				return nil, time.Time{}
 			},
@@ -209,7 +209,7 @@ func TestCache_GetOrSet_mappingFunc(t *testing.T) {
 	preloadCache(c.tokens, []cachedToken{
 		{
 			expireAt: time.UnixMilli(0),
-			idToken: &IDToken{
+			idToken: &Principal{
 				Sub:   "apa",
 				Email: "apa@example.org",
 			},
@@ -218,11 +218,11 @@ func TestCache_GetOrSet_mappingFunc(t *testing.T) {
 	assert.Assert(t, cmp.Len(c.tokens, 1))
 
 	// When
-	newToken := &IDToken{
+	newToken := &Principal{
 		Sub:   "apa",
 		Email: "apabepa@example.org",
 	}
-	gotToken := c.GetOrSet("apa", func() (*IDToken, time.Time) {
+	gotToken := c.GetOrSet("apa", func() (*Principal, time.Time) {
 		return newToken, time.UnixMilli(0).Add(time.Hour)
 	})
 
@@ -287,7 +287,7 @@ func genTokens(amount int, expireAt time.Time) []cachedToken {
 	for i := 0; i < amount; i++ {
 		tokens = append(tokens, cachedToken{
 			expireAt: expireAt,
-			idToken: &IDToken{
+			idToken: &Principal{
 				Sub: Subject(fmt.Sprintf("%d", rand.Int())), //nolint:gosec
 			},
 		})

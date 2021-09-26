@@ -3,13 +3,15 @@ package security
 import (
 	"crypto/subtle"
 
+	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/golang-jwt/jwt/v4"
 )
 
 // Auth0Claims represents the claims issues by Auth0 for their access tokens.
 type Auth0Claims struct {
-	// Auth0Claims represents the claims issues by Auth0 for their access tokens.
-	AuthorizedParty string `json:"azp,omitempty"`
+	Subject         principal.Subject `json:"sub,omitempty"`
+	AuthorizedParty string            `json:"azp,omitempty"`
+	Scope           string            `json:"scope,omitempty"`
 	jwt.RegisteredClaims
 }
 
