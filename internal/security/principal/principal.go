@@ -30,9 +30,9 @@ func (p *Principal) HasScope(scope string) bool {
 
 type contextKey string
 
-const key = contextKey("jwt-token")
+const key = contextKey("principal")
 
-// WithPrincipal affixes token to ctx, given that token is not nil.
+// WithPrincipal affixes the principal to the ctx, given that the principal is not nil.
 func WithPrincipal(ctx context.Context, principal *Principal) context.Context {
 	if principal == nil {
 		return ctx
@@ -41,10 +41,10 @@ func WithPrincipal(ctx context.Context, principal *Principal) context.Context {
 	return context.WithValue(ctx, key, principal)
 }
 
-// FromContext extracts a token or nil if none was found.
+// FromContext extracts a principal or nil if none was found.
 func FromContext(ctx context.Context) *Principal {
-	if token, ok := ctx.Value(key).(*Principal); ok {
-		return token
+	if prin, ok := ctx.Value(key).(*Principal); ok {
+		return prin
 	}
 	// TODO: what can we replace this with?
 	return nil

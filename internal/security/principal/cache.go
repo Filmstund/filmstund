@@ -2,7 +2,6 @@ package principal
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -11,29 +10,20 @@ import (
 )
 
 type Config struct {
-	DefaultCacheSize int           `env:"TOKEN_DEFAULT_CACHE_SIZE,default=20"`
-	ExpiryInterval   time.Duration `env:"TOKEN_EXPIRY_INTERVAL,default=7s"`
-}
-
-// TODO: remove.
-type cachedToken struct {
-	expireAt time.Time
-	idToken  *Principal
-}
-
-func (cu *cachedToken) String() string {
-	return fmt.Sprintf("{expires: %s, subject: %s}", cu.expireAt, cu.idToken.Sub)
+	DefaultCacheSize int           `env:"PRINCIPAL_DEFAULT_CACHE_SIZE,default=20"`
+	ExpiryInterval   time.Duration `env:"PRINCIPAL_EXPIRY_INTERVAL,default=7s"`
 }
 
 type Cache struct {
 	cfg                Config
-	tokens             map[Subject]cachedToken // the key is the subject (sub) from the token.
+	principals         map[Subject]*Principal
 	stopExpirationFunc context.CancelFunc
 	clock              clock.Clock
 	mu                 sync.RWMutex
 }
 
-type MappingFunc func() (*Principal, time.Time)
+// MappingFunc returns a new principal to be put in the cache.
+type MappingFunc func() *Principal
 
 func NewCache(cfg Config) *Cache {
 	return newWithClock(cfg, clock.New())
@@ -41,97 +31,94 @@ func NewCache(cfg Config) *Cache {
 
 func newWithClock(cfg Config, clock clock.Clock) *Cache {
 	c := &Cache{
-		cfg:    cfg,
-		tokens: make(map[Subject]cachedToken, cfg.DefaultCacheSize),
-		clock:  clock,
-		mu:     sync.RWMutex{},
+		cfg:        cfg,
+		principals: make(map[Subject]*Principal, cfg.DefaultCacheSize),
+		clock:      clock,
+		mu:         sync.RWMutex{},
 	}
 
 	return c
 }
 
-// Get returns the cached token if it exists and hasn't expired, else nil.
+// Get returns the cached principal if it exists and hasn't expired, else nil.
 func (c *Cache) Get(sub Subject) *Principal {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	if token, ok := c.tokens[sub]; ok && token.expireAt.After(c.clock.Now()) {
-		return token.idToken
+	if p, ok := c.principals[sub]; ok && p.ExpiresAt.After(c.clock.Now()) {
+		return p
 	}
 	return nil
 }
 
 func (c *Cache) GetOrSet(sub Subject, mappingFunc MappingFunc) *Principal {
-	if token := c.Get(sub); token != nil {
-		return token
+	if prin := c.Get(sub); prin != nil {
+		return prin
 	}
 
 	if mappingFunc == nil {
 		return nil
 	}
 
-	// TODO: Check token has same subject?
-	token, expireAt := mappingFunc()
-	c.PutOrUpdate(token, expireAt)
-	return token
+	// TODO: Check principal has same subject?
+	p := mappingFunc()
+	c.PutOrUpdate(p)
+	return p
 }
 
-// PutOrUpdate adds the token to the cache, or updates it if the expiry time is after
+// PutOrUpdate adds the principal to the cache, or updates it if the expiry time is after
 // the current expiry time.
-func (c *Cache) PutOrUpdate(token *Principal, expireAt time.Time) {
+func (c *Cache) PutOrUpdate(prin *Principal) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	// TODO: check expiry?
 
-	c.tokens[token.Sub] = cachedToken{
-		expireAt: expireAt,
-		idToken:  token,
-	}
+	c.principals[prin.Sub] = prin
 }
 
 func (c *Cache) StartExpiration(ctx context.Context) {
 	if c.stopExpirationFunc != nil {
-		logging.FromContext(ctx).Warnw("token expiration already on-going")
+		logging.FromContext(ctx).Warnw("principal expiration already on-going")
 		return
 	}
 
 	expiryCtx, cancelFunc := context.WithCancel(ctx)
 	c.stopExpirationFunc = cancelFunc
 
-	go c.expireTokens(expiryCtx)
+	go c.expirePrincipals(expiryCtx)
 }
 
-func (c *Cache) expireTokens(ctx context.Context) {
+func (c *Cache) expirePrincipals(ctx context.Context) {
 	logger := logging.FromContext(ctx)
 
-	logger.Debugw("running background token expiration", "interval", c.cfg.ExpiryInterval)
+	logger.Debugw("running background principal expiration", "interval", c.cfg.ExpiryInterval)
 	ticker := c.clock.Ticker(c.cfg.ExpiryInterval)
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Debugw("shutting down background token expiration...")
+			logger.Debugw("shutting down background principal expiration...")
 			return
 		case triggerTime := <-ticker.C:
-			if count := c.deleteExpiredTokens(); count > 0 {
-				logger.Debugw("removed expired tokens",
+			if count := c.deleteExpiredPrincipals(); count > 0 {
+				logger.Debugw("removed expired principals",
 					"duration", c.clock.Since(triggerTime),
 					"expired", count,
-					"not-expired", len(c.tokens),
+					"not-expired", len(c.principals),
 				)
 			}
 		}
 	}
 }
 
-func (c *Cache) deleteExpiredTokens() (deletedCount int) {
+func (c *Cache) deleteExpiredPrincipals() (deletedCount int) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	now := c.clock.Now()
-	for sub, item := range c.tokens {
-		if item.expireAt.Before(now) {
+	for sub, p := range c.principals {
+		if p.ExpiresAt.Before(now) {
 			deletedCount++
-			delete(c.tokens, sub)
+			delete(c.principals, sub)
 		}
 	}
 	return deletedCount

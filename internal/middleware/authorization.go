@@ -166,7 +166,7 @@ func (v *jwtVerifier) getPrincipal(ctx context.Context, token *jwt.Token) (*prin
 	p := idToken.toPrincipal(claims)
 	exp := claims.ExpiresAt.Time
 	v.logger.Debugf("caching %q until %s", p.Sub, exp)
-	v.cache.PutOrUpdate(&p, exp)
+	v.cache.PutOrUpdate(&p)
 	return &p, nil
 }
 
