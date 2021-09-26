@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/idtoken"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
+	"github.com/filmstund/filmstund/internal/security/idtoken"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/sethvargo/go-envconfig"
 )

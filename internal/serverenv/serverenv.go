@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/idtoken"
+	"github.com/filmstund/filmstund/internal/security/idtoken"
 )
 
 type ServerEnv struct {

@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/filmstund/filmstund/internal/httputils"
-	"github.com/filmstund/filmstund/internal/idtoken"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
+	"github.com/filmstund/filmstund/internal/security/idtoken"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
