@@ -78,5 +78,5 @@ To add a new migration, do the following:
 ```shell
 # Skip the first step if you already have migrate installed and in your $PATH
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-migrate create -ext sql -dir configs/database/migrations migration_name_goes_here
+migrate create -ext sql -seq -dir configs/database/migrations <migration_name_goes_here>
 ```
