@@ -35,7 +35,7 @@ func New(ctx context.Context, cfg *Config) (*DB, error) {
 	}, nil
 }
 
-type QueryFunc func(ctx context.Context, q *sqlc.Queries) error
+type QueryFunc func(q *sqlc.Queries) error
 
 // DoQuery retrieves a connection from the DB pool, and executes the
 // given func with a sqlc.Queries.
@@ -47,7 +47,7 @@ func (db *DB) DoQuery(ctx context.Context, f QueryFunc) error {
 	defer conn.Release()
 
 	queries := sqlc.New(conn)
-	return f(ctx, queries)
+	return f(queries)
 }
 
 func (db *DB) Close(ctx context.Context) {
