@@ -7,6 +7,10 @@ import (
 
 type Subject string
 
+func (s Subject) String() string {
+	return string(s)
+}
+
 type Principal struct {
 	Sub        Subject   `json:"subject"`
 	GivenName  string    `json:"givenName"`
@@ -46,6 +50,6 @@ func FromContext(ctx context.Context) *Principal {
 	if prin, ok := ctx.Value(key).(*Principal); ok {
 		return prin
 	}
-	// TODO: what can we replace this with?
-	return nil
+
+	panic("no principal stored in the context")
 }

@@ -2,7 +2,26 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Commandments struct {
 	Number int    `json:"number"`
 	Phrase string `json:"phrase"`
+}
+
+type User struct {
+	ID                     string    `json:"id"`
+	FilmstadenMembershipID *string   `json:"filmstadenMembershipId"`
+	Name                   string    `json:"name"`
+	FirstName              string    `json:"firstName"`
+	LastName               string    `json:"lastName"`
+	Nick                   *string   `json:"nick"`
+	Email                  string    `json:"email"`
+	Phone                  *string   `json:"phone"`
+	AvatarURL              *string   `json:"avatarURL"`
+	LastLogin              time.Time `json:"lastLogin"`
+	SignupDate             time.Time `json:"signupDate"`
+	LastModifiedDate       time.Time `json:"lastModifiedDate"`
 }

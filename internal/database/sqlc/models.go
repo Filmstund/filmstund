@@ -3,11 +3,30 @@
 package sqlc
 
 import (
+	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Commandment struct {
 	Number      int32     `json:"number"`
 	Phrase      string    `json:"phrase"`
 	CreatedDate time.Time `json:"createdDate"`
+}
+
+type User struct {
+	ID                     uuid.UUID      `json:"id"`
+	SubjectID              string         `json:"subjectID"`
+	FilmstadenMembershipID sql.NullString `json:"filmstadenMembershipID"`
+	FirstName              string         `json:"firstName"`
+	LastName               string         `json:"lastName"`
+	Nick                   sql.NullString `json:"nick"`
+	Email                  string         `json:"email"`
+	Phone                  sql.NullString `json:"phone"`
+	Avatar                 sql.NullString `json:"avatar"`
+	CalendarFeedID         uuid.NullUUID  `json:"calendarFeedID"`
+	LastLogin              time.Time      `json:"lastLogin"`
+	SignupDate             time.Time      `json:"signupDate"`
+	LastModifiedDate       time.Time      `json:"lastModifiedDate"`
 }

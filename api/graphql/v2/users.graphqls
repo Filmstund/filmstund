@@ -1,0 +1,24 @@
+scalar Time
+scalar UUID
+
+extend type Query  {
+    me: User!
+}
+
+type User {
+    id: UUID!
+    filmstadenMembershipId: String
+    name: String!
+    firstName: String!
+    lastName: String!
+    nick: String
+    email: String!
+    phone: String
+    avatarURL: String
+#    giftCertificates: [GiftCertificateDTO!]!
+#    calendarFeedId: String
+#    calendarFeedUrl: String
+    lastLogin: Time!
+    signupDate: Time!
+    lastModifiedDate: Time!
+}
