@@ -1,10 +1,3 @@
-scalar Time
-scalar UUID
-
-extend type Query  {
-    me: User!
-}
-
 type User {
     id: UUID!
     filmstadenMembershipId: String

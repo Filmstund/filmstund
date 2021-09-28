@@ -9,13 +9,13 @@ import (
 	"fmt"
 
 	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security/principal"
 )
 
-func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	// TODO: consider adding a separate /login route that can be used to create the user
+func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 
 	prin := principal.FromContext(ctx)
@@ -66,3 +66,8 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		LastModifiedDate:       user.LastModifiedDate,
 	}, nil
 }
+
+// Mutation returns gql.MutationResolver implementation.
+func (r *Resolver) Mutation() gql.MutationResolver { return &mutationResolver{r} }
+
+type mutationResolver struct{ *Resolver }

@@ -36,6 +36,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
 }
 
@@ -47,9 +48,12 @@ type ComplexityRoot struct {
 		Phrase func(childComplexity int) int
 	}
 
+	Mutation struct {
+		LoginUser func(childComplexity int) int
+	}
+
 	Query struct {
 		AllCommandments   func(childComplexity int) int
-		Me                func(childComplexity int) int
 		RandomCommandment func(childComplexity int) int
 	}
 
@@ -69,10 +73,13 @@ type ComplexityRoot struct {
 	}
 }
 
+type MutationResolver interface {
+	LoginUser(ctx context.Context) (*model.User, error)
+}
+
 type QueryResolver interface {
 	AllCommandments(ctx context.Context) ([]*model.Commandments, error)
 	RandomCommandment(ctx context.Context) (*model.Commandments, error)
-	Me(ctx context.Context) (*model.User, error)
 }
 
 type executableSchema struct {
@@ -104,19 +111,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Commandments.Phrase(childComplexity), true
 
+	case "Mutation.loginUser":
+		if e.complexity.Mutation.LoginUser == nil {
+			break
+		}
+
+		return e.complexity.Mutation.LoginUser(childComplexity), true
+
 	case "Query.allCommandments":
 		if e.complexity.Query.AllCommandments == nil {
 			break
 		}
 
 		return e.complexity.Query.AllCommandments(childComplexity), true
-
-	case "Query.me":
-		if e.complexity.Query.Me == nil {
-			break
-		}
-
-		return e.complexity.Query.Me(childComplexity), true
 
 	case "Query.randomCommandment":
 		if e.complexity.Query.RandomCommandment == nil {
@@ -233,6 +240,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -271,14 +292,13 @@ type Commandments {
     phrase: String!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/v2/users.graphqls", Input: `scalar Time
+	{Name: "../../api/graphql/v2/login.graphqls", Input: `extend type Mutation {
+    loginUser: User!
+}`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar Time
 scalar UUID
-
-extend type Query  {
-    me: User!
-}
-
-type User {
+`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/users.graphqls", Input: `type User {
     id: UUID!
     filmstadenMembershipId: String
     name: String!
@@ -426,6 +446,41 @@ func (ec *executionContext) _Commandments_phrase(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().LoginUser(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_allCommandments(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -494,41 +549,6 @@ func (ec *executionContext) _Query_randomCommandment(ctx context.Context, field 
 	res := resTmp.(*model.Commandments)
 	fc.Result = res
 	return ec.marshalNCommandments2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCommandments(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Me(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2172,6 +2192,37 @@ func (ec *executionContext) _Commandments(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "loginUser":
+			out.Values[i] = ec._Mutation_loginUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2210,20 +2261,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_randomCommandment(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
-		case "me":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_me(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
