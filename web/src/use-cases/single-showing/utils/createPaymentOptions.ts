@@ -59,7 +59,8 @@ export const stringifyOption = (option: DisplayPaymentOption): string => {
   }
 };
 
-export default (biljetter: SingleShowing_me_foretagsbiljetter[]) => [
+export const createPaymentOptions = (biljetter: SingleShowing_me_foretagsbiljetter[]) => [
   createPaymentOption("Swish", PaymentType.Swish),
   ...createForetagsbiljetter(biljetter)
 ];
+

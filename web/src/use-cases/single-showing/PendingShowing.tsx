@@ -11,7 +11,8 @@ import { SmallHeader } from "../common/ui/Header";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
 import { SingleShowing_me_foretagsbiljetter } from "./containers/__generated__/SingleShowing";
 
-import createPaymentOptions, {
+import {
+  createPaymentOptions,
   DisplayPaymentOption,
   stringifyOption
 } from "./utils/createPaymentOptions";

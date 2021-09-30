@@ -1,5 +1,5 @@
-/** @jsx jsx */
-import { jsx } from "@emotion/core";
+/** @jsxImportSource @emotion/react */
+
 import { PageWidthWrapper } from "../ui/PageWidthWrapper";
 
 import alfons from "../../../assets/alfons.jpg";

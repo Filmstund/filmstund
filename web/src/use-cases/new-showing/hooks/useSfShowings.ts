@@ -43,12 +43,12 @@ export const useSfShowings = (
     }
   );
 
-  const showings: SfShowingsQuery_movie_showings[] =
-    data && data.movie ? data.movie.showings : [];
-
   const sfdates = useMemo(
-    () => groupBy(showings, s => formatYMD(s.timeUtc || "")),
-    [showings]
+    () => {
+      const movieShowings = data?.movie?.showings ?? [];
+      return groupBy(movieShowings, s => formatYMD(s.timeUtc || ""));
+    },
+    [data]
   );
   return [sfdates, loading];
 };
