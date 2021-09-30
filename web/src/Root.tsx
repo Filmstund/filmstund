@@ -50,7 +50,6 @@ export class Root extends Component<{}, State> {
             <AsyncApp />
           </Suspense>
         </Router>
-        <GlobalStyles />
       </ApolloProvider>
     );
   }

@@ -5,7 +5,7 @@ import {
   useUnattendShowing,
 } from "../../apollo/mutations/showings/useAttendShowing";
 import MainButton, { GrayButton } from "../../use-cases/common/ui/MainButton";
-import Modal from "../../use-cases/common/ui/Modal";
+import Modal from "../common/ui/Modal";
 
 import { SmallHeader } from "../common/ui/Header";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";

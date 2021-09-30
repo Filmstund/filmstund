@@ -32,7 +32,7 @@ class Login extends Component {
     return this.props
       .initGoogleAuth({
         loginHint: getGoogleId(),
-        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       })
       .then(this.googleUserChanged)
       .catch((e) => {
