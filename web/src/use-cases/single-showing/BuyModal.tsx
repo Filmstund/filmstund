@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import Center from "../../use-cases/common/ui/Center";
 
-import Modal from "../../use-cases/common/ui/Modal";
+import Modal from "../common/ui/Modal";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { AdminModalAfterTicketsBought } from "./AdminModalAfterTicketsBought";
 import { AdminModalBeforeTicketsBought } from "./AdminModalBeforeTicketsBought.tsx";

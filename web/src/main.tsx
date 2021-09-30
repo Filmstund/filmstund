@@ -1,4 +1,5 @@
-import React, { StrictMode } from "react";
+import { StrictMode } from "react";
+import React from "react";
 import { render } from "react-dom";
 import { Root } from "./Root";
 

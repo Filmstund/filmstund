@@ -61,7 +61,6 @@ const App: React.FC<Props> = () => {
   return (
     <>
       <PageTitleTemplate titleTemplate="%s | sefilm">
-        <WelcomeModal me={me} />
         <NavBar />
         <MainGridContainer>
           <Suspense fallback={<Loader />}>
