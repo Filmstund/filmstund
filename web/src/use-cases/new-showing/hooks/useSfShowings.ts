@@ -1,12 +1,12 @@
 import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { groupBy } from "lodash-es";
 import { useMemo } from "react";
 import { formatYMD } from "../../../lib/dateTools";
 import {
   SfShowingsQuery,
   SfShowingsQuery_movie_showings,
-  SfShowingsQueryVariables
+  SfShowingsQueryVariables,
 } from "./__generated__/SfShowingsQuery";
 
 export type GroupedFilmstadenShowings = {
@@ -38,17 +38,14 @@ export const useSfShowings = (
       fetchPolicy: "no-cache",
       variables: {
         city,
-        movieId
-      }
+        movieId,
+      },
     }
   );
 
-  const sfdates = useMemo(
-    () => {
-      const movieShowings = data?.movie?.showings ?? [];
-      return groupBy(movieShowings, s => formatYMD(s.timeUtc || ""));
-    },
-    [data]
-  );
+  const sfdates = useMemo(() => {
+    const movieShowings = data?.movie?.showings ?? [];
+    return groupBy(movieShowings, (s) => formatYMD(s.timeUtc || ""));
+  }, [data]);
   return [sfdates, loading];
 };

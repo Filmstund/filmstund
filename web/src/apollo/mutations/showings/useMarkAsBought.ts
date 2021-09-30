@@ -1,8 +1,8 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   MarkShowingAsBought,
-  MarkShowingAsBoughtVariables
+  MarkShowingAsBoughtVariables,
 } from "./__generated__/MarkShowingAsBought";
 
 const markAsBoughtMutation = gql`
@@ -54,6 +54,6 @@ export const useMarkAsBought = () =>
   useMutation<MarkShowingAsBought, MarkShowingAsBoughtVariables>(
     markAsBoughtMutation,
     {
-      refetchQueries: ["ShowingsQuery"]
+      refetchQueries: ["ShowingsQuery"],
     }
   );

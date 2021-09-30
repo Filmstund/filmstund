@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { MEDIUM_FONT_SIZE, LARGE_FONT_SIZE } from "../../../lib/style-vars";
+import { LARGE_FONT_SIZE, MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 
 const Header = styled.h2`
   font-weight: 300;

@@ -8,7 +8,7 @@ const ShowingPaymentContainer = ({
   isAdmin,
   onClickTickets,
   openSwish,
-  isParticipating
+  isParticipating,
 }) => {
   if (showing.ticketsBought) {
     if (isParticipating) {
@@ -37,7 +37,7 @@ const ShowingPaymentContainer = ({
 
 ShowingPaymentContainer.fragments = {
   showing: BoughtShowing.fragments.showing,
-  currentUser: PendingShowing.fragments.currentUser
+  currentUser: PendingShowing.fragments.currentUser,
 };
 
 export default ShowingPaymentContainer;

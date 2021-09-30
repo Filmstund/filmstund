@@ -1,8 +1,8 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   PromoteToAdmin,
-  PromoteToAdminVariables
+  PromoteToAdminVariables,
 } from "./__generated__/PromoteToAdmin";
 
 const promoteToAdminMutation = gql`
@@ -38,6 +38,6 @@ export const usePromoteToAdmin = () => {
   return (showingId: string, userId: string) =>
     mutate({
       variables: { showingId, userId },
-      refetchQueries: ["SingleShowing"]
+      refetchQueries: ["SingleShowing"],
     });
 };

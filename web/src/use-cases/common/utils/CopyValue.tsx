@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "@emotion/styled";
 
 import copy from "../../../lib/copy";
@@ -15,7 +15,8 @@ const Hover = styled.span<{ strikethrough: boolean }>`
       font-size: ${SMALL_FONT_SIZE};
     }
   }
-  text-decoration: ${props => (props.strikethrough ? "line-through" : "none")};
+  text-decoration: ${(props) =>
+    props.strikethrough ? "line-through" : "none"};
 `;
 
 interface Props {
@@ -23,7 +24,7 @@ interface Props {
   useStricken?: boolean;
 }
 
-const CopyValue: React.FC<Props> = props => {
+const CopyValue: React.FC<Props> = (props) => {
   const [isStricken, setIsStricken] = useState(false);
 
   const onClick = useCallback(() => {

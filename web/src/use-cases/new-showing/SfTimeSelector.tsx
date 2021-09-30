@@ -19,7 +19,7 @@ export const SfTimeSelector: React.FC<Props> = ({
   filmstadenShowings,
   date,
   selectedValue,
-  onSelect
+  onSelect,
 }) => {
   if (!filmstadenShowings) {
     return <FontAwesomeIcon icon={faSpinner} spin />;

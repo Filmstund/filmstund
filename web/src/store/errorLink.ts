@@ -1,9 +1,9 @@
-import { onError } from "apollo-link-error";
+import { onError } from "@apollo/client/link/error";
 
-export const errorLink = onError(args => {
+export const errorLink = onError((args) => {
   const { graphQLErrors, networkError } = args;
   if (graphQLErrors)
-    graphQLErrors.map(error =>
+    graphQLErrors.map((error) =>
       console.log(`[GraphQL error] ${error.message}`, error)
     );
 

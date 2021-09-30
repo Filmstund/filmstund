@@ -12,20 +12,22 @@ export const showingDate = (
   showing: Pick<HomeQuery_showings, "date" | "time">
 ) => parseISO(showing.date + " " + showing.time);
 
-export const filterShowingsCreatedByMe = (meId: string): ShowingFilterFn => s =>
-  s.admin.id === meId;
+export const filterShowingsCreatedByMe =
+  (meId: string): ShowingFilterFn =>
+  (s) =>
+    s.admin.id === meId;
 
-export const filterShowingsParticipatedByMe = (
-  meId: string
-): ShowingFilterFn => s =>
-  s.participants.some(p => p.user && p.user.id === meId);
+export const filterShowingsParticipatedByMe =
+  (meId: string): ShowingFilterFn =>
+  (s) =>
+    s.participants.some((p) => p.user && p.user.id === meId);
 
-export const filterShowingsParticipatedByMeAndAfterToday = (
-  meId: string
-): ShowingFilterFn => s =>
-  filterShowingsParticipatedByMe(meId)(s) && isAfter(showingDate(s), today);
+export const filterShowingsParticipatedByMeAndAfterToday =
+  (meId: string): ShowingFilterFn =>
+  (s) =>
+    filterShowingsParticipatedByMe(meId)(s) && isAfter(showingDate(s), today);
 
-export const filterShowingsParticipatedByMeAndBeforeToday = (
-  meId: string
-): ShowingFilterFn => s =>
-  filterShowingsParticipatedByMe(meId)(s) && isBefore(showingDate(s), today);
+export const filterShowingsParticipatedByMeAndBeforeToday =
+  (meId: string): ShowingFilterFn =>
+  (s) =>
+    filterShowingsParticipatedByMe(meId)(s) && isBefore(showingDate(s), today);

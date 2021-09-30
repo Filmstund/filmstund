@@ -8,7 +8,7 @@ interface PageTitleTemplateProps {
 
 export const PageTitleTemplate: React.FC<PageTitleTemplateProps> = ({
   titleTemplate,
-  children
+  children,
 }) => {
   return (
     <PageTitleContext.Provider value={titleTemplate}>

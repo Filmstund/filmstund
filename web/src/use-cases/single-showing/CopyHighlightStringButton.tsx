@@ -4,7 +4,7 @@ import { useFadeState } from "../common/hooks/useFadeState";
 import { GrayButton } from "../common/ui/MainButton";
 import {
   SingleShowing_showing_participants,
-  SingleShowing_showing_participants_user
+  SingleShowing_showing_participants_user,
 } from "./containers/__generated__/SingleShowing";
 
 const mapToUserAndFilterMe = (
@@ -12,19 +12,19 @@ const mapToUserAndFilterMe = (
   meId: SeFilmUserID
 ): SingleShowing_showing_participants_user[] =>
   participants
-    .map(p => p.user)
+    .map((p) => p.user)
     .filter(
-      f => !!f && f.id !== meId
+      (f) => !!f && f.id !== meId
     ) as SingleShowing_showing_participants_user[];
 
 const formatParticipants = (
   users: SingleShowing_showing_participants_user[]
 ): string => {
   const nicks = users.map(
-    user => user.nick || `${user.firstName} ${user.lastName}`
+    (user) => user.nick || `${user.firstName} ${user.lastName}`
   );
 
-  const nicksWithAt = nicks.map(nick => `@${nick}`);
+  const nicksWithAt = nicks.map((nick) => `@${nick}`);
 
   return nicksWithAt.join(" ");
 };

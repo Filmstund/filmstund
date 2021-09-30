@@ -1,16 +1,15 @@
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import { sample } from "lodash-es";
 import React from "react";
-import { useQuery } from "react-apollo";
 import { useFadeBetweenValues } from "../../hooks/useFadeBetweenValues";
 import {
   BioordQuery,
-  BioordQuery_allBiobudord
+  BioordQuery_allBiobudord,
 } from "./__generated__/BioordQuery";
 import QuoteBox from "./QuoteBox";
 
 const Bioord: React.FC<{ biobudord: BioordQuery_allBiobudord[] }> = ({
-  biobudord
+  biobudord,
 }) => {
   const { faded, value: budord } = useFadeBetweenValues(biobudord, sample);
 

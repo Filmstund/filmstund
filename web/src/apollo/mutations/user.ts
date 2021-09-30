@@ -1,5 +1,5 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { completeUserFragment } from "../queries/currentUser";
 import { UpdateUser, UpdateUserVariables } from "./__generated__/UpdateUser";
 

@@ -11,8 +11,8 @@ import Input from "../../use-cases/common/ui/Input";
 import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
 import { UserProfile_me_foretagsbiljetter } from "./__generated__/UserProfile";
 
-const DatePickerInput = lazy(() =>
-  import("../../use-cases/common/ui/date-picker/DatePickerInput")
+const DatePickerInput = lazy(
+  () => import("../../use-cases/common/ui/date-picker/DatePickerInput")
 );
 
 const ForetagsbiljettWrapper = styled.div`
@@ -23,7 +23,8 @@ const ForetagsbiljettWrapper = styled.div`
 
 const MaxWidthInput = styled(Input)`
   max-width: 13.6em;
-  background: ${props => (props.disabled ? "rgba(0, 0, 0, 0.04)" : "inherit")};
+  background: ${(props) =>
+    props.disabled ? "rgba(0, 0, 0, 0.04)" : "inherit"};
 `;
 
 const IconButton = styled(FontAwesomeIcon)`
@@ -108,12 +109,11 @@ const Foretagsbiljett: React.FC<Props> = (props) => (
         <ValueField>{formatYMD(props.biljett.expires)}</ValueField>
       )}
     </BiljettField>
-    {"status" in props.biljett &&
-      props.biljett.status && (
-        <BiljettField text="Status">
-          <ValueField>{localizeTicketStatus(props.biljett.status)}</ValueField>
-        </BiljettField>
-      )}
+    {"status" in props.biljett && props.biljett.status && (
+      <BiljettField text="Status">
+        <ValueField>{localizeTicketStatus(props.biljett.status)}</ValueField>
+      </BiljettField>
+    )}
 
     <div onClick={props.handleRemoveForetagsbiljett}>
       <IconButton size="2x" icon={faTrash} />

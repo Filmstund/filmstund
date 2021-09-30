@@ -18,8 +18,8 @@ describe("createPaymentOptions", () => {
           {
             expires: expires,
             number: "123456",
-            status: ForetagsbiljettStatus.Available
-          }
+            status: ForetagsbiljettStatus.Available,
+          },
         ])
       ).toHaveLength(2);
     });

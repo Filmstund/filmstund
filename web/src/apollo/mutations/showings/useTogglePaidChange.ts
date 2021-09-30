@@ -1,8 +1,8 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   TogglePaidChange,
-  TogglePaidChangeVariables
+  TogglePaidChangeVariables,
 } from "./__generated__/TogglePaidChange";
 
 const togglePaidChangeMutation = gql`

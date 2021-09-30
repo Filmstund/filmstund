@@ -17,7 +17,7 @@ const PaddingContainer = styled.div`
 `;
 
 const Poster = styled.div`
-  background-image: url(${props => props.src}), url(${alfons});
+  background-image: url(${(props) => props.src}), url(${alfons});
   background-size: cover;
   height: 100%;
   width: 100px;
@@ -34,13 +34,13 @@ const PosterBox = ({
   poster,
   onClick,
   headerText,
-  children
+  children,
 }) => (
   <div
     tabIndex={onClick ? "0" : "-1"}
     className={className}
     onClick={onClick}
-    onKeyDown={e => filterEnterKey(e, onClick)}
+    onKeyDown={(e) => filterEnterKey(e, onClick)}
   >
     <Poster src={poster} />
     <PaddingContainer>
@@ -56,5 +56,5 @@ export default styled(PosterBox)`
   height: 150px;
   width: 100%;
   background: #fff;
-  ${props => props.onClick && pointerHover};
+  ${(props) => props.onClick && pointerHover};
 `;

@@ -77,7 +77,7 @@ const TicketHeader: React.FC<
     <HeaderText style={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
     <FlexSpaceRowContainer>
       <FlexRowContainer>
-        {(showAttributes || []).map(attr => (
+        {(showAttributes || []).map((attr) => (
           <ShowAttribute key={attr}>{attr}</ShowAttribute>
         ))}
       </FlexRowContainer>
@@ -95,7 +95,7 @@ interface TicketValueWithLabelProps {
 const TicketValueWithLabel: React.FC<TicketValueWithLabelProps> = ({
   label,
   value,
-  style = {}
+  style = {},
 }) => (
   <FlexColumnContainer style={{ ...style, paddingRight: "1rem" }}>
     <LabelText>{label}</LabelText>
@@ -179,8 +179,8 @@ export const Ticket: React.FC<Props> = ({
     showAttributes,
     profileId,
     seat,
-    barcode
-  }
+    barcode,
+  },
 }) => (
   <TicketWrapper>
     <CompanyHeader cinema={cinema} />

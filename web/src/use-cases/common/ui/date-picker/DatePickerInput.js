@@ -7,7 +7,7 @@ import { formatYMD } from "../../../../lib/dateTools";
 
 const localeUtils = {
   ...LocaleUtils,
-  getFirstDayOfWeek: () => 1
+  getFirstDayOfWeek: () => 1,
 };
 
 const DatePickerInput = ({
@@ -23,7 +23,7 @@ const DatePickerInput = ({
     dayPickerProps={{
       localeUtils,
       selectedDays: value,
-      ...dayPickerProps
+      ...dayPickerProps,
     }}
     {...props}
   />

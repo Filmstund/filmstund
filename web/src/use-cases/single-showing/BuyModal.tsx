@@ -32,7 +32,7 @@ interface BuyModalProps {
 export const BuyModal: React.FC<BuyModalProps> = ({
   loading,
   closeModal,
-  showing
+  showing,
 }) => {
   if (loading || !showing.adminPaymentDetails) {
     return (

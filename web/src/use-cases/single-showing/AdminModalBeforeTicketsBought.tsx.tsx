@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { ApolloError } from "apollo-client";
+import { ApolloError } from "@apollo/client";
 import * as React from "react";
 import { FormEventHandler, useState } from "react";
 import { useMarkAsBought } from "../../apollo/mutations/showings/useMarkAsBought";
@@ -18,7 +18,7 @@ import {
   SingleShowing_showing,
   SingleShowing_showing_adminPaymentDetails,
   SingleShowing_showing_adminPaymentDetails_filmstadenData,
-  SingleShowing_showing_adminPaymentDetails_filmstadenData_user
+  SingleShowing_showing_adminPaymentDetails_filmstadenData_user,
 } from "./containers/__generated__/SingleShowing";
 import { InputSpinner } from "./InputSpinner";
 
@@ -53,7 +53,7 @@ const TicketListRow = styled.div`
 const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
   <div>
     <SmallHeader>Deltagare</SmallHeader>
-    {tickets.map(ticket => (
+    {tickets.map((ticket) => (
       <TicketListRow key={ticket.user.id}>
         <div style={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
@@ -89,82 +89,82 @@ interface AdminModalBeforeTicketsBoughtProps {
 
 const priceTransformer = (str: string) => parseInt(str, 10);
 
-export const AdminModalBeforeTicketsBought: React.FC<
-  AdminModalBeforeTicketsBoughtProps
-> = ({ closeModal, showing, adminPaymentDetails }) => {
-  const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
-  const [ticketPrice, handlePriceChange] = useStateWithHandleChange(
-    (showing.price || 0) / 100,
-    priceTransformer
-  );
-
-  const [
-    addTickets,
-    { loading: addTicketsLoading, error: addTicketsError }
-  ] = useAddTickets();
-  const [
-    markAsBought,
-    { loading: markBoughtLoading, error: markBoughtError }
-  ] = useMarkAsBought();
-
-  const mutationInProgress = addTicketsLoading || markBoughtLoading;
-
-  const mutationErrors = [addTicketsError, markBoughtError].filter(
-    f => !!f
-  ) as ApolloError[];
-
-  const onFormSubmit: FormEventHandler<HTMLFormElement> = event => {
-    event.preventDefault();
-
-    const nonEmptyTicketUrls = cinemaTicketUrls.filter(
-      line => line.trim().length !== 0
+export const AdminModalBeforeTicketsBought: React.FC<AdminModalBeforeTicketsBoughtProps> =
+  ({ closeModal, showing, adminPaymentDetails }) => {
+    const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
+    const [ticketPrice, handlePriceChange] = useStateWithHandleChange(
+      (showing.price || 0) / 100,
+      priceTransformer
     );
-    addTickets({
-      variables: { showingId: showing.id, tickets: nonEmptyTicketUrls }
-    })
-      .then(() =>
-        markAsBought({
-          variables: { showingId: showing.id, price: ticketPrice * 100 }
-        })
-      )
-      .then(() => {
-        closeModal();
-      });
+
+    const [addTickets, { loading: addTicketsLoading, error: addTicketsError }] =
+      useAddTickets();
+    const [
+      markAsBought,
+      { loading: markBoughtLoading, error: markBoughtError },
+    ] = useMarkAsBought();
+
+    const mutationInProgress = addTicketsLoading || markBoughtLoading;
+
+    const mutationErrors = [addTicketsError, markBoughtError].filter(
+      (f) => !!f
+    ) as ApolloError[];
+
+    const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+      event.preventDefault();
+
+      const nonEmptyTicketUrls = cinemaTicketUrls.filter(
+        (line) => line.trim().length !== 0
+      );
+      addTickets({
+        variables: { showingId: showing.id, tickets: nonEmptyTicketUrls },
+      })
+        .then(() =>
+          markAsBought({
+            variables: { showingId: showing.id, price: ticketPrice * 100 },
+          })
+        )
+        .then(() => {
+          closeModal();
+        });
+    };
+
+    const { filmstadenBuyLink, filmstadenData } = adminPaymentDetails;
+
+    return (
+      <form onSubmit={onFormSubmit}>
+        <Header>Boka</Header>
+        {!filmstadenBuyLink &&
+          "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
+        {filmstadenBuyLink && (
+          <a href={filmstadenBuyLink} target="_blank" rel="noopener noreferrer">
+            Öppna Filmstaden-länk i nytt fönster
+          </a>
+        )}
+        <ParticipantsList
+          participants={showing.participants}
+          showPhone={true}
+        />
+        <TicketList tickets={filmstadenData} />
+        <StatusMessageBox
+          errors={mutationErrors.length > 0 ? mutationErrors : null}
+        />
+        <Field text="Biljettpris:">
+          <Input
+            type="number"
+            value={ticketPrice}
+            min={0}
+            onChange={handlePriceChange}
+          />
+        </Field>
+        <Field text="SF-biljettlänkar: (en per rad)">
+          <TicketURLInput
+            cinemaTicketUrls={cinemaTicketUrls}
+            onChange={setCinemaTicketUrls}
+          />
+        </Field>
+        {mutationInProgress && <InputSpinner />}
+        <MainButton>Markera som bokad</MainButton>
+      </form>
+    );
   };
-
-  const { filmstadenBuyLink, filmstadenData } = adminPaymentDetails;
-
-  return (
-    <form onSubmit={onFormSubmit}>
-      <Header>Boka</Header>
-      {!filmstadenBuyLink &&
-        "Ingen köplänk genererad ännu! Kom tillbaka senare!"}
-      {filmstadenBuyLink && (
-        <a href={filmstadenBuyLink} target="_blank" rel="noopener noreferrer">
-          Öppna Filmstaden-länk i nytt fönster
-        </a>
-      )}
-      <ParticipantsList participants={showing.participants} showPhone={true} />
-      <TicketList tickets={filmstadenData} />
-      <StatusMessageBox
-        errors={mutationErrors.length > 0 ? mutationErrors : null}
-      />
-      <Field text="Biljettpris:">
-        <Input
-          type="number"
-          value={ticketPrice}
-          min={0}
-          onChange={handlePriceChange}
-        />
-      </Field>
-      <Field text="SF-biljettlänkar: (en per rad)">
-        <TicketURLInput
-          cinemaTicketUrls={cinemaTicketUrls}
-          onChange={setCinemaTicketUrls}
-        />
-      </Field>
-      {mutationInProgress && <InputSpinner />}
-      <MainButton>Markera som bokad</MainButton>
-    </form>
-  );
-};
