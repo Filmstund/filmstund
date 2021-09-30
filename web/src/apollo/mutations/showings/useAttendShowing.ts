@@ -1,13 +1,13 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   AttendShowing,
-  AttendShowingVariables
+  AttendShowingVariables,
 } from "./__generated__/AttendShowing";
 import { PaymentOption } from "../../../__generated__/globalTypes";
 import {
   UnattendShowing,
-  UnattendShowingVariables
+  UnattendShowingVariables,
 } from "./__generated__/UnattendShowing";
 
 const participantsFragment = gql`

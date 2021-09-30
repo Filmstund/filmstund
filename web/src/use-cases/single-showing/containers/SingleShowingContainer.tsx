@@ -1,7 +1,5 @@
-import { ApolloError, NetworkStatus } from "apollo-client";
-import gql from "graphql-tag";
+import { ApolloError, gql, NetworkStatus, useQuery } from "@apollo/client";
 import React, { useState } from "react";
-import { useQuery } from "react-apollo";
 
 import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
 import { useHistory } from "react-router-dom";

@@ -1,11 +1,11 @@
 import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React from "react";
 import { movieFragment } from "../common/showing/Showing";
 import Loader from "../common/utils/ProjectorLoader";
 import {
   CreateShowingQuery,
-  CreateShowingQueryVariables
+  CreateShowingQueryVariables,
 } from "./__generated__/CreateShowingQuery";
 import { CreateShowingForm } from "./CreateShowingForm";
 
@@ -18,7 +18,7 @@ interface FetcherProps {
 export const CreateShowingFormFetcher: React.FC<FetcherProps> = ({
   movieId,
   navigateToShowing,
-  clearSelectedMovie
+  clearSelectedMovie,
 }) => {
   const { data } = useCreateShowingData(movieId);
 
@@ -62,7 +62,7 @@ const useCreateShowingData = (movieId: string) =>
     {
       fetchPolicy: "cache-and-network",
       variables: {
-        movieId
-      }
+        movieId,
+      },
     }
   );

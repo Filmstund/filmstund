@@ -1,9 +1,11 @@
-import { ApolloClient } from "apollo-client";
-import { ApolloLink } from "apollo-link";
-import { HttpLink } from "apollo-link-http";
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+} from "@apollo/client";
+import { persistCache, LocalStorageWrapper } from "apollo3-cache-persist";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { persistCache } from "apollo-cache-persist";
 import { tokenRefresh } from "./tokenRefreshLink";
 import { errorLink } from "./errorLink";
 
@@ -19,9 +21,9 @@ const cache = new InMemoryCache({
   },
 });
 
-persistCache({
+await persistCache({
   cache,
-  storage: window.localStorage,
+  storage: new LocalStorageWrapper(window.localStorage),
 });
 
 const httpLink = new HttpLink({

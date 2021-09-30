@@ -2,7 +2,10 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ForetagsbiljettInput, ForetagsbiljettStatus } from "./../../../__generated__/globalTypes";
+import {
+  ForetagsbiljettInput,
+  ForetagsbiljettStatus,
+} from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: DeleteForetagsbiljett
@@ -18,7 +21,9 @@ export interface DeleteForetagsbiljett_deleteForetagsBiljett_foretagsbiljetter {
 export interface DeleteForetagsbiljett_deleteForetagsBiljett {
   __typename: "CurrentUser";
   id: SeFilmUserID;
-  foretagsbiljetter: DeleteForetagsbiljett_deleteForetagsBiljett_foretagsbiljetter[] | null;
+  foretagsbiljetter:
+    | DeleteForetagsbiljett_deleteForetagsBiljett_foretagsbiljetter[]
+    | null;
 }
 
 export interface DeleteForetagsbiljett {

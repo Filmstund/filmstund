@@ -4,7 +4,12 @@ import googleIcon from "./assets/google-logo.svg";
 import itbioLogo from "./assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
-import { clearSession, getGoogleId, hasToken, setUserInfo } from "../../../lib/session";
+import {
+  clearSession,
+  getGoogleId,
+  hasToken,
+  setUserInfo,
+} from "../../../lib/session";
 import { provideGoogleLogin } from "./GoogleLoginProvider";
 import {
   Container,
@@ -13,27 +18,27 @@ import {
   GoogleButton,
   GoogleLogo,
   LoginContainer,
-  LoginDialog
+  LoginDialog,
 } from "../components/login-styles";
 
 class Login extends Component {
   state = {
     signedIn: hasToken(),
     loaded: false,
-    cookiesBlocked: false
+    cookiesBlocked: false,
   };
 
   componentDidMount() {
     return this.props
       .initGoogleAuth({
         loginHint: getGoogleId(),
-        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID
+        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
       })
       .then(this.googleUserChanged)
-      .catch(e => {
+      .catch((e) => {
         if (e.error === "idpiframe_initialization_failed") {
           this.setState({
-            cookiesBlocked: true
+            cookiesBlocked: true,
           });
         } else {
           throw e;
@@ -41,22 +46,22 @@ class Login extends Component {
       })
       .then(() => {
         this.setState({
-          loaded: true
+          loaded: true,
         });
       });
   }
 
-  googleUserChanged = response => {
+  googleUserChanged = (response) => {
     if (response.user_id) {
       setUserInfo(response);
 
       this.setState({
-        signedIn: true
+        signedIn: true,
       });
     } else {
       clearSession();
       this.setState({
-        signedIn: false
+        signedIn: false,
       });
     }
 
@@ -72,7 +77,7 @@ class Login extends Component {
     this.props.signOut();
 
     this.setState({
-      signedIn: false
+      signedIn: false,
     });
 
     this.props.history.push("/");

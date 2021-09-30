@@ -1,6 +1,5 @@
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import React, { useCallback } from "react";
-import { useQuery } from "react-apollo";
 import { useFetchMovies } from "../../apollo/queries/movies";
 import { navigateToShowing } from "../common/navigators";
 
@@ -8,12 +7,11 @@ import { movieFragment } from "../common/showing/Movie";
 import { NewShowingQuery } from "./__generated__/NewShowingQuery";
 import { CreateShowingFormFetcher } from "./CreateShowingFormFetcher";
 import MovieSelector from "./MovieSelector";
-import { useParams, useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 const NewShowing = () => {
   const history = useHistory();
   const { movieId } = useParams<{ movieId: string }>();
-
 
   const { data } = useAllMovies();
   const [fetchMovies] = useFetchMovies();
@@ -21,21 +19,18 @@ const NewShowing = () => {
   const movies = data ? data.movies : [];
 
   const handleNavigateToShowing = useCallback(
-    showing => {
+    (showing) => {
       navigateToShowing(history, showing);
     },
     [history]
   );
 
-  const clearSelectedMovie = useCallback(
-    () => {
-      history.push("/showings/new");
-    },
-    [history]
-  );
+  const clearSelectedMovie = useCallback(() => {
+    history.push("/showings/new");
+  }, [history]);
 
   const setMovie = useCallback(
-    movie => {
+    (movie) => {
       history.push(`/showings/new/${movie.id}`);
     },
     [history]
@@ -74,7 +69,7 @@ const useAllMovies = () =>
       ${movieFragment}
     `,
     {
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
     }
   );
 

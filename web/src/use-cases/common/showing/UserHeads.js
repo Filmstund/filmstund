@@ -8,7 +8,7 @@ export const UserHeads = ({ users, maxCount = 5 }) => {
 
   // Hack to shift people with default Google avatar to the end
   // For some reason the url of default avatars are longer
-  const sortedHeads = orderBy(users, [u => u.avatar.length], ["asc"]);
+  const sortedHeads = orderBy(users, [(u) => u.avatar.length], ["asc"]);
 
   return (
     <UsersContainer>

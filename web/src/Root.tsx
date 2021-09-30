@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, lazy, Suspense } from "react";
-import { ApolloProvider } from "react-apollo";
+import { ApolloProvider } from "@apollo/client";
 import "./index.css";
 
 import { BrowserRouter as Router } from "react-router-dom";

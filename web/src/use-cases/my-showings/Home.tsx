@@ -1,6 +1,5 @@
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import React from "react";
-import { useQuery } from "react-apollo";
 import { showingFragment } from "../common/showing/fragment";
 
 import { Link } from "../common/ui/MainButton";

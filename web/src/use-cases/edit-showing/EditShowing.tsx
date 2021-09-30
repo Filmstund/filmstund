@@ -1,6 +1,5 @@
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import React from "react";
-import { useQuery } from "react-apollo";
 import { useParams } from "react-router-dom";
 import { oldShowingFragment } from "../common/showing/Showing";
 import Loader from "../common/utils/ProjectorLoader";
@@ -34,7 +33,7 @@ const useEditShowingData = (webId: string) =>
     `,
     {
       fetchPolicy: "cache-and-network",
-      variables: { webId }
+      variables: { webId },
     }
   );
 

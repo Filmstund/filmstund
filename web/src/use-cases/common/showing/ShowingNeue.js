@@ -12,7 +12,7 @@ import {
   Description,
   FaIcon,
   Poster,
-  RedButton
+  RedButton,
 } from "./style";
 import { UserHeads } from "./UserHeads";
 
@@ -28,12 +28,12 @@ export const ShowingNeue = ({ showing, onClick, onClickTickets }) => {
           <Description>
             {formatShowingDateTime(showing.date + " " + showing.time)}
           </Description>
-          <UserHeads users={showing.participants.map(p => p.user)} />
+          <UserHeads users={showing.participants.map((p) => p.user)} />
         </Content>
         {showingHasTickets && (
           <RedButton
             disabled={!onClickTickets}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               if (onClickTickets) {
                 onClickTickets();

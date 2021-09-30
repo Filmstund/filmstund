@@ -4,13 +4,11 @@ import { cleanup, render } from "@testing-library/react";
 import { TicketContainer } from "./TicketContainer";
 import { createMockSeat, createMockTicket } from "./__mocks__/ticket";
 import { MemoryRouter as Router } from "react-router";
-import { ApolloProvider } from "react-apollo";
-import { ApolloClient } from "apollo-client";
-import { ApolloLink } from "apollo-link";
+import { ApolloClient, ApolloLink, ApolloProvider } from "@apollo/client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
 const mockUserData = {
-  id: "this-is-mock-user-id"
+  id: "this-is-mock-user-id",
 };
 
 const minimalMockData = {
@@ -18,10 +16,10 @@ const minimalMockData = {
   admin: mockUserData,
   ticketRange: {
     rows: [],
-    seatings: []
+    seatings: [],
   },
   filmstadenSeatMap: [],
-  myTickets: [createMockTicket(1, 2, 3)]
+  myTickets: [createMockTicket(1, 2, 3)],
 };
 
 const mockData = {
@@ -32,26 +30,26 @@ const mockData = {
     seatings: [
       {
         row: 2,
-        numbers: [3, 4]
+        numbers: [3, 4],
       },
       {
         row: 3,
-        numbers: [5, 6]
-      }
-    ]
+        numbers: [5, 6],
+      },
+    ],
   },
   filmstadenSeatMap: [
     createMockSeat(2, 3, 5, 0),
     createMockSeat(2, 4, 10, 0),
     createMockSeat(3, 5, 5, 5),
-    createMockSeat(3, 6, 10, 5)
+    createMockSeat(3, 6, 10, 5),
   ],
   myTickets: [
     createMockTicket(1, 2, 3),
     createMockTicket(2, 2, 4),
     createMockTicket(3, 3, 5),
-    createMockTicket(4, 3, 6)
-  ]
+    createMockTicket(4, 3, 6),
+  ],
 };
 
 afterEach(cleanup);

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import Modal from "../ui/Modal";
 
 import Header from "../ui/Header";
@@ -10,7 +10,9 @@ interface Props {
   me: AppQuery_me;
 }
 
-export const WelcomeModal: React.FC<Props> = ({ me: { filmstadenMembershipId } }) => {
+export const WelcomeModal: React.FC<Props> = ({
+  me: { filmstadenMembershipId },
+}) => {
   const history = useHistory();
 
   const [modalOpen, setModalOpen] = useState(true);
@@ -28,8 +30,8 @@ export const WelcomeModal: React.FC<Props> = ({ me: { filmstadenMembershipId } }
         <Header>Välkommen!</Header>
 
         <p>
-          Filmstaden har bytt bioklubbsnummer till ett annat format, och det heter
-          numera medlemsnummer.
+          Filmstaden har bytt bioklubbsnummer till ett annat format, och det
+          heter numera medlemsnummer.
         </p>
         <p>Var god uppdatera ditt registrerade nummer under profilsidan!</p>
         <ButtonContainer>

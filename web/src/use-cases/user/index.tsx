@@ -1,6 +1,5 @@
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import * as React from "react";
-import { useQuery } from "react-apollo";
 import { completeUserFragment } from "../../apollo/queries/currentUser";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { UserProfile } from "./__generated__/UserProfile";
@@ -18,7 +17,7 @@ const query = gql`
 
 const UserScreen = () => {
   const { data } = useQuery<UserProfile>(query, {
-    fetchPolicy: "cache-and-network"
+    fetchPolicy: "cache-and-network",
   });
 
   if (!data || !data.me) {

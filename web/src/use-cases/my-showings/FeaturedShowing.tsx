@@ -6,7 +6,7 @@ import * as React from "react";
 import { useHistory } from "react-router-dom";
 import {
   navigateToShowing,
-  navigateToShowingTickets
+  navigateToShowingTickets,
 } from "../common/navigators";
 import { ShowingNeue } from "../common/showing/ShowingNeue";
 import { FullWidthWrapper } from "../common/ui/PageWidthWrapper";
@@ -15,7 +15,7 @@ import { ItsHappeningTitle } from "./ItsHappeningTitle";
 import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import {
   filterShowingsParticipatedByMe,
-  showingDate
+  showingDate,
 } from "./utils/filtersCreators";
 
 interface FeaturedShowingProps {
@@ -25,14 +25,14 @@ interface FeaturedShowingProps {
 
 export const FeaturedShowing: React.FC<FeaturedShowingProps> = ({
   showings,
-  meId
+  meId,
 }) => {
   const history = useHistory();
 
   const compareTime = subMinutes(new Date(), 30);
 
   const todayShowings = showings.filter(
-    s =>
+    (s) =>
       filterShowingsParticipatedByMe(meId)(s) &&
       isBefore(compareTime, showingDate(s)) &&
       isSameDay(compareTime, showingDate(s))

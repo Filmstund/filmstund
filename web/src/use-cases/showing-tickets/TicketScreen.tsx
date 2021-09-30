@@ -1,6 +1,5 @@
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import * as React from "react";
-import { useQuery } from "react-apollo";
 import { ticketFragment } from "../../apollo/mutations/useAddTickets";
 import { useParams } from "react-router-dom";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
@@ -22,7 +21,7 @@ const useTickets = (webId: string) =>
     `,
     {
       fetchPolicy: "cache-and-network",
-      variables: { webId }
+      variables: { webId },
     }
   );
 

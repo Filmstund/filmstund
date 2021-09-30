@@ -6,11 +6,11 @@ import * as React from "react";
 import Header from "../../common/ui/Header";
 import {
   SingleShowing_showing_adminPaymentDetails_participantPaymentInfos,
-  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user
+  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user,
 } from "../containers/__generated__/SingleShowing";
 
 const UserActiveStatus = styled.div<{ active: boolean }>`
-  color: ${props => (props.active ? "#000" : "#ccc")};
+  color: ${(props) => (props.active ? "#000" : "#ccc")};
 `;
 
 interface UserWithPriceItemProps {
@@ -24,7 +24,7 @@ const UserWithPriceItem: React.FC<UserWithPriceItemProps> = ({
   user,
   active,
   onPaidChange,
-  hasPaid
+  hasPaid,
 }) => (
   <UserActiveStatus active={active}>
     {user.nick || user.name}{" "}
@@ -46,10 +46,10 @@ interface UserWithPriceItemListProps {
 const UserWithPriceItemList: React.FC<UserWithPriceItemListProps> = ({
   participantPaymentInfos,
   handlePaidChange,
-  paid
+  paid,
 }) => (
   <>
-    {participantPaymentInfos.map(info => (
+    {participantPaymentInfos.map((info) => (
       <UserWithPriceItem
         key={info.user.id}
         active={paid}
@@ -70,30 +70,28 @@ interface PaymentParticipantsListProps {
   participants: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
 }
 
-export const PaymentParticipantsList: React.FC<
-  PaymentParticipantsListProps
-> = ({ handlePaidChange, participants }) => {
-  const { hasPaid = [], hasNotPaid = [] } = groupBy(
-    participants,
-    info => (info.hasPaid ? "hasPaid" : "hasNotPaid")
-  );
+export const PaymentParticipantsList: React.FC<PaymentParticipantsListProps> =
+  ({ handlePaidChange, participants }) => {
+    const { hasPaid = [], hasNotPaid = [] } = groupBy(participants, (info) =>
+      info.hasPaid ? "hasPaid" : "hasNotPaid"
+    );
 
-  return (
-    <div>
-      <Header>Deltagare</Header>
-      {hasNotPaid.length === 0 && "Alla har betalat!"}
-      <UserWithPriceItemList
-        paid={false}
-        participantPaymentInfos={hasNotPaid}
-        handlePaidChange={handlePaidChange}
-      />
+    return (
+      <div>
+        <Header>Deltagare</Header>
+        {hasNotPaid.length === 0 && "Alla har betalat!"}
+        <UserWithPriceItemList
+          paid={false}
+          participantPaymentInfos={hasNotPaid}
+          handlePaidChange={handlePaidChange}
+        />
 
-      <hr />
-      <UserWithPriceItemList
-        paid={true}
-        participantPaymentInfos={hasPaid}
-        handlePaidChange={handlePaidChange}
-      />
-    </div>
-  );
-};
+        <hr />
+        <UserWithPriceItemList
+          paid={true}
+          participantPaymentInfos={hasPaid}
+          handlePaidChange={handlePaidChange}
+        />
+      </div>
+    );
+  };

@@ -7,7 +7,7 @@ const QuoteBox = styled.div`
   font-size: ${SMALL_FONT_SIZE};
   color: #9b9b9b;
   font-weight: 400;
-  opacity: ${props => (props.faded ? 0 : 1)};
+  opacity: ${(props) => (props.faded ? 0 : 1)};
   transition: 1s opacity;
 
   > blockquote {

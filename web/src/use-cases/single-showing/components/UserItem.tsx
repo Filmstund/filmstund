@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React from "react";
 
 const PaddingContainer = styled.div`
@@ -8,7 +8,7 @@ const PaddingContainer = styled.div`
 `;
 
 const Poster = styled.div<{ src: string }>`
-  background-image: url(${props => props.src});
+  background-image: url(${(props) => props.src});
   background-size: cover;
   height: 96px;
   width: 96px;
@@ -37,7 +37,7 @@ const UserItem: React.FC<Props> = ({
   className,
   showPhone,
   user,
-  children
+  children,
 }) => (
   <div className={className}>
     <Poster src={user.avatar!} />
@@ -60,7 +60,7 @@ export const fragments = {
       lastName
       phone
     }
-  `
+  `,
 };
 
 export default styled(UserItem)`

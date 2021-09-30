@@ -6,7 +6,7 @@ import { formatYMD } from "../../../../lib/dateTools";
 
 const localeUtils = {
   ...LocaleUtils,
-  getFirstDayOfWeek: () => 1
+  getFirstDayOfWeek: () => 1,
 };
 
 const DatePicker = ({ value, onChange, ...props }) => {

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React from "react";
 
 import { formatShowingDateTime } from "../../../lib/dateTools";

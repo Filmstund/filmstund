@@ -1,6 +1,6 @@
 import { getExpiresAt, getToken, GoogleAuthResponse } from "../lib/session";
 import { addMinutes, isAfter } from "date-fns";
-import { setContext } from "apollo-link-context";
+import { setContext } from "@apollo/client/link/context";
 
 interface AuthInstance {
   currentUser: {

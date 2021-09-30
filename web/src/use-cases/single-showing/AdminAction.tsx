@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React, { useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { navigateToEditShowing } from "../common/navigators";
@@ -21,39 +21,33 @@ interface State {
 const initialState: State = {
   adminMessage: null,
   loadingModal: false,
-  showModal: false
+  showModal: false,
 };
 
 const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
   const [state, setState] = useState(initialState);
   const { showModal, loadingModal, adminMessage } = state;
 
-  const handleStartBooking = useCallback(
-    async () => {
-      setState(state => ({
-        ...state,
-        showModal: true,
-        loadingModal: true
-      }));
+  const handleStartBooking = useCallback(async () => {
+    setState((state) => ({
+      ...state,
+      showModal: true,
+      loadingModal: true,
+    }));
 
-      await onBeforeOpenBuyModal();
+    await onBeforeOpenBuyModal();
 
-      setState(state => ({
-        ...state,
-        loadingModal: false
-      }));
-    },
-    [setState, onBeforeOpenBuyModal]
-  );
+    setState((state) => ({
+      ...state,
+      loadingModal: false,
+    }));
+  }, [setState, onBeforeOpenBuyModal]);
 
   const history = useHistory();
 
-  const handlePressEdit = useCallback(
-    () => {
-      navigateToEditShowing(history, showing);
-    },
-    [history, showing]
-  );
+  const handlePressEdit = useCallback(() => {
+    navigateToEditShowing(history, showing);
+  }, [history, showing]);
 
   const { ticketsBought } = showing;
 
@@ -63,10 +57,15 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
         <BuyModal
           loading={loadingModal}
           showing={showing}
-          closeModal={() => setState(state => ({ ...state, showModal: false }))}
+          closeModal={() =>
+            setState((state) => ({ ...state, showModal: false }))
+          }
         />
       )}
-      <CopyHighlightStringButton meId={showing.admin.id} participants={showing.participants} />
+      <CopyHighlightStringButton
+        meId={showing.admin.id}
+        participants={showing.participants}
+      />
       {adminMessage && <div>{adminMessage}</div>}
       {ticketsBought ? (
         <GrayButton onClick={handleStartBooking}>

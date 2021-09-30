@@ -1,12 +1,12 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export const useApolloMutationResult = <T extends Function>(mutate: T) => {
   const [{ errors, success }, setResult] = useState({
     errors: null,
-    success: false
+    success: false,
   });
 
-  const wrappedMutate = (useCallback(
+  const wrappedMutate = useCallback(
     (...args) => {
       return mutate(...args).then(
         (res: any) => {
@@ -20,7 +20,7 @@ export const useApolloMutationResult = <T extends Function>(mutate: T) => {
       );
     },
     [mutate]
-  ) as unknown) as T;
+  ) as unknown as T;
 
   const clearState = useCallback(() => {
     setResult({ errors: null, success: false });
@@ -30,6 +30,6 @@ export const useApolloMutationResult = <T extends Function>(mutate: T) => {
     errors,
     success,
     clearState,
-    mutate: wrappedMutate
+    mutate: wrappedMutate,
   };
 };

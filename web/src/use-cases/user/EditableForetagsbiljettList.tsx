@@ -30,10 +30,10 @@ const AddForetagsbiljettContainer = styled.div`
 
 const transformDraftToInput = ({
   number,
-  expires
+  expires,
 }: ForetagsbiljettInputDraft): ForetagsbiljettInput => ({
   number,
-  expires: formatYMD(expires)
+  expires: formatYMD(expires),
 });
 
 interface ForetagsbiljettInputDraft {
@@ -44,64 +44,59 @@ interface ForetagsbiljettInputDraft {
 
 const EditableForetagsbiljettList: React.FC = () => {
   const [tickets, setTickets] = useState<ForetagsbiljettInputDraft[]>([]);
-  const [
-    saveForetagsBiljetter,
-    { called, loading, error }
-  ] = useAddForetagsbiljett();
+  const [saveForetagsBiljetter, { called, loading, error }] =
+    useAddForetagsbiljett();
   const success = called && !error && !loading;
 
-  const onClickSubmit = useCallback(
-    () => {
-      const ticketsToSubmit = tickets
-        .filter(({ number }) => number && number.trim())
-        .map(transformDraftToInput);
+  const onClickSubmit = useCallback(() => {
+    const ticketsToSubmit = tickets
+      .filter(({ number }) => number && number.trim())
+      .map(transformDraftToInput);
 
-      return saveForetagsBiljetter({
-        variables: { tickets: ticketsToSubmit }
-      }).then(() => setTickets([]));
-    },
-    [saveForetagsBiljetter, tickets]
-  );
+    return saveForetagsBiljetter({
+      variables: { tickets: ticketsToSubmit },
+    }).then(() => setTickets([]));
+  }, [saveForetagsBiljetter, tickets]);
 
   const addForetagsbiljett = useCallback(() => {
     const foretagsbiljett: ForetagsbiljettInputDraft = {
       id: uniqueId("ftg-"),
       number: "",
-      expires: DEFAULT_DATE
+      expires: DEFAULT_DATE,
     };
-    setTickets(tickets => [...tickets, foretagsbiljett]);
+    setTickets((tickets) => [...tickets, foretagsbiljett]);
   }, []);
 
   const handleChange = useCallback(
     (id: string, event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
-      setTickets(tickets => {
-        return tickets.map(t => (t.id === id ? { ...t, number: value } : t));
+      setTickets((tickets) => {
+        return tickets.map((t) => (t.id === id ? { ...t, number: value } : t));
       });
     },
     []
   );
   const handleSetExpires = useCallback((id: string, value: Date) => {
-    setTickets(tickets => {
-      return tickets.map(t => (t.id === id ? { ...t, expires: value } : t));
+    setTickets((tickets) => {
+      return tickets.map((t) => (t.id === id ? { ...t, expires: value } : t));
     });
   }, []);
   const handlePressRemove = useCallback((id: string) => {
-    setTickets(tickets => {
-      return tickets.filter(t => t.id !== id);
+    setTickets((tickets) => {
+      return tickets.filter((t) => t.id !== id);
     });
   }, []);
 
   return (
     <>
       <div>
-        {tickets.map(biljett => (
+        {tickets.map((biljett) => (
           <Foretagsbiljett
             key={biljett.id}
             biljett={transformDraftToInput(biljett)}
             editable={true}
-            handleChangeForetagsbiljett={v => handleChange(biljett.id, v)}
-            handleSetExpiresForetagsbiljett={v =>
+            handleChangeForetagsbiljett={(v) => handleChange(biljett.id, v)}
+            handleSetExpiresForetagsbiljett={(v) =>
               handleSetExpires(biljett.id, v)
             }
             handleRemoveForetagsbiljett={() => handlePressRemove(biljett.id)}

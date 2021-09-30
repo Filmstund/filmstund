@@ -22,7 +22,7 @@ export const Box = styled.div`
 export const Poster = styled.div`
   min-width: 120px;
   max-width: 120px;
-  background-image: url(${props => props.src}), url(${alfons});
+  background-image: url(${(props) => props.src}), url(${alfons});
   background-size: cover;
   background-repeat: no-repeat;
 `;
@@ -43,7 +43,7 @@ export const CenterColumn = styled(Column)`
 export const Content = styled.div``;
 
 export const FaIcon = styled(FontAwesomeIcon)`
-  color: ${props => props.color};
+  color: ${(props) => props.color};
   font-size: 17px;
 `;
 
@@ -102,14 +102,14 @@ export const PlusUsers = styled.div`
 
 export const UserHead = styled.div`
   display: inline-block;
-  background-image: url(${props => props.src});
+  background-image: url(${(props) => props.src});
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 50%;
   width: 30px;
   height: 30px;
   border: 4px solid #fff;
-  margin-left: ${props => (props.last ? "0" : "-10px")};
+  margin-left: ${(props) => (props.last ? "0" : "-10px")};
 `;
 
 export const TicketRangeContainer = styled.div`

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React, { lazy, Suspense } from "react";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import { Route, Switch } from "react-router";
 import { AppQuery } from "./__generated__/AppQuery";
 import { completeUserFragment } from "./apollo/queries/currentUser";

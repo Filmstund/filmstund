@@ -1,8 +1,7 @@
 import isBefore from "date-fns/isBefore";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 import { groupBy } from "lodash-es";
 import React from "react";
-import { useQuery } from "react-apollo";
 
 import { getTodaysDate } from "../../lib/dateTools";
 import { showingFragment } from "../common/showing/fragment";

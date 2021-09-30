@@ -1,8 +1,8 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React, { ChangeEvent, useMemo, useState } from "react";
 import {
   useAttendShowing,
-  useUnattendShowing
+  useUnattendShowing,
 } from "../../apollo/mutations/showings/useAttendShowing";
 import MainButton, { GrayButton } from "../../use-cases/common/ui/MainButton";
 import Modal from "../../use-cases/common/ui/Modal";
@@ -14,7 +14,7 @@ import { SingleShowing_me_foretagsbiljetter } from "./containers/__generated__/S
 import {
   createPaymentOptions,
   DisplayPaymentOption,
-  stringifyOption
+  stringifyOption,
 } from "./utils/createPaymentOptions";
 
 interface Props {
@@ -26,7 +26,7 @@ interface Props {
 export const PendingShowing: React.FC<Props> = ({
   showingId,
   isParticipating,
-  foretagsbiljetter
+  foretagsbiljetter,
 }) => {
   const [selectedIndex, handleSelectIndex] = useStateWithHandleChange(0);
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,7 +95,7 @@ const ModalPaymentOptions: React.FC<ModalPaymentOptionsProps> = ({
   paymentOptions,
   setModalOpen,
   handleClickSelectPaymentOption,
-  setPaymentOption
+  setPaymentOption,
 }) => {
   return (
     <Modal onRequestClose={() => setModalOpen(false)}>
@@ -127,5 +127,5 @@ const ModalPaymentOptions: React.FC<ModalPaymentOptionsProps> = ({
         status
       }
     }
-  `
+  `,
 };

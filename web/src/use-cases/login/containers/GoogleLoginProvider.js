@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 
-export const provideGoogleLogin = component =>
+export const provideGoogleLogin = (component) =>
   class extends Component {
     state = {
-      loaded: false
+      loaded: false,
     };
 
     componentDidMount() {
@@ -16,7 +16,7 @@ export const provideGoogleLogin = component =>
       js.onload = () => {
         window.gapi.load("auth2", () => {
           this.setState({
-            loaded: true
+            loaded: true,
           });
         });
       };
@@ -31,7 +31,7 @@ export const provideGoogleLogin = component =>
       discoveryDocs,
       uxMode,
       redirectUri,
-      scope
+      scope,
     }) => {
       const params = {
         client_id: clientId,
@@ -42,15 +42,15 @@ export const provideGoogleLogin = component =>
         discoveryDocs,
         ux_mode: uxMode,
         redirect_uri: redirectUri,
-        scope
+        scope,
       };
 
-      return window.gapi.auth2.init(params).then(res => {
+      return window.gapi.auth2.init(params).then((res) => {
         const user = res.currentUser.get();
         const auth = user.getAuthResponse();
         const response = {
           user_id: user.getId(),
-          ...auth
+          ...auth,
         };
         return response;
       });
@@ -59,11 +59,11 @@ export const provideGoogleLogin = component =>
     signIn = () => {
       const auth2 = window.gapi.auth2.getAuthInstance();
 
-      return auth2.signIn().then(user => {
+      return auth2.signIn().then((user) => {
         const auth = user.getAuthResponse();
         const response = {
           user_id: user.getId(),
-          ...auth
+          ...auth,
         };
 
         return response;

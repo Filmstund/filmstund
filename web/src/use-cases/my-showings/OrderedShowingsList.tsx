@@ -3,7 +3,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import {
   navigateToShowing,
-  navigateToShowingTickets
+  navigateToShowingTickets,
 } from "../common/navigators";
 import { ShowingNeue } from "../common/showing/__generated__/ShowingNeue";
 import { ShowingNeue as ShowingNeueComponent } from "../common/showing/ShowingNeue";
@@ -18,7 +18,7 @@ interface OrderedShowingsListProps {
 
 export const OrderedShowingsList: React.FC<OrderedShowingsListProps> = ({
   showings,
-  order
+  order,
 }) => {
   const history = useHistory();
 
@@ -27,7 +27,7 @@ export const OrderedShowingsList: React.FC<OrderedShowingsListProps> = ({
   }
   return (
     <ShowingsGrid>
-      {orderBy(showings, [showingDate], [order]).map(showing => (
+      {orderBy(showings, [showingDate], [order]).map((showing) => (
         <ShowingNeueComponent
           showing={showing}
           onClick={() => navigateToShowing(history, showing)}

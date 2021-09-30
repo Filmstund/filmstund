@@ -1,5 +1,5 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { movieFragment } from "../../use-cases/common/showing/Movie";
 import { FetchMovies } from "./__generated__/FetchMovies";
 
@@ -17,6 +17,6 @@ export const useFetchMovies = () =>
       ${movieFragment}
     `,
     {
-      refetchQueries: ["NewShowingQuery"]
+      refetchQueries: ["NewShowingQuery"],
     }
   );

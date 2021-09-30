@@ -4,14 +4,13 @@ import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 import { SfShowingsQuery_movie_showings } from "../../new-showing/hooks/__generated__/SfShowingsQuery";
 
-
 const Option = styled.div<{ selected: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1em;
-  background: ${props => (props.selected ? "#8e1b1b" : "none")};
-  color: ${props => (props.selected ? "#fff" : "#8e1b1b")};
+  background: ${(props) => (props.selected ? "#8e1b1b" : "none")};
+  color: ${(props) => (props.selected ? "#fff" : "#8e1b1b")};
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 `;
@@ -50,11 +49,9 @@ interface Props {
 
 const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
   <Box>
-    {options.map(option => (
+    {options.map((option) => (
       <Option
-        key={
-         option.filmstadenRemoteEntityId
-        }
+        key={option.filmstadenRemoteEntityId}
         onClick={() => onChange(option)}
         selected={option.filmstadenRemoteEntityId === selectedValue}
       >
@@ -64,7 +61,9 @@ const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
           {option.cinemaName && option.cinemaName.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
-          {option.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          {option.tags.map((tag) => (
+            <Tag key={tag}>{tag}</Tag>
+          ))}
           <RightArrow>&gt;</RightArrow>
         </div>
       </Option>

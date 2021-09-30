@@ -2,7 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import { formatShowingDate, getTodaysDate } from "../../../lib/dateTools";
 import PosterBox from "../ui/PosterBox";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 
 const VerticalPaddingContainer = styled.div`
   padding: 1em 0;
@@ -10,7 +10,7 @@ const VerticalPaddingContainer = styled.div`
 
 const now = getTodaysDate();
 
-const renderPremiereDate = releaseDate => {
+const renderPremiereDate = (releaseDate) => {
   const formattedDate = formatShowingDate(releaseDate);
 
   if (releaseDate > now) {

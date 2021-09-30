@@ -1,9 +1,9 @@
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { UpdateShowingInput } from "../../../__generated__/globalTypes";
 import {
   UpdateShowing,
-  UpdateShowingVariables
+  UpdateShowingVariables,
 } from "./__generated__/UpdateShowing";
 
 const updateShowingMutation = gql`
