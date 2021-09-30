@@ -11,7 +11,7 @@ interface Props {
   foretagsbiljetter: UserProfile_me_foretagsbiljetter[];
 }
 
-const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
+export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
   const [deleteForetagsbiljett] = useDeleteForetagsbiljett();
 
   const handleDeleteForetagsBiljett = useCallback(
@@ -20,7 +20,7 @@ const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
         case "Available":
           if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
             deleteForetagsbiljett({
-              variables: { ticket: { number, expires } }
+              variables: { ticket: { number, expires } },
             });
           }
           break;
@@ -43,7 +43,7 @@ const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
   return (
     <div>
       <SmallHeader>Företagsbiljetter</SmallHeader>
-      {foretagsbiljetter.map(biljett => (
+      {foretagsbiljetter.map((biljett) => (
         <Foretagsbiljett
           key={biljett.number}
           biljett={biljett}
@@ -57,5 +57,3 @@ const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
     </div>
   );
 };
-
-export default ForetagsbiljettList;

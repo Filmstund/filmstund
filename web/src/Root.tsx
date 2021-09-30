@@ -1,12 +1,11 @@
 import React, { Component, ErrorInfo, lazy, Suspense } from "react";
 import { ApolloProvider } from "react-apollo";
+import "./index.css";
 
 import { BrowserRouter as Router } from "react-router-dom";
-import { GlobalStyles } from "./GlobalStyles";
 
 import client from "./store/apollo";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
-import Login from "./use-cases/login/containers/Login";
 
 const AsyncApp = lazy(() => import("./App"));
 
@@ -18,19 +17,18 @@ interface State {
 export class Root extends Component<{}, State> {
   state: State = {
     error: null,
-    hasError: false
+    hasError: false,
   };
 
   static getDerivedStateFromError(error: Error) {
     return {
       error,
-      hasError: true
+      hasError: true,
     };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.log(error, info.componentStack);
-
   }
 
   render() {
@@ -49,7 +47,7 @@ export class Root extends Component<{}, State> {
       <ApolloProvider client={client}>
         <Router>
           <Suspense fallback={<Loader />}>
-            <Login>{(props: any) => <AsyncApp {...props} />}</Login>
+            <AsyncApp />
           </Suspense>
         </Router>
         <GlobalStyles />

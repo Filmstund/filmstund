@@ -6,43 +6,36 @@ import { Route, Switch } from "react-router";
 import { AppQuery } from "./__generated__/AppQuery";
 import { completeUserFragment } from "./apollo/queries/currentUser";
 import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
-import Footer from "./use-cases/common/ui/footer/Footer";
+import { Footer } from "./use-cases/common/ui/footer/Footer";
 
 import NavBar from "./use-cases/common/ui/NavBar";
 import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
 import { WelcomeModal } from "./use-cases/common/utils/WelcomeModal";
 
-const MainGridContainer = styled.div`
+const MainGridContainer = styled.main`
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  grid-area: content;
-  display: grid;
-  grid-template-columns: minmax(1rem, 1fr) minmax(min-content, 1000px) minmax(
-      1rem,
-      1fr
-    );
-  grid-template-rows: min-content auto;
-  grid-template-areas:
-    "jumbo jumbo jumbo"
-    ". center .";
   background-color: #f8f8f8;
-  align-items: start;
+  justify-content: stretch;
+  padding: 1rem;
 `;
 
 const AsyncHome = lazy(() => import("./use-cases/my-showings/Home"));
 const AsyncUser = lazy(() => import("./use-cases/user"));
 const AsyncShowings = lazy(() => import("./use-cases/showings-list/Showings"));
-const AsyncNewShowing = lazy(() =>
-  import("./use-cases/new-showing/NewShowing")
+const AsyncNewShowing = lazy(
+  () => import("./use-cases/new-showing/NewShowing")
 );
-const AsyncEditShowing = lazy(() =>
-  import("./use-cases/edit-showing/EditShowing")
+const AsyncEditShowing = lazy(
+  () => import("./use-cases/edit-showing/EditShowing")
 );
-const AsyncShowingTickets = lazy(() =>
-  import("./use-cases/showing-tickets/TicketScreen")
+const AsyncShowingTickets = lazy(
+  () => import("./use-cases/showing-tickets/TicketScreen")
 );
-const AsyncSingleShowing = lazy(() =>
-  import("./use-cases/single-showing/screen/SingleShowingScreen")
+const AsyncSingleShowing = lazy(
+  () => import("./use-cases/single-showing/screen/SingleShowingScreen")
 );
 
 const appQuery = gql`
@@ -54,11 +47,9 @@ const appQuery = gql`
   ${completeUserFragment}
 `;
 
-interface Props {
-  signout: () => void;
-}
+interface Props {}
 
-const App: React.FC<Props> = ({ signout }) => {
+const App: React.FC<Props> = () => {
   const { data } = useQuery<AppQuery>(appQuery);
 
   if (!data || !data.me) {
@@ -71,7 +62,7 @@ const App: React.FC<Props> = ({ signout }) => {
     <>
       <PageTitleTemplate titleTemplate="%s | sefilm">
         <WelcomeModal me={me} />
-        <NavBar signout={signout} />
+        <NavBar />
         <MainGridContainer>
           <Suspense fallback={<Loader />}>
             <Switch>

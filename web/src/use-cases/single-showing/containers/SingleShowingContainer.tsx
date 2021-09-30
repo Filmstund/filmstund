@@ -10,13 +10,12 @@ import { MissingShowing } from "../../common/showing/MissingShowing";
 import Showing, { oldShowingFragment } from "../../common/showing/Showing";
 import IMDbLink from "../../common/ui/IMDbLink";
 import { ButtonContainer } from "../../common/ui/MainButton";
-import { PageWidthWrapper } from "../../common/ui/PageWidthWrapper";
 import Loader from "../../common/utils/ProjectorLoader";
 import StatusMessageBox from "../../common/utils/StatusMessageBox";
 import { useScrollToTop } from "../../common/utils/useScrollToTop";
 import AdminAction, { adminActionFragments } from "../AdminAction";
 import ParticipantList, {
-  participantsListFragment
+  participantsListFragment,
 } from "../components/ParticipantsList";
 import SwishModal from "../components/SwishModal";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
@@ -24,7 +23,7 @@ import {
   SingleShowing,
   SingleShowing_me,
   SingleShowing_showing,
-  SingleShowingVariables
+  SingleShowingVariables,
 } from "./__generated__/SingleShowing";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
 
@@ -39,7 +38,7 @@ const SingleShowingContainer: React.FC<Props> = ({
   me,
   showing,
   error,
-  refetch
+  refetch,
 }) => {
   const history = useHistory();
   const [openModal, setOpenModal] = useState(false);
@@ -71,7 +70,7 @@ const SingleShowingContainer: React.FC<Props> = ({
   const { attendeePaymentDetails } = showing;
 
   return (
-    <PageWidthWrapper>
+    <>
       {openModal && (
         <SwishModal
           attendeePaymentDetails={attendeePaymentDetails}
@@ -105,9 +104,9 @@ const SingleShowingContainer: React.FC<Props> = ({
         meId={me.id}
         isAdmin={isAdmin}
         participants={showing.participants}
-        onClickItem={userId => promoteToAdmin(showing.id, userId)}
+        onClickItem={(userId) => promoteToAdmin(showing.id, userId)}
       />
-    </PageWidthWrapper>
+    </>
   );
 };
 
@@ -143,14 +142,13 @@ const useSingleShowingData = (webId: string) =>
     `,
     {
       fetchPolicy: "cache-and-network",
-      variables: { webId }
+      variables: { webId },
     }
   );
 
 const SingleShowingLoader: React.FC<{ webId: string }> = ({ webId }) => {
-  const { data, loading, error, refetch, networkStatus } = useSingleShowingData(
-    webId
-  );
+  const { data, loading, error, refetch, networkStatus } =
+    useSingleShowingData(webId);
 
   if (!data || (loading && networkStatus !== NetworkStatus.refetch)) {
     return <Loader />;

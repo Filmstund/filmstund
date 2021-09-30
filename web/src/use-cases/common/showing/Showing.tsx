@@ -15,7 +15,7 @@ const Status = styled.div<{ ticketsBought?: boolean }>`
   position: absolute;
   right: 1em;
   top: 1em;
-  font-style: ${props => (props.ticketsBought ? "" : "italic")};
+  font-style: ${(props) => (props.ticketsBought ? "" : "italic")};
 `;
 
 const capitilized = (s: string) =>
@@ -34,7 +34,7 @@ const StyledShowing = styled.div<{ disabled?: boolean }>`
   &:not(:last-child) {
     margin-bottom: 1em;
   }
-  opacity: ${props => (props.disabled ? 0.5 : 1)};
+  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
 `;
 
 interface Props {
@@ -56,17 +56,17 @@ const Showing: React.FC<Props> = ({
   ticketsBought = false,
   location,
   disabled = false,
-  onClick
+  onClick,
 }) => (
   <StyledShowing disabled={disabled}>
     {setTitleTag && (
       <PageTitle
-        title={`${movie ? movie.title : ""} ${formatShowingDateTime(date)}`}
+        title={`${movie?.title ?? ""} ${formatShowingDateTime(date)}`}
       />
     )}
     <PosterBox
-      headerText={movie && movie.title}
-      poster={movie && movie.poster}
+      headerText={movie?.title}
+      poster={movie?.poster}
       onClick={onClick}
     >
       {ticketsBought !== undefined && (
@@ -80,7 +80,7 @@ const Showing: React.FC<Props> = ({
         {location}
         <br />
       </VerticalPaddingContainer>
-      {admin && <span>Skapad av {admin.nick || admin.name}</span>}
+      {admin && <span>Skapad av {admin.nick ?? admin.name}</span>}
     </PosterBox>
   </StyledShowing>
 );

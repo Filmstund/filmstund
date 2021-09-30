@@ -8,13 +8,12 @@ import { useFadeState } from "../common/hooks/useFadeState";
 import Field, { FieldWithoutMaxWidth } from "../common/ui/Field";
 import Input from "../common/ui/Input";
 import MainButton from "../common/ui/MainButton";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import CopyValue from "../common/utils/CopyValue";
 import { PageTitle } from "../common/utils/PageTitle";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { UserProfile_me } from "./__generated__/UserProfile";
 
-import ForetagsbiljettList from "./ForetagsbiljettList";
+import { ForetagsbiljettList } from "./ForetagsbiljettList";
 
 const Box = styled.div`
   background: #fff;
@@ -25,7 +24,7 @@ const Box = styled.div`
 `;
 
 const AvatarImage = styled.div<{ src: string | null }>`
-  background-image: url(${props => props.src}), url(${alfons});
+  background-image: url(${(props) => props.src}), url(${alfons});
   background-size: cover;
   background-position: center;
   height: 96px;
@@ -51,21 +50,18 @@ const Profile: React.FC<Props> = ({ me }) => {
 
   const success = called && !loading && !error && showSuccessMessage;
 
-  const [
-    { phone, filmstadenMembershipId, nick },
-    handleChange,
-    setEditedUser
-  ] = useStateWithHandleChangeName({
-    nick: me.nick || "",
-    phone: me.phone || "",
-    filmstadenMembershipId: me.filmstadenMembershipId || ""
-  });
+  const [{ phone, filmstadenMembershipId, nick }, handleChange, setEditedUser] =
+    useStateWithHandleChangeName({
+      nick: me.nick || "",
+      phone: me.phone || "",
+      filmstadenMembershipId: me.filmstadenMembershipId || "",
+    });
 
   const handleSubmit = () => {
     const trimmedValues = trim({
       nick,
       phone,
-      filmstadenMembershipId
+      filmstadenMembershipId,
     });
 
     mutate({ variables: { user: trimmedValues } }).then(({ data }) => {
@@ -75,7 +71,7 @@ const Profile: React.FC<Props> = ({ me }) => {
         setEditedUser({
           nick: nick || "",
           phone: phone || "",
-          filmstadenMembershipId: filmstadenMembershipId || ""
+          filmstadenMembershipId: filmstadenMembershipId || "",
         });
 
         bump();
@@ -84,7 +80,7 @@ const Profile: React.FC<Props> = ({ me }) => {
   };
 
   return (
-    <PageWidthWrapper>
+    <>
       <PageTitle title="Profil" />
       <Box>
         <AvatarImage src={me.avatar} />
@@ -126,7 +122,7 @@ const Profile: React.FC<Props> = ({ me }) => {
       </FieldWithoutMaxWidth>
       <MainButton onClick={handleSubmit}>Spara användare</MainButton>
       <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter || []} />
-    </PageWidthWrapper>
+    </>
   );
 };
 
@@ -143,7 +139,7 @@ const useStateWithHandleChangeName = <T extends object>(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
 
-      setState(state => ({ ...state, [name]: value }));
+      setState((state) => ({ ...state, [name]: value }));
     },
     []
   );
