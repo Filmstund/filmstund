@@ -4,7 +4,6 @@ import { useQuery } from "react-apollo";
 import { showingFragment } from "../common/showing/fragment";
 
 import { Link } from "../common/ui/MainButton";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { RedHeader } from "../common/ui/RedHeader";
 import { PageTitle } from "../common/utils/PageTitle";
 import { HomeQuery } from "./__generated__/HomeQuery";
@@ -13,7 +12,7 @@ import { OrderedShowingsList } from "./OrderedShowingsList";
 import {
   filterShowingsCreatedByMe,
   filterShowingsParticipatedByMeAndAfterToday,
-  filterShowingsParticipatedByMeAndBeforeToday
+  filterShowingsParticipatedByMeAndBeforeToday,
 } from "./utils/filtersCreators";
 
 const Home: React.FC = () => {
@@ -30,30 +29,28 @@ const Home: React.FC = () => {
     <>
       <PageTitle title="Mina Besök" />
       <FeaturedShowing showings={showings} meId={me.id} />
-      <PageWidthWrapper>
-        <Link to="/showings/new">Skapa nytt besök</Link>
-        <RedHeader>Mina kommande besök</RedHeader>
+      <Link to="/showings/new">Skapa nytt besök</Link>
+      <RedHeader>Mina kommande besök</RedHeader>
 
-        <OrderedShowingsList
-          showings={showings.filter(
-            filterShowingsParticipatedByMeAndAfterToday(me.id)
-          )}
-          order={"asc"}
-        />
+      <OrderedShowingsList
+        showings={showings.filter(
+          filterShowingsParticipatedByMeAndAfterToday(me.id)
+        )}
+        order={"asc"}
+      />
 
-        <RedHeader>Mina tidigare besök</RedHeader>
-        <OrderedShowingsList
-          showings={showings.filter(
-            filterShowingsParticipatedByMeAndBeforeToday(me.id)
-          )}
-          order={"desc"}
-        />
-        <RedHeader>Besök jag har skapat</RedHeader>
-        <OrderedShowingsList
-          showings={showings.filter(filterShowingsCreatedByMe(me.id))}
-          order={"desc"}
-        />
-      </PageWidthWrapper>
+      <RedHeader>Mina tidigare besök</RedHeader>
+      <OrderedShowingsList
+        showings={showings.filter(
+          filterShowingsParticipatedByMeAndBeforeToday(me.id)
+        )}
+        order={"desc"}
+      />
+      <RedHeader>Besök jag har skapat</RedHeader>
+      <OrderedShowingsList
+        showings={showings.filter(filterShowingsCreatedByMe(me.id))}
+        order={"desc"}
+      />
     </>
   );
 };
@@ -85,7 +82,7 @@ const useHomeScreenData = () =>
       ${showingFragment}
     `,
     {
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
     }
   );
 

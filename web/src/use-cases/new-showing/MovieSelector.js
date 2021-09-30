@@ -11,7 +11,6 @@ import { faSyncAlt } from "@fortawesome/free-solid-svg-icons/faSyncAlt";
 
 import Field from "../common/ui/Field";
 import Input from "../common/ui/Input";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
 import { useFetchingStatus } from "../common/utils/useFetchingStatus";
 import { PageTitle } from "../common/utils/PageTitle";
@@ -46,7 +45,7 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
   const [fetching, requestData] = useFetchingStatus(fetchMovies);
 
   const filterFn = useCallback(
-    movie => {
+    (movie) => {
       const lowerCaseTerm = searchTerm.toLowerCase();
       if (searchTerm && searchTerm.length > 0) {
         return movie.title.toLowerCase().indexOf(lowerCaseTerm) !== -1;
@@ -65,7 +64,7 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
   );
 
   return (
-    <PageWidthWrapper>
+    <>
       <PageTitle title="Skapa besök" />
       <FlexHeader>
         <RefreshButton role="button" onClick={requestData}>
@@ -82,11 +81,11 @@ const MovieSelector = ({ movies, setMovie, fetchMovies }) => {
         />
       </SearchField>
       <ShowingsGrid>
-        {filteredAndOrderedMovies.map(m => (
+        {filteredAndOrderedMovies.map((m) => (
           <StyledMovie key={m.id} movie={m} onClick={() => setMovie(m)} />
         ))}
       </ShowingsGrid>
-    </PageWidthWrapper>
+    </>
   );
 };
 

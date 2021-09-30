@@ -4,30 +4,28 @@ import { HttpLink } from "apollo-link-http";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { persistCache } from "apollo-cache-persist";
-import fetch from "../lib/fetch";
 import { tokenRefresh } from "./tokenRefreshLink";
 import { errorLink } from "./errorLink";
 
 const cache = new InMemoryCache({
   fragmentMatcher: [],
-  dataIdFromObject: object => {
+  dataIdFromObject: (object) => {
     switch (object.__typename) {
       case "BioBudord":
         return object.number;
       default:
         return object.id || object._id;
     }
-  }
+  },
 });
 
 persistCache({
   cache,
-  storage: window.localStorage
+  storage: window.localStorage,
 });
 
 const httpLink = new HttpLink({
   uri: BASE_GRAPHQL_URL,
-  fetch
 });
 
 const link = ApolloLink.from([tokenRefresh, errorLink, httpLink]);
@@ -39,11 +37,11 @@ const client = new ApolloClient({
   // to a different host
   defaultOptions: {
     query: {
-      fetchPolicy: "cache-and-network"
-    }
+      fetchPolicy: "cache-and-network",
+    },
   },
   link,
-  cache
+  cache,
 });
 
 export default client;

@@ -10,10 +10,9 @@ import Header, { SmallHeader } from "../common/ui/Header";
 import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import {
   CreateShowingQuery,
-  CreateShowingQuery_me
+  CreateShowingQuery_me,
 } from "./__generated__/CreateShowingQuery";
 import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
 import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
@@ -40,7 +39,7 @@ interface ShowingState {
 const getInitialState = (props: Props): ShowingState => {
   const {
     data: { me, movie },
-    movieId
+    movieId,
   } = props;
 
   let date = now;
@@ -56,17 +55,17 @@ const getInitialState = (props: Props): ShowingState => {
     filmstadenRemoteEntityId: null,
     filmstadenScreen: null,
     movieId: movieId,
-    admin: me!
+    admin: me!,
   };
 };
 
-export const CreateShowingForm: React.FC<Props> = props => {
+export const CreateShowingForm: React.FC<Props> = (props) => {
   const [city, setCity] = useState("GB");
   const {
     movieId,
     navigateToShowing,
     clearSelectedMovie,
-    data: { movie, filmstadenCities, previousLocations }
+    data: { movie, filmstadenCities, previousLocations },
   } = props;
 
   const [showing, setShowingState] = useState<ShowingState>(() =>
@@ -79,9 +78,9 @@ export const CreateShowingForm: React.FC<Props> = props => {
     key: K,
     value: ShowingState[K]
   ) => {
-    setShowingState(state => ({
+    setShowingState((state) => ({
       ...state,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -90,13 +89,13 @@ export const CreateShowingForm: React.FC<Props> = props => {
 
     const { name, filmstadenId } = screen!;
 
-    setShowingState(state => {
+    setShowingState((state) => {
       const newState: ShowingState = {
         ...state,
         filmstadenRemoteEntityId,
         time: formatLocalTime(timeUtc),
         location: cinemaName,
-        filmstadenScreen: { name, filmstadenId }
+        filmstadenScreen: { name, filmstadenId },
       };
 
       handleSubmit(newState);
@@ -117,7 +116,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
     date,
     filmstadenRemoteEntityId,
     location,
-    filmstadenScreen
+    filmstadenScreen,
   }: ShowingState) => {
     const showing: CreateShowingInput = {
       time,
@@ -125,15 +124,15 @@ export const CreateShowingForm: React.FC<Props> = props => {
       filmstadenRemoteEntityId,
       date: formatYMD(date),
       filmstadenScreen,
-      location
+      location,
     };
 
     createShowing({ variables: { showing } })
-      .then(resp => {
+      .then((resp) => {
         const { showing } = resp.data!;
         navigateToShowing(showing);
       })
-      .catch(errors => {
+      .catch((errors) => {
         console.log(errors);
       });
   };
@@ -141,7 +140,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
   const locationName = showing.location;
 
   return (
-    <PageWidthWrapper>
+    <>
       <Header>Skapa besök</Header>
       <div>
         <Showing
@@ -155,7 +154,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
             value={city}
             onChange={({ target: { value } }) => setCity(value)}
           >
-            {filmstadenCities.map(city => (
+            {filmstadenCities.map((city) => (
               <option key={city.alias} value={city.alias}>
                 {city.name}
               </option>
@@ -166,7 +165,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
         <FilmstadenShowingSelector
           date={showing.date}
           filmstadenRemoteEntityId={null}
-          onChangeDate={value => setShowingValue("date", value)}
+          onChangeDate={(value) => setShowingValue("date", value)}
           onSelectShowing={setShowingTime}
           city={city}
           movieId={movieId}
@@ -176,7 +175,7 @@ export const CreateShowingForm: React.FC<Props> = props => {
           <Input
             type="time"
             value={showing.time}
-            onChange={v => setShowingValueFromEvent("time", v)}
+            onChange={(v) => setShowingValueFromEvent("time", v)}
           />
         </Field>
         <Field text="Plats:">
@@ -191,6 +190,6 @@ export const CreateShowingForm: React.FC<Props> = props => {
           Skapa besök
         </MainButton>
       </div>
-    </PageWidthWrapper>
+    </>
   );
 };

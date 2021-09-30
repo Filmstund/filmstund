@@ -1,15 +1,15 @@
 import React from "react";
 import { NavLink as RouterLink } from "react-router-dom";
 import styled from "@emotion/styled";
+import { noop } from "lodash-es";
 
 const NavBarBackground = styled.div`
   background-color: #b71c1c;
   position: sticky;
   top: 0;
-  z-index: 99;
 `;
 
-const NavBarLinksContainer = styled.div`
+const NavBarLinksContainer = styled.nav`
   padding: 1rem 0;
   display: flex;
   justify-content: space-between;
@@ -35,7 +35,7 @@ const Link = styled(RouterLink)`
   }
 `;
 
-const NavBar = ({ signout }) => {
+const NavBar = () => {
   return (
     <NavBarBackground>
       <NavBarLinksContainer>
@@ -45,7 +45,7 @@ const NavBar = ({ signout }) => {
         </div>
         <div>
           <Link to="/user">Profil</Link>
-          <GoogleLogoutLink onClick={signout}>Logga ut</GoogleLogoutLink>
+          <GoogleLogoutLink onClick={noop}>Logga ut</GoogleLogoutLink>
         </div>
       </NavBarLinksContainer>
     </NavBarBackground>

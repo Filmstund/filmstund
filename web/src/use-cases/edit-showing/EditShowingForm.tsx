@@ -18,12 +18,11 @@ import Header, { SmallHeader } from "../common/ui/Header";
 import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { RedButton } from "../common/ui/MainButton";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { SfShowingsQuery_movie_showings } from "../new-showing/hooks/__generated__/SfShowingsQuery";
 import {
   EditShowing_previousLocations,
-  EditShowing_showing
+  EditShowing_showing,
 } from "./__generated__/EditShowing";
 
 const today = new Date();
@@ -54,7 +53,7 @@ const getInitialState = (
   expectedBuyDate: addDays(today, 7),
   location: showing.location.name,
   time: showing.time,
-  price: showing.price !== null ? String(showing.price / 100) : ""
+  price: showing.price !== null ? String(showing.price / 100) : "",
 });
 
 interface Props {
@@ -74,18 +73,15 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
   const updateShowing = useUpdateShowing();
   const deleteShowing = useDeleteShowing();
 
-  const handleDelete = useCallback(
-    () => {
-      const proceed = window.confirm("Är du säker? Går ej att ångra!");
+  const handleDelete = useCallback(() => {
+    const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
-      if (proceed) {
-        deleteShowing(showing.id).then(() => {
-          history.push("/showings");
-        });
-      }
-    },
-    [deleteShowing, showing, history]
-  );
+    if (proceed) {
+      deleteShowing(showing.id).then(() => {
+        history.push("/showings");
+      });
+    }
+  }, [deleteShowing, showing, history]);
 
   const handleSubmit = () => {
     updateShowing(showing.id, {
@@ -96,44 +92,44 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
       location: formState.location,
       time: formState.time,
       filmstadenRemoteEntityId: formState.filmstadenRemoteEntityId,
-      price: (parseInt(formState.price, 10) || 0) * 100
+      price: (parseInt(formState.price, 10) || 0) * 100,
     })
       .then(() => {
         setErrors(null);
         navigators.navigateToShowing(history, showing);
       })
-      .catch(errors => {
+      .catch((errors) => {
         setErrors(errors);
       });
   };
 
   const setShowingValue = useCallback<SetShowingValueFn>((key, value) => {
-    setFormState(state => ({
+    setFormState((state) => ({
       ...state,
-      [key]: value
+      [key]: value,
     }));
   }, []);
 
   const handleSfTimeSelect = (sfShowing: SfShowingsQuery_movie_showings) => {
     const { filmstadenRemoteEntityId, cinemaName, timeUtc } = sfShowing;
-    setFormState(state => ({
+    setFormState((state) => ({
       ...state,
       filmstadenRemoteEntityId,
       location: cinemaName,
-      time: formatLocalTime(timeUtc)
+      time: formatLocalTime(timeUtc),
     }));
   };
 
   const handleOtherTimeSelect = (time: string) => {
-    setFormState(state => ({
+    setFormState((state) => ({
       ...state,
       filmstadenRemoteEntityId: null,
-      time
+      time,
     }));
   };
 
   return (
-    <PageWidthWrapper>
+    <>
       <Header>Redigera besök</Header>
       <div>
         <Showing
@@ -144,7 +140,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
         />
         <StatusMessageBox errors={errors} />
         <FilmstadenShowingSelector
-          onChangeDate={value => setShowingValue("date", value)}
+          onChangeDate={(value) => setShowingValue("date", value)}
           onSelectShowing={handleSfTimeSelect}
           movieId={movie.id}
           date={formState.date}
@@ -156,7 +152,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
           <Input
             type="time"
             value={formState.time}
-            onChange={event => handleOtherTimeSelect(event.target.value)}
+            onChange={(event) => handleOtherTimeSelect(event.target.value)}
           />
         </Field>
         <Field text="Plats:">
@@ -170,7 +166,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
           <Input
             type="text"
             value={formState.price}
-            onChange={event => setShowingValue("price", event.target.value)}
+            onChange={(event) => setShowingValue("price", event.target.value)}
           />
         </Field>
         {!ticketsBought && (
@@ -182,7 +178,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
           <FaIcon icon={faEdit} /> Uppdatera besök
         </MainButton>
       </div>
-    </PageWidthWrapper>
+    </>
   );
 };
 

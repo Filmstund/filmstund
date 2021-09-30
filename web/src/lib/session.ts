@@ -11,7 +11,7 @@ export const getExpiresAt = (): number | null => {
   return parseInt(value, 10);
 };
 
-interface GoogleAuthResponse {
+export interface GoogleAuthResponse {
   id_token: string;
   user_id: string;
   expires_at: string;

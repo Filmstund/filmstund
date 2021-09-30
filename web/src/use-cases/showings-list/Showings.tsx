@@ -7,7 +7,6 @@ import { useQuery } from "react-apollo";
 import { getTodaysDate } from "../../lib/dateTools";
 import { showingFragment } from "../common/showing/fragment";
 import { Link } from "../common/ui/MainButton";
-import { PageWidthWrapper } from "../common/ui/PageWidthWrapper";
 
 import { RedHeader } from "../common/ui/RedHeader";
 import { PageTitle } from "../common/utils/PageTitle";
@@ -22,20 +21,19 @@ const Showings: React.FC = () => {
 
   const showings = data ? data.showings : [];
 
-  const { previous = [], upcoming = [] } = groupBy(
-    showings,
-    s => (isBefore(showingDate(s), today) ? "previous" : "upcoming")
+  const { previous = [], upcoming = [] } = groupBy(showings, (s) =>
+    isBefore(showingDate(s), today) ? "previous" : "upcoming"
   );
 
   return (
-    <PageWidthWrapper>
+    <>
       <PageTitle title="Alla besök" />
       <Link to="/showings/new">Skapa nytt besök</Link>
       <RedHeader>Aktuella besök</RedHeader>
       <OrderedShowingsList showings={upcoming} order={"asc"} />
       <RedHeader>Tidigare besök</RedHeader>
       <OrderedShowingsList showings={previous} order={"desc"} />
-    </PageWidthWrapper>
+    </>
   );
 };
 
@@ -55,7 +53,7 @@ const usePublicShowings = () =>
       ${showingFragment}
     `,
     {
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
     }
   );
 
