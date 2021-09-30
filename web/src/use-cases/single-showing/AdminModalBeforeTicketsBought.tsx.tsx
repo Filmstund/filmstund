@@ -1,5 +1,3 @@
-/** @jsx jsx */
-import { jsx } from "@emotion/core";
 import styled from "@emotion/styled";
 import { ApolloError } from "apollo-client";
 import * as React from "react";
@@ -57,15 +55,15 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
     <SmallHeader>Deltagare</SmallHeader>
     {tickets.map(ticket => (
       <TicketListRow key={ticket.user.id}>
-        <div css={{ flex: 1 }}>
+        <div style={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
         </div>
         {ticket.foretagsbiljett && (
-          <div css={{ width: 100, textAlign: "right" }}>
+          <div style={{ width: 100, textAlign: "right" }}>
             <CopyValue useStricken text={ticket.foretagsbiljett} />
           </div>
         )}
-        <div css={{ width: 100, textAlign: "right" }}>
+        <div style={{ width: 100, textAlign: "right" }}>
           <CopyValue useStricken text={ticket.filmstadenMembershipId || ""} />
         </div>
       </TicketListRow>

@@ -16,7 +16,7 @@ const query = gql`
   ${completeUserFragment}
 `;
 
-export default () => {
+const UserScreen = () => {
   const { data } = useQuery<UserProfile>(query, {
     fetchPolicy: "cache-and-network"
   });
@@ -27,3 +27,4 @@ export default () => {
     return <Profile me={data.me} />;
   }
 };
+export default UserScreen;

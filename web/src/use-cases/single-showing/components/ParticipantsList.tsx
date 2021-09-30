@@ -1,5 +1,5 @@
-/** @jsx jsx */
-import { jsx } from "@emotion/core";
+/** @jsxImportSource @emotion/react */
+
 import styled from "@emotion/styled";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons/faUserTie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

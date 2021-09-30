@@ -1,5 +1,3 @@
-/** @jsx jsx */
-import { jsx } from "@emotion/core";
 import styled from "@emotion/styled";
 import * as React from "react";
 import fslogo from "../../assets/fslogo.png";
@@ -56,14 +54,14 @@ const FlexRowPaddingContainer = styled(FlexRowContainer)`
 `;
 
 const CompanyHeader: React.FC<{ cinema: string }> = ({ cinema }) => (
-  <FlexRowContainer css={{ marginBottom: "1rem" }}>
+  <FlexRowContainer style={{ marginBottom: "1rem" }}>
     <img
       alt="FS logo"
       src={fslogo}
-      css={{ height: "3rem", width: "auto", marginRight: "1rem" }}
+      style={{ height: "3rem", width: "auto", marginRight: "1rem" }}
     />
     <FlexColumnContainer>
-      <HeaderText css={{ fontSize: "1rem" }}>{cinema}</HeaderText>
+      <HeaderText style={{ fontSize: "1rem" }}>{cinema}</HeaderText>
       <LabelText>Filmstaden</LabelText>
     </FlexColumnContainer>
   </FlexRowContainer>
@@ -75,8 +73,8 @@ const TicketHeader: React.FC<
     "movieName" | "movieRating" | "showAttributes"
   >
 > = ({ movieName, movieRating, showAttributes }) => (
-  <FlexColumnContainer css={{ marginBottom: "1rem" }}>
-    <HeaderText css={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
+  <FlexColumnContainer style={{ marginBottom: "1rem" }}>
+    <HeaderText style={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
     <FlexSpaceRowContainer>
       <FlexRowContainer>
         {(showAttributes || []).map(attr => (
@@ -99,7 +97,7 @@ const TicketValueWithLabel: React.FC<TicketValueWithLabelProps> = ({
   value,
   style = {}
 }) => (
-  <FlexColumnContainer css={{ ...style, paddingRight: "1rem" }}>
+  <FlexColumnContainer style={{ ...style, paddingRight: "1rem" }}>
     <LabelText>{label}</LabelText>
     <HeaderText>{value}</HeaderText>
   </FlexColumnContainer>
@@ -108,7 +106,7 @@ const TicketValueWithLabel: React.FC<TicketValueWithLabelProps> = ({
 const TicketDateTime: React.FC<
   Pick<TicketQuery_showing_myTickets, "date" | "time">
 > = ({ date, time }) => (
-  <FlexRowContainer css={{ marginBottom: "1rem" }}>
+  <FlexRowContainer style={{ marginBottom: "1rem" }}>
     <TicketValueWithLabel label="Datum" value={date} />
     <TicketValueWithLabel label="Tid" value={time.substring(0, 5)} />
   </FlexRowContainer>
@@ -118,12 +116,12 @@ const TicketPlacement: React.FC<
   Pick<TicketQuery_showing_myTickets, "screen" | "seat">
 > = ({ screen, seat }) => (
   <FlexRowPaddingContainer
-    css={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
+    style={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
   >
     <TicketValueWithLabel
       label="Salong"
       value={screen}
-      css={{ width: "50%" }}
+      style={{ width: "50%" }}
     />
     <TicketValueWithLabel label="Rad" value={seat.row} />
     <TicketValueWithLabel label="Stolsnr" value={seat.number} />
@@ -133,7 +131,7 @@ const TicketPlacement: React.FC<
 const TicketCustomerType: React.FC<
   Pick<TicketQuery_showing_myTickets, "customerType">
 > = ({ customerType }) => (
-  <FlexRowContainer css={{ marginBottom: "1rem", fontWeight: 500 }}>
+  <FlexRowContainer style={{ marginBottom: "1rem", fontWeight: 500 }}>
     {customerType}
   </FlexRowContainer>
 );
@@ -153,8 +151,8 @@ const AztecCodeImage = styled.img`
 
 const TicketCode: React.FC<TicketCodeProps> = ({ src, id, profileId }) => {
   return (
-    <FlexRowContainer css={{ marginBottom: "1rem" }}>
-      <FlexColumnContainer css={{ alignItems: "left" }}>
+    <FlexRowContainer style={{ marginBottom: "1rem" }}>
+      <FlexColumnContainer style={{ alignItems: "left" }}>
         <AztecCodeImage alt={id} src={src} />
         <div>
           {id} {profileId}

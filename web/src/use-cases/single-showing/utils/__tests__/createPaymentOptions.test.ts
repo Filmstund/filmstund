@@ -1,7 +1,7 @@
 import { addYears } from "date-fns";
 import { ForetagsbiljettStatus } from "../../../../__generated__/globalTypes";
 import { formatYMD } from "../../../../lib/dateTools";
-import createPaymentOptions from "../createPaymentOptions";
+import { createPaymentOptions } from "../createPaymentOptions";
 
 describe("createPaymentOptions", () => {
   describe("default", () => {

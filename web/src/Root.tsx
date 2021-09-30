@@ -3,7 +3,6 @@ import { ApolloProvider } from "react-apollo";
 
 import { BrowserRouter as Router } from "react-router-dom";
 import { GlobalStyles } from "./GlobalStyles";
-import { rollbar } from "./lib/error-reporting";
 
 import client from "./store/apollo";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
@@ -32,7 +31,6 @@ export class Root extends Component<{}, State> {
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.log(error, info.componentStack);
 
-    rollbar.error("Root didCatch", error, info.componentStack);
   }
 
   render() {
