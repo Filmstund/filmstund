@@ -4,11 +4,11 @@ import ReactModal from "react-modal";
 ReactModal.setAppElement("#root");
 
 const modalOverlayStyle = {
-  zIndex: 2
+  zIndex: 2,
 };
 const modalContentStyle = {
   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
-  backgroundColor: "white"
+  backgroundColor: "white",
 };
 
 const Modal = ({ children, ...props }) => (

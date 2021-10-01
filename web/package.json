@@ -2,25 +2,15 @@
   "name": "frontend",
   "version": "1.4.1",
   "private": true,
-  "devDependencies": {
-    "@types/jest": "^27.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.0.0",
-    "@typescript-eslint/parser": "^4.0.0",
-    "apollo": "2.21.0",
-    "babel-eslint": "^10.0.0",
-    "eslint": "^7.5.0",
-    "eslint-config-react-app": "^6.0.0",
-    "eslint-plugin-flowtype": "^5.2.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^27.0.6",
-    "jest-transform-stub": "^2.0.0",
-    "prettier": "2.4.1",
-    "source-map-explorer": "2.5.2",
-    "ts-jest": "^27.0.5"
+  "scripts": {
+    "analyze": "yarn build && yarn source-map-explorer build/assets/*.js*",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext js,jsx,ts,tsx",
+    "serve": "vite preview",
+    "test": "jest",
+    "prettier": "prettier --no-config --write 'src/**/*.[tj]s?(x)' 'src/**/*.css'",
+    "prettier:check": "prettier --no-config --check 'src/**/*.[tj]s?(x)' 'src/**/*.css'"
   },
   "dependencies": {
     "@apollo/client": "3.4.15",
@@ -54,13 +44,25 @@
     "vite-plugin-svgr": "0.4.0",
     "whatwg-fetch": "3.6.2"
   },
-  "scripts": {
-    "analyze": "yarn build && yarn source-map-explorer build/assets/*.js*",
-    "start": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext js,jsx,ts,tsx",
-    "serve": "vite preview",
-    "test": "jest"
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.0.0",
+    "@typescript-eslint/parser": "^4.0.0",
+    "apollo": "2.21.0",
+    "babel-eslint": "^10.0.0",
+    "eslint": "^7.5.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react-hooks": "^4.0.8",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.0.6",
+    "jest-transform-stub": "^2.0.0",
+    "prettier": "2.4.1",
+    "source-map-explorer": "2.5.2",
+    "ts-jest": "^27.0.5"
   },
   "browserslist": [
     ">0.2%",

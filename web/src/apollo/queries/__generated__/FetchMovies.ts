@@ -19,5 +19,7 @@ export interface FetchMovies {
   /**
    * Fetch any new movies from Filmstaden, returns the movies that were added
    */
-  fetchNewMoviesFromFilmstaden: FetchMovies_fetchNewMoviesFromFilmstaden[] | null;
+  fetchNewMoviesFromFilmstaden:
+    | FetchMovies_fetchNewMoviesFromFilmstaden[]
+    | null;
 }

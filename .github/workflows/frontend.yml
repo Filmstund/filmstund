@@ -26,6 +26,7 @@ jobs:
           cd web
           yarn
           yarn lint
+          yarn prettier:check
           yarn build
           yarn test
         env:

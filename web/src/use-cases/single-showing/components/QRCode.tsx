@@ -4,10 +4,11 @@ import QRC from "../../../lib/qrcode";
 
 interface Props {
   value: string;
-  width: number;
-  height: number;
+  width: string;
+  height: string;
 }
-const QRCode: React.VFC<Props> = ({ value, width, height }) => {
+
+export const QRCode: React.VFC<Props> = ({ value, width, height }) => {
   const svgString = useMemo(() => {
     // @ts-ignore
     return QRC.encodeText(value, QRC.Ecc.MEDIUM).toSvgString(5);
@@ -20,5 +21,3 @@ const QRCode: React.VFC<Props> = ({ value, width, height }) => {
     />
   );
 };
-
-export default QRCode;

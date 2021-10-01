@@ -15,7 +15,7 @@ const TicketURLInput: React.FC<Props> = ({ cinemaTicketUrls, onChange }) => (
   <Textarea
     rows={5}
     value={cinemaTicketUrls.join("\n")}
-    onChange={event => onChange(event.target.value.split("\n"))}
+    onChange={(event) => onChange(event.target.value.split("\n"))}
   />
 );
 

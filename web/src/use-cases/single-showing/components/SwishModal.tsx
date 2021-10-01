@@ -1,11 +1,19 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-import QRCode from "./QRCode";
+import { QRCode } from "./QRCode";
 import Loader from "../../common/utils/ProjectorLoader";
 import Modal from "../../common/ui/Modal";
+import { SingleShowing_showing_attendeePaymentDetails } from "../containers/__generated__/SingleShowing";
 
-const SwishModal = ({ attendeePaymentDetails, closeSwish }) => {
+interface SwishModalProps {
+  attendeePaymentDetails: SingleShowing_showing_attendeePaymentDetails | null;
+  closeSwish: () => void;
+}
+
+export const SwishModal: React.VFC<SwishModalProps> = ({
+  attendeePaymentDetails,
+  closeSwish,
+}) => {
   if (!attendeePaymentDetails) {
     return <Loader />;
   }
@@ -23,10 +31,3 @@ const SwishModal = ({ attendeePaymentDetails, closeSwish }) => {
     </Modal>
   );
 };
-
-SwishModal.propTypes = {
-  payData: PropTypes.object,
-  closeSwish: PropTypes.func.isRequired
-};
-
-export default SwishModal;
