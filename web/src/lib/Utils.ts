@@ -1,4 +1,4 @@
-import { mapValues } from "lodash-es";
+import { mapValues } from "lodash";
 
 export function trim(params: string): string;
 export function trim(params: string[]): string[];
@@ -6,7 +6,7 @@ export function trim<T extends Record<string, string>>(params: T): T;
 export function trim(v: any): any {
   if (v === null) return v;
   if (Array.isArray(v)) {
-    return v.map(item => trim(item));
+    return v.map((item) => trim(item));
   } else if (v === Object(v)) {
     return mapValues(v, trim);
   } else if (v.trim) {

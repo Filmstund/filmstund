@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-import { groupBy } from "lodash-es";
+import { groupBy } from "lodash";
 import * as React from "react";
 
 import Header from "../../common/ui/Header";

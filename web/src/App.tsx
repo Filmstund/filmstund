@@ -11,7 +11,6 @@ import { Footer } from "./use-cases/common/ui/footer/Footer";
 import NavBar from "./use-cases/common/ui/NavBar";
 import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
-import { WelcomeModal } from "./use-cases/common/utils/WelcomeModal";
 
 const MainGridContainer = styled.main`
   display: flex;
@@ -55,8 +54,6 @@ const App: React.FC<Props> = () => {
   if (!data || !data.me) {
     return <Loader />;
   }
-
-  const me = data.me;
 
   return (
     <>

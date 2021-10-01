@@ -1,4 +1,4 @@
-import { orderBy } from "lodash-es";
+import { orderBy } from "lodash";
 import React from "react";
 import { Ticket_ticketRange } from "../../apollo/mutations/__generated__/Ticket";
 import { formatSeatingRow } from "../../lib/summarizeSeatingRange";

@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { sample } from "lodash-es";
+import { sample } from "lodash";
 import React from "react";
 import { useFadeBetweenValues } from "../../hooks/useFadeBetweenValues";
 import {

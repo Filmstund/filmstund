@@ -1,6 +1,6 @@
 import isBefore from "date-fns/isBefore";
 import { gql, useQuery } from "@apollo/client";
-import { groupBy } from "lodash-es";
+import { groupBy } from "lodash";
 import React from "react";
 
 import { getTodaysDate } from "../../lib/dateTools";

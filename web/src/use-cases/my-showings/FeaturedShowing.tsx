@@ -1,7 +1,7 @@
 import isBefore from "date-fns/isBefore";
 import isSameDay from "date-fns/isSameDay";
 import subMinutes from "date-fns/subMinutes";
-import { orderBy } from "lodash-es";
+import { orderBy } from "lodash";
 import * as React from "react";
 import { useHistory } from "react-router-dom";
 import {

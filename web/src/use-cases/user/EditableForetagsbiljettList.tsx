@@ -3,14 +3,14 @@ import { faPlusCircle } from "@fortawesome/free-solid-svg-icons/faPlusCircle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import addYears from "date-fns/addYears";
-import { uniqueId } from "lodash-es";
+import { uniqueId } from "lodash";
 import React, { ChangeEvent, useCallback, useState } from "react";
 import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
 import { formatYMD } from "../../lib/dateTools";
 
 import { margin } from "../../lib/style-vars";
 
-import MainButton from "../../use-cases/common/ui/MainButton";
+import MainButton from "../common/ui/MainButton";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import Foretagsbiljett from "./Foretagsbiljett";
 import { useAddForetagsbiljett } from "./useAddForetagsbiljett";

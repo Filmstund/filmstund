@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import styled from "@emotion/styled";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons/faUserTie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -42,7 +40,7 @@ const ParticipantsList: React.FC<Props> = ({
             <UserItem key={user.id} showPhone={showPhone} user={user}>
               {isAdmin && user.id !== meId && (
                 <div
-                  css={{
+                  style={{
                     display: "inline-block",
                     cursor: "pointer",
                     marginTop: 10,

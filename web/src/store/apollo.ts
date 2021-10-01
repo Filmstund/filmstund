@@ -4,24 +4,24 @@ import {
   HttpLink,
   InMemoryCache,
 } from "@apollo/client";
-import { persistCache, LocalStorageWrapper } from "apollo3-cache-persist";
+import { LocalStorageWrapper, persistCache } from "apollo3-cache-persist";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
 import { tokenRefresh } from "./tokenRefreshLink";
 import { errorLink } from "./errorLink";
 
 const cache = new InMemoryCache({
-  fragmentMatcher: [],
+  possibleTypes: {},
   dataIdFromObject: (object) => {
     switch (object.__typename) {
       case "BioBudord":
-        return object.number;
+        return (object as any).number;
       default:
         return object.id || object._id;
     }
   },
 });
 
-await persistCache({
+persistCache({
   cache,
   storage: new LocalStorageWrapper(window.localStorage),
 });
@@ -30,20 +30,12 @@ const httpLink = new HttpLink({
   uri: BASE_GRAPHQL_URL,
 });
 
-const link = ApolloLink.from([tokenRefresh, errorLink, httpLink]);
-
-const client = new ApolloClient({
-  // By default, this client will send queries to the
-  //  `/graphql` endpoint on the same host
-  // Pass the configuration option { uri: YOUR_GRAPHQL_API_URL } to the `HttpLink` to connect
-  // to a different host
+export const client = new ApolloClient({
+  link: ApolloLink.from([tokenRefresh, errorLink, httpLink]),
+  cache,
   defaultOptions: {
-    query: {
+    watchQuery: {
       fetchPolicy: "cache-and-network",
     },
   },
-  link,
-  cache,
 });
-
-export default client;
