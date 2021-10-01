@@ -2,7 +2,7 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import parseISO from "date-fns/parseISO";
 
-import { padStart, take } from "lodash-es";
+import { padStart, take } from "lodash";
 
 const DATE_MONTH_TIME = "d MMM HH:mm";
 const HOUR_MINUTE = "HH:mm";

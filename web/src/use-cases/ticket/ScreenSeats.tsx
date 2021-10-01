@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { flatMap, groupBy, map } from "lodash-es";
+import { flatMap, groupBy, map } from "lodash";
 import React from "react";
 import {
   TicketQuery_showing_filmstadenSeatMap,

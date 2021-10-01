@@ -4,11 +4,11 @@ import * as React from "react";
 import { FormEventHandler, useState } from "react";
 import { useMarkAsBought } from "../../apollo/mutations/showings/useMarkAsBought";
 import { useAddTickets } from "../../apollo/mutations/useAddTickets";
-import Field from "../../use-cases/common/ui/Field";
-import Header, { SmallHeader } from "../../use-cases/common/ui/Header";
+import Field from "../common/ui/Field";
+import Header, { SmallHeader } from "../common/ui/Header";
 import Input from "../../use-cases/common/ui/Input";
 
-import MainButton from "../../use-cases/common/ui/MainButton";
+import MainButton from "../common/ui/MainButton";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import CopyValue from "../common/utils/CopyValue";

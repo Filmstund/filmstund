@@ -1,5 +1,5 @@
 import parseISO from "date-fns/parseISO";
-import { keys } from "lodash-es";
+import { keys } from "lodash";
 import React, { lazy } from "react";
 import { formatYMD } from "../../../lib/dateTools";
 import { SfShowingsQuery_movie_showings } from "../../new-showing/hooks/__generated__/SfShowingsQuery";

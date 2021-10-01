@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink as RouterLink } from "react-router-dom";
 import styled from "@emotion/styled";
-import { noop } from "lodash-es";
+import { noop } from "lodash";
 
 const NavBarBackground = styled.div`
   background-color: #b71c1c;

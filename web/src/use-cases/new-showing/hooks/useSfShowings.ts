@@ -1,6 +1,6 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/client";
 import { gql } from "@apollo/client";
-import { groupBy } from "lodash-es";
+import { groupBy } from "lodash";
 import { useMemo } from "react";
 import { formatYMD } from "../../../lib/dateTools";
 import {

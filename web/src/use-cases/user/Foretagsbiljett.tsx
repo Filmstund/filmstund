@@ -6,13 +6,13 @@ import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
 import { formatYMD } from "../../lib/dateTools";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
-import Field from "../../use-cases/common/ui/Field";
+import Field from "../common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
 import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
 import { UserProfile_me_foretagsbiljetter } from "./__generated__/UserProfile";
 
 const DatePickerInput = lazy(
-  () => import("../../use-cases/common/ui/date-picker/DatePickerInput")
+  () => import("../common/ui/date-picker/DatePickerInput")
 );
 
 const ForetagsbiljettWrapper = styled.div`

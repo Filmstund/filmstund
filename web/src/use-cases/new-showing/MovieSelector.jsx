@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 
-import { orderBy } from "lodash-es";
+import { orderBy } from "lodash";
 import Header from "../common/ui/Header";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import Movie from "../common/showing/Movie";

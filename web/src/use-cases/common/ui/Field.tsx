@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentPropsWithoutRef } from "react";
 import styled from "@emotion/styled";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 
@@ -9,7 +9,15 @@ const Label = styled.label`
   padding: 0.5em 0;
 `;
 
-const UnstyledField = ({ children, text, ...props }) => (
+interface UnstyledFieldProps extends ComponentPropsWithoutRef<"div"> {
+  text: string;
+}
+
+const UnstyledField: React.FC<UnstyledFieldProps> = ({
+  children,
+  text,
+  ...props
+}) => (
   <div {...props}>
     <Label>{text}</Label>
     <br />

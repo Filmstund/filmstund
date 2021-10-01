@@ -39,9 +39,7 @@ afterEach(cleanup);
 
 describe("<SeatRange />", () => {
   it("works", () => {
-    const { queryByText, debug } = render(
-      <SeatRange ticketRange={ticketRange} />
-    );
+    const { queryByText } = render(<SeatRange ticketRange={ticketRange} />);
     const text = queryByText("29-31");
     const text2 = queryByText("19-22");
     expect(text).toBeDefined();

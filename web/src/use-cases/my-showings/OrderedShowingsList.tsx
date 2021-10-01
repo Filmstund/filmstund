@@ -1,4 +1,4 @@
-import { orderBy } from "lodash-es";
+import { orderBy } from "lodash";
 import React from "react";
 import { useHistory } from "react-router-dom";
 import {

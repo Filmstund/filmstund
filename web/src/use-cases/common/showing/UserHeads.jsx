@@ -1,6 +1,6 @@
 import React from "react";
 
-import { orderBy, take } from "lodash-es";
+import { orderBy, take } from "lodash";
 import { PlusUsers, UserHead, UsersContainer } from "./style";
 
 export const UserHeads = ({ users, maxCount = 5 }) => {

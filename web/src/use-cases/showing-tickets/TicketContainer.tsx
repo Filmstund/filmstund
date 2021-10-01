@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 import { useHistory } from "react-router-dom";
-import MainButton from "../../use-cases/common/ui/MainButton";
+import MainButton from "../common/ui/MainButton";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { navigateToShowing } from "../common/navigators";

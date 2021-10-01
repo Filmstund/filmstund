@@ -1,6 +1,6 @@
 import React from "react";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
-import MainButton from "../../use-cases/common/ui/MainButton";
+import MainButton from "../common/ui/MainButton";
 import { gql } from "@apollo/client";
 
 const PayToUser = ({ user }) => (

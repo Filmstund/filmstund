@@ -9,7 +9,7 @@ import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowi
 import { formatLocalTime, formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
 import { useHistory } from "react-router-dom";
-import * as navigators from "../common/navigators/index";
+import * as navigators from "../common/navigators";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
 import Field from "../common/ui/Field";
