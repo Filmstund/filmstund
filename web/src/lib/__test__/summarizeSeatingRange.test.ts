@@ -1,6 +1,6 @@
 import {
   formatSeatingRange,
-  groupSeatingRange
+  groupSeatingRange,
 } from "../summarizeSeatingRange";
 
 describe("summarizeSeatingRange", () => {
@@ -9,14 +9,14 @@ describe("summarizeSeatingRange", () => {
       expect(groupSeatingRange([0, 1, 2, 4, 5, 7])).toEqual([
         [0, 1, 2],
         [4, 5],
-        [7]
+        [7],
       ]);
     });
     it("should group ranges", () => {
       expect(groupSeatingRange([4, 5, 6, 8, 9, 11])).toEqual([
         [4, 5, 6],
         [8, 9],
-        [11]
+        [11],
       ]);
     });
     it("should group ranges", () => {
@@ -24,7 +24,7 @@ describe("summarizeSeatingRange", () => {
         [0],
         [2, 3, 4],
         [6],
-        [8, 9]
+        [8, 9],
       ]);
     });
     describe("real world examples", () => {
@@ -57,7 +57,7 @@ describe("summarizeSeatingRange", () => {
       expect(formatSeatingRange([[0, 1, 2], [4, 5], [7]])).toEqual([
         "0-2",
         "4-5",
-        "7"
+        "7",
       ]);
     });
     it("should group ranges", () => {
@@ -65,7 +65,7 @@ describe("summarizeSeatingRange", () => {
         "0",
         "2-4",
         "6",
-        "8-9"
+        "8-9",
       ]);
     });
     it("should not fail on empty array as input", () => {

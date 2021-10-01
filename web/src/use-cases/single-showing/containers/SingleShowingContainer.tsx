@@ -15,7 +15,7 @@ import AdminAction, { adminActionFragments } from "../AdminAction";
 import ParticipantList, {
   participantsListFragment,
 } from "../components/ParticipantsList";
-import SwishModal from "../components/SwishModal";
+import { SwishModal } from "../components/SwishModal";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import {
   SingleShowing,
