@@ -83,20 +83,27 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	r.Use(middleware.RecoverPanic())
 	r.Use(middleware.AttachAppLogger(logger))
 	r.Use(middleware.ProcessMaintenance(s.cfg))
-	r.Use(middleware.ApplyAuthorization(s.env.IDTokenCache(), s.cfg))
 	// TODO: authentication, CORS, security headers?
 
+	api := r.PathPrefix("/api").Subrouter()
+	api.Use(middleware.ApplyAuthorization(s.env.IDTokenCache(), s.cfg))
+
+	// Routing table
+	api.Handle("/graphql", s.graphQLHandler()).
+		Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
+
+	r.PathPrefix("/").
+		Handler(http.FileServer(http.Dir(s.cfg.ServePath)))
+
+	return r
+}
+
+func (s *Server) graphQLHandler() *handler.Server {
 	// GraphQL setup
 	gqlConfig := gql.Config{
 		Resolvers: &graph.Resolver{
 			DB: s.env.Database(),
 		},
 	}
-	gqlHandler := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
-
-	// Routing table
-	r.Handle("/query", gqlHandler).Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir(s.cfg.ServePath)))
-
-	return r
+	return handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 }
