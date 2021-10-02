@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"os"
 
+	"edholm.dev/go-logging"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/gql"
-	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/security/principal"

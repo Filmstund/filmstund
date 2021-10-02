@@ -8,16 +8,23 @@ import (
 	"os/signal"
 	"syscall"
 
+	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/cinema"
-	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/server"
 	"github.com/filmstund/filmstund/internal/setup"
+	"github.com/sethvargo/go-envconfig"
+	"go.uber.org/zap"
 )
+
+type LoggerConfig struct {
+	Level           string `env:"LOGGER_LEVEL, default=INFO"`
+	DevelopmentMode bool   `env:"LOGGER_DEVELOPMENT_MODE, default=true"`
+}
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
-	logger := logging.NewLogger()
+	logger := setupLogger(ctx)
 	defer logger.Sync() //nolint:errcheck
 	ctx = logging.WithLogger(ctx, logger)
 
@@ -57,4 +64,19 @@ func realMain(ctx context.Context) error {
 	}
 
 	return srv.ServeHTTPHandler(ctx, fs.Routes(ctx))
+}
+
+func setupLogger(ctx context.Context) *zap.SugaredLogger {
+	loggerCfg := new(LoggerConfig)
+	err := envconfig.Process(ctx, loggerCfg)
+	if err != nil {
+		logging.DefaultLogger().Warnw("failed to process logger config", "error", err)
+		loggerCfg = &LoggerConfig{
+			Level:           "INFO",
+			DevelopmentMode: true,
+		}
+	}
+
+	logger := logging.NewLogger(loggerCfg.Level, loggerCfg.DevelopmentMode)
+	return logger
 }

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/httputils"
-	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/setup"

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/filmstund/filmstund/internal/logging"
+	"edholm.dev/go-logging"
 	"go.uber.org/zap"
 	"gotest.tools/v3/assert"
 )

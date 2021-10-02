@@ -3,6 +3,7 @@ module github.com/filmstund/filmstund
 go 1.17
 
 require (
+	edholm.dev/go-logging v0.0.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/MicahParks/keyfunc v0.8.2
 	github.com/benbjohnson/clock v1.1.0

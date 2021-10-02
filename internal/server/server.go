@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/filmstund/filmstund/internal/logging"
+	"edholm.dev/go-logging"
 )
 
 const shutdownTimeout = 10 * time.Second

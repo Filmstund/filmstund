@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
-	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )

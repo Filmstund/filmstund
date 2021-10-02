@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
+	"edholm.dev/go-logging"
 	"github.com/benbjohnson/clock"
-	"github.com/filmstund/filmstund/internal/logging"
 )
 
 type Config struct {

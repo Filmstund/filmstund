@@ -8,10 +8,10 @@ import (
 	"database/sql"
 	"fmt"
 
+	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
-	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/filmstund/filmstund/internal/security/principal"
 )
 

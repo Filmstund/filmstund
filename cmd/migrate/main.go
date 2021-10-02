@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/logging"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/pgx"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -22,7 +22,7 @@ import (
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
-	logger := logging.NewLogger()
+	logger := logging.NewLoggerFromEnv()
 	defer logger.Sync() //nolint:errcheck
 	ctx = logging.WithLogger(ctx, logger)
 

@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/filmstund/filmstund/internal/logging"
+	"edholm.dev/go-logging"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
