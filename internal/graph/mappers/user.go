@@ -12,7 +12,7 @@ import (
 
 func ToGraphUser(u sqlc.User) *model.User {
 	return &model.User{
-		ID:                     u.ID.String(),
+		ID:                     u.ID,
 		FilmstadenMembershipID: scalars.NewFilmstadenMembershipID(u.FilmstadenMembershipID),
 		Name:                   strings.TrimSpace(fmt.Sprintf("%s %s", u.FirstName, u.LastName)),
 		FirstName:              u.FirstName,

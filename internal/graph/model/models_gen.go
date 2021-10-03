@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/filmstund/filmstund/internal/graph/scalars"
+	"github.com/google/uuid"
 )
 
 type Commandments struct {
@@ -28,7 +29,7 @@ type GiftCertificateInput struct {
 }
 
 type User struct {
-	ID                     string                          `json:"id"`
+	ID                     uuid.UUID                       `json:"id"`
 	FilmstadenMembershipID *scalars.FilmstadenMembershipID `json:"filmstadenMembershipId"`
 	Name                   string                          `json:"name"`
 	FirstName              string                          `json:"firstName"`
