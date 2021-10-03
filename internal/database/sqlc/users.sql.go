@@ -6,30 +6,18 @@ package sqlc
 import (
 	"context"
 	"database/sql"
-	"time"
-
-	"github.com/google/uuid"
 )
 
-const newOrExistingUser = `-- name: NewOrExistingUser :one
-WITH neworexisting AS (
-    INSERT INTO users
-        (subject_id, first_name, last_name, nick, email, avatar)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (subject_id) DO
-            UPDATE SET
-                last_login = current_timestamp,
-                last_modified_date = current_timestamp,
-                avatar = $6,
-                first_name = $2,
-                email = $5
-        RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
-)
-SELECT id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
-FROM neworexisting
+const createUser = `-- name: CreateUser :one
+INSERT INTO users
+    (subject_id, first_name, last_name, nick, email, avatar)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT (subject_id) DO UPDATE SET last_login         = current_timestamp,
+                                       last_modified_date = current_timestamp
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
 `
 
-type NewOrExistingUserParams struct {
+type CreateUserParams struct {
 	Subject   string         `json:"subject"`
 	FirstName string         `json:"firstName"`
 	LastName  string         `json:"lastName"`
@@ -38,24 +26,8 @@ type NewOrExistingUserParams struct {
 	Avatar    sql.NullString `json:"avatar"`
 }
 
-type NewOrExistingUserRow struct {
-	ID                     uuid.UUID      `json:"id"`
-	SubjectID              string         `json:"subjectID"`
-	FilmstadenMembershipID sql.NullString `json:"filmstadenMembershipID"`
-	FirstName              string         `json:"firstName"`
-	LastName               string         `json:"lastName"`
-	Nick                   sql.NullString `json:"nick"`
-	Email                  string         `json:"email"`
-	Phone                  sql.NullString `json:"phone"`
-	Avatar                 sql.NullString `json:"avatar"`
-	CalendarFeedID         uuid.NullUUID  `json:"calendarFeedID"`
-	LastLogin              time.Time      `json:"lastLogin"`
-	SignupDate             time.Time      `json:"signupDate"`
-	LastModifiedDate       time.Time      `json:"lastModifiedDate"`
-}
-
-func (q *Queries) NewOrExistingUser(ctx context.Context, arg NewOrExistingUserParams) (NewOrExistingUserRow, error) {
-	row := q.db.QueryRow(ctx, newOrExistingUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, createUser,
 		arg.Subject,
 		arg.FirstName,
 		arg.LastName,
@@ -63,7 +35,42 @@ func (q *Queries) NewOrExistingUser(ctx context.Context, arg NewOrExistingUserPa
 		arg.Email,
 		arg.Avatar,
 	)
-	var i NewOrExistingUserRow
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.SubjectID,
+		&i.FilmstadenMembershipID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Nick,
+		&i.Email,
+		&i.Phone,
+		&i.Avatar,
+		&i.CalendarFeedID,
+		&i.LastLogin,
+		&i.SignupDate,
+		&i.LastModifiedDate,
+	)
+	return i, err
+}
+
+const updateLoginTimes = `-- name: UpdateLoginTimes :one
+UPDATE users
+SET avatar             = $1,
+    last_login         = current_timestamp,
+    last_modified_date = current_timestamp
+WHERE subject_id = $2
+returning id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+`
+
+type UpdateLoginTimesParams struct {
+	Avatar    sql.NullString `json:"avatar"`
+	SubjectID string         `json:"subjectID"`
+}
+
+func (q *Queries) UpdateLoginTimes(ctx context.Context, arg UpdateLoginTimesParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateLoginTimes, arg.Avatar, arg.SubjectID)
+	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.SubjectID,

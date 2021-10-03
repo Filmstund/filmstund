@@ -11,61 +11,55 @@ import (
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/graph/gql"
+	"github.com/filmstund/filmstund/internal/graph/mappers"
 	"github.com/filmstund/filmstund/internal/graph/model"
-	"github.com/filmstund/filmstund/internal/graph/scalars"
 	"github.com/filmstund/filmstund/internal/security/principal"
 )
 
 func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 	logger := logging.FromContext(ctx)
-
 	prin := principal.FromContext(ctx)
-	var user sqlc.NewOrExistingUserRow
-	var err error
 
-	err = r.DB.DoQuery(ctx, func(q *sqlc.Queries) error {
-		user, err = q.NewOrExistingUser(ctx, sqlc.NewOrExistingUserParams{
-			Subject:   prin.Sub.String(),
-			FirstName: prin.GivenName,
-			LastName:  prin.FamilyName,
-			Nick: sql.NullString{
-				String: prin.Nickname,
-				Valid:  true,
-			},
-			Email: prin.Email,
-			Avatar: sql.NullString{
-				String: prin.Picture,
-				Valid:  true,
-			},
-		})
+	var user sqlc.User
+	err := r.DB.DoQuery(ctx, func(q *sqlc.Queries) error {
+		exists, err := q.UserExistsBySubject(ctx, prin.Sub.String())
+		if err != nil {
+			return err
+		}
+
+		if exists {
+			user, err = q.UpdateLoginTimes(ctx, sqlc.UpdateLoginTimesParams{
+				Avatar: sql.NullString{
+					String: prin.Picture,
+					Valid:  true,
+				},
+				SubjectID: prin.Sub.String(),
+			})
+		} else {
+			user, err = q.CreateUser(ctx, sqlc.CreateUserParams{
+				Subject:   prin.Sub.String(),
+				FirstName: prin.GivenName,
+				LastName:  prin.FamilyName,
+				Nick: sql.NullString{
+					String: prin.Nickname,
+					Valid:  true,
+				},
+				Email: prin.Email,
+				Avatar: sql.NullString{
+					String: prin.Picture,
+					Valid:  true,
+				},
+			})
+		}
+
 		return err
 	})
 	if err != nil {
-		logger.Warnw("failed to create/get user", "subject", prin.Sub, "err", err)
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		logger.Warnw("failed to create/update user", "subject", prin.Sub, "err", err)
+		return nil, fmt.Errorf("failed to login user")
 	}
 
-	toString := func(v sql.NullString) *string {
-		if v.Valid {
-			return &v.String
-		}
-		return nil
-	}
-
-	return &model.User{
-		ID:                     user.ID.String(),
-		FilmstadenMembershipID: scalars.NewFilmstadenMembershipID(user.FilmstadenMembershipID),
-		Name:                   fmt.Sprintf("%s %s", user.FirstName, user.LastName),
-		FirstName:              user.FirstName,
-		LastName:               user.LastName,
-		Nick:                   toString(user.Nick),
-		Email:                  user.Email,
-		Phone:                  toString(user.Phone),
-		AvatarURL:              toString(user.Avatar),
-		LastLogin:              user.LastLogin,
-		SignupDate:             user.SignupDate,
-		LastModifiedDate:       user.LastModifiedDate,
-	}, nil
+	return mappers.ToGraphUser(user), nil
 }
 
 // Mutation returns gql.MutationResolver implementation.
