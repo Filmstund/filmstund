@@ -59,7 +59,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 		return nil, fmt.Errorf("failed to login user")
 	}
 
-	return mappers.ToGraphUser(user), nil
+	return mappers.ToGraphUser(user, r.siteCfg), nil
 }
 
 // Mutation returns gql.MutationResolver implementation.

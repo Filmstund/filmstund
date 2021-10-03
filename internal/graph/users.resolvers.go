@@ -31,7 +31,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 		logger.Infof("failed to update user (%s): %w", princ.Sub, err)
 		return nil, fmt.Errorf("failed to update user")
 	}
-	return mappers.ToGraphUser(user), nil
+	return mappers.ToGraphUser(user, r.siteCfg), nil
 }
 
 func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.User, error) {

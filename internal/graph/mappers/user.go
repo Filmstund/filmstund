@@ -8,9 +8,10 @@ import (
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/graph/scalars"
 	"github.com/filmstund/filmstund/internal/security/principal"
+	"github.com/filmstund/filmstund/internal/site"
 )
 
-func ToGraphUser(u sqlc.User) *model.User {
+func ToGraphUser(u sqlc.User, siteCfg site.Config) *model.User {
 	return &model.User{
 		ID:                     u.ID,
 		FilmstadenMembershipID: scalars.NewFilmstadenMembershipID(u.FilmstadenMembershipID),
@@ -22,8 +23,8 @@ func ToGraphUser(u sqlc.User) *model.User {
 		Phone:                  toString(u.Phone),
 		AvatarURL:              toString(u.Avatar),
 		GiftCertificates:       nil, // TODO
-		CalendarFeedID:         nil, // TODO
-		CalendarFeedURL:        nil, // TODO
+		CalendarFeedID:         fromUUID(u.CalendarFeedID),
+		CalendarFeedURL:        toCalendarURL(u.CalendarFeedID, siteCfg),
 		LastLogin:              u.LastLogin,
 		SignupDate:             u.SignupDate,
 		LastModifiedDate:       u.LastModifiedDate,
