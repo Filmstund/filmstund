@@ -32,7 +32,6 @@ linters:
     - "nestif"
     - "nilerr"
     - "noctx"
-    - "paralleltest"
     - "prealloc"
     - "predeclared"
     - "revive"
