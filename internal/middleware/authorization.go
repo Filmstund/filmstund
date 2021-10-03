@@ -73,7 +73,7 @@ func (v *jwtVerifier) doAuthorization(r *http.Request) (*jwt.Token, error) {
 	// Parse and validate the token
 	token, err := jwt.ParseWithClaims(rawToken, &security.Auth0Claims{}, jwks.Keyfunc)
 	if err != nil {
-		v.logger.Debugw("[token] invalid token", "err", err, "claims", token.Claims)
+		v.logger.Debugw("[token] invalid token", "err", err)
 		return nil, httputils.ErrUnauthorized
 	}
 
