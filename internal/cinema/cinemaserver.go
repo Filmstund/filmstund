@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 
 	"edholm.dev/go-logging"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -48,12 +49,13 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	r.Use(middleware.ProcessMaintenance(s.cfg))
 	// TODO: authentication, CORS, security headers?
 
-	api := r.PathPrefix("/api").Subrouter()
-	api.Use(middleware.ApplyAuthorization(s.env.PrincipalCache(), s.cfg))
+	authorized := r.PathPrefix("/").Subrouter()
+	authorized.Use(middleware.ApplyAuthorization(s.env.PrincipalCache(), s.cfg))
 
 	// Routing table
-	api.Handle("/graphql", s.graphQLHandler()).
+	authorized.Handle("/api/graphql", s.graphQLHandler()).
 		Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
+	authorized.Handle(path.Join(s.cfg.Site.CalendarURLPrefix, "/{feed}"), s.calendarFeedHandler())
 
 	r.PathPrefix("/").
 		Handler(http.FileServer(http.Dir(s.cfg.ServePath)))
