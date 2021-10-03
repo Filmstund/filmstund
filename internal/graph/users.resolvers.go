@@ -56,7 +56,24 @@ func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.U
 }
 
 func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx)
+	princ := principal.FromContext(ctx)
+
+	var user *model.User
+	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
+		u, err := q.DisableCalendarFeed(ctx, princ.Sub.String())
+		if err != nil {
+			return err
+		}
+
+		user = mappers.ToGraphUser(u, r.siteCfg)
+		return nil
+	})
+	if err != nil {
+		logger.Infow("failed to disable calendar feed", "sub", princ.Sub, "err", err)
+		return nil, fmt.Errorf("failed to disable calendar feed")
+	}
+	return user, nil
 }
 
 func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []*model.GiftCertificateInput) (*model.User, error) {
