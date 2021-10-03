@@ -3,7 +3,12 @@
 package model
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
+
+	"github.com/filmstund/filmstund/internal/graph/scalars"
 )
 
 type Commandments struct {
@@ -11,17 +16,86 @@ type Commandments struct {
 	Phrase string `json:"phrase"`
 }
 
+type GiftCertificate struct {
+	Number    string                `json:"number"`
+	ExpiresAt time.Time             `json:"expiresAt"`
+	Status    GiftCertificateStatus `json:"status"`
+}
+
+type GiftCertificateInput struct {
+	Number    string     `json:"number"`
+	ExpiresAt *time.Time `json:"expiresAt"`
+}
+
 type User struct {
-	ID                     string    `json:"id"`
-	FilmstadenMembershipID *string   `json:"filmstadenMembershipId"`
-	Name                   string    `json:"name"`
-	FirstName              string    `json:"firstName"`
-	LastName               string    `json:"lastName"`
-	Nick                   *string   `json:"nick"`
-	Email                  string    `json:"email"`
-	Phone                  *string   `json:"phone"`
-	AvatarURL              *string   `json:"avatarURL"`
-	LastLogin              time.Time `json:"lastLogin"`
-	SignupDate             time.Time `json:"signupDate"`
-	LastModifiedDate       time.Time `json:"lastModifiedDate"`
+	ID                     string                          `json:"id"`
+	FilmstadenMembershipID *scalars.FilmstadenMembershipID `json:"filmstadenMembershipId"`
+	Name                   string                          `json:"name"`
+	FirstName              string                          `json:"firstName"`
+	LastName               string                          `json:"lastName"`
+	Nick                   *string                         `json:"nick"`
+	Email                  string                          `json:"email"`
+	Phone                  *string                         `json:"phone"`
+	AvatarURL              *string                         `json:"avatarURL"`
+	GiftCertificates       []*GiftCertificate              `json:"giftCertificates"`
+	CalendarFeedID         *string                         `json:"calendarFeedId"`
+	CalendarFeedURL        *string                         `json:"calendarFeedUrl"`
+	LastLogin              time.Time                       `json:"lastLogin"`
+	SignupDate             time.Time                       `json:"signupDate"`
+	LastModifiedDate       time.Time                       `json:"lastModifiedDate"`
+}
+
+type UserDetailsInput struct {
+	FirstName              *string                         `json:"firstName"`
+	LastName               *string                         `json:"lastName"`
+	Nick                   *string                         `json:"nick"`
+	FilmstadenMembershipID *scalars.FilmstadenMembershipID `json:"filmstadenMembershipId"`
+	Phone                  *string                         `json:"phone"`
+}
+
+type GiftCertificateStatus string
+
+const (
+	GiftCertificateStatusAvailable GiftCertificateStatus = "AVAILABLE"
+	GiftCertificateStatusPending   GiftCertificateStatus = "PENDING"
+	GiftCertificateStatusUsed      GiftCertificateStatus = "USED"
+	GiftCertificateStatusExpired   GiftCertificateStatus = "EXPIRED"
+	GiftCertificateStatusUnknown   GiftCertificateStatus = "UNKNOWN"
+)
+
+var AllGiftCertificateStatus = []GiftCertificateStatus{
+	GiftCertificateStatusAvailable,
+	GiftCertificateStatusPending,
+	GiftCertificateStatusUsed,
+	GiftCertificateStatusExpired,
+	GiftCertificateStatusUnknown,
+}
+
+func (e GiftCertificateStatus) IsValid() bool {
+	switch e {
+	case GiftCertificateStatusAvailable, GiftCertificateStatusPending, GiftCertificateStatusUsed, GiftCertificateStatusExpired, GiftCertificateStatusUnknown:
+		return true
+	}
+	return false
+}
+
+func (e GiftCertificateStatus) String() string {
+	return string(e)
+}
+
+func (e *GiftCertificateStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = GiftCertificateStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid GiftCertificate_Status", str)
+	}
+	return nil
+}
+
+func (e GiftCertificateStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

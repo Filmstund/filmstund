@@ -82,6 +82,55 @@ func (q *Queries) NewOrExistingUser(ctx context.Context, arg NewOrExistingUserPa
 	return i, err
 }
 
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET filmstaden_membership_id = COALESCE(NULLIF(TRIM($1), ''), filmstaden_membership_id),
+    phone                    = COALESCE(NULLIF(TRIM($2), ''), phone),
+    first_name               = COALESCE(NULLIF(TRIM($3), ''), first_name),
+    last_name                = COALESCE(NULLIF(TRIM($4), ''), last_name),
+    nick                     = COALESCE(NULLIF(TRIM($5), ''), nick),
+    last_modified_date       = current_timestamp
+WHERE subject_id = $6
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+`
+
+type UpdateUserParams struct {
+	FilmstadenMembershipID string `json:"filmstadenMembershipID"`
+	PhoneNumber            string `json:"phoneNumber"`
+	FirstName              string `json:"firstName"`
+	LastName               string `json:"lastName"`
+	Nick                   string `json:"nick"`
+	SubjectID              string `json:"subjectID"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.FilmstadenMembershipID,
+		arg.PhoneNumber,
+		arg.FirstName,
+		arg.LastName,
+		arg.Nick,
+		arg.SubjectID,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.SubjectID,
+		&i.FilmstadenMembershipID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Nick,
+		&i.Email,
+		&i.Phone,
+		&i.Avatar,
+		&i.CalendarFeedID,
+		&i.LastLogin,
+		&i.SignupDate,
+		&i.LastModifiedDate,
+	)
+	return i, err
+}
+
 const userExistsBySubject = `-- name: UserExistsBySubject :one
 SELECT exists(SELECT 1 FROM users where subject_id = $1)
 `

@@ -14,6 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/filmstund/filmstund/internal/graph/model"
+	"github.com/filmstund/filmstund/internal/graph/scalars"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -48,8 +49,19 @@ type ComplexityRoot struct {
 		Phrase func(childComplexity int) int
 	}
 
+	GiftCertificate struct {
+		ExpiresAt func(childComplexity int) int
+		Number    func(childComplexity int) int
+		Status    func(childComplexity int) int
+	}
+
 	Mutation struct {
-		LoginUser func(childComplexity int) int
+		AddGiftCertificates    func(childComplexity int, giftCerts []*model.GiftCertificateInput) int
+		DeleteGiftCertificate  func(childComplexity int, giftCert model.GiftCertificateInput) int
+		DisableCalendarFeed    func(childComplexity int) int
+		InvalidateCalendarFeed func(childComplexity int) int
+		LoginUser              func(childComplexity int) int
+		UpdateUser             func(childComplexity int, newInfo model.UserDetailsInput) int
 	}
 
 	Query struct {
@@ -59,9 +71,12 @@ type ComplexityRoot struct {
 
 	User struct {
 		AvatarURL              func(childComplexity int) int
+		CalendarFeedID         func(childComplexity int) int
+		CalendarFeedURL        func(childComplexity int) int
 		Email                  func(childComplexity int) int
 		FilmstadenMembershipID func(childComplexity int) int
 		FirstName              func(childComplexity int) int
+		GiftCertificates       func(childComplexity int) int
 		ID                     func(childComplexity int) int
 		LastLogin              func(childComplexity int) int
 		LastModifiedDate       func(childComplexity int) int
@@ -75,6 +90,11 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	LoginUser(ctx context.Context) (*model.User, error)
+	UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error)
+	InvalidateCalendarFeed(ctx context.Context) (*model.User, error)
+	DisableCalendarFeed(ctx context.Context) (*model.User, error)
+	AddGiftCertificates(ctx context.Context, giftCerts []*model.GiftCertificateInput) (*model.User, error)
+	DeleteGiftCertificate(ctx context.Context, giftCert model.GiftCertificateInput) (*model.User, error)
 }
 
 type QueryResolver interface {
@@ -111,12 +131,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Commandments.Phrase(childComplexity), true
 
+	case "GiftCertificate.expiresAt":
+		if e.complexity.GiftCertificate.ExpiresAt == nil {
+			break
+		}
+
+		return e.complexity.GiftCertificate.ExpiresAt(childComplexity), true
+
+	case "GiftCertificate.number":
+		if e.complexity.GiftCertificate.Number == nil {
+			break
+		}
+
+		return e.complexity.GiftCertificate.Number(childComplexity), true
+
+	case "GiftCertificate.status":
+		if e.complexity.GiftCertificate.Status == nil {
+			break
+		}
+
+		return e.complexity.GiftCertificate.Status(childComplexity), true
+
+	case "Mutation.addGiftCertificates":
+		if e.complexity.Mutation.AddGiftCertificates == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addGiftCertificates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddGiftCertificates(childComplexity, args["giftCerts"].([]*model.GiftCertificateInput)), true
+
+	case "Mutation.deleteGiftCertificate":
+		if e.complexity.Mutation.DeleteGiftCertificate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteGiftCertificate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteGiftCertificate(childComplexity, args["giftCert"].(model.GiftCertificateInput)), true
+
+	case "Mutation.disableCalendarFeed":
+		if e.complexity.Mutation.DisableCalendarFeed == nil {
+			break
+		}
+
+		return e.complexity.Mutation.DisableCalendarFeed(childComplexity), true
+
+	case "Mutation.invalidateCalendarFeed":
+		if e.complexity.Mutation.InvalidateCalendarFeed == nil {
+			break
+		}
+
+		return e.complexity.Mutation.InvalidateCalendarFeed(childComplexity), true
+
 	case "Mutation.loginUser":
 		if e.complexity.Mutation.LoginUser == nil {
 			break
 		}
 
 		return e.complexity.Mutation.LoginUser(childComplexity), true
+
+	case "Mutation.updateUser":
+		if e.complexity.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["newInfo"].(model.UserDetailsInput)), true
 
 	case "Query.allCommandments":
 		if e.complexity.Query.AllCommandments == nil {
@@ -139,6 +230,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.AvatarURL(childComplexity), true
 
+	case "User.calendarFeedId":
+		if e.complexity.User.CalendarFeedID == nil {
+			break
+		}
+
+		return e.complexity.User.CalendarFeedID(childComplexity), true
+
+	case "User.calendarFeedUrl":
+		if e.complexity.User.CalendarFeedURL == nil {
+			break
+		}
+
+		return e.complexity.User.CalendarFeedURL(childComplexity), true
+
 	case "User.email":
 		if e.complexity.User.Email == nil {
 			break
@@ -159,6 +264,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.FirstName(childComplexity), true
+
+	case "User.giftCertificates":
+		if e.complexity.User.GiftCertificates == nil {
+			break
+		}
+
+		return e.complexity.User.GiftCertificates(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -297,10 +409,23 @@ type Commandments {
 }`, BuiltIn: false},
 	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar Time
 scalar UUID
-`, BuiltIn: false},
-	{Name: "../../api/graphql/v2/users.graphqls", Input: `type User {
+scalar FilmstadenMembershipID`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/users.graphqls", Input: `extend type Mutation {
+    updateUser(newInfo: UserDetailsInput!): User!
+
+    # Generate a new calendar feed id, invalidating the old one
+    invalidateCalendarFeed: User!
+
+    # Remove the calendar feed for the current user
+    disableCalendarFeed: User!
+
+    addGiftCertificates(giftCerts: [GiftCertificateInput!]): User!
+    deleteGiftCertificate(giftCert: GiftCertificateInput!): User!
+}
+
+type User {
     id: UUID!
-    filmstadenMembershipId: String
+    filmstadenMembershipId: FilmstadenMembershipID
     name: String!
     firstName: String!
     lastName: String!
@@ -308,12 +433,41 @@ scalar UUID
     email: String!
     phone: String
     avatarURL: String
-#    giftCertificates: [GiftCertificateDTO!]!
-#    calendarFeedId: String
-#    calendarFeedUrl: String
+    giftCertificates: [GiftCertificate!]!
+    calendarFeedId: String
+    calendarFeedUrl: String
     lastLogin: Time!
     signupDate: Time!
     lastModifiedDate: Time!
+}
+
+type GiftCertificate {
+    number: String!
+    expiresAt: Time!
+    status: GiftCertificate_Status!
+}
+
+enum GiftCertificate_Status {
+    AVAILABLE
+    PENDING
+    USED
+    EXPIRED
+    UNKNOWN
+}
+
+## ------ Input ------
+
+input UserDetailsInput {
+    firstName: String
+    lastName: String
+    nick: String
+    filmstadenMembershipId: FilmstadenMembershipID
+    phone: String
+}
+
+input GiftCertificateInput {
+    number: String!
+    expiresAt: Time
 }
 `, BuiltIn: false},
 }
@@ -322,6 +476,51 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addGiftCertificates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.GiftCertificateInput
+	if tmp, ok := rawArgs["giftCerts"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("giftCerts"))
+		arg0, err = ec.unmarshalOGiftCertificateInput2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["giftCerts"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteGiftCertificate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.GiftCertificateInput
+	if tmp, ok := rawArgs["giftCert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("giftCert"))
+		arg0, err = ec.unmarshalNGiftCertificateInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["giftCert"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UserDetailsInput
+	if tmp, ok := rawArgs["newInfo"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newInfo"))
+		arg0, err = ec.unmarshalNUserDetailsInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUserDetailsInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["newInfo"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -446,6 +645,111 @@ func (ec *executionContext) _Commandments_phrase(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _GiftCertificate_number(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GiftCertificate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Number, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _GiftCertificate_expiresAt(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GiftCertificate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpiresAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _GiftCertificate_status(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GiftCertificate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.GiftCertificateStatus)
+	fc.Result = res
+	return ec.marshalNGiftCertificate_Status2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateStatus(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -465,6 +769,202 @@ func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().LoginUser(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUser(rctx, args["newInfo"].(model.UserDetailsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_invalidateCalendarFeed(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InvalidateCalendarFeed(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_disableCalendarFeed(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DisableCalendarFeed(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addGiftCertificates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addGiftCertificates_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddGiftCertificates(rctx, args["giftCerts"].([]*model.GiftCertificateInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteGiftCertificate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteGiftCertificate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteGiftCertificate(rctx, args["giftCert"].(model.GiftCertificateInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -684,9 +1184,9 @@ func (ec *executionContext) _User_filmstadenMembershipId(ctx context.Context, fi
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*scalars.FilmstadenMembershipID)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋscalarsᚐFilmstadenMembershipID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -912,6 +1412,105 @@ func (ec *executionContext) _User_avatarURL(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.AvatarURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_giftCertificates(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GiftCertificates, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.GiftCertificate)
+	fc.Result = res
+	return ec.marshalNGiftCertificate2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_calendarFeedId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CalendarFeedID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_calendarFeedUrl(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CalendarFeedURL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2152,6 +2751,92 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputGiftCertificateInput(ctx context.Context, obj interface{}) (model.GiftCertificateInput, error) {
+	var it model.GiftCertificateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "number":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("number"))
+			it.Number, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "expiresAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expiresAt"))
+			it.ExpiresAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserDetailsInput(ctx context.Context, obj interface{}) (model.UserDetailsInput, error) {
+	var it model.UserDetailsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "firstName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
+			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
+			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nick":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nick"))
+			it.Nick, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "filmstadenMembershipId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filmstadenMembershipId"))
+			it.FilmstadenMembershipID, err = ec.unmarshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋscalarsᚐFilmstadenMembershipID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "phone":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			it.Phone, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2192,6 +2877,43 @@ func (ec *executionContext) _Commandments(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var giftCertificateImplementors = []string{"GiftCertificate"}
+
+func (ec *executionContext) _GiftCertificate(ctx context.Context, sel ast.SelectionSet, obj *model.GiftCertificate) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, giftCertificateImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GiftCertificate")
+		case "number":
+			out.Values[i] = ec._GiftCertificate_number(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "expiresAt":
+			out.Values[i] = ec._GiftCertificate_expiresAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "status":
+			out.Values[i] = ec._GiftCertificate_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2209,6 +2931,31 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "loginUser":
 			out.Values[i] = ec._Mutation_loginUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateUser":
+			out.Values[i] = ec._Mutation_updateUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "invalidateCalendarFeed":
+			out.Values[i] = ec._Mutation_invalidateCalendarFeed(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "disableCalendarFeed":
+			out.Values[i] = ec._Mutation_disableCalendarFeed(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addGiftCertificates":
+			out.Values[i] = ec._Mutation_addGiftCertificates(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteGiftCertificate":
+			out.Values[i] = ec._Mutation_deleteGiftCertificate(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2325,6 +3072,15 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_phone(ctx, field, obj)
 		case "avatarURL":
 			out.Values[i] = ec._User_avatarURL(ctx, field, obj)
+		case "giftCertificates":
+			out.Values[i] = ec._User_giftCertificates(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "calendarFeedId":
+			out.Values[i] = ec._User_calendarFeedId(ctx, field, obj)
+		case "calendarFeedUrl":
+			out.Values[i] = ec._User_calendarFeedUrl(ctx, field, obj)
 		case "lastLogin":
 			out.Values[i] = ec._User_lastLogin(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2674,6 +3430,80 @@ func (ec *executionContext) marshalNCommandments2ᚖgithubᚗcomᚋfilmstundᚋf
 	return ec._Commandments(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNGiftCertificate2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.GiftCertificate) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNGiftCertificate2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificate(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNGiftCertificate2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificate(ctx context.Context, sel ast.SelectionSet, v *model.GiftCertificate) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._GiftCertificate(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGiftCertificateInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInput(ctx context.Context, v interface{}) (model.GiftCertificateInput, error) {
+	res, err := ec.unmarshalInputGiftCertificateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNGiftCertificateInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInput(ctx context.Context, v interface{}) (*model.GiftCertificateInput, error) {
+	res, err := ec.unmarshalInputGiftCertificateInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNGiftCertificate_Status2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateStatus(ctx context.Context, v interface{}) (model.GiftCertificateStatus, error) {
+	var res model.GiftCertificateStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGiftCertificate_Status2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateStatus(ctx context.Context, sel ast.SelectionSet, v model.GiftCertificateStatus) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2746,6 +3576,11 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstund
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUserDetailsInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUserDetailsInput(ctx context.Context, v interface{}) (model.UserDetailsInput, error) {
+	res, err := ec.unmarshalInputUserDetailsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -3029,6 +3864,46 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) unmarshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋscalarsᚐFilmstadenMembershipID(ctx context.Context, v interface{}) (*scalars.FilmstadenMembershipID, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res := new(scalars.FilmstadenMembershipID)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋscalarsᚐFilmstadenMembershipID(ctx context.Context, sel ast.SelectionSet, v *scalars.FilmstadenMembershipID) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOGiftCertificateInput2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInputᚄ(ctx context.Context, v interface{}) ([]*model.GiftCertificateInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.GiftCertificateInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNGiftCertificateInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3051,6 +3926,21 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalTime(*v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

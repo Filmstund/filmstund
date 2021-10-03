@@ -56,3 +56,6 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  FilmstadenMembershipID:
+    model:
+      - github.com/filmstund/filmstund/internal/graph/scalars.FilmstadenMembershipID

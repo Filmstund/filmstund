@@ -1,6 +1,19 @@
+extend type Mutation {
+    updateUser(newInfo: UserDetailsInput!): User!
+
+    # Generate a new calendar feed id, invalidating the old one
+    invalidateCalendarFeed: User!
+
+    # Remove the calendar feed for the current user
+    disableCalendarFeed: User!
+
+    addGiftCertificates(giftCerts: [GiftCertificateInput!]): User!
+    deleteGiftCertificate(giftCert: GiftCertificateInput!): User!
+}
+
 type User {
     id: UUID!
-    filmstadenMembershipId: String
+    filmstadenMembershipId: FilmstadenMembershipID
     name: String!
     firstName: String!
     lastName: String!
@@ -8,10 +21,39 @@ type User {
     email: String!
     phone: String
     avatarURL: String
-#    giftCertificates: [GiftCertificateDTO!]!
-#    calendarFeedId: String
-#    calendarFeedUrl: String
+    giftCertificates: [GiftCertificate!]!
+    calendarFeedId: String
+    calendarFeedUrl: String
     lastLogin: Time!
     signupDate: Time!
     lastModifiedDate: Time!
+}
+
+type GiftCertificate {
+    number: String!
+    expiresAt: Time!
+    status: GiftCertificate_Status!
+}
+
+enum GiftCertificate_Status {
+    AVAILABLE
+    PENDING
+    USED
+    EXPIRED
+    UNKNOWN
+}
+
+## ------ Input ------
+
+input UserDetailsInput {
+    firstName: String
+    lastName: String
+    nick: String
+    filmstadenMembershipId: FilmstadenMembershipID
+    phone: String
+}
+
+input GiftCertificateInput {
+    number: String!
+    expiresAt: Time
 }

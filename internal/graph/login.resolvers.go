@@ -12,6 +12,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
+	"github.com/filmstund/filmstund/internal/graph/scalars"
 	"github.com/filmstund/filmstund/internal/security/principal"
 )
 
@@ -53,7 +54,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 
 	return &model.User{
 		ID:                     user.ID.String(),
-		FilmstadenMembershipID: toString(user.FilmstadenMembershipID),
+		FilmstadenMembershipID: scalars.NewFilmstadenMembershipID(user.FilmstadenMembershipID),
 		Name:                   fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 		FirstName:              user.FirstName,
 		LastName:               user.LastName,
