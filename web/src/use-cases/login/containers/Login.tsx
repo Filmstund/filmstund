@@ -14,7 +14,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 interface LoginProps {}
 
 export const Login: React.VFC<LoginProps> = ({}) => {
-  const { isLoading, error, loginWithPopup } = useAuth0();
+  const { isLoading, error, loginWithRedirect } = useAuth0();
   const loaded = !isLoading;
 
   const cookiesBlocked = false;
@@ -34,7 +34,7 @@ export const Login: React.VFC<LoginProps> = ({}) => {
           <h3>Logga in för att boka biobesök!</h3>
           {loaded ? (
             !cookiesBlocked && (
-              <GoogleButton onClick={() => loginWithPopup()}>
+              <GoogleButton onClick={() => loginWithRedirect()}>
                 Logga in
               </GoogleButton>
             )
