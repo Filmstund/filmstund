@@ -14,6 +14,7 @@ checks:\
 	mod-verify \
 	commitlint \
 	verify-nodiff
+	$(info done!)
 .PHONY: checks
 
 # Include tooling here
