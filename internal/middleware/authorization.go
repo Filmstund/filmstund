@@ -63,7 +63,7 @@ func ApplyAuthorization(principalCache *principal.Cache, confProvider setup.Secu
 func (v *jwtVerifier) doAuthorization(r *http.Request) (*jwt.Token, error) {
 	rawToken, exists := httputils.ExtractTokenFromHeader(r)
 	if !exists {
-		v.logger.Debugf("[token] missing doAuthorization header")
+		v.logger.Debugf("[token] missing authorization header")
 		return nil, httputils.ErrUnauthorized
 	}
 

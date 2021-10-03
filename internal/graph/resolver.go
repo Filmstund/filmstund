@@ -18,11 +18,7 @@ type Resolver struct {
 	siteCfg site.Config
 }
 
-type SiteConfigProvider interface {
-	SiteConfig() site.Config
-}
-
-func NewResolver(db *database.DB, siteCfg SiteConfigProvider) *Resolver {
+func NewResolver(db *database.DB, siteCfg site.ConfigProvider) *Resolver {
 	return &Resolver{
 		db:      db,
 		siteCfg: siteCfg.SiteConfig(),

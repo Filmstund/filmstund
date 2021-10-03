@@ -2,7 +2,6 @@ package cinema
 
 import (
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/setup"
@@ -14,7 +13,7 @@ var (
 	_ setup.DatabaseConfigProvider       = (*Config)(nil)
 	_ setup.SecurityConfigProvider       = (*Config)(nil)
 	_ setup.PrincipalCacheConfigProvider = (*Config)(nil)
-	_ graph.SiteConfigProvider           = (*Config)(nil)
+	_ site.ConfigProvider                = (*Config)(nil)
 )
 
 type Config struct {

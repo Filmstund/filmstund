@@ -47,7 +47,8 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	r.Use(middleware.RecoverPanic())
 	r.Use(middleware.AttachAppLogger(logger))
 	r.Use(middleware.ProcessMaintenance(s.cfg))
-	// TODO: authentication, CORS, security headers?
+	r.Use(middleware.Cors(s.cfg))
+	// TODO: authentication, security headers?
 
 	authorized := r.PathPrefix("/").Subrouter()
 	authorized.Use(middleware.ApplyAuthorization(s.env.PrincipalCache(), s.cfg))
