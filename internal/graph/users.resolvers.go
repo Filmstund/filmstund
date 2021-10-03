@@ -19,7 +19,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 	princ := principal.FromContext(ctx)
 
 	var user sqlc.User
-	err := r.DB.DoQuery(ctx, func(q *sqlc.Queries) error {
+	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
 		u, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Sub))
 		if err != nil {
 			return err

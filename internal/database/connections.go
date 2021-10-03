@@ -42,7 +42,7 @@ type QueryFunc func(q *sqlc.Queries) error
 func (db *DB) DoQuery(ctx context.Context, f QueryFunc) error {
 	conn, err := db.Pool.Acquire(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to acquire DB connection: %w", err)
+		return fmt.Errorf("failed to acquire db connection: %w", err)
 	}
 	defer conn.Release()
 

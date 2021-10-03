@@ -13,5 +13,11 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	DB *database.DB
+	db *database.DB
+}
+
+func NewResolver(db *database.DB) *Resolver {
+	return &Resolver{
+		db: db,
+	}
 }

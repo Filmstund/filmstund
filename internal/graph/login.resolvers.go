@@ -21,7 +21,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 	prin := principal.FromContext(ctx)
 
 	var user sqlc.User
-	err := r.DB.DoQuery(ctx, func(q *sqlc.Queries) error {
+	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
 		exists, err := q.UserExistsBySubject(ctx, prin.Sub.String())
 		if err != nil {
 			return err

@@ -17,7 +17,7 @@ func (r *queryResolver) AllCommandments(ctx context.Context) ([]*model.Commandme
 	logger := logging.FromContext(ctx)
 
 	var commandments []*model.Commandments
-	err := r.DB.DoQuery(ctx, func(q *sqlc.Queries) error {
+	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
 		all, err := q.ListCommandments(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to list all commandments: %w", err)
@@ -44,7 +44,7 @@ func (r *queryResolver) RandomCommandment(ctx context.Context) (*model.Commandme
 	logger := logging.FromContext(ctx)
 
 	var commandment model.Commandments
-	err := r.DB.DoQuery(ctx, func(q *sqlc.Queries) error {
+	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
 		rnd, err := q.RandomCommandment(ctx)
 		if err != nil {
 			return fmt.Errorf("RandomCommandment query failed: %w", err)
