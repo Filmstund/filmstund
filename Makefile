@@ -4,10 +4,10 @@ GOFMT_FILES = $(shell go list -f '{{.Dir}}' ./... | grep -v '/pb')
 
 ## Default make target
 checks:\
-	build \
-	lint \
 	sqlc-generate \
 	generate \
+	build \
+	lint \
 	fmt  \
 	test \
 	mod-tidy \
