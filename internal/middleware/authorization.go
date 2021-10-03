@@ -28,11 +28,11 @@ type jwtVerifier struct {
 // ApplyAuthorization validates the JWT token in the "Authorization" header.
 // If valid, it fetches the id_token and affixes the tokens to the request context.
 // TODO: document and test.
-func ApplyAuthorization(idTokenCache *principal.Cache, confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
+func ApplyAuthorization(principalCache *principal.Cache, confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			verifier := jwtVerifier{
-				cache: idTokenCache,
+				cache: principalCache,
 				cfg:   confProvider.SecurityConfig(),
 				logger: logging.FromContext(r.Context()).
 					With("url", r.URL.String()).

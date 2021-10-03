@@ -8,8 +8,8 @@ import (
 )
 
 type ServerEnv struct {
-	db           *database.DB
-	idTokenCache *principal.Cache
+	db             *database.DB
+	principalCache *principal.Cache
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -35,15 +35,15 @@ func (e *ServerEnv) Database() *database.DB {
 	return e.db
 }
 
-func WithIDTokenCache(cache *principal.Cache) Option {
+func WithPrincipalCache(cache *principal.Cache) Option {
 	return func(env *ServerEnv) *ServerEnv {
-		env.idTokenCache = cache
+		env.principalCache = cache
 		return env
 	}
 }
 
-func (e *ServerEnv) IDTokenCache() *principal.Cache {
-	return e.idTokenCache
+func (e *ServerEnv) PrincipalCache() *principal.Cache {
+	return e.principalCache
 }
 
 func (e *ServerEnv) Close(ctx context.Context) error {
@@ -55,8 +55,8 @@ func (e *ServerEnv) Close(ctx context.Context) error {
 		e.db.Close(ctx)
 	}
 
-	if e.idTokenCache != nil {
-		e.idTokenCache.StopBackgroundExpiration()
+	if e.principalCache != nil {
+		e.principalCache.StopBackgroundExpiration()
 	}
 
 	return nil

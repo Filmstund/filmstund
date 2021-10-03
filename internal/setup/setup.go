@@ -20,8 +20,8 @@ type SecurityConfigProvider interface {
 	SecurityConfig() *security.Config
 }
 
-type IDTokenCacheConfigProvider interface {
-	IDTokenCacheConfig() principal.Config
+type PrincipalCacheConfigProvider interface {
+	PrincipalCacheConfig() principal.Config
 }
 
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
@@ -47,13 +47,13 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	}
 
 	// ID token cache
-	if provider, ok := cfg.(IDTokenCacheConfigProvider); ok {
-		cacheConfig := provider.IDTokenCacheConfig()
+	if provider, ok := cfg.(PrincipalCacheConfigProvider); ok {
+		cacheConfig := provider.PrincipalCacheConfig()
 
 		cache := principal.NewCache(cacheConfig)
 		cache.StartExpiration(ctx)
 
-		options = append(options, serverenv.WithIDTokenCache(cache))
+		options = append(options, serverenv.WithPrincipalCache(cache))
 	}
 
 	return serverenv.New(ctx, options...), nil

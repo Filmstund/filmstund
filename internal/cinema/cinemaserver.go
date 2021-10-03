@@ -21,15 +21,15 @@ import (
 
 // Assertion for making sure the config implements these interfaces.
 var (
-	_ setup.DatabaseConfigProvider     = (*Config)(nil)
-	_ setup.SecurityConfigProvider     = (*Config)(nil)
-	_ setup.IDTokenCacheConfigProvider = (*Config)(nil)
+	_ setup.DatabaseConfigProvider       = (*Config)(nil)
+	_ setup.SecurityConfigProvider       = (*Config)(nil)
+	_ setup.PrincipalCacheConfigProvider = (*Config)(nil)
 )
 
 type Config struct {
-	Database     database.Config
-	Security     security.Config
-	IDTokenCache principal.Config
+	Database       database.Config
+	Security       security.Config
+	PrincipalCache principal.Config
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
 	ServePath   string `env:"SERVE_PATH,default=./web/build"`
@@ -44,8 +44,8 @@ func (c *Config) SecurityConfig() *security.Config {
 	return &c.Security
 }
 
-func (c *Config) IDTokenCacheConfig() principal.Config {
-	return c.IDTokenCache
+func (c *Config) PrincipalCacheConfig() principal.Config {
+	return c.PrincipalCache
 }
 
 func (c *Config) MaintenanceMode() bool {
@@ -86,7 +86,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	// TODO: authentication, CORS, security headers?
 
 	api := r.PathPrefix("/api").Subrouter()
-	api.Use(middleware.ApplyAuthorization(s.env.IDTokenCache(), s.cfg))
+	api.Use(middleware.ApplyAuthorization(s.env.PrincipalCache(), s.cfg))
 
 	// Routing table
 	api.Handle("/graphql", s.graphQLHandler()).
