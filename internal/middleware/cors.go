@@ -16,7 +16,6 @@ func Cors(provider site.ConfigProvider) mux.MiddlewareFunc {
 			AllowedOrigins:   cfg.AllowedOrigins,
 			AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "X-Requested-With", "Authorization"},
 			AllowCredentials: false,
-			Debug:            true,
 		})
 		return http.HandlerFunc(c.HandlerFunc)
 	}
