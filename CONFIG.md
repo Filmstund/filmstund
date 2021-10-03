@@ -33,4 +33,8 @@
 ## principal/Config
 `PRINCIPAL_DEFAULT_CACHE_SIZE=20`<br>
 `PRINCIPAL_EXPIRY_INTERVAL=7s`<br>
+ 
+## site/Config
+`SITE_DOMAIN=staging.filmstund.se`<br>
+`SITE_PROTOCOL=https://`<br>
 

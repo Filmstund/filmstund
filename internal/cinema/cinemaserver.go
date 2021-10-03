@@ -64,7 +64,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 func (s *Server) graphQLHandler() *handler.Server {
 	// GraphQL setup
 	gqlConfig := gql.Config{
-		Resolvers: graph.NewResolver(s.env.Database()),
+		Resolvers: graph.NewResolver(s.env.Database(), s.cfg),
 	}
 	return handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 }
