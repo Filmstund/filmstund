@@ -28,14 +28,31 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 		return nil
 	})
 	if err != nil {
-		logger.Infof("failed to update user (%s): %w", princ.Sub, err)
+		logger.Infow("failed to update user", "sub", princ.Sub, "err", err)
 		return nil, fmt.Errorf("failed to update user")
 	}
 	return mappers.ToGraphUser(user, r.siteCfg), nil
 }
 
 func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx)
+	princ := principal.FromContext(ctx)
+
+	var user *model.User
+	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
+		u, err := q.RandomizeCalendarFeed(ctx, princ.Sub.String())
+		if err != nil {
+			return err
+		}
+
+		user = mappers.ToGraphUser(u, r.siteCfg)
+		return nil
+	})
+	if err != nil {
+		logger.Infow("failed to invalidate calendar feed", "sub", princ.Sub, "err", err)
+		return nil, fmt.Errorf("failed to invalidate calendar feed")
+	}
+	return user, nil
 }
 
 func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User, error) {

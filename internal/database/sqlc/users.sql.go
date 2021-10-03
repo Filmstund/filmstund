@@ -54,6 +54,62 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const disableCalendarFeed = `-- name: DisableCalendarFeed :one
+UPDATE users
+SET calendar_feed_id = NULL
+WHERE subject_id = $1
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+`
+
+func (q *Queries) DisableCalendarFeed(ctx context.Context, subjectID string) (User, error) {
+	row := q.db.QueryRow(ctx, disableCalendarFeed, subjectID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.SubjectID,
+		&i.FilmstadenMembershipID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Nick,
+		&i.Email,
+		&i.Phone,
+		&i.Avatar,
+		&i.CalendarFeedID,
+		&i.LastLogin,
+		&i.SignupDate,
+		&i.LastModifiedDate,
+	)
+	return i, err
+}
+
+const randomizeCalendarFeed = `-- name: RandomizeCalendarFeed :one
+UPDATE users
+SET calendar_feed_id = uuid_generate_v4()
+WHERE subject_id = $1
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+`
+
+func (q *Queries) RandomizeCalendarFeed(ctx context.Context, subjectID string) (User, error) {
+	row := q.db.QueryRow(ctx, randomizeCalendarFeed, subjectID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.SubjectID,
+		&i.FilmstadenMembershipID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Nick,
+		&i.Email,
+		&i.Phone,
+		&i.Avatar,
+		&i.CalendarFeedID,
+		&i.LastLogin,
+		&i.SignupDate,
+		&i.LastModifiedDate,
+	)
+	return i, err
+}
+
 const updateLoginTimes = `-- name: UpdateLoginTimes :one
 UPDATE users
 SET avatar             = $1,

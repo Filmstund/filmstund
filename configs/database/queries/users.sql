@@ -27,3 +27,15 @@ SET filmstaden_membership_id = COALESCE(NULLIF(TRIM(@filmstaden_membership_id), 
     last_modified_date       = current_timestamp
 WHERE subject_id = @subject_id
 RETURNING *;
+
+-- name: RandomizeCalendarFeed :one
+UPDATE users
+SET calendar_feed_id = uuid_generate_v4()
+WHERE subject_id = @subject_id
+RETURNING *;
+
+-- name: DisableCalendarFeed :one
+UPDATE users
+SET calendar_feed_id = NULL
+WHERE subject_id = @subject_id
+RETURNING *;
