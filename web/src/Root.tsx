@@ -49,7 +49,8 @@ export class Root extends Component<{}, State> {
     return (
       <ApolloProvider client={client}>
         <Auth0Provider
-          domain={import.meta.env.VITE_AUTH0_AUD as string}
+          domain={import.meta.env.VITE_AUTH0_DOMAIN as string}
+          audience={import.meta.env.VITE_AUTH0_AUD as string}
           clientId={import.meta.env.VITE_AUTH0_CLIENT_ID as string}
           redirectUri={window.location.origin}
         >
