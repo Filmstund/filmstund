@@ -61,8 +61,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/ClickHouse/clickhouse-go v1.4.3/go.mod h1:EaI/sW7Azgz9UATzd5ZdZHRUhHgv5+JMS9NSr2smCJI=
 github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
-github.com/MicahParks/keyfunc v0.8.2 h1:C5T/ixarxdwFVDHh10+UwP6Bi2GIlvs9IwICg9kCs/I=
-github.com/MicahParks/keyfunc v0.8.2/go.mod h1:yGAHz3pCqcMHdEbqZWv5kvY9p5KXO/c38QW3018ax74=
+github.com/MicahParks/keyfunc v0.8.3 h1:YvfkThv6cH+/8VmDA4XJisb8NjFiaDWL3Iz+jqpeO3E=
+github.com/MicahParks/keyfunc v0.8.3/go.mod h1:yGAHz3pCqcMHdEbqZWv5kvY9p5KXO/c38QW3018ax74=
 github.com/Microsoft/go-winio v0.4.16 h1:FtSW/jqD+l4ba5iPBj9CODVtgfYAD8w2wS923g/cFDk=
 github.com/Microsoft/go-winio v0.4.16/go.mod h1:XB6nPKklQyQ7GC9LdcBEcBl8PF76WugXOPRXwdLnMv0=
 github.com/agnivade/levenshtein v1.0.1/go.mod h1:CURSv5d9Uaml+FovSIICkLbAUZ9S4RqaHDIsdSBg7lM=
