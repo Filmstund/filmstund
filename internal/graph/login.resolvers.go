@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
@@ -17,57 +16,58 @@ import (
 )
 
 func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
-	logger := logging.FromContext(ctx)
 	prin := principal.FromContext(ctx)
+	logger := logging.FromContext(ctx).
+		With("subject", prin.Subject)
 
-	var user sqlc.User
-	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		exists, err := q.UserExistsBySubject(ctx, prin.Subject.String())
-		if err != nil {
-			return err
-		}
-
-		if exists {
-			// TODO: we might need to update the info from the ID token here. Include from the frontend?
-			updatedUser, err := q.UpdateLoginTimes(ctx, prin.Subject.String())
-			if err != nil {
-				return err
-			}
-			user = updatedUser
-		} else {
-			idToken, err := r.auth0Service.FetchIDToken(ctx)
-			if err != nil {
-				return err
-			}
-
-			createdUser, err := q.CreateUser(ctx, sqlc.CreateUserParams{
-				Subject:   prin.Subject.String(),
-				FirstName: idToken.GivenName,
-				LastName:  idToken.FamilyName,
-				Nick: sql.NullString{
-					String: idToken.Nickname,
-					Valid:  true,
-				},
-				Email: idToken.Email,
-				Avatar: sql.NullString{
-					String: idToken.Picture,
-					Valid:  true,
-				},
-			})
-			if err != nil {
-				return err
-			}
-			user = createdUser
-		}
-
-		return nil
-	})
+	query, cleanup, err := r.db.Queries(ctx)
 	if err != nil {
-		logger.Warnw("failed to create/update user", "subject", prin.Subject, "err", err)
-		return nil, fmt.Errorf("failed to login user")
+		logger.Warnw("failed to setup database query interface", "err", err)
+		return nil, errLoginFailure
+	}
+	defer cleanup()
+
+	exists, err := query.UserExistsBySubject(ctx, prin.Subject.String())
+	if err != nil {
+		logger.Infow("failed to query for user existence", "err", err)
+		return nil, errLoginFailure
 	}
 
-	return mappers.ToGraphUser(user, r.siteCfg), nil
+	if exists {
+		// TODO: we might need to update the info from the ID token here. Include from the frontend?
+		updatedUser, err := query.UpdateLoginTimes(ctx, prin.Subject.String())
+		if err != nil {
+			logger.Infow("failed to update login times", "err", err)
+			return nil, errLoginFailure
+		}
+		return mappers.ToGraphUser(updatedUser, r.siteCfg), nil
+	}
+
+	idToken, err := r.auth0Service.FetchIDToken(ctx)
+	if err != nil {
+		logger.Warnw("failed to fetch the ID token", "err", err)
+		return nil, errLoginFailure
+	}
+
+	createdUser, err := query.CreateUser(ctx, sqlc.CreateUserParams{
+		Subject:   prin.Subject.String(),
+		FirstName: idToken.GivenName,
+		LastName:  idToken.FamilyName,
+		Nick: sql.NullString{
+			String: idToken.Nickname,
+			Valid:  true,
+		},
+		Email: idToken.Email,
+		Avatar: sql.NullString{
+			String: idToken.Picture,
+			Valid:  true,
+		},
+	})
+	if err != nil {
+		logger.Infow("failed to create user", "err", err)
+		return nil, errLoginFailure
+	}
+	return mappers.ToGraphUser(createdUser, r.siteCfg), nil
 }
 
 // Mutation returns gql.MutationResolver implementation.

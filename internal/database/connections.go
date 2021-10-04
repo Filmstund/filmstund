@@ -50,6 +50,20 @@ func (db *DB) DoQuery(ctx context.Context, f QueryFunc) error {
 	return f(queries)
 }
 
+// Queries retrieves a connection from the DB pool, using it to create a queryable interface.
+// Use func() to clean up and release the connection back to the pool.
+func (db *DB) Queries(ctx context.Context) (*sqlc.Queries, func(), error) {
+	conn, err := db.Pool.Acquire(ctx)
+	if err != nil {
+		return nil, noop, fmt.Errorf("failed to acquire db connection: %w", err)
+	}
+
+	queries := sqlc.New(conn)
+	return queries, conn.Release, nil
+}
+
+func noop() {}
+
 func (db *DB) Close(ctx context.Context) {
 	logging.FromContext(ctx).Infof("closing database connection pool...")
 	db.Pool.Close()
