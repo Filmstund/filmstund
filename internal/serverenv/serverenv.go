@@ -5,11 +5,13 @@ import (
 
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/security/principal"
+	"github.com/filmstund/filmstund/internal/user"
 )
 
 type ServerEnv struct {
 	db             *database.DB
 	principalCache *principal.Cache
+	userService    *user.Service
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -44,6 +46,17 @@ func WithPrincipalCache(cache *principal.Cache) Option {
 
 func (e *ServerEnv) PrincipalCache() *principal.Cache {
 	return e.principalCache
+}
+
+func WithUserService(us *user.Service) Option {
+	return func(env *ServerEnv) *ServerEnv {
+		env.userService = us
+		return env
+	}
+}
+
+func (e *ServerEnv) UserService() *user.Service {
+	return e.userService
 }
 
 func (e *ServerEnv) Close(ctx context.Context) error {

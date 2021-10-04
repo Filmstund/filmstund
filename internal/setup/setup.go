@@ -9,6 +9,7 @@ import (
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/serverenv"
+	"github.com/filmstund/filmstund/internal/user"
 	"github.com/sethvargo/go-envconfig"
 )
 
@@ -43,7 +44,10 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 			return nil, fmt.Errorf("couldn't setup database: %w", err)
 		}
 
-		options = append(options, serverenv.WithDatabase(db))
+		options = append(options,
+			serverenv.WithDatabase(db),
+			serverenv.WithUserService(user.NewService(db)),
+		)
 	}
 
 	// ID token cache
