@@ -36,7 +36,7 @@ func (s *Service) FetchIDToken(ctx context.Context) (*IDToken, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		logger.Infow("non-200 status code when fetching /userinfo", "code", resp.Status)
+		logger.Infow("non-200 status code when fetching /userinfo", "code", resp.Status, "headers", resp.Header)
 		return nil, errFetchFailure
 	}
 
