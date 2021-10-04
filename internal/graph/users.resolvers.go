@@ -8,10 +8,10 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/graph/mappers"
 	"github.com/filmstund/filmstund/internal/graph/model"
-	"github.com/filmstund/filmstund/internal/security/principal"
 )
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error) {

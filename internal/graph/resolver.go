@@ -6,8 +6,8 @@ import (
 
 	// needed to keep the dependencies needed for the above go generate command.
 	_ "github.com/99designs/gqlgen/cmd"
+	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/site"
 	"github.com/filmstund/filmstund/internal/user"
@@ -17,7 +17,7 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	auth0Service *security.Service
+	auth0Service *auth0.Service
 	userService  *user.Service
 	db           *database.DB
 	siteCfg      site.Config

@@ -1,4 +1,4 @@
-package security
+package auth0
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"edholm.dev/go-logging"
-	"github.com/filmstund/filmstund/internal/security/principal"
+	"github.com/filmstund/filmstund/internal/auth0/principal"
 )
 
 var errFetchFailure = errors.New("failed to fetch user information")

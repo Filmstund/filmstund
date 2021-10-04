@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/user"
 	"github.com/sethvargo/go-envconfig"
@@ -16,8 +16,8 @@ type DatabaseConfigProvider interface {
 	DatabaseConfig() *database.Config
 }
 
-type SecurityConfigProvider interface {
-	SecurityConfig() *security.Config
+type Auth0ConfigProvider interface {
+	Auth0Config() *auth0.Config
 }
 
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
@@ -46,9 +46,9 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	}
 
 	// Auth0 service
-	if provider, ok := cfg.(SecurityConfigProvider); ok {
-		authConfig := provider.SecurityConfig()
-		auth0Service := security.NewService(authConfig)
+	if provider, ok := cfg.(Auth0ConfigProvider); ok {
+		authConfig := provider.Auth0Config()
+		auth0Service := auth0.NewService(authConfig)
 		options = append(options, serverenv.WithAuth0Service(auth0Service))
 	}
 

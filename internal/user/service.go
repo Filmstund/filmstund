@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
-	"github.com/filmstund/filmstund/internal/security/principal"
 )
 
 type Service struct {

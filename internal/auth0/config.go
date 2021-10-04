@@ -1,4 +1,4 @@
-package security
+package auth0
 
 import (
 	"context"
@@ -26,7 +26,7 @@ type Config struct {
 	jwksOnce sync.Once
 }
 
-func (c *Config) SecurityConfig() *Config {
+func (c *Config) Auth0Config() *Config {
 	return c
 }
 

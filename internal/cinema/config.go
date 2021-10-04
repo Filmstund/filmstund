@@ -1,8 +1,8 @@
 package cinema
 
 import (
+	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/filmstund/filmstund/internal/site"
 )
@@ -10,13 +10,13 @@ import (
 // Assertion for making sure the config implements these interfaces.
 var (
 	_ setup.DatabaseConfigProvider = (*Config)(nil)
-	_ setup.SecurityConfigProvider = (*Config)(nil)
+	_ setup.Auth0ConfigProvider    = (*Config)(nil)
 	_ site.ConfigProvider          = (*Config)(nil)
 )
 
 type Config struct {
 	Database database.Config
-	Security security.Config
+	Security auth0.Config
 	Site     site.Config
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
@@ -28,7 +28,7 @@ func (c *Config) DatabaseConfig() *database.Config {
 	return &c.Database
 }
 
-func (c *Config) SecurityConfig() *security.Config {
+func (c *Config) Auth0Config() *auth0.Config {
 	return &c.Security
 }
 

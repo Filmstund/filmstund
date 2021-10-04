@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/auth0"
+	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/httputils"
-	"github.com/filmstund/filmstund/internal/security"
-	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
@@ -16,18 +16,18 @@ import (
 )
 
 type jwtVerifier struct {
-	cfg    *security.Config
+	cfg    *auth0.Config
 	logger *zap.SugaredLogger
 }
 
 // ApplyAuthorization validates the JWT token in the "Authorization" header.
 // If valid, it fetches the id_token and affixes the tokens to the request context.
 // TODO: document and test.
-func ApplyAuthorization(confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
+func ApplyAuthorization(confProvider setup.Auth0ConfigProvider) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			verifier := jwtVerifier{
-				cfg: confProvider.SecurityConfig(),
+				cfg: confProvider.Auth0Config(),
 				logger: logging.FromContext(r.Context()).
 					With("url", r.URL.String()).
 					With("from", r.RemoteAddr),
@@ -65,7 +65,7 @@ func (v *jwtVerifier) doAuthorization(r *http.Request) (*jwt.Token, error) {
 	jwks := v.cfg.JWKs(r.Context())
 
 	// Parse and validate the token
-	token, err := jwt.ParseWithClaims(rawToken, &security.Auth0Claims{}, jwks.Keyfunc)
+	token, err := jwt.ParseWithClaims(rawToken, &auth0.Claims{}, jwks.Keyfunc)
 	if err != nil {
 		v.logger.Debugw("[token] invalid token", "err", err)
 		return nil, httputils.ErrUnauthorized
@@ -79,7 +79,7 @@ func (v *jwtVerifier) doAuthorization(r *http.Request) (*jwt.Token, error) {
 	}
 
 	// Verify token has the expected issuer, audience, expires at claims
-	claims, castOK := token.Claims.(*security.Auth0Claims)
+	claims, castOK := token.Claims.(*auth0.Claims)
 	if !castOK {
 		v.logger.Errorf("failed to cast claims, got type %T", token.Claims)
 		return nil, httputils.ErrInternal
@@ -114,7 +114,7 @@ func (v *jwtVerifier) extractPrincipal(token *jwt.Token) (*principal.Principal, 
 	}
 
 	// we panic here if it is the wrong type - should've been checked earlier
-	claims := token.Claims.(*security.Auth0Claims) //nolint:forcetypeassert
+	claims := token.Claims.(*auth0.Claims) //nolint:forcetypeassert
 
 	return &principal.Principal{
 		Subject:   claims.Subject,
