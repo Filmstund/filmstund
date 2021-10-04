@@ -45,6 +45,7 @@ func ApplyAuthorization(confProvider setup.Auth0ConfigProvider) mux.MiddlewareFu
 				return
 			}
 
+			// TODO: check if we have an id token from the frontend to include.
 			ctx := principal.WithPrincipal(r.Context(), princ)
 			next.ServeHTTP(w, r.Clone(ctx))
 		})
