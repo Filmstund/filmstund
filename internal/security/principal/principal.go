@@ -3,6 +3,8 @@ package principal
 import (
 	"context"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type Subject string
@@ -12,15 +14,10 @@ func (s Subject) String() string {
 }
 
 type Principal struct {
-	Sub        Subject   `json:"subject"`
-	GivenName  string    `json:"givenName"`
-	FamilyName string    `json:"familyName"`
-	Nickname   string    `json:"nickname"`
-	Picture    string    `json:"picture"`
-	Email      string    `json:"email"`
-	Scopes     []string  `json:"scopes"`
-	UpdatedAt  time.Time `json:"updatedAt"`
-	ExpiresAt  time.Time `json:"expiresAt"`
+	Subject   Subject    `json:"subject"`
+	Scopes    []string   `json:"scopes"`
+	ExpiresAt time.Time  `json:"expiresAt"`
+	Token     *jwt.Token `json:"-"`
 }
 
 func (p *Principal) HasScope(scope string) bool {

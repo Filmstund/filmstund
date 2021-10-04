@@ -11,8 +11,7 @@ SELECT exists(SELECT 1 FROM users where subject_id = $1);
 
 -- name: UpdateLoginTimes :one
 UPDATE users
-SET avatar             = @avatar,
-    last_login         = current_timestamp,
+SET last_login         = current_timestamp,
     last_modified_date = current_timestamp
 WHERE subject_id = @subject_id
 returning *;

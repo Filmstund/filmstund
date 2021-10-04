@@ -7,7 +7,6 @@ import (
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/security"
-	"github.com/filmstund/filmstund/internal/security/principal"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/user"
 	"github.com/sethvargo/go-envconfig"
@@ -19,10 +18,6 @@ type DatabaseConfigProvider interface {
 
 type SecurityConfigProvider interface {
 	SecurityConfig() *security.Config
-}
-
-type PrincipalCacheConfigProvider interface {
-	PrincipalCacheConfig() principal.Config
 }
 
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
@@ -50,14 +45,11 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 		)
 	}
 
-	// ID token cache
-	if provider, ok := cfg.(PrincipalCacheConfigProvider); ok {
-		cacheConfig := provider.PrincipalCacheConfig()
-
-		cache := principal.NewCache(cacheConfig)
-		cache.StartExpiration(ctx)
-
-		options = append(options, serverenv.WithPrincipalCache(cache))
+	// Auth0 service
+	if provider, ok := cfg.(SecurityConfigProvider); ok {
+		authConfig := provider.SecurityConfig()
+		auth0Service := security.NewService(authConfig)
+		options = append(options, serverenv.WithAuth0Service(auth0Service))
 	}
 
 	return serverenv.New(ctx, options...), nil

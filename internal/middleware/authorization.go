@@ -1,10 +1,6 @@
 package middleware
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -20,7 +16,6 @@ import (
 )
 
 type jwtVerifier struct {
-	cache  *principal.Cache
 	cfg    *security.Config
 	logger *zap.SugaredLogger
 }
@@ -28,12 +23,11 @@ type jwtVerifier struct {
 // ApplyAuthorization validates the JWT token in the "Authorization" header.
 // If valid, it fetches the id_token and affixes the tokens to the request context.
 // TODO: document and test.
-func ApplyAuthorization(principalCache *principal.Cache, confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
+func ApplyAuthorization(confProvider setup.SecurityConfigProvider) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			verifier := jwtVerifier{
-				cache: principalCache,
-				cfg:   confProvider.SecurityConfig(),
+				cfg: confProvider.SecurityConfig(),
 				logger: logging.FromContext(r.Context()).
 					With("url", r.URL.String()).
 					With("from", r.RemoteAddr),
@@ -45,13 +39,13 @@ func ApplyAuthorization(principalCache *principal.Cache, confProvider setup.Secu
 				return
 			}
 
-			p, err := verifier.getPrincipal(r.Context(), token)
+			princ, err := verifier.extractPrincipal(token)
 			if err != nil {
 				httputils.RespondBasedOnErr(err, w, r)
 				return
 			}
 
-			ctx := principal.WithPrincipal(r.Context(), p)
+			ctx := principal.WithPrincipal(r.Context(), princ)
 			next.ServeHTTP(w, r.Clone(ctx))
 		})
 	}
@@ -110,91 +104,22 @@ func (v *jwtVerifier) doAuthorization(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-// getPrincipal fetches the principal from cache _or_ downloads the ID token
+// extractPrincipal fetches the principal from cache _or_ downloads the ID token
 // from the userinfo endpoint and parses the principal. If everything checks out
 // you will have valid principal that is put into the cache, else an error.
-func (v *jwtVerifier) getPrincipal(ctx context.Context, token *jwt.Token) (*principal.Principal, error) {
+func (v *jwtVerifier) extractPrincipal(token *jwt.Token) (*principal.Principal, error) {
 	if token == nil || !token.Valid {
-		v.logger.Errorf("no/invalid token supplied. Missing doAuthorization?")
+		v.logger.Errorf("no/invalid token supplied. Missing authorization?")
 		return nil, httputils.ErrInternal
 	}
 
 	// we panic here if it is the wrong type - should've been checked earlier
 	claims := token.Claims.(*security.Auth0Claims) //nolint:forcetypeassert
 
-	// return early if we have the current subject in cache.
-	if p := v.cache.Get(claims.Subject); p != nil {
-		// TODO: remove log line
-		v.logger.Debugf("principal fetched from cache for %s: %v", claims.Subject, p)
-		return p, nil
-	}
-
-	userinfoReq, err := http.NewRequestWithContext(ctx, http.MethodGet, v.cfg.UserinfoURL, nil)
-	if err != nil {
-		v.logger.Infow("failed to construct request to /userinfo", "err", err, "url", v.cfg.UserinfoURL)
-		return nil, httputils.ErrInternal
-	}
-	userinfoReq.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.Raw))
-
-	resp, err := http.DefaultClient.Do(userinfoReq)
-	if err != nil {
-		v.logger.Infow("GET /userinfo failed", "err", err, "url", v.cfg.UserinfoURL)
-		return nil, httputils.ErrInternal
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		v.logger.Infow("non-200 status code when fetching /userinfo", "code", resp.Status)
-		if resp.StatusCode == http.StatusUnauthorized {
-			return nil, httputils.ErrUnauthorized
-		}
-		return nil, httputils.ErrInternal
-	}
-
-	buf, err := io.ReadAll(resp.Body)
-	if err != nil {
-		v.logger.Infow("failed to read response body", "err", err)
-		return nil, httputils.ErrInternal
-	}
-
-	var idToken idToken
-	if err := json.Unmarshal(buf, &idToken); err != nil {
-		v.logger.Infow("failed to unmarshal ID token", "err", err)
-		return nil, httputils.ErrInternal
-	}
-
-	p := idToken.toPrincipal(claims)
-	exp := claims.ExpiresAt.Time
-	v.logger.Debugf("caching %q until %s", p.Sub, exp)
-	v.cache.PutOrUpdate(&p)
-	return &p, nil
-}
-
-// idToken as returned by the /userinfo endpoint.
-type idToken struct {
-	Sub           string    `json:"sub"`
-	GivenName     string    `json:"given_name"`
-	FamilyName    string    `json:"family_name"`
-	Nickname      string    `json:"nickname"`
-	Name          string    `json:"name"`
-	Picture       string    `json:"picture"`
-	Locale        string    `json:"locale"`
-	UpdatedAt     time.Time `json:"updated_at"`
-	Email         string    `json:"email"`
-	EmailVerified bool      `json:"email_verified"`
-}
-
-// toPrincipal converts an ID token together with our claims to the principal.
-func (t *idToken) toPrincipal(claims *security.Auth0Claims) principal.Principal {
-	return principal.Principal{
-		Sub:        principal.Subject(t.Sub),
-		GivenName:  t.GivenName,
-		FamilyName: t.FamilyName,
-		Nickname:   t.Nickname,
-		Picture:    t.Picture,
-		Email:      t.Email,
-		Scopes:     strings.Split(claims.Scope, " "),
-		UpdatedAt:  t.UpdatedAt,
-		ExpiresAt:  claims.ExpiresAt.Time,
-	}
+	return &principal.Principal{
+		Subject:   claims.Subject,
+		Scopes:    strings.Split(claims.Scope, " "),
+		ExpiresAt: claims.ExpiresAt.Time,
+		Token:     token,
+	}, nil
 }

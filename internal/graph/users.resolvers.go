@@ -20,7 +20,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 
 	var user sqlc.User
 	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		u, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Sub))
+		u, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Subject))
 		if err != nil {
 			return err
 		}
@@ -28,7 +28,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 		return nil
 	})
 	if err != nil {
-		logger.Infow("failed to update user", "sub", princ.Sub, "err", err)
+		logger.Infow("failed to update user", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to update user")
 	}
 	return mappers.ToGraphUser(user, r.siteCfg), nil
@@ -40,7 +40,7 @@ func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.U
 
 	var user *model.User
 	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		u, err := q.RandomizeCalendarFeed(ctx, princ.Sub.String())
+		u, err := q.RandomizeCalendarFeed(ctx, princ.Subject.String())
 		if err != nil {
 			return err
 		}
@@ -49,7 +49,7 @@ func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.U
 		return nil
 	})
 	if err != nil {
-		logger.Infow("failed to invalidate calendar feed", "sub", princ.Sub, "err", err)
+		logger.Infow("failed to invalidate calendar feed", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to invalidate calendar feed")
 	}
 	return user, nil
@@ -61,7 +61,7 @@ func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User
 
 	var user *model.User
 	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		u, err := q.DisableCalendarFeed(ctx, princ.Sub.String())
+		u, err := q.DisableCalendarFeed(ctx, princ.Subject.String())
 		if err != nil {
 			return err
 		}
@@ -70,7 +70,7 @@ func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User
 		return nil
 	})
 	if err != nil {
-		logger.Infow("failed to disable calendar feed", "sub", princ.Sub, "err", err)
+		logger.Infow("failed to disable calendar feed", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to disable calendar feed")
 	}
 	return user, nil

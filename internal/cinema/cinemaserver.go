@@ -51,7 +51,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	// TODO: authentication, security headers?
 
 	authorized := r.PathPrefix("/").Subrouter()
-	authorized.Use(middleware.ApplyAuthorization(s.env.PrincipalCache(), s.cfg))
+	authorized.Use(middleware.ApplyAuthorization(s.cfg))
 
 	// Routing table
 	authorized.Handle("/api/graphql", s.graphQLHandler()).
@@ -67,7 +67,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 func (s *Server) graphQLHandler() *handler.Server {
 	// GraphQL setup
 	gqlConfig := gql.Config{
-		Resolvers: graph.NewResolver(s.env.Database(), s.cfg),
+		Resolvers: graph.NewResolver(s.env, s.cfg),
 	}
 	return handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 }

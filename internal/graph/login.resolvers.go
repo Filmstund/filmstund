@@ -22,40 +22,48 @@ func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 
 	var user sqlc.User
 	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		exists, err := q.UserExistsBySubject(ctx, prin.Sub.String())
+		exists, err := q.UserExistsBySubject(ctx, prin.Subject.String())
 		if err != nil {
 			return err
 		}
 
 		if exists {
-			user, err = q.UpdateLoginTimes(ctx, sqlc.UpdateLoginTimesParams{
-				Avatar: sql.NullString{
-					String: prin.Picture,
-					Valid:  true,
-				},
-				SubjectID: prin.Sub.String(),
-			})
+			// TODO: we might need to update the info from the ID token here. Include from the frontend?
+			updatedUser, err := q.UpdateLoginTimes(ctx, prin.Subject.String())
+			if err != nil {
+				return err
+			}
+			user = updatedUser
 		} else {
-			user, err = q.CreateUser(ctx, sqlc.CreateUserParams{
-				Subject:   prin.Sub.String(),
-				FirstName: prin.GivenName,
-				LastName:  prin.FamilyName,
+			idToken, err := r.auth0Service.FetchIDToken(ctx)
+			if err != nil {
+				return err
+			}
+
+			createdUser, err := q.CreateUser(ctx, sqlc.CreateUserParams{
+				Subject:   prin.Subject.String(),
+				FirstName: idToken.GivenName,
+				LastName:  idToken.FamilyName,
 				Nick: sql.NullString{
-					String: prin.Nickname,
+					String: idToken.Nickname,
 					Valid:  true,
 				},
-				Email: prin.Email,
+				Email: idToken.Email,
 				Avatar: sql.NullString{
-					String: prin.Picture,
+					String: idToken.Picture,
 					Valid:  true,
 				},
 			})
+			if err != nil {
+				return err
+			}
+			user = createdUser
 		}
 
-		return err
+		return nil
 	})
 	if err != nil {
-		logger.Warnw("failed to create/update user", "subject", prin.Sub, "err", err)
+		logger.Warnw("failed to create/update user", "subject", prin.Subject, "err", err)
 		return nil, fmt.Errorf("failed to login user")
 	}
 

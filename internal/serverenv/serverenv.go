@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/security/principal"
+	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/user"
 )
 
 type ServerEnv struct {
-	db             *database.DB
-	principalCache *principal.Cache
-	userService    *user.Service
+	db           *database.DB
+	auth0Service *security.Service
+	userService  *user.Service
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -37,15 +37,15 @@ func (e *ServerEnv) Database() *database.DB {
 	return e.db
 }
 
-func WithPrincipalCache(cache *principal.Cache) Option {
+func WithAuth0Service(auth0Service *security.Service) Option {
 	return func(env *ServerEnv) *ServerEnv {
-		env.principalCache = cache
+		env.auth0Service = auth0Service
 		return env
 	}
 }
 
-func (e *ServerEnv) PrincipalCache() *principal.Cache {
-	return e.principalCache
+func (e *ServerEnv) Auth0Service() *security.Service {
+	return e.auth0Service
 }
 
 func WithUserService(us *user.Service) Option {
@@ -66,10 +66,6 @@ func (e *ServerEnv) Close(ctx context.Context) error {
 
 	if e.db != nil {
 		e.db.Close(ctx)
-	}
-
-	if e.principalCache != nil {
-		e.principalCache.StopBackgroundExpiration()
 	}
 
 	return nil

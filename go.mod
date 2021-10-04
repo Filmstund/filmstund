@@ -6,7 +6,6 @@ require (
 	edholm.dev/go-logging v0.0.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/MicahParks/keyfunc v0.8.3
-	github.com/benbjohnson/clock v1.1.0
 	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang-migrate/migrate/v4 v4.15.0
 	github.com/google/uuid v1.3.0
