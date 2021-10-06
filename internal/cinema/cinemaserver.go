@@ -40,17 +40,17 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	logger := logging.FromContext(ctx)
 	logger.Debugf("routing / to file://%s", s.cfg.ServePath)
 
-	r := mux.NewRouter()
+	notAuthed := mux.NewRouter()
 
 	// Middleware
 	// TODO: request id?
-	r.Use(middleware.RecoverPanic())
-	r.Use(middleware.AttachAppLogger(logger))
-	r.Use(middleware.ProcessMaintenance(s.cfg))
-	r.Use(middleware.Cors(s.cfg))
+	notAuthed.Use(middleware.RecoverPanic())
+	notAuthed.Use(middleware.AttachAppLogger(logger))
+	notAuthed.Use(middleware.ProcessMaintenance(s.cfg))
+	notAuthed.Use(middleware.Cors(s.cfg))
 	// TODO: authentication, security headers?
 
-	authorized := r.PathPrefix("/").Subrouter()
+	authorized := notAuthed.PathPrefix("/").Subrouter()
 	authorized.Use(middleware.ApplyAuthorization(s.cfg))
 
 	// Routing table
@@ -58,10 +58,17 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 		Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
 	authorized.Handle(path.Join(s.cfg.Site.CalendarURLPrefix, "/{feed}"), s.calendarFeedHandler())
 
-	r.PathPrefix("/").
+	notAuthed.HandleFunc("/temp", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("success?"))
+	})
+	notAuthed.Handle("/login", s.env.Auth0Service().LoginHandler())
+	notAuthed.Handle("/login/callback", s.env.Auth0Service().LoginCallbackHandler())
+	notAuthed.Handle("/logout", s.env.Auth0Service().LogoutHandler())
+
+	notAuthed.PathPrefix("/").
 		Handler(http.FileServer(http.Dir(s.cfg.ServePath)))
 
-	return r
+	return notAuthed
 }
 
 func (s *Server) graphQLHandler() *handler.Server {

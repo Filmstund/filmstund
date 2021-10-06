@@ -48,7 +48,11 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	// Auth0 service
 	if provider, ok := cfg.(Auth0ConfigProvider); ok {
 		authConfig := provider.Auth0Config()
-		auth0Service := auth0.NewService(authConfig)
+		auth0Service, err := auth0.NewService(ctx, authConfig)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't setup the Auth0 service: %w", err)
+		}
+
 		options = append(options, serverenv.WithAuth0Service(auth0Service))
 	}
 

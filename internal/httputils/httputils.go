@@ -36,6 +36,23 @@ func RespondBasedOnErr(err error, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func BadRequest(w http.ResponseWriter, r *http.Request, trailer string) {
+	errMsg := "bad request"
+	if trailer != "" {
+		errMsg = errMsg + ": " + trailer
+	}
+
+	sendError(
+		w,
+		r,
+		http.StatusBadRequest,
+		ErrorResponse{
+			Error: errMsg,
+			Time:  time.Now(),
+		},
+	)
+}
+
 func InternalServerError(w http.ResponseWriter, r *http.Request) {
 	sendError(
 		w,

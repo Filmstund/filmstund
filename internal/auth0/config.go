@@ -14,12 +14,24 @@ import (
 )
 
 type Config struct {
-	Algorithm string `env:"JWT_EXPECTED_ALG, default=RS256"` // expected signing algorithm
-	Audience  string `env:"JWT_EXPECTED_AUD, required"`      // expected audience (who, or what is the tokens intended for)
-	Issuer    string `env:"JWT_EXPECTED_ISS, required"`      // the expected issuer (who created and signed our tokens)
+	ClientID     string `env:"OIDC_CLIENT_ID, required"`
+	ClientSecret string `env:"OIDC_CLIENT_SECRET, required" json:"-"`
 
-	JwksURL     string `env:"JWT_JWKS_URL, default=${JWT_EXPECTED_ISS}.well-known/jwks.json"`
-	UserinfoURL string `env:"JWT_USERINFO_URL, default=${JWT_EXPECTED_ISS}userinfo"`
+	// The issuer of our tokens (who created and signed our tokens)
+	Issuer string `env:"OIDC_ISSUER, required"`
+	// Audience of the API we want to use (who, or what is the tokens intended for)
+	Audience string `env:"OIDC_AUDIENCE, required"`
+	// The scopes to request for our tokens
+	Scopes []string `env:"OIDC_SCOPES, default=openid,profile,email"`
+
+	// Where should auth0 return users?
+	LoginCallbackURL  string `env:"OIDC_LOGIN_CALLBACK_URL, default=http://local.filmstund.se:8080/login/callback"`
+	LogoutCallbackURL string `env:"OIDC_LOGOUT_CALLBACK_URL, default=http://local.filmstund.se:8080/temp"`
+
+	// TODO: remove
+	Algorithm   string `env:"OIDC_EXPECTED_ALG, default=RS256"` // expected signing algorithm
+	JWKsURL     string `env:"OIDC_JWKS_URL, default=${JWT_EXPECTED_ISS}.well-known/jwks.json"`
+	UserinfoURL string `env:"OIDC_USERINFO_URL, default=${JWT_EXPECTED_ISS}userinfo"`
 	// TODO client secret etc?
 
 	jwks     *keyfunc.JWKs
@@ -34,12 +46,12 @@ func (c *Config) Auth0Config() *Config {
 // and keep refreshing it in the background on a set interval.
 func (c *Config) JWKs(ctx context.Context) *keyfunc.JWKs {
 	// Panic if the URL isn't valid. No need to query for the JWKS indefinitely
-	if _, err := url.ParseRequestURI(c.JwksURL); err != nil {
+	if _, err := url.ParseRequestURI(c.JWKsURL); err != nil {
 		panic(fmt.Errorf("URL to JWKS is invalid: %w", err))
 	}
 
 	c.jwksOnce.Do(func() {
-		c.jwks = fetchJwksUntilFound(ctx, c.JwksURL)
+		c.jwks = fetchJwksUntilFound(ctx, c.JWKsURL)
 	})
 	return c.jwks
 }
