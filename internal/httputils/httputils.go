@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	ErrBadRequest   = errors.New("bad request")
 	ErrUnauthorized = errors.New("unauthorized")
 	ErrForbidden    = errors.New("forbidden")
 	ErrInternal     = errors.New("internal server error")
@@ -27,7 +28,9 @@ func RespondBasedOnErr(err error, w http.ResponseWriter, r *http.Request) {
 		InternalServerError(w, r)
 	}
 
-	if errors.Is(err, ErrUnauthorized) {
+	if errors.Is(err, ErrBadRequest) {
+		BadRequest(w, r, err.Error())
+	} else if errors.Is(err, ErrUnauthorized) {
 		Unauthorized(w, r)
 	} else if errors.Is(err, ErrForbidden) {
 		Forbidden(w, r)
@@ -40,6 +43,9 @@ func BadRequest(w http.ResponseWriter, r *http.Request, trailer string) {
 	errMsg := "bad request"
 	if trailer != "" {
 		errMsg = errMsg + ": " + trailer
+	}
+	if strings.HasPrefix(trailer, ErrBadRequest.Error()) {
+		errMsg = trailer
 	}
 
 	sendError(
