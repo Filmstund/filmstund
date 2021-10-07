@@ -3,6 +3,7 @@ package cinema
 import (
 	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/filmstund/filmstund/internal/site"
 )
@@ -12,12 +13,14 @@ var (
 	_ setup.DatabaseConfigProvider = (*Config)(nil)
 	_ setup.Auth0ConfigProvider    = (*Config)(nil)
 	_ site.ConfigProvider          = (*Config)(nil)
+	_ setup.SessionConfigProvider  = (*Config)(nil)
 )
 
 type Config struct {
 	Database database.Config
 	Security auth0.Config
 	Site     site.Config
+	Session  session.Config
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
 	ServePath   string `env:"SERVE_PATH,default=./web/build"`
@@ -34,6 +37,10 @@ func (c *Config) Auth0Config() *auth0.Config {
 
 func (c *Config) SiteConfig() site.Config {
 	return c.Site
+}
+
+func (c *Config) SessionConfig() session.Config {
+	return c.Session
 }
 
 func (c *Config) MaintenanceMode() bool {

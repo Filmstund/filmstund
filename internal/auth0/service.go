@@ -14,11 +14,12 @@ import (
 	"github.com/filmstund/filmstund/internal/auth0/codeflow"
 	"github.com/filmstund/filmstund/internal/httputils"
 	"github.com/filmstund/filmstund/internal/security"
+	"github.com/filmstund/filmstund/internal/session"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 )
 
-func NewService(ctx context.Context, cfg *Config) (*Service, error) {
+func NewService(ctx context.Context, cfg *Config, sessionStorage *session.Storage) (*Service, error) {
 	// This is using the OpenID discovery protocol to figure out well known stuff.
 	provider, err := oidc.NewProvider(ctx, cfg.Issuer)
 	if err != nil {
@@ -33,9 +34,10 @@ func NewService(ctx context.Context, cfg *Config) (*Service, error) {
 			RedirectURL:  cfg.LoginCallbackURL,
 			Scopes:       cfg.Scopes,
 		},
-		verifier:  provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
-		cfg:       cfg,
-		pkceCache: codeflow.NewPkceCache(),
+		verifier:       provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
+		cfg:            cfg,
+		pkceCache:      codeflow.NewPkceCache(),
+		sessionStorage: sessionStorage,
 	}, nil
 }
 
@@ -45,7 +47,8 @@ type Service struct {
 
 	cfg *Config
 
-	pkceCache *codeflow.PkceCache
+	pkceCache      *codeflow.PkceCache
+	sessionStorage *session.Storage
 }
 
 func setCookie(w http.ResponseWriter, r *http.Request, name, value string) {
@@ -53,11 +56,22 @@ func setCookie(w http.ResponseWriter, r *http.Request, name, value string) {
 		Name:     name,
 		Value:    value,
 		MaxAge:   int((5 * time.Minute).Seconds()),
-		Secure:   r.TLS != nil,
+		Secure:   r.TLS != nil, // TODO: this won't work if proxy-forwared to non-tls I assume?
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode, // TODO: how to use strict?
 	}
 	http.SetCookie(w, &kaka)
+}
+
+//goland:noinspection GoUnusedFunction
+//nolint:deadcode,unused
+func clearCookie(w http.ResponseWriter, name, path, domain string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   name,
+		Path:   path,
+		Domain: domain,
+		MaxAge: -1,
+	})
 }
 
 func (s *Service) LoginHandler() http.Handler {

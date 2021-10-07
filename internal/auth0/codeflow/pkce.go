@@ -11,7 +11,7 @@ import (
 
 type (
 	PkceCache struct {
-		cache map[State]pkceEntry // keyed by the 'state'
+		cache map[State]pkceEntry // keyed by the 'state' // TODO: switch to gocache
 		mu    sync.RWMutex
 	}
 	pkceEntry struct {

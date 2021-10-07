@@ -5,13 +5,15 @@ import (
 
 	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/user"
 )
 
 type ServerEnv struct {
-	db           *database.DB
-	auth0Service *auth0.Service
-	userService  *user.Service
+	db             *database.DB
+	auth0Service   *auth0.Service
+	userService    *user.Service
+	sessionStorage *session.Storage
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -57,6 +59,17 @@ func WithUserService(us *user.Service) Option {
 
 func (e *ServerEnv) UserService() *user.Service {
 	return e.userService
+}
+
+func WithSessionStorage(sessionStorage *session.Storage) Option {
+	return func(env *ServerEnv) *ServerEnv {
+		env.sessionStorage = sessionStorage
+		return env
+	}
+}
+
+func (e *ServerEnv) SessionStorage() *session.Storage {
+	return e.sessionStorage
 }
 
 func (e *ServerEnv) Close(ctx context.Context) error {

@@ -17,7 +17,7 @@ type Principal struct {
 	Subject   Subject    `json:"subject"`
 	Scopes    []string   `json:"scopes"`
 	ExpiresAt time.Time  `json:"expiresAt"`
-	Token     *jwt.Token `json:"-"`
+	Token     *jwt.Token `json:"-"` // TODO: replace with string
 }
 
 func (p *Principal) HasScope(scope string) bool {

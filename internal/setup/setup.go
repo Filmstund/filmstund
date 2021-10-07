@@ -8,6 +8,7 @@ import (
 	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/serverenv"
+	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/user"
 	"github.com/sethvargo/go-envconfig"
 )
@@ -20,6 +21,10 @@ type Auth0ConfigProvider interface {
 	Auth0Config() *auth0.Config
 }
 
+type SessionConfigProvider interface {
+	SessionConfig() session.Config
+}
+
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	logger := logging.FromContext(ctx)
 
@@ -29,7 +34,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	}
 	logger.Debugw("using config", "config", cfg)
 
-	options := make([]serverenv.Option, 0, 1)
+	options := make([]serverenv.Option, 0, 3)
 
 	// Database connection pooling
 	if provider, ok := cfg.(DatabaseConfigProvider); ok {
@@ -46,14 +51,25 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	}
 
 	// Auth0 service
-	if provider, ok := cfg.(Auth0ConfigProvider); ok {
-		authConfig := provider.Auth0Config()
-		auth0Service, err := auth0.NewService(ctx, authConfig)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't setup the Auth0 service: %w", err)
-		}
+	//nolint:nestif
+	if auth0Provider, ok := cfg.(Auth0ConfigProvider); ok {
+		// Session storage
+		if provider, ok := cfg.(SessionConfigProvider); ok {
+			sessCfg := provider.SessionConfig()
+			sessionStorage, err := session.NewStorage(sessCfg)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't setup the session storage: %w", err)
+			}
 
-		options = append(options, serverenv.WithAuth0Service(auth0Service))
+			authConfig := auth0Provider.Auth0Config()
+			auth0Service, err := auth0.NewService(ctx, authConfig, sessionStorage)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't setup the Auth0 service: %w", err)
+			}
+
+			options = append(options, serverenv.WithSessionStorage(sessionStorage))
+			options = append(options, serverenv.WithAuth0Service(auth0Service))
+		}
 	}
 
 	return serverenv.New(ctx, options...), nil
