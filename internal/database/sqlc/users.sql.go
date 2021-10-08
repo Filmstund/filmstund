@@ -6,18 +6,22 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+
+	"github.com/google/uuid"
 )
 
-const createUser = `-- name: CreateUser :one
+const createUpdateUser = `-- name: CreateUpdateUser :one
 INSERT INTO users
     (subject_id, first_name, last_name, nick, email, avatar)
 VALUES ($1, $2, $3, $4, $5, $6)
 ON CONFLICT (subject_id) DO UPDATE SET last_login         = current_timestamp,
+                                       email              = $5,
+                                       avatar             = $6,
                                        last_modified_date = current_timestamp
-RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+RETURNING id
 `
 
-type CreateUserParams struct {
+type CreateUpdateUserParams struct {
 	Subject   string         `json:"subject"`
 	FirstName string         `json:"firstName"`
 	LastName  string         `json:"lastName"`
@@ -26,8 +30,8 @@ type CreateUserParams struct {
 	Avatar    sql.NullString `json:"avatar"`
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser,
+func (q *Queries) CreateUpdateUser(ctx context.Context, arg CreateUpdateUserParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, createUpdateUser,
 		arg.Subject,
 		arg.FirstName,
 		arg.LastName,
@@ -35,23 +39,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Email,
 		arg.Avatar,
 	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.SubjectID,
-		&i.FilmstadenMembershipID,
-		&i.FirstName,
-		&i.LastName,
-		&i.Nick,
-		&i.Email,
-		&i.Phone,
-		&i.Avatar,
-		&i.CalendarFeedID,
-		&i.LastLogin,
-		&i.SignupDate,
-		&i.LastModifiedDate,
-	)
-	return i, err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const disableCalendarFeed = `-- name: DisableCalendarFeed :one
@@ -118,6 +108,7 @@ WHERE subject_id = $1
 returning id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
 `
 
+// TODO: remove
 func (q *Queries) UpdateLoginTimes(ctx context.Context, subjectID string) (User, error) {
 	row := q.db.QueryRow(ctx, updateLoginTimes, subjectID)
 	var i User

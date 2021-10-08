@@ -37,6 +37,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	options := make([]serverenv.Option, 0, 3)
 
 	// Database connection pooling
+	//nolint:nestif
 	if provider, ok := cfg.(DatabaseConfigProvider); ok {
 		dbCfg := provider.DatabaseConfig()
 		db, err := database.New(ctx, dbCfg)
@@ -48,27 +49,26 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 			serverenv.WithDatabase(db),
 			serverenv.WithUserService(user.NewService(db)),
 		)
-	}
 
-	// Auth0 service
-	//nolint:nestif
-	if auth0Provider, ok := cfg.(Auth0ConfigProvider); ok {
-		// Session storage
-		if provider, ok := cfg.(SessionConfigProvider); ok {
-			sessCfg := provider.SessionConfig()
-			sessionStorage, err := session.NewStorage(sessCfg)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't setup the session storage: %w", err)
+		// Auth0 service
+		if auth0Provider, ok := cfg.(Auth0ConfigProvider); ok {
+			// Session storage
+			if provider, ok := cfg.(SessionConfigProvider); ok {
+				sessCfg := provider.SessionConfig()
+				sessionStorage, err := session.NewStorage(sessCfg)
+				if err != nil {
+					return nil, fmt.Errorf("couldn't setup the session storage: %w", err)
+				}
+
+				authConfig := auth0Provider.Auth0Config()
+				auth0Service, err := auth0.NewService(ctx, authConfig, db, sessionStorage)
+				if err != nil {
+					return nil, fmt.Errorf("couldn't setup the Auth0 service: %w", err)
+				}
+
+				options = append(options, serverenv.WithSessionStorage(sessionStorage))
+				options = append(options, serverenv.WithAuth0Service(auth0Service))
 			}
-
-			authConfig := auth0Provider.Auth0Config()
-			auth0Service, err := auth0.NewService(ctx, authConfig, sessionStorage)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't setup the Auth0 service: %w", err)
-			}
-
-			options = append(options, serverenv.WithSessionStorage(sessionStorage))
-			options = append(options, serverenv.WithAuth0Service(auth0Service))
 		}
 	}
 

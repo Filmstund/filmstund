@@ -49,7 +49,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 		return nil, errLoginFailure
 	}
 
-	createdUser, err := query.CreateUser(ctx, sqlc.CreateUserParams{
+	_, err = query.CreateUpdateUser(ctx, sqlc.CreateUpdateUserParams{
 		Subject:   prin.Subject.String(),
 		FirstName: idToken.GivenName,
 		LastName:  idToken.FamilyName,
@@ -67,7 +67,8 @@ func (r *mutationResolver) LoginUser(ctx context.Context) (*model.User, error) {
 		logger.Infow("failed to create user", "err", err)
 		return nil, errLoginFailure
 	}
-	return mappers.ToGraphUser(createdUser, r.siteCfg), nil
+	// TODO:remove?
+	return mappers.ToGraphUser(sqlc.User{}, r.siteCfg), nil
 }
 
 // Mutation returns gql.MutationResolver implementation.

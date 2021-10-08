@@ -102,5 +102,5 @@ func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principa
 
 func (s *Storage) Invalidate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	// TODO: remove cookie and remove from cache.
-	return nil
+	return fmt.Errorf("not implemented")
 }

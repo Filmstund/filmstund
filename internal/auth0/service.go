@@ -2,16 +2,20 @@ package auth0
 
 import (
 	"context"
-	"encoding/json"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 	"time"
 
 	"edholm.dev/go-logging"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/filmstund/filmstund/internal/auth0/codeflow"
+	"github.com/filmstund/filmstund/internal/auth0/principal"
+	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/httputils"
 	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/session"
@@ -19,7 +23,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func NewService(ctx context.Context, cfg *Config, sessionStorage *session.Storage) (*Service, error) {
+func NewService(ctx context.Context, cfg *Config, db *database.DB, sessionStorage *session.Storage) (*Service, error) {
 	// This is using the OpenID discovery protocol to figure out well known stuff.
 	provider, err := oidc.NewProvider(ctx, cfg.Issuer)
 	if err != nil {
@@ -37,6 +41,7 @@ func NewService(ctx context.Context, cfg *Config, sessionStorage *session.Storag
 		verifier:       provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
 		cfg:            cfg,
 		pkceCache:      codeflow.NewPkceCache(),
+		db:             db,
 		sessionStorage: sessionStorage,
 	}, nil
 }
@@ -48,6 +53,7 @@ type Service struct {
 	cfg *Config
 
 	pkceCache      *codeflow.PkceCache
+	db             *database.DB
 	sessionStorage *session.Storage
 }
 
@@ -78,6 +84,7 @@ func (s *Service) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		state := codeflow.State(security.RandBase64String(43))
 		nonce := security.RandBase64String(43)
+		// TODO: switch to pkce cache instead.
 		setCookie(w, r, "state", state.String())
 		setCookie(w, r, "nonce", nonce)
 
@@ -95,7 +102,6 @@ func (s *Service) LoginHandler() http.Handler {
 	})
 }
 
-//nolint:cyclop
 func (s *Service) LoginCallbackHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := logging.FromContext(r.Context())
@@ -105,7 +111,7 @@ func (s *Service) LoginCallbackHandler() http.Handler {
 			return
 		}
 
-		state, err := validateState(r)
+		state, err := validateState(r, w)
 		if err != nil {
 			httputils.BadRequest(w, r, err.Error())
 			return
@@ -131,32 +137,60 @@ func (s *Service) LoginCallbackHandler() http.Handler {
 			return
 		}
 
-		err = validateNonce(r, idToken, logger)
+		err = validateNonce(r, w, idToken, logger)
 		if err != nil {
 			httputils.RespondBasedOnErr(err, w, r)
 			return
 		}
 
-		// TODO: update user information from ID token
-		// TODO: create a session cookie
-		// TODO: redirect to /
-		resp := struct {
-			OAuth2Token   *oauth2.Token
-			IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
-			Scopes        string
-		}{token, new(json.RawMessage), scopes}
+		if err := s.startNewSession(w, r, idToken, scopes); err != nil {
+			httputils.InternalServerError(w, r)
+			logger.Warnw("failed to start new session", "err", err)
+			return
+		}
 
-		if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		data, err := json.MarshalIndent(resp, "", "    ")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		_, _ = w.Write(data)
+		http.Redirect(w, r, "/", http.StatusFound)
 	})
+}
+
+func (s *Service) startNewSession(w http.ResponseWriter, r *http.Request, idToken *oidc.IDToken, scopes string) error {
+	if err := s.sessionStorage.Start(r.Context(), w, principal.Principal{
+		Subject:   principal.Subject(idToken.Subject),
+		Scopes:    strings.Split(scopes, " "),
+		ExpiresAt: idToken.Expiry,
+		Token:     nil, // TODO
+	}); err != nil {
+		return err
+	}
+
+	idTokenClaims := new(IDToken)
+	if err := idToken.Claims(idTokenClaims); err != nil {
+		return err
+	}
+
+	queries, cleanup, err := s.db.Queries(r.Context())
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	_, err = queries.CreateUpdateUser(r.Context(), sqlc.CreateUpdateUserParams{
+		Subject:   idToken.Subject,
+		FirstName: idTokenClaims.GivenName,
+		LastName:  idTokenClaims.FamilyName,
+		Nick: sql.NullString{
+			String: idTokenClaims.Nickname,
+			Valid:  true,
+		},
+		Email: idTokenClaims.Email,
+		Avatar: sql.NullString{
+			String: idTokenClaims.Picture,
+			Valid:  true,
+		},
+	})
+
+	// TODO: use userID
+	return err
 }
 
 func extractIDToken(token *oauth2.Token, s *Service, r *http.Request, logger *zap.SugaredLogger) (*oidc.IDToken, error) {
@@ -186,7 +220,7 @@ func exchangeCode(s *Service, state codeflow.State, r *http.Request) (*oauth2.To
 	return token, err
 }
 
-func validateState(r *http.Request) (codeflow.State, error) {
+func validateState(r *http.Request, w http.ResponseWriter) (codeflow.State, error) {
 	stateCookie, err := r.Cookie("state")
 	if err != nil {
 		return "", fmt.Errorf("state not found")
@@ -195,10 +229,12 @@ func validateState(r *http.Request) (codeflow.State, error) {
 	if r.URL.Query().Get("state") != stateCookie.Value {
 		return "", fmt.Errorf("state doesn't match")
 	}
+
+	clearCookie(w, stateCookie.Name, stateCookie.Path, stateCookie.Domain)
 	return codeflow.State(stateCookie.Value), nil
 }
 
-func validateNonce(r *http.Request, idToken *oidc.IDToken, logger *zap.SugaredLogger) error {
+func validateNonce(r *http.Request, w http.ResponseWriter, idToken *oidc.IDToken, logger *zap.SugaredLogger) error {
 	nonceCookie, err := r.Cookie("nonce")
 	if err != nil {
 		return fmt.Errorf("%w: nonce not found", httputils.ErrBadRequest)
@@ -208,19 +244,25 @@ func validateNonce(r *http.Request, idToken *oidc.IDToken, logger *zap.SugaredLo
 		return fmt.Errorf("%w: wrong nonce", httputils.ErrBadRequest)
 	}
 
+	clearCookie(w, nonceCookie.Name, nonceCookie.Path, nonceCookie.Domain)
 	return nil
 }
 
 func (s *Service) LogoutHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := logging.FromContext(r.Context())
+
 		logoutURL, err := s.logoutURL()
 		if err != nil {
 			httputils.InternalServerError(w, r)
-			logging.FromContext(r.Context()).Warnw("failed to create logout URL", "err", err)
+			logger.Warnw("failed to create logout URL", "err", err)
 			return
 		}
 
-		// TODO: invalidate local session state
+		if err = s.sessionStorage.Invalidate(r.Context(), w, r); err != nil {
+			httputils.InternalServerError(w, r)
+			logger.Warnw("failed to invalidate session", "err", err)
+		}
 		http.Redirect(w, r, logoutURL, http.StatusFound)
 	})
 }

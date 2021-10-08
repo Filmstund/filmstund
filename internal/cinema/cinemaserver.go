@@ -47,7 +47,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	notAuthed.Use(middleware.RecoverPanic())
 	notAuthed.Use(middleware.AttachAppLogger(logger))
 	notAuthed.Use(middleware.ProcessMaintenance(s.cfg))
-	notAuthed.Use(middleware.Cors(s.cfg))
+	notAuthed.Use(middleware.Cors(s.cfg)) // TODO: stricter settings
 	// TODO: authentication, security headers?
 
 	authorized := notAuthed.PathPrefix("/").Subrouter()
@@ -58,9 +58,6 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 		Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
 	authorized.Handle(path.Join(s.cfg.Site.CalendarURLPrefix, "/{feed}"), s.calendarFeedHandler())
 
-	notAuthed.HandleFunc("/temp", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("success?"))
-	})
 	notAuthed.Handle("/login", s.env.Auth0Service().LoginHandler())
 	notAuthed.Handle("/login/callback", s.env.Auth0Service().LoginCallbackHandler())
 	notAuthed.Handle("/logout", s.env.Auth0Service().LogoutHandler())

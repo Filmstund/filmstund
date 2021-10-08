@@ -1,14 +1,17 @@
--- name: CreateUser :one
+-- name: CreateUpdateUser :one
 INSERT INTO users
     (subject_id, first_name, last_name, nick, email, avatar)
 VALUES (@subject, @first_name, @last_name, @nick, @email, @avatar)
 ON CONFLICT (subject_id) DO UPDATE SET last_login         = current_timestamp,
+                                       email              = @email,
+                                       avatar             = @avatar,
                                        last_modified_date = current_timestamp
-RETURNING *;
+RETURNING id;
 
 -- name: UserExistsBySubject :one
 SELECT exists(SELECT 1 FROM users where subject_id = $1);
 
+-- TODO: remove
 -- name: UpdateLoginTimes :one
 UPDATE users
 SET last_login         = current_timestamp,
