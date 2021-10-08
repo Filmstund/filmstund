@@ -9,7 +9,6 @@ import (
 	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/httputils"
-	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -23,11 +22,11 @@ type jwtVerifier struct {
 // ApplyAuthorization validates the JWT token in the "Authorization" header.
 // If valid, it fetches the id_token and affixes the tokens to the request context.
 // TODO: document and test.
-func ApplyAuthorization(confProvider setup.Auth0ConfigProvider) mux.MiddlewareFunc {
+func ApplyAuthorization(cfg *auth0.Config) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			verifier := jwtVerifier{
-				cfg: confProvider.Auth0Config(),
+				cfg: cfg,
 				logger: logging.FromContext(r.Context()).
 					With("url", r.URL.String()).
 					With("from", r.RemoteAddr),

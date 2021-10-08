@@ -58,7 +58,7 @@ func realMain(ctx context.Context) error {
 		return fmt.Errorf("server.New: %w", err)
 	}
 
-	fs, err := cinema.NewServer(&cfg, env)
+	fs, err := cinema.NewServer(ctx, &cfg, env)
 	if err != nil {
 		return fmt.Errorf("cinema.New: %w", err)
 	}

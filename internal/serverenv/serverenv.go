@@ -3,7 +3,6 @@ package serverenv
 import (
 	"context"
 
-	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/user"
@@ -11,7 +10,6 @@ import (
 
 type ServerEnv struct {
 	db             *database.DB
-	auth0Service   *auth0.Service
 	userService    *user.Service
 	sessionStorage *session.Storage
 }
@@ -37,17 +35,6 @@ func WithDatabase(db *database.DB) Option {
 
 func (e *ServerEnv) Database() *database.DB {
 	return e.db
-}
-
-func WithAuth0Service(auth0Service *auth0.Service) Option {
-	return func(env *ServerEnv) *ServerEnv {
-		env.auth0Service = auth0Service
-		return env
-	}
-}
-
-func (e *ServerEnv) Auth0Service() *auth0.Service {
-	return e.auth0Service
 }
 
 func WithUserService(us *user.Service) Option {

@@ -9,6 +9,7 @@ import (
 
 	"edholm.dev/go-logging"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/middleware"
@@ -17,11 +18,12 @@ import (
 )
 
 type Server struct {
-	cfg *Config
-	env *serverenv.ServerEnv
+	cfg          *Config
+	auth0Handler *auth0.Handler
+	env          *serverenv.ServerEnv
 }
 
-func NewServer(cfg *Config, env *serverenv.ServerEnv) (*Server, error) {
+func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Server, error) {
 	stat, err := os.Stat(cfg.ServePath)
 	if err != nil {
 		return nil, err
@@ -30,9 +32,15 @@ func NewServer(cfg *Config, env *serverenv.ServerEnv) (*Server, error) {
 		return nil, fmt.Errorf("not a directory: %s", cfg.ServePath)
 	}
 
+	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env.Database(), env.SessionStorage())
+	if err != nil {
+		return nil, fmt.Errorf("failed to setup Auth0 handler: %w", err)
+	}
+
 	return &Server{
-		cfg: cfg,
-		env: env,
+		cfg:          cfg,
+		auth0Handler: auth0Handler,
+		env:          env,
 	}, nil
 }
 
@@ -51,16 +59,16 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	// TODO: authentication, security headers?
 
 	authorized := notAuthed.PathPrefix("/").Subrouter()
-	authorized.Use(middleware.ApplyAuthorization(s.cfg))
+	authorized.Use(middleware.ApplyAuthorization(s.cfg.Auth0Config()))
 
 	// Routing table
 	authorized.Handle("/api/graphql", s.graphQLHandler()).
 		Methods(http.MethodPost, http.MethodGet, http.MethodOptions)
 	authorized.Handle(path.Join(s.cfg.Site.CalendarURLPrefix, "/{feed}"), s.calendarFeedHandler())
 
-	notAuthed.Handle("/login", s.env.Auth0Service().LoginHandler())
-	notAuthed.Handle("/login/callback", s.env.Auth0Service().LoginCallbackHandler())
-	notAuthed.Handle("/logout", s.env.Auth0Service().LogoutHandler())
+	notAuthed.Handle("/login", s.auth0Handler.LoginHandler())
+	notAuthed.Handle("/login/callback", s.auth0Handler.LoginCallbackHandler())
+	notAuthed.Handle("/logout", s.auth0Handler.LogoutHandler())
 
 	notAuthed.PathPrefix("/").
 		Handler(http.FileServer(http.Dir(s.cfg.ServePath)))

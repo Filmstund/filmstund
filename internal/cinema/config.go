@@ -11,7 +11,6 @@ import (
 // Assertion for making sure the config implements these interfaces.
 var (
 	_ setup.DatabaseConfigProvider = (*Config)(nil)
-	_ setup.Auth0ConfigProvider    = (*Config)(nil)
 	_ site.ConfigProvider          = (*Config)(nil)
 	_ setup.SessionConfigProvider  = (*Config)(nil)
 )

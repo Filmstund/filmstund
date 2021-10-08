@@ -61,7 +61,6 @@ type ComplexityRoot struct {
 		DeleteGiftCertificate  func(childComplexity int, giftCert model.GiftCertificateInput) int
 		DisableCalendarFeed    func(childComplexity int) int
 		InvalidateCalendarFeed func(childComplexity int) int
-		LoginUser              func(childComplexity int) int
 		UpdateUser             func(childComplexity int, newInfo model.UserDetailsInput) int
 	}
 
@@ -90,7 +89,6 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	LoginUser(ctx context.Context) (*model.User, error)
 	UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error)
 	InvalidateCalendarFeed(ctx context.Context) (*model.User, error)
 	DisableCalendarFeed(ctx context.Context) (*model.User, error)
@@ -190,13 +188,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.InvalidateCalendarFeed(childComplexity), true
-
-	case "Mutation.loginUser":
-		if e.complexity.Mutation.LoginUser == nil {
-			break
-		}
-
-		return e.complexity.Mutation.LoginUser(childComplexity), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -405,9 +396,6 @@ type Commandments {
     phrase: String!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/v2/login.graphqls", Input: `extend type Mutation {
-    loginUser: User!
-}`, BuiltIn: false},
 	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar Time
 scalar UUID
 scalar FilmstadenMembershipID`, BuiltIn: false},
@@ -749,41 +737,6 @@ func (ec *executionContext) _GiftCertificate_status(ctx context.Context, field g
 	res := resTmp.(model.GiftCertificateStatus)
 	fc.Result = res
 	return ec.marshalNGiftCertificate_Status2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateStatus(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().LoginUser(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2930,11 +2883,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "loginUser":
-			out.Values[i] = ec._Mutation_loginUser(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateUser":
 			out.Values[i] = ec._Mutation_updateUser(ctx, field)
 			if out.Values[i] == graphql.Null {

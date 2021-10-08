@@ -22,7 +22,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func NewService(ctx context.Context, cfg *Config, db *database.DB, sessionStorage *session.Storage) (*Service, error) {
+func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionStorage *session.Storage) (*Handler, error) {
 	// This is using the OpenID discovery protocol to figure out well known stuff.
 	provider, err := oidc.NewProvider(ctx, cfg.Issuer)
 	if err != nil {
@@ -36,7 +36,7 @@ func NewService(ctx context.Context, cfg *Config, db *database.DB, sessionStorag
 		RedirectURL:  cfg.LoginCallbackURL,
 		Scopes:       cfg.Scopes,
 	}
-	return &Service{
+	return &Handler{
 		codeFlowClient: codeflow.NewClient(
 			cfg.Audience,
 			oauthCfg,
@@ -48,7 +48,7 @@ func NewService(ctx context.Context, cfg *Config, db *database.DB, sessionStorag
 	}, nil
 }
 
-type Service struct {
+type Handler struct {
 	cfg *Config
 
 	codeFlowClient *codeflow.Client
@@ -68,7 +68,7 @@ func setCookie(w http.ResponseWriter, r *http.Request, name, value string) {
 	http.SetCookie(w, &kaka)
 }
 
-func (s *Service) LoginHandler() http.Handler {
+func (s *Handler) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := uuid.NewRandom()
 		if err != nil {
@@ -82,7 +82,7 @@ func (s *Service) LoginHandler() http.Handler {
 	})
 }
 
-func (s *Service) LoginCallbackHandler() http.Handler {
+func (s *Handler) LoginCallbackHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := logging.FromContext(r.Context())
 
@@ -115,7 +115,7 @@ func (s *Service) LoginCallbackHandler() http.Handler {
 	})
 }
 
-func (s *Service) startNewSession(w http.ResponseWriter, r *http.Request, idToken *oidc.IDToken, scopes string) error {
+func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, idToken *oidc.IDToken, scopes string) error {
 	idTokenClaims := new(IDToken)
 	if err := idToken.Claims(idTokenClaims); err != nil {
 		return err
@@ -158,7 +158,7 @@ func (s *Service) startNewSession(w http.ResponseWriter, r *http.Request, idToke
 	return nil
 }
 
-func (s *Service) LogoutHandler() http.Handler {
+func (s *Handler) LogoutHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := logging.FromContext(r.Context())
 
@@ -177,7 +177,7 @@ func (s *Service) LogoutHandler() http.Handler {
 	})
 }
 
-func (s *Service) logoutURL() (string, error) {
+func (s *Handler) logoutURL() (string, error) {
 	parsed, err := url.Parse(path.Join(s.cfg.Issuer, "/v2/logout"))
 	if err != nil {
 		return "", fmt.Errorf("failed to parse logout URL: %w", err)

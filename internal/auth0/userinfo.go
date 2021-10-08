@@ -16,7 +16,7 @@ import (
 var errFetchFailure = errors.New("failed to fetch user information")
 
 // FetchIDToken downloads the ID token from the userinfo endpoint.
-func (s *Service) FetchIDToken(ctx context.Context) (*IDToken, error) {
+func (s *Handler) FetchIDToken(ctx context.Context) (*IDToken, error) {
 	princ := principal.FromContext(ctx)
 	logger := logging.FromContext(ctx)
 

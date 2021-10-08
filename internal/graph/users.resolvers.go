@@ -10,6 +10,7 @@ import (
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/mappers"
 	"github.com/filmstund/filmstund/internal/graph/model"
 )
@@ -83,3 +84,8 @@ func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []
 func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert model.GiftCertificateInput) (*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
+
+// Mutation returns gql.MutationResolver implementation.
+func (r *Resolver) Mutation() gql.MutationResolver { return &mutationResolver{r} }
+
+type mutationResolver struct{ *Resolver }
