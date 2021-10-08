@@ -185,7 +185,7 @@ func (s *Handler) logoutURL() (string, error) {
 
 	q := parsed.Query()
 	q.Add("client_id", s.cfg.ClientID)
-	q.Add("returnTo", s.cfg.LogoutCallbackURL) // TODO: prodify.
+	q.Add("returnTo", s.cfg.LogoutCallbackURL)
 	parsed.RawQuery = q.Encode()
 
 	return parsed.String(), nil

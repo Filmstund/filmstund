@@ -26,7 +26,7 @@ type Config struct {
 
 	// Where should auth0 return users?
 	LoginCallbackURL  string `env:"OIDC_LOGIN_CALLBACK_URL, default=http://local.filmstund.se:8080/login/callback"`
-	LogoutCallbackURL string `env:"OIDC_LOGOUT_CALLBACK_URL, default=http://local.filmstund.se:8080/temp"`
+	LogoutCallbackURL string `env:"OIDC_LOGOUT_CALLBACK_URL, default=http://local.filmstund.se:8080/"`
 
 	// TODO: remove
 	Algorithm   string `env:"OIDC_EXPECTED_ALG, default=RS256"` // expected signing algorithm

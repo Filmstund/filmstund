@@ -59,7 +59,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	// TODO: authentication, security headers?
 
 	authorized := notAuthed.PathPrefix("/").Subrouter()
-	authorized.Use(middleware.ApplyAuthorization(s.cfg.Auth0Config()))
+	authorized.Use(middleware.AuthorizeSession(s.env.SessionStorage()))
 
 	// Routing table
 	authorized.Handle("/api/graphql", s.graphQLHandler()).
