@@ -4,7 +4,7 @@ import Modal from "../ui/Modal";
 import Header from "../ui/Header";
 import MainButton, { ButtonContainer } from "../ui/MainButton";
 import { AppQuery_me } from "../../../__generated__/AppQuery";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   me: AppQuery_me;
@@ -13,14 +13,14 @@ interface Props {
 export const WelcomeModal: React.FC<Props> = ({
   me: { filmstadenMembershipId },
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [modalOpen, setModalOpen] = useState(true);
 
   const navigateToProfile = useCallback(() => {
     setModalOpen(false);
-    history.push("/user");
-  }, [history]);
+    navigate("/user");
+  }, [navigate]);
 
   if (filmstadenMembershipId) {
     return null;

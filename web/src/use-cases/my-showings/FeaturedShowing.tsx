@@ -3,7 +3,7 @@ import isSameDay from "date-fns/isSameDay";
 import subMinutes from "date-fns/subMinutes";
 import { orderBy } from "lodash";
 import * as React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   navigateToShowing,
   navigateToShowingTickets,
@@ -27,7 +27,7 @@ export const FeaturedShowing: React.FC<FeaturedShowingProps> = ({
   showings,
   meId,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const compareTime = subMinutes(new Date(), 30);
 
@@ -54,9 +54,9 @@ export const FeaturedShowing: React.FC<FeaturedShowingProps> = ({
         <Jumbotron>
           <ShowingNeue
             showing={featuredShowing}
-            onClick={() => navigateToShowing(history, featuredShowing)}
+            onClick={() => navigateToShowing(navigate, featuredShowing)}
             onClickTickets={() =>
-              navigateToShowingTickets(history, featuredShowing)
+              navigateToShowingTickets(navigate, featuredShowing)
             }
           />
           <ItsHappeningTitle>

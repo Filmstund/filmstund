@@ -2,7 +2,6 @@ import { ApolloError, gql, NetworkStatus, useQuery } from "@apollo/client";
 import React, { useState } from "react";
 
 import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
-import { useHistory } from "react-router-dom";
 import { navigateToShowingTickets } from "../../common/navigators";
 import { MissingShowing } from "../../common/showing/MissingShowing";
 import Showing, { oldShowingFragment } from "../../common/showing/Showing";
@@ -24,6 +23,7 @@ import {
   SingleShowingVariables,
 } from "./__generated__/SingleShowing";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   me: SingleShowing_me;
@@ -38,7 +38,7 @@ const SingleShowingContainer: React.FC<Props> = ({
   error,
   refetch,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
 
   const promoteToAdmin = usePromoteToAdmin();
@@ -47,7 +47,7 @@ const SingleShowingContainer: React.FC<Props> = ({
 
   const navigateToTickets = () => {
     if (showing) {
-      navigateToShowingTickets(history, showing);
+      navigateToShowingTickets(navigate, showing);
     }
   };
 

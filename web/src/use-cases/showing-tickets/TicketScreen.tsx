@@ -26,9 +26,9 @@ const useTickets = (webId: string) =>
   );
 
 const TicketScreen = () => {
-  const { webId } = useParams<{ webId: string }>();
+  const { webId } = useParams<"webId">();
 
-  const { data } = useTickets(webId);
+  const { data } = useTickets(webId!);
 
   if (!data || !data.me || !data.showing) {
     return <Loader />;

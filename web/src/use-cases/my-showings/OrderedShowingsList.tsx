@@ -1,6 +1,5 @@
 import { orderBy } from "lodash";
 import React from "react";
-import { useHistory } from "react-router-dom";
 import {
   navigateToShowing,
   navigateToShowingTickets,
@@ -10,6 +9,7 @@ import { ShowingNeue as ShowingNeueComponent } from "../common/showing/ShowingNe
 import { EmptyList } from "../common/ui/EmptyList";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import { showingDate } from "./utils/filtersCreators";
+import { useNavigate } from "react-router-dom";
 
 interface OrderedShowingsListProps {
   showings: ShowingNeue[];
@@ -20,7 +20,7 @@ export const OrderedShowingsList: React.FC<OrderedShowingsListProps> = ({
   showings,
   order,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   if (showings.length === 0) {
     return <EmptyList />;
@@ -30,8 +30,8 @@ export const OrderedShowingsList: React.FC<OrderedShowingsListProps> = ({
       {orderBy(showings, [showingDate], [order]).map((showing) => (
         <ShowingNeueComponent
           showing={showing}
-          onClick={() => navigateToShowing(history, showing)}
-          onClickTickets={() => navigateToShowingTickets(history, showing)}
+          onClick={() => navigateToShowing(navigate, showing)}
+          onClickTickets={() => navigateToShowingTickets(navigate, showing)}
           key={showing.id}
         />
       ))}

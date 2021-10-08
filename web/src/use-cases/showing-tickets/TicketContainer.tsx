@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useAddTickets } from "../../apollo/mutations/useAddTickets";
-import { useHistory } from "react-router-dom";
 import MainButton from "../common/ui/MainButton";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
 import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
@@ -15,6 +14,7 @@ import {
 } from "./__generated__/TicketQuery";
 import { SeatRange } from "./SeatRange";
 import { Ticket } from "./Ticket";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   showing: TicketQuery_showing;
@@ -22,14 +22,14 @@ interface Props {
 }
 
 export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
   const [addTickets, { error, called, loading }] = useAddTickets();
   const success = called && !error && !loading;
 
   const handleGoBackToShowing = () => {
-    navigateToShowing(history, showing);
+    navigateToShowing(navigate, showing);
   };
 
   const handleSubmitCinemaTicketUrls = () => {

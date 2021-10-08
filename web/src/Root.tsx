@@ -1,14 +1,11 @@
 import React, { Component, ErrorInfo, lazy, Suspense } from "react";
 import { ApolloProvider } from "@apollo/client";
-import { Auth0Provider } from "@auth0/auth0-react";
 import "./index.css";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
 import { client } from "./store/apollo";
 import Loader from "./use-cases/common/utils/ProjectorLoader";
-import { LoginGate } from "./LoginGate";
-import { Login } from "./use-cases/login/containers/Login";
 
 const AsyncApp = lazy(() => import("./App"));
 
@@ -48,20 +45,11 @@ export class Root extends Component<{}, State> {
 
     return (
       <ApolloProvider client={client}>
-        <Auth0Provider
-          domain={import.meta.env.VITE_AUTH0_DOMAIN as string}
-          audience={import.meta.env.VITE_AUTH0_AUD as string}
-          clientId={import.meta.env.VITE_AUTH0_CLIENT_ID as string}
-          redirectUri={window.location.origin}
-        >
-          <LoginGate fallback={<Login />}>
-            <Router>
-              <Suspense fallback={<Loader />}>
-                <AsyncApp />
-              </Suspense>
-            </Router>
-          </LoginGate>
-        </Auth0Provider>
+        <Router>
+          <Suspense fallback={<Loader />}>
+            <AsyncApp />
+          </Suspense>
+        </Router>
       </ApolloProvider>
     );
   }

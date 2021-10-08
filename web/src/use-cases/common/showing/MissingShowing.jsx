@@ -1,3 +1,4 @@
+import React from "react";
 import alfons from "../../../assets/alfons.jpg";
 import Header, { SmallHeader } from "../ui/Header";
 

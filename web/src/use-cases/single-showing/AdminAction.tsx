@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import React, { useCallback, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { navigateToEditShowing } from "../common/navigators";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { BuyModal } from "./BuyModal";
@@ -43,11 +43,11 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
     }));
   }, [setState, onBeforeOpenBuyModal]);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handlePressEdit = useCallback(() => {
-    navigateToEditShowing(history, showing);
-  }, [history, showing]);
+    navigateToEditShowing(navigate, showing);
+  }, [navigate, showing]);
 
   const { ticketsBought } = showing;
 

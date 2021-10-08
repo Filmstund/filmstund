@@ -1,23 +1,13 @@
 import styled from "@emotion/styled";
 import { MEDIUM_FONT_SIZE } from "../../../lib/style-vars";
 
-export const Container = styled.div`
-  height: 100%;
-  display: grid;
-  background-color: black;
-`;
-
-export const ContentContainer = styled.div`
+export const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
-  background: white;
-`;
-
-export const LoginContainer = styled.div`
-  height: 100vh;
-  display: grid;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background-color: black;
+  height: 100vh;
 `;
 
 export const ErrorBox = styled.div`

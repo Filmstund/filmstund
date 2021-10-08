@@ -7,11 +7,11 @@ import { movieFragment } from "../common/showing/Movie";
 import { NewShowingQuery } from "./__generated__/NewShowingQuery";
 import { CreateShowingFormFetcher } from "./CreateShowingFormFetcher";
 import MovieSelector from "./MovieSelector";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const NewShowing = () => {
-  const history = useHistory();
-  const { movieId } = useParams<{ movieId: string }>();
+  const navigate = useNavigate();
+  const { movieId } = useParams<"movieId">();
 
   const { data } = useAllMovies();
   const [fetchMovies] = useFetchMovies();
@@ -20,20 +20,20 @@ const NewShowing = () => {
 
   const handleNavigateToShowing = useCallback(
     (showing) => {
-      navigateToShowing(history, showing);
+      navigateToShowing(navigate, showing);
     },
-    [history]
+    [navigate]
   );
 
   const clearSelectedMovie = useCallback(() => {
-    history.push("/showings/new");
-  }, [history]);
+    navigate("/showings/new");
+  }, [navigate]);
 
   const setMovie = useCallback(
     (movie) => {
-      history.push(`/showings/new/${movie.id}`);
+      navigate(`/showings/new/${movie.id}`);
     },
-    [history]
+    [navigate]
   );
 
   if (movieId) {

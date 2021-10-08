@@ -3,7 +3,7 @@ import { cleanup, render } from "@testing-library/react";
 
 import { TicketContainer } from "./TicketContainer";
 import { createMockSeat, createMockTicket } from "./__mocks__/ticket";
-import { MemoryRouter as Router } from "react-router";
+import { MemoryRouter as Router } from "react-router-dom";
 import {
   ApolloClient,
   ApolloLink,

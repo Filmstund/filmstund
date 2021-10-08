@@ -8,7 +8,7 @@ import { useDeleteShowing } from "../../apollo/mutations/showings/useDeleteShowi
 import { useUpdateShowing } from "../../apollo/mutations/showings/useUpdateShowing";
 import { formatLocalTime, formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as navigators from "../common/navigators";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import Showing from "../common/showing/Showing";
@@ -62,7 +62,7 @@ interface Props {
 }
 
 const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [errors, setErrors] = useState<Error[] | null>(null);
   const [formState, setFormState] = useState<EditShowingFormShowing>(() =>
     getInitialState(showing)
@@ -78,10 +78,10 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
 
     if (proceed) {
       deleteShowing(showing.id).then(() => {
-        history.push("/showings");
+        navigate("/showings");
       });
     }
-  }, [deleteShowing, showing, history]);
+  }, [deleteShowing, showing, navigate]);
 
   const handleSubmit = () => {
     updateShowing(showing.id, {
@@ -96,7 +96,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
     })
       .then(() => {
         setErrors(null);
-        navigators.navigateToShowing(history, showing);
+        navigators.navigateToShowing(navigate, showing);
       })
       .catch((errors) => {
         setErrors(errors);

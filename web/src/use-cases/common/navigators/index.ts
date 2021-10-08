@@ -1,4 +1,4 @@
-import { History } from "history";
+import { NavigateFunction } from "react-router-dom";
 
 interface NavigateToShowingParams {
   webId: string;
@@ -6,16 +6,16 @@ interface NavigateToShowingParams {
 }
 
 export const navigateToShowing = (
-  history: History,
+  navigate: NavigateFunction,
   { webId, slug }: NavigateToShowingParams
-) => history.push(`/showings/${webId}/${slug}`);
+) => navigate(`/showings/${webId}/${slug}`);
 
 export const navigateToEditShowing = (
-  history: History,
+  navigate: NavigateFunction,
   { webId, slug }: NavigateToShowingParams
-) => history.push(`/showings/${webId}/${slug}/edit`);
+) => navigate(`/showings/${webId}/${slug}/edit`);
 
 export const navigateToShowingTickets = (
-  history: History,
+  navigate: NavigateFunction,
   { webId, slug }: NavigateToShowingParams
-) => history.push(`/showings/${webId}/${slug}/tickets`);
+) => navigate(`/showings/${webId}/${slug}/tickets`);

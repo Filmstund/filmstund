@@ -38,8 +38,8 @@ const useEditShowingData = (webId: string) =>
   );
 
 const EditShowingFormLoader = () => {
-  const { webId } = useParams<{ webId: string }>();
-  const { data } = useEditShowingData(webId);
+  const { webId } = useParams<"webId">();
+  const { data } = useEditShowingData(webId!);
 
   if (!data || !data.showing) {
     return <Loader />;

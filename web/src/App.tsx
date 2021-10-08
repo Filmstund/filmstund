@@ -1,8 +1,7 @@
 import styled from "@emotion/styled";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import React, { lazy, Suspense } from "react";
-import { useQuery } from "@apollo/client";
-import { Route, Switch } from "react-router";
+import { Route, Routes } from "react-router-dom";
 import { AppQuery } from "./__generated__/AppQuery";
 import { completeUserFragment } from "./apollo/queries/currentUser";
 import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
@@ -61,28 +60,28 @@ const App: React.FC<Props> = () => {
         <NavBar />
         <MainGridContainer>
           <Suspense fallback={<Loader />}>
-            <Switch>
-              <Route exact path="/" component={AsyncHome} />
-              <Route path="/user" component={AsyncUser} />
-              <Route exact path="/showings" component={AsyncShowings} />
+            <Routes>
+              <Route path="/" element={<AsyncHome />} />
+              <Route path="/user" element={<AsyncUser />} />
+              <Route path="/showings" element={<AsyncShowings />} />
               <Route
                 path="/showings/new/:movieId?"
-                component={AsyncNewShowing}
-              />
-              <Route
-                path="/showings/:webId/:slug/tickets"
-                component={AsyncShowingTickets}
-              />
-              <Route
-                path="/showings/:webId/:slug/edit"
-                component={AsyncEditShowing}
+                element={<AsyncNewShowing />}
               />
               <Route
                 path="/showings/:webId/:slug"
-                component={AsyncSingleShowing}
+                element={<AsyncSingleShowing />}
               />
-              <Route component={MissingShowing} />
-            </Switch>
+              <Route
+                path="/showings/:webId/:slug/tickets"
+                element={<AsyncShowingTickets />}
+              />
+              <Route
+                path="/showings/:webId/:slug/edit"
+                element={<AsyncEditShowing />}
+              />
+              <Route path="*" element={<MissingShowing />} />
+            </Routes>
           </Suspense>
         </MainGridContainer>
         <Footer />
