@@ -100,36 +100,6 @@ func (q *Queries) RandomizeCalendarFeed(ctx context.Context, subjectID string) (
 	return i, err
 }
 
-const updateLoginTimes = `-- name: UpdateLoginTimes :one
-UPDATE users
-SET last_login         = current_timestamp,
-    last_modified_date = current_timestamp
-WHERE subject_id = $1
-returning id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
-`
-
-// TODO: remove
-func (q *Queries) UpdateLoginTimes(ctx context.Context, subjectID string) (User, error) {
-	row := q.db.QueryRow(ctx, updateLoginTimes, subjectID)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.SubjectID,
-		&i.FilmstadenMembershipID,
-		&i.FirstName,
-		&i.LastName,
-		&i.Nick,
-		&i.Email,
-		&i.Phone,
-		&i.Avatar,
-		&i.CalendarFeedID,
-		&i.LastLogin,
-		&i.SignupDate,
-		&i.LastModifiedDate,
-	)
-	return i, err
-}
-
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET filmstaden_membership_id = COALESCE(NULLIF(TRIM($1), ''), filmstaden_membership_id),

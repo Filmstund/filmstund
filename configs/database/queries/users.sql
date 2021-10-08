@@ -11,14 +11,6 @@ RETURNING id;
 -- name: UserExistsBySubject :one
 SELECT exists(SELECT 1 FROM users where subject_id = $1);
 
--- TODO: remove
--- name: UpdateLoginTimes :one
-UPDATE users
-SET last_login         = current_timestamp,
-    last_modified_date = current_timestamp
-WHERE subject_id = @subject_id
-returning *;
-
 -- name: UpdateUser :one
 UPDATE users
 SET filmstaden_membership_id = COALESCE(NULLIF(TRIM(@filmstaden_membership_id), ''), filmstaden_membership_id),
