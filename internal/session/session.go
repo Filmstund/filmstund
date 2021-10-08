@@ -45,10 +45,10 @@ func (s *Storage) Start(ctx context.Context, w http.ResponseWriter, prin princip
 	}
 
 	sessionCookie := http.Cookie{
-		Name:     s.cfg.CookieName,
-		Value:    sessionID.String(),
-		Path:     "/",
-		MaxAge:   int(s.cfg.ExpirationTime.Seconds()),
+		Name:  s.cfg.CookieName,
+		Value: sessionID.String(),
+		Path:  "/",
+		// MaxAge:   int(s.cfg.ExpirationTime.Seconds()), // TODO: only a "real" session cookie if there is no max-age
 		Secure:   false, // TODO: true
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 type Subject string
@@ -14,6 +15,7 @@ func (s Subject) String() string {
 }
 
 type Principal struct {
+	ID        uuid.UUID  `json:"id"`
 	Subject   Subject    `json:"subject"`
 	Scopes    []string   `json:"scopes"`
 	ExpiresAt time.Time  `json:"expiresAt"`

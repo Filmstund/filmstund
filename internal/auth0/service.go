@@ -17,9 +17,8 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/httputils"
-	"github.com/filmstund/filmstund/internal/security"
 	"github.com/filmstund/filmstund/internal/session"
-	"go.uber.org/zap"
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 )
 
@@ -30,29 +29,29 @@ func NewService(ctx context.Context, cfg *Config, db *database.DB, sessionStorag
 		return nil, fmt.Errorf("failed to setup OpenID Connect provider: %w", err)
 	}
 
+	oauthCfg := oauth2.Config{
+		ClientID:     cfg.ClientID,
+		ClientSecret: cfg.ClientSecret,
+		Endpoint:     provider.Endpoint(),
+		RedirectURL:  cfg.LoginCallbackURL,
+		Scopes:       cfg.Scopes,
+	}
 	return &Service{
-		oauthCfg: oauth2.Config{
-			ClientID:     cfg.ClientID,
-			ClientSecret: cfg.ClientSecret,
-			Endpoint:     provider.Endpoint(),
-			RedirectURL:  cfg.LoginCallbackURL,
-			Scopes:       cfg.Scopes,
-		},
-		verifier:       provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
+		codeFlowClient: codeflow.NewClient(
+			cfg.Audience,
+			oauthCfg,
+			provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
+		),
 		cfg:            cfg,
-		pkceCache:      codeflow.NewPkceCache(),
 		db:             db,
 		sessionStorage: sessionStorage,
 	}, nil
 }
 
 type Service struct {
-	oauthCfg oauth2.Config
-	verifier *oidc.IDTokenVerifier
-
 	cfg *Config
 
-	pkceCache      *codeflow.PkceCache
+	codeFlowClient *codeflow.Client
 	db             *database.DB
 	sessionStorage *session.Storage
 }
@@ -69,35 +68,16 @@ func setCookie(w http.ResponseWriter, r *http.Request, name, value string) {
 	http.SetCookie(w, &kaka)
 }
 
-//goland:noinspection GoUnusedFunction
-//nolint:deadcode,unused
-func clearCookie(w http.ResponseWriter, name, path, domain string) {
-	http.SetCookie(w, &http.Cookie{
-		Name:   name,
-		Path:   path,
-		Domain: domain,
-		MaxAge: -1,
-	})
-}
-
 func (s *Service) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		state := codeflow.State(security.RandBase64String(43))
-		nonce := security.RandBase64String(43)
-		// TODO: switch to pkce cache instead.
-		setCookie(w, r, "state", state.String())
-		setCookie(w, r, "nonce", nonce)
+		id, err := uuid.NewRandom()
+		if err != nil {
+			httputils.InternalServerError(w, r)
+			return
+		}
 
-		codeVerifier := codeflow.NewCodeVerifier()
-		s.pkceCache.Add(state, codeVerifier)
-
-		authURL := s.oauthCfg.AuthCodeURL(
-			state.String(),
-			oidc.Nonce(nonce),
-			oauth2.SetAuthURLParam("audience", s.cfg.Audience), // not needed if default audience is configured in tenant
-			oauth2.SetAuthURLParam("code_challenge", codeVerifier.CreateChallenge()),
-			oauth2.SetAuthURLParam("code_challenge_method", "S256"),
-		)
+		setCookie(w, r, "flow", id.String())
+		authURL := s.codeFlowClient.AuthCodeURL(id.String())
 		http.Redirect(w, r, authURL, http.StatusFound)
 	})
 }
@@ -111,35 +91,17 @@ func (s *Service) LoginCallbackHandler() http.Handler {
 			return
 		}
 
-		state, err := validateState(r, w)
+		accessToken, idToken, err := s.codeFlowClient.ExchangeCode(r)
 		if err != nil {
 			httputils.BadRequest(w, r, err.Error())
+			logger.Warnw("code exchange failed", "err", err)
 			return
 		}
 
-		token, err := exchangeCode(s, state, r)
-		if err != nil {
-			httputils.InternalServerError(w, r)
-			logger.Warnw(err.Error(), "err", err)
-			return
-		}
-
-		scopes, ok := token.Extra("scope").(string)
+		scopes, ok := accessToken.Extra("scope").(string)
 		if !ok {
 			httputils.InternalServerError(w, r)
 			logger.Warnw("didn't get any scopes from the access token")
-			return
-		}
-
-		idToken, err := extractIDToken(token, s, r, logger)
-		if err != nil {
-			httputils.RespondBasedOnErr(err, w, r)
-			return
-		}
-
-		err = validateNonce(r, w, idToken, logger)
-		if err != nil {
-			httputils.RespondBasedOnErr(err, w, r)
 			return
 		}
 
@@ -154,15 +116,6 @@ func (s *Service) LoginCallbackHandler() http.Handler {
 }
 
 func (s *Service) startNewSession(w http.ResponseWriter, r *http.Request, idToken *oidc.IDToken, scopes string) error {
-	if err := s.sessionStorage.Start(r.Context(), w, principal.Principal{
-		Subject:   principal.Subject(idToken.Subject),
-		Scopes:    strings.Split(scopes, " "),
-		ExpiresAt: idToken.Expiry,
-		Token:     nil, // TODO
-	}); err != nil {
-		return err
-	}
-
 	idTokenClaims := new(IDToken)
 	if err := idToken.Claims(idTokenClaims); err != nil {
 		return err
@@ -174,7 +127,7 @@ func (s *Service) startNewSession(w http.ResponseWriter, r *http.Request, idToke
 	}
 	defer cleanup()
 
-	_, err = queries.CreateUpdateUser(r.Context(), sqlc.CreateUpdateUserParams{
+	userID, err := queries.CreateUpdateUser(r.Context(), sqlc.CreateUpdateUserParams{
 		Subject:   idToken.Subject,
 		FirstName: idTokenClaims.GivenName,
 		LastName:  idTokenClaims.FamilyName,
@@ -188,63 +141,20 @@ func (s *Service) startNewSession(w http.ResponseWriter, r *http.Request, idToke
 			Valid:  true,
 		},
 	})
-
-	// TODO: use userID
-	return err
-}
-
-func extractIDToken(token *oauth2.Token, s *Service, r *http.Request, logger *zap.SugaredLogger) (*oidc.IDToken, error) {
-	rawIDToken, ok := token.Extra("id_token").(string)
-	if !ok {
-		logger.Warnw("didn't get an ID token from the token exchange")
-		return nil, httputils.ErrInternal
-	}
-
-	idToken, err := s.verifier.Verify(r.Context(), rawIDToken)
 	if err != nil {
-		logger.Infow("failed to verify ID token", "err", err)
-		return nil, httputils.ErrUnauthorized
-	}
-	return idToken, err
-}
-
-func exchangeCode(s *Service, state codeflow.State, r *http.Request) (*oauth2.Token, error) {
-	codeVerifier, matchFound := s.pkceCache.Get(state)
-	if !matchFound {
-		return nil, fmt.Errorf("failed to find code_verifier")
-	}
-	s.pkceCache.Del(state)
-
-	code := r.URL.Query().Get("code")
-	token, err := s.oauthCfg.Exchange(r.Context(), code, oauth2.SetAuthURLParam("code_verifier", string(codeVerifier)))
-	return token, err
-}
-
-func validateState(r *http.Request, w http.ResponseWriter) (codeflow.State, error) {
-	stateCookie, err := r.Cookie("state")
-	if err != nil {
-		return "", fmt.Errorf("state not found")
+		return err
 	}
 
-	if r.URL.Query().Get("state") != stateCookie.Value {
-		return "", fmt.Errorf("state doesn't match")
+	if err := s.sessionStorage.Start(r.Context(), w, principal.Principal{
+		ID:        userID,
+		Subject:   principal.Subject(idToken.Subject),
+		Scopes:    strings.Split(scopes, " "),
+		ExpiresAt: idToken.Expiry,
+		Token:     nil, // TODO
+	}); err != nil {
+		return err
 	}
 
-	clearCookie(w, stateCookie.Name, stateCookie.Path, stateCookie.Domain)
-	return codeflow.State(stateCookie.Value), nil
-}
-
-func validateNonce(r *http.Request, w http.ResponseWriter, idToken *oidc.IDToken, logger *zap.SugaredLogger) error {
-	nonceCookie, err := r.Cookie("nonce")
-	if err != nil {
-		return fmt.Errorf("%w: nonce not found", httputils.ErrBadRequest)
-	}
-	if idToken.Nonce != nonceCookie.Value {
-		logger.Infow("nonce from cookie didn't match ID token nonce")
-		return fmt.Errorf("%w: wrong nonce", httputils.ErrBadRequest)
-	}
-
-	clearCookie(w, nonceCookie.Name, nonceCookie.Path, nonceCookie.Domain)
 	return nil
 }
 
