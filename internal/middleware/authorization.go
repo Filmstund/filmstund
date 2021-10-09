@@ -120,6 +120,6 @@ func (v *jwtVerifier) extractPrincipal(token *jwt.Token) (*principal.Principal, 
 		Subject:   claims.Subject,
 		Scopes:    strings.Split(claims.Scope, " "),
 		ExpiresAt: claims.ExpiresAt.Time,
-		Token:     token,
+		Token:     nil, // TODO
 	}, nil
 }

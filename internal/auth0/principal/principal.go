@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"golang.org/x/oauth2"
 )
 
 type Subject string
@@ -15,11 +15,11 @@ func (s Subject) String() string {
 }
 
 type Principal struct {
-	ID        uuid.UUID  `json:"id"`
-	Subject   Subject    `json:"subject"`
-	Scopes    []string   `json:"scopes"`
-	ExpiresAt time.Time  `json:"expiresAt"`
-	Token     *jwt.Token `json:"-"` // TODO: replace with string
+	ID        uuid.UUID     `json:"id"`
+	Subject   Subject       `json:"subject"`
+	Scopes    []string      `json:"scopes"`
+	ExpiresAt time.Time     `json:"expiresAt"`
+	Token     *oauth2.Token `json:"-"`
 }
 
 func (p *Principal) HasScope(scope string) bool {

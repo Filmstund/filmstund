@@ -79,14 +79,7 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 			return
 		}
 
-		scopes, ok := accessToken.Extra("scope").(string)
-		if !ok {
-			httputils.InternalServerError(w, r)
-			logger.Warnw("didn't get any scopes from the access token")
-			return
-		}
-
-		if err := s.startNewSession(w, r, idToken, scopes); err != nil {
+		if err := s.startNewSession(w, r, accessToken, idToken); err != nil {
 			httputils.InternalServerError(w, r)
 			logger.Warnw("failed to start new session", "err", err)
 			return
@@ -100,10 +93,15 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 	})
 }
 
-func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, idToken *oidc.IDToken, scopes string) error {
+func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, token *oauth2.Token, idToken *oidc.IDToken) error {
 	idTokenClaims := new(IDToken)
 	if err := idToken.Claims(idTokenClaims); err != nil {
 		return err
+	}
+
+	scopes, ok := token.Extra("scope").(string)
+	if !ok {
+		return fmt.Errorf("failed to extract scope from token")
 	}
 
 	queries, cleanup, err := s.db.Queries(r.Context())
@@ -135,7 +133,7 @@ func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, idToke
 		Subject:   principal.Subject(idToken.Subject),
 		Scopes:    strings.Split(scopes, " "),
 		ExpiresAt: idToken.Expiry,
-		Token:     nil, // TODO
+		Token:     token,
 	}); err != nil {
 		return err
 	}
