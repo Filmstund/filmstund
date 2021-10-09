@@ -11,13 +11,14 @@ import (
 
 type (
 	stateCache struct {
-		cache map[State]verification // TODO: switch to gocache?
+		cache map[State]Verification // TODO: switch to gocache?
 		mu    sync.RWMutex
 	}
 
-	verification struct {
+	Verification struct {
 		nonce        Nonce
 		codeVerifier CodeVerifier
+		redirectURL  string // optional URL that we should redirect to upon successful login
 		expiresAt    time.Time
 	}
 
@@ -29,27 +30,28 @@ type (
 // newPkceCache creates a new cache instance.
 func newPkceCache() *stateCache {
 	return &stateCache{
-		cache: map[State]verification{},
+		cache: map[State]Verification{},
 		mu:    sync.RWMutex{},
 	}
 }
 
-// Get the code verifier for the state.
-func (p *stateCache) Get(state State) (Nonce, CodeVerifier, bool) {
+// Get the all verification variables for the state.
+func (p *stateCache) Get(state State) (Verification, bool) {
 	p.invalidateOldEntries()
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	pkce, itemFound := p.cache[state]
-	return pkce.nonce, pkce.codeVerifier, itemFound
+	verification, itemFound := p.cache[state]
+	return verification, itemFound
 }
 
 // Add code verifier for the given state.
-func (p *stateCache) Add(state State, nonce Nonce, codeVerifier CodeVerifier) {
+func (p *stateCache) Add(state State, nonce Nonce, codeVerifier CodeVerifier, redirectURL string) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.cache[state] = verification{
+	p.cache[state] = Verification{
 		nonce:        nonce,
 		codeVerifier: codeVerifier,
+		redirectURL:  redirectURL,
 		expiresAt:    time.Now().Add(10 * time.Minute),
 	}
 }

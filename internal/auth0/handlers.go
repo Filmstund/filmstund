@@ -56,7 +56,9 @@ type Handler struct {
 
 func (s *Handler) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authURL := s.codeFlowClient.AuthCodeURL()
+		redirectURL := r.URL.Query().Get("to")
+
+		authURL := s.codeFlowClient.AuthCodeURL(redirectURL)
 		http.Redirect(w, r, authURL, http.StatusFound)
 	})
 }
@@ -70,7 +72,7 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 			return
 		}
 
-		accessToken, idToken, err := s.codeFlowClient.ExchangeCode(r)
+		accessToken, idToken, redirectURL, err := s.codeFlowClient.ExchangeCode(r)
 		if err != nil {
 			httputils.BadRequest(w, r, err.Error())
 			logger.Warnw("code exchange failed", "err", err)
@@ -90,6 +92,10 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 			return
 		}
 
+		if redirectURL != "" && strings.HasPrefix(redirectURL, "/") {
+			http.Redirect(w, r, redirectURL, http.StatusFound)
+			return
+		}
 		http.Redirect(w, r, "/", http.StatusFound)
 	})
 }

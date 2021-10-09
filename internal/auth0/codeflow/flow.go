@@ -34,19 +34,19 @@ func NewClient(audience string, oauthCfg oauth2.Config, verifier *oidc.IDTokenVe
 
 // generateVerification randomly create the State, Nonce, and CodeVerifier
 // for use in the oauth2 authorization code flow.
-func (c *Client) generateVerification() (State, Nonce, CodeVerifier) {
+func (c *Client) generateVerification(redirectURL string) (State, Nonce, CodeVerifier) {
 	state := State(security.RandBase64String(43))
 	nonce := Nonce(security.RandBase64String(43))
 	codeVerifier := NewCodeVerifier()
 
-	c.pkceCache.Add(state, nonce, codeVerifier)
+	c.pkceCache.Add(state, nonce, codeVerifier, redirectURL)
 	return state, nonce, codeVerifier
 }
 
-// AuthCodeURL generates the necessary verifcation variables and
+// AuthCodeURL generates the necessary verification variables and
 // puts them into cache and returns the auth code URL to redirect to.
-func (c *Client) AuthCodeURL() string {
-	state, nonce, codeVerifier := c.generateVerification()
+func (c *Client) AuthCodeURL(redirectURL string) string {
+	state, nonce, codeVerifier := c.generateVerification(redirectURL)
 
 	return c.oauthCfg.AuthCodeURL(
 		state.String(),
@@ -59,45 +59,45 @@ func (c *Client) AuthCodeURL() string {
 
 // validateSate fetch the state from the query and cache and compare
 // that they are equal. If equal, it will return the other verification variables.
-func (c *Client) validateState(r *http.Request) (Nonce, CodeVerifier, error) {
+func (c *Client) validateState(r *http.Request) (Verification, error) {
 	stateGiven := State(r.URL.Query().Get("state"))
-	nonce, codeVerifier, found := c.pkceCache.Get(stateGiven)
+	verification, found := c.pkceCache.Get(stateGiven)
 	if !found {
-		return "", "", fmt.Errorf("%w: no state in cache", ErrInvalidData)
+		return Verification{}, fmt.Errorf("%w: no state in cache", ErrInvalidData)
 	}
 
 	c.pkceCache.Del(stateGiven)
-	return nonce, codeVerifier, nil
+	return verification, nil
 }
 
 // ExchangeCode takes the code and exchanges it for an access token and an ID token.
 // Verifications and sanity checks are done along the way.
-func (c *Client) ExchangeCode(r *http.Request) (*oauth2.Token, *oidc.IDToken, error) {
-	nonce, codeVerifier, err := c.validateState(r)
+func (c *Client) ExchangeCode(r *http.Request) (*oauth2.Token, *oidc.IDToken, string, error) {
+	verification, err := c.validateState(r)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 
 	code := r.URL.Query().Get("code")
 	token, err := c.oauthCfg.Exchange(
 		r.Context(),
 		code,
-		oauth2.SetAuthURLParam("code_verifier", string(codeVerifier)),
+		oauth2.SetAuthURLParam("code_verifier", string(verification.codeVerifier)),
 	)
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w: %v", ErrExchangeFailure, err)
+		return nil, nil, "", fmt.Errorf("%w: %v", ErrExchangeFailure, err)
 	}
 
 	idToken, err := c.extractIDToken(token, r)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 
-	if err := validateNonce(nonce, idToken); err != nil {
-		return nil, nil, err
+	if err := validateNonce(verification.nonce, idToken); err != nil {
+		return nil, nil, "", err
 	}
 
-	return token, idToken, err
+	return token, idToken, verification.redirectURL, err
 }
 
 // extractIDToken from the given access token.
