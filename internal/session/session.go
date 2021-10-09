@@ -96,8 +96,18 @@ func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principa
 	prin := new(principal.Principal)
 	buff := bytes.NewBuffer(cachedPrincipal.([]byte))
 	err = gob.NewDecoder(buff).Decode(prin)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode principal: %w", err)
+	}
 
-	return prin, err
+	// Extend life of session on successful lookup
+	if err := s.cacheManager.Set(ctx, sessionID, cachedPrincipal, &store.Options{
+		Expiration: s.cfg.ExpirationTime,
+	}); err != nil {
+		return nil, fmt.Errorf("failed to update session with new expiration: %w", err)
+	}
+
+	return prin, nil
 }
 
 func (s *Storage) Invalidate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
