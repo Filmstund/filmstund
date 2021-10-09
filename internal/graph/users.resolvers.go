@@ -85,6 +85,26 @@ func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert m
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) CurrentUser(ctx context.Context) (*model.User, error) {
+	logger := logging.FromContext(ctx)
+	princ := principal.FromContext(ctx)
+
+	queries, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		logger.Infow("failed to connect to database", "err", err)
+		return nil, fmt.Errorf("failed to connect to database")
+	}
+	defer cleanup()
+
+	user, err := queries.GetUser(ctx, princ.ID)
+	if err != nil {
+		logger.Infow("failed to get user", "id", princ.ID, "err", err)
+		return nil, fmt.Errorf("failed to get user")
+	}
+
+	return mappers.ToGraphUser(user, r.siteCfg), nil
+}
+
 // Mutation returns gql.MutationResolver implementation.
 func (r *Resolver) Mutation() gql.MutationResolver { return &mutationResolver{r} }
 

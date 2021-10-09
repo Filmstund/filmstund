@@ -72,6 +72,33 @@ func (q *Queries) DisableCalendarFeed(ctx context.Context, subjectID string) (Us
 	return i, err
 }
 
+const getUser = `-- name: GetUser :one
+SELECT id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.SubjectID,
+		&i.FilmstadenMembershipID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Nick,
+		&i.Email,
+		&i.Phone,
+		&i.Avatar,
+		&i.CalendarFeedID,
+		&i.LastLogin,
+		&i.SignupDate,
+		&i.LastModifiedDate,
+	)
+	return i, err
+}
+
 const randomizeCalendarFeed = `-- name: RandomizeCalendarFeed :one
 UPDATE users
 SET calendar_feed_id = uuid_generate_v4()

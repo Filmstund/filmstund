@@ -66,6 +66,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		AllCommandments   func(childComplexity int) int
+		CurrentUser       func(childComplexity int) int
 		RandomCommandment func(childComplexity int) int
 	}
 
@@ -99,6 +100,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	AllCommandments(ctx context.Context) ([]*model.Commandments, error)
 	RandomCommandment(ctx context.Context) (*model.Commandments, error)
+	CurrentUser(ctx context.Context) (*model.User, error)
 }
 
 type executableSchema struct {
@@ -207,6 +209,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AllCommandments(childComplexity), true
+
+	case "Query.currentUser":
+		if e.complexity.Query.CurrentUser == nil {
+			break
+		}
+
+		return e.complexity.Query.CurrentUser(childComplexity), true
 
 	case "Query.randomCommandment":
 		if e.complexity.Query.RandomCommandment == nil {
@@ -399,7 +408,11 @@ type Commandments {
 	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar Time
 scalar UUID
 scalar FilmstadenMembershipID`, BuiltIn: false},
-	{Name: "../../api/graphql/v2/users.graphqls", Input: `extend type Mutation {
+	{Name: "../../api/graphql/v2/users.graphqls", Input: `extend type Query  {
+    currentUser: User!
+}
+
+extend type Mutation {
     updateUser(newInfo: UserDetailsInput!): User!
 
     # Generate a new calendar feed id, invalidating the old one
@@ -1003,6 +1016,41 @@ func (ec *executionContext) _Query_randomCommandment(ctx context.Context, field 
 	res := resTmp.(*model.Commandments)
 	fc.Result = res
 	return ec.marshalNCommandments2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCommandments(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_currentUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CurrentUser(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2957,6 +3005,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_randomCommandment(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "currentUser":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_currentUser(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

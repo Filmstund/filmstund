@@ -22,6 +22,11 @@ SET filmstaden_membership_id = COALESCE(NULLIF(TRIM(@filmstaden_membership_id), 
 WHERE subject_id = @subject_id
 RETURNING *;
 
+-- name: GetUser :one
+SELECT *
+FROM users
+WHERE id = $1;
+
 -- name: RandomizeCalendarFeed :one
 UPDATE users
 SET calendar_feed_id = uuid_generate_v4()
