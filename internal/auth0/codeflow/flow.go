@@ -20,7 +20,7 @@ type Client struct {
 	audience  string
 	oauthCfg  oauth2.Config
 	verifier  *oidc.IDTokenVerifier
-	pkceCache *pkceCache
+	pkceCache *stateCache
 }
 
 func NewClient(audience string, oauthCfg oauth2.Config, verifier *oidc.IDTokenVerifier) *Client {
@@ -34,19 +34,19 @@ func NewClient(audience string, oauthCfg oauth2.Config, verifier *oidc.IDTokenVe
 
 // generateVerification randomly create the State, Nonce, and CodeVerifier
 // for use in the oauth2 authorization code flow.
-func (c *Client) generateVerification(flowID string) (State, Nonce, CodeVerifier) {
+func (c *Client) generateVerification() (State, Nonce, CodeVerifier) {
 	state := State(security.RandBase64String(43))
 	nonce := Nonce(security.RandBase64String(43))
 	codeVerifier := NewCodeVerifier()
 
-	c.pkceCache.Add(flowID, state, nonce, codeVerifier)
+	c.pkceCache.Add(state, nonce, codeVerifier)
 	return state, nonce, codeVerifier
 }
 
 // AuthCodeURL generates the necessary verifcation variables and
 // puts them into cache and returns the auth code URL to redirect to.
-func (c *Client) AuthCodeURL(flowID string) string {
-	state, nonce, codeVerifier := c.generateVerification(flowID)
+func (c *Client) AuthCodeURL() string {
+	state, nonce, codeVerifier := c.generateVerification()
 
 	return c.oauthCfg.AuthCodeURL(
 		state.String(),
@@ -59,31 +59,21 @@ func (c *Client) AuthCodeURL(flowID string) string {
 
 // validateSate fetch the state from the query and cache and compare
 // that they are equal. If equal, it will return the other verification variables.
-func (c *Client) validateState(flowID string, r *http.Request) (Nonce, CodeVerifier, error) {
+func (c *Client) validateState(r *http.Request) (Nonce, CodeVerifier, error) {
 	stateGiven := State(r.URL.Query().Get("state"))
-	stateExpected, nonce, codeVerifier, found := c.pkceCache.Get(flowID)
+	nonce, codeVerifier, found := c.pkceCache.Get(stateGiven)
 	if !found {
-		return "", "", ErrInvalidData
+		return "", "", fmt.Errorf("%w: no state in cache", ErrInvalidData)
 	}
 
-	cmp := subtle.ConstantTimeCompare([]byte(stateGiven), []byte(stateExpected))
-	if cmp != 1 {
-		return "", "", ErrInvalidData
-	}
-
-	c.pkceCache.Del(flowID)
+	c.pkceCache.Del(stateGiven)
 	return nonce, codeVerifier, nil
 }
 
 // ExchangeCode takes the code and exchanges it for an access token and an ID token.
 // Verifications and sanity checks are done along the way.
 func (c *Client) ExchangeCode(r *http.Request) (*oauth2.Token, *oidc.IDToken, error) {
-	flowCookie, err := r.Cookie("flow")
-	if err != nil {
-		return nil, nil, ErrInvalidData
-	}
-
-	nonce, codeVerifier, err := c.validateState(flowCookie.Value, r)
+	nonce, codeVerifier, err := c.validateState(r)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -10,13 +10,12 @@ import (
 )
 
 type (
-	pkceCache struct {
-		cache map[string]verification // Keyed by the session ID // TODO: switch to gocache?
+	stateCache struct {
+		cache map[State]verification // TODO: switch to gocache?
 		mu    sync.RWMutex
 	}
 
 	verification struct {
-		state        State
 		nonce        Nonce
 		codeVerifier CodeVerifier
 		expiresAt    time.Time
@@ -28,28 +27,27 @@ type (
 )
 
 // newPkceCache creates a new cache instance.
-func newPkceCache() *pkceCache {
-	return &pkceCache{
-		cache: map[string]verification{},
+func newPkceCache() *stateCache {
+	return &stateCache{
+		cache: map[State]verification{},
 		mu:    sync.RWMutex{},
 	}
 }
 
 // Get the code verifier for the state.
-func (p *pkceCache) Get(key string) (State, Nonce, CodeVerifier, bool) {
+func (p *stateCache) Get(state State) (Nonce, CodeVerifier, bool) {
 	p.invalidateOldEntries()
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	pkce, itemFound := p.cache[key]
-	return pkce.state, pkce.nonce, pkce.codeVerifier, itemFound
+	pkce, itemFound := p.cache[state]
+	return pkce.nonce, pkce.codeVerifier, itemFound
 }
 
 // Add code verifier for the given state.
-func (p *pkceCache) Add(key string, state State, nonce Nonce, codeVerifier CodeVerifier) {
+func (p *stateCache) Add(state State, nonce Nonce, codeVerifier CodeVerifier) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.cache[key] = verification{
-		state:        state,
+	p.cache[state] = verification{
 		nonce:        nonce,
 		codeVerifier: codeVerifier,
 		expiresAt:    time.Now().Add(10 * time.Minute),
@@ -57,14 +55,14 @@ func (p *pkceCache) Add(key string, state State, nonce Nonce, codeVerifier CodeV
 }
 
 // Del removes the code verifier for the given state.
-func (p *pkceCache) Del(key string) {
+func (p *stateCache) Del(state State) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	delete(p.cache, key)
+	delete(p.cache, state)
 }
 
 // invalidate old entries in the cache.
-func (p *pkceCache) invalidateOldEntries() {
+func (p *stateCache) invalidateOldEntries() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 

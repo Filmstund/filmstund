@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"path"
 	"strings"
-	"time"
 
 	"edholm.dev/go-logging"
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -18,7 +17,6 @@ import (
 	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/httputils"
 	"github.com/filmstund/filmstund/internal/session"
-	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 )
 
@@ -56,28 +54,9 @@ type Handler struct {
 	sessionStorage *session.Storage
 }
 
-func setCookie(w http.ResponseWriter, r *http.Request, name, value string) {
-	kaka := http.Cookie{
-		Name:     name,
-		Value:    value,
-		MaxAge:   int((5 * time.Minute).Seconds()),
-		Secure:   r.TLS != nil, // TODO: this won't work if proxy-forwared to non-tls I assume?
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode, // TODO: how to use strict?
-	}
-	http.SetCookie(w, &kaka)
-}
-
 func (s *Handler) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := uuid.NewRandom()
-		if err != nil {
-			httputils.InternalServerError(w, r)
-			return
-		}
-
-		setCookie(w, r, "flow", id.String())
-		authURL := s.codeFlowClient.AuthCodeURL(id.String())
+		authURL := s.codeFlowClient.AuthCodeURL()
 		http.Redirect(w, r, authURL, http.StatusFound)
 	})
 }
