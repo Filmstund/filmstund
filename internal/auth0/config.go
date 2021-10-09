@@ -22,7 +22,7 @@ type Config struct {
 	// Audience of the API we want to use (who, or what is the tokens intended for)
 	Audience string `env:"OIDC_AUDIENCE, required"`
 	// The scopes to request for our tokens
-	Scopes []string `env:"OIDC_SCOPES, default=openid,profile,email"`
+	Scopes []string `env:"OIDC_SCOPES, default=openid,profile,email,offline_access"`
 
 	// Where should auth0 return users?
 	LoginCallbackURL  string `env:"OIDC_LOGIN_CALLBACK_URL, default=http://local.filmstund.se:8080/login/callback"`
@@ -32,7 +32,6 @@ type Config struct {
 	Algorithm   string `env:"OIDC_EXPECTED_ALG, default=RS256"` // expected signing algorithm
 	JWKsURL     string `env:"OIDC_JWKS_URL, default=${JWT_EXPECTED_ISS}.well-known/jwks.json"`
 	UserinfoURL string `env:"OIDC_USERINFO_URL, default=${JWT_EXPECTED_ISS}userinfo"`
-	// TODO client secret etc?
 
 	jwks     *keyfunc.JWKs
 	jwksOnce sync.Once
