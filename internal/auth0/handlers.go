@@ -63,6 +63,13 @@ func (s *Handler) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		redirectURL := codeflow.RedirectURL(r.URL.Query().Get("to"))
 
+		// If user already logged in, redirect to URL immediately.
+		_, err := s.sessionStorage.Lookup(r.Context(), r)
+		if err == nil {
+			http.Redirect(w, r, string(redirectURL), http.StatusFound)
+			return
+		}
+
 		authURL := s.codeFlowClient.AuthCodeURL(redirectURL)
 		http.Redirect(w, r, authURL, http.StatusFound)
 	})
