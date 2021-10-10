@@ -34,12 +34,17 @@ func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionStorag
 		RedirectURL:  cfg.LoginCallbackURL,
 		Scopes:       cfg.Scopes,
 	}
+	codeClient, err := codeflow.NewClient(
+		cfg.Audience,
+		oauthCfg,
+		provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to setup codeflow client: %w", err)
+	}
+
 	return &Handler{
-		codeFlowClient: codeflow.NewClient(
-			cfg.Audience,
-			oauthCfg,
-			provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
-		),
+		codeFlowClient: codeClient,
 		cfg:            cfg,
 		db:             db,
 		sessionStorage: sessionStorage,
@@ -56,7 +61,7 @@ type Handler struct {
 
 func (s *Handler) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		redirectURL := r.URL.Query().Get("to")
+		redirectURL := codeflow.RedirectURL(r.URL.Query().Get("to"))
 
 		authURL := s.codeFlowClient.AuthCodeURL(redirectURL)
 		http.Redirect(w, r, authURL, http.StatusFound)
@@ -74,7 +79,7 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 
 		accessToken, idToken, redirectURL, err := s.codeFlowClient.ExchangeCode(r)
 		if err != nil {
-			httputils.BadRequest(w, r, err.Error())
+			httputils.BadRequest(w, r, "invalid data")
 			logger.Warnw("code exchange failed", "err", err)
 			return
 		}
@@ -84,9 +89,8 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 			logger.Warnw("failed to start new session", "err", err)
 			return
 		}
-
-		if redirectURL != "" && strings.HasPrefix(redirectURL, "/") {
-			http.Redirect(w, r, redirectURL, http.StatusFound)
+		if redirectURL != "" && strings.HasPrefix(string(redirectURL), "/") {
+			http.Redirect(w, r, string(redirectURL), http.StatusFound)
 			return
 		}
 		http.Redirect(w, r, "/", http.StatusFound)
