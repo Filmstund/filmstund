@@ -53,7 +53,17 @@ func NewState(gcm cipher.AEAD, nonce Nonce, codeVerifier CodeVerifier, redirectU
 }
 
 func StateFromBase64(s string) (State, error) {
-	return base64.RawURLEncoding.DecodeString(s)
+	decoded, err := base64.RawURLEncoding.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+
+	// 12 is the GCM nonce size...
+	if len(decoded) < codeVerifierSize+12 {
+		return nil, fmt.Errorf("state size too small")
+	}
+
+	return decoded, nil
 }
 
 // String returns the state as a base64 encoded string.
