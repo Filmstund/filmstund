@@ -4,6 +4,18 @@
 `LOGGER_LEVEL=INFO`<br>
 `LOGGER_DEVELOPMENT_MODE=true`<br>
  
+## auth0/Config
+`OIDC_CLIENT_ID=<required-to-be-set>`<br>
+`OIDC_CLIENT_SECRET=<required-to-be-set>`<br>
+`OIDC_ISSUER=<required-to-be-set>`<br>
+`OIDC_AUDIENCE=<required-to-be-set>`<br>
+`OIDC_SCOPES=openid`<br>
+`OIDC_LOGIN_CALLBACK_URL=http://local.filmstund.se:8080/login/callback`<br>
+`OIDC_LOGOUT_CALLBACK_URL=http://local.filmstund.se:8080/`<br>
+`OIDC_EXPECTED_ALG=RS256`<br>
+`OIDC_JWKS_URL=${JWT_EXPECTED_ISS}.well-known/jwks.json`<br>
+`OIDC_USERINFO_URL=${JWT_EXPECTED_ISS}userinfo`<br>
+ 
 ## cinema/Config
 `LISTEN_ADDR=:8080`<br>
 `SERVE_PATH=./web/build`<br>
@@ -23,18 +35,13 @@
 `DB_POOL_MAX_CONN_IDLE_TIME`<br>
 `DB_POOL_HEALTH_CHECK_PERIOD`<br>
  
-## security/Config
-`JWT_EXPECTED_ALG=RS256`<br>
-`JWT_EXPECTED_AUD=<required-to-be-set>`<br>
-`JWT_EXPECTED_ISS=<required-to-be-set>`<br>
-`JWT_JWKS_URL=${JWT_EXPECTED_ISS}.well-known/jwks.json`<br>
-`JWT_USERINFO_URL=${JWT_EXPECTED_ISS}userinfo`<br>
- 
-## principal/Config
-`PRINCIPAL_DEFAULT_CACHE_SIZE=20`<br>
-`PRINCIPAL_EXPIRY_INTERVAL=7s`<br>
+## session/Config
+`SESSION_EXPIRATION_DURATION=48h`<br>
+`SESSION_COOKIE_NAME=data`<br>
  
 ## site/Config
-`SITE_DOMAIN=staging.filmstund.se`<br>
-`SITE_PROTOCOL=https://`<br>
+`SITE_HOST=staging.filmstund.se`<br>
+`SITE_SCHEME=https`<br>
+`SITE_CALENDAR_PREFIX=/calendar/ical`<br>
+`SITE_ALLOWED_ORIGINS=http://localhost:3000`<br>
 
