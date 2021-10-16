@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 )
@@ -16,49 +15,46 @@ import (
 func (r *queryResolver) AllCommandments(ctx context.Context) ([]*model.Commandments, error) {
 	logger := logging.FromContext(ctx)
 
-	var commandments []*model.Commandments
-	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		all, err := q.ListCommandments(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to list all commandments: %w", err)
-		}
+	q, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("AllCommandments: %w", err)
+	}
+	defer cleanup()
 
-		commandments = make([]*model.Commandments, 0, len(all))
-		for _, row := range all {
-			commandments = append(commandments, &model.Commandments{
-				Number: int(row.Number),
-				Phrase: row.Phrase,
-			})
-		}
-		return nil
-	})
+	all, err := q.ListCommandments(ctx)
 	if err != nil {
 		logger.Warnw("AllCommandments failed", "err", err)
-		return nil, fmt.Errorf("couldn't list all commandments")
+		return nil, fmt.Errorf("failed to list all commandments: %w", err)
 	}
 
+	commandments := make([]*model.Commandments, 0, len(all))
+	for _, row := range all {
+		commandments = append(commandments, &model.Commandments{
+			Number: int(row.Number),
+			Phrase: row.Phrase,
+		})
+	}
 	return commandments, nil
 }
 
 func (r *queryResolver) RandomCommandment(ctx context.Context) (*model.Commandments, error) {
 	logger := logging.FromContext(ctx)
 
-	var commandment model.Commandments
-	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		rnd, err := q.RandomCommandment(ctx)
-		if err != nil {
-			return fmt.Errorf("RandomCommandment query failed: %w", err)
-		}
+	q, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("AllCommandments: %w", err)
+	}
+	defer cleanup()
 
-		commandment = model.Commandments{
-			Number: int(rnd.Number),
-			Phrase: rnd.Phrase,
-		}
-		return nil
-	})
+	rnd, err := q.RandomCommandment(ctx)
 	if err != nil {
 		logger.Warnw("RandomCommandment failed", "err", err)
-		return nil, fmt.Errorf("couldn't fetch a random commandment")
+		return nil, fmt.Errorf("RandomCommandment query failed: %w", err)
+	}
+
+	commandment := model.Commandments{
+		Number: int(rnd.Number),
+		Phrase: rnd.Phrase,
 	}
 	return &commandment, nil
 }

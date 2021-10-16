@@ -9,7 +9,6 @@ import (
 
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/mappers"
 	"github.com/filmstund/filmstund/internal/graph/model"
@@ -19,15 +18,13 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 	logger := logging.FromContext(ctx)
 	princ := principal.FromContext(ctx)
 
-	var user sqlc.User
-	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		u, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Subject))
-		if err != nil {
-			return err
-		}
-		user = u
-		return nil
-	})
+	q, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("AllCommandments: %w", err)
+	}
+	defer cleanup()
+
+	user, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Subject))
 	if err != nil {
 		logger.Infow("failed to update user", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to update user")
@@ -39,42 +36,36 @@ func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.U
 	logger := logging.FromContext(ctx)
 	princ := principal.FromContext(ctx)
 
-	var user *model.User
-	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		u, err := q.RandomizeCalendarFeed(ctx, princ.Subject.String())
-		if err != nil {
-			return err
-		}
+	q, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("AllCommandments: %w", err)
+	}
+	defer cleanup()
 
-		user = mappers.ToGraphUser(u, r.siteCfg)
-		return nil
-	})
+	user, err := q.RandomizeCalendarFeed(ctx, princ.Subject.String())
 	if err != nil {
 		logger.Infow("failed to invalidate calendar feed", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to invalidate calendar feed")
 	}
-	return user, nil
+	return mappers.ToGraphUser(user, r.siteCfg), nil
 }
 
 func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	princ := principal.FromContext(ctx)
 
-	var user *model.User
-	err := r.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		u, err := q.DisableCalendarFeed(ctx, princ.Subject.String())
-		if err != nil {
-			return err
-		}
+	q, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("AllCommandments: %w", err)
+	}
+	defer cleanup()
 
-		user = mappers.ToGraphUser(u, r.siteCfg)
-		return nil
-	})
+	user, err := q.DisableCalendarFeed(ctx, princ.Subject.String())
 	if err != nil {
 		logger.Infow("failed to disable calendar feed", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to disable calendar feed")
 	}
-	return user, nil
+	return mappers.ToGraphUser(user, r.siteCfg), nil
 }
 
 func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []*model.GiftCertificateInput) (*model.User, error) {

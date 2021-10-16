@@ -6,7 +6,6 @@ import (
 
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
 )
 
 type Service struct {
@@ -20,12 +19,13 @@ func NewService(db *database.DB) *Service {
 }
 
 func (s *Service) Exists(ctx context.Context, sub principal.Subject) (bool, error) {
-	var exists bool
-	err := s.db.DoQuery(ctx, func(q *sqlc.Queries) error {
-		found, err := q.UserExistsBySubject(ctx, sub.String())
-		exists = found
-		return err
-	})
+	q, cleanup, err := s.db.Queries(ctx)
+	if err != nil {
+		return false, fmt.Errorf("Exists: %w", err)
+	}
+	defer cleanup()
+
+	exists, err := q.UserExistsBySubject(ctx, sub.String())
 	if err != nil {
 		return false, fmt.Errorf("failed to check for existence on %s: %w", sub, err)
 	}

@@ -35,24 +35,9 @@ func New(ctx context.Context, cfg *Config) (*DB, error) {
 	}, nil
 }
 
-type QueryFunc func(q *sqlc.Queries) error
-
-// DoQuery retrieves a connection from the DB pool, and executes the
-// given func with a sqlc.Queries.
-func (db *DB) DoQuery(ctx context.Context, f QueryFunc) error {
-	conn, err := db.Pool.Acquire(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to acquire db connection: %w", err)
-	}
-	defer conn.Release()
-
-	queries := sqlc.New(conn)
-	return f(queries)
-}
-
 // Queries retrieves a connection from the DB pool, using it to create a queryable interface.
 // Use func() to clean up and release the connection back to the pool.
-func (db *DB) Queries(ctx context.Context) (*sqlc.Queries, func(), error) {
+func (db *DB) Queries(ctx context.Context) (q *sqlc.Queries, cleanup func(), err error) {
 	conn, err := db.Pool.Acquire(ctx)
 	if err != nil {
 		return nil, noop, fmt.Errorf("failed to acquire db connection: %w", err)
