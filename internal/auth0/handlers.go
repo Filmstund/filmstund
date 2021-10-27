@@ -87,13 +87,13 @@ func (s *Handler) LoginCallbackHandler() http.Handler {
 		accessToken, idToken, redirectURL, err := s.codeFlowClient.ExchangeCode(r)
 		if err != nil {
 			httputils.BadRequest(w, r, "invalid data")
-			logger.Warnw("code exchange failed", "err", err)
+			logger.Info("code exchange failed", "err", err)
 			return
 		}
 
 		if err := s.startNewSession(w, r, accessToken, idToken); err != nil {
 			httputils.InternalServerError(w, r)
-			logger.Warnw("failed to start new session", "err", err)
+			logger.Info("failed to start new session", "err", err)
 			return
 		}
 		if redirectURL != "" && strings.HasPrefix(string(redirectURL), "/") {
@@ -159,13 +159,13 @@ func (s *Handler) LogoutHandler() http.Handler {
 		logoutURL, err := s.logoutURL()
 		if err != nil {
 			httputils.InternalServerError(w, r)
-			logger.Warnw("failed to create logout URL", "err", err)
+			logger.Info("failed to create logout URL", "err", err)
 			return
 		}
 
 		if err = s.sessionStorage.Invalidate(r.Context(), w, r); err != nil {
 			httputils.InternalServerError(w, r)
-			logger.Warnw("failed to invalidate session", "err", err)
+			logger.Info("failed to invalidate session", "err", err)
 		}
 		http.Redirect(w, r, logoutURL, http.StatusFound)
 	})

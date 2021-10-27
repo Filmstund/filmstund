@@ -103,12 +103,12 @@ func sendError(w http.ResponseWriter, r *http.Request, status int, response Erro
 
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		logger.Warnw("failed to unmarshal error response", "err", err)
+		logger.Info("failed to unmarshal error response", "err", err)
 		return
 	}
 
 	if _, err = w.Write(bytes); err != nil {
-		logger.Warnw("failed to write error response", "err", err)
+		logger.Info("failed to write error response", "err", err)
 		return
 	}
 }

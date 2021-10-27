@@ -3,12 +3,13 @@ module github.com/filmstund/filmstund
 go 1.17
 
 require (
-	edholm.dev/go-logging v0.0.0
+	edholm.dev/go-logging v1.0.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/MicahParks/keyfunc v0.9.0
 	github.com/allegro/bigcache/v3 v3.0.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/eko/gocache/v2 v2.1.0
+	github.com/go-logr/logr v1.2.0
 	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/google/uuid v1.3.0
@@ -19,7 +20,6 @@ require (
 	github.com/sethvargo/go-envconfig v0.3.5
 	github.com/spf13/pflag v1.0.5
 	github.com/vektah/gqlparser/v2 v2.2.0
-	go.uber.org/zap v1.19.1
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	gotest.tools/v3 v3.0.3
 )
@@ -33,6 +33,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/go-logr/zapr v1.2.0 // indirect
 	github.com/go-redis/redis/v8 v8.9.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
@@ -66,6 +67,7 @@ require (
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
+	go.uber.org/zap v1.19.1 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e // indirect

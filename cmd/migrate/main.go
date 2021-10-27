@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -11,30 +12,30 @@ import (
 
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/go-logr/logr"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/pgx"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/sethvargo/go-envconfig"
 	"github.com/spf13/pflag"
-	"go.uber.org/zap"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
 	logger := logging.NewLoggerFromEnv()
-	defer logger.Sync() //nolint:errcheck
 	ctx = logging.WithLogger(ctx, logger)
 
 	defer func() {
 		stop()
 		if r := recover(); r != nil {
-			logger.Fatalw("application panic", "panic", r)
+			logger.Info("application panic", "panic", r)
+			os.Exit(1)
 		}
 	}()
 
 	if err := realMain(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Errorw("migration error", "err", err)
+		logger.Error(err, "migration error")
 	}
 }
 
@@ -54,7 +55,7 @@ func realMain(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("unable to process the config: %w", err)
 	}
-	logger.Infow("using database config", "config", cfg)
+	logger.Info("using database config", "config", cfg)
 
 	file := fmt.Sprintf("file://%s", *pathToMigrations)
 	mig, err := migrate.New(file, cfg.PGXConnectionString())
@@ -62,9 +63,9 @@ func realMain(ctx context.Context) error {
 		return fmt.Errorf("unable to setup migrate: %w", err)
 	}
 	mig.LockTimeout = *timeout
-	mig.Log = &migLogger{logger: logger.Named("migrater")}
+	mig.Log = &migLogger{logger: logger.WithName("migrater")}
 
-	logger.Infof("running database migrations from %s", *pathToMigrations)
+	logger.Info("running database migrations", "source", *pathToMigrations)
 	if err = mig.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("unable to run Up(): %w", err)
 	}
@@ -77,17 +78,17 @@ func realMain(ctx context.Context) error {
 		return fmt.Errorf("migrate database error: %w", err)
 	}
 
-	logger.Infof("migrations complete")
+	logger.Info("migrations complete")
 	return nil
 }
 
 // migLogger is an implementation of the interface that the migrate lib expects.
 type migLogger struct {
-	logger *zap.SugaredLogger
+	logger logr.Logger
 }
 
 func (s *migLogger) Printf(format string, v ...interface{}) {
-	s.logger.Infof(strings.TrimSpace(format), v...)
+	s.logger.Info(fmt.Sprintf(strings.TrimSpace(format), v...))
 }
 
 func (s *migLogger) Verbose() bool {

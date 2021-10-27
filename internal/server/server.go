@@ -42,20 +42,20 @@ func (s *Server) ServeHTTP(ctx context.Context, srv *http.Server) error {
 	go func() {
 		<-ctx.Done()
 
-		logger.Debugf("http.Server: context closed")
+		logger.V(2).Info("http.Server: context closed")
 		timeCtx, cancelFunc := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancelFunc()
 
-		logger.Debugf("http.Server: shutting down")
+		logger.V(1).Info("http.Server: shutting down")
 		errCh <- srv.Shutdown(timeCtx)
 	}()
 
-	logger.Infof("listening for HTTP on %s", s.Addr())
+	logger.Info("listening for HTTP", "addr", s.Addr())
 	if err := srv.Serve(s.listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("failed to serve HTTP: %w", err)
 	}
 
-	logger.Debugf("stopped listening for HTTP")
+	logger.V(1).Info("stopped listening for HTTP")
 	select {
 	case err := <-errCh:
 		return fmt.Errorf("failed to shutdown server: %w", err)

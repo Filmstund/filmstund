@@ -23,7 +23,7 @@ func (r *queryResolver) AllCommandments(ctx context.Context) ([]*model.Commandme
 
 	all, err := q.ListCommandments(ctx)
 	if err != nil {
-		logger.Warnw("AllCommandments failed", "err", err)
+		logger.Info("AllCommandments failed", "err", err)
 		return nil, fmt.Errorf("failed to list all commandments: %w", err)
 	}
 
@@ -48,7 +48,7 @@ func (r *queryResolver) RandomCommandment(ctx context.Context) (*model.Commandme
 
 	rnd, err := q.RandomCommandment(ctx)
 	if err != nil {
-		logger.Warnw("RandomCommandment failed", "err", err)
+		logger.Info("RandomCommandment failed", "err", err)
 		return nil, fmt.Errorf("RandomCommandment query failed: %w", err)
 	}
 

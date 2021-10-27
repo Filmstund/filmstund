@@ -64,7 +64,7 @@ func fetchJwksUntilFound(ctx context.Context, jwksURL string) *keyfunc.JWKs {
 	refreshInterval := 48 * time.Hour
 	refreshRateLimit := 7 * time.Minute
 	errorHandler := func(err error) {
-		logger.Warnw("failed to refresh JWKS", "err", err, "url", jwksURL)
+		logger.Info("failed to refresh JWKS", "err", err, "url", jwksURL)
 	}
 
 	attempt := 0
@@ -73,7 +73,7 @@ func fetchJwksUntilFound(ctx context.Context, jwksURL string) *keyfunc.JWKs {
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Debugf("context cancelled, bailing out without JWKS...")
+			logger.V(1).Info("context cancelled, bailing out without JWKS...")
 			return nil
 		case <-ticker.C:
 			jwks, err := keyfunc.Get(jwksURL, keyfunc.Options{
@@ -86,11 +86,11 @@ func fetchJwksUntilFound(ctx context.Context, jwksURL string) *keyfunc.JWKs {
 			if err != nil {
 				attempt++
 				ticker.Reset(exponentialBackoff(attempt))
-				logger.Infow("failed to download JWKS", "url", jwksURL, "err", err, "attempt", attempt)
+				logger.Info("failed to download JWKS", "url", jwksURL, "err", err, "attempt", attempt)
 				continue
 			}
 
-			logger.Debugw("downloaded JWKs", "attempt", attempt, "url", jwksURL)
+			logger.V(1).Info("downloaded JWKs", "attempt", attempt, "url", jwksURL)
 			return jwks
 		}
 	}

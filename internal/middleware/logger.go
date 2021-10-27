@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"edholm.dev/go-logging"
+	"github.com/go-logr/logr"
 	"github.com/gorilla/mux"
-	"go.uber.org/zap"
 )
 
-func AttachAppLogger(logger *zap.SugaredLogger) mux.MiddlewareFunc {
+func AttachAppLogger(logger logr.Logger) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()

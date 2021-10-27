@@ -50,6 +50,6 @@ func (db *DB) Queries(ctx context.Context) (q *sqlc.Queries, cleanup func(), err
 func noop() {}
 
 func (db *DB) Close(ctx context.Context) {
-	logging.FromContext(ctx).Infof("closing database connection pool...")
+	logging.FromContext(ctx).Info("closing database connection pool...")
 	db.Pool.Close()
 }

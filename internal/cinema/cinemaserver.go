@@ -46,7 +46,6 @@ func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Ser
 
 func (s *Server) Routes(ctx context.Context) *mux.Router {
 	logger := logging.FromContext(ctx)
-	logger.Debugf("routing / to file://%s", s.cfg.ServePath)
 
 	notAuthed := mux.NewRouter()
 

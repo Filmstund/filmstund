@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"edholm.dev/go-logging"
-	"go.uber.org/zap"
+	"github.com/go-logr/logr"
 	"gotest.tools/v3/assert"
 )
 
@@ -14,7 +14,7 @@ func TestAttachAppLogger(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name   string
-		logger *zap.SugaredLogger
+		logger logr.Logger
 	}{
 		{
 			name:   "Default logger",
@@ -22,7 +22,7 @@ func TestAttachAppLogger(t *testing.T) {
 		},
 		{
 			name:   "Custom logger",
-			logger: zap.NewExample().Sugar(),
+			logger: logr.Discard(),
 		},
 	}
 	for _, tt := range tests {
@@ -36,7 +36,7 @@ func TestAttachAppLogger(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := http.Request{}
 
-			var actualLogger *zap.SugaredLogger
+			var actualLogger logr.Logger
 			handlerFunc(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 				actualLogger = logging.FromContext(request.Context())
 				w.WriteHeader(http.StatusOK)

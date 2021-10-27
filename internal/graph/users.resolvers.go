@@ -26,7 +26,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 
 	user, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Subject))
 	if err != nil {
-		logger.Infow("failed to update user", "sub", princ.Subject, "err", err)
+		logger.Info("failed to update user", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to update user")
 	}
 	return mappers.ToGraphUser(user, r.siteCfg), nil
@@ -44,7 +44,7 @@ func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.U
 
 	user, err := q.RandomizeCalendarFeed(ctx, princ.Subject.String())
 	if err != nil {
-		logger.Infow("failed to invalidate calendar feed", "sub", princ.Subject, "err", err)
+		logger.Info("failed to invalidate calendar feed", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to invalidate calendar feed")
 	}
 	return mappers.ToGraphUser(user, r.siteCfg), nil
@@ -62,7 +62,7 @@ func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User
 
 	user, err := q.DisableCalendarFeed(ctx, princ.Subject.String())
 	if err != nil {
-		logger.Infow("failed to disable calendar feed", "sub", princ.Subject, "err", err)
+		logger.Info("failed to disable calendar feed", "sub", princ.Subject, "err", err)
 		return nil, fmt.Errorf("failed to disable calendar feed")
 	}
 	return mappers.ToGraphUser(user, r.siteCfg), nil
@@ -82,14 +82,14 @@ func (r *queryResolver) CurrentUser(ctx context.Context) (*model.User, error) {
 
 	queries, cleanup, err := r.db.Queries(ctx)
 	if err != nil {
-		logger.Infow("failed to connect to database", "err", err)
+		logger.Info("failed to connect to database", "err", err)
 		return nil, fmt.Errorf("failed to connect to database")
 	}
 	defer cleanup()
 
 	user, err := queries.GetUser(ctx, princ.ID)
 	if err != nil {
-		logger.Infow("failed to get user", "id", princ.ID, "err", err)
+		logger.Info("failed to get user", "id", princ.ID, "err", err)
 		return nil, fmt.Errorf("failed to get user")
 	}
 

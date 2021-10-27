@@ -27,7 +27,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	if err := envconfig.Process(ctx, cfg); err != nil {
 		return nil, fmt.Errorf("failed to process config: %w", err)
 	}
-	logger.Debugw("using config", "config", cfg)
+	logger.V(1).Info("using config", "config", cfg)
 
 	options := make([]serverenv.Option, 0, 3)
 

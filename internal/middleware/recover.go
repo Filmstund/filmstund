@@ -17,7 +17,7 @@ func RecoverPanic() mux.MiddlewareFunc {
 			defer func() {
 				rec := recover()
 				if rec != nil {
-					logger.Errorw("panic occurred", "url", r.RequestURI, "panic", rec)
+					logger.Info("panic occurred", "url", r.RequestURI, "panic", rec)
 					// TODO: replace with something more convenient
 					http.Error(w, `{"error": "an unexpected error occurred"}`, http.StatusInternalServerError)
 				}

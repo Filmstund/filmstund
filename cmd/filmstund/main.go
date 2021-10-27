@@ -12,35 +12,35 @@ import (
 	"github.com/filmstund/filmstund/internal/cinema"
 	"github.com/filmstund/filmstund/internal/server"
 	"github.com/filmstund/filmstund/internal/setup"
+	"github.com/go-logr/logr"
 	"github.com/sethvargo/go-envconfig"
-	"go.uber.org/zap"
 )
 
 type LoggerConfig struct {
-	Level           string `env:"LOGGER_LEVEL, default=INFO"`
-	DevelopmentMode bool   `env:"LOGGER_DEVELOPMENT_MODE, default=true"`
+	Verbosity       int  `env:"LOGGER_VERBOSITY, default=0"`
+	DevelopmentMode bool `env:"LOGGER_DEVELOPMENT_MODE, default=true"`
 }
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
 	logger := setupLogger(ctx)
-	defer logger.Sync() //nolint:errcheck
 	ctx = logging.WithLogger(ctx, logger)
 
 	if err := os.Setenv("TZ", "UTC"); err != nil {
-		logger.Warnw("failed to change timezone to UTC", "err", err)
+		logger.Info("failed to change timezone to UTC", "err", err)
 	}
 
 	defer func() {
 		stop()
 		if r := recover(); r != nil {
-			logger.Fatalw("application panic", "panic", r)
+			logger.Info("application panic", "panic", r)
+			os.Exit(1)
 		}
 	}()
 
 	if err := realMain(ctx); err != nil && !errors.Is(err, context.Canceled) {
-		logger.Errorw("application error", "err", err)
+		logger.Error(err, "application error")
 	}
 }
 
@@ -66,17 +66,17 @@ func realMain(ctx context.Context) error {
 	return srv.ServeHTTPHandler(ctx, fs.Routes(ctx))
 }
 
-func setupLogger(ctx context.Context) *zap.SugaredLogger {
+func setupLogger(ctx context.Context) logr.Logger {
 	loggerCfg := new(LoggerConfig)
 	err := envconfig.Process(ctx, loggerCfg)
 	if err != nil {
-		logging.DefaultLogger().Warnw("failed to process logger config", "error", err)
+		logging.DefaultLogger().Info("failed to process logger config", "error", err)
 		loggerCfg = &LoggerConfig{
-			Level:           "INFO",
+			Verbosity:       0,
 			DevelopmentMode: true,
 		}
 	}
 
-	logger := logging.NewLogger(loggerCfg.Level, loggerCfg.DevelopmentMode)
+	logger := logging.NewLogger(loggerCfg.Verbosity, loggerCfg.DevelopmentMode)
 	return logger
 }
