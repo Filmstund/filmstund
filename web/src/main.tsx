@@ -1,14 +1,8 @@
-import { StrictMode } from "react";
 import React from "react";
-import { render } from "react-dom";
+import { createRoot } from "react-dom";
 import { Root } from "./Root";
 
-render(
-  <StrictMode>
-    <Root />
-  </StrictMode>,
-  document.getElementById("root")
-);
+createRoot(document.getElementById("root")!).render(<Root />);
 
 declare global {
   interface ArrayConstructor {
