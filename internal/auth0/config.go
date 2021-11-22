@@ -79,8 +79,8 @@ func fetchJwksUntilFound(ctx context.Context, jwksURL string) *keyfunc.JWKs {
 			jwks, err := keyfunc.Get(jwksURL, keyfunc.Options{
 				Ctx:                 ctx,
 				RefreshErrorHandler: errorHandler,
-				RefreshInterval:     &refreshInterval,
-				RefreshRateLimit:    &refreshRateLimit,
+				RefreshInterval:     refreshInterval,
+				RefreshRateLimit:    refreshRateLimit,
 				RefreshUnknownKID:   &refreshUnknownKID,
 			})
 			if err != nil {
