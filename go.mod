@@ -15,7 +15,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgconn v1.10.1
-	github.com/jackc/pgx/v4 v4.13.0
+	github.com/jackc/pgx/v4 v4.14.1
 	github.com/rs/cors v1.8.0
 	github.com/sethvargo/go-envconfig v0.4.0
 	github.com/spf13/pflag v1.0.5
@@ -45,10 +45,10 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20201024163028-a0d42d470451 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.1.1 // indirect
+	github.com/jackc/pgproto3/v2 v2.2.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.8.1 // indirect
-	github.com/jackc/puddle v1.1.4 // indirect
+	github.com/jackc/pgtype v1.9.1 // indirect
+	github.com/jackc/puddle v1.2.0 // indirect
 	github.com/lib/pq v1.10.3 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
