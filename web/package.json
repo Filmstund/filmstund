@@ -22,7 +22,7 @@
     "@fortawesome/free-solid-svg-icons": "5.15.4",
     "@fortawesome/react-fontawesome": "0.1.16",
     "@testing-library/jest-dom": "5.15.0",
-    "@testing-library/react": "13.0.0-alpha.4",
+    "@testing-library/react": "13.0.0-alpha.5",
     "@types/lodash": "4.14.177",
     "@types/node": "16.11.9",
     "@types/react": "^17.0.36",
