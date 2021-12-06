@@ -9,7 +9,7 @@ require (
 	github.com/allegro/bigcache/v3 v3.0.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/eko/gocache/v2 v2.1.0
-	github.com/go-logr/logr v1.2.0
+	github.com/go-logr/logr v1.2.1
 	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/google/uuid v1.3.0
