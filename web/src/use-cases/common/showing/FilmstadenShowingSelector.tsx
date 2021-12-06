@@ -20,46 +20,47 @@ interface FilmstadenShowingSelectorProps {
   movieId: string;
 }
 
-export const FilmstadenShowingSelector: React.FC<FilmstadenShowingSelectorProps> =
-  ({
-    city,
-    movieId,
-    date,
-    filmstadenRemoteEntityId,
-    onChangeDate,
-    onSelectShowing,
-  }) => {
-    const [sfDates] = useSfShowings(movieId, city);
+export const FilmstadenShowingSelector: React.FC<
+  FilmstadenShowingSelectorProps
+> = ({
+  city,
+  movieId,
+  date,
+  filmstadenRemoteEntityId,
+  onChangeDate,
+  onSelectShowing,
+}) => {
+  const [sfDates] = useSfShowings(movieId, city);
 
-    const handleChange = (date: Date) => {
-      onChangeDate(formatYMD(date));
-    };
-
-    return (
-      <>
-        <Field text="Datum:">
-          <DatePicker
-            value={parseISO(date)}
-            onChange={handleChange}
-            disabledDays={{ before: today }}
-            modifiers={{
-              filmstadendays: keys(sfDates || {}).map((s) => new Date(s)),
-            }}
-            modifiersStyles={{
-              filmstadendays: {
-                backgroundColor: "#fff",
-                borderColor: "#d0021b",
-                color: "#d0021b",
-              },
-            }}
-          />
-        </Field>
-        <SfTimeSelector
-          date={date}
-          selectedValue={filmstadenRemoteEntityId || undefined}
-          onSelect={onSelectShowing}
-          filmstadenShowings={sfDates}
-        />
-      </>
-    );
+  const handleChange = (date: Date) => {
+    onChangeDate(formatYMD(date));
   };
+
+  return (
+    <>
+      <Field text="Datum:">
+        <DatePicker
+          value={parseISO(date)}
+          onChange={handleChange}
+          disabledDays={{ before: today }}
+          modifiers={{
+            filmstadendays: keys(sfDates || {}).map((s) => new Date(s)),
+          }}
+          modifiersStyles={{
+            filmstadendays: {
+              backgroundColor: "#fff",
+              borderColor: "#d0021b",
+              color: "#d0021b",
+            },
+          }}
+        />
+      </Field>
+      <SfTimeSelector
+        date={date}
+        selectedValue={filmstadenRemoteEntityId || undefined}
+        onSelect={onSelectShowing}
+        filmstadenShowings={sfDates}
+      />
+    </>
+  );
+};
