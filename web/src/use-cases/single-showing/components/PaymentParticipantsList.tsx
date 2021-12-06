@@ -70,28 +70,29 @@ interface PaymentParticipantsListProps {
   participants: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
 }
 
-export const PaymentParticipantsList: React.FC<PaymentParticipantsListProps> =
-  ({ handlePaidChange, participants }) => {
-    const { hasPaid = [], hasNotPaid = [] } = groupBy(participants, (info) =>
-      info.hasPaid ? "hasPaid" : "hasNotPaid"
-    );
+export const PaymentParticipantsList: React.FC<
+  PaymentParticipantsListProps
+> = ({ handlePaidChange, participants }) => {
+  const { hasPaid = [], hasNotPaid = [] } = groupBy(participants, (info) =>
+    info.hasPaid ? "hasPaid" : "hasNotPaid"
+  );
 
-    return (
-      <div>
-        <Header>Deltagare</Header>
-        {hasNotPaid.length === 0 && "Alla har betalat!"}
-        <UserWithPriceItemList
-          paid={false}
-          participantPaymentInfos={hasNotPaid}
-          handlePaidChange={handlePaidChange}
-        />
+  return (
+    <div>
+      <Header>Deltagare</Header>
+      {hasNotPaid.length === 0 && "Alla har betalat!"}
+      <UserWithPriceItemList
+        paid={false}
+        participantPaymentInfos={hasNotPaid}
+        handlePaidChange={handlePaidChange}
+      />
 
-        <hr />
-        <UserWithPriceItemList
-          paid={true}
-          participantPaymentInfos={hasPaid}
-          handlePaidChange={handlePaidChange}
-        />
-      </div>
-    );
-  };
+      <hr />
+      <UserWithPriceItemList
+        paid={true}
+        participantPaymentInfos={hasPaid}
+        handlePaidChange={handlePaidChange}
+      />
+    </div>
+  );
+};
