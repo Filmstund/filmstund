@@ -23,7 +23,7 @@
     "@fortawesome/react-fontawesome": "0.1.16",
     "@testing-library/jest-dom": "5.16.1",
     "@testing-library/react": "13.0.0-alpha.5",
-    "@types/lodash": "4.14.177",
+    "@types/lodash": "4.14.178",
     "@types/node": "16.11.12",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
