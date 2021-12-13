@@ -73,8 +73,8 @@ github.com/ClickHouse/clickhouse-go v1.4.3/go.mod h1:EaI/sW7Azgz9UATzd5ZdZHRUhHg
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
-github.com/MicahParks/keyfunc v0.10.0 h1:jWNhUVtMchsdYVl714lrZL8On+SKPEvPKC+CpIN7HwE=
-github.com/MicahParks/keyfunc v0.10.0/go.mod h1:R8RZa27qn+5cHTfYLJ9/+7aSb5JIdz7cl0XFo0o4muo=
+github.com/MicahParks/keyfunc v1.0.1 h1:BIKfiyELXV0A8SRCHQaByJW0s71xXpArhzfTS3uf26c=
+github.com/MicahParks/keyfunc v1.0.1/go.mod h1:R8RZa27qn+5cHTfYLJ9/+7aSb5JIdz7cl0XFo0o4muo=
 github.com/Microsoft/go-winio v0.4.11/go.mod h1:VhR8bwka0BXejwEJY73c50VrPtXAaKcyvVC4A4RozmA=
 github.com/Microsoft/go-winio v0.4.14/go.mod h1:qXqCSQ3Xa7+6tgxaGTIe4Kpcdsi+P8jBhyzoq1bpyYA=
 github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5/go.mod h1:tTuCMEN+UleMWgg9dVx4Hu52b1bJo+59jBh3ajtinzw=
