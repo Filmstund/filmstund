@@ -5694,10 +5694,10 @@ react-transition-group@^4.3.0:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@^18.0.0-beta-4729ff6d1-20211202:
-  version "18.0.0-beta-4729ff6d1-20211202"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-beta-4729ff6d1-20211202.tgz#e11d739b03a02ee3a3c1e198fd1c082b5678d217"
-  integrity sha512-wrt3gfwezAL0cGRSnBCeRs6UqTLL0QmETd3+EPQZs1Wq2ufpr29xLJL/VNn+TXrz05wWGAODHudm+C+HTwP1bw==
+react@^18.0.0-rc.0:
+  version "18.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.0.tgz#60bfcf1edd0b35fbeeeca852515c6cc2ce06a6eb"
+  integrity sha512-PawosMBgF8k5Nlc3++ibzjFqPvo1XKv80MNtVYqz3abHHB2w3IpU65sSdSmBd2ooCwVhcp9b1vkx/twqhakNtA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

@@ -33,7 +33,7 @@
     "graphql": "16.1.0",
     "history": "^5.1.0",
     "lodash": "4.17.21",
-    "react": "^18.0.0-beta-4729ff6d1-20211202",
+    "react": "^18.0.0-rc.0",
     "react-day-picker": "7.4.10",
     "react-dom": "^18.0.0-beta-4729ff6d1-20211202",
     "react-modal": "3.14.4",
