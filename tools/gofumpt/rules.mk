@@ -6,11 +6,15 @@ gofumpt_bin := $(gofumpt_cwd)/$(gofumpt_ver)/gofumpt
 system_os   := $(shell uname -s)
 system_arch := $(shell uname -m)
 
-ifneq ($(system_arch), x86_64)
-$(error unsupported arch: $(uname -m))
+ifeq ($(system_arch), x86_64)
+	system_arch := amd64
+else ifeq ($(system_arch), arm64)
+	system_arch := arm64
+else
+	$(error unsupported arch: $(uname -m))
 endif
 
-gofumpt_url := https://github.com/mvdan/gofumpt/releases/download/$(gofumpt_ver)/gofumpt_$(gofumpt_ver)_$(system_os)_amd64
+gofumpt_url := https://github.com/mvdan/gofumpt/releases/download/$(gofumpt_ver)/gofumpt_$(gofumpt_ver)_$(system_os)_$(system_arch)
 
 $(gofumpt_bin): $(gofumpt_cwd)/rules.mk
 	$(info [gofumpt] downloading $(gofumpt_ver)...)
