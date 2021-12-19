@@ -110,17 +110,7 @@ func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []
 			return nil, fmt.Errorf("failed to insert gift certificate")
 		}
 	}
-	user, err := q.GetUser(ctx, prin.ID)
-	if err != nil {
-		logger.Info("failed to get user", "uid", prin.ID, "err", err)
-		return nil, fmt.Errorf("failed to fetch user info: %w", err)
-	}
-	allCerts, err := q.GetGiftCertificates(ctx, prin.ID)
-	if err != nil {
-		logger.Info("failed to get user gift certificates", "uid", prin.ID, "err", err)
-		return nil, fmt.Errorf("failed to fetch user gift certificates")
-	}
-	return mappers.ToGraphUser(user, allCerts, r.siteCfg), nil
+	return fetchUser(ctx, q, r.siteCfg)
 }
 
 func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert model.GiftCertificateInput) (*model.User, error) {
@@ -145,42 +135,18 @@ func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert m
 		logger.Info("failed to delete gift certificates", "uid", prin.ID, "err", err)
 		return nil, fmt.Errorf("failed to delete gift certificates")
 	}
-	user, err := q.GetUser(ctx, prin.ID)
-	if err != nil {
-		logger.Info("failed to get user", "id", prin.ID, "err", err)
-		return nil, fmt.Errorf("failed to fetch user info")
-	}
-	giftCerts, err := q.GetGiftCertificates(ctx, prin.ID)
-	if err != nil {
-		logger.Info("failed to get user gift certificates", "uid", prin.ID, "err", err)
-		return nil, fmt.Errorf("failed to fetch user gift certificates")
-	}
-	return mappers.ToGraphUser(user, giftCerts, r.siteCfg), nil
+	return fetchUser(ctx, q, r.siteCfg)
 }
 
 func (r *queryResolver) CurrentUser(ctx context.Context) (*model.User, error) {
 	logger := logging.FromContext(ctx)
-	princ := principal.FromContext(ctx)
-
 	queries, cleanup, err := r.db.Queries(ctx)
 	if err != nil {
 		logger.Info("failed to connect to database", "err", err)
 		return nil, fmt.Errorf("failed to connect to database")
 	}
 	defer cleanup()
-
-	user, err := queries.GetUser(ctx, princ.ID)
-	if err != nil {
-		logger.Info("failed to get user", "uid", princ.ID, "err", err)
-		return nil, fmt.Errorf("failed to get user")
-	}
-	giftCerts, err := queries.GetGiftCertificates(ctx, princ.ID)
-	if err != nil {
-		logger.Info("failed to get user gift certificates", "uid", princ.ID, "err", err)
-		return nil, fmt.Errorf("failed to get user gift certificates")
-	}
-
-	return mappers.ToGraphUser(user, giftCerts, r.siteCfg), nil
+	return fetchUser(ctx, queries, r.siteCfg)
 }
 
 // Mutation returns gql.MutationResolver implementation.
