@@ -6,9 +6,26 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const addGiftCertificate = `-- name: AddGiftCertificate :exec
+INSERT INTO gift_certificate (user_id, number, expires_at)
+values ($1, $2, $3)
+`
+
+type AddGiftCertificateParams struct {
+	UserID    uuid.UUID `json:"userID"`
+	Number    string    `json:"number"`
+	ExpiresAt time.Time `json:"expiresAt"`
+}
+
+func (q *Queries) AddGiftCertificate(ctx context.Context, arg AddGiftCertificateParams) error {
+	_, err := q.db.Exec(ctx, addGiftCertificate, arg.UserID, arg.Number, arg.ExpiresAt)
+	return err
+}
 
 const createUpdateUser = `-- name: CreateUpdateUser :one
 INSERT INTO users
@@ -44,6 +61,25 @@ func (q *Queries) CreateUpdateUser(ctx context.Context, arg CreateUpdateUserPara
 	return id, err
 }
 
+const deleteGiftCertificate = `-- name: DeleteGiftCertificate :exec
+DELETE
+FROM gift_certificate
+WHERE user_id = $1
+  AND number = $2
+  AND expires_at = $3
+`
+
+type DeleteGiftCertificateParams struct {
+	UserID    uuid.UUID `json:"userID"`
+	Number    string    `json:"number"`
+	ExpiresAt time.Time `json:"expiresAt"`
+}
+
+func (q *Queries) DeleteGiftCertificate(ctx context.Context, arg DeleteGiftCertificateParams) error {
+	_, err := q.db.Exec(ctx, deleteGiftCertificate, arg.UserID, arg.Number, arg.ExpiresAt)
+	return err
+}
+
 const disableCalendarFeed = `-- name: DisableCalendarFeed :one
 UPDATE users
 SET calendar_feed_id = NULL
@@ -70,6 +106,37 @@ func (q *Queries) DisableCalendarFeed(ctx context.Context, subjectID string) (Us
 		&i.LastModifiedDate,
 	)
 	return i, err
+}
+
+const getGiftCertificates = `-- name: GetGiftCertificates :many
+SELECT user_id, number, expires_at, created_date
+FROM gift_certificate
+WHERE user_id = $1
+`
+
+func (q *Queries) GetGiftCertificates(ctx context.Context, userID uuid.UUID) ([]GiftCertificate, error) {
+	rows, err := q.db.Query(ctx, getGiftCertificates, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GiftCertificate
+	for rows.Next() {
+		var i GiftCertificate
+		if err := rows.Scan(
+			&i.UserID,
+			&i.Number,
+			&i.ExpiresAt,
+			&i.CreatedDate,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUser = `-- name: GetUser :one

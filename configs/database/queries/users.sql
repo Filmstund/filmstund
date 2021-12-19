@@ -38,3 +38,19 @@ UPDATE users
 SET calendar_feed_id = NULL
 WHERE subject_id = @subject_id
 RETURNING *;
+
+-- name: AddGiftCertificate :exec
+INSERT INTO gift_certificate (user_id, number, expires_at)
+values (@user_id, @number, @expires_at);
+
+-- name: GetGiftCertificates :many
+SELECT *
+FROM gift_certificate
+WHERE user_id = @user_id;
+
+-- name: DeleteGiftCertificate :exec
+DELETE
+FROM gift_certificate
+WHERE user_id = @user_id
+  AND number = @number
+  AND expires_at = @expires_at;

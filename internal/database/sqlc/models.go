@@ -15,6 +15,13 @@ type Commandment struct {
 	CreatedDate time.Time `json:"createdDate"`
 }
 
+type GiftCertificate struct {
+	UserID      uuid.UUID `json:"userID"`
+	Number      string    `json:"number"`
+	ExpiresAt   time.Time `json:"expiresAt"`
+	CreatedDate time.Time `json:"createdDate"`
+}
+
 type Session struct {
 	ID               uuid.UUID `json:"id"`
 	UserID           uuid.UUID `json:"userID"`
