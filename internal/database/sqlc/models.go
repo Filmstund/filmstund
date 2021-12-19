@@ -15,6 +15,16 @@ type Commandment struct {
 	CreatedDate time.Time `json:"createdDate"`
 }
 
+type Session struct {
+	ID               uuid.UUID `json:"id"`
+	UserID           uuid.UUID `json:"userID"`
+	RefreshToken     string    `json:"refreshToken"`
+	Principal        []byte    `json:"principal"`
+	ExpirationDate   time.Time `json:"expirationDate"`
+	CreatedDate      time.Time `json:"createdDate"`
+	LastModifiedDate time.Time `json:"lastModifiedDate"`
+}
+
 type User struct {
 	ID                     uuid.UUID      `json:"id"`
 	SubjectID              string         `json:"subjectID"`

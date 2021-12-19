@@ -6,20 +6,25 @@ import (
 	"encoding/gob"
 	"fmt"
 	"net/http"
+	"time"
 
+	"edholm.dev/go-logging"
 	"github.com/allegro/bigcache/v3"
 	"github.com/eko/gocache/v2/cache"
 	"github.com/eko/gocache/v2/store"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
+	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/database/sqlc"
 	"github.com/google/uuid"
 )
 
 type Storage struct {
 	cfg          Config
 	cacheManager *cache.Cache
+	db           *database.DB
 }
 
-func NewStorage(cfg Config) (*Storage, error) {
+func NewStorage(cfg Config, db *database.DB) (*Storage, error) {
 	bigCache, err := bigcache.NewBigCache(bigcache.DefaultConfig(cfg.ExpirationTime))
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup bigcache: %w", err)
@@ -28,9 +33,11 @@ func NewStorage(cfg Config) (*Storage, error) {
 	cacheStore := store.NewBigcache(bigCache, nil)
 	cacheManager := cache.New(cacheStore)
 
+	// TODO: spin up a goroutine that removes old sessions
 	return &Storage{
 		cfg:          cfg,
 		cacheManager: cacheManager,
+		db:           db,
 	}, nil
 }
 
@@ -40,6 +47,9 @@ func (s *Storage) Start(ctx context.Context, w http.ResponseWriter, prin princip
 		return fmt.Errorf("failed to create session ID: %w", err)
 	}
 
+	if err := s.addToDatabase(ctx, sessionID, prin); err != nil {
+		return fmt.Errorf("failed to add session to database: %w", err)
+	}
 	if err := s.addToCache(ctx, sessionID, prin); err != nil {
 		return fmt.Errorf("failed to put session into cache: %w", err)
 	}
@@ -60,30 +70,61 @@ func (s *Storage) Start(ctx context.Context, w http.ResponseWriter, prin princip
 }
 
 func (s *Storage) addToCache(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
-	bb := new(bytes.Buffer)
-	encoder := gob.NewEncoder(bb)
-	if err := encoder.Encode(prin); err != nil {
-		return fmt.Errorf("failed to encode to byte slice: %w", err)
+	marshaled, err := marshalPrincipal(prin)
+	if err != nil {
+		return err
 	}
 
-	return s.cacheManager.Set(ctx, sessionID.String(), bb.Bytes(), &store.Options{
+	return s.cacheManager.Set(ctx, sessionID.String(), marshaled, &store.Options{
 		Expiration: s.cfg.ExpirationTime,
 	})
 }
 
+func (s *Storage) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
+	marshaled, err := marshalPrincipal(prin)
+	if err != nil {
+		return err
+	}
+	queries, cleanup, err := s.db.Queries(ctx)
+	if err != nil {
+		return fmt.Errorf("faild to accuire query interface: %w", err)
+	}
+	defer cleanup()
+	if err := queries.AddSession(ctx, sqlc.AddSessionParams{
+		ID:           sessionID,
+		UserID:       prin.ID,
+		RefreshToken: prin.Token.RefreshToken,
+		Principal:    marshaled,
+	}); err != nil {
+		return fmt.Errorf("failed to add session to DB: %w", err)
+	}
+	return nil
+}
+
+// Lookup the principal based on the session cookie. Lookup will either be from
+// the local in-mem cache, or from the database.
+// TODO: refresh the principal id token maybe?.
 func (s *Storage) Lookup(ctx context.Context, r *http.Request) (*principal.Principal, error) {
 	sessionCookie, err := r.Cookie(s.cfg.CookieName)
 	if err != nil {
 		return nil, fmt.Errorf("no session found")
 	}
-
 	sessionID := sessionCookie.Value
-
 	prin, err := s.getFromCache(ctx, sessionID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve session from cache: %w", err)
+		session, err := s.getFromDatabase(ctx, sessionID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to lookup session from cache or db: %w", err)
+		}
+		prin, err = unmarshalPrincipal(session.Principal)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal principal from DB: %w", err)
+		}
+		if err := s.addToCache(ctx, uuid.MustParse(sessionID), *prin); err != nil {
+			logging.FromContext(ctx).Error(err, "failed to put principal into cache")
+		}
 	}
-
+	// TODO: check principal token expiry time and refresh it if needed. (maybe not in this func though..)
 	return prin, nil
 }
 
@@ -93,11 +134,9 @@ func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principa
 		return nil, err
 	}
 
-	prin := new(principal.Principal)
-	buff := bytes.NewBuffer(cachedPrincipal.([]byte))
-	err = gob.NewDecoder(buff).Decode(prin)
+	prin, err := unmarshalPrincipal(cachedPrincipal.([]byte))
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode principal: %w", err)
+		return nil, err
 	}
 
 	// Extend life of session on successful lookup
@@ -108,6 +147,25 @@ func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principa
 	}
 
 	return prin, nil
+}
+
+func (s *Storage) getFromDatabase(ctx context.Context, sessionID string) (sqlc.Session, error) {
+	queries, cleanup, err := s.db.Queries(ctx)
+	if err != nil {
+		return sqlc.Session{}, fmt.Errorf("failed to setup query interface: %w", err)
+	}
+	defer cleanup()
+	session, err := queries.GetSession(ctx, uuid.MustParse(sessionID))
+	if err != nil {
+		return sqlc.Session{}, fmt.Errorf("failed to fetch session from DB: %w", err)
+	}
+	if time.Now().After(session.ExpirationDate) {
+		if err := queries.DeleteSession(ctx, uuid.MustParse(sessionID)); err != nil {
+			logging.FromContext(ctx).Error(err, "failed to delete session", "sessionID", sessionID)
+		}
+		return sqlc.Session{}, fmt.Errorf("session has expired")
+	}
+	return session, nil
 }
 
 func (s *Storage) Invalidate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -126,4 +184,22 @@ func (s *Storage) Invalidate(ctx context.Context, w http.ResponseWriter, r *http
 	})
 
 	return s.cacheManager.Delete(ctx, sessionCookie.Value)
+}
+
+func marshalPrincipal(prin principal.Principal) ([]byte, error) {
+	bb := new(bytes.Buffer)
+	encoder := gob.NewEncoder(bb)
+	if err := encoder.Encode(prin); err != nil {
+		return nil, fmt.Errorf("failed to encode to byte slice: %w", err)
+	}
+	return bb.Bytes(), nil
+}
+
+func unmarshalPrincipal(cachedPrincipal []byte) (*principal.Principal, error) {
+	prin := new(principal.Principal)
+	buff := bytes.NewBuffer(cachedPrincipal)
+	if err := gob.NewDecoder(buff).Decode(prin); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal principal: %w", err)
+	}
+	return prin, nil
 }

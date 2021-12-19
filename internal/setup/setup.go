@@ -43,16 +43,16 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 			serverenv.WithDatabase(db),
 			serverenv.WithUserService(user.NewService(db)),
 		)
-	}
 
-	// Session storage
-	if provider, ok := cfg.(SessionConfigProvider); ok {
-		sessCfg := provider.SessionConfig()
-		sessionStorage, err := session.NewStorage(sessCfg)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't setup the session storage: %w", err)
+		// Session storage
+		if provider, ok := cfg.(SessionConfigProvider); ok {
+			sessCfg := provider.SessionConfig()
+			sessionStorage, err := session.NewStorage(sessCfg, db)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't setup the session storage: %w", err)
+			}
+			options = append(options, serverenv.WithSessionStorage(sessionStorage))
 		}
-		options = append(options, serverenv.WithSessionStorage(sessionStorage))
 	}
 
 	return serverenv.New(ctx, options...), nil
