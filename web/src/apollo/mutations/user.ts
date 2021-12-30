@@ -4,7 +4,7 @@ import { completeUserFragment } from "../queries/currentUser";
 import { UpdateUser, UpdateUserVariables } from "./__generated__/UpdateUser";
 
 const updateUserMutation = gql`
-  mutation UpdateUser($user: NewUserInfo!) {
+  mutation UpdateUser($user: UserDetailsInput!) {
     editedUser: updateUser(newInfo: $user) {
       ...CompleteUser
       calendarFeedUrl

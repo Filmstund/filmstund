@@ -1,9 +1,10 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import * as React from "react";
 import { completeUserFragment } from "../../apollo/queries/currentUser";
-import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { UserProfile } from "./__generated__/UserProfile";
 import Profile from "./ProfileView";
+import { suspend } from "suspend-react";
+import { client } from "../../store/apollo";
 
 const query = gql`
   query UserProfile {
@@ -16,14 +17,16 @@ const query = gql`
 `;
 
 const UserScreen = () => {
-  const { data } = useQuery<UserProfile>(query, {
-    fetchPolicy: "cache-and-network",
-  });
+  const { data } = suspend(
+    () =>
+      client.query<UserProfile>({
+        query,
+        canonizeResults: true,
+        fetchPolicy: "network-only",
+      }),
+    ["user", "profile"]
+  );
 
-  if (!data || !data.me) {
-    return <Loader />;
-  } else {
-    return <Profile me={data.me} />;
-  }
+  return <Profile me={data.me} />;
 };
 export default UserScreen;

@@ -18,4 +18,10 @@ const Logo = ({ className }) => (
 
 export default styled(Logo)`
   fill: #9b9b9b;
+
+  transition: fill 100ms ease;
+
+  :hover {
+    fill: #505050;
+  }
 `;

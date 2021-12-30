@@ -32,7 +32,7 @@ const TicketListRow = styled.div`
   font-size: 13px;
   width: 100%;
   transition: background-color 0.1s ease;
-  background: #f8f8f8;
+  background: var(--main-bg);
 
   @media (min-width: 500px) {
     max-width: 100%;
@@ -42,7 +42,7 @@ const TicketListRow = styled.div`
   }
 
   &:nth-of-type(even) {
-    background: #e3e3e3;
+    background: var(--footer-bg);
   }
 
   &:hover {

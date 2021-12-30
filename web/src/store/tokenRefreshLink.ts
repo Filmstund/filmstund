@@ -39,7 +39,6 @@ export const tokenRefresh = setContext(async (req, { headers }) => {
   return {
     headers: {
       ...headers,
-      Authorization: authorization,
     },
   };
 });

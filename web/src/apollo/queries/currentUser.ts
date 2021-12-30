@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const completeUserFragment = gql`
-  fragment CompleteUser on CurrentUser {
+  fragment CompleteUser on User {
     id
     name
     firstName
@@ -10,10 +10,10 @@ export const completeUserFragment = gql`
     email
     filmstadenMembershipId
     phone
-    avatar
-    foretagsbiljetter {
+    avatar: avatarURL
+    foretagsbiljetter: giftCertificates {
       number
-      expires
+      expires: expiresAt
       status
     }
   }

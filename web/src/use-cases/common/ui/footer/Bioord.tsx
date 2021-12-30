@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { sample } from "lodash";
 import React from "react";
 import { useFadeBetweenValues } from "../../hooks/useFadeBetweenValues";
@@ -7,6 +7,8 @@ import {
   BioordQuery_allBiobudord,
 } from "./__generated__/BioordQuery";
 import QuoteBox from "./QuoteBox";
+import { suspend } from "suspend-react";
+import { client } from "../../../../store/apollo";
 
 const Bioord: React.FC<{ biobudord: BioordQuery_allBiobudord[] }> = ({
   biobudord,
@@ -24,22 +26,20 @@ const Bioord: React.FC<{ biobudord: BioordQuery_allBiobudord[] }> = ({
   );
 };
 
-const useBioord = () =>
-  useQuery<BioordQuery>(gql`
-    query BioordQuery {
-      allBiobudord {
-        number
-        phrase
-      }
+const query = gql`
+  query BioordQuery {
+    allBiobudord: allCommandments {
+      number
+      phrase
     }
-  `);
+  }
+`;
 
 export const BioordLoader = () => {
-  const { data } = useBioord();
-
-  if (!data) {
-    return null;
-  }
+  const { data } = suspend(
+    () => client.query<BioordQuery>({ query, canonizeResults: true }),
+    ["bioord"]
+  );
 
   return <Bioord biobudord={data.allBiobudord} />;
 };

@@ -1,7 +1,6 @@
 import React from "react";
-import { NavLink as RouterLink } from "react-router-dom";
+import { NavLink as ReactRouterLink } from "react-router-dom";
 import styled from "@emotion/styled";
-import { noop } from "lodash";
 
 const NavBarBackground = styled.div`
   background-color: #b71c1c;
@@ -15,7 +14,7 @@ const NavBarLinksContainer = styled.nav`
   justify-content: space-between;
 `;
 
-const GoogleLogoutLink = styled.a`
+const Link = styled.a`
   padding: 0.8rem;
   color: white;
   text-decoration: none;
@@ -25,7 +24,7 @@ const GoogleLogoutLink = styled.a`
   }
 `;
 
-const Link = styled(RouterLink)`
+const InternalLink = styled(ReactRouterLink)`
   padding: 0.8rem;
   color: white;
   text-decoration: none;
@@ -40,12 +39,12 @@ const NavBar = () => {
     <NavBarBackground>
       <NavBarLinksContainer>
         <div>
-          <Link to="/">Mina besök</Link>
-          <Link to="/showings">Alla besök</Link>
+          <InternalLink to="/">Mina besök</InternalLink>
+          <InternalLink to="/showings">Alla besök</InternalLink>
         </div>
         <div>
-          <Link to="/user">Profil</Link>
-          <GoogleLogoutLink onClick={noop}>Logga ut</GoogleLogoutLink>
+          <InternalLink to="/user">Profil</InternalLink>
+          <Link href="/logout">Logga ut</Link>
         </div>
       </NavBarLinksContainer>
     </NavBarBackground>

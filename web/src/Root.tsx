@@ -5,7 +5,7 @@ import "./index.css";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import { client } from "./store/apollo";
-import Loader from "./use-cases/common/utils/ProjectorLoader";
+import { Loader } from "./use-cases/common/utils/ProjectorLoader";
 
 const AsyncApp = lazy(() => import("./App"));
 

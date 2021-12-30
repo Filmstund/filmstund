@@ -1,6 +1,11 @@
 {
-  "schemaPath": "graphql.schema.json",
+  "schemaPath": "schema.graphql",
   "extensions": {
-    "endpoints": {}
+    "endpoints": {
+      "local": {
+        "url": "http://local.filmstund.se:8080/api/graphql",
+        "introspect": true
+      }
+    }
   }
 }

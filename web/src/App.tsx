@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AppQuery } from "./__generated__/AppQuery";
@@ -9,13 +9,15 @@ import { Footer } from "./use-cases/common/ui/footer/Footer";
 
 import NavBar from "./use-cases/common/ui/NavBar";
 import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
-import Loader from "./use-cases/common/utils/ProjectorLoader";
+import { Loader } from "./use-cases/common/utils/ProjectorLoader";
+import { suspend } from "suspend-react";
+import { client } from "./store/apollo";
 
 const MainGridContainer = styled.main`
   display: flex;
   flex-direction: column;
   flex: 1;
-  background-color: #f8f8f8;
+  background-color: var(--main-bg);
   justify-content: stretch;
   padding: 1rem;
 `;
@@ -48,11 +50,10 @@ const appQuery = gql`
 interface Props {}
 
 const App: React.FC<Props> = () => {
-  const { data } = useQuery<AppQuery>(appQuery);
-
-  if (!data || !data.me) {
-    return <Loader />;
-  }
+  suspend(
+    () => client.query<AppQuery>({ query: appQuery, canonizeResults: true }),
+    ["user", "app"]
+  );
 
   return (
     <>
@@ -61,13 +62,10 @@ const App: React.FC<Props> = () => {
         <MainGridContainer>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="/" element={<AsyncHome />} />
+              <Route index element={<AsyncHome />} />
               <Route path="/user" element={<AsyncUser />} />
               <Route path="/showings" element={<AsyncShowings />} />
-              <Route
-                path="/showings/new/:movieId?"
-                element={<AsyncNewShowing />}
-              />
+              <Route path="/showings/new" element={<AsyncNewShowing />} />
               <Route
                 path="/showings/:webId/:slug"
                 element={<AsyncSingleShowing />}
@@ -80,7 +78,7 @@ const App: React.FC<Props> = () => {
                 path="/showings/:webId/:slug/edit"
                 element={<AsyncEditShowing />}
               />
-              <Route path="*" element={<MissingShowing />} />
+              <Route path="/*" element={<MissingShowing />} />
             </Routes>
           </Suspense>
         </MainGridContainer>

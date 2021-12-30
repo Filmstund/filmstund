@@ -16,6 +16,9 @@ export const errorLink = onError((args) => {
       (networkError as any).statusCode === 403 ||
       (networkError as any).statusCode === 401
     ) {
+      if (window.location.pathname !== "/login") {
+        window.location.pathname = "/login";
+      }
       // User is not signed in ???
       console.log("This should never happen...");
     } else {
