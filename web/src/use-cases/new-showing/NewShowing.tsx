@@ -1,46 +1,38 @@
 import { gql, useQuery } from "@apollo/client";
 import React, { useCallback } from "react";
 import { useFetchMovies } from "../../apollo/queries/movies";
-import { navigateToShowing } from "../common/navigators";
 
 import { movieFragment } from "../common/showing/Movie";
 import { NewShowingQuery } from "./__generated__/NewShowingQuery";
-import { CreateShowingFormFetcher } from "./CreateShowingFormFetcher";
 import MovieSelector from "./MovieSelector";
-import { useParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { CreateShowingForm } from "./CreateShowingForm";
 
 const NewShowing = () => {
-  const navigate = useNavigate();
-  const { movieId } = useParams<"movieId">();
+  const [searchParams, setSearchParams] = useSearchParams({ movieId: "" });
 
   const { data } = useAllMovies();
   const [fetchMovies] = useFetchMovies();
 
-  const movies = data ? data.movies : [];
-
-  const handleNavigateToShowing = useCallback(
-    (showing) => {
-      navigateToShowing(navigate, showing);
-    },
-    [navigate]
-  );
+  const movies = data?.movies ?? [];
 
   const clearSelectedMovie = useCallback(() => {
-    navigate("/showings/new");
-  }, [navigate]);
+    setSearchParams({});
+  }, [setSearchParams]);
 
   const setMovie = useCallback(
     (movie) => {
-      navigate(`/showings/new/${movie.id}`);
+      setSearchParams({ movieId: movie.id });
     },
-    [navigate]
+    [setSearchParams]
   );
+
+  const movieId = searchParams.get("movieId") || null;
 
   if (movieId) {
     return (
-      <CreateShowingFormFetcher
+      <CreateShowingForm
         movieId={movieId}
-        navigateToShowing={handleNavigateToShowing}
         clearSelectedMovie={clearSelectedMovie}
       />
     );

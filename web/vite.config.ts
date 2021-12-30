@@ -9,4 +9,17 @@ export default defineConfig({
     outDir: "build",
     sourcemap: true,
   },
+  server: {
+    host: "local.filmstund.se",
+    port: 8080,
+    cors: {
+      origin: /local\.filmstund\.se/,
+      credentials: true,
+    },
+    proxy: {
+      "/api": "http://localhost:8079",
+      "/login": "http://localhost:8079",
+      "/logout": "http://localhost:8079",
+    },
+  },
 });

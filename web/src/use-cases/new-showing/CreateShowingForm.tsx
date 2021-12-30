@@ -13,16 +13,20 @@ import MainButton, { GrayButton } from "../common/ui/MainButton";
 import {
   CreateShowingQuery,
   CreateShowingQuery_me,
+  CreateShowingQueryVariables,
 } from "./__generated__/CreateShowingQuery";
 import { SfShowingsQuery_movie_showings } from "./hooks/__generated__/SfShowingsQuery";
 import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
+import { suspend } from "suspend-react";
+import { createShowingFormQuery } from "./CreateShowingFormFetcher";
+import { client } from "../../store/apollo";
+import { useNavigate } from "react-router-dom";
+import { navigateToShowing } from "../common/navigators";
 
 const now = new Date();
 
 interface Props {
-  data: CreateShowingQuery;
   movieId: string;
-  navigateToShowing: (s: { webId: string; slug: string }) => void;
   clearSelectedMovie: () => void;
 }
 
@@ -36,11 +40,11 @@ interface ShowingState {
   admin: CreateShowingQuery_me;
 }
 
-const getInitialState = (props: Props): ShowingState => {
-  const {
-    data: { me, movie },
-    movieId,
-  } = props;
+const getInitialState = (
+  data: CreateShowingQuery,
+  movieId: string
+): ShowingState => {
+  const { me, movie } = data;
 
   let date = now;
 
@@ -60,16 +64,27 @@ const getInitialState = (props: Props): ShowingState => {
 };
 
 export const CreateShowingForm: React.FC<Props> = (props) => {
+  const { movieId, clearSelectedMovie } = props;
+  const navigate = useNavigate();
+
+  const { data } = suspend(
+    () =>
+      client.query<CreateShowingQuery, CreateShowingQueryVariables>({
+        query: createShowingFormQuery,
+        fetchPolicy: "network-only",
+        variables: {
+          movieId,
+        },
+      }),
+    ["movie", movieId]
+  );
+
+  const { me, movie, filmstadenCities, previousLocations } = data;
+
   const [city, setCity] = useState("GB");
-  const {
-    movieId,
-    navigateToShowing,
-    clearSelectedMovie,
-    data: { movie, filmstadenCities, previousLocations },
-  } = props;
 
   const [showing, setShowingState] = useState<ShowingState>(() =>
-    getInitialState(props)
+    getInitialState(data, movieId)
   );
 
   const [createShowing] = useCreateShowingMutation();
@@ -130,7 +145,7 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
     createShowing({ variables: { showing } })
       .then((resp) => {
         const { showing } = resp.data!;
-        navigateToShowing(showing);
+        navigateToShowing(navigate, showing);
       })
       .catch((errors) => {
         console.log(errors);

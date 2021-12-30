@@ -7,8 +7,8 @@ import { Row } from "../Layout";
 const FooterBox = styled.footer`
   display: flex;
   align-items: center;
-  background-color: #e3e3e3;
-  color: #9b9b9b;
+  background-color: var(--footer-bg);
+  color: #505050;
   padding: 1em;
   font-weight: 300;
 `;
