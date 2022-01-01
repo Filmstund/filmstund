@@ -9,6 +9,7 @@ import (
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/user"
+	"github.com/go-redis/redis/v8"
 	"github.com/sethvargo/go-envconfig"
 )
 
@@ -18,6 +19,10 @@ type DatabaseConfigProvider interface {
 
 type SessionConfigProvider interface {
 	SessionConfig() session.Config
+}
+
+type RedisConfigProvider interface {
+	RedisConfig() serverenv.RedisConfig
 }
 
 func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
@@ -53,6 +58,21 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 			}
 			options = append(options, serverenv.WithSessionStorage(sessionStorage))
 		}
+	}
+
+	if provider, ok := cfg.(RedisConfigProvider); ok {
+		redisCfg := provider.RedisConfig()
+		client := redis.NewClient(&redis.Options{
+			Addr:     fmt.Sprintf("%s:%s", redisCfg.Host, redisCfg.Port),
+			Password: redisCfg.Password,
+			DB:       0,
+		})
+		if err := client.Ping(ctx).Err(); err != nil {
+			return nil, fmt.Errorf("failed to ping Redis: %w", err)
+		}
+		options = append(options,
+			serverenv.WithRedis(client),
+		)
 	}
 
 	return serverenv.New(ctx, options...), nil

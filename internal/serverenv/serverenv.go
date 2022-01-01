@@ -6,12 +6,14 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/user"
+	"github.com/go-redis/redis/v8"
 )
 
 type ServerEnv struct {
 	db             *database.DB
 	userService    *user.Service
 	sessionStorage *session.Storage
+	redis          *redis.Client
 }
 
 type Option func(*ServerEnv) *ServerEnv
@@ -59,6 +61,17 @@ func (e *ServerEnv) SessionStorage() *session.Storage {
 	return e.sessionStorage
 }
 
+func WithRedis(redis *redis.Client) Option {
+	return func(env *ServerEnv) *ServerEnv {
+		env.redis = redis
+		return env
+	}
+}
+
+func (e *ServerEnv) Redis() *redis.Client {
+	return e.redis
+}
+
 func (e *ServerEnv) Close(ctx context.Context) error {
 	if e == nil {
 		return nil
@@ -66,6 +79,10 @@ func (e *ServerEnv) Close(ctx context.Context) error {
 
 	if e.db != nil {
 		e.db.Close(ctx)
+	}
+
+	if e.redis != nil {
+		return e.redis.Close()
 	}
 
 	return nil
