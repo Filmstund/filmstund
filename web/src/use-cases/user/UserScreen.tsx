@@ -29,4 +29,5 @@ const UserScreen = () => {
 
   return <Profile me={data.me} />;
 };
+
 export default UserScreen;

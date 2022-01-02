@@ -1,0 +1,75 @@
+type Commandments {
+  number: Int!
+  phrase: String!
+}
+
+scalar FilmstadenMembershipID
+
+type GiftCertificate {
+  expireTime: Time!
+  number: String!
+  status: GiftCertificate_Status!
+}
+
+input GiftCertificateInput {
+  expireTime: Time
+  number: String!
+}
+
+enum GiftCertificate_Status {
+  AVAILABLE
+  EXPIRED
+  PENDING
+  UNKNOWN
+  USED
+}
+
+scalar IMDbID
+
+scalar MovieID
+
+type Mutation {
+  addGiftCertificates(giftCerts: [GiftCertificateInput!]): User!
+  deleteGiftCertificate(giftCert: GiftCertificateInput!): User!
+  disableCalendarFeed: User!
+  invalidateCalendarFeed: User!
+  updateUser(newInfo: UserDetailsInput!): User!
+}
+
+type Query {
+  allCommandments: [Commandments!]!
+  currentUser: User!
+  randomCommandment: Commandments!
+}
+
+scalar TMDbID
+
+scalar Time
+
+scalar UUID
+
+type User {
+  avatarURL: String
+  calendarFeedId: String
+  calendarFeedUrl: String
+  email: String!
+  filmstadenMembershipId: FilmstadenMembershipID
+  firstName: String!
+  giftCertificates: [GiftCertificate!]!
+  id: UUID!
+  lastLoginTime: Time!
+  lastName: String!
+  name: String!
+  nick: String
+  phone: String
+  signupTime: Time!
+  updateTime: Time!
+}
+
+input UserDetailsInput {
+  filmstadenMembershipId: FilmstadenMembershipID
+  firstName: String
+  lastName: String
+  nick: String
+  phone: String
+}

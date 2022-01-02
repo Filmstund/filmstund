@@ -13,7 +13,7 @@ export const completeUserFragment = gql`
     avatar: avatarURL
     foretagsbiljetter: giftCertificates {
       number
-      expires: expiresAt
+      expires: expireTime
       status
     }
   }
