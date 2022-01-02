@@ -86,7 +86,7 @@ const Profile: React.FC<Props> = ({ me }) => {
         <AvatarImage src={me.avatar} />
         <UserInfo>
           {me.nick && <UserName>{me.nick}</UserName>}
-          <div>"{me.name}"</div>
+          <div>{me.name}</div>
           <div>{me.email}</div>
         </UserInfo>
       </Box>
