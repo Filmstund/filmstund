@@ -28,6 +28,23 @@ type GiftCertificateInput struct {
 	ExpireTime *time.Time `json:"expireTime"`
 }
 
+type Movie struct {
+	ID             string   `json:"id"`
+	FilmstadenID   *string  `json:"filmstadenId"`
+	ImdbID         *string  `json:"imdbId"`
+	TmdbID         *string  `json:"tmdbId"`
+	Slug           *string  `json:"slug"`
+	Title          string   `json:"title"`
+	ReleaseDate    string   `json:"releaseDate"`
+	ProductionYear *int     `json:"productionYear"`
+	Runtime        string   `json:"runtime"`
+	Poster         *string  `json:"poster"`
+	Genres         []string `json:"genres"`
+	Archived       bool     `json:"archived"`
+	UpdateTime     string   `json:"updateTime"`
+	CreateTime     string   `json:"createTime"`
+}
+
 type User struct {
 	ID                     uuid.UUID                       `json:"id"`
 	FilmstadenMembershipID *scalars.FilmstadenMembershipID `json:"filmstadenMembershipId"`
