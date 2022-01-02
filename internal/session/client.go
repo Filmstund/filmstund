@@ -4,22 +4,20 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
-	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
-	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 )
 
+var ErrNoSession = errors.New("no session found")
+
 type Client struct {
 	cfg   Config
-	db    *database.DB
 	redis *redis.Client
 }
 
@@ -27,27 +25,19 @@ func NewClient(cfgProvider ConfigProvider, servEnv *serverenv.ServerEnv) (*Clien
 	cfg := cfgProvider.SessionConfig()
 	return &Client{
 		cfg:   cfg,
-		db:    servEnv.Database(),
 		redis: servEnv.Redis(),
 	}, nil
 }
 
 func (s *Client) Start(ctx context.Context, w http.ResponseWriter, prin principal.Principal) error {
-	sessionID, err := uuid.NewRandom()
-	if err != nil {
-		return fmt.Errorf("failed to create session ID: %w", err)
-	}
-
-	if err := s.addToDatabase(ctx, sessionID, prin); err != nil {
-		return fmt.Errorf("failed to add session to database: %w", err)
-	}
+	sessionID := uuid.NewString()
 	if err := s.addToCache(ctx, sessionID, prin); err != nil {
 		return fmt.Errorf("failed to put session into cache: %w", err)
 	}
 
 	sessionCookie := http.Cookie{
 		Name:  s.cfg.CookieName,
-		Value: sessionID.String(),
+		Value: sessionID,
 		Path:  "/",
 		// MaxAge:   int(s.cfg.ExpirationTime.Seconds()), // TODO: only a "real" session cookie if there is no max-age
 		Secure:   false, // TODO: true
@@ -60,34 +50,13 @@ func (s *Client) Start(ctx context.Context, w http.ResponseWriter, prin principa
 	return nil
 }
 
-func (s *Client) addToCache(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
+func (s *Client) addToCache(ctx context.Context, sessionID string, prin principal.Principal) error {
 	marshaled, err := marshalPrincipal(prin)
 	if err != nil {
 		return err
 	}
 
-	return s.redis.Set(ctx, sessionID.String(), marshaled, s.cfg.ExpirationTime).Err()
-}
-
-func (s *Client) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
-	marshaled, err := marshalPrincipal(prin)
-	if err != nil {
-		return err
-	}
-	queries, cleanup, err := s.db.Queries(ctx)
-	if err != nil {
-		return fmt.Errorf("faild to accuire query interface: %w", err)
-	}
-	defer cleanup()
-	if err := queries.AddSession(ctx, dao.AddSessionParams{
-		ID:           sessionID,
-		UserID:       prin.ID,
-		RefreshToken: prin.Token.RefreshToken,
-		Principal:    marshaled,
-	}); err != nil {
-		return fmt.Errorf("failed to add session to DB: %w", err)
-	}
-	return nil
+	return s.redis.Set(ctx, sessionID, marshaled, s.cfg.ExpirationTime).Err()
 }
 
 // Lookup the principal based on the session cookie. Lookup will either be from
@@ -96,22 +65,12 @@ func (s *Client) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin pr
 func (s *Client) Lookup(ctx context.Context, r *http.Request) (*principal.Principal, error) {
 	sessionCookie, err := r.Cookie(s.cfg.CookieName)
 	if err != nil {
-		return nil, fmt.Errorf("no session found")
+		return nil, ErrNoSession
 	}
 	sessionID := sessionCookie.Value
 	prin, err := s.getFromCache(ctx, sessionID)
 	if err != nil {
-		session, err := s.getFromDatabase(ctx, sessionID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to lookup session from cache or db: %w", err)
-		}
-		prin, err = unmarshalPrincipal(session.Principal)
-		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal principal from DB: %w", err)
-		}
-		if err := s.addToCache(ctx, uuid.MustParse(sessionID), *prin); err != nil {
-			logging.FromContext(ctx).Error(err, "failed to put principal into cache")
-		}
+		return nil, ErrNoSession
 	}
 	// TODO: check principal token expiry time and refresh it if needed. (maybe not in this func though..)
 	return prin, nil
@@ -134,25 +93,6 @@ func (s *Client) getFromCache(ctx context.Context, sessionID string) (*principal
 	}
 
 	return prin, nil
-}
-
-func (s *Client) getFromDatabase(ctx context.Context, sessionID string) (dao.Session, error) {
-	queries, cleanup, err := s.db.Queries(ctx)
-	if err != nil {
-		return dao.Session{}, fmt.Errorf("failed to setup query interface: %w", err)
-	}
-	defer cleanup()
-	session, err := queries.GetSession(ctx, uuid.MustParse(sessionID))
-	if err != nil {
-		return dao.Session{}, fmt.Errorf("failed to fetch session from DB: %w", err)
-	}
-	if time.Now().After(session.ExpirationDate) {
-		if err := queries.DeleteSession(ctx, uuid.MustParse(sessionID)); err != nil {
-			logging.FromContext(ctx).Error(err, "failed to delete session", "sessionID", sessionID)
-		}
-		return dao.Session{}, fmt.Errorf("session has expired")
-	}
-	return session, nil
 }
 
 func (s *Client) Invalidate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
