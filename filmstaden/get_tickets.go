@@ -98,6 +98,7 @@ func (client *Client) Tickets(ctx context.Context, sysID, showingID, ticketID st
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup request: %w", err)
 	}
+	logging.FromContext(ctx).V(2).Info("requesting Filmstaden tickets", "url", url)
 	resp, err := client.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to request Filmstaden tickets: %w", err)
