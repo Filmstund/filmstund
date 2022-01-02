@@ -18,14 +18,14 @@ type Commandments struct {
 }
 
 type GiftCertificate struct {
-	Number    string                `json:"number"`
-	ExpiresAt time.Time             `json:"expiresAt"`
-	Status    GiftCertificateStatus `json:"status"`
+	Number     string                `json:"number"`
+	ExpireTime time.Time             `json:"expireTime"`
+	Status     GiftCertificateStatus `json:"status"`
 }
 
 type GiftCertificateInput struct {
-	Number    string     `json:"number"`
-	ExpiresAt *time.Time `json:"expiresAt"`
+	Number     string     `json:"number"`
+	ExpireTime *time.Time `json:"expireTime"`
 }
 
 type User struct {
@@ -41,9 +41,9 @@ type User struct {
 	GiftCertificates       []*GiftCertificate              `json:"giftCertificates"`
 	CalendarFeedID         *string                         `json:"calendarFeedId"`
 	CalendarFeedURL        *string                         `json:"calendarFeedUrl"`
-	LastLogin              time.Time                       `json:"lastLogin"`
-	SignupDate             time.Time                       `json:"signupDate"`
-	LastModifiedDate       time.Time                       `json:"lastModifiedDate"`
+	LastLoginTime          time.Time                       `json:"lastLoginTime"`
+	SignupTime             time.Time                       `json:"signupTime"`
+	UpdateTime             time.Time                       `json:"updateTime"`
 }
 
 type UserDetailsInput struct {

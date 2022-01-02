@@ -12,18 +12,18 @@ import (
 )
 
 const addGiftCertificate = `-- name: AddGiftCertificate :exec
-INSERT INTO gift_certificate (user_id, number, expires_at)
+INSERT INTO gift_certificate (user_id, number, expire_time)
 values ($1, $2, $3)
 `
 
 type AddGiftCertificateParams struct {
-	UserID    uuid.UUID `json:"userID"`
-	Number    string    `json:"number"`
-	ExpiresAt time.Time `json:"expiresAt"`
+	UserID     uuid.UUID `json:"userID"`
+	Number     string    `json:"number"`
+	ExpireTime time.Time `json:"expireTime"`
 }
 
 func (q *Queries) AddGiftCertificate(ctx context.Context, arg AddGiftCertificateParams) error {
-	_, err := q.db.Exec(ctx, addGiftCertificate, arg.UserID, arg.Number, arg.ExpiresAt)
+	_, err := q.db.Exec(ctx, addGiftCertificate, arg.UserID, arg.Number, arg.ExpireTime)
 	return err
 }
 
@@ -31,10 +31,10 @@ const createUpdateUser = `-- name: CreateUpdateUser :one
 INSERT INTO users
     (subject_id, first_name, last_name, nick, email, avatar)
 VALUES ($1, $2, $3, $4, $5, $6)
-ON CONFLICT (subject_id) DO UPDATE SET last_login         = current_timestamp,
+ON CONFLICT (subject_id) DO UPDATE SET last_login_time         = current_timestamp,
                                        email              = $5,
                                        avatar             = $6,
-                                       last_modified_date = current_timestamp
+                                       update_time = current_timestamp
 RETURNING id
 `
 
@@ -66,17 +66,17 @@ DELETE
 FROM gift_certificate
 WHERE user_id = $1
   AND number = $2
-  AND expires_at = $3
+  AND expire_time = $3
 `
 
 type DeleteGiftCertificateParams struct {
-	UserID    uuid.UUID `json:"userID"`
-	Number    string    `json:"number"`
-	ExpiresAt time.Time `json:"expiresAt"`
+	UserID     uuid.UUID `json:"userID"`
+	Number     string    `json:"number"`
+	ExpireTime time.Time `json:"expireTime"`
 }
 
 func (q *Queries) DeleteGiftCertificate(ctx context.Context, arg DeleteGiftCertificateParams) error {
-	_, err := q.db.Exec(ctx, deleteGiftCertificate, arg.UserID, arg.Number, arg.ExpiresAt)
+	_, err := q.db.Exec(ctx, deleteGiftCertificate, arg.UserID, arg.Number, arg.ExpireTime)
 	return err
 }
 
@@ -84,7 +84,7 @@ const disableCalendarFeed = `-- name: DisableCalendarFeed :one
 UPDATE users
 SET calendar_feed_id = NULL
 WHERE subject_id = $1
-RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login_time, signup_time, update_time
 `
 
 func (q *Queries) DisableCalendarFeed(ctx context.Context, subjectID string) (User, error) {
@@ -101,15 +101,15 @@ func (q *Queries) DisableCalendarFeed(ctx context.Context, subjectID string) (Us
 		&i.Phone,
 		&i.Avatar,
 		&i.CalendarFeedID,
-		&i.LastLogin,
-		&i.SignupDate,
-		&i.LastModifiedDate,
+		&i.LastLoginTime,
+		&i.SignupTime,
+		&i.UpdateTime,
 	)
 	return i, err
 }
 
 const getGiftCertificates = `-- name: GetGiftCertificates :many
-SELECT user_id, number, expires_at, created_date
+SELECT user_id, number, expire_time, create_time
 FROM gift_certificate
 WHERE user_id = $1
 `
@@ -126,8 +126,8 @@ func (q *Queries) GetGiftCertificates(ctx context.Context, userID uuid.UUID) ([]
 		if err := rows.Scan(
 			&i.UserID,
 			&i.Number,
-			&i.ExpiresAt,
-			&i.CreatedDate,
+			&i.ExpireTime,
+			&i.CreateTime,
 		); err != nil {
 			return nil, err
 		}
@@ -140,7 +140,7 @@ func (q *Queries) GetGiftCertificates(ctx context.Context, userID uuid.UUID) ([]
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+SELECT id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login_time, signup_time, update_time
 FROM users
 WHERE id = $1
 `
@@ -159,9 +159,9 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Phone,
 		&i.Avatar,
 		&i.CalendarFeedID,
-		&i.LastLogin,
-		&i.SignupDate,
-		&i.LastModifiedDate,
+		&i.LastLoginTime,
+		&i.SignupTime,
+		&i.UpdateTime,
 	)
 	return i, err
 }
@@ -170,7 +170,7 @@ const randomizeCalendarFeed = `-- name: RandomizeCalendarFeed :one
 UPDATE users
 SET calendar_feed_id = uuid_generate_v4()
 WHERE subject_id = $1
-RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login_time, signup_time, update_time
 `
 
 func (q *Queries) RandomizeCalendarFeed(ctx context.Context, subjectID string) (User, error) {
@@ -187,9 +187,9 @@ func (q *Queries) RandomizeCalendarFeed(ctx context.Context, subjectID string) (
 		&i.Phone,
 		&i.Avatar,
 		&i.CalendarFeedID,
-		&i.LastLogin,
-		&i.SignupDate,
-		&i.LastModifiedDate,
+		&i.LastLoginTime,
+		&i.SignupTime,
+		&i.UpdateTime,
 	)
 	return i, err
 }
@@ -201,9 +201,9 @@ SET filmstaden_membership_id = COALESCE(NULLIF(TRIM($1), ''), filmstaden_members
     first_name               = COALESCE(NULLIF(TRIM($3), ''), first_name),
     last_name                = COALESCE(NULLIF(TRIM($4), ''), last_name),
     nick                     = COALESCE(NULLIF(TRIM($5), ''), nick),
-    last_modified_date       = current_timestamp
+    update_time       = current_timestamp
 WHERE subject_id = $6
-RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login, signup_date, last_modified_date
+RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login_time, signup_time, update_time
 `
 
 type UpdateUserParams struct {
@@ -236,9 +236,9 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Phone,
 		&i.Avatar,
 		&i.CalendarFeedID,
-		&i.LastLogin,
-		&i.SignupDate,
-		&i.LastModifiedDate,
+		&i.LastLoginTime,
+		&i.SignupTime,
+		&i.UpdateTime,
 	)
 	return i, err
 }

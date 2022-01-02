@@ -16,69 +16,65 @@ type Attendee struct {
 	HasPaid             bool           `json:"hasPaid"`
 	AmountOwed          int32          `json:"amountOwed"`
 	GiftCertificateUsed sql.NullString `json:"giftCertificateUsed"`
-	LastModifiedDate    time.Time      `json:"lastModifiedDate"`
-	CreatedDate         time.Time      `json:"createdDate"`
+	UpdateTime          time.Time      `json:"updateTime"`
+	CreateTime          time.Time      `json:"createTime"`
 }
 
 type CinemaScreen struct {
-	ID          string         `json:"id"`
-	Name        sql.NullString `json:"name"`
-	CreatedDate time.Time      `json:"createdDate"`
+	ID         string         `json:"id"`
+	Name       sql.NullString `json:"name"`
+	CreateTime time.Time      `json:"createTime"`
 }
 
 type Commandment struct {
-	Number      int32     `json:"number"`
-	Phrase      string    `json:"phrase"`
-	CreatedDate time.Time `json:"createdDate"`
+	Number     int32     `json:"number"`
+	Phrase     string    `json:"phrase"`
+	CreateTime time.Time `json:"createTime"`
 }
 
 type GiftCertificate struct {
-	UserID      uuid.UUID `json:"userID"`
-	Number      string    `json:"number"`
-	ExpiresAt   time.Time `json:"expiresAt"`
-	CreatedDate time.Time `json:"createdDate"`
+	UserID     uuid.UUID `json:"userID"`
+	Number     string    `json:"number"`
+	ExpireTime time.Time `json:"expireTime"`
+	CreateTime time.Time `json:"createTime"`
 }
 
 type Location struct {
-	Name             string          `json:"name"`
-	CityAlias        sql.NullString  `json:"cityAlias"`
-	City             sql.NullString  `json:"city"`
-	StreetAddress    sql.NullString  `json:"streetAddress"`
-	PostalCode       sql.NullString  `json:"postalCode"`
-	PostalAddress    sql.NullString  `json:"postalAddress"`
-	Latitude         sql.NullFloat64 `json:"latitude"`
-	Longitude        sql.NullFloat64 `json:"longitude"`
-	FilmstadenID     sql.NullString  `json:"filmstadenID"`
-	LastModifiedDate time.Time       `json:"lastModifiedDate"`
-	CreatedDate      time.Time       `json:"createdDate"`
+	Name          string          `json:"name"`
+	CityAlias     sql.NullString  `json:"cityAlias"`
+	City          sql.NullString  `json:"city"`
+	StreetAddress sql.NullString  `json:"streetAddress"`
+	PostalCode    sql.NullString  `json:"postalCode"`
+	PostalAddress sql.NullString  `json:"postalAddress"`
+	Latitude      sql.NullFloat64 `json:"latitude"`
+	Longitude     sql.NullFloat64 `json:"longitude"`
+	FilmstadenID  sql.NullString  `json:"filmstadenID"`
+	UpdateTime    time.Time       `json:"updateTime"`
+	CreateTime    time.Time       `json:"createTime"`
 }
 
 type LocationAlias struct {
-	Location         sql.NullString `json:"location"`
-	Alias            string         `json:"alias"`
-	LastModifiedDate time.Time      `json:"lastModifiedDate"`
-	CreatedDate      time.Time      `json:"createdDate"`
+	Location   sql.NullString `json:"location"`
+	Alias      string         `json:"alias"`
+	UpdateTime time.Time      `json:"updateTime"`
+	CreateTime time.Time      `json:"createTime"`
 }
 
 type Movie struct {
-	ID                    uuid.UUID      `json:"id"`
-	FilmstadenID          sql.NullString `json:"filmstadenID"`
-	ImdbID                sql.NullString `json:"imdbID"`
-	TmdbID                sql.NullInt64  `json:"tmdbID"`
-	Slug                  sql.NullString `json:"slug"`
-	Title                 string         `json:"title"`
-	Synopsis              sql.NullString `json:"synopsis"`
-	OriginalTitle         sql.NullString `json:"originalTitle"`
-	ReleaseDate           sql.NullTime   `json:"releaseDate"`
-	ProductionYear        sql.NullInt32  `json:"productionYear"`
-	Runtime               sql.NullInt64  `json:"runtime"`
-	Poster                sql.NullString `json:"poster"`
-	Genres                []string       `json:"genres"`
-	Popularity            float64        `json:"popularity"`
-	PopularityLastUpdated sql.NullTime   `json:"popularityLastUpdated"`
-	Archived              bool           `json:"archived"`
-	LastModifiedDate      time.Time      `json:"lastModifiedDate"`
-	CreatedDate           time.Time      `json:"createdDate"`
+	ID             uuid.UUID      `json:"id"`
+	FilmstadenID   sql.NullString `json:"filmstadenID"`
+	ImdbID         sql.NullString `json:"imdbID"`
+	TmdbID         sql.NullInt64  `json:"tmdbID"`
+	Slug           sql.NullString `json:"slug"`
+	Title          string         `json:"title"`
+	ReleaseDate    sql.NullTime   `json:"releaseDate"`
+	ProductionYear sql.NullInt32  `json:"productionYear"`
+	Runtime        sql.NullInt64  `json:"runtime"`
+	Poster         sql.NullString `json:"poster"`
+	Genres         []string       `json:"genres"`
+	Archived       bool           `json:"archived"`
+	UpdateTime     time.Time      `json:"updateTime"`
+	CreateTime     time.Time      `json:"createTime"`
 }
 
 type Showing struct {
@@ -95,8 +91,8 @@ type Showing struct {
 	TicketsBought       bool           `json:"ticketsBought"`
 	Admin               uuid.UUID      `json:"admin"`
 	PayToUser           uuid.UUID      `json:"payToUser"`
-	LastModifiedDate    time.Time      `json:"lastModifiedDate"`
-	CreatedDate         time.Time      `json:"createdDate"`
+	UpdateTime          time.Time      `json:"updateTime"`
+	CreateTime          time.Time      `json:"createTime"`
 }
 
 type Ticket struct {
@@ -117,8 +113,8 @@ type Ticket struct {
 	MovieName              string         `json:"movieName"`
 	MovieRating            string         `json:"movieRating"`
 	Attributes             []string       `json:"attributes"`
-	LastModifiedDate       time.Time      `json:"lastModifiedDate"`
-	CreatedDate            time.Time      `json:"createdDate"`
+	UpdateTime             time.Time      `json:"updateTime"`
+	CreateTime             time.Time      `json:"createTime"`
 }
 
 type User struct {
@@ -132,7 +128,7 @@ type User struct {
 	Phone                  sql.NullString `json:"phone"`
 	Avatar                 sql.NullString `json:"avatar"`
 	CalendarFeedID         uuid.NullUUID  `json:"calendarFeedID"`
-	LastLogin              time.Time      `json:"lastLogin"`
-	SignupDate             time.Time      `json:"signupDate"`
-	LastModifiedDate       time.Time      `json:"lastModifiedDate"`
+	LastLoginTime          time.Time      `json:"lastLoginTime"`
+	SignupTime             time.Time      `json:"signupTime"`
+	UpdateTime             time.Time      `json:"updateTime"`
 }

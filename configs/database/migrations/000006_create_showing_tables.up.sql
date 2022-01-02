@@ -1,37 +1,37 @@
 BEGIN TRANSACTION;
 create table locations
 (
-    name               varchar(100)             not null
+    name           varchar(100)             not null
         constraint location_pk primary key,
-    city_alias         varchar(2)               null,
-    city               varchar(100)             null,
-    street_address     varchar(100)             null,
-    postal_code        varchar(10)              null,
-    postal_address     varchar(100)             null,
-    latitude           float                    null,
-    longitude          float                    null,
-    filmstaden_id      varchar(15)              null
+    city_alias     varchar(2)               null,
+    city           varchar(100)             null,
+    street_address varchar(100)             null,
+    postal_code    varchar(10)              null,
+    postal_address varchar(100)             null,
+    latitude       float                    null,
+    longitude      float                    null,
+    filmstaden_id  varchar(15)              null
         constraint location_fsId_unique unique,
-    last_modified_date timestamp with time zone not null default current_timestamp,
-    created_date       timestamp with time zone not null default current_timestamp
+    update_time    timestamp with time zone not null default current_timestamp,
+    create_time    timestamp with time zone not null default current_timestamp
 );
 
 create table location_aliases
 (
-    location           varchar(100)
+    location    varchar(100)
         constraint location_alias_fk references locations on delete cascade,
-    alias              varchar(100)
-        constraint alias_uniq unique            not null,
-    last_modified_date timestamp with time zone not null default current_timestamp,
-    created_date       timestamp with time zone not null default current_timestamp
+    alias       varchar(100)
+        constraint alias_uniq unique     not null,
+    update_time timestamp with time zone not null default current_timestamp,
+    create_time timestamp with time zone not null default current_timestamp
 );
 
 create table cinema_screens
 (
-    id           varchar(50)
+    id          varchar(50)
         constraint cinema_screen_pk primary key,
-    name         varchar(255)             null     default null,
-    created_date timestamp with time zone not null default current_timestamp
+    name        varchar(255)             null     default null,
+    create_time timestamp with time zone not null default current_timestamp
 );
 
 
@@ -57,8 +57,8 @@ create table showings
         constraint showing_admin_fk references users,
     pay_to_user           uuid                   not null
         constraint showing_paytouser_fk references users,
-    last_modified_date    timestamp              not null default current_timestamp,
-    created_date          timestamp              not null default current_timestamp
+    update_time           timestamp              not null default current_timestamp,
+    create_time           timestamp              not null default current_timestamp
 );
 
 create table attendees
@@ -74,8 +74,8 @@ create table attendees
     amount_owed           integer                  not null default 0,
     gift_certificate_used varchar(25)              null
         constraint attendee_giftcert_unique unique,
-    last_modified_date    timestamp with time zone not null default current_timestamp,
-    created_date          timestamp with time zone not null default current_timestamp,
+    update_time           timestamp with time zone not null default current_timestamp,
+    create_time           timestamp with time zone not null default current_timestamp,
 
     constraint attendee_giftcert_fk foreign key (user_id, gift_certificate_used) references gift_certificate on delete set null,
     constraint attendee_pk primary key (showing_id, user_id)
@@ -105,7 +105,7 @@ create table tickets
     movie_name               varchar(100)             not null,
     movie_rating             varchar(30)              not null,
     attributes               varchar(50)[]            not null default '{}',
-    last_modified_date       timestamp with time zone not null default current_timestamp,
-    created_date             timestamp with time zone not null default current_timestamp
+    update_time              timestamp with time zone not null default current_timestamp,
+    create_time              timestamp with time zone not null default current_timestamp
 );
 COMMIT TRANSACTION;

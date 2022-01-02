@@ -2,10 +2,10 @@
 INSERT INTO users
     (subject_id, first_name, last_name, nick, email, avatar)
 VALUES (@subject, @first_name, @last_name, @nick, @email, @avatar)
-ON CONFLICT (subject_id) DO UPDATE SET last_login         = current_timestamp,
+ON CONFLICT (subject_id) DO UPDATE SET last_login_time         = current_timestamp,
                                        email              = @email,
                                        avatar             = @avatar,
-                                       last_modified_date = current_timestamp
+                                       update_time = current_timestamp
 RETURNING id;
 
 -- name: UserExistsBySubject :one
@@ -18,7 +18,7 @@ SET filmstaden_membership_id = COALESCE(NULLIF(TRIM(@filmstaden_membership_id), 
     first_name               = COALESCE(NULLIF(TRIM(@first_name), ''), first_name),
     last_name                = COALESCE(NULLIF(TRIM(@last_name), ''), last_name),
     nick                     = COALESCE(NULLIF(TRIM(@nick), ''), nick),
-    last_modified_date       = current_timestamp
+    update_time       = current_timestamp
 WHERE subject_id = @subject_id
 RETURNING *;
 
@@ -40,8 +40,8 @@ WHERE subject_id = @subject_id
 RETURNING *;
 
 -- name: AddGiftCertificate :exec
-INSERT INTO gift_certificate (user_id, number, expires_at)
-values (@user_id, @number, @expires_at);
+INSERT INTO gift_certificate (user_id, number, expire_time)
+values (@user_id, @number, @expire_time);
 
 -- name: GetGiftCertificates :many
 SELECT *
@@ -53,4 +53,4 @@ DELETE
 FROM gift_certificate
 WHERE user_id = @user_id
   AND number = @number
-  AND expires_at = @expires_at;
+  AND expire_time = @expire_time;

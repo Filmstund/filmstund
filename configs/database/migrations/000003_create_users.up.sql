@@ -14,7 +14,7 @@ create table if not exists users
     avatar                   varchar(255) null,
     calendar_feed_id         uuid
         constraint user_calendarfeedid_unique unique default uuid_generate_v4(),
-    last_login               timestamp    not null   default current_timestamp,
-    signup_date              timestamp    not null   default current_timestamp,
-    last_modified_date       timestamp    not null   default current_timestamp
+    last_login_time          timestamp    not null   default current_timestamp,
+    signup_time              timestamp    not null   default current_timestamp,
+    update_time              timestamp    not null   default current_timestamp
 );

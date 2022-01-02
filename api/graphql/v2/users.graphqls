@@ -28,14 +28,14 @@ type User {
     giftCertificates: [GiftCertificate!]!
     calendarFeedId: String
     calendarFeedUrl: String
-    lastLogin: Time!
-    signupDate: Time!
-    lastModifiedDate: Time!
+    lastLoginTime: Time!
+    signupTime: Time!
+    updateTime: Time!
 }
 
 type GiftCertificate {
     number: String!
-    expiresAt: Time!
+    expireTime: Time!
     status: GiftCertificate_Status!
 }
 
@@ -59,5 +59,5 @@ input UserDetailsInput {
 
 input GiftCertificateInput {
     number: String!
-    expiresAt: Time
+    expireTime: Time
 }

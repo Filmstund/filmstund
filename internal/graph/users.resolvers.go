@@ -95,16 +95,16 @@ func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []
 	defer cleanup()
 	// TODO: do all this in a transaction
 	for _, cert := range giftCerts {
-		var expiresAt time.Time
-		if cert.ExpiresAt == nil {
-			expiresAt = time.Now().AddDate(1, 0, 0)
+		var expireTime time.Time
+		if cert.ExpireTime == nil {
+			expireTime = time.Now().AddDate(1, 0, 0)
 		} else {
-			expiresAt = *cert.ExpiresAt
+			expireTime = *cert.ExpireTime
 		}
 		if err := q.AddGiftCertificate(ctx, dao.AddGiftCertificateParams{
-			UserID:    prin.ID,
-			Number:    cert.Number,
-			ExpiresAt: expiresAt,
+			UserID:     prin.ID,
+			Number:     cert.Number,
+			ExpireTime: expireTime,
 		}); err != nil {
 			logger.Info("failed to insert gift cert", "uid", prin.ID, "err", err, "number", cert.Number)
 			return nil, fmt.Errorf("failed to insert gift certificate")
@@ -121,16 +121,16 @@ func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert m
 		return nil, fmt.Errorf("AddGiftCertificates: %w", err)
 	}
 	defer cleanup()
-	var expiresAt time.Time
-	if giftCert.ExpiresAt == nil {
-		expiresAt = time.Now()
+	var expireTime time.Time
+	if giftCert.ExpireTime == nil {
+		expireTime = time.Now()
 	} else {
-		expiresAt = *giftCert.ExpiresAt
+		expireTime = *giftCert.ExpireTime
 	}
 	if err := q.DeleteGiftCertificate(ctx, dao.DeleteGiftCertificateParams{
-		UserID:    prin.ID,
-		Number:    giftCert.Number,
-		ExpiresAt: expiresAt,
+		UserID:     prin.ID,
+		Number:     giftCert.Number,
+		ExpireTime: expireTime,
 	}); err != nil {
 		logger.Info("failed to delete gift certificates", "uid", prin.ID, "err", err)
 		return nil, fmt.Errorf("failed to delete gift certificates")

@@ -2,11 +2,11 @@ BEGIN TRANSACTION;
 
 create table if not exists commandment
 (
-    number       integer
+    number      integer
         constraint bioBudord_pk primary key,
-    phrase       varchar(255)
-        constraint phrase_uniq unique     not null,
-    created_date timestamp with time zone not null default current_timestamp
+    phrase      varchar(255)
+        constraint phrase_uniq unique    not null,
+    create_time timestamp with time zone not null default current_timestamp
 );
 
 insert into commandment (number, phrase)

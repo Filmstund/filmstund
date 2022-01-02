@@ -51,9 +51,9 @@ type ComplexityRoot struct {
 	}
 
 	GiftCertificate struct {
-		ExpiresAt func(childComplexity int) int
-		Number    func(childComplexity int) int
-		Status    func(childComplexity int) int
+		ExpireTime func(childComplexity int) int
+		Number     func(childComplexity int) int
+		Status     func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -79,13 +79,13 @@ type ComplexityRoot struct {
 		FirstName              func(childComplexity int) int
 		GiftCertificates       func(childComplexity int) int
 		ID                     func(childComplexity int) int
-		LastLogin              func(childComplexity int) int
-		LastModifiedDate       func(childComplexity int) int
+		LastLoginTime          func(childComplexity int) int
 		LastName               func(childComplexity int) int
 		Name                   func(childComplexity int) int
 		Nick                   func(childComplexity int) int
 		Phone                  func(childComplexity int) int
-		SignupDate             func(childComplexity int) int
+		SignupTime             func(childComplexity int) int
+		UpdateTime             func(childComplexity int) int
 	}
 }
 
@@ -132,12 +132,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Commandments.Phrase(childComplexity), true
 
-	case "GiftCertificate.expiresAt":
-		if e.complexity.GiftCertificate.ExpiresAt == nil {
+	case "GiftCertificate.expireTime":
+		if e.complexity.GiftCertificate.ExpireTime == nil {
 			break
 		}
 
-		return e.complexity.GiftCertificate.ExpiresAt(childComplexity), true
+		return e.complexity.GiftCertificate.ExpireTime(childComplexity), true
 
 	case "GiftCertificate.number":
 		if e.complexity.GiftCertificate.Number == nil {
@@ -280,19 +280,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
-	case "User.lastLogin":
-		if e.complexity.User.LastLogin == nil {
+	case "User.lastLoginTime":
+		if e.complexity.User.LastLoginTime == nil {
 			break
 		}
 
-		return e.complexity.User.LastLogin(childComplexity), true
-
-	case "User.lastModifiedDate":
-		if e.complexity.User.LastModifiedDate == nil {
-			break
-		}
-
-		return e.complexity.User.LastModifiedDate(childComplexity), true
+		return e.complexity.User.LastLoginTime(childComplexity), true
 
 	case "User.lastName":
 		if e.complexity.User.LastName == nil {
@@ -322,12 +315,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Phone(childComplexity), true
 
-	case "User.signupDate":
-		if e.complexity.User.SignupDate == nil {
+	case "User.signupTime":
+		if e.complexity.User.SignupTime == nil {
 			break
 		}
 
-		return e.complexity.User.SignupDate(childComplexity), true
+		return e.complexity.User.SignupTime(childComplexity), true
+
+	case "User.updateTime":
+		if e.complexity.User.UpdateTime == nil {
+			break
+		}
+
+		return e.complexity.User.UpdateTime(childComplexity), true
 
 	}
 	return 0, false
@@ -405,7 +405,10 @@ type Commandments {
     phrase: String!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar Time
+	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar MovieID
+scalar IMDbID
+scalar TMDbID
+scalar Time
 scalar UUID
 scalar FilmstadenMembershipID`, BuiltIn: false},
 	{Name: "../../api/graphql/v2/users.graphqls", Input: `extend type Query  {
@@ -438,14 +441,14 @@ type User {
     giftCertificates: [GiftCertificate!]!
     calendarFeedId: String
     calendarFeedUrl: String
-    lastLogin: Time!
-    signupDate: Time!
-    lastModifiedDate: Time!
+    lastLoginTime: Time!
+    signupTime: Time!
+    updateTime: Time!
 }
 
 type GiftCertificate {
     number: String!
-    expiresAt: Time!
+    expireTime: Time!
     status: GiftCertificate_Status!
 }
 
@@ -469,7 +472,7 @@ input UserDetailsInput {
 
 input GiftCertificateInput {
     number: String!
-    expiresAt: Time
+    expireTime: Time
 }
 `, BuiltIn: false},
 }
@@ -682,7 +685,7 @@ func (ec *executionContext) _GiftCertificate_number(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _GiftCertificate_expiresAt(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
+func (ec *executionContext) _GiftCertificate_expireTime(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -700,7 +703,7 @@ func (ec *executionContext) _GiftCertificate_expiresAt(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ExpiresAt, nil
+		return obj.ExpireTime, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1526,7 +1529,7 @@ func (ec *executionContext) _User_calendarFeedUrl(ctx context.Context, field gra
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_lastLogin(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_lastLoginTime(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1544,7 +1547,7 @@ func (ec *executionContext) _User_lastLogin(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastLogin, nil
+		return obj.LastLoginTime, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1561,7 +1564,7 @@ func (ec *executionContext) _User_lastLogin(ctx context.Context, field graphql.C
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_signupDate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_signupTime(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1579,7 +1582,7 @@ func (ec *executionContext) _User_signupDate(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.SignupDate, nil
+		return obj.SignupTime, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1596,7 +1599,7 @@ func (ec *executionContext) _User_signupDate(ctx context.Context, field graphql.
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_lastModifiedDate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_updateTime(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1614,7 +1617,7 @@ func (ec *executionContext) _User_lastModifiedDate(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastModifiedDate, nil
+		return obj.UpdateTime, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2770,11 +2773,11 @@ func (ec *executionContext) unmarshalInputGiftCertificateInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "expiresAt":
+		case "expireTime":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expiresAt"))
-			it.ExpiresAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expireTime"))
+			it.ExpireTime, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2895,8 +2898,8 @@ func (ec *executionContext) _GiftCertificate(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "expiresAt":
-			out.Values[i] = ec._GiftCertificate_expiresAt(ctx, field, obj)
+		case "expireTime":
+			out.Values[i] = ec._GiftCertificate_expireTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3092,18 +3095,18 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_calendarFeedId(ctx, field, obj)
 		case "calendarFeedUrl":
 			out.Values[i] = ec._User_calendarFeedUrl(ctx, field, obj)
-		case "lastLogin":
-			out.Values[i] = ec._User_lastLogin(ctx, field, obj)
+		case "lastLoginTime":
+			out.Values[i] = ec._User_lastLoginTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "signupDate":
-			out.Values[i] = ec._User_signupDate(ctx, field, obj)
+		case "signupTime":
+			out.Values[i] = ec._User_signupTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "lastModifiedDate":
-			out.Values[i] = ec._User_lastModifiedDate(ctx, field, obj)
+		case "updateTime":
+			out.Values[i] = ec._User_updateTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

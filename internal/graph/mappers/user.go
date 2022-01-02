@@ -25,9 +25,9 @@ func ToGraphUser(u dao.User, giftCerts []dao.GiftCertificate, siteCfg site.Confi
 		GiftCertificates:       ToGraphGiftCerts(giftCerts),
 		CalendarFeedID:         fromUUID(u.CalendarFeedID),
 		CalendarFeedURL:        toCalendarURL(u.CalendarFeedID, siteCfg),
-		LastLogin:              u.LastLogin,
-		SignupDate:             u.SignupDate,
-		LastModifiedDate:       u.LastModifiedDate,
+		LastLoginTime:          u.LastLoginTime,
+		SignupTime:             u.SignupTime,
+		UpdateTime:             u.UpdateTime,
 	}
 }
 
@@ -46,9 +46,9 @@ func ToGraphGiftCerts(certs []dao.GiftCertificate) []*model.GiftCertificate {
 	modelCerts := make([]*model.GiftCertificate, len(certs))
 	for i, cert := range certs {
 		modelCerts[i] = &model.GiftCertificate{
-			Number:    cert.Number,
-			ExpiresAt: cert.ExpiresAt,
-			Status:    model.GiftCertificateStatusUnknown, // TODO: needs to be calculated
+			Number:     cert.Number,
+			ExpireTime: cert.ExpireTime,
+			Status:     model.GiftCertificateStatusUnknown, // TODO: needs to be calculated
 		}
 	}
 	return modelCerts
