@@ -6,3 +6,7 @@ type RedisConfig struct {
 	Port     string `env:"REDIS_PORT, default=6379"`
 	Password string `env:"REDIS_PASSWORD" json:"-"`
 }
+
+type RedisConfigProvider interface {
+	RedisConfig() RedisConfig
+}

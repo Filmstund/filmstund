@@ -9,36 +9,26 @@ import (
 	"time"
 
 	"edholm.dev/go-logging"
-	"github.com/allegro/bigcache/v3"
-	"github.com/eko/gocache/v2/cache"
-	"github.com/eko/gocache/v2/store"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/serverenv"
+	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 )
 
 type Storage struct {
-	cfg          Config
-	cacheManager *cache.Cache
-	db           *database.DB
+	cfg   Config
+	db    *database.DB
+	redis *redis.Client
 }
 
-func NewStorage(cfgProvider ConfigProvider, db *database.DB) (*Storage, error) {
+func NewStorage(cfgProvider ConfigProvider, servEnv *serverenv.ServerEnv) (*Storage, error) {
 	cfg := cfgProvider.SessionConfig()
-	bigCache, err := bigcache.NewBigCache(bigcache.DefaultConfig(cfg.ExpirationTime))
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup bigcache: %w", err)
-	}
-
-	cacheStore := store.NewBigcache(bigCache, nil)
-	cacheManager := cache.New(cacheStore)
-
-	// TODO: spin up a goroutine that removes old sessions
 	return &Storage{
-		cfg:          cfg,
-		cacheManager: cacheManager,
-		db:           db,
+		cfg:   cfg,
+		db:    servEnv.Database(),
+		redis: servEnv.Redis(),
 	}, nil
 }
 
@@ -76,9 +66,7 @@ func (s *Storage) addToCache(ctx context.Context, sessionID uuid.UUID, prin prin
 		return err
 	}
 
-	return s.cacheManager.Set(ctx, sessionID.String(), marshaled, &store.Options{
-		Expiration: s.cfg.ExpirationTime,
-	})
+	return s.redis.Set(ctx, sessionID.String(), marshaled, s.cfg.ExpirationTime).Err()
 }
 
 func (s *Storage) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
@@ -130,20 +118,18 @@ func (s *Storage) Lookup(ctx context.Context, r *http.Request) (*principal.Princ
 }
 
 func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principal.Principal, error) {
-	cachedPrincipal, err := s.cacheManager.Get(ctx, sessionID)
+	cachedPrincipal, err := s.redis.Get(ctx, sessionID).Result()
 	if err != nil {
 		return nil, err
 	}
 
-	prin, err := unmarshalPrincipal(cachedPrincipal.([]byte))
+	prin, err := unmarshalPrincipal([]byte(cachedPrincipal))
 	if err != nil {
 		return nil, err
 	}
 
 	// Extend life of session on successful lookup
-	if err := s.cacheManager.Set(ctx, sessionID, cachedPrincipal, &store.Options{
-		Expiration: s.cfg.ExpirationTime,
-	}); err != nil {
+	if err := s.redis.Expire(ctx, sessionID, s.cfg.ExpirationTime).Err(); err != nil {
 		return nil, fmt.Errorf("failed to update session with new expiration: %w", err)
 	}
 
@@ -184,7 +170,7 @@ func (s *Storage) Invalidate(ctx context.Context, w http.ResponseWriter, r *http
 		MaxAge: -1,
 	})
 
-	return s.cacheManager.Delete(ctx, sessionCookie.Value)
+	return s.redis.Del(ctx, sessionCookie.Value).Err()
 }
 
 func marshalPrincipal(prin principal.Principal) ([]byte, error) {

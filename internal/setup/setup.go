@@ -32,6 +32,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 
 	// Database connection pooling
 	if provider, ok := cfg.(DatabaseConfigProvider); ok {
+		logger.V(2).Info("setting up database...")
 		dbCfg := provider.DatabaseConfig()
 		db, err := database.New(ctx, dbCfg)
 		if err != nil {
@@ -44,6 +45,7 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 	}
 
 	if provider, ok := cfg.(RedisConfigProvider); ok {
+		logger.V(2).Info("setting up redis...")
 		redisCfg := provider.RedisConfig()
 		client := redis.NewClient(&redis.Options{
 			Addr:     fmt.Sprintf("%s:%s", redisCfg.Host, redisCfg.Port),

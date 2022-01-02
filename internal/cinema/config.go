@@ -3,6 +3,7 @@ package cinema
 import (
 	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/session"
 	"github.com/filmstund/filmstund/internal/setup"
 	"github.com/filmstund/filmstund/internal/site"
@@ -10,9 +11,10 @@ import (
 
 // Assertion for making sure the config implements these interfaces.
 var (
-	_ setup.DatabaseConfigProvider = (*Config)(nil)
-	_ site.ConfigProvider          = (*Config)(nil)
-	_ session.ConfigProvider       = (*Config)(nil)
+	_ setup.DatabaseConfigProvider  = (*Config)(nil)
+	_ site.ConfigProvider           = (*Config)(nil)
+	_ session.ConfigProvider        = (*Config)(nil)
+	_ serverenv.RedisConfigProvider = (*Config)(nil)
 )
 
 type Config struct {
@@ -20,6 +22,7 @@ type Config struct {
 	Security auth0.Config
 	Site     site.Config
 	Session  session.Config
+	Redis    serverenv.RedisConfig
 
 	ListenAddr  string `env:"LISTEN_ADDR,default=:8080"`
 	ServePath   string `env:"SERVE_PATH,default=./web/build"`
@@ -40,6 +43,10 @@ func (c *Config) SiteConfig() site.Config {
 
 func (c *Config) SessionConfig() session.Config {
 	return c.Session
+}
+
+func (c *Config) RedisConfig() serverenv.RedisConfig {
+	return c.Redis
 }
 
 func (c *Config) MaintenanceMode() bool {

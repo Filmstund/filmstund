@@ -34,7 +34,7 @@ func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Ser
 		return nil, fmt.Errorf("not a directory: %s", cfg.ServePath)
 	}
 
-	sessStore, err := session.NewStorage(cfg, env.Database())
+	sessStore, err := session.NewStorage(cfg, env)
 	if err != nil {
 		return nil, fmt.Errorf("session.NewStorage: %w", err)
 	}
