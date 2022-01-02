@@ -39,7 +39,7 @@ func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Ser
 		return nil, fmt.Errorf("session.NewClient: %w", err)
 	}
 
-	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env.Database(), sessClient)
+	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env, sessClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup Auth0 handler: %w", err)
 	}

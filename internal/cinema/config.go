@@ -15,6 +15,7 @@ var (
 	_ site.ConfigProvider           = (*Config)(nil)
 	_ session.ConfigProvider        = (*Config)(nil)
 	_ serverenv.RedisConfigProvider = (*Config)(nil)
+	_ auth0.ConfigProvider          = (*Config)(nil)
 )
 
 type Config struct {
@@ -33,8 +34,8 @@ func (c *Config) DatabaseConfig() *database.Config {
 	return &c.Database
 }
 
-func (c *Config) Auth0Config() *auth0.Config {
-	return &c.Security
+func (c *Config) Auth0Config() auth0.Config {
+	return c.Security
 }
 
 func (c *Config) SiteConfig() site.Config {

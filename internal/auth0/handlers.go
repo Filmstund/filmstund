@@ -16,28 +16,16 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/httputils"
+	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/session"
 	"golang.org/x/oauth2"
 )
 
-func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionClient *session.Client) (*Handler, error) {
-	// This is using the OpenID discovery protocol to figure out well known stuff.
-	provider, err := oidc.NewProvider(ctx, cfg.Issuer)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup OpenID Connect provider: %w", err)
-	}
-
-	oauthCfg := oauth2.Config{
-		ClientID:     cfg.ClientID,
-		ClientSecret: cfg.ClientSecret,
-		Endpoint:     provider.Endpoint(),
-		RedirectURL:  cfg.LoginCallbackURL,
-		Scopes:       cfg.Scopes,
-	}
+func NewHandler(ctx context.Context, cfg Config, env *serverenv.ServerEnv, sessionClient *session.Client) (*Handler, error) {
 	codeClient, err := codeflow.NewClient(
 		cfg.Audience,
-		oauthCfg,
-		provider.Verifier(&oidc.Config{ClientID: cfg.ClientID}),
+		env.Oauth2Config(),
+		env.OidcProvider().Verifier(&oidc.Config{ClientID: cfg.ClientID}),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup codeflow client: %w", err)
@@ -46,13 +34,13 @@ func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionClient
 	return &Handler{
 		codeFlowClient: codeClient,
 		cfg:            cfg,
-		db:             db,
+		db:             env.Database(),
 		sessionClient:  sessionClient,
 	}, nil
 }
 
 type Handler struct {
-	cfg *Config
+	cfg Config
 
 	codeFlowClient *codeflow.Client
 	db             *database.DB

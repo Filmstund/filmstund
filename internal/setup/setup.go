@@ -5,10 +5,13 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/go-redis/redis/v8"
 	"github.com/sethvargo/go-envconfig"
+	"golang.org/x/oauth2"
 )
 
 type DatabaseConfigProvider interface {
@@ -57,6 +60,28 @@ func Setup(ctx context.Context, cfg interface{}) (*serverenv.ServerEnv, error) {
 		}
 		options = append(options,
 			serverenv.WithRedis(client),
+		)
+	}
+
+	if provider, ok := cfg.(auth0.ConfigProvider); ok {
+		logger.V(2).Info("setting up oauth2 config and oidc provider...")
+		authCfg := provider.Auth0Config()
+		// This is using the OpenID discovery protocol to figure out well known stuff.
+		provider, err := oidc.NewProvider(ctx, authCfg.Issuer)
+		if err != nil {
+			return nil, fmt.Errorf("failed to setup OpenID Connect provider: %w", err)
+		}
+		oauthCfg := oauth2.Config{
+			ClientID:     authCfg.ClientID,
+			ClientSecret: authCfg.ClientSecret,
+			Endpoint:     provider.Endpoint(),
+			RedirectURL:  authCfg.LoginCallbackURL,
+			Scopes:       authCfg.Scopes,
+		}
+		options = append(
+			options,
+			serverenv.WithOidcProvider(provider),
+			serverenv.WithOauth2Config(oauthCfg),
 		)
 	}
 

@@ -16,6 +16,10 @@ type Config struct {
 	LogoutCallbackURL string `env:"OIDC_LOGOUT_CALLBACK_URL, default=http://local.filmstund.se:8080/"`
 }
 
-func (c *Config) Auth0Config() *Config {
+func (c Config) Auth0Config() Config {
 	return c
+}
+
+type ConfigProvider interface {
+	Auth0Config() Config
 }
