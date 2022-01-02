@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"github.com/filmstund/filmstund/internal/auth0/principal"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/graph/scalars"
 	"github.com/filmstund/filmstund/internal/site"
 )
 
-func ToGraphUser(u sqlc.User, giftCerts []sqlc.GiftCertificate, siteCfg site.Config) *model.User {
+func ToGraphUser(u dao.User, giftCerts []dao.GiftCertificate, siteCfg site.Config) *model.User {
 	return &model.User{
 		ID:                     u.ID,
 		FilmstadenMembershipID: scalars.NewFilmstadenMembershipID(u.FilmstadenMembershipID),
@@ -31,8 +31,8 @@ func ToGraphUser(u sqlc.User, giftCerts []sqlc.GiftCertificate, siteCfg site.Con
 	}
 }
 
-func ToUpdateUserParams(newInfo model.UserDetailsInput, subject principal.Subject) sqlc.UpdateUserParams {
-	return sqlc.UpdateUserParams{
+func ToUpdateUserParams(newInfo model.UserDetailsInput, subject principal.Subject) dao.UpdateUserParams {
+	return dao.UpdateUserParams{
 		FilmstadenMembershipID: newInfo.FilmstadenMembershipID.String(),
 		PhoneNumber:            fromStringP(newInfo.Phone),
 		FirstName:              fromStringP(newInfo.FirstName),
@@ -42,7 +42,7 @@ func ToUpdateUserParams(newInfo model.UserDetailsInput, subject principal.Subjec
 	}
 }
 
-func ToGraphGiftCerts(certs []sqlc.GiftCertificate) []*model.GiftCertificate {
+func ToGraphGiftCerts(certs []dao.GiftCertificate) []*model.GiftCertificate {
 	modelCerts := make([]*model.GiftCertificate, len(certs))
 	for i, cert := range certs {
 		modelCerts[i] = &model.GiftCertificate{

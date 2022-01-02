@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -37,13 +37,13 @@ func New(ctx context.Context, cfg *Config) (*DB, error) {
 
 // Queries retrieves a connection from the DB pool, using it to create a queryable interface.
 // Use func() to clean up and release the connection back to the pool.
-func (db *DB) Queries(ctx context.Context) (q *sqlc.Queries, cleanup func(), err error) {
+func (db *DB) Queries(ctx context.Context) (q *dao.Queries, cleanup func(), err error) {
 	conn, err := db.Pool.Acquire(ctx)
 	if err != nil {
 		return nil, noop, fmt.Errorf("failed to acquire db connection: %w", err)
 	}
 
-	queries := sqlc.New(conn)
+	queries := dao.New(conn)
 	return queries, conn.Release, nil
 }
 

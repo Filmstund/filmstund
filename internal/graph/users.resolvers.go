@@ -10,7 +10,7 @@ import (
 
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/mappers"
 	"github.com/filmstund/filmstund/internal/graph/model"
@@ -101,7 +101,7 @@ func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []
 		} else {
 			expiresAt = *cert.ExpiresAt
 		}
-		if err := q.AddGiftCertificate(ctx, sqlc.AddGiftCertificateParams{
+		if err := q.AddGiftCertificate(ctx, dao.AddGiftCertificateParams{
 			UserID:    prin.ID,
 			Number:    cert.Number,
 			ExpiresAt: expiresAt,
@@ -127,7 +127,7 @@ func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert m
 	} else {
 		expiresAt = *giftCert.ExpiresAt
 	}
-	if err := q.DeleteGiftCertificate(ctx, sqlc.DeleteGiftCertificateParams{
+	if err := q.DeleteGiftCertificate(ctx, dao.DeleteGiftCertificateParams{
 		UserID:    prin.ID,
 		Number:    giftCert.Number,
 		ExpiresAt: expiresAt,

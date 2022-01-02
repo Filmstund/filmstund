@@ -11,7 +11,7 @@ import (
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -79,7 +79,7 @@ func (s *Storage) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin p
 		return fmt.Errorf("faild to accuire query interface: %w", err)
 	}
 	defer cleanup()
-	if err := queries.AddSession(ctx, sqlc.AddSessionParams{
+	if err := queries.AddSession(ctx, dao.AddSessionParams{
 		ID:           sessionID,
 		UserID:       prin.ID,
 		RefreshToken: prin.Token.RefreshToken,
@@ -136,21 +136,21 @@ func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principa
 	return prin, nil
 }
 
-func (s *Storage) getFromDatabase(ctx context.Context, sessionID string) (sqlc.Session, error) {
+func (s *Storage) getFromDatabase(ctx context.Context, sessionID string) (dao.Session, error) {
 	queries, cleanup, err := s.db.Queries(ctx)
 	if err != nil {
-		return sqlc.Session{}, fmt.Errorf("failed to setup query interface: %w", err)
+		return dao.Session{}, fmt.Errorf("failed to setup query interface: %w", err)
 	}
 	defer cleanup()
 	session, err := queries.GetSession(ctx, uuid.MustParse(sessionID))
 	if err != nil {
-		return sqlc.Session{}, fmt.Errorf("failed to fetch session from DB: %w", err)
+		return dao.Session{}, fmt.Errorf("failed to fetch session from DB: %w", err)
 	}
 	if time.Now().After(session.ExpirationDate) {
 		if err := queries.DeleteSession(ctx, uuid.MustParse(sessionID)); err != nil {
 			logging.FromContext(ctx).Error(err, "failed to delete session", "sessionID", sessionID)
 		}
-		return sqlc.Session{}, fmt.Errorf("session has expired")
+		return dao.Session{}, fmt.Errorf("session has expired")
 	}
 	return session, nil
 }

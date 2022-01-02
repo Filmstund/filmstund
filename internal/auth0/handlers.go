@@ -14,7 +14,7 @@ import (
 	"github.com/filmstund/filmstund/internal/auth0/codeflow"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/database/sqlc"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/httputils"
 	"github.com/filmstund/filmstund/internal/session"
 	"golang.org/x/oauth2"
@@ -121,7 +121,7 @@ func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, token 
 	}
 	defer cleanup()
 
-	userID, err := queries.CreateUpdateUser(r.Context(), sqlc.CreateUpdateUserParams{
+	userID, err := queries.CreateUpdateUser(r.Context(), dao.CreateUpdateUserParams{
 		Subject:   idToken.Subject,
 		FirstName: idTokenClaims.GivenName,
 		LastName:  idTokenClaims.FamilyName,
