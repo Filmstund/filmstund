@@ -18,10 +18,10 @@ checks:\
 .PHONY: checks
 
 # Include tooling here
-include tools/golangci-lint/rules.mk
-include tools/gofumpt/rules.mk
-include tools/commitlint/rules.mk
-include tools/sqlc/rules.mk
+include .tools/golangci-lint/rules.mk
+include .tools/gofumpt/rules.mk
+include .tools/commitlint/rules.mk
+include .tools/sqlc/rules.mk
 
 lint: $(golangci-lint_bin)
 	$(info [$@] linting $(PROJECT_NAME)...)
@@ -64,13 +64,13 @@ test:
 .PHONY: test
 
 clean:
-	@rm -rf ./build
+	@rm -rf ./.build
 .PHONY: clean
 
 build: clean
 	$(info [$@] building ${PROJECT_NAME}...)
-	go build -o build/${PROJECT_NAME} ./cmd/${PROJECT_NAME}
-	go build -o build/migrate ./cmd/migrate
+	go build -o .build/${PROJECT_NAME} ./cmd/${PROJECT_NAME}
+	go build -o .build/migrate ./cmd/migrate
 .PHONY: build
 
 build-website:
@@ -79,8 +79,8 @@ build-website:
 	@yarn --cwd ./web --silent build
 
 migrate: build
-	@./build/migrate
+	@./.build/migrate
 
 run: build build-website migrate
-	@./build/${PROJECT_NAME}
+	@./.build/${PROJECT_NAME}
 .PHONY: run

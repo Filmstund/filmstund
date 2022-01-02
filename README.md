@@ -15,6 +15,11 @@ yarn build
 yarn test
 ```
 
+## Requirements
+
+- `yarn`
+- Node 16
+
 # Go backend
 
 The backend is written in Go and is currently also serving up the frontend using a file server.
