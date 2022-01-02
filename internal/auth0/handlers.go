@@ -20,7 +20,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionStorage *session.Storage) (*Handler, error) {
+func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionClient *session.Client) (*Handler, error) {
 	// This is using the OpenID discovery protocol to figure out well known stuff.
 	provider, err := oidc.NewProvider(ctx, cfg.Issuer)
 	if err != nil {
@@ -47,7 +47,7 @@ func NewHandler(ctx context.Context, cfg *Config, db *database.DB, sessionStorag
 		codeFlowClient: codeClient,
 		cfg:            cfg,
 		db:             db,
-		sessionStorage: sessionStorage,
+		sessionClient:  sessionClient,
 	}, nil
 }
 
@@ -56,7 +56,7 @@ type Handler struct {
 
 	codeFlowClient *codeflow.Client
 	db             *database.DB
-	sessionStorage *session.Storage
+	sessionClient  *session.Client
 }
 
 func (s *Handler) LoginHandler() http.Handler {
@@ -64,7 +64,7 @@ func (s *Handler) LoginHandler() http.Handler {
 		redirectURL := codeflow.RedirectURL(r.URL.Query().Get("to"))
 
 		// If user already logged in, redirect to URL immediately.
-		_, err := s.sessionStorage.Lookup(r.Context(), r)
+		_, err := s.sessionClient.Lookup(r.Context(), r)
 		if err == nil {
 			http.Redirect(w, r, string(redirectURL), http.StatusFound)
 			return
@@ -139,7 +139,7 @@ func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, token 
 		return err
 	}
 
-	if err := s.sessionStorage.Start(r.Context(), w, principal.Principal{
+	if err := s.sessionClient.Start(r.Context(), w, principal.Principal{
 		ID:        userID,
 		Subject:   principal.Subject(idToken.Subject),
 		Scopes:    strings.Split(scopes, " "),
@@ -163,7 +163,7 @@ func (s *Handler) LogoutHandler() http.Handler {
 			return
 		}
 
-		if err = s.sessionStorage.Invalidate(r.Context(), w, r); err != nil {
+		if err = s.sessionClient.Invalidate(r.Context(), w, r); err != nil {
 			httputils.InternalServerError(w, r)
 			logger.Info("failed to invalidate session", "err", err)
 		}

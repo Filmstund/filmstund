@@ -10,13 +10,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func AuthorizeSession(sessionStorage *session.Storage) mux.MiddlewareFunc {
+func AuthorizeSession(sessionClient *session.Client) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logger := logging.FromContext(r.Context()).
 				WithValues("url", r.URL.String(), "from", r.RemoteAddr)
 
-			prin, err := sessionStorage.Lookup(r.Context(), r)
+			prin, err := sessionClient.Lookup(r.Context(), r)
 			if err != nil {
 				logger.V(1).Info("failed to validate session", "err", err)
 				httputils.Unauthorized(w, r)

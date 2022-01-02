@@ -19,10 +19,10 @@ import (
 )
 
 type Server struct {
-	cfg          *Config
-	auth0Handler *auth0.Handler
-	env          *serverenv.ServerEnv
-	sessionStore *session.Storage
+	cfg           *Config
+	auth0Handler  *auth0.Handler
+	env           *serverenv.ServerEnv
+	sessionClient *session.Client
 }
 
 func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Server, error) {
@@ -34,21 +34,21 @@ func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Ser
 		return nil, fmt.Errorf("not a directory: %s", cfg.ServePath)
 	}
 
-	sessStore, err := session.NewStorage(cfg, env)
+	sessClient, err := session.NewClient(cfg, env)
 	if err != nil {
-		return nil, fmt.Errorf("session.NewStorage: %w", err)
+		return nil, fmt.Errorf("session.NewClient: %w", err)
 	}
 
-	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env.Database(), sessStore)
+	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env.Database(), sessClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup Auth0 handler: %w", err)
 	}
 
 	return &Server{
-		cfg:          cfg,
-		auth0Handler: auth0Handler,
-		env:          env,
-		sessionStore: sessStore,
+		cfg:           cfg,
+		auth0Handler:  auth0Handler,
+		env:           env,
+		sessionClient: sessClient,
 	}, nil
 }
 
@@ -66,7 +66,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	// TODO: authentication, security headers?
 
 	authorized := notAuthed.PathPrefix("/").Subrouter()
-	authorized.Use(middleware.AuthorizeSession(s.sessionStore))
+	authorized.Use(middleware.AuthorizeSession(s.sessionClient))
 
 	// Routing table
 	authorized.Handle("/api/graphql", s.graphQLHandler()).

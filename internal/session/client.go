@@ -17,22 +17,22 @@ import (
 	"github.com/google/uuid"
 )
 
-type Storage struct {
+type Client struct {
 	cfg   Config
 	db    *database.DB
 	redis *redis.Client
 }
 
-func NewStorage(cfgProvider ConfigProvider, servEnv *serverenv.ServerEnv) (*Storage, error) {
+func NewClient(cfgProvider ConfigProvider, servEnv *serverenv.ServerEnv) (*Client, error) {
 	cfg := cfgProvider.SessionConfig()
-	return &Storage{
+	return &Client{
 		cfg:   cfg,
 		db:    servEnv.Database(),
 		redis: servEnv.Redis(),
 	}, nil
 }
 
-func (s *Storage) Start(ctx context.Context, w http.ResponseWriter, prin principal.Principal) error {
+func (s *Client) Start(ctx context.Context, w http.ResponseWriter, prin principal.Principal) error {
 	sessionID, err := uuid.NewRandom()
 	if err != nil {
 		return fmt.Errorf("failed to create session ID: %w", err)
@@ -60,7 +60,7 @@ func (s *Storage) Start(ctx context.Context, w http.ResponseWriter, prin princip
 	return nil
 }
 
-func (s *Storage) addToCache(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
+func (s *Client) addToCache(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
 	marshaled, err := marshalPrincipal(prin)
 	if err != nil {
 		return err
@@ -69,7 +69,7 @@ func (s *Storage) addToCache(ctx context.Context, sessionID uuid.UUID, prin prin
 	return s.redis.Set(ctx, sessionID.String(), marshaled, s.cfg.ExpirationTime).Err()
 }
 
-func (s *Storage) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
+func (s *Client) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin principal.Principal) error {
 	marshaled, err := marshalPrincipal(prin)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (s *Storage) addToDatabase(ctx context.Context, sessionID uuid.UUID, prin p
 // Lookup the principal based on the session cookie. Lookup will either be from
 // the local in-mem cache, or from the database.
 // TODO: refresh the principal id token maybe?.
-func (s *Storage) Lookup(ctx context.Context, r *http.Request) (*principal.Principal, error) {
+func (s *Client) Lookup(ctx context.Context, r *http.Request) (*principal.Principal, error) {
 	sessionCookie, err := r.Cookie(s.cfg.CookieName)
 	if err != nil {
 		return nil, fmt.Errorf("no session found")
@@ -117,7 +117,7 @@ func (s *Storage) Lookup(ctx context.Context, r *http.Request) (*principal.Princ
 	return prin, nil
 }
 
-func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principal.Principal, error) {
+func (s *Client) getFromCache(ctx context.Context, sessionID string) (*principal.Principal, error) {
 	cachedPrincipal, err := s.redis.Get(ctx, sessionID).Result()
 	if err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ func (s *Storage) getFromCache(ctx context.Context, sessionID string) (*principa
 	return prin, nil
 }
 
-func (s *Storage) getFromDatabase(ctx context.Context, sessionID string) (dao.Session, error) {
+func (s *Client) getFromDatabase(ctx context.Context, sessionID string) (dao.Session, error) {
 	queries, cleanup, err := s.db.Queries(ctx)
 	if err != nil {
 		return dao.Session{}, fmt.Errorf("failed to setup query interface: %w", err)
@@ -155,7 +155,7 @@ func (s *Storage) getFromDatabase(ctx context.Context, sessionID string) (dao.Se
 	return session, nil
 }
 
-func (s *Storage) Invalidate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (s *Client) Invalidate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	sessionCookie, err := r.Cookie(s.cfg.CookieName)
 	if err != nil {
 		// No cookie == no session to invalidate
