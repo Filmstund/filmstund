@@ -24,7 +24,8 @@ type Storage struct {
 	db           *database.DB
 }
 
-func NewStorage(cfg Config, db *database.DB) (*Storage, error) {
+func NewStorage(cfgProvider ConfigProvider, db *database.DB) (*Storage, error) {
+	cfg := cfgProvider.SessionConfig()
 	bigCache, err := bigcache.NewBigCache(bigcache.DefaultConfig(cfg.ExpirationTime))
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup bigcache: %w", err)

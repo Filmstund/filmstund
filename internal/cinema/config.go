@@ -12,7 +12,7 @@ import (
 var (
 	_ setup.DatabaseConfigProvider = (*Config)(nil)
 	_ site.ConfigProvider          = (*Config)(nil)
-	_ setup.SessionConfigProvider  = (*Config)(nil)
+	_ session.ConfigProvider       = (*Config)(nil)
 )
 
 type Config struct {

@@ -14,6 +14,7 @@ import (
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/serverenv"
+	"github.com/filmstund/filmstund/internal/session"
 	"github.com/gorilla/mux"
 )
 
@@ -21,6 +22,7 @@ type Server struct {
 	cfg          *Config
 	auth0Handler *auth0.Handler
 	env          *serverenv.ServerEnv
+	sessionStore *session.Storage
 }
 
 func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Server, error) {
@@ -32,7 +34,12 @@ func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Ser
 		return nil, fmt.Errorf("not a directory: %s", cfg.ServePath)
 	}
 
-	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env.Database(), env.SessionStorage())
+	sessStore, err := session.NewStorage(cfg, env.Database())
+	if err != nil {
+		return nil, fmt.Errorf("session.NewStorage: %w", err)
+	}
+
+	auth0Handler, err := auth0.NewHandler(ctx, cfg.Auth0Config(), env.Database(), sessStore)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup Auth0 handler: %w", err)
 	}
@@ -41,6 +48,7 @@ func NewServer(ctx context.Context, cfg *Config, env *serverenv.ServerEnv) (*Ser
 		cfg:          cfg,
 		auth0Handler: auth0Handler,
 		env:          env,
+		sessionStore: sessStore,
 	}, nil
 }
 
@@ -58,7 +66,7 @@ func (s *Server) Routes(ctx context.Context) *mux.Router {
 	// TODO: authentication, security headers?
 
 	authorized := notAuthed.PathPrefix("/").Subrouter()
-	authorized.Use(middleware.AuthorizeSession(s.env.SessionStorage()))
+	authorized.Use(middleware.AuthorizeSession(s.sessionStore))
 
 	// Routing table
 	authorized.Handle("/api/graphql", s.graphQLHandler()).
