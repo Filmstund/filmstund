@@ -21,30 +21,20 @@ import (
 func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context) ([]*model.Movie, error) {
 	const cityAlias = "GB"
 	logger := logging.FromContext(ctx)
-	shows, err := r.filmstaden.Shows(ctx, 1, cityAlias)
+	merged, err := r.filmstaden.CurrentMovies(ctx, cityAlias)
 	if err != nil {
-		logger.Error(err, "failed to request Filmstaden shows")
-		return nil, fmt.Errorf("failed to lookup current shows")
+		logger.Error(err, "failed to request Filmstaden current movies")
+		return nil, fmt.Errorf("failed to fetch current movies")
 	}
-	mids := shows.UniqueMovieIDs()
-	movies, err := r.filmstaden.Movies(ctx, mids)
-	if err != nil {
-		logger.Error(err, "failed to fetch Filmstaden movies")
-	}
-	upcoming, err := r.filmstaden.UpcomingMovies(ctx, cityAlias)
-	if err != nil {
-		logger.Error(err, "failed to fetch upcoming Filmstaden movies")
-	}
-	merged := movies.Merge(upcoming)
+
 	if merged.TotalCount == 0 {
 		return nil, fmt.Errorf("no movies found. Filmstaden failure?")
 	}
 
-	q, cleanup, err := r.db.Queries(ctx)
+	q, commit, _, err := r.db.TX(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup DB")
 	}
-	defer cleanup()
 
 	graphMovies := make([]*model.Movie, 0, len(merged.Items))
 	for _, item := range merged.Items {
@@ -81,6 +71,10 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context) ([]
 		graphMovies = append(graphMovies, movie.GraphMovie())
 	}
 
+	if err := commit(ctx); err != nil {
+		logger.Error(err, "failed to commit movie upsert")
+		return nil, fmt.Errorf("failed to insert movies")
+	}
 	return graphMovies, nil
 }
 

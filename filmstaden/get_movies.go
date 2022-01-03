@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
+	"edholm.dev/go-logging"
 )
 
 type Movie struct {
@@ -222,4 +224,22 @@ func (client *Client) UpcomingMovies(ctx context.Context, cityAlias string) (*Mo
 		ids[i] = movie.NcgID
 	}
 	return client.Movies(ctx, ids)
+}
+
+// CurrentMovies returns all now relevant movies (either currently showing or are marked as upcoming).
+func (client *Client) CurrentMovies(ctx context.Context, cityAlias string) (*Movies, error) {
+	shows, err := client.Shows(ctx, 1, cityAlias)
+	if err != nil {
+		return nil, fmt.Errorf("failed to lookup current shows")
+	}
+	mids := shows.UniqueMovieIDs()
+	movies, err := client.Movies(ctx, mids)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "failed to fetch Filmstaden movies")
+	}
+	upcoming, err := client.UpcomingMovies(ctx, cityAlias)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "failed to fetch upcoming Filmstaden movies")
+	}
+	return movies.Merge(upcoming), nil
 }

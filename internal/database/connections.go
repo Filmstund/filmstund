@@ -47,7 +47,20 @@ func (db *DB) Queries(ctx context.Context) (q *dao.Queries, cleanup func(), err 
 	return queries, conn.Release, nil
 }
 
+type FinalizeFunc func(ctx context.Context) error
+
+func (db *DB) TX(ctx context.Context) (q *dao.Queries, commit FinalizeFunc, rollback FinalizeFunc, err error) {
+	tx, err := db.Pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return nil, noopFinalize, noopFinalize, fmt.Errorf("failed to begin TX: %w", err)
+	}
+	return dao.New(tx), tx.Commit, tx.Rollback, nil
+}
+
 func noop() {}
+func noopFinalize(ctx context.Context) error {
+	return nil
+}
 
 func (db *DB) Close(ctx context.Context) {
 	logging.FromContext(ctx).Info("closing database connection pool...")
