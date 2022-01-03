@@ -86,6 +86,10 @@ export type MutationDeleteGiftCertificateArgs = {
   giftCert: GiftCertificateInput;
 };
 
+export type MutationFetchNewMoviesFromFilmstadenArgs = {
+  cityAlias?: Scalars["String"];
+};
+
 export type MutationUpdateUserArgs = {
   newInfo: UserDetailsInput;
 };

@@ -77,7 +77,7 @@ type ComplexityRoot struct {
 		AddGiftCertificates          func(childComplexity int, giftCerts []*model.GiftCertificateInput) int
 		DeleteGiftCertificate        func(childComplexity int, giftCert model.GiftCertificateInput) int
 		DisableCalendarFeed          func(childComplexity int) int
-		FetchNewMoviesFromFilmstaden func(childComplexity int) int
+		FetchNewMoviesFromFilmstaden func(childComplexity int, cityAlias string) int
 		InvalidateCalendarFeed       func(childComplexity int) int
 		UpdateUser                   func(childComplexity int, newInfo model.UserDetailsInput) int
 	}
@@ -111,7 +111,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	FetchNewMoviesFromFilmstaden(ctx context.Context) ([]*model.Movie, error)
+	FetchNewMoviesFromFilmstaden(ctx context.Context, cityAlias string) ([]*model.Movie, error)
 	UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error)
 	InvalidateCalendarFeed(ctx context.Context) (*model.User, error)
 	DisableCalendarFeed(ctx context.Context) (*model.User, error)
@@ -312,7 +312,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Mutation.FetchNewMoviesFromFilmstaden(childComplexity), true
+		args, err := ec.field_Mutation_fetchNewMoviesFromFilmstaden_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.FetchNewMoviesFromFilmstaden(childComplexity, args["cityAlias"].(string)), true
 
 	case "Mutation.invalidateCalendarFeed":
 		if e.complexity.Mutation.InvalidateCalendarFeed == nil {
@@ -569,7 +574,7 @@ type Commandments {
 
 extend type Mutation {
     # Fetch any new movies from Filmstaden, returns the movies that were added
-    fetchNewMoviesFromFilmstaden: [Movie!]!
+    fetchNewMoviesFromFilmstaden(cityAlias: String! = "GB"): [Movie!]!
 }
 
 type Movie {
@@ -694,6 +699,21 @@ func (ec *executionContext) field_Mutation_deleteGiftCertificate_args(ctx contex
 		}
 	}
 	args["giftCert"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_fetchNewMoviesFromFilmstaden_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["cityAlias"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cityAlias"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["cityAlias"] = arg0
 	return args, nil
 }
 
@@ -1452,9 +1472,16 @@ func (ec *executionContext) _Mutation_fetchNewMoviesFromFilmstaden(ctx context.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_fetchNewMoviesFromFilmstaden_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().FetchNewMoviesFromFilmstaden(rctx)
+		return ec.resolvers.Mutation().FetchNewMoviesFromFilmstaden(rctx, args["cityAlias"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -6,7 +6,7 @@ extend type Query {
 
 extend type Mutation {
     # Fetch any new movies from Filmstaden, returns the movies that were added
-    fetchNewMoviesFromFilmstaden: [Movie!]!
+    fetchNewMoviesFromFilmstaden(cityAlias: String! = "GB"): [Movie!]!
 }
 
 type Movie {

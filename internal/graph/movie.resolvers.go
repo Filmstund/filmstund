@@ -18,9 +18,9 @@ import (
 	pgx "github.com/jackc/pgx/v4"
 )
 
-func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context) ([]*model.Movie, error) {
-	const cityAlias = "GB"
-	logger := logging.FromContext(ctx)
+func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cityAlias string) ([]*model.Movie, error) {
+	logger := logging.FromContext(ctx).
+		WithValues("cityAlias", cityAlias)
 	merged, err := r.filmstaden.CurrentMovies(ctx, cityAlias)
 	if err != nil {
 		logger.Error(err, "failed to request Filmstaden current movies")
