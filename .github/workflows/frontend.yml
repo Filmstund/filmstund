@@ -18,7 +18,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16.x
           cache: "yarn"
           cache-dependency-path: "web/yarn.lock"
       - name: Build frontend
@@ -26,6 +26,7 @@ jobs:
           cd web
           yarn
           yarn lint
+          yarn types
           yarn prettier:check
           yarn build
           yarn test
