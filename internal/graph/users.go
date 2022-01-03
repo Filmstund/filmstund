@@ -20,10 +20,5 @@ func fetchUser(ctx context.Context, q *dao.Queries, siteCfg site.Config) (*model
 		logger.Info("failed to get user", "id", prin.ID, "err", err)
 		return nil, fmt.Errorf("failed to fetch user info")
 	}
-	giftCerts, err := q.GetGiftCertificates(ctx, prin.ID)
-	if err != nil {
-		logger.Info("failed to get user gift certificates", "uid", prin.ID, "err", err)
-		return nil, fmt.Errorf("failed to fetch user gift certificates")
-	}
-	return mappers.ToGraphUser(user, giftCerts, siteCfg), nil
+	return mappers.ToGraphUser(user, siteCfg), nil
 }

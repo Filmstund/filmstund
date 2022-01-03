@@ -1,14 +1,14 @@
-extend type ShowingDTO {
-    myTickets: [TicketDTO!]!
+extend type Showing {
+    myTickets: [Ticket!]!
     ticketRange: TicketRange
 }
 
-# A ticket assigned to a user that allowes access to Filmstaden
-type TicketDTO {
+# A ticket assigned to a user that allows access to Filmstaden
+type Ticket {
     id: String!
-    showingId: ShowingID!
+    showingID: ShowingID!
     assignedToUser: UserID!
-    profileId: String
+    profileID: String
     barcode: String!
     customerType: String!
     customerTypeDefinition: String!

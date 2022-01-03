@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
-	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 )
 
@@ -58,8 +57,3 @@ func (r *queryResolver) RandomCommandment(ctx context.Context) (*model.Commandme
 	}
 	return &commandment, nil
 }
-
-// Query returns gql.QueryResolver implementation.
-func (r *Resolver) Query() gql.QueryResolver { return &queryResolver{r} }
-
-type queryResolver struct{ *Resolver }

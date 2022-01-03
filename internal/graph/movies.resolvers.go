@@ -18,6 +18,10 @@ import (
 	pgx "github.com/jackc/pgx/v4"
 )
 
+func (r *movieResolver) FilmstadenShowings(ctx context.Context, obj *model.Movie, city *string, afterDate *string) ([]*model.FilmstadenShowing, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cityAlias string) ([]*model.Movie, error) {
 	logger := logging.FromContext(ctx).
 		WithValues("cityAlias", cityAlias)
@@ -76,7 +80,7 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 			logger.Error(err, "failed to insert movie", "movieID", item.NcgID)
 			continue
 		}
-		graphMovies = append(graphMovies, movie.GraphMovie())
+		graphMovies = append(graphMovies, movie.GraphModel())
 	}
 
 	if err := commit(ctx); err != nil {
@@ -100,7 +104,7 @@ func (r *queryResolver) Movie(ctx context.Context, id string) (*model.Movie, err
 		logging.FromContext(ctx).Error(err, "failed to fetch movie", "id", id)
 		return nil, fmt.Errorf("failed to fetch movie")
 	}
-	return movie.GraphMovie(), nil
+	return movie.GraphModel(), nil
 }
 
 func (r *queryResolver) AllMovies(ctx context.Context) ([]*model.Movie, error) {
@@ -116,7 +120,7 @@ func (r *queryResolver) AllMovies(ctx context.Context) ([]*model.Movie, error) {
 	}
 	movies := make([]*model.Movie, len(dbMovies))
 	for i, movie := range dbMovies {
-		movies[i] = movie.GraphMovie()
+		movies[i] = movie.GraphModel()
 	}
 	return movies, nil
 }
@@ -134,12 +138,12 @@ func (r *queryResolver) ArchivedMovies(ctx context.Context) ([]*model.Movie, err
 	}
 	movies := make([]*model.Movie, len(dbMovies))
 	for i, movie := range dbMovies {
-		movies[i] = movie.GraphMovie()
+		movies[i] = movie.GraphModel()
 	}
 	return movies, nil
 }
 
-// Mutation returns gql.MutationResolver implementation.
-func (r *Resolver) Mutation() gql.MutationResolver { return &mutationResolver{r} }
+// Movie returns gql.MovieResolver implementation.
+func (r *Resolver) Movie() gql.MovieResolver { return &movieResolver{r} }
 
-type mutationResolver struct{ *Resolver }
+type movieResolver struct{ *Resolver }

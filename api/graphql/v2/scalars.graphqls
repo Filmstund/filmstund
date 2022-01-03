@@ -4,3 +4,9 @@ scalar TMDbID
 scalar Time
 scalar UUID
 scalar FilmstadenMembershipID
+scalar ShowingID
+scalar Base64ID
+scalar SEK
+scalar LocalDate
+scalar LocalTime
+scalar UserID

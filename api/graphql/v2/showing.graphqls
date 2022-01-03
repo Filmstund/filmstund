@@ -1,0 +1,89 @@
+type Query {
+    showing(id: ShowingID, webID: Base64ID): Showing
+    publicShowings(afterDate: LocalDate): [Showing!]!
+    showingForMovie(movieId: MovieID): [Showing!]!
+}
+
+type Mutation {
+    attendShowing(showingID: ShowingID!, paymentOption: PaymentOption!): Showing!
+    unattendShowing(showingID: ShowingID!): Showing!
+
+    createShowing(showing: CreateShowingInput!): Showing!
+
+    # Delete a showing and return all public showings
+    deleteShowing(showingID: ShowingID!): [Showing!]!
+
+    markAsBought(showingID: ShowingID!, price: SEK!): Showing!
+    processTicketUrls(showingID: ShowingID!, ticketUrls: [String!]): Showing!
+
+    updateShowing(showingID: ShowingID!, newValues: UpdateShowingInput): Showing!
+
+    promoteToAdmin(showingID: ShowingID!, userToPromote: UserID!): Showing!
+}
+
+type Showing {
+    id: ShowingID!
+    webID: Base64ID!
+    filmstadenShowingID: String
+    slug: String!
+    date: String!
+    time: String!
+    movieID: MovieID!
+    movieTitle: String!
+    movie: Movie!
+    location: String!
+    cinemaScreen: CinemaScreen
+    price: SEK
+    ticketsBought: Boolean!
+    admin: PublicUser!
+    payToUser: PublicUser!
+    lastModifiedDate: String!
+    createdDate: String!
+    filmstadenSeatMap: [FilmstadenSeatMap!]!
+    attendees: [PublicAttendee!]!
+}
+
+type PublicAttendee {
+    userID: UserID!
+    showingID: ShowingID!
+    userInfo: PublicUser!
+}
+
+type CinemaScreen {
+    id: ID!
+    name: String!
+}
+
+input CinemaScreenInput {
+    id: String!
+    name: String
+}
+
+# Used for supplying how the user will pay, when attending a showing
+input PaymentOption {
+    type: PaymentType!
+    ticketNumber: String
+}
+
+enum PaymentType {
+    SWISH
+    GIFT_CERTIFICATE
+}
+
+input CreateShowingInput {
+    date: LocalDate!
+    time: LocalTime!
+    movieID: MovieID!
+    location: String!
+    filmstadenScreen: CinemaScreenInput
+    filmstadenRemoteEntityID: String
+}
+
+input UpdateShowingInput {
+    price: SEK!
+    payToUser: UserID!
+    location: String!
+    filmstadenRemoteEntityID: String
+    time: LocalTime!
+    date: LocalDate!
+}

@@ -6,9 +6,10 @@ GOFMT_FILES = $(shell go list -f '{{.Dir}}' ./... | grep -v '/pb')
 checks:\
 	sqlc-generate \
 	generate \
-	build \
-	lint \
 	fmt  \
+	build \
+	build-website \
+	lint \
 	test \
 	mod-tidy \
 	mod-verify \

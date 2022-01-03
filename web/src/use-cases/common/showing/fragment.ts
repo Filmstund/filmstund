@@ -5,7 +5,7 @@ export const showingFragment = gql`
     id
     date
     time
-    webId
+    webID
     slug
     movie {
       id
@@ -15,8 +15,8 @@ export const showingFragment = gql`
     myTickets {
       id
     }
-    participants {
-      user {
+    attendees {
+      userInfo {
         id
         avatar
       }

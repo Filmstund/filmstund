@@ -1,0 +1,40 @@
+extend type Mutation {
+    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee!
+}
+
+extend type Showing {
+    adminPaymentDetails: AdminPaymentDetails
+    attendeePaymentDetails: AttendeePaymentDetails
+}
+
+type AdminPaymentDetails {
+    filmstadenBuyLink: String
+    showingID: ShowingID
+    attendees: [Attendee!]!
+}
+
+type AttendeePaymentDetails {
+    hasPaid: Boolean!
+    amountOwed: SEK!
+    payTo: PublicUser!
+    payer: PublicUser!
+    swishLink: String
+}
+
+type Attendee {
+    userID: UserID!
+    user: PublicUser!
+    showingID: ShowingID!
+    hasPaid: Boolean!
+    amountOwed: SEK!
+    type: PaymentType!
+    giftCertificateUsed: GiftCertificate
+    filmstadenMembershipID: String
+}
+
+input AttendeePaymentInfoInput {
+    userID: UserID!
+    showingID: ShowingID
+    hasPaid: Boolean!
+    amountOwed: SEK!
+}

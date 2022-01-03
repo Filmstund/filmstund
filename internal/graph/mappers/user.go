@@ -11,7 +11,7 @@ import (
 	"github.com/filmstund/filmstund/internal/site"
 )
 
-func ToGraphUser(u dao.User, giftCerts []dao.GiftCertificate, siteCfg site.Config) *model.User {
+func ToGraphUser(u dao.User, siteCfg site.Config) *model.User {
 	return &model.User{
 		ID:                     u.ID,
 		FilmstadenMembershipID: scalars.NewFilmstadenMembershipID(u.FilmstadenMembershipID),
@@ -22,7 +22,7 @@ func ToGraphUser(u dao.User, giftCerts []dao.GiftCertificate, siteCfg site.Confi
 		Email:                  u.Email,
 		Phone:                  toString(u.Phone),
 		AvatarURL:              toString(u.Avatar),
-		GiftCertificates:       ToGraphGiftCerts(giftCerts),
+		GiftCertificates:       nil,
 		CalendarFeedID:         fromUUID(u.CalendarFeedID),
 		CalendarFeedURL:        toCalendarURL(u.CalendarFeedID, siteCfg),
 		LastLoginTime:          u.LastLoginTime,
@@ -40,16 +40,4 @@ func ToUpdateUserParams(newInfo model.UserDetailsInput, subject principal.Subjec
 		Nick:                   fromStringP(newInfo.Nick),
 		SubjectID:              subject.String(),
 	}
-}
-
-func ToGraphGiftCerts(certs []dao.GiftCertificate) []*model.GiftCertificate {
-	modelCerts := make([]*model.GiftCertificate, len(certs))
-	for i, cert := range certs {
-		modelCerts[i] = &model.GiftCertificate{
-			Number:     cert.Number,
-			ExpireTime: cert.ExpireTime,
-			Status:     model.GiftCertificateStatusUnknown, // TODO: needs to be calculated
-		}
-	}
-	return modelCerts
 }

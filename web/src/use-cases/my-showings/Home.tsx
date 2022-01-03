@@ -61,7 +61,7 @@ const useHomeScreenData = () =>
         showings: publicShowings {
           ...ShowingNeue
           id
-          webId
+          webID
           slug
           date
           time

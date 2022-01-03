@@ -1,4 +1,4 @@
-type FilmstadenSeatMapDTO {
+type FilmstadenSeatMap {
     row: Int!
     number: Int!
     seatType: String!
@@ -16,16 +16,16 @@ type FilmstadenSeatDimensions {
     height: Int!
 }
 
-type FilmstadenLiteScreenDTO {
-    filmstadenId: ID!
+type FilmstadenLiteScreen {
+    filmstadenID: ID!
     name: String!
 }
 
-type FilmstadenShowingDTO {
+type FilmstadenShowing {
     cinemaName: String!,
-    screen: FilmstadenLiteScreenDTO!,
+    screen: FilmstadenLiteScreen!,
     seatCount: Int!,
     timeUtc: String!,
     tags: [String!]!,
-    filmstadenRemoteEntityId: String!
+    filmstadenRemoteEntityID: String!
 }

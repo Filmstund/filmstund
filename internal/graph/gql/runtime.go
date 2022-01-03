@@ -38,16 +38,81 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Movie() MovieResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Showing() ShowingResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct{}
 
 type ComplexityRoot struct {
+	AdminPaymentDetails struct {
+		Attendees         func(childComplexity int) int
+		FilmstadenBuyLink func(childComplexity int) int
+		ShowingID         func(childComplexity int) int
+	}
+
+	Attendee struct {
+		AmountOwed             func(childComplexity int) int
+		FilmstadenMembershipID func(childComplexity int) int
+		GiftCertificateUsed    func(childComplexity int) int
+		HasPaid                func(childComplexity int) int
+		ShowingID              func(childComplexity int) int
+		Type                   func(childComplexity int) int
+		User                   func(childComplexity int) int
+		UserID                 func(childComplexity int) int
+	}
+
+	AttendeePaymentDetails struct {
+		AmountOwed func(childComplexity int) int
+		HasPaid    func(childComplexity int) int
+		PayTo      func(childComplexity int) int
+		Payer      func(childComplexity int) int
+		SwishLink  func(childComplexity int) int
+	}
+
+	CinemaScreen struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
+	}
+
 	Commandments struct {
 		Number func(childComplexity int) int
 		Phrase func(childComplexity int) int
+	}
+
+	FilmstadenLiteScreen struct {
+		FilmstadenID func(childComplexity int) int
+		Name         func(childComplexity int) int
+	}
+
+	FilmstadenSeatCoordinates struct {
+		X func(childComplexity int) int
+		Y func(childComplexity int) int
+	}
+
+	FilmstadenSeatDimensions struct {
+		Height func(childComplexity int) int
+		Width  func(childComplexity int) int
+	}
+
+	FilmstadenSeatMap struct {
+		Coordinates func(childComplexity int) int
+		Dimensions  func(childComplexity int) int
+		Number      func(childComplexity int) int
+		Row         func(childComplexity int) int
+		SeatType    func(childComplexity int) int
+	}
+
+	FilmstadenShowing struct {
+		CinemaName               func(childComplexity int) int
+		FilmstadenRemoteEntityID func(childComplexity int) int
+		Screen                   func(childComplexity int) int
+		SeatCount                func(childComplexity int) int
+		Tags                     func(childComplexity int) int
+		TimeUtc                  func(childComplexity int) int
 	}
 
 	GiftCertificate struct {
@@ -57,38 +122,129 @@ type ComplexityRoot struct {
 	}
 
 	Movie struct {
-		Archived       func(childComplexity int) int
-		CreateTime     func(childComplexity int) int
-		FilmstadenID   func(childComplexity int) int
-		Genres         func(childComplexity int) int
-		ID             func(childComplexity int) int
-		ImdbID         func(childComplexity int) int
-		Poster         func(childComplexity int) int
-		ProductionYear func(childComplexity int) int
-		ReleaseDate    func(childComplexity int) int
-		Runtime        func(childComplexity int) int
-		Slug           func(childComplexity int) int
-		Title          func(childComplexity int) int
-		TmdbID         func(childComplexity int) int
-		UpdateTime     func(childComplexity int) int
+		Archived           func(childComplexity int) int
+		CreateTime         func(childComplexity int) int
+		FilmstadenID       func(childComplexity int) int
+		FilmstadenShowings func(childComplexity int, city *string, afterDate *string) int
+		Genres             func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		ImdbID             func(childComplexity int) int
+		Poster             func(childComplexity int) int
+		ProductionYear     func(childComplexity int) int
+		ReleaseDate        func(childComplexity int) int
+		Runtime            func(childComplexity int) int
+		Slug               func(childComplexity int) int
+		Title              func(childComplexity int) int
+		TmdbID             func(childComplexity int) int
+		UpdateTime         func(childComplexity int) int
 	}
 
 	Mutation struct {
 		AddGiftCertificates          func(childComplexity int, giftCerts []*model.GiftCertificateInput) int
+		AttendShowing                func(childComplexity int, showingID string, paymentOption model.PaymentOption) int
+		CreateShowing                func(childComplexity int, showing model.CreateShowingInput) int
 		DeleteGiftCertificate        func(childComplexity int, giftCert model.GiftCertificateInput) int
+		DeleteShowing                func(childComplexity int, showingID string) int
 		DisableCalendarFeed          func(childComplexity int) int
 		FetchNewMoviesFromFilmstaden func(childComplexity int, cityAlias string) int
 		InvalidateCalendarFeed       func(childComplexity int) int
+		MarkAsBought                 func(childComplexity int, showingID string, price string) int
+		ProcessTicketUrls            func(childComplexity int, showingID string, ticketUrls []string) int
+		PromoteToAdmin               func(childComplexity int, showingID string, userToPromote string) int
+		UnattendShowing              func(childComplexity int, showingID string) int
+		UpdateAttendeePaymentInfo    func(childComplexity int, paymentInfo model.AttendeePaymentInfoInput) int
+		UpdateShowing                func(childComplexity int, showingID string, newValues *model.UpdateShowingInput) int
 		UpdateUser                   func(childComplexity int, newInfo model.UserDetailsInput) int
+	}
+
+	PublicAttendee struct {
+		ShowingID func(childComplexity int) int
+		UserID    func(childComplexity int) int
+		UserInfo  func(childComplexity int) int
+	}
+
+	PublicUser struct {
+		Avatar    func(childComplexity int) int
+		FirstName func(childComplexity int) int
+		ID        func(childComplexity int) int
+		LastName  func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Nick      func(childComplexity int) int
+		Phone     func(childComplexity int) int
 	}
 
 	Query struct {
 		AllCommandments   func(childComplexity int) int
 		AllMovies         func(childComplexity int) int
+		AllUsers          func(childComplexity int) int
 		ArchivedMovies    func(childComplexity int) int
 		CurrentUser       func(childComplexity int) int
 		Movie             func(childComplexity int, id string) int
+		PublicShowings    func(childComplexity int, afterDate *string) int
 		RandomCommandment func(childComplexity int) int
+		Showing           func(childComplexity int, id *string, webID *string) int
+		ShowingForMovie   func(childComplexity int, movieID *string) int
+	}
+
+	Seat struct {
+		Number func(childComplexity int) int
+		Row    func(childComplexity int) int
+	}
+
+	SeatRange struct {
+		Numbers func(childComplexity int) int
+		Row     func(childComplexity int) int
+	}
+
+	Showing struct {
+		Admin                  func(childComplexity int) int
+		AdminPaymentDetails    func(childComplexity int) int
+		AttendeePaymentDetails func(childComplexity int) int
+		Attendees              func(childComplexity int) int
+		CinemaScreen           func(childComplexity int) int
+		CreatedDate            func(childComplexity int) int
+		Date                   func(childComplexity int) int
+		FilmstadenSeatMap      func(childComplexity int) int
+		FilmstadenShowingID    func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		LastModifiedDate       func(childComplexity int) int
+		Location               func(childComplexity int) int
+		Movie                  func(childComplexity int) int
+		MovieID                func(childComplexity int) int
+		MovieTitle             func(childComplexity int) int
+		MyTickets              func(childComplexity int) int
+		PayToUser              func(childComplexity int) int
+		Price                  func(childComplexity int) int
+		Slug                   func(childComplexity int) int
+		TicketRange            func(childComplexity int) int
+		TicketsBought          func(childComplexity int) int
+		Time                   func(childComplexity int) int
+		WebID                  func(childComplexity int) int
+	}
+
+	Ticket struct {
+		AssignedToUser         func(childComplexity int) int
+		Attributes             func(childComplexity int) int
+		Barcode                func(childComplexity int) int
+		Cinema                 func(childComplexity int) int
+		CinemaCity             func(childComplexity int) int
+		CustomerType           func(childComplexity int) int
+		CustomerTypeDefinition func(childComplexity int) int
+		Date                   func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		MovieName              func(childComplexity int) int
+		MovieRating            func(childComplexity int) int
+		ProfileID              func(childComplexity int) int
+		Screen                 func(childComplexity int) int
+		Seat                   func(childComplexity int) int
+		ShowingID              func(childComplexity int) int
+		Time                   func(childComplexity int) int
+	}
+
+	TicketRange struct {
+		Rows       func(childComplexity int) int
+		Seatings   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	User struct {
@@ -110,8 +266,21 @@ type ComplexityRoot struct {
 	}
 }
 
+type MovieResolver interface {
+	FilmstadenShowings(ctx context.Context, obj *model.Movie, city *string, afterDate *string) ([]*model.FilmstadenShowing, error)
+}
+
 type MutationResolver interface {
+	AttendShowing(ctx context.Context, showingID string, paymentOption model.PaymentOption) (*model.Showing, error)
+	UnattendShowing(ctx context.Context, showingID string) (*model.Showing, error)
+	CreateShowing(ctx context.Context, showing model.CreateShowingInput) (*model.Showing, error)
+	DeleteShowing(ctx context.Context, showingID string) ([]*model.Showing, error)
+	MarkAsBought(ctx context.Context, showingID string, price string) (*model.Showing, error)
+	ProcessTicketUrls(ctx context.Context, showingID string, ticketUrls []string) (*model.Showing, error)
+	UpdateShowing(ctx context.Context, showingID string, newValues *model.UpdateShowingInput) (*model.Showing, error)
+	PromoteToAdmin(ctx context.Context, showingID string, userToPromote string) (*model.Showing, error)
 	FetchNewMoviesFromFilmstaden(ctx context.Context, cityAlias string) ([]*model.Movie, error)
+	UpdateAttendeePaymentInfo(ctx context.Context, paymentInfo model.AttendeePaymentInfoInput) (*model.Attendee, error)
 	UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error)
 	InvalidateCalendarFeed(ctx context.Context) (*model.User, error)
 	DisableCalendarFeed(ctx context.Context) (*model.User, error)
@@ -120,12 +289,25 @@ type MutationResolver interface {
 }
 
 type QueryResolver interface {
+	Showing(ctx context.Context, id *string, webID *string) (*model.Showing, error)
+	PublicShowings(ctx context.Context, afterDate *string) ([]*model.Showing, error)
+	ShowingForMovie(ctx context.Context, movieID *string) ([]*model.Showing, error)
 	AllCommandments(ctx context.Context) ([]*model.Commandments, error)
 	RandomCommandment(ctx context.Context) (*model.Commandments, error)
 	Movie(ctx context.Context, id string) (*model.Movie, error)
 	AllMovies(ctx context.Context) ([]*model.Movie, error)
 	ArchivedMovies(ctx context.Context) ([]*model.Movie, error)
 	CurrentUser(ctx context.Context) (*model.User, error)
+	AllUsers(ctx context.Context) ([]*model.PublicUser, error)
+}
+
+type ShowingResolver interface {
+	FilmstadenSeatMap(ctx context.Context, obj *model.Showing) ([]*model.FilmstadenSeatMap, error)
+	Attendees(ctx context.Context, obj *model.Showing) ([]*model.PublicAttendee, error)
+}
+
+type UserResolver interface {
+	GiftCertificates(ctx context.Context, obj *model.User) ([]*model.GiftCertificate, error)
 }
 
 type executableSchema struct {
@@ -143,6 +325,132 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "AdminPaymentDetails.attendees":
+		if e.complexity.AdminPaymentDetails.Attendees == nil {
+			break
+		}
+
+		return e.complexity.AdminPaymentDetails.Attendees(childComplexity), true
+
+	case "AdminPaymentDetails.filmstadenBuyLink":
+		if e.complexity.AdminPaymentDetails.FilmstadenBuyLink == nil {
+			break
+		}
+
+		return e.complexity.AdminPaymentDetails.FilmstadenBuyLink(childComplexity), true
+
+	case "AdminPaymentDetails.showingID":
+		if e.complexity.AdminPaymentDetails.ShowingID == nil {
+			break
+		}
+
+		return e.complexity.AdminPaymentDetails.ShowingID(childComplexity), true
+
+	case "Attendee.amountOwed":
+		if e.complexity.Attendee.AmountOwed == nil {
+			break
+		}
+
+		return e.complexity.Attendee.AmountOwed(childComplexity), true
+
+	case "Attendee.filmstadenMembershipID":
+		if e.complexity.Attendee.FilmstadenMembershipID == nil {
+			break
+		}
+
+		return e.complexity.Attendee.FilmstadenMembershipID(childComplexity), true
+
+	case "Attendee.giftCertificateUsed":
+		if e.complexity.Attendee.GiftCertificateUsed == nil {
+			break
+		}
+
+		return e.complexity.Attendee.GiftCertificateUsed(childComplexity), true
+
+	case "Attendee.hasPaid":
+		if e.complexity.Attendee.HasPaid == nil {
+			break
+		}
+
+		return e.complexity.Attendee.HasPaid(childComplexity), true
+
+	case "Attendee.showingID":
+		if e.complexity.Attendee.ShowingID == nil {
+			break
+		}
+
+		return e.complexity.Attendee.ShowingID(childComplexity), true
+
+	case "Attendee.type":
+		if e.complexity.Attendee.Type == nil {
+			break
+		}
+
+		return e.complexity.Attendee.Type(childComplexity), true
+
+	case "Attendee.user":
+		if e.complexity.Attendee.User == nil {
+			break
+		}
+
+		return e.complexity.Attendee.User(childComplexity), true
+
+	case "Attendee.userID":
+		if e.complexity.Attendee.UserID == nil {
+			break
+		}
+
+		return e.complexity.Attendee.UserID(childComplexity), true
+
+	case "AttendeePaymentDetails.amountOwed":
+		if e.complexity.AttendeePaymentDetails.AmountOwed == nil {
+			break
+		}
+
+		return e.complexity.AttendeePaymentDetails.AmountOwed(childComplexity), true
+
+	case "AttendeePaymentDetails.hasPaid":
+		if e.complexity.AttendeePaymentDetails.HasPaid == nil {
+			break
+		}
+
+		return e.complexity.AttendeePaymentDetails.HasPaid(childComplexity), true
+
+	case "AttendeePaymentDetails.payTo":
+		if e.complexity.AttendeePaymentDetails.PayTo == nil {
+			break
+		}
+
+		return e.complexity.AttendeePaymentDetails.PayTo(childComplexity), true
+
+	case "AttendeePaymentDetails.payer":
+		if e.complexity.AttendeePaymentDetails.Payer == nil {
+			break
+		}
+
+		return e.complexity.AttendeePaymentDetails.Payer(childComplexity), true
+
+	case "AttendeePaymentDetails.swishLink":
+		if e.complexity.AttendeePaymentDetails.SwishLink == nil {
+			break
+		}
+
+		return e.complexity.AttendeePaymentDetails.SwishLink(childComplexity), true
+
+	case "CinemaScreen.id":
+		if e.complexity.CinemaScreen.ID == nil {
+			break
+		}
+
+		return e.complexity.CinemaScreen.ID(childComplexity), true
+
+	case "CinemaScreen.name":
+		if e.complexity.CinemaScreen.Name == nil {
+			break
+		}
+
+		return e.complexity.CinemaScreen.Name(childComplexity), true
+
 	case "Commandments.number":
 		if e.complexity.Commandments.Number == nil {
 			break
@@ -156,6 +464,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Commandments.Phrase(childComplexity), true
+
+	case "FilmstadenLiteScreen.filmstadenID":
+		if e.complexity.FilmstadenLiteScreen.FilmstadenID == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenLiteScreen.FilmstadenID(childComplexity), true
+
+	case "FilmstadenLiteScreen.name":
+		if e.complexity.FilmstadenLiteScreen.Name == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenLiteScreen.Name(childComplexity), true
+
+	case "FilmstadenSeatCoordinates.x":
+		if e.complexity.FilmstadenSeatCoordinates.X == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatCoordinates.X(childComplexity), true
+
+	case "FilmstadenSeatCoordinates.y":
+		if e.complexity.FilmstadenSeatCoordinates.Y == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatCoordinates.Y(childComplexity), true
+
+	case "FilmstadenSeatDimensions.height":
+		if e.complexity.FilmstadenSeatDimensions.Height == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatDimensions.Height(childComplexity), true
+
+	case "FilmstadenSeatDimensions.width":
+		if e.complexity.FilmstadenSeatDimensions.Width == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatDimensions.Width(childComplexity), true
+
+	case "FilmstadenSeatMap.coordinates":
+		if e.complexity.FilmstadenSeatMap.Coordinates == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatMap.Coordinates(childComplexity), true
+
+	case "FilmstadenSeatMap.dimensions":
+		if e.complexity.FilmstadenSeatMap.Dimensions == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatMap.Dimensions(childComplexity), true
+
+	case "FilmstadenSeatMap.number":
+		if e.complexity.FilmstadenSeatMap.Number == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatMap.Number(childComplexity), true
+
+	case "FilmstadenSeatMap.row":
+		if e.complexity.FilmstadenSeatMap.Row == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatMap.Row(childComplexity), true
+
+	case "FilmstadenSeatMap.seatType":
+		if e.complexity.FilmstadenSeatMap.SeatType == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenSeatMap.SeatType(childComplexity), true
+
+	case "FilmstadenShowing.cinemaName":
+		if e.complexity.FilmstadenShowing.CinemaName == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenShowing.CinemaName(childComplexity), true
+
+	case "FilmstadenShowing.filmstadenRemoteEntityID":
+		if e.complexity.FilmstadenShowing.FilmstadenRemoteEntityID == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenShowing.FilmstadenRemoteEntityID(childComplexity), true
+
+	case "FilmstadenShowing.screen":
+		if e.complexity.FilmstadenShowing.Screen == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenShowing.Screen(childComplexity), true
+
+	case "FilmstadenShowing.seatCount":
+		if e.complexity.FilmstadenShowing.SeatCount == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenShowing.SeatCount(childComplexity), true
+
+	case "FilmstadenShowing.tags":
+		if e.complexity.FilmstadenShowing.Tags == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenShowing.Tags(childComplexity), true
+
+	case "FilmstadenShowing.timeUtc":
+		if e.complexity.FilmstadenShowing.TimeUtc == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenShowing.TimeUtc(childComplexity), true
 
 	case "GiftCertificate.expireTime":
 		if e.complexity.GiftCertificate.ExpireTime == nil {
@@ -192,12 +619,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Movie.CreateTime(childComplexity), true
 
-	case "Movie.filmstadenId":
+	case "Movie.filmstadenID":
 		if e.complexity.Movie.FilmstadenID == nil {
 			break
 		}
 
 		return e.complexity.Movie.FilmstadenID(childComplexity), true
+
+	case "Movie.filmstadenShowings":
+		if e.complexity.Movie.FilmstadenShowings == nil {
+			break
+		}
+
+		args, err := ec.field_Movie_filmstadenShowings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Movie.FilmstadenShowings(childComplexity, args["city"].(*string), args["afterDate"].(*string)), true
 
 	case "Movie.genres":
 		if e.complexity.Movie.Genres == nil {
@@ -213,7 +652,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Movie.ID(childComplexity), true
 
-	case "Movie.imdbId":
+	case "Movie.imdbID":
 		if e.complexity.Movie.ImdbID == nil {
 			break
 		}
@@ -262,7 +701,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Movie.Title(childComplexity), true
 
-	case "Movie.tmdbId":
+	case "Movie.tmdbID":
 		if e.complexity.Movie.TmdbID == nil {
 			break
 		}
@@ -288,6 +727,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddGiftCertificates(childComplexity, args["giftCerts"].([]*model.GiftCertificateInput)), true
 
+	case "Mutation.attendShowing":
+		if e.complexity.Mutation.AttendShowing == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_attendShowing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AttendShowing(childComplexity, args["showingID"].(string), args["paymentOption"].(model.PaymentOption)), true
+
+	case "Mutation.createShowing":
+		if e.complexity.Mutation.CreateShowing == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createShowing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateShowing(childComplexity, args["showing"].(model.CreateShowingInput)), true
+
 	case "Mutation.deleteGiftCertificate":
 		if e.complexity.Mutation.DeleteGiftCertificate == nil {
 			break
@@ -299,6 +762,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteGiftCertificate(childComplexity, args["giftCert"].(model.GiftCertificateInput)), true
+
+	case "Mutation.deleteShowing":
+		if e.complexity.Mutation.DeleteShowing == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteShowing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteShowing(childComplexity, args["showingID"].(string)), true
 
 	case "Mutation.disableCalendarFeed":
 		if e.complexity.Mutation.DisableCalendarFeed == nil {
@@ -326,6 +801,78 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.InvalidateCalendarFeed(childComplexity), true
 
+	case "Mutation.markAsBought":
+		if e.complexity.Mutation.MarkAsBought == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markAsBought_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkAsBought(childComplexity, args["showingID"].(string), args["price"].(string)), true
+
+	case "Mutation.processTicketUrls":
+		if e.complexity.Mutation.ProcessTicketUrls == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_processTicketUrls_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ProcessTicketUrls(childComplexity, args["showingID"].(string), args["ticketUrls"].([]string)), true
+
+	case "Mutation.promoteToAdmin":
+		if e.complexity.Mutation.PromoteToAdmin == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_promoteToAdmin_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PromoteToAdmin(childComplexity, args["showingID"].(string), args["userToPromote"].(string)), true
+
+	case "Mutation.unattendShowing":
+		if e.complexity.Mutation.UnattendShowing == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_unattendShowing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UnattendShowing(childComplexity, args["showingID"].(string)), true
+
+	case "Mutation.updateAttendeePaymentInfo":
+		if e.complexity.Mutation.UpdateAttendeePaymentInfo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAttendeePaymentInfo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAttendeePaymentInfo(childComplexity, args["paymentInfo"].(model.AttendeePaymentInfoInput)), true
+
+	case "Mutation.updateShowing":
+		if e.complexity.Mutation.UpdateShowing == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateShowing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateShowing(childComplexity, args["showingID"].(string), args["newValues"].(*model.UpdateShowingInput)), true
+
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
 			break
@@ -337,6 +884,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["newInfo"].(model.UserDetailsInput)), true
+
+	case "PublicAttendee.showingID":
+		if e.complexity.PublicAttendee.ShowingID == nil {
+			break
+		}
+
+		return e.complexity.PublicAttendee.ShowingID(childComplexity), true
+
+	case "PublicAttendee.userID":
+		if e.complexity.PublicAttendee.UserID == nil {
+			break
+		}
+
+		return e.complexity.PublicAttendee.UserID(childComplexity), true
+
+	case "PublicAttendee.userInfo":
+		if e.complexity.PublicAttendee.UserInfo == nil {
+			break
+		}
+
+		return e.complexity.PublicAttendee.UserInfo(childComplexity), true
+
+	case "PublicUser.avatar":
+		if e.complexity.PublicUser.Avatar == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.Avatar(childComplexity), true
+
+	case "PublicUser.firstName":
+		if e.complexity.PublicUser.FirstName == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.FirstName(childComplexity), true
+
+	case "PublicUser.id":
+		if e.complexity.PublicUser.ID == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.ID(childComplexity), true
+
+	case "PublicUser.lastName":
+		if e.complexity.PublicUser.LastName == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.LastName(childComplexity), true
+
+	case "PublicUser.name":
+		if e.complexity.PublicUser.Name == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.Name(childComplexity), true
+
+	case "PublicUser.nick":
+		if e.complexity.PublicUser.Nick == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.Nick(childComplexity), true
+
+	case "PublicUser.phone":
+		if e.complexity.PublicUser.Phone == nil {
+			break
+		}
+
+		return e.complexity.PublicUser.Phone(childComplexity), true
 
 	case "Query.allCommandments":
 		if e.complexity.Query.AllCommandments == nil {
@@ -351,6 +968,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AllMovies(childComplexity), true
+
+	case "Query.allUsers":
+		if e.complexity.Query.AllUsers == nil {
+			break
+		}
+
+		return e.complexity.Query.AllUsers(childComplexity), true
 
 	case "Query.archivedMovies":
 		if e.complexity.Query.ArchivedMovies == nil {
@@ -378,12 +1002,370 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Movie(childComplexity, args["id"].(string)), true
 
+	case "Query.publicShowings":
+		if e.complexity.Query.PublicShowings == nil {
+			break
+		}
+
+		args, err := ec.field_Query_publicShowings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PublicShowings(childComplexity, args["afterDate"].(*string)), true
+
 	case "Query.randomCommandment":
 		if e.complexity.Query.RandomCommandment == nil {
 			break
 		}
 
 		return e.complexity.Query.RandomCommandment(childComplexity), true
+
+	case "Query.showing":
+		if e.complexity.Query.Showing == nil {
+			break
+		}
+
+		args, err := ec.field_Query_showing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Showing(childComplexity, args["id"].(*string), args["webID"].(*string)), true
+
+	case "Query.showingForMovie":
+		if e.complexity.Query.ShowingForMovie == nil {
+			break
+		}
+
+		args, err := ec.field_Query_showingForMovie_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ShowingForMovie(childComplexity, args["movieId"].(*string)), true
+
+	case "Seat.number":
+		if e.complexity.Seat.Number == nil {
+			break
+		}
+
+		return e.complexity.Seat.Number(childComplexity), true
+
+	case "Seat.row":
+		if e.complexity.Seat.Row == nil {
+			break
+		}
+
+		return e.complexity.Seat.Row(childComplexity), true
+
+	case "SeatRange.numbers":
+		if e.complexity.SeatRange.Numbers == nil {
+			break
+		}
+
+		return e.complexity.SeatRange.Numbers(childComplexity), true
+
+	case "SeatRange.row":
+		if e.complexity.SeatRange.Row == nil {
+			break
+		}
+
+		return e.complexity.SeatRange.Row(childComplexity), true
+
+	case "Showing.admin":
+		if e.complexity.Showing.Admin == nil {
+			break
+		}
+
+		return e.complexity.Showing.Admin(childComplexity), true
+
+	case "Showing.adminPaymentDetails":
+		if e.complexity.Showing.AdminPaymentDetails == nil {
+			break
+		}
+
+		return e.complexity.Showing.AdminPaymentDetails(childComplexity), true
+
+	case "Showing.attendeePaymentDetails":
+		if e.complexity.Showing.AttendeePaymentDetails == nil {
+			break
+		}
+
+		return e.complexity.Showing.AttendeePaymentDetails(childComplexity), true
+
+	case "Showing.attendees":
+		if e.complexity.Showing.Attendees == nil {
+			break
+		}
+
+		return e.complexity.Showing.Attendees(childComplexity), true
+
+	case "Showing.cinemaScreen":
+		if e.complexity.Showing.CinemaScreen == nil {
+			break
+		}
+
+		return e.complexity.Showing.CinemaScreen(childComplexity), true
+
+	case "Showing.createdDate":
+		if e.complexity.Showing.CreatedDate == nil {
+			break
+		}
+
+		return e.complexity.Showing.CreatedDate(childComplexity), true
+
+	case "Showing.date":
+		if e.complexity.Showing.Date == nil {
+			break
+		}
+
+		return e.complexity.Showing.Date(childComplexity), true
+
+	case "Showing.filmstadenSeatMap":
+		if e.complexity.Showing.FilmstadenSeatMap == nil {
+			break
+		}
+
+		return e.complexity.Showing.FilmstadenSeatMap(childComplexity), true
+
+	case "Showing.filmstadenShowingID":
+		if e.complexity.Showing.FilmstadenShowingID == nil {
+			break
+		}
+
+		return e.complexity.Showing.FilmstadenShowingID(childComplexity), true
+
+	case "Showing.id":
+		if e.complexity.Showing.ID == nil {
+			break
+		}
+
+		return e.complexity.Showing.ID(childComplexity), true
+
+	case "Showing.lastModifiedDate":
+		if e.complexity.Showing.LastModifiedDate == nil {
+			break
+		}
+
+		return e.complexity.Showing.LastModifiedDate(childComplexity), true
+
+	case "Showing.location":
+		if e.complexity.Showing.Location == nil {
+			break
+		}
+
+		return e.complexity.Showing.Location(childComplexity), true
+
+	case "Showing.movie":
+		if e.complexity.Showing.Movie == nil {
+			break
+		}
+
+		return e.complexity.Showing.Movie(childComplexity), true
+
+	case "Showing.movieID":
+		if e.complexity.Showing.MovieID == nil {
+			break
+		}
+
+		return e.complexity.Showing.MovieID(childComplexity), true
+
+	case "Showing.movieTitle":
+		if e.complexity.Showing.MovieTitle == nil {
+			break
+		}
+
+		return e.complexity.Showing.MovieTitle(childComplexity), true
+
+	case "Showing.myTickets":
+		if e.complexity.Showing.MyTickets == nil {
+			break
+		}
+
+		return e.complexity.Showing.MyTickets(childComplexity), true
+
+	case "Showing.payToUser":
+		if e.complexity.Showing.PayToUser == nil {
+			break
+		}
+
+		return e.complexity.Showing.PayToUser(childComplexity), true
+
+	case "Showing.price":
+		if e.complexity.Showing.Price == nil {
+			break
+		}
+
+		return e.complexity.Showing.Price(childComplexity), true
+
+	case "Showing.slug":
+		if e.complexity.Showing.Slug == nil {
+			break
+		}
+
+		return e.complexity.Showing.Slug(childComplexity), true
+
+	case "Showing.ticketRange":
+		if e.complexity.Showing.TicketRange == nil {
+			break
+		}
+
+		return e.complexity.Showing.TicketRange(childComplexity), true
+
+	case "Showing.ticketsBought":
+		if e.complexity.Showing.TicketsBought == nil {
+			break
+		}
+
+		return e.complexity.Showing.TicketsBought(childComplexity), true
+
+	case "Showing.time":
+		if e.complexity.Showing.Time == nil {
+			break
+		}
+
+		return e.complexity.Showing.Time(childComplexity), true
+
+	case "Showing.webID":
+		if e.complexity.Showing.WebID == nil {
+			break
+		}
+
+		return e.complexity.Showing.WebID(childComplexity), true
+
+	case "Ticket.assignedToUser":
+		if e.complexity.Ticket.AssignedToUser == nil {
+			break
+		}
+
+		return e.complexity.Ticket.AssignedToUser(childComplexity), true
+
+	case "Ticket.attributes":
+		if e.complexity.Ticket.Attributes == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Attributes(childComplexity), true
+
+	case "Ticket.barcode":
+		if e.complexity.Ticket.Barcode == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Barcode(childComplexity), true
+
+	case "Ticket.cinema":
+		if e.complexity.Ticket.Cinema == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Cinema(childComplexity), true
+
+	case "Ticket.cinemaCity":
+		if e.complexity.Ticket.CinemaCity == nil {
+			break
+		}
+
+		return e.complexity.Ticket.CinemaCity(childComplexity), true
+
+	case "Ticket.customerType":
+		if e.complexity.Ticket.CustomerType == nil {
+			break
+		}
+
+		return e.complexity.Ticket.CustomerType(childComplexity), true
+
+	case "Ticket.customerTypeDefinition":
+		if e.complexity.Ticket.CustomerTypeDefinition == nil {
+			break
+		}
+
+		return e.complexity.Ticket.CustomerTypeDefinition(childComplexity), true
+
+	case "Ticket.date":
+		if e.complexity.Ticket.Date == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Date(childComplexity), true
+
+	case "Ticket.id":
+		if e.complexity.Ticket.ID == nil {
+			break
+		}
+
+		return e.complexity.Ticket.ID(childComplexity), true
+
+	case "Ticket.movieName":
+		if e.complexity.Ticket.MovieName == nil {
+			break
+		}
+
+		return e.complexity.Ticket.MovieName(childComplexity), true
+
+	case "Ticket.movieRating":
+		if e.complexity.Ticket.MovieRating == nil {
+			break
+		}
+
+		return e.complexity.Ticket.MovieRating(childComplexity), true
+
+	case "Ticket.profileID":
+		if e.complexity.Ticket.ProfileID == nil {
+			break
+		}
+
+		return e.complexity.Ticket.ProfileID(childComplexity), true
+
+	case "Ticket.screen":
+		if e.complexity.Ticket.Screen == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Screen(childComplexity), true
+
+	case "Ticket.seat":
+		if e.complexity.Ticket.Seat == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Seat(childComplexity), true
+
+	case "Ticket.showingID":
+		if e.complexity.Ticket.ShowingID == nil {
+			break
+		}
+
+		return e.complexity.Ticket.ShowingID(childComplexity), true
+
+	case "Ticket.time":
+		if e.complexity.Ticket.Time == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Time(childComplexity), true
+
+	case "TicketRange.rows":
+		if e.complexity.TicketRange.Rows == nil {
+			break
+		}
+
+		return e.complexity.TicketRange.Rows(childComplexity), true
+
+	case "TicketRange.seatings":
+		if e.complexity.TicketRange.Seatings == nil {
+			break
+		}
+
+		return e.complexity.TicketRange.Seatings(childComplexity), true
+
+	case "TicketRange.totalCount":
+		if e.complexity.TicketRange.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.TicketRange.TotalCount(childComplexity), true
 
 	case "User.avatarURL":
 		if e.complexity.User.AvatarURL == nil {
@@ -392,7 +1374,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.AvatarURL(childComplexity), true
 
-	case "User.calendarFeedId":
+	case "User.calendarFeedID":
 		if e.complexity.User.CalendarFeedID == nil {
 			break
 		}
@@ -413,7 +1395,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Email(childComplexity), true
 
-	case "User.filmstadenMembershipId":
+	case "User.filmstadenMembershipID":
 		if e.complexity.User.FilmstadenMembershipID == nil {
 			break
 		}
@@ -566,7 +1548,39 @@ type Commandments {
     phrase: String!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/v2/movie.graphqls", Input: `extend type Query {
+	{Name: "../../api/graphql/v2/filmstaden.graphqls", Input: `type FilmstadenSeatMap {
+    row: Int!
+    number: Int!
+    seatType: String!
+    coordinates: FilmstadenSeatCoordinates!
+    dimensions: FilmstadenSeatDimensions!
+}
+
+type FilmstadenSeatCoordinates {
+    x: Float!
+    y: Float!
+}
+
+type FilmstadenSeatDimensions {
+    width: Int!
+    height: Int!
+}
+
+type FilmstadenLiteScreen {
+    filmstadenID: ID!
+    name: String!
+}
+
+type FilmstadenShowing {
+    cinemaName: String!,
+    screen: FilmstadenLiteScreen!,
+    seatCount: Int!,
+    timeUtc: String!,
+    tags: [String!]!,
+    filmstadenRemoteEntityID: String!
+}
+`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/movies.graphqls", Input: `extend type Query {
     movie(id: MovieID!): Movie
     allMovies: [Movie!]!
     archivedMovies: [Movie!]!
@@ -579,9 +1593,9 @@ extend type Mutation {
 
 type Movie {
     id: MovieID!
-    filmstadenId: String!
-    imdbId: IMDbID
-    tmdbId: TMDbID
+    filmstadenID: String!
+    imdbID: IMDbID
+    tmdbID: TMDbID
     slug: String!
     title: String!
     releaseDate: String!
@@ -592,7 +1606,48 @@ type Movie {
     archived: Boolean!
     updateTime: String!
     createTime: String!
-#    filmstadenShowings(city: String = "GB", afterDate: LocalDate): [FilmstadenShowingDTO!]!
+    filmstadenShowings(city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
+}
+`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/payment.graphqls", Input: `extend type Mutation {
+    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee!
+}
+
+extend type Showing {
+    adminPaymentDetails: AdminPaymentDetails
+    attendeePaymentDetails: AttendeePaymentDetails
+}
+
+type AdminPaymentDetails {
+    filmstadenBuyLink: String
+    showingID: ShowingID
+    attendees: [Attendee!]!
+}
+
+type AttendeePaymentDetails {
+    hasPaid: Boolean!
+    amountOwed: SEK!
+    payTo: PublicUser!
+    payer: PublicUser!
+    swishLink: String
+}
+
+type Attendee {
+    userID: UserID!
+    user: PublicUser!
+    showingID: ShowingID!
+    hasPaid: Boolean!
+    amountOwed: SEK!
+    type: PaymentType!
+    giftCertificateUsed: GiftCertificate
+    filmstadenMembershipID: String
+}
+
+input AttendeePaymentInfoInput {
+    userID: UserID!
+    showingID: ShowingID
+    hasPaid: Boolean!
+    amountOwed: SEK!
 }
 `, BuiltIn: false},
 	{Name: "../../api/graphql/v2/scalars.graphqls", Input: `scalar MovieID
@@ -600,9 +1655,153 @@ scalar IMDbID
 scalar TMDbID
 scalar Time
 scalar UUID
-scalar FilmstadenMembershipID`, BuiltIn: false},
+scalar FilmstadenMembershipID
+scalar ShowingID
+scalar Base64ID
+scalar SEK
+scalar LocalDate
+scalar LocalTime
+scalar UserID
+`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/showing.graphqls", Input: `type Query {
+    showing(id: ShowingID, webID: Base64ID): Showing
+    publicShowings(afterDate: LocalDate): [Showing!]!
+    showingForMovie(movieId: MovieID): [Showing!]!
+}
+
+type Mutation {
+    attendShowing(showingID: ShowingID!, paymentOption: PaymentOption!): Showing!
+    unattendShowing(showingID: ShowingID!): Showing!
+
+    createShowing(showing: CreateShowingInput!): Showing!
+
+    # Delete a showing and return all public showings
+    deleteShowing(showingID: ShowingID!): [Showing!]!
+
+    markAsBought(showingID: ShowingID!, price: SEK!): Showing!
+    processTicketUrls(showingID: ShowingID!, ticketUrls: [String!]): Showing!
+
+    updateShowing(showingID: ShowingID!, newValues: UpdateShowingInput): Showing!
+
+    promoteToAdmin(showingID: ShowingID!, userToPromote: UserID!): Showing!
+}
+
+type Showing {
+    id: ShowingID!
+    webID: Base64ID!
+    filmstadenShowingID: String
+    slug: String!
+    date: String!
+    time: String!
+    movieID: MovieID!
+    movieTitle: String!
+    movie: Movie!
+    location: String!
+    cinemaScreen: CinemaScreen
+    price: SEK
+    ticketsBought: Boolean!
+    admin: PublicUser!
+    payToUser: PublicUser!
+    lastModifiedDate: String!
+    createdDate: String!
+    filmstadenSeatMap: [FilmstadenSeatMap!]!
+    attendees: [PublicAttendee!]!
+}
+
+type PublicAttendee {
+    userID: UserID!
+    showingID: ShowingID!
+    userInfo: PublicUser!
+}
+
+type CinemaScreen {
+    id: ID!
+    name: String!
+}
+
+input CinemaScreenInput {
+    id: String!
+    name: String
+}
+
+# Used for supplying how the user will pay, when attending a showing
+input PaymentOption {
+    type: PaymentType!
+    ticketNumber: String
+}
+
+enum PaymentType {
+    SWISH
+    GIFT_CERTIFICATE
+}
+
+input CreateShowingInput {
+    date: LocalDate!
+    time: LocalTime!
+    movieID: MovieID!
+    location: String!
+    filmstadenScreen: CinemaScreenInput
+    filmstadenRemoteEntityID: String
+}
+
+input UpdateShowingInput {
+    price: SEK!
+    payToUser: UserID!
+    location: String!
+    filmstadenRemoteEntityID: String
+    time: LocalTime!
+    date: LocalDate!
+}
+`, BuiltIn: false},
+	{Name: "../../api/graphql/v2/ticket.graphqls", Input: `extend type Showing {
+    myTickets: [Ticket!]!
+    ticketRange: TicketRange
+}
+
+# A ticket assigned to a user that allows access to Filmstaden
+type Ticket {
+    id: String!
+    showingID: ShowingID!
+    assignedToUser: UserID!
+    profileID: String
+    barcode: String!
+    customerType: String!
+    customerTypeDefinition: String!
+    cinema: String!
+    cinemaCity: String
+    screen: String!
+    seat: Seat!
+    date: LocalDate!,
+    time: String!,
+    movieName: String!
+    # 15 år, 11 år etc.
+    movieRating: String!
+    # "textad", "en" etc
+    attributes: [String!]!
+}
+
+type Seat {
+    row: Int!
+    number: Int!
+}
+
+type SeatRange {
+    row: Int!
+    # All numbers for this particular row
+    numbers: [Int!]!
+}
+
+# In what range is the seating assigned for each row
+type TicketRange {
+    rows: [Int!]!
+    seatings: [SeatRange!]!
+    # The total number of tickets for this showing
+    totalCount: Int!
+}
+`, BuiltIn: false},
 	{Name: "../../api/graphql/v2/users.graphqls", Input: `extend type Query  {
     currentUser: User!
+    allUsers: [PublicUser!]!
 }
 
 extend type Mutation {
@@ -620,7 +1819,7 @@ extend type Mutation {
 
 type User {
     id: UUID!
-    filmstadenMembershipId: FilmstadenMembershipID
+    filmstadenMembershipID: FilmstadenMembershipID
     name: String!
     firstName: String!
     lastName: String!
@@ -629,11 +1828,21 @@ type User {
     phone: String
     avatarURL: String
     giftCertificates: [GiftCertificate!]!
-    calendarFeedId: String
+    calendarFeedID: String
     calendarFeedUrl: String
     lastLoginTime: Time!
     signupTime: Time!
     updateTime: Time!
+}
+
+type PublicUser {
+    id: UserID!
+    name: String
+    firstName: String
+    lastName: String
+    nick: String
+    phone: String
+    avatar: String
 }
 
 type GiftCertificate {
@@ -656,7 +1865,7 @@ input UserDetailsInput {
     firstName: String
     lastName: String
     nick: String
-    filmstadenMembershipId: FilmstadenMembershipID
+    filmstadenMembershipID: FilmstadenMembershipID
     phone: String
 }
 
@@ -672,6 +1881,30 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Movie_filmstadenShowings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["city"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["city"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["afterDate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("afterDate"))
+		arg1, err = ec.unmarshalOLocalDate2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["afterDate"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addGiftCertificates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -684,6 +1917,45 @@ func (ec *executionContext) field_Mutation_addGiftCertificates_args(ctx context.
 		}
 	}
 	args["giftCerts"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_attendShowing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	var arg1 model.PaymentOption
+	if tmp, ok := rawArgs["paymentOption"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymentOption"))
+		arg1, err = ec.unmarshalNPaymentOption2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPaymentOption(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["paymentOption"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createShowing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateShowingInput
+	if tmp, ok := rawArgs["showing"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showing"))
+		arg0, err = ec.unmarshalNCreateShowingInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCreateShowingInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showing"] = arg0
 	return args, nil
 }
 
@@ -702,6 +1974,21 @@ func (ec *executionContext) field_Mutation_deleteGiftCertificate_args(ctx contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteShowing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_fetchNewMoviesFromFilmstaden_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -714,6 +2001,132 @@ func (ec *executionContext) field_Mutation_fetchNewMoviesFromFilmstaden_args(ctx
 		}
 	}
 	args["cityAlias"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_markAsBought_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["price"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+		arg1, err = ec.unmarshalNSEK2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["price"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_processTicketUrls_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	var arg1 []string
+	if tmp, ok := rawArgs["ticketUrls"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ticketUrls"))
+		arg1, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ticketUrls"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_promoteToAdmin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["userToPromote"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userToPromote"))
+		arg1, err = ec.unmarshalNUserID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userToPromote"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_unattendShowing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateAttendeePaymentInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AttendeePaymentInfoInput
+	if tmp, ok := rawArgs["paymentInfo"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymentInfo"))
+		arg0, err = ec.unmarshalNAttendeePaymentInfoInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendeePaymentInfoInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["paymentInfo"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateShowing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["showingID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+		arg0, err = ec.unmarshalNShowingID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showingID"] = arg0
+	var arg1 *model.UpdateShowingInput
+	if tmp, ok := rawArgs["newValues"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newValues"))
+		arg1, err = ec.unmarshalOUpdateShowingInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUpdateShowingInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["newValues"] = arg1
 	return args, nil
 }
 
@@ -762,6 +2175,60 @@ func (ec *executionContext) field_Query_movie_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_publicShowings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["afterDate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("afterDate"))
+		arg0, err = ec.unmarshalOLocalDate2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["afterDate"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_showingForMovie_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["movieId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("movieId"))
+		arg0, err = ec.unmarshalOMovieID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["movieId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_showing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOShowingID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["webID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("webID"))
+		arg1, err = ec.unmarshalOBase64ID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["webID"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -799,6 +2266,621 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AdminPaymentDetails_filmstadenBuyLink(ctx context.Context, field graphql.CollectedField, obj *model.AdminPaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AdminPaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FilmstadenBuyLink, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AdminPaymentDetails_showingID(ctx context.Context, field graphql.CollectedField, obj *model.AdminPaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AdminPaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShowingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOShowingID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AdminPaymentDetails_attendees(ctx context.Context, field graphql.CollectedField, obj *model.AdminPaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AdminPaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attendees, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Attendee)
+	fc.Result = res
+	return ec.marshalNAttendee2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendeeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_userID(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUserID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_user(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_showingID(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShowingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNShowingID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_hasPaid(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasPaid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_amountOwed(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AmountOwed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNSEK2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_type(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.PaymentType)
+	fc.Result = res
+	return ec.marshalNPaymentType2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPaymentType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_giftCertificateUsed(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GiftCertificateUsed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.GiftCertificate)
+	fc.Result = res
+	return ec.marshalOGiftCertificate2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attendee_filmstadenMembershipID(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Attendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FilmstadenMembershipID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttendeePaymentDetails_hasPaid(ctx context.Context, field graphql.CollectedField, obj *model.AttendeePaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AttendeePaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasPaid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttendeePaymentDetails_amountOwed(ctx context.Context, field graphql.CollectedField, obj *model.AttendeePaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AttendeePaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AmountOwed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNSEK2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttendeePaymentDetails_payTo(ctx context.Context, field graphql.CollectedField, obj *model.AttendeePaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AttendeePaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PayTo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttendeePaymentDetails_payer(ctx context.Context, field graphql.CollectedField, obj *model.AttendeePaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AttendeePaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Payer, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttendeePaymentDetails_swishLink(ctx context.Context, field graphql.CollectedField, obj *model.AttendeePaymentDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AttendeePaymentDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SwishLink, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CinemaScreen_id(ctx context.Context, field graphql.CollectedField, obj *model.CinemaScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CinemaScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CinemaScreen_name(ctx context.Context, field graphql.CollectedField, obj *model.CinemaScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CinemaScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Commandments_number(ctx context.Context, field graphql.CollectedField, obj *model.Commandments) (ret graphql.Marshaler) {
 	defer func() {
@@ -854,6 +2936,601 @@ func (ec *executionContext) _Commandments_phrase(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Phrase, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenLiteScreen_filmstadenID(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenLiteScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenLiteScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FilmstadenID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenLiteScreen_name(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenLiteScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenLiteScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatCoordinates_x(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatCoordinates) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatCoordinates",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.X, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatCoordinates_y(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatCoordinates) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatCoordinates",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Y, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatDimensions_width(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatDimensions) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatDimensions",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Width, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatDimensions_height(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatDimensions) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatDimensions",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Height, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatMap_row(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Row, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatMap_number(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Number, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatMap_seatType(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeatType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatMap_coordinates(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Coordinates, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.FilmstadenSeatCoordinates)
+	fc.Result = res
+	return ec.marshalNFilmstadenSeatCoordinates2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatCoordinates(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenSeatMap_dimensions(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenSeatMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Dimensions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.FilmstadenSeatDimensions)
+	fc.Result = res
+	return ec.marshalNFilmstadenSeatDimensions2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatDimensions(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_cinemaName(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CinemaName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_screen(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Screen, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.FilmstadenLiteScreen)
+	fc.Result = res
+	return ec.marshalNFilmstadenLiteScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenLiteScreen(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_seatCount(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeatCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_timeUtc(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TimeUtc, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_tags(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tags, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_filmstadenRemoteEntityID(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FilmstadenRemoteEntityID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1010,7 +3687,7 @@ func (ec *executionContext) _Movie_id(ctx context.Context, field graphql.Collect
 	return ec.marshalNMovieID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Movie_filmstadenId(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
+func (ec *executionContext) _Movie_filmstadenID(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1045,7 +3722,7 @@ func (ec *executionContext) _Movie_filmstadenId(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Movie_imdbId(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
+func (ec *executionContext) _Movie_imdbID(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1077,7 +3754,7 @@ func (ec *executionContext) _Movie_imdbId(ctx context.Context, field graphql.Col
 	return ec.marshalOIMDbID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Movie_tmdbId(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
+func (ec *executionContext) _Movie_tmdbID(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1456,6 +4133,384 @@ func (ec *executionContext) _Movie_createTime(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Movie_filmstadenShowings(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Movie",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Movie_filmstadenShowings_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Movie().FilmstadenShowings(rctx, obj, args["city"].(*string), args["afterDate"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.FilmstadenShowing)
+	fc.Result = res
+	return ec.marshalNFilmstadenShowing2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenShowingᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_attendShowing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_attendShowing_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AttendShowing(rctx, args["showingID"].(string), args["paymentOption"].(model.PaymentOption))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_unattendShowing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_unattendShowing_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UnattendShowing(rctx, args["showingID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createShowing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createShowing_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateShowing(rctx, args["showing"].(model.CreateShowingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteShowing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteShowing_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteShowing(rctx, args["showingID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowingᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_markAsBought(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_markAsBought_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MarkAsBought(rctx, args["showingID"].(string), args["price"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_processTicketUrls(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_processTicketUrls_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ProcessTicketUrls(rctx, args["showingID"].(string), args["ticketUrls"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateShowing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateShowing_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateShowing(rctx, args["showingID"].(string), args["newValues"].(*model.UpdateShowingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_promoteToAdmin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_promoteToAdmin_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PromoteToAdmin(rctx, args["showingID"].(string), args["userToPromote"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_fetchNewMoviesFromFilmstaden(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1496,6 +4551,48 @@ func (ec *executionContext) _Mutation_fetchNewMoviesFromFilmstaden(ctx context.C
 	res := resTmp.([]*model.Movie)
 	fc.Result = res
 	return ec.marshalNMovie2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐMovieᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAttendeePaymentInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAttendeePaymentInfo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAttendeePaymentInfo(rctx, args["paymentInfo"].(model.AttendeePaymentInfoInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Attendee)
+	fc.Result = res
+	return ec.marshalNAttendee2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendee(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1692,6 +4789,461 @@ func (ec *executionContext) _Mutation_deleteGiftCertificate(ctx context.Context,
 	res := resTmp.(*model.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicAttendee_userID(ctx context.Context, field graphql.CollectedField, obj *model.PublicAttendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicAttendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUserID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicAttendee_showingID(ctx context.Context, field graphql.CollectedField, obj *model.PublicAttendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicAttendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShowingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNShowingID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicAttendee_userInfo(ctx context.Context, field graphql.CollectedField, obj *model.PublicAttendee) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicAttendee",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_id(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUserID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_name(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_firstName(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirstName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_lastName(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_nick(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nick, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_phone(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Phone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublicUser_avatar(ctx context.Context, field graphql.CollectedField, obj *model.PublicUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PublicUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Avatar, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_showing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_showing_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Showing(rctx, args["id"].(*string), args["webID"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalOShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_publicShowings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_publicShowings_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PublicShowings(rctx, args["afterDate"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowingᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_showingForMovie(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_showingForMovie_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ShowingForMovie(rctx, args["movieId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowingᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_allCommandments(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1908,6 +5460,41 @@ func (ec *executionContext) _Query_currentUser(ctx context.Context, field graphq
 	return ec.marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_allUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AllUsers(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUserᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1979,6 +5566,1592 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Seat_row(ctx context.Context, field graphql.CollectedField, obj *model.Seat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Seat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Row, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Seat_number(ctx context.Context, field graphql.CollectedField, obj *model.Seat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Seat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Number, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SeatRange_row(ctx context.Context, field graphql.CollectedField, obj *model.SeatRange) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SeatRange",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Row, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SeatRange_numbers(ctx context.Context, field graphql.CollectedField, obj *model.SeatRange) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SeatRange",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Numbers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]int)
+	fc.Result = res
+	return ec.marshalNInt2ᚕintᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_id(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNShowingID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_webID(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WebID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNBase64ID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_filmstadenShowingID(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FilmstadenShowingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_slug(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Slug, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_date(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_time(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_movieID(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MovieID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNMovieID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_movieTitle(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MovieTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_movie(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Movie, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Movie)
+	fc.Result = res
+	return ec.marshalNMovie2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐMovie(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_location(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_cinemaScreen(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CinemaScreen, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CinemaScreen)
+	fc.Result = res
+	return ec.marshalOCinemaScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCinemaScreen(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_price(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOSEK2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_ticketsBought(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TicketsBought, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_admin(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Admin, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_payToUser(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PayToUser, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_lastModifiedDate(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastModifiedDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_createdDate(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_filmstadenSeatMap(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Showing().FilmstadenSeatMap(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.FilmstadenSeatMap)
+	fc.Result = res
+	return ec.marshalNFilmstadenSeatMap2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatMapᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_attendees(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Showing().Attendees(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PublicAttendee)
+	fc.Result = res
+	return ec.marshalNPublicAttendee2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicAttendeeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_adminPaymentDetails(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AdminPaymentDetails, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AdminPaymentDetails)
+	fc.Result = res
+	return ec.marshalOAdminPaymentDetails2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAdminPaymentDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_attendeePaymentDetails(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AttendeePaymentDetails, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AttendeePaymentDetails)
+	fc.Result = res
+	return ec.marshalOAttendeePaymentDetails2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendeePaymentDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_myTickets(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MyTickets, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Ticket)
+	fc.Result = res
+	return ec.marshalNTicket2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicketᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Showing_ticketRange(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Showing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TicketRange, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TicketRange)
+	fc.Result = res
+	return ec.marshalOTicketRange2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicketRange(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_id(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_showingID(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShowingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNShowingID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_assignedToUser(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssignedToUser, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUserID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_profileID(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProfileID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_barcode(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Barcode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_customerType(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CustomerType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_customerTypeDefinition(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CustomerTypeDefinition, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_cinema(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cinema, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_cinemaCity(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CinemaCity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_screen(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Screen, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_seat(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Seat, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Seat)
+	fc.Result = res
+	return ec.marshalNSeat2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeat(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_date(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNLocalDate2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_time(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_movieName(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MovieName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_movieRating(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MovieRating, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ticket_attributes(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Ticket",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attributes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TicketRange_rows(ctx context.Context, field graphql.CollectedField, obj *model.TicketRange) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TicketRange",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rows, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]int)
+	fc.Result = res
+	return ec.marshalNInt2ᚕintᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TicketRange_seatings(ctx context.Context, field graphql.CollectedField, obj *model.TicketRange) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TicketRange",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Seatings, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.SeatRange)
+	fc.Result = res
+	return ec.marshalNSeatRange2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeatRangeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TicketRange_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.TicketRange) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TicketRange",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2014,7 +7187,7 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_filmstadenMembershipId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_filmstadenMembershipID(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2293,14 +7466,14 @@ func (ec *executionContext) _User_giftCertificates(ctx context.Context, field gr
 		Object:     "User",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.GiftCertificates, nil
+		return ec.resolvers.User().GiftCertificates(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2317,7 +7490,7 @@ func (ec *executionContext) _User_giftCertificates(ctx context.Context, field gr
 	return ec.marshalNGiftCertificate2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_calendarFeedId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_calendarFeedID(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3608,6 +8781,147 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAttendeePaymentInfoInput(ctx context.Context, obj interface{}) (model.AttendeePaymentInfoInput, error) {
+	var it model.AttendeePaymentInfoInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "userID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+			it.UserID, err = ec.unmarshalNUserID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "showingID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showingID"))
+			it.ShowingID, err = ec.unmarshalOShowingID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasPaid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasPaid"))
+			it.HasPaid, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "amountOwed":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amountOwed"))
+			it.AmountOwed, err = ec.unmarshalNSEK2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCinemaScreenInput(ctx context.Context, obj interface{}) (model.CinemaScreenInput, error) {
+	var it model.CinemaScreenInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateShowingInput(ctx context.Context, obj interface{}) (model.CreateShowingInput, error) {
+	var it model.CreateShowingInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			it.Date, err = ec.unmarshalNLocalDate2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "time":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("time"))
+			it.Time, err = ec.unmarshalNLocalTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "movieID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("movieID"))
+			it.MovieID, err = ec.unmarshalNMovieID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "filmstadenScreen":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filmstadenScreen"))
+			it.FilmstadenScreen, err = ec.unmarshalOCinemaScreenInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCinemaScreenInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "filmstadenRemoteEntityID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filmstadenRemoteEntityID"))
+			it.FilmstadenRemoteEntityID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputGiftCertificateInput(ctx context.Context, obj interface{}) (model.GiftCertificateInput, error) {
 	var it model.GiftCertificateInput
 	asMap := map[string]interface{}{}
@@ -3630,6 +8944,100 @@ func (ec *executionContext) unmarshalInputGiftCertificateInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expireTime"))
 			it.ExpireTime, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPaymentOption(ctx context.Context, obj interface{}) (model.PaymentOption, error) {
+	var it model.PaymentOption
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalNPaymentType2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPaymentType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ticketNumber":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ticketNumber"))
+			it.TicketNumber, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateShowingInput(ctx context.Context, obj interface{}) (model.UpdateShowingInput, error) {
+	var it model.UpdateShowingInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			it.Price, err = ec.unmarshalNSEK2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "payToUser":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payToUser"))
+			it.PayToUser, err = ec.unmarshalNUserID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "filmstadenRemoteEntityID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filmstadenRemoteEntityID"))
+			it.FilmstadenRemoteEntityID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "time":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("time"))
+			it.Time, err = ec.unmarshalNLocalTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			it.Date, err = ec.unmarshalNLocalDate2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3672,10 +9080,10 @@ func (ec *executionContext) unmarshalInputUserDetailsInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "filmstadenMembershipId":
+		case "filmstadenMembershipID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filmstadenMembershipId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filmstadenMembershipID"))
 			it.FilmstadenMembershipID, err = ec.unmarshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋscalarsᚐFilmstadenMembershipID(ctx, v)
 			if err != nil {
 				return it, err
@@ -3702,6 +9110,169 @@ func (ec *executionContext) unmarshalInputUserDetailsInput(ctx context.Context, 
 
 // region    **************************** object.gotpl ****************************
 
+var adminPaymentDetailsImplementors = []string{"AdminPaymentDetails"}
+
+func (ec *executionContext) _AdminPaymentDetails(ctx context.Context, sel ast.SelectionSet, obj *model.AdminPaymentDetails) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, adminPaymentDetailsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AdminPaymentDetails")
+		case "filmstadenBuyLink":
+			out.Values[i] = ec._AdminPaymentDetails_filmstadenBuyLink(ctx, field, obj)
+		case "showingID":
+			out.Values[i] = ec._AdminPaymentDetails_showingID(ctx, field, obj)
+		case "attendees":
+			out.Values[i] = ec._AdminPaymentDetails_attendees(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var attendeeImplementors = []string{"Attendee"}
+
+func (ec *executionContext) _Attendee(ctx context.Context, sel ast.SelectionSet, obj *model.Attendee) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, attendeeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Attendee")
+		case "userID":
+			out.Values[i] = ec._Attendee_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "user":
+			out.Values[i] = ec._Attendee_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "showingID":
+			out.Values[i] = ec._Attendee_showingID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "hasPaid":
+			out.Values[i] = ec._Attendee_hasPaid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "amountOwed":
+			out.Values[i] = ec._Attendee_amountOwed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "type":
+			out.Values[i] = ec._Attendee_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "giftCertificateUsed":
+			out.Values[i] = ec._Attendee_giftCertificateUsed(ctx, field, obj)
+		case "filmstadenMembershipID":
+			out.Values[i] = ec._Attendee_filmstadenMembershipID(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var attendeePaymentDetailsImplementors = []string{"AttendeePaymentDetails"}
+
+func (ec *executionContext) _AttendeePaymentDetails(ctx context.Context, sel ast.SelectionSet, obj *model.AttendeePaymentDetails) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, attendeePaymentDetailsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AttendeePaymentDetails")
+		case "hasPaid":
+			out.Values[i] = ec._AttendeePaymentDetails_hasPaid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "amountOwed":
+			out.Values[i] = ec._AttendeePaymentDetails_amountOwed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "payTo":
+			out.Values[i] = ec._AttendeePaymentDetails_payTo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "payer":
+			out.Values[i] = ec._AttendeePaymentDetails_payer(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "swishLink":
+			out.Values[i] = ec._AttendeePaymentDetails_swishLink(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var cinemaScreenImplementors = []string{"CinemaScreen"}
+
+func (ec *executionContext) _CinemaScreen(ctx context.Context, sel ast.SelectionSet, obj *model.CinemaScreen) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cinemaScreenImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CinemaScreen")
+		case "id":
+			out.Values[i] = ec._CinemaScreen_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._CinemaScreen_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var commandmentsImplementors = []string{"Commandments"}
 
 func (ec *executionContext) _Commandments(ctx context.Context, sel ast.SelectionSet, obj *model.Commandments) graphql.Marshaler {
@@ -3720,6 +9291,201 @@ func (ec *executionContext) _Commandments(ctx context.Context, sel ast.Selection
 			}
 		case "phrase":
 			out.Values[i] = ec._Commandments_phrase(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var filmstadenLiteScreenImplementors = []string{"FilmstadenLiteScreen"}
+
+func (ec *executionContext) _FilmstadenLiteScreen(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenLiteScreen) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenLiteScreenImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilmstadenLiteScreen")
+		case "filmstadenID":
+			out.Values[i] = ec._FilmstadenLiteScreen_filmstadenID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._FilmstadenLiteScreen_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var filmstadenSeatCoordinatesImplementors = []string{"FilmstadenSeatCoordinates"}
+
+func (ec *executionContext) _FilmstadenSeatCoordinates(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenSeatCoordinates) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenSeatCoordinatesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilmstadenSeatCoordinates")
+		case "x":
+			out.Values[i] = ec._FilmstadenSeatCoordinates_x(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "y":
+			out.Values[i] = ec._FilmstadenSeatCoordinates_y(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var filmstadenSeatDimensionsImplementors = []string{"FilmstadenSeatDimensions"}
+
+func (ec *executionContext) _FilmstadenSeatDimensions(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenSeatDimensions) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenSeatDimensionsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilmstadenSeatDimensions")
+		case "width":
+			out.Values[i] = ec._FilmstadenSeatDimensions_width(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "height":
+			out.Values[i] = ec._FilmstadenSeatDimensions_height(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var filmstadenSeatMapImplementors = []string{"FilmstadenSeatMap"}
+
+func (ec *executionContext) _FilmstadenSeatMap(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenSeatMap) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenSeatMapImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilmstadenSeatMap")
+		case "row":
+			out.Values[i] = ec._FilmstadenSeatMap_row(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "number":
+			out.Values[i] = ec._FilmstadenSeatMap_number(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "seatType":
+			out.Values[i] = ec._FilmstadenSeatMap_seatType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "coordinates":
+			out.Values[i] = ec._FilmstadenSeatMap_coordinates(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "dimensions":
+			out.Values[i] = ec._FilmstadenSeatMap_dimensions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var filmstadenShowingImplementors = []string{"FilmstadenShowing"}
+
+func (ec *executionContext) _FilmstadenShowing(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenShowing) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenShowingImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilmstadenShowing")
+		case "cinemaName":
+			out.Values[i] = ec._FilmstadenShowing_cinemaName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "screen":
+			out.Values[i] = ec._FilmstadenShowing_screen(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "seatCount":
+			out.Values[i] = ec._FilmstadenShowing_seatCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "timeUtc":
+			out.Values[i] = ec._FilmstadenShowing_timeUtc(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tags":
+			out.Values[i] = ec._FilmstadenShowing_tags(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "filmstadenRemoteEntityID":
+			out.Values[i] = ec._FilmstadenShowing_filmstadenRemoteEntityID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3785,64 +9551,78 @@ func (ec *executionContext) _Movie(ctx context.Context, sel ast.SelectionSet, ob
 		case "id":
 			out.Values[i] = ec._Movie_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "filmstadenId":
-			out.Values[i] = ec._Movie_filmstadenId(ctx, field, obj)
+		case "filmstadenID":
+			out.Values[i] = ec._Movie_filmstadenID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "imdbId":
-			out.Values[i] = ec._Movie_imdbId(ctx, field, obj)
-		case "tmdbId":
-			out.Values[i] = ec._Movie_tmdbId(ctx, field, obj)
+		case "imdbID":
+			out.Values[i] = ec._Movie_imdbID(ctx, field, obj)
+		case "tmdbID":
+			out.Values[i] = ec._Movie_tmdbID(ctx, field, obj)
 		case "slug":
 			out.Values[i] = ec._Movie_slug(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "title":
 			out.Values[i] = ec._Movie_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "releaseDate":
 			out.Values[i] = ec._Movie_releaseDate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "productionYear":
 			out.Values[i] = ec._Movie_productionYear(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "runtime":
 			out.Values[i] = ec._Movie_runtime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "poster":
 			out.Values[i] = ec._Movie_poster(ctx, field, obj)
 		case "genres":
 			out.Values[i] = ec._Movie_genres(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "archived":
 			out.Values[i] = ec._Movie_archived(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "updateTime":
 			out.Values[i] = ec._Movie_updateTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "createTime":
 			out.Values[i] = ec._Movie_createTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "filmstadenShowings":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Movie_filmstadenShowings(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3869,8 +9649,53 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "attendShowing":
+			out.Values[i] = ec._Mutation_attendShowing(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "unattendShowing":
+			out.Values[i] = ec._Mutation_unattendShowing(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createShowing":
+			out.Values[i] = ec._Mutation_createShowing(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteShowing":
+			out.Values[i] = ec._Mutation_deleteShowing(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "markAsBought":
+			out.Values[i] = ec._Mutation_markAsBought(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "processTicketUrls":
+			out.Values[i] = ec._Mutation_processTicketUrls(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateShowing":
+			out.Values[i] = ec._Mutation_updateShowing(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "promoteToAdmin":
+			out.Values[i] = ec._Mutation_promoteToAdmin(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "fetchNewMoviesFromFilmstaden":
 			out.Values[i] = ec._Mutation_fetchNewMoviesFromFilmstaden(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateAttendeePaymentInfo":
+			out.Values[i] = ec._Mutation_updateAttendeePaymentInfo(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3910,6 +9735,82 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var publicAttendeeImplementors = []string{"PublicAttendee"}
+
+func (ec *executionContext) _PublicAttendee(ctx context.Context, sel ast.SelectionSet, obj *model.PublicAttendee) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, publicAttendeeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PublicAttendee")
+		case "userID":
+			out.Values[i] = ec._PublicAttendee_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "showingID":
+			out.Values[i] = ec._PublicAttendee_showingID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userInfo":
+			out.Values[i] = ec._PublicAttendee_userInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var publicUserImplementors = []string{"PublicUser"}
+
+func (ec *executionContext) _PublicUser(ctx context.Context, sel ast.SelectionSet, obj *model.PublicUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, publicUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PublicUser")
+		case "id":
+			out.Values[i] = ec._PublicUser_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._PublicUser_name(ctx, field, obj)
+		case "firstName":
+			out.Values[i] = ec._PublicUser_firstName(ctx, field, obj)
+		case "lastName":
+			out.Values[i] = ec._PublicUser_lastName(ctx, field, obj)
+		case "nick":
+			out.Values[i] = ec._PublicUser_nick(ctx, field, obj)
+		case "phone":
+			out.Values[i] = ec._PublicUser_phone(ctx, field, obj)
+		case "avatar":
+			out.Values[i] = ec._PublicUser_avatar(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3925,6 +9826,45 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "showing":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_showing(ctx, field)
+				return res
+			})
+		case "publicShowings":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_publicShowings(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "showingForMovie":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_showingForMovie(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "allCommandments":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -4006,10 +9946,358 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "allUsers":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_allUsers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var seatImplementors = []string{"Seat"}
+
+func (ec *executionContext) _Seat(ctx context.Context, sel ast.SelectionSet, obj *model.Seat) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, seatImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Seat")
+		case "row":
+			out.Values[i] = ec._Seat_row(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "number":
+			out.Values[i] = ec._Seat_number(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var seatRangeImplementors = []string{"SeatRange"}
+
+func (ec *executionContext) _SeatRange(ctx context.Context, sel ast.SelectionSet, obj *model.SeatRange) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, seatRangeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SeatRange")
+		case "row":
+			out.Values[i] = ec._SeatRange_row(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "numbers":
+			out.Values[i] = ec._SeatRange_numbers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var showingImplementors = []string{"Showing"}
+
+func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, obj *model.Showing) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, showingImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Showing")
+		case "id":
+			out.Values[i] = ec._Showing_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "webID":
+			out.Values[i] = ec._Showing_webID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "filmstadenShowingID":
+			out.Values[i] = ec._Showing_filmstadenShowingID(ctx, field, obj)
+		case "slug":
+			out.Values[i] = ec._Showing_slug(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "date":
+			out.Values[i] = ec._Showing_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "time":
+			out.Values[i] = ec._Showing_time(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "movieID":
+			out.Values[i] = ec._Showing_movieID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "movieTitle":
+			out.Values[i] = ec._Showing_movieTitle(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "movie":
+			out.Values[i] = ec._Showing_movie(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "location":
+			out.Values[i] = ec._Showing_location(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "cinemaScreen":
+			out.Values[i] = ec._Showing_cinemaScreen(ctx, field, obj)
+		case "price":
+			out.Values[i] = ec._Showing_price(ctx, field, obj)
+		case "ticketsBought":
+			out.Values[i] = ec._Showing_ticketsBought(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "admin":
+			out.Values[i] = ec._Showing_admin(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "payToUser":
+			out.Values[i] = ec._Showing_payToUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "lastModifiedDate":
+			out.Values[i] = ec._Showing_lastModifiedDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "createdDate":
+			out.Values[i] = ec._Showing_createdDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "filmstadenSeatMap":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_filmstadenSeatMap(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "attendees":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_attendees(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "adminPaymentDetails":
+			out.Values[i] = ec._Showing_adminPaymentDetails(ctx, field, obj)
+		case "attendeePaymentDetails":
+			out.Values[i] = ec._Showing_attendeePaymentDetails(ctx, field, obj)
+		case "myTickets":
+			out.Values[i] = ec._Showing_myTickets(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "ticketRange":
+			out.Values[i] = ec._Showing_ticketRange(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var ticketImplementors = []string{"Ticket"}
+
+func (ec *executionContext) _Ticket(ctx context.Context, sel ast.SelectionSet, obj *model.Ticket) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, ticketImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Ticket")
+		case "id":
+			out.Values[i] = ec._Ticket_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "showingID":
+			out.Values[i] = ec._Ticket_showingID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "assignedToUser":
+			out.Values[i] = ec._Ticket_assignedToUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "profileID":
+			out.Values[i] = ec._Ticket_profileID(ctx, field, obj)
+		case "barcode":
+			out.Values[i] = ec._Ticket_barcode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "customerType":
+			out.Values[i] = ec._Ticket_customerType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "customerTypeDefinition":
+			out.Values[i] = ec._Ticket_customerTypeDefinition(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cinema":
+			out.Values[i] = ec._Ticket_cinema(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cinemaCity":
+			out.Values[i] = ec._Ticket_cinemaCity(ctx, field, obj)
+		case "screen":
+			out.Values[i] = ec._Ticket_screen(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "seat":
+			out.Values[i] = ec._Ticket_seat(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "date":
+			out.Values[i] = ec._Ticket_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "time":
+			out.Values[i] = ec._Ticket_time(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "movieName":
+			out.Values[i] = ec._Ticket_movieName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "movieRating":
+			out.Values[i] = ec._Ticket_movieRating(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "attributes":
+			out.Values[i] = ec._Ticket_attributes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var ticketRangeImplementors = []string{"TicketRange"}
+
+func (ec *executionContext) _TicketRange(ctx context.Context, sel ast.SelectionSet, obj *model.TicketRange) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, ticketRangeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TicketRange")
+		case "rows":
+			out.Values[i] = ec._TicketRange_rows(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "seatings":
+			out.Values[i] = ec._TicketRange_seatings(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._TicketRange_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4035,59 +10323,68 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._User_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "filmstadenMembershipId":
-			out.Values[i] = ec._User_filmstadenMembershipId(ctx, field, obj)
+		case "filmstadenMembershipID":
+			out.Values[i] = ec._User_filmstadenMembershipID(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._User_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "firstName":
 			out.Values[i] = ec._User_firstName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "lastName":
 			out.Values[i] = ec._User_lastName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "nick":
 			out.Values[i] = ec._User_nick(ctx, field, obj)
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "phone":
 			out.Values[i] = ec._User_phone(ctx, field, obj)
 		case "avatarURL":
 			out.Values[i] = ec._User_avatarURL(ctx, field, obj)
 		case "giftCertificates":
-			out.Values[i] = ec._User_giftCertificates(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "calendarFeedId":
-			out.Values[i] = ec._User_calendarFeedId(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_giftCertificates(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "calendarFeedID":
+			out.Values[i] = ec._User_calendarFeedID(ctx, field, obj)
 		case "calendarFeedUrl":
 			out.Values[i] = ec._User_calendarFeedUrl(ctx, field, obj)
 		case "lastLoginTime":
 			out.Values[i] = ec._User_lastLoginTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "signupTime":
 			out.Values[i] = ec._User_signupTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "updateTime":
 			out.Values[i] = ec._User_updateTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -4350,6 +10647,84 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAttendee2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendee(ctx context.Context, sel ast.SelectionSet, v model.Attendee) graphql.Marshaler {
+	return ec._Attendee(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttendee2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendeeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Attendee) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAttendee2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendee(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAttendee2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendee(ctx context.Context, sel ast.SelectionSet, v *model.Attendee) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Attendee(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAttendeePaymentInfoInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendeePaymentInfoInput(ctx context.Context, v interface{}) (model.AttendeePaymentInfoInput, error) {
+	res, err := ec.unmarshalInputAttendeePaymentInfoInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNBase64ID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNBase64ID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4421,6 +10796,164 @@ func (ec *executionContext) marshalNCommandments2ᚖgithubᚗcomᚋfilmstundᚋf
 		return graphql.Null
 	}
 	return ec._Commandments(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateShowingInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCreateShowingInput(ctx context.Context, v interface{}) (model.CreateShowingInput, error) {
+	res, err := ec.unmarshalInputCreateShowingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFilmstadenLiteScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenLiteScreen(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenLiteScreen) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FilmstadenLiteScreen(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNFilmstadenSeatCoordinates2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatCoordinates(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenSeatCoordinates) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FilmstadenSeatCoordinates(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNFilmstadenSeatDimensions2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatDimensions(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenSeatDimensions) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FilmstadenSeatDimensions(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNFilmstadenSeatMap2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatMapᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.FilmstadenSeatMap) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFilmstadenSeatMap2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatMap(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNFilmstadenSeatMap2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatMap(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenSeatMap) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FilmstadenSeatMap(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNFilmstadenShowing2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenShowingᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.FilmstadenShowing) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFilmstadenShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenShowing(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNFilmstadenShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenShowing(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenShowing) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FilmstadenShowing(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloat(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNGiftCertificate2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.GiftCertificate) graphql.Marshaler {
@@ -4497,6 +11030,21 @@ func (ec *executionContext) marshalNGiftCertificate_Status2githubᚗcomᚋfilmst
 	return v
 }
 
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalID(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4504,6 +11052,72 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
 	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNLocalDate2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLocalDate2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNLocalTime2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLocalTime2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4581,6 +11195,281 @@ func (ec *executionContext) marshalNMovieID2string(ctx context.Context, sel ast.
 	return res
 }
 
+func (ec *executionContext) unmarshalNPaymentOption2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPaymentOption(ctx context.Context, v interface{}) (model.PaymentOption, error) {
+	res, err := ec.unmarshalInputPaymentOption(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPaymentType2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPaymentType(ctx context.Context, v interface{}) (model.PaymentType, error) {
+	var res model.PaymentType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPaymentType2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPaymentType(ctx context.Context, sel ast.SelectionSet, v model.PaymentType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNPublicAttendee2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicAttendeeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PublicAttendee) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPublicAttendee2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicAttendee(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPublicAttendee2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicAttendee(ctx context.Context, sel ast.SelectionSet, v *model.PublicAttendee) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PublicAttendee(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPublicUser2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PublicUser) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx context.Context, sel ast.SelectionSet, v *model.PublicUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PublicUser(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSEK2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSEK2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNSeat2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeat(ctx context.Context, sel ast.SelectionSet, v *model.Seat) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Seat(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSeatRange2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeatRangeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.SeatRange) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNSeatRange2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeatRange(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNSeatRange2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeatRange(ctx context.Context, sel ast.SelectionSet, v *model.SeatRange) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SeatRange(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNShowing2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx context.Context, sel ast.SelectionSet, v model.Showing) graphql.Marshaler {
+	return ec._Showing(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNShowing2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowingᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Showing) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx context.Context, sel ast.SelectionSet, v *model.Showing) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Showing(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNShowingID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNShowingID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4632,6 +11521,60 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
+func (ec *executionContext) marshalNTicket2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicketᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Ticket) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTicket2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicket(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTicket2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicket(ctx context.Context, sel ast.SelectionSet, v *model.Ticket) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Ticket(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4679,6 +11622,21 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋfilmstundᚋfilmstund
 func (ec *executionContext) unmarshalNUserDetailsInput2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUserDetailsInput(ctx context.Context, v interface{}) (model.UserDetailsInput, error) {
 	res, err := ec.unmarshalInputUserDetailsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUserID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -4938,6 +11896,35 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) marshalOAdminPaymentDetails2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAdminPaymentDetails(ctx context.Context, sel ast.SelectionSet, v *model.AdminPaymentDetails) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AdminPaymentDetails(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAttendeePaymentDetails2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendeePaymentDetails(ctx context.Context, sel ast.SelectionSet, v *model.AttendeePaymentDetails) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AttendeePaymentDetails(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOBase64ID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOBase64ID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*v)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4962,6 +11949,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) marshalOCinemaScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCinemaScreen(ctx context.Context, sel ast.SelectionSet, v *model.CinemaScreen) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CinemaScreen(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOCinemaScreenInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCinemaScreenInput(ctx context.Context, v interface{}) (*model.CinemaScreenInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCinemaScreenInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋscalarsᚐFilmstadenMembershipID(ctx context.Context, v interface{}) (*scalars.FilmstadenMembershipID, error) {
 	if v == nil {
 		return nil, nil
@@ -4976,6 +11978,13 @@ func (ec *executionContext) marshalOFilmstadenMembershipID2ᚖgithubᚗcomᚋfil
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) marshalOGiftCertificate2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificate(ctx context.Context, sel ast.SelectionSet, v *model.GiftCertificate) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._GiftCertificate(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOGiftCertificateInput2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateInputᚄ(ctx context.Context, v interface{}) ([]*model.GiftCertificateInput, error) {
@@ -5017,11 +12026,78 @@ func (ec *executionContext) marshalOIMDbID2ᚖstring(ctx context.Context, sel as
 	return graphql.MarshalString(*v)
 }
 
+func (ec *executionContext) unmarshalOLocalDate2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLocalDate2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*v)
+}
+
 func (ec *executionContext) marshalOMovie2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐMovie(ctx context.Context, sel ast.SelectionSet, v *model.Movie) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Movie(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMovieID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMovieID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOSEK2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOSEK2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) marshalOShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx context.Context, sel ast.SelectionSet, v *model.Showing) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Showing(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOShowingID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOShowingID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
@@ -5031,6 +12107,48 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -5063,6 +12181,13 @@ func (ec *executionContext) marshalOTMDbID2ᚖstring(ctx context.Context, sel as
 	return graphql.MarshalString(*v)
 }
 
+func (ec *executionContext) marshalOTicketRange2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicketRange(ctx context.Context, sel ast.SelectionSet, v *model.TicketRange) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TicketRange(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
 	if v == nil {
 		return nil, nil
@@ -5076,6 +12201,14 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 		return graphql.Null
 	}
 	return graphql.MarshalTime(*v)
+}
+
+func (ec *executionContext) unmarshalOUpdateShowingInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUpdateShowingInput(ctx context.Context, v interface{}) (*model.UpdateShowingInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateShowingInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

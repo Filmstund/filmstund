@@ -1,9 +1,94 @@
+type AdminPaymentDetails {
+  attendees: [Attendee!]!
+  filmstadenBuyLink: String
+  showingID: ShowingID
+}
+
+type Attendee {
+  amountOwed: SEK!
+  filmstadenMembershipID: String
+  giftCertificateUsed: GiftCertificate
+  hasPaid: Boolean!
+  showingID: ShowingID!
+  type: PaymentType!
+  user: PublicUser!
+  userID: UserID!
+}
+
+type AttendeePaymentDetails {
+  amountOwed: SEK!
+  hasPaid: Boolean!
+  payTo: PublicUser!
+  payer: PublicUser!
+  swishLink: String
+}
+
+input AttendeePaymentInfoInput {
+  amountOwed: SEK!
+  hasPaid: Boolean!
+  showingID: ShowingID
+  userID: UserID!
+}
+
+scalar Base64ID
+
+type CinemaScreen {
+  id: ID!
+  name: String!
+}
+
+input CinemaScreenInput {
+  id: String!
+  name: String
+}
+
 type Commandments {
   number: Int!
   phrase: String!
 }
 
+input CreateShowingInput {
+  date: LocalDate!
+  filmstadenRemoteEntityID: String
+  filmstadenScreen: CinemaScreenInput
+  location: String!
+  movieID: MovieID!
+  time: LocalTime!
+}
+
+type FilmstadenLiteScreen {
+  filmstadenID: ID!
+  name: String!
+}
+
 scalar FilmstadenMembershipID
+
+type FilmstadenSeatCoordinates {
+  x: Float!
+  y: Float!
+}
+
+type FilmstadenSeatDimensions {
+  height: Int!
+  width: Int!
+}
+
+type FilmstadenSeatMap {
+  coordinates: FilmstadenSeatCoordinates!
+  dimensions: FilmstadenSeatDimensions!
+  number: Int!
+  row: Int!
+  seatType: String!
+}
+
+type FilmstadenShowing {
+  cinemaName: String!
+  filmstadenRemoteEntityID: String!
+  screen: FilmstadenLiteScreen!
+  seatCount: Int!
+  tags: [String!]!
+  timeUtc: String!
+}
 
 type GiftCertificate {
   expireTime: Time!
@@ -26,20 +111,25 @@ enum GiftCertificate_Status {
 
 scalar IMDbID
 
+scalar LocalDate
+
+scalar LocalTime
+
 type Movie {
   archived: Boolean!
   createTime: String!
-  filmstadenId: String!
+  filmstadenID: String!
+  filmstadenShowings(afterDate: LocalDate, city: String = "GB"): [FilmstadenShowing!]!
   genres: [String!]!
   id: MovieID!
-  imdbId: IMDbID
+  imdbID: IMDbID
   poster: String
   productionYear: Int!
   releaseDate: String!
   runtime: String!
   slug: String!
   title: String!
-  tmdbId: TMDbID
+  tmdbID: TMDbID
   updateTime: String!
 }
 
@@ -47,34 +137,147 @@ scalar MovieID
 
 type Mutation {
   addGiftCertificates(giftCerts: [GiftCertificateInput!]): User!
+  attendShowing(paymentOption: PaymentOption!, showingID: ShowingID!): Showing!
+  createShowing(showing: CreateShowingInput!): Showing!
   deleteGiftCertificate(giftCert: GiftCertificateInput!): User!
+  deleteShowing(showingID: ShowingID!): [Showing!]!
   disableCalendarFeed: User!
   fetchNewMoviesFromFilmstaden(cityAlias: String! = "GB"): [Movie!]!
   invalidateCalendarFeed: User!
+  markAsBought(price: SEK!, showingID: ShowingID!): Showing!
+  processTicketUrls(showingID: ShowingID!, ticketUrls: [String!]): Showing!
+  promoteToAdmin(showingID: ShowingID!, userToPromote: UserID!): Showing!
+  unattendShowing(showingID: ShowingID!): Showing!
+  updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee!
+  updateShowing(newValues: UpdateShowingInput, showingID: ShowingID!): Showing!
   updateUser(newInfo: UserDetailsInput!): User!
+}
+
+input PaymentOption {
+  ticketNumber: String
+  type: PaymentType!
+}
+
+enum PaymentType {
+  GIFT_CERTIFICATE
+  SWISH
+}
+
+type PublicAttendee {
+  showingID: ShowingID!
+  userID: UserID!
+  userInfo: PublicUser!
+}
+
+type PublicUser {
+  avatar: String
+  firstName: String
+  id: UserID!
+  lastName: String
+  name: String
+  nick: String
+  phone: String
 }
 
 type Query {
   allCommandments: [Commandments!]!
   allMovies: [Movie!]!
+  allUsers: [PublicUser!]!
   archivedMovies: [Movie!]!
   currentUser: User!
   movie(id: MovieID!): Movie
+  publicShowings(afterDate: LocalDate): [Showing!]!
   randomCommandment: Commandments!
+  showing(id: ShowingID, webID: Base64ID): Showing
+  showingForMovie(movieId: MovieID): [Showing!]!
 }
 
+scalar SEK
+
+type Seat {
+  number: Int!
+  row: Int!
+}
+
+type SeatRange {
+  numbers: [Int!]!
+  row: Int!
+}
+
+type Showing {
+  admin: PublicUser!
+  adminPaymentDetails: AdminPaymentDetails
+  attendeePaymentDetails: AttendeePaymentDetails
+  attendees: [PublicAttendee!]!
+  cinemaScreen: CinemaScreen
+  createdDate: String!
+  date: String!
+  filmstadenSeatMap: [FilmstadenSeatMap!]!
+  filmstadenShowingID: String
+  id: ShowingID!
+  lastModifiedDate: String!
+  location: String!
+  movie: Movie!
+  movieID: MovieID!
+  movieTitle: String!
+  myTickets: [Ticket!]!
+  payToUser: PublicUser!
+  price: SEK
+  slug: String!
+  ticketRange: TicketRange
+  ticketsBought: Boolean!
+  time: String!
+  webID: Base64ID!
+}
+
+scalar ShowingID
+
 scalar TMDbID
+
+type Ticket {
+  assignedToUser: UserID!
+  attributes: [String!]!
+  barcode: String!
+  cinema: String!
+  cinemaCity: String
+  customerType: String!
+  customerTypeDefinition: String!
+  date: LocalDate!
+  id: String!
+  movieName: String!
+  movieRating: String!
+  profileID: String
+  screen: String!
+  seat: Seat!
+  showingID: ShowingID!
+  time: String!
+}
+
+type TicketRange {
+  rows: [Int!]!
+  seatings: [SeatRange!]!
+  totalCount: Int!
+}
 
 scalar Time
 
 scalar UUID
 
+input UpdateShowingInput {
+  date: LocalDate!
+  filmstadenRemoteEntityID: String
+  location: String!
+  payToUser: UserID!
+  price: SEK!
+  time: LocalTime!
+}
+
 type User {
   avatarURL: String
-  calendarFeedId: String
+  calendarFeedID: String
   calendarFeedUrl: String
   email: String!
-  filmstadenMembershipId: FilmstadenMembershipID
+  filmstadenMembershipID: FilmstadenMembershipID
   firstName: String!
   giftCertificates: [GiftCertificate!]!
   id: UUID!
@@ -88,9 +291,11 @@ type User {
 }
 
 input UserDetailsInput {
-  filmstadenMembershipId: FilmstadenMembershipID
+  filmstadenMembershipID: FilmstadenMembershipID
   firstName: String
   lastName: String
   nick: String
   phone: String
 }
+
+scalar UserID

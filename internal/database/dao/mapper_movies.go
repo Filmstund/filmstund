@@ -8,7 +8,7 @@ import (
 	"github.com/filmstund/filmstund/internal/graph/model"
 )
 
-func (m *Movie) GraphMovie() *model.Movie {
+func (m *Movie) GraphModel() *model.Movie {
 	tostr := func(s sql.NullString) *string {
 		if s.Valid {
 			return &s.String

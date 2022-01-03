@@ -1,5 +1,6 @@
 extend type Query  {
     currentUser: User!
+    allUsers: [PublicUser!]!
 }
 
 extend type Mutation {
@@ -17,7 +18,7 @@ extend type Mutation {
 
 type User {
     id: UUID!
-    filmstadenMembershipId: FilmstadenMembershipID
+    filmstadenMembershipID: FilmstadenMembershipID
     name: String!
     firstName: String!
     lastName: String!
@@ -26,11 +27,21 @@ type User {
     phone: String
     avatarURL: String
     giftCertificates: [GiftCertificate!]!
-    calendarFeedId: String
+    calendarFeedID: String
     calendarFeedUrl: String
     lastLoginTime: Time!
     signupTime: Time!
     updateTime: Time!
+}
+
+type PublicUser {
+    id: UserID!
+    name: String
+    firstName: String
+    lastName: String
+    nick: String
+    phone: String
+    avatar: String
 }
 
 type GiftCertificate {
@@ -53,7 +64,7 @@ input UserDetailsInput {
     firstName: String
     lastName: String
     nick: String
-    filmstadenMembershipId: FilmstadenMembershipID
+    filmstadenMembershipID: FilmstadenMembershipID
     phone: String
 }
 
