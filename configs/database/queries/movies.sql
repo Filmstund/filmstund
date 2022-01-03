@@ -11,14 +11,11 @@ RETURNING *;
 select *
 FROM movies
 WHERE id = @id
-  AND archived = false;
+  AND archived = false
+order by release_date desc ;
 
 -- name: AllMovies :many
 SELECT *
 FROM movies
-WHERE archived = @archived;
-
--- name: MoviesByFilmstadenID :many
-select id, filmstaden_id
-FROM movies
-WHERE filmstaden_id IN (@filmstaden_ids);
+WHERE archived = @archived
+order by release_date;

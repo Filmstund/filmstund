@@ -14,6 +14,7 @@ const allMovies = `-- name: AllMovies :many
 SELECT id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, archived, update_time, create_time
 FROM movies
 WHERE archived = $1
+order by release_date
 `
 
 func (q *Queries) AllMovies(ctx context.Context, archived bool) ([]Movie, error) {
@@ -56,6 +57,7 @@ select id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, productio
 FROM movies
 WHERE id = $1
   AND archived = false
+order by release_date desc
 `
 
 func (q *Queries) Movie(ctx context.Context, id uuid.UUID) (Movie, error) {
@@ -78,37 +80,6 @@ func (q *Queries) Movie(ctx context.Context, id uuid.UUID) (Movie, error) {
 		&i.CreateTime,
 	)
 	return i, err
-}
-
-const moviesByFilmstadenID = `-- name: MoviesByFilmstadenID :many
-select id, filmstaden_id
-FROM movies
-WHERE filmstaden_id IN ($1)
-`
-
-type MoviesByFilmstadenIDRow struct {
-	ID           uuid.UUID `json:"id"`
-	FilmstadenID string    `json:"filmstadenID"`
-}
-
-func (q *Queries) MoviesByFilmstadenID(ctx context.Context, filmstadenIds string) ([]MoviesByFilmstadenIDRow, error) {
-	rows, err := q.db.Query(ctx, moviesByFilmstadenID, filmstadenIds)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []MoviesByFilmstadenIDRow
-	for rows.Next() {
-		var i MoviesByFilmstadenIDRow
-		if err := rows.Scan(&i.ID, &i.FilmstadenID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const upsertMovie = `-- name: UpsertMovie :one
