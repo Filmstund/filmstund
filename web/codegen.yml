@@ -1,5 +1,5 @@
 schema: ../api/graphql/v2/*.graphqls
-documents: ./src/**/*.ts*
+#documents: ./src/**/*.ts*
 generates:
   schema.graphql:
     plugins:
