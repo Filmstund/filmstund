@@ -26,7 +26,7 @@ module.exports = {
   // Code coverage config
   collectCoverageFrom: ["<rootDir>/src/**/*.{ts,tsx}"],
   coverageDirectory: "<rootDir>/coverage/",
-  coveragePathIgnorePatterns: ["<rootDir>/node_modules/", "(.*).d.ts$"],
+  coveragePathIgnorePatterns: ["(.*).d.ts$"],
 
   // Return proxies object for CSS modules via identity-obj-proxy
   moduleNameMapper: {
