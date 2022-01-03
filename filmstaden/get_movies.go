@@ -173,6 +173,7 @@ func (client *Client) UpcomingMovies(ctx context.Context, cityAlias string) (*Mo
 		client.baseURL,
 		cityAlias,
 	)
+
 	movies := new(struct {
 		TotalNbrOfItems int `json:"totalNbrOfItems"`
 		Items           []struct {

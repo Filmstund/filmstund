@@ -18,9 +18,9 @@ func NoopCache() filmstaden.QueryCache {
 }
 
 func (n *noopCache) Get(ctx context.Context, key string) *redis.StringCmd {
-	return nil
+	return redis.NewStringResult("", redis.Nil)
 }
 
 func (n *noopCache) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
-	return nil
+	return redis.NewStatusResult("", redis.Nil)
 }
