@@ -26,19 +26,40 @@ enum GiftCertificate_Status {
 
 scalar IMDbID
 
+type Movie {
+  archived: Boolean!
+  createTime: String!
+  filmstadenId: String!
+  genres: [String!]!
+  id: MovieID!
+  imdbId: IMDbID
+  poster: String
+  productionYear: Int!
+  releaseDate: String!
+  runtime: String!
+  slug: String!
+  title: String!
+  tmdbId: TMDbID
+  updateTime: String!
+}
+
 scalar MovieID
 
 type Mutation {
   addGiftCertificates(giftCerts: [GiftCertificateInput!]): User!
   deleteGiftCertificate(giftCert: GiftCertificateInput!): User!
   disableCalendarFeed: User!
+  fetchNewMoviesFromFilmstaden: [Movie!]!
   invalidateCalendarFeed: User!
   updateUser(newInfo: UserDetailsInput!): User!
 }
 
 type Query {
   allCommandments: [Commandments!]!
+  allMovies: [Movie!]!
+  archivedMovies: [Movie!]!
   currentUser: User!
+  movie(id: MovieID!): Movie
   randomCommandment: Commandments!
 }
 

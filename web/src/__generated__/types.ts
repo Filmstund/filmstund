@@ -50,11 +50,30 @@ export enum GiftCertificate_Status {
   Used = "USED",
 }
 
+export type Movie = {
+  __typename?: "Movie";
+  archived: Scalars["Boolean"];
+  createTime: Scalars["String"];
+  filmstadenId: Scalars["String"];
+  genres: Array<Scalars["String"]>;
+  id: Scalars["MovieID"];
+  imdbId?: Maybe<Scalars["IMDbID"]>;
+  poster?: Maybe<Scalars["String"]>;
+  productionYear: Scalars["Int"];
+  releaseDate: Scalars["String"];
+  runtime: Scalars["String"];
+  slug: Scalars["String"];
+  title: Scalars["String"];
+  tmdbId?: Maybe<Scalars["TMDbID"]>;
+  updateTime: Scalars["String"];
+};
+
 export type Mutation = {
   __typename?: "Mutation";
   addGiftCertificates: User;
   deleteGiftCertificate: User;
   disableCalendarFeed: User;
+  fetchNewMoviesFromFilmstaden: Array<Movie>;
   invalidateCalendarFeed: User;
   updateUser: User;
 };
@@ -74,8 +93,15 @@ export type MutationUpdateUserArgs = {
 export type Query = {
   __typename?: "Query";
   allCommandments: Array<Commandments>;
+  allMovies: Array<Movie>;
+  archivedMovies: Array<Movie>;
   currentUser: User;
+  movie?: Maybe<Movie>;
   randomCommandment: Commandments;
+};
+
+export type QueryMovieArgs = {
+  id: Scalars["MovieID"];
 };
 
 export type User = {
