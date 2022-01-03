@@ -7,11 +7,6 @@ export const createShowingFormQuery = gql`
       ...ShowingMovie
       releaseDate
     }
-    me: currentUser {
-      id
-      nick
-      name
-    }
     previousLocations {
       name
     }

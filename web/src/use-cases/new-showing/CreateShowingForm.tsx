@@ -79,7 +79,7 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
     ["movie", movieId]
   );
 
-  const { me, movie, filmstadenCities, previousLocations } = data;
+  const { movie, filmstadenCities, previousLocations } = data;
 
   const [city, setCity] = useState("GB");
 

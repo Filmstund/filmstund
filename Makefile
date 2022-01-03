@@ -76,6 +76,7 @@ build: clean
 build-website:
 	$(info [$@] building website...)
 	@yarn --cwd ./web --silent install
+	@yarn --cwd ./web --silent types
 	@yarn --cwd ./web --silent build
 
 migrate: build

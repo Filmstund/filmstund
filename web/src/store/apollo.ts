@@ -6,19 +6,10 @@ import {
 } from "@apollo/client";
 import { LocalStorageWrapper, persistCache } from "apollo3-cache-persist";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
-import { tokenRefresh } from "./tokenRefreshLink";
 import { errorLink } from "./errorLink";
 
 const cache = new InMemoryCache({
   possibleTypes: {},
-  dataIdFromObject: (object) => {
-    switch (object.__typename) {
-      case "BioBudord":
-        return (object as any).number;
-      default:
-        return object.id || object._id;
-    }
-  },
 });
 
 persistCache({
@@ -31,7 +22,7 @@ const httpLink = new HttpLink({
 });
 
 export const client = new ApolloClient({
-  link: ApolloLink.from([tokenRefresh, errorLink, httpLink]),
+  link: ApolloLink.from([errorLink, httpLink]),
   cache,
   defaultOptions: {
     watchQuery: {
