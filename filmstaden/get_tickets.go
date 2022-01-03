@@ -2,13 +2,8 @@ package filmstaden
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"time"
-
-	"edholm.dev/go-logging"
 )
 
 type Ticket struct {
@@ -91,35 +86,10 @@ type Ticket struct {
 }
 
 func (client *Client) Tickets(ctx context.Context, sysID, showingID, ticketID string) ([]Ticket, error) {
-	timeout, cancelFunc := context.WithTimeout(ctx, requestTimeout)
-	defer cancelFunc()
 	url := fmt.Sprintf("%s/ticket/%s/%s/%s", client.baseURL, sysID, showingID, ticketID)
-	req, err := http.NewRequestWithContext(timeout, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup request: %w", err)
-	}
-	logging.FromContext(ctx).V(2).Info("requesting Filmstaden tickets", "url", url)
-	resp, err := client.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to request Filmstaden tickets: %w", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		logging.FromContext(ctx).Info("failed to fetch Filmstaden tickets",
-			"sysID", sysID,
-			"showingID", showingID,
-			"ticketID", ticketID,
-			"status", resp.Status,
-			"body", string(body),
-			"err", err,
-		)
-		return nil, fmt.Errorf("error fetching Filmstaden tickets, got %s", resp.Status)
-	}
-	decoder := json.NewDecoder(resp.Body)
 	tickets := make([]Ticket, 8)
-	if err := decoder.Decode(&tickets); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Filmstaden tickets: %w", err)
+	if err := client.decodedGet(ctx, url, &tickets); err != nil {
+		return nil, fmt.Errorf("tickets: %w", err)
 	}
 	return tickets, nil
 }

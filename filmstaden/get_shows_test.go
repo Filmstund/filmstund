@@ -31,7 +31,7 @@ func TestClient_Shows(t *testing.T) {
 	defer srv.Close()
 
 	t.Run("happy path", func(t *testing.T) {
-		client := filmstaden.NewClient(srv.URL)
+		client := filmstaden.NewClient(srv.URL, NoopCache())
 		shows, err := client.Shows(context.Background(), 1, "GB")
 		assert.NilError(t, err)
 		assert.Equal(t, shows.TotalCount, 604)
@@ -57,8 +57,8 @@ func TestClient_Shows_error(t *testing.T) {
 		http.Error(w, "apa bepa", http.StatusInternalServerError)
 	}))
 	defer srv.Close()
-	client := filmstaden.NewClient(srv.URL)
+	client := filmstaden.NewClient(srv.URL, NoopCache())
 	shows, err := client.Shows(context.Background(), 2, "SE")
 	assert.Check(t, cmp.Nil(shows))
-	assert.ErrorContains(t, err, "error fetching Filmstaden shows, got 500 Internal Server Error")
+	assert.ErrorContains(t, err, "shows: error fetching Filmstaden data, got 500 Internal Server Error")
 }

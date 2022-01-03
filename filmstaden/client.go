@@ -1,8 +1,14 @@
 package filmstaden
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"time"
+
+	"edholm.dev/go-logging"
 )
 
 const (
@@ -14,9 +20,10 @@ const (
 type Client struct {
 	baseURL string
 	http    *http.Client
+	cache   QueryCache
 }
 
-func NewClient(baseURL string) *Client {
+func NewClient(baseURL string, cache QueryCache) *Client {
 	transport := defaultHeaderTransport{
 		roundTripper: http.DefaultTransport,
 	}
@@ -26,6 +33,7 @@ func NewClient(baseURL string) *Client {
 			Transport: &transport,
 			Timeout:   requestTimeout,
 		},
+		cache: cache,
 	}
 }
 
@@ -38,4 +46,38 @@ func (transport *defaultHeaderTransport) RoundTrip(req *http.Request) (*http.Res
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("X-Requested-With", "se.sfbio.mobile.android")
 	return transport.roundTripper.RoundTrip(req)
+}
+
+func (client *Client) decodedGet(ctx context.Context, url string, target interface{}) error {
+	logger := logging.FromContext(ctx).
+		WithValues("url", url)
+	timeout, cancelFunc := context.WithTimeout(ctx, requestTimeout)
+	defer cancelFunc()
+
+	req, err := http.NewRequestWithContext(timeout, http.MethodGet, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to setup request: %w", err)
+	}
+
+	logger.V(2).Info("requesting Filmstaden data")
+	resp, err := client.http.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to request Filmstaden data: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+		logger.Info("failed to fetch Filmstaden data",
+			"status", resp.Status,
+			"body", string(body),
+			"err", err,
+		)
+		return fmt.Errorf("error fetching Filmstaden data, got %s", resp.Status)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(target); err != nil {
+		return fmt.Errorf("failed to decode Filmstaden data: %w", err)
+	}
+	return nil
 }

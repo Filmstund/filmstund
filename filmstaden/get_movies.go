@@ -2,13 +2,8 @@ package filmstaden
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"strings"
-
-	"edholm.dev/go-logging"
 )
 
 type Movies struct {
@@ -157,80 +152,35 @@ type Movies struct {
 
 // Movies returns detailed information about the given NCG IDs.
 func (client *Client) Movies(ctx context.Context, movieIDs []string) (*Movies, error) {
-	timeout, cancelFunc := context.WithTimeout(ctx, requestTimeout)
-	defer cancelFunc()
 	joined := strings.Join(movieIDs, ",")
 	url := fmt.Sprintf(
 		"%s/movie/sv?movieNcgIds=%s",
 		client.baseURL,
 		joined,
 	)
-	req, err := http.NewRequestWithContext(timeout, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup request: %w", err)
-	}
-	logging.FromContext(ctx).V(2).Info("requesting Filmstaden movies", "url", url)
-	resp, err := client.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to request Filmstaden movies: %w", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		logging.FromContext(ctx).Info("failed to fetch Filmstaden movies",
-			"movieIDs", movieIDs,
-			"status", resp.Status,
-			"body", string(body),
-			"err", err,
-		)
-		return nil, fmt.Errorf("error fetching Filmstaden movies, got %s", resp.Status)
-	}
-	decoder := json.NewDecoder(resp.Body)
+
 	movies := new(Movies)
-	if err := decoder.Decode(movies); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Filmstaden movies: %w", err)
+	if err := client.decodedGet(ctx, url, movies); err != nil {
+		return nil, fmt.Errorf("movies: %w", err)
 	}
 	return movies, nil
 }
 
 // UpcomingMovies returns detailed info about all movies not yet released.
 func (client *Client) UpcomingMovies(ctx context.Context, cityAlias string) (*Movies, error) {
-	timeout, cancelFunc := context.WithTimeout(ctx, requestTimeout)
-	defer cancelFunc()
 	url := fmt.Sprintf(
 		"%s/movie/bytype/sv/1/1024/Upcoming/true?filter.cityAlias=%s&countryAlias=se",
 		client.baseURL,
 		cityAlias,
 	)
-	req, err := http.NewRequestWithContext(timeout, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup request: %w", err)
-	}
-	logging.FromContext(ctx).V(2).Info("requesting upcoming Filmstaden movies", "url", url)
-	resp, err := client.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to request upcoming Filmstaden movies: %w", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		logging.FromContext(ctx).Info("failed to fetch upcoming Filmstaden movies",
-			"cityAlias", cityAlias,
-			"status", resp.Status,
-			"body", string(body),
-			"err", err,
-		)
-		return nil, fmt.Errorf("error fetching upcoming Filmstaden movies, got %s", resp.Status)
-	}
-	decoder := json.NewDecoder(resp.Body)
 	movies := new(struct {
 		TotalNbrOfItems int `json:"totalNbrOfItems"`
 		Items           []struct {
 			NcgID string `json:"ncgId"`
 		}
 	})
-	if err := decoder.Decode(movies); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal upcoming Filmstaden movies: %w", err)
+	if err := client.decodedGet(ctx, url, movies); err != nil {
+		return nil, fmt.Errorf("upcomingMovies: %w", err)
 	}
 
 	if movies.TotalNbrOfItems == 0 || len(movies.Items) == 0 {

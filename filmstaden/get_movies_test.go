@@ -25,7 +25,7 @@ func TestClient_Movies(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := filmstaden.NewClient(srv.URL)
+	client := filmstaden.NewClient(srv.URL, NoopCache())
 	movies, err := client.Movies(context.Background(), []string{"apa", "bepa"})
 	assert.NilError(t, err)
 	assert.Equal(t, movies.TotalNbrOfItems, 33) // matches how many are actually in the movies.json file
@@ -42,10 +42,10 @@ func TestClient_Movies_error(t *testing.T) {
 		http.Error(w, "slerp derp", http.StatusInternalServerError)
 	}))
 	defer srv.Close()
-	client := filmstaden.NewClient(srv.URL)
+	client := filmstaden.NewClient(srv.URL, NoopCache())
 	movies, err := client.Movies(context.Background(), []string{"apa", "bepa"})
 	assert.Check(t, cmp.Nil(movies))
-	assert.ErrorContains(t, err, "error fetching Filmstaden movies, got 500 Internal Server Error")
+	assert.Error(t, err, "movies: error fetching Filmstaden data, got 500 Internal Server Error")
 }
 
 func TestClient_UpcomingMovies(t *testing.T) {
@@ -65,7 +65,7 @@ func TestClient_UpcomingMovies(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := filmstaden.NewClient(srv.URL)
+	client := filmstaden.NewClient(srv.URL, NoopCache())
 	movies, err := client.UpcomingMovies(context.Background(), "GB")
 	assert.NilError(t, err)
 	assert.Equal(t, movies.TotalNbrOfItems, 78) // matches how many are actually in the movies-upcoming.json file
