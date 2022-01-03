@@ -75,7 +75,7 @@ func TestClient_UpcomingMovies(t *testing.T) {
 	assert.Equal(t, m.OriginalTitle, "Zerkalo")
 	assert.Equal(t, m.ProductionYear, 1975)
 	assert.Equal(t, m.ReleaseDate, "1979-11-12T00:00:00")
-	assert.Equal(t, m.ReReleaseDate, "2022-01-05T11:00:00")
+	assert.Equal(t, *m.ReReleaseDate, "2022-01-05T11:00:00")
 }
 
 func TestMovies_Merge(t *testing.T) {

@@ -38,9 +38,17 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context) ([]
 
 	graphMovies := make([]*model.Movie, 0, len(merged.Items))
 	for _, item := range merged.Items {
-		releaseDate, err := time.Parse("2006-01-02T15:04:05", item.ReleaseDate)
+		var releaseDate time.Time
+		if item.ReReleaseDate != nil {
+			releaseDate, err = time.Parse("2006-01-02T15:04:05", *item.ReReleaseDate)
+		} else {
+			releaseDate, err = time.Parse("2006-01-02T15:04:05", item.ReleaseDate)
+		}
 		if err != nil {
-			logger.Error(err, "failed to parse release date", "releaseDate", item.ReleaseDate)
+			logger.Error(err, "failed to parse release date",
+				"releaseDate", item.ReleaseDate,
+				"reReleaseDate", item.ReReleaseDate,
+			)
 		}
 		genres := make([]string, len(item.Genres))
 		for i, genre := range item.Genres {

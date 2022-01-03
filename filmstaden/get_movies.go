@@ -78,7 +78,7 @@ type Movie struct {
 	ReleaseDateInfo    interface{} `json:"releaseDateInfo"`
 	PreReleaseDate     *string     `json:"preReleaseDate"`
 	PreReleaseDateInfo interface{} `json:"preReleaseDateInfo"`
-	ReReleaseDate      string      `json:"reReleaseDate"`
+	ReReleaseDate      *string     `json:"reReleaseDate"`
 	ReReleaseDateInfo  interface{} `json:"reReleaseDateInfo"`
 	Actors             []struct {
 		DisplayName string  `json:"displayName"`
