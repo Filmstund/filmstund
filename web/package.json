@@ -9,7 +9,7 @@
     "lint": "eslint src --ext js,jsx,ts,tsx",
     "serve": "vite preview",
     "test": "jest",
-    "types": "graphql-codegen",
+    "types": "graphql-codegen && prettier --no-config --write 'src/__generated__/types.ts'",
     "prettier": "prettier --no-config --write 'src/**/*.[tj]s?(x)' 'src/**/*.css'",
     "prettier:check": "prettier --no-config --check 'src/**/*.[tj]s?(x)' 'src/**/*.css'"
   },
