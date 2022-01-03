@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -80,47 +79,47 @@ func TestClient_UpcomingMovies(t *testing.T) {
 }
 
 func TestMovies_Merge(t *testing.T) {
-	type fields struct {
-		TotalCount int
-		Items      []filmstaden.Movie
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		other  *filmstaden.Movies
-		want   *filmstaden.Movies
+		name  string
+		input *filmstaden.Movies
+		other *filmstaden.Movies
+		want  struct {
+			count int
+			ids   []string
+		}
 	}{
 		{
 			name: "No items",
-			fields: fields{
+			input: &filmstaden.Movies{
 				TotalCount: 0,
 				Items:      nil,
 			},
 			other: nil,
-			want: &filmstaden.Movies{
-				TotalCount: 0,
-				Items:      nil,
+			want: struct {
+				count int
+				ids   []string
+			}{
+				count: 0,
+				ids:   nil,
 			},
 		},
 		{
 			name: "No merge, single",
-			fields: fields{
+			input: &filmstaden.Movies{
 				TotalCount: 1,
 				Items: []filmstaden.Movie{
 					{NcgID: "apa"},
 				},
 			},
 			other: nil,
-			want: &filmstaden.Movies{
-				TotalCount: 1,
-				Items: []filmstaden.Movie{
-					{NcgID: "apa"},
-				},
-			},
+			want: struct {
+				count int
+				ids   []string
+			}{count: 1, ids: []string{"apa"}},
 		},
 		{
 			name: "Merge",
-			fields: fields{
+			input: &filmstaden.Movies{
 				TotalCount: 1,
 				Items: []filmstaden.Movie{
 					{NcgID: "apa"},
@@ -132,17 +131,14 @@ func TestMovies_Merge(t *testing.T) {
 					{NcgID: "bepa"},
 				},
 			},
-			want: &filmstaden.Movies{
-				TotalCount: 2,
-				Items: []filmstaden.Movie{
-					{NcgID: "apa"},
-					{NcgID: "bepa"},
-				},
-			},
+			want: struct {
+				count int
+				ids   []string
+			}{count: 2, ids: []string{"apa", "bepa"}},
 		},
 		{
 			name: "Merge with empty",
-			fields: fields{
+			input: &filmstaden.Movies{
 				TotalCount: 0,
 				Items:      nil,
 			},
@@ -152,16 +148,14 @@ func TestMovies_Merge(t *testing.T) {
 					{NcgID: "bepa"},
 				},
 			},
-			want: &filmstaden.Movies{
-				TotalCount: 1,
-				Items: []filmstaden.Movie{
-					{NcgID: "bepa"},
-				},
-			},
+			want: struct {
+				count int
+				ids   []string
+			}{count: 1, ids: []string{"bepa"}},
 		},
 		{
 			name: "Merge with same",
-			fields: fields{
+			input: &filmstaden.Movies{
 				TotalCount: 1,
 				Items: []filmstaden.Movie{
 					{NcgID: "apa"},
@@ -173,22 +167,55 @@ func TestMovies_Merge(t *testing.T) {
 					{NcgID: "apa"},
 				},
 			},
-			want: &filmstaden.Movies{
+			want: struct {
+				count int
+				ids   []string
+			}{count: 1, ids: []string{"apa"}},
+		},
+		{
+			name: "Merge with nil",
+			input: &filmstaden.Movies{
 				TotalCount: 1,
 				Items: []filmstaden.Movie{
 					{NcgID: "apa"},
 				},
 			},
+			other: nil,
+			want: struct {
+				count int
+				ids   []string
+			}{count: 1, ids: []string{"apa"}},
+		},
+		{
+			name:  "Nil merge with non-nil",
+			input: nil,
+			other: &filmstaden.Movies{
+				TotalCount: 1,
+				Items: []filmstaden.Movie{
+					{NcgID: "apa"},
+				},
+			},
+			want: struct {
+				count int
+				ids   []string
+			}{count: 1, ids: []string{"apa"}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			movies := &filmstaden.Movies{
-				TotalCount: tt.fields.TotalCount,
-				Items:      tt.fields.Items,
+			merged := tt.input.Merge(tt.other)
+			assert.Equal(t, merged.TotalCount, tt.want.count)
+			contains := func(id string) bool {
+				for _, item := range merged.Items {
+					if item.NcgID == id {
+						return true
+					}
+				}
+				return false
 			}
-			if got := movies.Merge(tt.other); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Merge() = %v, want %v", got, tt.want)
+			// We cannot do a DeepEqual due to maps being randomized when iterated.
+			for _, id := range tt.want.ids {
+				assert.Check(t, contains(id))
 			}
 		})
 	}

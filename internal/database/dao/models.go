@@ -62,14 +62,14 @@ type LocationAlias struct {
 
 type Movie struct {
 	ID             uuid.UUID      `json:"id"`
-	FilmstadenID   sql.NullString `json:"filmstadenID"`
+	FilmstadenID   string         `json:"filmstadenID"`
 	ImdbID         sql.NullString `json:"imdbID"`
 	TmdbID         sql.NullInt64  `json:"tmdbID"`
-	Slug           sql.NullString `json:"slug"`
+	Slug           string         `json:"slug"`
 	Title          string         `json:"title"`
 	ReleaseDate    sql.NullTime   `json:"releaseDate"`
-	ProductionYear sql.NullInt32  `json:"productionYear"`
-	Runtime        sql.NullInt64  `json:"runtime"`
+	ProductionYear int32          `json:"productionYear"`
+	Runtime        int32          `json:"runtime"`
 	Poster         sql.NullString `json:"poster"`
 	Genres         []string       `json:"genres"`
 	Archived       bool           `json:"archived"`

@@ -154,7 +154,9 @@ type Movies struct {
 
 // Merge this Movies struct with another based on the movie ID (NCG ID).
 func (movies *Movies) Merge(other *Movies) *Movies {
-	if movies == nil || other == nil {
+	if movies == nil && other != nil {
+		return other
+	} else if movies == nil || other == nil {
 		return movies
 	}
 	set := make(map[string]Movie, movies.TotalCount+other.TotalCount)

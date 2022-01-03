@@ -3,6 +3,7 @@ package filmstaden
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -32,6 +33,7 @@ func (shows *Shows) UniqueMovieIDs() []string {
 	for movieID := range ids {
 		movieIDs = append(movieIDs, movieID)
 	}
+	sort.Strings(movieIDs) // we loop over a map (randomized), so we sort for consistence.
 	return movieIDs
 }
 

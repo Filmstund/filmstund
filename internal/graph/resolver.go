@@ -6,6 +6,7 @@ import (
 
 	// needed to keep the dependencies needed for the above go generate command.
 	_ "github.com/99designs/gqlgen/cmd"
+	"github.com/filmstund/filmstund/filmstaden"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/site"
@@ -15,13 +16,15 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	db      *database.DB
-	siteCfg site.Config
+	db         *database.DB
+	filmstaden *filmstaden.Client
+	siteCfg    site.Config
 }
 
 func NewResolver(env *serverenv.ServerEnv, siteCfg site.ConfigProvider) *Resolver {
 	return &Resolver{
-		db:      env.Database(),
-		siteCfg: siteCfg.SiteConfig(),
+		db:         env.Database(),
+		filmstaden: filmstaden.NewClient(filmstaden.APIURL, env.Redis()),
+		siteCfg:    siteCfg.SiteConfig(),
 	}
 }

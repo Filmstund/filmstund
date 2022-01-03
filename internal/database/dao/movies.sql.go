@@ -87,11 +87,11 @@ WHERE filmstaden_id IN ($1)
 `
 
 type MoviesByFilmstadenIDRow struct {
-	ID           uuid.UUID      `json:"id"`
-	FilmstadenID sql.NullString `json:"filmstadenID"`
+	ID           uuid.UUID `json:"id"`
+	FilmstadenID string    `json:"filmstadenID"`
 }
 
-func (q *Queries) MoviesByFilmstadenID(ctx context.Context, filmstadenIds sql.NullString) ([]MoviesByFilmstadenIDRow, error) {
+func (q *Queries) MoviesByFilmstadenID(ctx context.Context, filmstadenIds string) ([]MoviesByFilmstadenIDRow, error) {
 	rows, err := q.db.Query(ctx, moviesByFilmstadenID, filmstadenIds)
 	if err != nil {
 		return nil, err
@@ -123,12 +123,12 @@ RETURNING id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, produc
 
 type UpsertMovieParams struct {
 	ID             uuid.UUID      `json:"id"`
-	FilmstadenID   sql.NullString `json:"filmstadenID"`
-	Slug           sql.NullString `json:"slug"`
+	FilmstadenID   string         `json:"filmstadenID"`
+	Slug           string         `json:"slug"`
 	Title          string         `json:"title"`
 	ReleaseDate    sql.NullTime   `json:"releaseDate"`
-	ProductionYear sql.NullInt32  `json:"productionYear"`
-	Runtime        sql.NullInt64  `json:"runtime"`
+	ProductionYear int32          `json:"productionYear"`
+	Runtime        int32          `json:"runtime"`
 	Poster         sql.NullString `json:"poster"`
 	Genres         []string       `json:"genres"`
 }

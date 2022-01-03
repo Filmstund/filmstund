@@ -5,10 +5,13 @@ package graph
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
@@ -16,7 +19,69 @@ import (
 )
 
 func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context) ([]*model.Movie, error) {
-	panic(fmt.Errorf("not implemented"))
+	const cityAlias = "GB"
+	logger := logging.FromContext(ctx)
+	shows, err := r.filmstaden.Shows(ctx, 1, cityAlias)
+	if err != nil {
+		logger.Error(err, "failed to request Filmstaden shows")
+		return nil, fmt.Errorf("failed to lookup current shows")
+	}
+	mids := shows.UniqueMovieIDs()
+	movies, err := r.filmstaden.Movies(ctx, mids)
+	if err != nil {
+		logger.Error(err, "failed to fetch Filmstaden movies")
+	}
+	upcoming, err := r.filmstaden.UpcomingMovies(ctx, cityAlias)
+	if err != nil {
+		logger.Error(err, "failed to fetch upcoming Filmstaden movies")
+	}
+	merged := movies.Merge(upcoming)
+	if merged.TotalCount == 0 {
+		return nil, fmt.Errorf("no movies found. Filmstaden failure?")
+	}
+
+	q, cleanup, err := r.db.Queries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to setup DB")
+	}
+	defer cleanup()
+
+	graphMovies := make([]*model.Movie, 0, len(merged.Items))
+	for _, item := range merged.Items {
+		releaseDate, err := time.Parse("2006-01-02T15:04:05", item.ReleaseDate)
+		if err != nil {
+			logger.Error(err, "failed to parse release date", "releaseDate", item.ReleaseDate)
+		}
+		genres := make([]string, len(item.Genres))
+		for i, genre := range item.Genres {
+			genres[i] = genre.Name
+		}
+
+		movie, err := q.UpsertMovie(ctx, dao.UpsertMovieParams{
+			ID:           uuid.New(),
+			FilmstadenID: item.NcgID,
+			Slug:         item.Slug,
+			Title:        item.OriginalTitle,
+			ReleaseDate: sql.NullTime{
+				Time:  releaseDate,
+				Valid: true,
+			},
+			ProductionYear: int32(item.ProductionYear),
+			Runtime:        int32(item.Length), // in minutes
+			Poster: sql.NullString{
+				String: item.PosterURL,
+				Valid:  true,
+			},
+			Genres: genres,
+		})
+		if err != nil {
+			logger.Error(err, "failed to insert movie", "movieID", item.NcgID)
+			continue
+		}
+		graphMovies = append(graphMovies, movie.GraphMovie())
+	}
+
+	return graphMovies, nil
 }
 
 func (r *queryResolver) Movie(ctx context.Context, id string) (*model.Movie, error) {

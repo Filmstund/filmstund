@@ -11,13 +11,13 @@ extend type Mutation {
 
 type Movie {
     id: MovieID!
-    filmstadenId: String
+    filmstadenId: String!
     imdbId: IMDbID
     tmdbId: TMDbID
-    slug: String
+    slug: String!
     title: String!
     releaseDate: String!
-    productionYear: Int
+    productionYear: Int!
     runtime: String!
     poster: String
     genres: [String!]!

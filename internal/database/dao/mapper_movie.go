@@ -22,32 +22,23 @@ func (m *Movie) GraphMovie() *model.Movie {
 		}
 		return nil
 	}
-	fromint32 := func(i sql.NullInt32) *int {
-		if i.Valid {
-			i2 := int(i.Int32)
-			return &i2
-		}
-		return nil
-	}
 	fromtime := func(t sql.NullTime) string {
 		if t.Valid {
-			t.Time.Format("2006-01-02")
+			return t.Time.Format("2006-01-02")
 		}
 		return "1970-01-01"
 	}
-	runtime := "0"
-	if m.Runtime.Valid {
-		runtime = time.Duration(m.Runtime.Int64).String()
-	}
+
+	runtime := (time.Duration(m.Runtime) * time.Minute).String()
 	return &model.Movie{
 		ID:             m.ID.String(),
-		FilmstadenID:   tostr(m.FilmstadenID),
+		FilmstadenID:   m.FilmstadenID,
 		ImdbID:         tostr(m.ImdbID),
 		TmdbID:         fromint64(m.TmdbID),
-		Slug:           tostr(m.Slug),
+		Slug:           m.Slug,
 		Title:          m.Title,
 		ReleaseDate:    fromtime(m.ReleaseDate),
-		ProductionYear: fromint32(m.ProductionYear),
+		ProductionYear: int(m.ProductionYear),
 		Runtime:        runtime,
 		Poster:         tostr(m.Poster),
 		Genres:         m.Genres,
