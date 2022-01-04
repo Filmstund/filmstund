@@ -4,17 +4,16 @@ import { groupBy } from "lodash";
 import * as React from "react";
 
 import Header from "../../common/ui/Header";
-import {
-  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos,
-  SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user,
-} from "../containers/__generated__/SingleShowing";
+import { ShowingAdminFragment } from "../../../__generated__/types";
 
 const UserActiveStatus = styled.div<{ active: boolean }>`
   color: ${(props) => (props.active ? "#000" : "#ccc")};
 `;
 
 interface UserWithPriceItemProps {
-  user: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos_user;
+  user: NonNullable<
+    ShowingAdminFragment["adminPaymentDetails"]
+  >["attendees"][0]["user"];
   active: boolean;
   onPaidChange: () => void;
   hasPaid: boolean;
@@ -27,7 +26,7 @@ const UserWithPriceItem: React.FC<UserWithPriceItemProps> = ({
   hasPaid,
 }) => (
   <UserActiveStatus active={active}>
-    {user.nick || user.name}{" "}
+    {user.nick || user.firstName + " " + user.lastName}{" "}
     <label>
       har betalat:{" "}
       <input type="checkbox" checked={hasPaid} onChange={onPaidChange} />
@@ -36,9 +35,13 @@ const UserWithPriceItem: React.FC<UserWithPriceItemProps> = ({
 );
 
 interface UserWithPriceItemListProps {
-  participantPaymentInfos: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
+  participantPaymentInfos: NonNullable<
+    ShowingAdminFragment["adminPaymentDetails"]
+  >["attendees"];
   handlePaidChange: (
-    info: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
+    info: NonNullable<
+      ShowingAdminFragment["adminPaymentDetails"]
+    >["attendees"][0]
   ) => void;
   paid: boolean;
 }
@@ -51,7 +54,7 @@ const UserWithPriceItemList: React.FC<UserWithPriceItemListProps> = ({
   <>
     {participantPaymentInfos.map((info) => (
       <UserWithPriceItem
-        key={info.user.id}
+        key={info.userID}
         active={paid}
         user={info.user}
         onPaidChange={() =>
@@ -65,16 +68,20 @@ const UserWithPriceItemList: React.FC<UserWithPriceItemListProps> = ({
 
 interface PaymentParticipantsListProps {
   handlePaidChange: (
-    info: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
+    info: NonNullable<
+      ShowingAdminFragment["adminPaymentDetails"]
+    >["attendees"][0]
   ) => void;
-  participants: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
+  participants: NonNullable<
+    ShowingAdminFragment["adminPaymentDetails"]
+  >["attendees"];
 }
 
 export const PaymentParticipantsList: React.FC<
   PaymentParticipantsListProps
 > = ({ handlePaidChange, participants }) => {
   const { hasPaid = [], hasNotPaid = [] } = groupBy(participants, (info) =>
-    info.hasPaid ? "hasPaid" : "hasNotPaid"
+    info?.hasPaid ? "hasPaid" : "hasNotPaid"
   );
 
   return (

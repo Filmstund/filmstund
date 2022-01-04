@@ -31,7 +31,7 @@ func (m *Movie) GraphModel() *model.Movie {
 
 	runtime := (time.Duration(m.Runtime) * time.Minute).String()
 	return &model.Movie{
-		ID:             m.ID.String(),
+		ID:             m.ID,
 		FilmstadenID:   m.FilmstadenID,
 		ImdbID:         tostr(m.ImdbID),
 		TmdbID:         fromint64(m.TmdbID),

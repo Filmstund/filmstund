@@ -48,15 +48,15 @@ const App: React.FC<Props> = () => {
               <Route path="/showings" element={<AsyncShowings />} />
               <Route path="/showings/new" element={<AsyncNewShowing />} />
               <Route
-                path="/showings/:webId/:slug"
+                path="/showings/:webID/:slug"
                 element={<AsyncSingleShowing />}
               />
               <Route
-                path="/showings/:webId/:slug/tickets"
+                path="/showings/:webID/:slug/tickets"
                 element={<AsyncShowingTickets />}
               />
               <Route
-                path="/showings/:webId/:slug/edit"
+                path="/showings/:webID/:slug/edit"
                 element={<AsyncEditShowing />}
               />
               <Route path="/*" element={<MissingShowing />} />

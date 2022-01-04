@@ -14,14 +14,14 @@ import (
 
 type AdminPaymentDetails struct {
 	FilmstadenBuyLink *string     `json:"filmstadenBuyLink"`
-	ShowingID         *string     `json:"showingID"`
+	ShowingID         uuid.UUID   `json:"showingID"`
 	Attendees         []*Attendee `json:"attendees"`
 }
 
 type Attendee struct {
 	UserID                 string           `json:"userID"`
 	User                   *PublicUser      `json:"user"`
-	ShowingID              string           `json:"showingID"`
+	ShowingID              uuid.UUID        `json:"showingID"`
 	HasPaid                bool             `json:"hasPaid"`
 	AmountOwed             string           `json:"amountOwed"`
 	Type                   PaymentType      `json:"type"`
@@ -38,10 +38,10 @@ type AttendeePaymentDetails struct {
 }
 
 type AttendeePaymentInfoInput struct {
-	UserID     string  `json:"userID"`
-	ShowingID  *string `json:"showingID"`
-	HasPaid    bool    `json:"hasPaid"`
-	AmountOwed string  `json:"amountOwed"`
+	UserID     string    `json:"userID"`
+	ShowingID  uuid.UUID `json:"showingID"`
+	HasPaid    bool      `json:"hasPaid"`
+	AmountOwed string    `json:"amountOwed"`
 }
 
 type CinemaScreen struct {
@@ -62,10 +62,15 @@ type Commandments struct {
 type CreateShowingInput struct {
 	Date                     string             `json:"date"`
 	Time                     string             `json:"time"`
-	MovieID                  string             `json:"movieID"`
+	MovieID                  uuid.UUID          `json:"movieID"`
 	Location                 string             `json:"location"`
 	FilmstadenScreen         *CinemaScreenInput `json:"filmstadenScreen"`
 	FilmstadenRemoteEntityID *string            `json:"filmstadenRemoteEntityID"`
+}
+
+type FilmstadenCityAlias struct {
+	Name  string `json:"name"`
+	Alias string `json:"alias"`
 }
 
 type FilmstadenLiteScreen struct {
@@ -112,21 +117,20 @@ type GiftCertificateInput struct {
 }
 
 type Movie struct {
-	ID                 string               `json:"id"`
-	FilmstadenID       string               `json:"filmstadenID"`
-	ImdbID             *string              `json:"imdbID"`
-	TmdbID             *string              `json:"tmdbID"`
-	Slug               string               `json:"slug"`
-	Title              string               `json:"title"`
-	ReleaseDate        string               `json:"releaseDate"`
-	ProductionYear     int                  `json:"productionYear"`
-	Runtime            string               `json:"runtime"`
-	Poster             *string              `json:"poster"`
-	Genres             []string             `json:"genres"`
-	Archived           bool                 `json:"archived"`
-	UpdateTime         string               `json:"updateTime"`
-	CreateTime         string               `json:"createTime"`
-	FilmstadenShowings []*FilmstadenShowing `json:"filmstadenShowings"`
+	ID             uuid.UUID `json:"id"`
+	FilmstadenID   string    `json:"filmstadenID"`
+	ImdbID         *string   `json:"imdbID"`
+	TmdbID         *string   `json:"tmdbID"`
+	Slug           string    `json:"slug"`
+	Title          string    `json:"title"`
+	ReleaseDate    string    `json:"releaseDate"`
+	ProductionYear int       `json:"productionYear"`
+	Runtime        string    `json:"runtime"`
+	Poster         *string   `json:"poster"`
+	Genres         []string  `json:"genres"`
+	Archived       bool      `json:"archived"`
+	UpdateTime     string    `json:"updateTime"`
+	CreateTime     string    `json:"createTime"`
 }
 
 type PaymentOption struct {
@@ -136,18 +140,18 @@ type PaymentOption struct {
 
 type PublicAttendee struct {
 	UserID    string      `json:"userID"`
-	ShowingID string      `json:"showingID"`
+	ShowingID uuid.UUID   `json:"showingID"`
 	UserInfo  *PublicUser `json:"userInfo"`
 }
 
 type PublicUser struct {
 	ID        string  `json:"id"`
-	Name      *string `json:"name"`
-	FirstName *string `json:"firstName"`
-	LastName  *string `json:"lastName"`
+	Name      string  `json:"name"`
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
 	Nick      *string `json:"nick"`
 	Phone     *string `json:"phone"`
-	Avatar    *string `json:"avatar"`
+	AvatarURL *string `json:"avatarURL"`
 }
 
 type Seat struct {
@@ -161,13 +165,13 @@ type SeatRange struct {
 }
 
 type Showing struct {
-	ID                     string                  `json:"id"`
+	ID                     uuid.UUID               `json:"id"`
 	WebID                  string                  `json:"webID"`
 	FilmstadenShowingID    *string                 `json:"filmstadenShowingID"`
 	Slug                   string                  `json:"slug"`
 	Date                   string                  `json:"date"`
 	Time                   string                  `json:"time"`
-	MovieID                string                  `json:"movieID"`
+	MovieID                uuid.UUID               `json:"movieID"`
 	MovieTitle             string                  `json:"movieTitle"`
 	Movie                  *Movie                  `json:"movie"`
 	Location               string                  `json:"location"`
@@ -175,9 +179,10 @@ type Showing struct {
 	Price                  *string                 `json:"price"`
 	TicketsBought          bool                    `json:"ticketsBought"`
 	Admin                  *PublicUser             `json:"admin"`
+	Private                bool                    `json:"private"`
 	PayToUser              *PublicUser             `json:"payToUser"`
-	LastModifiedDate       string                  `json:"lastModifiedDate"`
-	CreatedDate            string                  `json:"createdDate"`
+	UpdateTime             string                  `json:"updateTime"`
+	CreateTime             string                  `json:"createTime"`
 	FilmstadenSeatMap      []*FilmstadenSeatMap    `json:"filmstadenSeatMap"`
 	Attendees              []*PublicAttendee       `json:"attendees"`
 	AdminPaymentDetails    *AdminPaymentDetails    `json:"adminPaymentDetails"`
@@ -187,22 +192,22 @@ type Showing struct {
 }
 
 type Ticket struct {
-	ID                     string   `json:"id"`
-	ShowingID              string   `json:"showingID"`
-	AssignedToUser         string   `json:"assignedToUser"`
-	ProfileID              *string  `json:"profileID"`
-	Barcode                string   `json:"barcode"`
-	CustomerType           string   `json:"customerType"`
-	CustomerTypeDefinition string   `json:"customerTypeDefinition"`
-	Cinema                 string   `json:"cinema"`
-	CinemaCity             *string  `json:"cinemaCity"`
-	Screen                 string   `json:"screen"`
-	Seat                   *Seat    `json:"seat"`
-	Date                   string   `json:"date"`
-	Time                   string   `json:"time"`
-	MovieName              string   `json:"movieName"`
-	MovieRating            string   `json:"movieRating"`
-	Attributes             []string `json:"attributes"`
+	ID                     string    `json:"id"`
+	ShowingID              uuid.UUID `json:"showingID"`
+	AssignedToUser         string    `json:"assignedToUser"`
+	ProfileID              *string   `json:"profileID"`
+	Barcode                string    `json:"barcode"`
+	CustomerType           string    `json:"customerType"`
+	CustomerTypeDefinition string    `json:"customerTypeDefinition"`
+	Cinema                 string    `json:"cinema"`
+	CinemaCity             *string   `json:"cinemaCity"`
+	Screen                 string    `json:"screen"`
+	Seat                   *Seat     `json:"seat"`
+	Date                   string    `json:"date"`
+	Time                   string    `json:"time"`
+	MovieName              string    `json:"movieName"`
+	MovieRating            string    `json:"movieRating"`
+	Attributes             []string  `json:"attributes"`
 }
 
 type TicketRange struct {
@@ -231,7 +236,7 @@ type User struct {
 	Phone                  *string                         `json:"phone"`
 	AvatarURL              *string                         `json:"avatarURL"`
 	GiftCertificates       []*GiftCertificate              `json:"giftCertificates"`
-	CalendarFeedID         *string                         `json:"calendarFeedID"`
+	CalendarFeedID         *uuid.UUID                      `json:"calendarFeedID"`
 	CalendarFeedURL        *string                         `json:"calendarFeedUrl"`
 	LastLoginTime          time.Time                       `json:"lastLoginTime"`
 	SignupTime             time.Time                       `json:"signupTime"`

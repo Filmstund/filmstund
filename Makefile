@@ -27,6 +27,7 @@ include .tools/sqlc/rules.mk
 lint: $(golangci-lint_bin)
 	$(info [$@] linting $(PROJECT_NAME)...)
 	@$< run --config .golangci.yaml
+	cd ./web && yarn lint
 .PHONY: lint
 
 verify-nodiff:

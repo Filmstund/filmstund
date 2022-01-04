@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
-import { UpdateShowingInput } from "../../../__generated__/globalTypes";
 import {
-  UpdateShowing,
-  UpdateShowingVariables,
-} from "./__generated__/UpdateShowing";
+  UpdateShowingMutation,
+  UpdateShowingMutationVariables,
+  UpdateShowingInput,
+} from "../../../__generated__/types";
 
 const updateShowingMutation = gql`
   mutation UpdateShowing($showingId: UUID!, $showing: UpdateShowingInput!) {
-    updateShowing(showingId: $showingId, newValues: $showing) {
+    updateShowing(showingID: $showingId, newValues: $showing) {
       id
       time
       date
@@ -18,15 +18,15 @@ const updateShowingMutation = gql`
       payToUser {
         id
       }
-      expectedBuyDate
     }
   }
 `;
 
 export const useUpdateShowing = () => {
-  const [mutate] = useMutation<UpdateShowing, UpdateShowingVariables>(
-    updateShowingMutation
-  );
+  const [mutate] = useMutation<
+    UpdateShowingMutation,
+    UpdateShowingMutationVariables
+  >(updateShowingMutation);
 
   return (showingId: string, showing: UpdateShowingInput) =>
     mutate({ variables: { showing, showingId } });

@@ -2,14 +2,17 @@ import { gql } from "@apollo/client";
 import { movieFragment } from "../common/showing/Showing";
 
 export const createShowingFormQuery = gql`
-  query CreateShowingQuery($movieId: UUID!) {
-    movie(id: $movieId) {
+  query CreateShowingQuery($movieID: UUID!) {
+    movie(id: $movieID) {
       ...ShowingMovie
       releaseDate
     }
-    previousLocations {
+    me: currentUser {
+      id
+      nick
       name
     }
+    previouslyUsedLocations
     filmstadenCities {
       name
       alias

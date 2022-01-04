@@ -15,15 +15,15 @@ import CopyValue from "../common/utils/CopyValue";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
 import ParticipantsList from "./components/ParticipantsList";
 import {
-  SingleShowing_showing,
-  SingleShowing_showing_adminPaymentDetails,
-  SingleShowing_showing_adminPaymentDetails_filmstadenData,
-  SingleShowing_showing_adminPaymentDetails_filmstadenData_user,
-} from "./containers/__generated__/SingleShowing";
+  ShowingAdminFragment,
+  SingleShowingQuery,
+} from "../../__generated__/types";
 import { InputSpinner } from "./InputSpinner";
 
 interface TicketListProps {
-  tickets: SingleShowing_showing_adminPaymentDetails_filmstadenData[];
+  tickets: NonNullable<
+    ShowingAdminFragment["adminPaymentDetails"]
+  >["attendees"];
 }
 
 const TicketListRow = styled.div`
@@ -58,13 +58,13 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
         <div style={{ flex: 1 }}>
           <UserFullName user={ticket.user} />
         </div>
-        {ticket.foretagsbiljett && (
+        {ticket.giftCertificateUsed && (
           <div style={{ width: 100, textAlign: "right" }}>
-            <CopyValue useStricken text={ticket.foretagsbiljett} />
+            <CopyValue useStricken text={ticket.giftCertificateUsed.number} />
           </div>
         )}
         <div style={{ width: 100, textAlign: "right" }}>
-          <CopyValue useStricken text={ticket.filmstadenMembershipId || ""} />
+          <CopyValue useStricken text={ticket.filmstadenMembershipID || ""} />
         </div>
       </TicketListRow>
     ))}
@@ -72,7 +72,9 @@ const TicketList: React.FC<TicketListProps> = ({ tickets }) => (
 );
 
 interface UserFullNameProps {
-  user: SingleShowing_showing_adminPaymentDetails_filmstadenData_user;
+  user: NonNullable<
+    ShowingAdminFragment["adminPaymentDetails"]
+  >["attendees"][0]["user"];
 }
 
 const UserFullName: React.FC<UserFullNameProps> = ({ user }) => (
@@ -83,8 +85,8 @@ const UserFullName: React.FC<UserFullNameProps> = ({ user }) => (
 
 interface AdminModalBeforeTicketsBoughtProps {
   closeModal: () => void;
-  showing: SingleShowing_showing;
-  adminPaymentDetails: SingleShowing_showing_adminPaymentDetails;
+  showing: NonNullable<SingleShowingQuery["showing"]>;
+  adminPaymentDetails: NonNullable<ShowingAdminFragment["adminPaymentDetails"]>;
 }
 
 const priceTransformer = (str: string) => parseInt(str, 10);
@@ -128,7 +130,7 @@ export const AdminModalBeforeTicketsBought: React.FC<
       });
   };
 
-  const { filmstadenBuyLink, filmstadenData } = adminPaymentDetails;
+  const { filmstadenBuyLink, attendees } = adminPaymentDetails;
 
   return (
     <form onSubmit={onFormSubmit}>
@@ -140,8 +142,8 @@ export const AdminModalBeforeTicketsBought: React.FC<
           Öppna Filmstaden-länk i nytt fönster
         </a>
       )}
-      <ParticipantsList participants={showing.participants} showPhone={true} />
-      <TicketList tickets={filmstadenData} />
+      <ParticipantsList participants={showing.attendees} showPhone={true} />
+      <TicketList tickets={attendees} />
       <StatusMessageBox
         errors={mutationErrors.length > 0 ? mutationErrors : null}
       />

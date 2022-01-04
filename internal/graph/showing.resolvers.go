@@ -9,13 +9,14 @@ import (
 
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
+	"github.com/google/uuid"
 )
 
-func (r *mutationResolver) AttendShowing(ctx context.Context, showingID string, paymentOption model.PaymentOption) (*model.Showing, error) {
+func (r *mutationResolver) AttendShowing(ctx context.Context, showingID uuid.UUID, paymentOption model.PaymentOption) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UnattendShowing(ctx context.Context, showingID string) (*model.Showing, error) {
+func (r *mutationResolver) UnattendShowing(ctx context.Context, showingID uuid.UUID) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -23,27 +24,27 @@ func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.Crea
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID string) ([]*model.Showing, error) {
+func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID uuid.UUID) ([]*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID string, price string) (*model.Showing, error) {
+func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID, price string) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID string, ticketUrls []string) (*model.Showing, error) {
+func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID string, newValues *model.UpdateShowingInput) (*model.Showing, error) {
+func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID uuid.UUID, newValues *model.UpdateShowingInput) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID string, userToPromote string) (*model.Showing, error) {
+func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote string) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Showing(ctx context.Context, id *string, webID *string) (*model.Showing, error) {
+func (r *queryResolver) Showing(ctx context.Context, id *uuid.UUID, webID *string) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -51,7 +52,7 @@ func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *string) (
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID *string) ([]*model.Showing, error) {
+func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID *uuid.UUID) ([]*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import React from "react";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
-import { SfShowingsQuery_movie_showings } from "../../new-showing/hooks/__generated__/SfShowingsQuery";
+import { FilmstadenShowing } from "../../../__generated__/types";
 
 const Option = styled.div<{ selected: boolean }>`
   display: flex;
@@ -43,17 +43,17 @@ const RightArrow = styled.div`
 
 interface Props {
   selectedValue?: string;
-  options: SfShowingsQuery_movie_showings[];
-  onChange: (v: SfShowingsQuery_movie_showings) => void;
+  options: FilmstadenShowing[];
+  onChange: (v: FilmstadenShowing) => void;
 }
 
 const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
   <Box>
     {options.map((option) => (
       <Option
-        key={option.filmstadenRemoteEntityId}
+        key={option.filmstadenRemoteEntityID}
         onClick={() => onChange(option)}
-        selected={option.filmstadenRemoteEntityId === selectedValue}
+        selected={option.filmstadenRemoteEntityID === selectedValue}
       >
         <Lable>
           {option.timeUtc && formatLocalTime(option.timeUtc)}{" "}

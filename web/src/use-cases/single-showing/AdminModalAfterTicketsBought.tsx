@@ -3,12 +3,14 @@ import { useCallback } from "react";
 import { useTogglePaidChange } from "../../apollo/mutations/showings/useTogglePaidChange";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { PaymentParticipantsList } from "./components/PaymentParticipantsList";
-import { SingleShowing_showing_adminPaymentDetails_participantPaymentInfos } from "./containers/__generated__/SingleShowing";
+import { ShowingAdminFragment } from "../../__generated__/types";
 import { InputSpinner } from "./InputSpinner";
 
 interface AdminModalAfterTicketsBoughtProps {
   showingId: string;
-  participantPaymentInfos: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos[];
+  participantPaymentInfos: NonNullable<
+    ShowingAdminFragment["adminPaymentDetails"]
+  >["attendees"];
 }
 
 export const AdminModalAfterTicketsBought: React.FC<
@@ -21,18 +23,19 @@ export const AdminModalAfterTicketsBought: React.FC<
 
   const handlePaidChange = useCallback(
     (
-      info: SingleShowing_showing_adminPaymentDetails_participantPaymentInfos
+      info: NonNullable<
+        ShowingAdminFragment["adminPaymentDetails"]
+      >["attendees"][0]
     ) => {
-      const { id, user, hasPaid, amountOwed } = info;
+      const { user, hasPaid, amountOwed } = info!;
 
       togglePaidChange({
         variables: {
           paymentInfo: {
             amountOwed,
             hasPaid,
-            id,
-            showingId: showingId,
-            userId: user.id,
+            showingID: showingId,
+            userID: user.id,
           },
         },
       });

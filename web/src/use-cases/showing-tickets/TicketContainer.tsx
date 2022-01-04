@@ -8,17 +8,14 @@ import { navigateToShowing } from "../common/navigators";
 import { FieldWithoutMaxWidth } from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import { ScreenSeats } from "../ticket/ScreenSeats";
-import {
-  TicketQuery_me,
-  TicketQuery_showing,
-} from "./__generated__/TicketQuery";
+import { TicketQueryQuery } from "../../__generated__/types";
 import { SeatRange } from "./SeatRange";
 import { Ticket } from "./Ticket";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
-  showing: TicketQuery_showing;
-  me: TicketQuery_me;
+  showing: NonNullable<TicketQueryQuery["showing"]>;
+  me: NonNullable<TicketQueryQuery["me"]>;
 }
 
 export const TicketContainer: React.FC<Props> = ({ me, showing }) => {

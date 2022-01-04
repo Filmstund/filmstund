@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import {
-  MarkShowingAsBought,
-  MarkShowingAsBoughtVariables,
-} from "./__generated__/MarkShowingAsBought";
+  MarkShowingAsBoughtMutation,
+  MarkShowingAsBoughtMutationVariables,
+} from "../../../__generated__/types";
 
 const markAsBoughtMutation = gql`
   mutation MarkShowingAsBought($showingId: UUID!, $price: SEK!) {
-    markAsBought(showingId: $showingId, price: $price) {
+    markAsBought(showingID: $showingId, price: $price) {
       id
       ticketsBought
       price
@@ -15,7 +15,6 @@ const markAsBoughtMutation = gql`
       payToUser {
         id
       }
-      expectedBuyDate
       date
       time
       myTickets {
@@ -34,8 +33,8 @@ const markAsBoughtMutation = gql`
         amountOwed
       }
       adminPaymentDetails {
-        participantPaymentInfos {
-          id
+        attendees {
+          userID
           hasPaid
           amountOwed
           user {
@@ -51,9 +50,9 @@ const markAsBoughtMutation = gql`
 `;
 
 export const useMarkAsBought = () =>
-  useMutation<MarkShowingAsBought, MarkShowingAsBoughtVariables>(
-    markAsBoughtMutation,
-    {
-      refetchQueries: ["ShowingsQuery"],
-    }
-  );
+  useMutation<
+    MarkShowingAsBoughtMutation,
+    MarkShowingAsBoughtMutationVariables
+  >(markAsBoughtMutation, {
+    refetchQueries: ["ShowingsQuery"],
+  });

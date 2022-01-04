@@ -1,7 +1,8 @@
 extend type Query {
-    movie(id: MovieID!): Movie
+    movie(id: UUID!): Movie
     allMovies: [Movie!]!
     archivedMovies: [Movie!]!
+    filmstadenShowings(movieID: UUID!, city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
 }
 
 extend type Mutation {
@@ -10,7 +11,7 @@ extend type Mutation {
 }
 
 type Movie {
-    id: MovieID!
+    id: UUID!
     filmstadenID: String!
     imdbID: IMDbID
     tmdbID: TMDbID
@@ -24,5 +25,4 @@ type Movie {
     archived: Boolean!
     updateTime: String!
     createTime: String!
-    filmstadenShowings(city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
 }

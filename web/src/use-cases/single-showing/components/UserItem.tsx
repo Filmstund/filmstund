@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { gql } from "@apollo/client";
+import { UserItemFragment } from "../../../__generated__/types";
 import React from "react";
 
 const PaddingContainer = styled.div`
@@ -24,13 +25,7 @@ const Header = styled.h3`
 interface Props {
   className?: string;
   showPhone: boolean;
-  user: {
-    phone: string | null;
-    avatar: string | null;
-    firstName: string | null;
-    nick: string | null;
-    lastName: string | null;
-  };
+  user: UserItemFragment;
 }
 
 const UserItem: React.FC<Props> = ({
@@ -40,7 +35,7 @@ const UserItem: React.FC<Props> = ({
   children,
 }) => (
   <div className={className}>
-    <Poster src={user.avatar!} />
+    <Poster src={user.avatarURL!} />
     <PaddingContainer>
       <Header>
         {user.firstName} '{user.nick}' {user.lastName}
@@ -53,8 +48,8 @@ const UserItem: React.FC<Props> = ({
 
 export const fragments = {
   user: gql`
-    fragment UserItem on User {
-      avatar
+    fragment UserItem on PublicUser {
+      avatarURL
       firstName
       nick
       lastName

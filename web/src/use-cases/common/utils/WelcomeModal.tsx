@@ -3,15 +3,15 @@ import Modal from "../ui/Modal";
 
 import Header from "../ui/Header";
 import MainButton, { ButtonContainer } from "../ui/MainButton";
-import { AppQuery_me } from "../../../__generated__/AppQuery";
+import { User } from "../../../__generated__/types";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
-  me: AppQuery_me;
+  me: User;
 }
 
 export const WelcomeModal: React.FC<Props> = ({
-  me: { filmstadenMembershipId },
+  me: { filmstadenMembershipID },
 }) => {
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ export const WelcomeModal: React.FC<Props> = ({
     navigate("/user");
   }, [navigate]);
 
-  if (filmstadenMembershipId) {
+  if (filmstadenMembershipID) {
     return null;
   } else {
     return (

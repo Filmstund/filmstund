@@ -2,14 +2,16 @@ import styled from "@emotion/styled";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, lazy } from "react";
-import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
+import {
+  GiftCertificateInput,
+  UserProfileQuery,
+} from "../../__generated__/types";
 import { formatYMD } from "../../lib/dateTools";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
 import Field from "../common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
 import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
-import { UserProfile_me_foretagsbiljetter } from "./__generated__/UserProfile";
 
 const DatePickerInput = lazy(
   () => import("../common/ui/date-picker/DatePickerInput")
@@ -68,7 +70,7 @@ const DateInput = ({ onChange, ...props }: any) => {
 };
 
 interface EditableForetagsbiljettProps {
-  biljett: ForetagsbiljettInput;
+  biljett: GiftCertificateInput;
   editable: true;
   handleChangeForetagsbiljett: (event: ChangeEvent<HTMLInputElement>) => void;
   handleSetExpiresForetagsbiljett: (value: Date) => void;
@@ -76,7 +78,7 @@ interface EditableForetagsbiljettProps {
 }
 
 interface ForetagsbiljettProps {
-  biljett: UserProfile_me_foretagsbiljetter;
+  biljett: UserProfileQuery["me"]["giftCertificates"][0];
   editable: false;
   handleChangeForetagsbiljett?: undefined;
   handleSetExpiresForetagsbiljett?: undefined;
@@ -102,11 +104,11 @@ const Foretagsbiljett: React.FC<Props> = (props) => (
     <BiljettField text="Utgångsdatum">
       {props.editable ? (
         <DateInput
-          value={props.biljett.expires}
+          value={props.biljett.expireTime}
           onChange={props.handleSetExpiresForetagsbiljett}
         />
       ) : (
-        <ValueField>{formatYMD(props.biljett.expires)}</ValueField>
+        <ValueField>{formatYMD(props.biljett.expireTime)}</ValueField>
       )}
     </BiljettField>
     {"status" in props.biljett && props.biljett.status && (

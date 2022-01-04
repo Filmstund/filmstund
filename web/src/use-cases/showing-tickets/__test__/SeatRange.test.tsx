@@ -1,9 +1,9 @@
 import { cleanup, render } from "@testing-library/react";
 import * as React from "react";
-import { Ticket_ticketRange } from "../../../apollo/mutations/__generated__/Ticket";
+import { TicketRange } from "../../../__generated__/types";
 import { SeatRange } from "../SeatRange";
 
-const ticketRange: Ticket_ticketRange = {
+const ticketRange: TicketRange = {
   rows: [1, 2, 3, 4, 5],
   seatings: [
     {
@@ -32,6 +32,7 @@ const ticketRange: Ticket_ticketRange = {
       __typename: "SeatRange",
     },
   ],
+  totalCount: 16,
   __typename: "TicketRange",
 };
 

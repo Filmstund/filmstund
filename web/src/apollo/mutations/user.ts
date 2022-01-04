@@ -1,7 +1,10 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { completeUserFragment } from "../queries/currentUser";
-import { UpdateUser, UpdateUserVariables } from "./__generated__/UpdateUser";
+import {
+  UpdateUserMutation,
+  UpdateUserMutationVariables,
+} from "../../__generated__/types";
 
 const updateUserMutation = gql`
   mutation UpdateUser($user: UserDetailsInput!) {
@@ -14,4 +17,6 @@ const updateUserMutation = gql`
 `;
 
 export const useUpdateUserMutation = () =>
-  useMutation<UpdateUser, UpdateUserVariables>(updateUserMutation);
+  useMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+    updateUserMutation
+  );

@@ -1,10 +1,10 @@
 import { orderBy } from "lodash";
 import React from "react";
-import { Ticket_ticketRange } from "../../apollo/mutations/__generated__/Ticket";
+import { TicketFragment } from "../../__generated__/types";
 import { formatSeatingRow } from "../../lib/summarizeSeatingRange";
 
 interface Props {
-  ticketRange: Ticket_ticketRange | null;
+  ticketRange: TicketFragment["ticketRange"];
 }
 
 export const SeatRange: React.FC<Props> = ({ ticketRange }) => {

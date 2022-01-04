@@ -1,36 +1,35 @@
-import { useQuery } from "@apollo/client";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { groupBy } from "lodash";
 import { useMemo } from "react";
 import { formatYMD } from "../../../lib/dateTools";
 import {
-  SfShowingsQuery,
-  SfShowingsQuery_movie_showings,
-  SfShowingsQueryVariables,
-} from "./__generated__/SfShowingsQuery";
+  FilmstadenShowing,
+  QueryFilmstadenShowingsArgs,
+} from "../../../__generated__/types";
 
 export type GroupedFilmstadenShowings = {
-  [date: string]: SfShowingsQuery_movie_showings[];
+  [date: string]: FilmstadenShowing[];
 };
 
 export const useSfShowings = (
-  movieId: string,
+  movieID: string,
   city: string
 ): [GroupedFilmstadenShowings | null, boolean] => {
-  const { data, loading } = useQuery<SfShowingsQuery, SfShowingsQueryVariables>(
+  const { data, loading } = useQuery<
+    FilmstadenShowing[],
+    QueryFilmstadenShowingsArgs
+  >(
     gql`
-      query SfShowingsQuery($movieId: UUID!, $city: String) {
-        movie(id: $movieId) {
-          showings: filmstadenShowings(city: $city) {
-            cinemaName
-            screen {
-              filmstadenId
-              name
-            }
-            timeUtc
-            tags
-            filmstadenRemoteEntityId
+      query FsShowingsQuery($movieID: UUID!, $city: String) {
+        filmstadenShowings(movieID: $movieID, city: $city) {
+          cinemaName
+          screen {
+            filmstadenID
+            name
           }
+          timeUtc
+          tags
+          filmstadenRemoteEntityID
         }
       }
     `,
@@ -38,14 +37,14 @@ export const useSfShowings = (
       fetchPolicy: "no-cache",
       variables: {
         city,
-        movieId,
+        movieID,
       },
     }
   );
 
   const sfdates = useMemo(() => {
-    const movieShowings = data?.movie?.showings ?? [];
-    return groupBy(movieShowings, (s) => formatYMD(s.timeUtc || ""));
+    return groupBy(data ?? [], (s) => formatYMD(s.timeUtc || ""));
   }, [data]);
+
   return [sfdates, loading];
 };

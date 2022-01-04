@@ -3,43 +3,42 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { oldShowingFragment } from "../common/showing/Showing";
 import Loader from "../common/utils/ProjectorLoader";
-import { EditShowing, EditShowingVariables } from "./__generated__/EditShowing";
+import {
+  EditShowingQuery,
+  EditShowingQueryVariables,
+} from "../../__generated__/types";
 import EditShowingForm from "./EditShowingForm";
 
-const useEditShowingData = (webId: string) =>
-  useQuery<EditShowing, EditShowingVariables>(
+const useEditShowingData = (webID: string) =>
+  useQuery<EditShowingQuery, EditShowingQueryVariables>(
     gql`
-      query EditShowing($webId: Base64ID!) {
+      query EditShowing($webID: Base64ID!) {
         me: currentUser {
           id
         }
-        showing(webId: $webId) {
+        showing(webID: $webID) {
           ...OldShowing
           price
           private
-          filmstadenRemoteEntityId
-          location {
-            cityAlias
-          }
+          filmstadenShowingID
+          location
           payToUser {
             id
           }
         }
-        previousLocations {
-          name
-        }
+        previouslyUsedLocations
       }
       ${oldShowingFragment}
     `,
     {
       fetchPolicy: "cache-and-network",
-      variables: { webId },
+      variables: { webID },
     }
   );
 
 const EditShowingFormLoader = () => {
-  const { webId } = useParams<"webId">();
-  const { data } = useEditShowingData(webId!);
+  const { webID } = useParams<"webID">();
+  const { data } = useEditShowingData(webID!);
 
   if (!data || !data.showing) {
     return <Loader />;
@@ -48,7 +47,7 @@ const EditShowingFormLoader = () => {
   return (
     <EditShowingForm
       showing={data.showing}
-      previousLocations={data.previousLocations}
+      previousLocations={data.previouslyUsedLocations}
     />
   );
 };

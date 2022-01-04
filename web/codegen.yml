@@ -1,5 +1,8 @@
 schema: ../api/graphql/v2/*.graphqls
-#documents: ./src/**/*.ts*
+documents:
+  - ./src/**/*.ts*
+  - ./src/**/*.jsx
+
 generates:
   schema.graphql:
     plugins:
@@ -8,3 +11,5 @@ generates:
     plugins:
       - typescript
       - typescript-operations
+    config:
+      inlineFragmentTypes: combine

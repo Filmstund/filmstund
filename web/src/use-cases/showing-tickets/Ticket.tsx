@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import * as React from "react";
 import fslogo from "../../assets/fslogo.png";
-import { TicketQuery_showing_myTickets } from "./__generated__/TicketQuery";
+import { TicketFragment } from "../../__generated__/types";
 
 const TicketWrapper = styled.div`
   margin: 3rem 0;
@@ -69,15 +69,15 @@ const CompanyHeader: React.FC<{ cinema: string }> = ({ cinema }) => (
 
 const TicketHeader: React.FC<
   Pick<
-    TicketQuery_showing_myTickets,
-    "movieName" | "movieRating" | "showAttributes"
+    TicketFragment["myTickets"][0],
+    "movieName" | "movieRating" | "attributes"
   >
-> = ({ movieName, movieRating, showAttributes }) => (
+> = ({ movieName, movieRating, attributes }) => (
   <FlexColumnContainer style={{ marginBottom: "1rem" }}>
     <HeaderText style={{ marginBottom: "0.5rem" }}>{movieName}</HeaderText>
     <FlexSpaceRowContainer>
       <FlexRowContainer>
-        {(showAttributes || []).map((attr) => (
+        {(attributes || []).map((attr) => (
           <ShowAttribute key={attr}>{attr}</ShowAttribute>
         ))}
       </FlexRowContainer>
@@ -104,7 +104,7 @@ const TicketValueWithLabel: React.FC<TicketValueWithLabelProps> = ({
 );
 
 const TicketDateTime: React.FC<
-  Pick<TicketQuery_showing_myTickets, "date" | "time">
+  Pick<TicketFragment["myTickets"][0], "date" | "time">
 > = ({ date, time }) => (
   <FlexRowContainer style={{ marginBottom: "1rem" }}>
     <TicketValueWithLabel label="Datum" value={date} />
@@ -113,7 +113,7 @@ const TicketDateTime: React.FC<
 );
 
 const TicketPlacement: React.FC<
-  Pick<TicketQuery_showing_myTickets, "screen" | "seat">
+  Pick<TicketFragment["myTickets"][0], "screen" | "seat">
 > = ({ screen, seat }) => (
   <FlexRowPaddingContainer
     style={{ marginBottom: "1rem", border: ".0625rem solid #000" }}
@@ -129,7 +129,7 @@ const TicketPlacement: React.FC<
 );
 
 const TicketCustomerType: React.FC<
-  Pick<TicketQuery_showing_myTickets, "customerType">
+  Pick<TicketFragment["myTickets"][0], "customerType">
 > = ({ customerType }) => (
   <FlexRowContainer style={{ marginBottom: "1rem", fontWeight: 500 }}>
     {customerType}
@@ -137,7 +137,7 @@ const TicketCustomerType: React.FC<
 );
 
 interface TicketCodeProps
-  extends Pick<TicketQuery_showing_myTickets, "id" | "profileId"> {
+  extends Pick<TicketFragment["myTickets"][0], "id" | "profileID"> {
   src: string;
 }
 
@@ -149,13 +149,13 @@ const AztecCodeImage = styled.img`
   filter: contrast(2);
 `;
 
-const TicketCode: React.FC<TicketCodeProps> = ({ src, id, profileId }) => {
+const TicketCode: React.FC<TicketCodeProps> = ({ src, id, profileID }) => {
   return (
     <FlexRowContainer style={{ marginBottom: "1rem" }}>
       <FlexColumnContainer style={{ alignItems: "left" }}>
         <AztecCodeImage alt={id} src={src} />
         <div>
-          {id} {profileId}
+          {id} {profileID}
         </div>
       </FlexColumnContainer>
     </FlexRowContainer>
@@ -163,7 +163,7 @@ const TicketCode: React.FC<TicketCodeProps> = ({ src, id, profileId }) => {
 };
 
 interface Props {
-  ticket: TicketQuery_showing_myTickets;
+  ticket: TicketFragment["myTickets"][0];
 }
 
 export const Ticket: React.FC<Props> = ({
@@ -176,8 +176,8 @@ export const Ticket: React.FC<Props> = ({
     movieRating,
     screen,
     customerType,
-    showAttributes,
-    profileId,
+    attributes,
+    profileID,
     seat,
     barcode,
   },
@@ -185,13 +185,13 @@ export const Ticket: React.FC<Props> = ({
   <TicketWrapper>
     <CompanyHeader cinema={cinema} />
     <TicketHeader
-      showAttributes={showAttributes}
+      attributes={attributes}
       movieName={movieName}
       movieRating={movieRating}
     />
     <TicketDateTime date={date} time={time} />
     <TicketPlacement screen={screen} seat={seat} />
     <TicketCustomerType customerType={customerType} />
-    <TicketCode id={id} profileId={profileId} src={barcode} />
+    <TicketCode id={id} profileID={profileID} src={barcode} />
   </TicketWrapper>
 );

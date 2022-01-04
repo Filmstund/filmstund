@@ -58,13 +58,7 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
       >
         <div
           class="css-o2j9ze"
-        >
-          <span
-            class="css-ya7yf4"
-          >
-            3D
-          </span>
-        </div>
+        />
         R
       </div>
     </div>
@@ -175,7 +169,6 @@ exports[`<TicketContainer /> renders without crashing 1`] = `
         <div>
           1
            
-          mock-profile-id
         </div>
       </div>
     </div>

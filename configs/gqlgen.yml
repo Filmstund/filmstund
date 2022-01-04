@@ -62,10 +62,6 @@ models:
   UUID:
     model:
       - github.com/filmstund/filmstund/internal/graph/scalars.UUIDScalar
-  Movie:
-    fields:
-      filmstadenShowings:
-        resolver: true # generate an explicit resolver for this field
   User:
     fields:
       giftCertificates:

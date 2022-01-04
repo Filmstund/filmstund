@@ -11,7 +11,7 @@ import { RedHeader } from "../common/ui/RedHeader";
 import { PageTitle } from "../common/utils/PageTitle";
 import { OrderedShowingsList } from "../my-showings/OrderedShowingsList";
 import { showingDate } from "../my-showings/utils/filtersCreators";
-import { ShowingsQuery } from "./__generated__/ShowingsQuery";
+import { ShowingsQueryQuery } from "../../__generated__/types";
 
 const today = getTodaysDate();
 
@@ -37,13 +37,13 @@ const Showings: React.FC = () => {
 };
 
 const usePublicShowings = () =>
-  useQuery<ShowingsQuery>(
+  useQuery<ShowingsQueryQuery>(
     gql`
       query ShowingsQuery {
         showings: publicShowings {
           ...ShowingNeue
           id
-          webId
+          webID
           slug
           date
           time

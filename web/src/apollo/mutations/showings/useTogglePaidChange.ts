@@ -1,21 +1,21 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import {
-  TogglePaidChange,
-  TogglePaidChangeVariables,
-} from "./__generated__/TogglePaidChange";
+  TogglePaidChangeMutation,
+  TogglePaidChangeMutationVariables,
+} from "../../../__generated__/types";
 
 const togglePaidChangeMutation = gql`
-  mutation TogglePaidChange($paymentInfo: ParticipantPaymentInput!) {
-    updateParticipantPaymentInfo(paymentInfo: $paymentInfo) {
-      id
+  mutation TogglePaidChange($paymentInfo: AttendeePaymentInfoInput!) {
+    updateAttendeePaymentInfo(paymentInfo: $paymentInfo) {
+      userID
       hasPaid
     }
   }
 `;
 
 export const useTogglePaidChange = () =>
-  useMutation<TogglePaidChange, TogglePaidChangeVariables>(
+  useMutation<TogglePaidChangeMutation, TogglePaidChangeMutationVariables>(
     togglePaidChangeMutation,
     { refetchQueries: ["ShowingsQuery"] }
   );

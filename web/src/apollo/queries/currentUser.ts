@@ -8,12 +8,12 @@ export const completeUserFragment = gql`
     lastName
     nick
     email
-    filmstadenMembershipId
+    filmstadenMembershipID
     phone
-    avatar: avatarURL
-    foretagsbiljetter: giftCertificates {
+    avatarURL
+    giftCertificates {
       number
-      expires: expireTime
+      expireTime
       status
     }
   }

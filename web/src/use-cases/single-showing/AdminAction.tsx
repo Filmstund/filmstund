@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { navigateToEditShowing } from "../common/navigators";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { BuyModal } from "./BuyModal";
-import { SingleShowing_showing } from "./containers/__generated__/SingleShowing";
+import { SingleShowingQuery } from "../../__generated__/types";
 import { CopyHighlightStringButton } from "./CopyHighlightStringButton";
 
 interface Props {
   onBeforeOpenBuyModal: () => Promise<any>;
-  showing: SingleShowing_showing;
+  showing: NonNullable<SingleShowingQuery["showing"]>;
 }
 
 interface State {
@@ -64,7 +64,7 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
       )}
       <CopyHighlightStringButton
         meId={showing.admin.id}
-        participants={showing.participants}
+        participants={showing.attendees}
       />
       {adminMessage && <div>{adminMessage}</div>}
       {ticketsBought ? (
@@ -86,9 +86,10 @@ export const adminActionFragments = gql`
     id
     price
     private
-    filmstadenRemoteEntityId
-    filmstadenScreen {
-      filmstadenId
+    filmstadenShowingID
+    ticketsBought
+    cinemaScreen {
+      id
       name
     }
     payToUser {
@@ -96,24 +97,19 @@ export const adminActionFragments = gql`
     }
     adminPaymentDetails {
       filmstadenBuyLink
-      filmstadenData {
+      attendees {
+        userID
+        hasPaid
+        amountOwed
+        filmstadenMembershipID
+        giftCertificateUsed {
+          number
+        }
         user {
           id
           nick
           firstName
           lastName
-        }
-        filmstadenMembershipId
-        foretagsbiljett
-      }
-      participantPaymentInfos {
-        id
-        hasPaid
-        amountOwed
-        user {
-          id
-          nick
-          name
           phone
         }
       }

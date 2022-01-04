@@ -9,7 +9,7 @@ import Modal from "../common/ui/Modal";
 
 import { SmallHeader } from "../common/ui/Header";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
-import { SingleShowing_me_foretagsbiljetter } from "./containers/__generated__/SingleShowing";
+import { SingleShowingQuery } from "../../__generated__/types";
 
 import {
   createPaymentOptions,
@@ -20,7 +20,7 @@ import {
 interface Props {
   showingId: string;
   isParticipating: boolean;
-  foretagsbiljetter: SingleShowing_me_foretagsbiljetter[];
+  foretagsbiljetter: SingleShowingQuery["me"]["giftCertificates"];
 }
 
 export const PendingShowing: React.FC<Props> = ({
@@ -120,9 +120,9 @@ const ModalPaymentOptions: React.FC<ModalPaymentOptionsProps> = ({
 
 (PendingShowing as any).fragments = {
   currentUser: gql`
-    fragment PendingShowing on CurrentUser {
-      foretagsbiljetter {
-        expires
+    fragment PendingShowing on User {
+      giftCertificates {
+        expireTime
         number
         status
       }

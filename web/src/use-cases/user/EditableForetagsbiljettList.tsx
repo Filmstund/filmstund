@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addYears from "date-fns/addYears";
 import { uniqueId } from "lodash";
 import React, { ChangeEvent, useCallback, useState } from "react";
-import { ForetagsbiljettInput } from "../../__generated__/globalTypes";
+import { GiftCertificateInput } from "../../__generated__/types";
 import { formatYMD } from "../../lib/dateTools";
 
 import { margin } from "../../lib/style-vars";
@@ -31,9 +31,9 @@ const AddForetagsbiljettContainer = styled.div`
 const transformDraftToInput = ({
   number,
   expires,
-}: ForetagsbiljettInputDraft): ForetagsbiljettInput => ({
+}: ForetagsbiljettInputDraft): GiftCertificateInput => ({
   number,
-  expires: formatYMD(expires),
+  expireTime: formatYMD(expires),
 });
 
 interface ForetagsbiljettInputDraft {

@@ -2,7 +2,7 @@ import parseISO from "date-fns/parseISO";
 import { keys } from "lodash";
 import React, { lazy } from "react";
 import { formatYMD } from "../../../lib/dateTools";
-import { SfShowingsQuery_movie_showings } from "../../new-showing/hooks/__generated__/SfShowingsQuery";
+import { FilmstadenShowing } from "../../../__generated__/types";
 import { useSfShowings } from "../../new-showing/hooks/useSfShowings";
 import { SfTimeSelector } from "../../new-showing/SfTimeSelector";
 import Field from "../ui/Field";
@@ -13,9 +13,9 @@ const today = new Date();
 
 interface FilmstadenShowingSelectorProps {
   date: string;
-  filmstadenRemoteEntityId: string | null;
+  filmstadenRemoteEntityId: string | null | undefined;
   onChangeDate: (value: string) => void;
-  onSelectShowing: (sfShowing: SfShowingsQuery_movie_showings) => void;
+  onSelectShowing: (sfShowing: FilmstadenShowing) => void;
   city: string;
   movieId: string;
 }

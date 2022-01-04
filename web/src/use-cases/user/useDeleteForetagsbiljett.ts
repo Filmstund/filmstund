@@ -1,19 +1,22 @@
 import { useMutation } from "@apollo/client";
 import { gql } from "@apollo/client";
 import {
-  DeleteForetagsbiljett,
-  DeleteForetagsbiljettVariables,
-} from "./__generated__/DeleteForetagsbiljett";
+  DeleteForetagsbiljettMutation,
+  DeleteForetagsbiljettMutationVariables,
+} from "../../__generated__/types";
 
 export const useDeleteForetagsbiljett = () =>
-  useMutation<DeleteForetagsbiljett, DeleteForetagsbiljettVariables>(
+  useMutation<
+    DeleteForetagsbiljettMutation,
+    DeleteForetagsbiljettMutationVariables
+  >(
     gql`
-      mutation DeleteForetagsbiljett($ticket: ForetagsbiljettInput!) {
-        deleteForetagsBiljett(biljett: $ticket) {
+      mutation DeleteForetagsbiljett($ticket: GiftCertificateInput!) {
+        deleteGiftCertificate(giftCert: $ticket) {
           id
-          foretagsbiljetter {
+          giftCertificates {
             number
-            expires
+            expireTime
             status
           }
         }

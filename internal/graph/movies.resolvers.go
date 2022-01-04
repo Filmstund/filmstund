@@ -12,15 +12,10 @@ import (
 
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/database/dao"
-	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
 	pgx "github.com/jackc/pgx/v4"
 )
-
-func (r *movieResolver) FilmstadenShowings(ctx context.Context, obj *model.Movie, city *string, afterDate *string) ([]*model.FilmstadenShowing, error) {
-	panic(fmt.Errorf("not implemented"))
-}
 
 func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cityAlias string) ([]*model.Movie, error) {
 	logger := logging.FromContext(ctx).
@@ -90,13 +85,13 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 	return graphMovies, nil
 }
 
-func (r *queryResolver) Movie(ctx context.Context, id string) (*model.Movie, error) {
+func (r *queryResolver) Movie(ctx context.Context, id uuid.UUID) (*model.Movie, error) {
 	q, cleanup, err := r.db.Queries(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup DB query interface: %w", err)
 	}
 	defer cleanup()
-	movie, err := q.Movie(ctx, uuid.MustParse(id))
+	movie, err := q.Movie(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
@@ -143,7 +138,6 @@ func (r *queryResolver) ArchivedMovies(ctx context.Context) ([]*model.Movie, err
 	return movies, nil
 }
 
-// Movie returns gql.MovieResolver implementation.
-func (r *Resolver) Movie() gql.MovieResolver { return &movieResolver{r} }
-
-type movieResolver struct{ *Resolver }
+func (r *queryResolver) FilmstadenShowings(ctx context.Context, movieID uuid.UUID, city *string, afterDate *string) ([]*model.FilmstadenShowing, error) {
+	panic(fmt.Errorf("not implemented"))
+}

@@ -1,16 +1,16 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { movieFragment } from "../../use-cases/common/showing/Movie";
-import { FetchMovies } from "./__generated__/FetchMovies";
+import { FetchMoviesMutation } from "../../__generated__/types";
 
 export const useFetchMovies = () =>
-  useMutation<FetchMovies>(
+  useMutation<FetchMoviesMutation>(
     gql`
       mutation FetchMovies {
         fetchNewMoviesFromFilmstaden {
           ...Movie
           id
-          popularity
+          #          popularity
           releaseDate
         }
       }

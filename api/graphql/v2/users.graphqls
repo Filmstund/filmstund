@@ -27,7 +27,7 @@ type User {
     phone: String
     avatarURL: String
     giftCertificates: [GiftCertificate!]!
-    calendarFeedID: String
+    calendarFeedID: UUID
     calendarFeedUrl: String
     lastLoginTime: Time!
     signupTime: Time!
@@ -36,12 +36,12 @@ type User {
 
 type PublicUser {
     id: UserID!
-    name: String
-    firstName: String
-    lastName: String
+    name: String!
+    firstName: String!
+    lastName: String!
     nick: String
     phone: String
-    avatar: String
+    avatarURL: String
 }
 
 type GiftCertificate {

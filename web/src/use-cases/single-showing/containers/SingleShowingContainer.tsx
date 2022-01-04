@@ -17,18 +17,16 @@ import ParticipantList, {
 import { SwishModal } from "../components/SwishModal";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import {
-  SingleShowing,
-  SingleShowing_me,
-  SingleShowing_showing,
-  SingleShowingVariables,
-} from "./__generated__/SingleShowing";
+  SingleShowingQuery,
+  SingleShowingQueryVariables,
+} from "../../../__generated__/types";
 import ShowingPaymentContainer from "./ShowingPaymentContainer";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
-  me: SingleShowing_me;
+  me: SingleShowingQuery["me"];
   error: ApolloError | undefined;
-  showing: SingleShowing_showing | null;
+  showing: SingleShowingQuery["showing"] | null | undefined;
   refetch: () => Promise<unknown>;
 }
 
@@ -63,7 +61,7 @@ const SingleShowingContainer: React.FC<Props> = ({
   }
 
   const isAdmin = userIsAdmin(showing, me);
-  const isParticipating = userIsParticipating(showing.participants, me);
+  const isParticipating = userIsParticipating(showing.attendees, me);
 
   const { attendeePaymentDetails } = showing;
 
@@ -71,7 +69,7 @@ const SingleShowingContainer: React.FC<Props> = ({
     <>
       {openModal && (
         <SwishModal
-          attendeePaymentDetails={attendeePaymentDetails}
+          swishLink={attendeePaymentDetails?.swishLink}
           closeSwish={() => setOpenModal(false)}
         />
       )}
@@ -80,19 +78,19 @@ const SingleShowingContainer: React.FC<Props> = ({
         movie={showing.movie}
         date={showing.date + " " + showing.time}
         admin={showing.admin}
-        location={showing.location.name}
+        location={showing.location}
         ticketsBought={showing.ticketsBought}
       />
       {error && <StatusMessageBox errors={error.graphQLErrors} />}
       <ButtonContainer>
-        <IMDbLink imdbId={showing.movie.imdbId} />
+        <IMDbLink imdbId={showing.movie.imdbID} />
         {isAdmin && (
           <AdminAction onBeforeOpenBuyModal={refetch} showing={showing} />
         )}
         <ShowingPaymentContainer
           showing={showing}
           isAdmin={isAdmin}
-          foretagsbiljetter={me.foretagsbiljetter}
+          foretagsbiljetter={me.giftCertificates}
           isParticipating={isParticipating}
           onClickTickets={navigateToTickets}
           openSwish={openSwish}
@@ -101,33 +99,33 @@ const SingleShowingContainer: React.FC<Props> = ({
       <ParticipantList
         meId={me.id}
         isAdmin={isAdmin}
-        participants={showing.participants}
+        participants={showing.attendees}
         onClickItem={(userId) => promoteToAdmin(showing.id, userId)}
       />
     </>
   );
 };
 
-const useSingleShowingData = (webId: string) =>
-  useQuery<SingleShowing, SingleShowingVariables>(
+const useSingleShowingData = (webID: string) =>
+  useQuery<SingleShowingQuery, SingleShowingQueryVariables>(
     gql`
-      query SingleShowing($webId: Base64ID!) {
+      query SingleShowing($webID: Base64ID!) {
         me: currentUser {
           ...PendingShowing
           id
         }
-        showing(webId: $webId) {
+        showing(webID: $webID) {
           ...OldShowing
           ...ShowingAdmin
           ...BoughtShowing
-          webId
+          webID
           slug
           price
           private
           movie {
-            imdbId
+            imdbID
           }
-          participants {
+          attendees {
             ...ParticipantsList
           }
         }
@@ -140,13 +138,13 @@ const useSingleShowingData = (webId: string) =>
     `,
     {
       fetchPolicy: "cache-and-network",
-      variables: { webId },
+      variables: { webID },
     }
   );
 
-const SingleShowingLoader: React.FC<{ webId: string }> = ({ webId }) => {
+const SingleShowingLoader: React.FC<{ webID: string }> = ({ webID }) => {
   const { data, loading, error, refetch, networkStatus } =
-    useSingleShowingData(webId);
+    useSingleShowingData(webID);
 
   if (!data || (loading && networkStatus !== NetworkStatus.refetch)) {
     return <Loader />;

@@ -3,17 +3,20 @@ import * as React from "react";
 import { ticketFragment } from "../../apollo/mutations/useAddTickets";
 import { useParams } from "react-router-dom";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
-import { TicketQuery, TicketQueryVariables } from "./__generated__/TicketQuery";
+import {
+  TicketQueryQuery,
+  TicketQueryQueryVariables,
+} from "../../__generated__/types";
 import { TicketContainer } from "./TicketContainer";
 
-const useTickets = (webId: string) =>
-  useQuery<TicketQuery, TicketQueryVariables>(
+const useTickets = (webID: string) =>
+  useQuery<TicketQueryQuery, TicketQueryQueryVariables>(
     gql`
-      query TicketQuery($webId: Base64ID!) {
+      query TicketQuery($webID: Base64ID!) {
         me: currentUser {
           id
         }
-        showing(webId: $webId) {
+        showing(webID: $webID) {
           ...Ticket
         }
       }
@@ -21,14 +24,14 @@ const useTickets = (webId: string) =>
     `,
     {
       fetchPolicy: "cache-and-network",
-      variables: { webId },
+      variables: { webID },
     }
   );
 
 const TicketScreen = () => {
-  const { webId } = useParams<"webId">();
+  const { webID } = useParams<"webID">();
 
-  const { data } = useTickets(webId!);
+  const { data } = useTickets(webID!);
 
   if (!data || !data.me || !data.showing) {
     return <Loader />;

@@ -8,7 +8,7 @@ import Modal from "../common/ui/Modal";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { AdminModalAfterTicketsBought } from "./AdminModalAfterTicketsBought";
 import { AdminModalBeforeTicketsBought } from "./AdminModalBeforeTicketsBought.tsx";
-import { SingleShowing_showing } from "./containers/__generated__/SingleShowing";
+import { SingleShowingQuery } from "../../__generated__/types";
 
 const Padding = styled.div`
   padding: 0 1em;
@@ -26,7 +26,7 @@ const Close = styled.div`
 interface BuyModalProps {
   loading: boolean;
   closeModal: () => void;
-  showing: SingleShowing_showing;
+  showing: SingleShowingQuery["showing"];
 }
 
 export const BuyModal: React.FC<BuyModalProps> = ({
@@ -34,7 +34,7 @@ export const BuyModal: React.FC<BuyModalProps> = ({
   closeModal,
   showing,
 }) => {
-  if (loading || !showing.adminPaymentDetails) {
+  if (loading || !showing?.adminPaymentDetails) {
     return (
       <Modal>
         <Center>
@@ -44,7 +44,7 @@ export const BuyModal: React.FC<BuyModalProps> = ({
     );
   }
 
-  const { ticketsBought, adminPaymentDetails } = showing;
+  const { ticketsBought, adminPaymentDetails } = showing!;
 
   return (
     <Modal>
@@ -55,9 +55,7 @@ export const BuyModal: React.FC<BuyModalProps> = ({
         <Padding>
           {ticketsBought && (
             <AdminModalAfterTicketsBought
-              participantPaymentInfos={
-                adminPaymentDetails.participantPaymentInfos
-              }
+              participantPaymentInfos={adminPaymentDetails?.attendees ?? []}
               showingId={showing.id}
             />
           )}
@@ -65,7 +63,7 @@ export const BuyModal: React.FC<BuyModalProps> = ({
             <AdminModalBeforeTicketsBought
               closeModal={closeModal}
               showing={showing}
-              adminPaymentDetails={adminPaymentDetails}
+              adminPaymentDetails={adminPaymentDetails!}
             />
           )}
         </Padding>

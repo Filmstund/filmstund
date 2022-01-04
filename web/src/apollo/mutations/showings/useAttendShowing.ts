@@ -1,26 +1,25 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import {
-  AttendShowing,
-  AttendShowingVariables,
-} from "./__generated__/AttendShowing";
-import { PaymentOption } from "../../../__generated__/globalTypes";
+  AttendShowingMutation,
+  AttendShowingMutationVariables,
+} from "../../../__generated__/types";
+import { PaymentOption } from "../../../__generated__/types";
 import {
-  UnattendShowing,
-  UnattendShowingVariables,
-} from "./__generated__/UnattendShowing";
+  UnattendShowingMutation,
+  UnattendShowingMutationVariables,
+} from "../../../__generated__/types";
 
 const participantsFragment = gql`
   fragment ShowingParticipant on Showing {
     id
-    participants {
-      paymentType
-      user {
+    attendees {
+      userInfo {
         id
         nick
         firstName
         lastName
-        avatar
+        avatarURL
       }
     }
   }
@@ -28,7 +27,7 @@ const participantsFragment = gql`
 
 const attendShowingMutation = gql`
   mutation AttendShowing($showingId: UUID!, $paymentOption: PaymentOption!) {
-    attendShowing(showingId: $showingId, paymentOption: $paymentOption) {
+    attendShowing(showingID: $showingId, paymentOption: $paymentOption) {
       ...ShowingParticipant
     }
   }
@@ -37,7 +36,7 @@ const attendShowingMutation = gql`
 
 const unattendShowingMutation = gql`
   mutation UnattendShowing($showingId: UUID!) {
-    unattendShowing(showingId: $showingId) {
+    unattendShowing(showingID: $showingId) {
       ...ShowingParticipant
     }
   }
@@ -45,18 +44,20 @@ const unattendShowingMutation = gql`
 `;
 
 export const useAttendShowing = () => {
-  const [mutate] = useMutation<AttendShowing, AttendShowingVariables>(
-    attendShowingMutation
-  );
+  const [mutate] = useMutation<
+    AttendShowingMutation,
+    AttendShowingMutationVariables
+  >(attendShowingMutation);
 
   return (showingId: string, paymentOption: PaymentOption) =>
     mutate({ variables: { showingId, paymentOption } });
 };
 
 export const useUnattendShowing = () => {
-  const [mutate] = useMutation<UnattendShowing, UnattendShowingVariables>(
-    unattendShowingMutation
-  );
+  const [mutate] = useMutation<
+    UnattendShowingMutation,
+    UnattendShowingMutationVariables
+  >(unattendShowingMutation);
 
   return (showingId: string) => mutate({ variables: { showingId } });
 };

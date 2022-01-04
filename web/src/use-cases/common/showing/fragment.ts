@@ -18,7 +18,7 @@ export const showingFragment = gql`
     attendees {
       userInfo {
         id
-        avatar
+        avatarURL
       }
     }
   }

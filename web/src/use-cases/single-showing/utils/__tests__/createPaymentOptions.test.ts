@@ -1,5 +1,5 @@
 import { addYears } from "date-fns";
-import { ForetagsbiljettStatus } from "../../../../__generated__/globalTypes";
+import { GiftCertificate_Status } from "../../../../__generated__/types";
 import { formatYMD } from "../../../../lib/dateTools";
 import { createPaymentOptions } from "../createPaymentOptions";
 
@@ -16,9 +16,9 @@ describe("createPaymentOptions", () => {
       expect(
         createPaymentOptions([
           {
-            expires: expires,
+            expireTime: expires,
             number: "123456",
-            status: ForetagsbiljettStatus.Available,
+            status: GiftCertificate_Status.Available,
           },
         ])
       ).toHaveLength(2);

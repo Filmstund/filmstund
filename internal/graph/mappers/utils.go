@@ -38,9 +38,9 @@ func toCalendarURL(id uuid.NullUUID, siteCfg site.Config) *string {
 	return &str
 }
 
-func fromUUID(nullU uuid.NullUUID) *string {
+func fromUUID(nullU uuid.NullUUID) *uuid.UUID {
 	if nullU.Valid {
-		u := nullU.UUID.String()
+		u := nullU.UUID
 		return &u
 	}
 	return nil

@@ -9,7 +9,7 @@ extend type Showing {
 
 type AdminPaymentDetails {
     filmstadenBuyLink: String
-    showingID: ShowingID
+    showingID: UUID!
     attendees: [Attendee!]!
 }
 
@@ -24,7 +24,7 @@ type AttendeePaymentDetails {
 type Attendee {
     userID: UserID!
     user: PublicUser!
-    showingID: ShowingID!
+    showingID: UUID!
     hasPaid: Boolean!
     amountOwed: SEK!
     type: PaymentType!
@@ -34,7 +34,7 @@ type Attendee {
 
 input AttendeePaymentInfoInput {
     userID: UserID!
-    showingID: ShowingID
+    showingID: UUID!
     hasPaid: Boolean!
     amountOwed: SEK!
 }

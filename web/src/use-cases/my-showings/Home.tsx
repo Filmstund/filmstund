@@ -5,7 +5,7 @@ import { showingFragment } from "../common/showing/fragment";
 import { Link } from "../common/ui/MainButton";
 import { RedHeader } from "../common/ui/RedHeader";
 import { PageTitle } from "../common/utils/PageTitle";
-import { HomeQuery } from "./__generated__/HomeQuery";
+import { HomeQueryQuery } from "../../__generated__/types";
 import { FeaturedShowing } from "./FeaturedShowing";
 import { OrderedShowingsList } from "./OrderedShowingsList";
 import {
@@ -55,7 +55,7 @@ const Home: React.FC = () => {
 };
 
 const useHomeScreenData = () =>
-  useQuery<HomeQuery>(
+  useQuery<HomeQueryQuery>(
     gql`
       query HomeQuery {
         showings: publicShowings {
@@ -68,10 +68,8 @@ const useHomeScreenData = () =>
           admin {
             id
           }
-          participants {
-            user {
-              id
-            }
+          attendees {
+            userID
           }
         }
         me: currentUser {

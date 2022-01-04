@@ -5,7 +5,7 @@ import React from "react";
 import { formatShowingDateTime } from "../../../lib/dateTools";
 import PosterBox from "../ui/PosterBox";
 import { PageTitle } from "../utils/PageTitle";
-import { OldShowing_movie } from "./__generated__/OldShowing";
+import { OldShowingFragment } from "../../../__generated__/types";
 
 const VerticalPaddingContainer = styled.div`
   padding: 1em 0;
@@ -37,9 +37,14 @@ const StyledShowing = styled.div<{ disabled?: boolean }>`
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
 `;
 
+interface AdminProps {
+  name: string;
+  nick?: string | null | undefined;
+}
+
 interface Props {
-  movie?: OldShowing_movie;
-  admin: { name: string | null; nick: string | null } | null;
+  movie?: OldShowingFragment["movie"];
+  admin: AdminProps | undefined | null;
   location: string;
   date: string;
   setTitleTag?: boolean;
@@ -96,13 +101,11 @@ export const movieFragment = gql`
 export const oldShowingFragment = gql`
   fragment OldShowing on Showing {
     id
-    webId
+    webID
     slug
     date
     time
-    location {
-      name
-    }
+    location
     ticketsBought
     movie {
       ...ShowingMovie

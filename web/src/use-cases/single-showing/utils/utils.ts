@@ -1,19 +1,18 @@
 import {
-  SingleShowing_me,
-  SingleShowing_showing,
-  SingleShowing_showing_participants,
-} from "../containers/__generated__/SingleShowing";
+  ParticipantsListFragment,
+  SingleShowingQuery,
+} from "../../../__generated__/types";
 
 export const userIsAdmin = (
-  showing: SingleShowing_showing,
-  user: SingleShowing_me
+  showing: SingleShowingQuery["showing"],
+  user: SingleShowingQuery["me"]
 ): boolean => {
-  return showing.admin.id === user.id;
+  return showing?.admin.id === user.id;
 };
 
 export const userIsParticipating = (
-  participants: SingleShowing_showing_participants[],
-  user: SingleShowing_me
+  participants: ParticipantsListFragment[],
+  user: SingleShowingQuery["me"]
 ): boolean => {
-  return participants.some((p) => !!p.user && p.user.id === user.id);
+  return participants.some((p) => !!p.userInfo && p.userInfo.id === user.id);
 };

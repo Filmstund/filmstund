@@ -10,16 +10,13 @@ import {
   ApolloProvider,
   InMemoryCache,
 } from "@apollo/client";
-import {
-  TicketQuery_me,
-  TicketQuery_showing,
-} from "./__generated__/TicketQuery";
+import { TicketQueryQuery } from "../../__generated__/types";
 
-const mockUserData: TicketQuery_me = {
+const mockUserData: NonNullable<TicketQueryQuery["me"]> = {
   id: "this-is-mock-user-id",
 } as any;
 
-const minimalMockData: TicketQuery_showing = {
+const minimalMockData: NonNullable<TicketQueryQuery["showing"]> = {
   id: "this-is-mock-showing-id",
   admin: mockUserData,
   ticketRange: {
@@ -30,7 +27,7 @@ const minimalMockData: TicketQuery_showing = {
   myTickets: [createMockTicket("1", 2, 3)],
 } as any;
 
-const mockData: TicketQuery_showing = {
+const mockData: NonNullable<TicketQueryQuery["showing"]> = {
   id: "this-is-mock-showing-id",
   admin: mockUserData,
   ticketRange: {

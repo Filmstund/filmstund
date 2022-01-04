@@ -1,10 +1,11 @@
 import isAfter from "date-fns/isAfter";
 import isSameDay from "date-fns/isSameDay";
 import {
-  ForetagsbiljettStatus,
+  GiftCertificate_Status,
   PaymentOption,
   PaymentType,
-} from "../../../__generated__/globalTypes";
+  SingleShowingQuery,
+} from "../../../__generated__/types";
 
 import { formatYMD, parseDate } from "../../../lib/dateTools";
 
@@ -13,12 +14,6 @@ export interface DisplayPaymentOption extends PaymentOption {
   type: PaymentType;
   ticketNumber?: string | null;
   suffix?: string | null;
-}
-
-export interface SingleShowing_me_foretagsbiljetter {
-  expires: string;
-  number: string;
-  status: ForetagsbiljettStatus;
 }
 
 const createPaymentOption = (
@@ -34,23 +29,23 @@ const createPaymentOption = (
 };
 
 const createForetagsbiljetter = (
-  foretagsbiljetter: SingleShowing_me_foretagsbiljetter[]
+  foretagsbiljetter: SingleShowingQuery["me"]["giftCertificates"]
 ): DisplayPaymentOption[] => {
   const now = formatYMD(new Date());
 
   return foretagsbiljetter
     .filter(
-      ({ status, expires }) =>
-        status === "Available" &&
-        (isSameDay(parseDate(expires), parseDate(now)) ||
-          isAfter(parseDate(expires), parseDate(now)))
+      ({ status, expireTime }) =>
+        status === GiftCertificate_Status.Available &&
+        (isSameDay(parseDate(expireTime), parseDate(now)) ||
+          isAfter(parseDate(expireTime), parseDate(now)))
     )
-    .map(({ number, expires }) =>
+    .map(({ number, expireTime }) =>
       createPaymentOption(
         "Företagsbiljett",
-        PaymentType.Foretagsbiljett,
+        PaymentType.GiftCertificate,
         number,
-        expires
+        expireTime
       )
     );
 };
@@ -65,7 +60,7 @@ export const stringifyOption = (option: DisplayPaymentOption): string => {
 };
 
 export const createPaymentOptions = (
-  biljetter: SingleShowing_me_foretagsbiljetter[]
+  biljetter: SingleShowingQuery["me"]["giftCertificates"]
 ) => [
   createPaymentOption("Swish", PaymentType.Swish),
   ...createForetagsbiljetter(biljetter),

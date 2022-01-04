@@ -19,11 +19,7 @@ import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { RedButton } from "../common/ui/MainButton";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
-import { SfShowingsQuery_movie_showings } from "../new-showing/hooks/__generated__/SfShowingsQuery";
-import {
-  EditShowing_previousLocations,
-  EditShowing_showing,
-} from "./__generated__/EditShowing";
+import { EditShowingQuery, FilmstadenShowing } from "../../__generated__/types";
 
 const today = new Date();
 
@@ -39,26 +35,26 @@ type SetShowingValueFn = <K extends keyof EditShowingFormShowing>(
 interface EditShowingFormShowing {
   date: string;
   expectedBuyDate: Date;
-  filmstadenRemoteEntityId: string | null;
+  filmstadenRemoteEntityID: string | null | undefined;
   location: string;
   time: string;
   price: string;
 }
 
 const getInitialState = (
-  showing: EditShowing_showing
+  showing: EditShowingQuery["showing"]
 ): EditShowingFormShowing => ({
-  date: showing.date,
-  filmstadenRemoteEntityId: showing.filmstadenRemoteEntityId,
+  date: showing!.date,
+  filmstadenRemoteEntityID: showing!.filmstadenShowingID,
   expectedBuyDate: addDays(today, 7),
-  location: showing.location.name,
-  time: showing.time,
-  price: showing.price !== null ? String(showing.price / 100) : "",
+  location: showing!.location,
+  time: showing!.time,
+  price: showing!.price !== null ? String(showing!.price / 100) : "",
 });
 
 interface Props {
-  showing: EditShowing_showing;
-  previousLocations: EditShowing_previousLocations[];
+  showing: EditShowingQuery["showing"];
+  previousLocations: EditShowingQuery["previouslyUsedLocations"];
 }
 
 const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
@@ -68,7 +64,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
     getInitialState(showing)
   );
 
-  const { movie, admin, ticketsBought } = showing;
+  const { movie, admin, ticketsBought } = showing!;
 
   const updateShowing = useUpdateShowing();
   const deleteShowing = useDeleteShowing();
@@ -77,26 +73,26 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
     const proceed = window.confirm("Är du säker? Går ej att ångra!");
 
     if (proceed) {
-      deleteShowing(showing.id).then(() => {
+      deleteShowing(showing!.id).then(() => {
         navigate("/showings");
       });
     }
   }, [deleteShowing, showing, navigate]);
 
   const handleSubmit = () => {
-    updateShowing(showing.id, {
+    updateShowing(showing!.id, {
       date: formState.date,
-      expectedBuyDate: formatYMD(formState.expectedBuyDate),
-      private: showing.private,
-      payToUser: showing.payToUser.id,
+      //      expectedBuyDate: formatYMD(formState.expectedBuyDate), // TODO re-add these two maybe?
+      //      private: showing!.private,
+      payToUser: showing!.payToUser.id,
       location: formState.location,
       time: formState.time,
-      filmstadenRemoteEntityId: formState.filmstadenRemoteEntityId,
+      filmstadenRemoteEntityID: formState.filmstadenRemoteEntityID,
       price: (parseInt(formState.price, 10) || 0) * 100,
     })
       .then(() => {
         setErrors(null);
-        navigators.navigateToShowing(navigate, showing);
+        navigators.navigateToShowing(navigate, showing!);
       })
       .catch((errors) => {
         setErrors(errors);
@@ -110,11 +106,11 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
     }));
   }, []);
 
-  const handleSfTimeSelect = (sfShowing: SfShowingsQuery_movie_showings) => {
-    const { filmstadenRemoteEntityId, cinemaName, timeUtc } = sfShowing;
+  const handleSfTimeSelect = (sfShowing: FilmstadenShowing) => {
+    const { filmstadenRemoteEntityID, cinemaName, timeUtc } = sfShowing;
     setFormState((state) => ({
       ...state,
-      filmstadenRemoteEntityId,
+      filmstadenRemoteEntityID: filmstadenRemoteEntityID,
       location: cinemaName,
       time: formatLocalTime(timeUtc),
     }));
@@ -123,7 +119,7 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
   const handleOtherTimeSelect = (time: string) => {
     setFormState((state) => ({
       ...state,
-      filmstadenRemoteEntityId: null,
+      filmstadenRemoteEntityID: null,
       time,
     }));
   };
@@ -144,8 +140,8 @@ const EditShowingForm: React.FC<Props> = ({ showing, previousLocations }) => {
           onSelectShowing={handleSfTimeSelect}
           movieId={movie.id}
           date={formState.date}
-          filmstadenRemoteEntityId={formState.filmstadenRemoteEntityId}
-          city={showing.location.cityAlias || "GB"}
+          filmstadenRemoteEntityId={formState.filmstadenRemoteEntityID}
+          city={"GB"} // TODO: allow for variable
         />
         <SmallHeader>...eller skapa egen tid</SmallHeader>
         <Field text="Tid:">

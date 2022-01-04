@@ -6,7 +6,7 @@ extend type Showing {
 # A ticket assigned to a user that allows access to Filmstaden
 type Ticket {
     id: String!
-    showingID: ShowingID!
+    showingID: UUID!
     assignedToUser: UserID!
     profileID: String
     barcode: String!

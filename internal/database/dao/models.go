@@ -39,27 +39,6 @@ type GiftCertificate struct {
 	CreateTime time.Time `json:"createTime"`
 }
 
-type Location struct {
-	Name          string          `json:"name"`
-	CityAlias     sql.NullString  `json:"cityAlias"`
-	City          sql.NullString  `json:"city"`
-	StreetAddress sql.NullString  `json:"streetAddress"`
-	PostalCode    sql.NullString  `json:"postalCode"`
-	PostalAddress sql.NullString  `json:"postalAddress"`
-	Latitude      sql.NullFloat64 `json:"latitude"`
-	Longitude     sql.NullFloat64 `json:"longitude"`
-	FilmstadenID  sql.NullString  `json:"filmstadenID"`
-	UpdateTime    time.Time       `json:"updateTime"`
-	CreateTime    time.Time       `json:"createTime"`
-}
-
-type LocationAlias struct {
-	Location   sql.NullString `json:"location"`
-	Alias      string         `json:"alias"`
-	UpdateTime time.Time      `json:"updateTime"`
-	CreateTime time.Time      `json:"createTime"`
-}
-
 type Movie struct {
 	ID             uuid.UUID      `json:"id"`
 	FilmstadenID   string         `json:"filmstadenID"`
@@ -84,13 +63,14 @@ type Showing struct {
 	Date                time.Time      `json:"date"`
 	Time                time.Time      `json:"time"`
 	MovieID             uuid.UUID      `json:"movieID"`
-	LocationID          string         `json:"locationID"`
+	Location            string         `json:"location"`
 	CinemaScreenID      sql.NullString `json:"cinemaScreenID"`
 	FilmstadenShowingID sql.NullString `json:"filmstadenShowingID"`
 	Price               int32          `json:"price"`
 	TicketsBought       bool           `json:"ticketsBought"`
 	Admin               uuid.UUID      `json:"admin"`
 	PayToUser           uuid.UUID      `json:"payToUser"`
+	Private             bool           `json:"private"`
 	UpdateTime          time.Time      `json:"updateTime"`
 	CreateTime          time.Time      `json:"createTime"`
 }

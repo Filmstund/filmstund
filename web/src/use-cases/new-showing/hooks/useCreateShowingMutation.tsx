@@ -2,12 +2,12 @@ import { useMutation } from "@apollo/client";
 import { gql } from "@apollo/client";
 import { oldShowingFragment } from "../../common/showing/Showing";
 import {
-  CreateShowing,
-  CreateShowingVariables,
-} from "./__generated__/CreateShowing";
+  CreateShowingMutation,
+  CreateShowingMutationVariables,
+} from "../../../__generated__/types";
 
 export const useCreateShowingMutation = () =>
-  useMutation<CreateShowing, CreateShowingVariables>(
+  useMutation<CreateShowingMutation, CreateShowingMutationVariables>(
     gql`
       mutation CreateShowing($showing: CreateShowingInput!) {
         showing: createShowing(showing: $showing) {

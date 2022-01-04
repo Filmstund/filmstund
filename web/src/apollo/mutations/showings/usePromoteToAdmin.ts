@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import {
-  PromoteToAdmin,
-  PromoteToAdminVariables,
-} from "./__generated__/PromoteToAdmin";
+  PromoteToAdminMutation,
+  PromoteToAdminMutationVariables,
+} from "../../../__generated__/types";
 
 const promoteToAdminMutation = gql`
   mutation PromoteToAdmin($showingId: UUID!, $userId: UserID!) {
-    promoteToAdmin(showingId: $showingId, userToPromote: $userId) {
+    promoteToAdmin(showingID: $showingId, userToPromote: $userId) {
       admin {
         id
       }
@@ -31,9 +31,10 @@ const promoteToAdminMutation = gql`
 `;
 
 export const usePromoteToAdmin = () => {
-  const [mutate] = useMutation<PromoteToAdmin, PromoteToAdminVariables>(
-    promoteToAdminMutation
-  );
+  const [mutate] = useMutation<
+    PromoteToAdminMutation,
+    PromoteToAdminMutationVariables
+  >(promoteToAdminMutation);
 
   return (showingId: string, userId: string) =>
     mutate({

@@ -1,21 +1,21 @@
 import { NavigateFunction } from "react-router-dom";
 
 interface NavigateToShowingParams {
-  webId: string;
+  webID: string;
   slug: string;
 }
 
 export const navigateToShowing = (
   navigate: NavigateFunction,
-  { webId, slug }: NavigateToShowingParams
-) => navigate(`/showings/${webId}/${slug}`);
+  { webID, slug }: NavigateToShowingParams
+) => navigate(`/showings/${webID}/${slug}`);
 
 export const navigateToEditShowing = (
   navigate: NavigateFunction,
-  { webId, slug }: NavigateToShowingParams
-) => navigate(`/showings/${webId}/${slug}/edit`);
+  { webID, slug }: NavigateToShowingParams
+) => navigate(`/showings/${webID}/${slug}/edit`);
 
 export const navigateToShowingTickets = (
   navigate: NavigateFunction,
-  { webId, slug }: NavigateToShowingParams
-) => navigate(`/showings/${webId}/${slug}/tickets`);
+  { webID, slug }: NavigateToShowingParams
+) => navigate(`/showings/${webID}/${slug}/tickets`);

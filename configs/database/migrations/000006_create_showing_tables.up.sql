@@ -1,30 +1,4 @@
 BEGIN TRANSACTION;
-create table locations
-(
-    name           varchar(100)             not null
-        constraint location_pk primary key,
-    city_alias     varchar(2)               null,
-    city           varchar(100)             null,
-    street_address varchar(100)             null,
-    postal_code    varchar(10)              null,
-    postal_address varchar(100)             null,
-    latitude       float                    null,
-    longitude      float                    null,
-    filmstaden_id  varchar(15)              null
-        constraint location_fsId_unique unique,
-    update_time    timestamp with time zone not null default current_timestamp,
-    create_time    timestamp with time zone not null default current_timestamp
-);
-
-create table location_aliases
-(
-    location    varchar(100)
-        constraint location_alias_fk references locations on delete cascade,
-    alias       varchar(100)
-        constraint alias_uniq unique     not null,
-    update_time timestamp with time zone not null default current_timestamp,
-    create_time timestamp with time zone not null default current_timestamp
-);
 
 create table cinema_screens
 (
@@ -45,8 +19,7 @@ create table showings
     time                  time without time zone not null,
     movie_id              uuid                   not null
         constraint showing_movie_fk references movies on delete no action,
-    location_id           varchar(100)           not null
-        constraint showing_location_fk references locations on delete CASCADE,
+    location              varchar(256)           not null,
     cinema_screen_id      varchar(50)            null
         constraint showing_cs_fk references cinema_screens on delete set null,
     filmstaden_showing_id varchar(50)            null,
@@ -57,6 +30,7 @@ create table showings
         constraint showing_admin_fk references users,
     pay_to_user           uuid                   not null
         constraint showing_paytouser_fk references users,
+    private               boolean                not null default false,
     update_time           timestamp              not null default current_timestamp,
     create_time           timestamp              not null default current_timestamp
 );

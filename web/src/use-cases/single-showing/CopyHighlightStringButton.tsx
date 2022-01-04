@@ -2,23 +2,20 @@ import React from "react";
 import copy from "../../lib/copy";
 import { useFadeState } from "../common/hooks/useFadeState";
 import { GrayButton } from "../common/ui/MainButton";
-import {
-  SingleShowing_showing_participants,
-  SingleShowing_showing_participants_user,
-} from "./containers/__generated__/SingleShowing";
+import { ParticipantsListFragment } from "../../__generated__/types";
 
 const mapToUserAndFilterMe = (
-  participants: SingleShowing_showing_participants[],
+  participants: ParticipantsListFragment[],
   meId: SeFilmUserID
-): SingleShowing_showing_participants_user[] =>
+): ParticipantsListFragment["userInfo"][] =>
   participants
-    .map((p) => p.user)
+    .map((p) => p.userInfo)
     .filter(
       (f) => !!f && f.id !== meId
-    ) as SingleShowing_showing_participants_user[];
+    ) as ParticipantsListFragment["userInfo"][];
 
 const formatParticipants = (
-  users: SingleShowing_showing_participants_user[]
+  users: ParticipantsListFragment["userInfo"][]
 ): string => {
   const nicks = users.map(
     (user) => user.nick || `${user.firstName} ${user.lastName}`
@@ -31,7 +28,7 @@ const formatParticipants = (
 
 export const CopyHighlightStringButton: React.FC<{
   meId: SeFilmUserID;
-  participants: SingleShowing_showing_participants[];
+  participants: ParticipantsListFragment[];
 }> = ({ participants, meId }) => {
   const [active, bump] = useFadeState();
 

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import * as React from "react";
 import { completeUserFragment } from "../../apollo/queries/currentUser";
-import { UserProfile } from "./__generated__/UserProfile";
+import { UserProfileQuery } from "../../__generated__/types";
 import Profile from "./ProfileView";
 import { suspend } from "suspend-react";
 import { client } from "../../store/apollo";
@@ -19,7 +19,7 @@ const query = gql`
 const UserScreen = () => {
   const { data } = suspend(
     () =>
-      client.query<UserProfile>({
+      client.query<UserProfileQuery>({
         query,
         canonizeResults: true,
         fetchPolicy: "network-only",

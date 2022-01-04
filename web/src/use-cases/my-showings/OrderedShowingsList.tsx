@@ -4,7 +4,7 @@ import {
   navigateToShowing,
   navigateToShowingTickets,
 } from "../common/navigators";
-import { ShowingNeue } from "../common/showing/__generated__/ShowingNeue";
+import { ShowingNeueFragment } from "../../__generated__/types";
 import { ShowingNeue as ShowingNeueComponent } from "../common/showing/ShowingNeue";
 import { EmptyList } from "../common/ui/EmptyList";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
@@ -12,7 +12,7 @@ import { showingDate } from "./utils/filtersCreators";
 import { useNavigate } from "react-router-dom";
 
 interface OrderedShowingsListProps {
-  showings: ShowingNeue[];
+  showings: ShowingNeueFragment[];
   order: "asc" | "desc";
 }
 

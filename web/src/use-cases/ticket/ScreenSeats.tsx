@@ -1,10 +1,7 @@
 import styled from "@emotion/styled";
 import { flatMap, groupBy, map } from "lodash";
 import React from "react";
-import {
-  TicketQuery_showing_filmstadenSeatMap,
-  TicketQuery_showing_ticketRange,
-} from "../showing-tickets/__generated__/TicketQuery";
+import { TicketFragment } from "../../__generated__/types";
 
 const Seat = styled.div<{ selected: boolean }>(({ selected }) => ({
   backgroundColor: selected ? "#d0021b" : "#9b9b9b",
@@ -20,11 +17,12 @@ const Screen = styled.div<{ height: number; width: number }>`
 `;
 
 interface Props {
-  ticketRange: TicketQuery_showing_ticketRange;
-  seatMap: TicketQuery_showing_filmstadenSeatMap[];
+  ticketRange: TicketFragment["ticketRange"];
+  seatMap: TicketFragment["filmstadenSeatMap"];
 }
 
 export const ScreenSeats: React.FC<Props> = ({ ticketRange, seatMap }) => {
+  ticketRange = ticketRange!;
   if (seatMap.length === 0) {
     return null;
   }

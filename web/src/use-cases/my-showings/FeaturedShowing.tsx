@@ -10,7 +10,7 @@ import {
 } from "../common/navigators";
 import { ShowingNeue } from "../common/showing/ShowingNeue";
 import { FullWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { HomeQuery_showings } from "./__generated__/HomeQuery";
+import { HomeQueryQuery, ShowingNeueFragment } from "../../__generated__/types";
 import { ItsHappeningTitle } from "./ItsHappeningTitle";
 import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import {
@@ -19,7 +19,7 @@ import {
 } from "./utils/filtersCreators";
 
 interface FeaturedShowingProps {
-  showings: HomeQuery_showings[];
+  showings: HomeQueryQuery["showings"];
   meId: string;
 }
 
@@ -38,7 +38,7 @@ export const FeaturedShowing: React.FC<FeaturedShowingProps> = ({
       isSameDay(compareTime, showingDate(s))
   );
 
-  const featuredShowing: HomeQuery_showings | undefined = orderBy(
+  const featuredShowing: ShowingNeueFragment | undefined = orderBy(
     todayShowings,
     [showingDate],
     ["asc"]

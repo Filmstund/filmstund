@@ -11,7 +11,7 @@ import MainButton from "../common/ui/MainButton";
 import CopyValue from "../common/utils/CopyValue";
 import { PageTitle } from "../common/utils/PageTitle";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
-import { UserProfile_me } from "./__generated__/UserProfile";
+import { UserProfileQuery } from "../../__generated__/types";
 
 import { ForetagsbiljettList } from "./ForetagsbiljettList";
 
@@ -23,7 +23,7 @@ const Box = styled.div`
   height: 96px;
 `;
 
-const AvatarImage = styled.div<{ src: string | null }>`
+const AvatarImage = styled.div<{ src: string | undefined | null }>`
   background-image: url(${(props) => props.src}), url(${alfons});
   background-size: cover;
   background-position: center;
@@ -41,7 +41,7 @@ const UserInfo = styled.div`
 `;
 
 interface Props {
-  me: UserProfile_me;
+  me: UserProfileQuery["me"];
 }
 
 const Profile: React.FC<Props> = ({ me }) => {
@@ -50,28 +50,28 @@ const Profile: React.FC<Props> = ({ me }) => {
 
   const success = called && !loading && !error && showSuccessMessage;
 
-  const [{ phone, filmstadenMembershipId, nick }, handleChange, setEditedUser] =
+  const [{ phone, filmstadenMembershipID, nick }, handleChange, setEditedUser] =
     useStateWithHandleChangeName({
       nick: me.nick || "",
       phone: me.phone || "",
-      filmstadenMembershipId: me.filmstadenMembershipId || "",
+      filmstadenMembershipID: me.filmstadenMembershipID || "",
     });
 
   const handleSubmit = () => {
     const trimmedValues = trim({
       nick,
       phone,
-      filmstadenMembershipId,
+      filmstadenMembershipId: filmstadenMembershipID,
     });
 
     mutate({ variables: { user: trimmedValues } }).then(({ data }) => {
       if (data) {
-        const { nick, phone, filmstadenMembershipId } = data.editedUser;
+        const { nick, phone, filmstadenMembershipID } = data.editedUser;
 
         setEditedUser({
           nick: nick || "",
           phone: phone || "",
-          filmstadenMembershipId: filmstadenMembershipId || "",
+          filmstadenMembershipID: filmstadenMembershipID || "",
         });
 
         bump();
@@ -83,7 +83,7 @@ const Profile: React.FC<Props> = ({ me }) => {
     <>
       <PageTitle title="Profil" />
       <Box>
-        <AvatarImage src={me.avatar} />
+        <AvatarImage src={me.avatarURL} />
         <UserInfo>
           {me.nick && <UserName>{me.nick}</UserName>}
           <div>{me.name}</div>
@@ -101,7 +101,7 @@ const Profile: React.FC<Props> = ({ me }) => {
       <Field text="Filmstaden medlemsnummer:">
         <Input
           type="text"
-          value={filmstadenMembershipId}
+          value={filmstadenMembershipID}
           name="filmstadenMembershipId"
           placeholder="XXX-XXX"
           maxLength={7}
@@ -121,7 +121,7 @@ const Profile: React.FC<Props> = ({ me }) => {
         {me.calendarFeedUrl && <CopyValue text={me.calendarFeedUrl} />}
       </FieldWithoutMaxWidth>
       <MainButton onClick={handleSubmit}>Spara användare</MainButton>
-      <ForetagsbiljettList foretagsbiljetter={me.foretagsbiljetter || []} />
+      <ForetagsbiljettList foretagsbiljetter={me.giftCertificates || []} />
     </>
   );
 };

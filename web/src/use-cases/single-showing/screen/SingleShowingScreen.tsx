@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import SingleShowingContainer from "../containers/SingleShowingContainer";
 
 const SingleShowingScreen = () => {
-  const { webId } = useParams<"webId">();
+  const { webID } = useParams<"webID">();
 
-  return <SingleShowingContainer webId={webId!} />;
+  return <SingleShowingContainer webID={webID!} />;
 };
 
 export default SingleShowingScreen;

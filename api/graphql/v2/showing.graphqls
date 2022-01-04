@@ -1,34 +1,34 @@
 type Query {
-    showing(id: ShowingID, webID: Base64ID): Showing
+    showing(id: UUID, webID: Base64ID): Showing
     publicShowings(afterDate: LocalDate): [Showing!]!
-    showingForMovie(movieId: MovieID): [Showing!]!
+    showingForMovie(movieId: UUID): [Showing!]!
 }
 
 type Mutation {
-    attendShowing(showingID: ShowingID!, paymentOption: PaymentOption!): Showing!
-    unattendShowing(showingID: ShowingID!): Showing!
+    attendShowing(showingID: UUID!, paymentOption: PaymentOption!): Showing!
+    unattendShowing(showingID: UUID!): Showing!
 
     createShowing(showing: CreateShowingInput!): Showing!
 
     # Delete a showing and return all public showings
-    deleteShowing(showingID: ShowingID!): [Showing!]!
+    deleteShowing(showingID: UUID!): [Showing!]!
 
-    markAsBought(showingID: ShowingID!, price: SEK!): Showing!
-    processTicketUrls(showingID: ShowingID!, ticketUrls: [String!]): Showing!
+    markAsBought(showingID: UUID!, price: SEK!): Showing!
+    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing!
 
-    updateShowing(showingID: ShowingID!, newValues: UpdateShowingInput): Showing!
+    updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing!
 
-    promoteToAdmin(showingID: ShowingID!, userToPromote: UserID!): Showing!
+    promoteToAdmin(showingID: UUID!, userToPromote: UserID!): Showing!
 }
 
 type Showing {
-    id: ShowingID!
+    id: UUID!
     webID: Base64ID!
     filmstadenShowingID: String
     slug: String!
     date: String!
     time: String!
-    movieID: MovieID!
+    movieID: UUID!
     movieTitle: String!
     movie: Movie!
     location: String!
@@ -36,16 +36,17 @@ type Showing {
     price: SEK
     ticketsBought: Boolean!
     admin: PublicUser!
+    private: Boolean!
     payToUser: PublicUser!
-    lastModifiedDate: String!
-    createdDate: String!
+    updateTime: String!
+    createTime: String!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
     attendees: [PublicAttendee!]!
 }
 
 type PublicAttendee {
     userID: UserID!
-    showingID: ShowingID!
+    showingID: UUID!
     userInfo: PublicUser!
 }
 
@@ -73,7 +74,7 @@ enum PaymentType {
 input CreateShowingInput {
     date: LocalDate!
     time: LocalTime!
-    movieID: MovieID!
+    movieID: UUID!
     location: String!
     filmstadenScreen: CinemaScreenInput
     filmstadenRemoteEntityID: String

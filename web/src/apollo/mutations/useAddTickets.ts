@@ -1,12 +1,15 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 
-import { AddTickets, AddTicketsVariables } from "./__generated__/AddTickets";
+import {
+  AddTicketsMutation,
+  AddTicketsMutationVariables,
+} from "../../__generated__/types";
 
 export const ticketFragment = gql`
   fragment Ticket on Showing {
     id
-    webId
+    webID
     slug
     admin {
       id
@@ -38,7 +41,7 @@ export const ticketFragment = gql`
       customerTypeDefinition
       cinema
       screen
-      profileId
+      profileID
       seat {
         row
         number
@@ -47,14 +50,14 @@ export const ticketFragment = gql`
       time
       movieName
       movieRating
-      showAttributes
+      attributes
     }
   }
 `;
 
 const addTicketsMutation = gql`
   mutation AddTickets($showingId: UUID!, $tickets: [String!]) {
-    processTicketUrls(showingId: $showingId, ticketUrls: $tickets) {
+    processTicketUrls(showingID: $showingId, ticketUrls: $tickets) {
       ...Ticket
     }
   }
@@ -62,4 +65,6 @@ const addTicketsMutation = gql`
 `;
 
 export const useAddTickets = () =>
-  useMutation<AddTickets, AddTicketsVariables>(addTicketsMutation);
+  useMutation<AddTicketsMutation, AddTicketsMutationVariables>(
+    addTicketsMutation
+  );

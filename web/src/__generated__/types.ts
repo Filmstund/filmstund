@@ -21,9 +21,7 @@ export type Scalars = {
   IMDbID: any;
   LocalDate: any;
   LocalTime: any;
-  MovieID: any;
   SEK: any;
-  ShowingID: any;
   TMDbID: any;
   Time: any;
   UUID: any;
@@ -34,7 +32,7 @@ export type AdminPaymentDetails = {
   __typename?: "AdminPaymentDetails";
   attendees: Array<Attendee>;
   filmstadenBuyLink?: Maybe<Scalars["String"]>;
-  showingID?: Maybe<Scalars["ShowingID"]>;
+  showingID: Scalars["UUID"];
 };
 
 export type Attendee = {
@@ -43,7 +41,7 @@ export type Attendee = {
   filmstadenMembershipID?: Maybe<Scalars["String"]>;
   giftCertificateUsed?: Maybe<GiftCertificate>;
   hasPaid: Scalars["Boolean"];
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
   type: PaymentType;
   user: PublicUser;
   userID: Scalars["UserID"];
@@ -61,7 +59,7 @@ export type AttendeePaymentDetails = {
 export type AttendeePaymentInfoInput = {
   amountOwed: Scalars["SEK"];
   hasPaid: Scalars["Boolean"];
-  showingID?: InputMaybe<Scalars["ShowingID"]>;
+  showingID: Scalars["UUID"];
   userID: Scalars["UserID"];
 };
 
@@ -87,8 +85,14 @@ export type CreateShowingInput = {
   filmstadenRemoteEntityID?: InputMaybe<Scalars["String"]>;
   filmstadenScreen?: InputMaybe<CinemaScreenInput>;
   location: Scalars["String"];
-  movieID: Scalars["MovieID"];
+  movieID: Scalars["UUID"];
   time: Scalars["LocalTime"];
+};
+
+export type FilmstadenCityAlias = {
+  __typename?: "FilmstadenCityAlias";
+  alias: Scalars["String"];
+  name: Scalars["String"];
 };
 
 export type FilmstadenLiteScreen = {
@@ -153,9 +157,8 @@ export type Movie = {
   archived: Scalars["Boolean"];
   createTime: Scalars["String"];
   filmstadenID: Scalars["String"];
-  filmstadenShowings: Array<FilmstadenShowing>;
   genres: Array<Scalars["String"]>;
-  id: Scalars["MovieID"];
+  id: Scalars["UUID"];
   imdbID?: Maybe<Scalars["IMDbID"]>;
   poster?: Maybe<Scalars["String"]>;
   productionYear: Scalars["Int"];
@@ -165,11 +168,6 @@ export type Movie = {
   title: Scalars["String"];
   tmdbID?: Maybe<Scalars["TMDbID"]>;
   updateTime: Scalars["String"];
-};
-
-export type MovieFilmstadenShowingsArgs = {
-  afterDate?: InputMaybe<Scalars["LocalDate"]>;
-  city?: InputMaybe<Scalars["String"]>;
 };
 
 export type Mutation = {
@@ -197,7 +195,7 @@ export type MutationAddGiftCertificatesArgs = {
 
 export type MutationAttendShowingArgs = {
   paymentOption: PaymentOption;
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
 };
 
 export type MutationCreateShowingArgs = {
@@ -209,7 +207,7 @@ export type MutationDeleteGiftCertificateArgs = {
 };
 
 export type MutationDeleteShowingArgs = {
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
 };
 
 export type MutationFetchNewMoviesFromFilmstadenArgs = {
@@ -218,21 +216,21 @@ export type MutationFetchNewMoviesFromFilmstadenArgs = {
 
 export type MutationMarkAsBoughtArgs = {
   price: Scalars["SEK"];
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
 };
 
 export type MutationProcessTicketUrlsArgs = {
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
   ticketUrls?: InputMaybe<Array<Scalars["String"]>>;
 };
 
 export type MutationPromoteToAdminArgs = {
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
   userToPromote: Scalars["UserID"];
 };
 
 export type MutationUnattendShowingArgs = {
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
 };
 
 export type MutationUpdateAttendeePaymentInfoArgs = {
@@ -241,7 +239,7 @@ export type MutationUpdateAttendeePaymentInfoArgs = {
 
 export type MutationUpdateShowingArgs = {
   newValues?: InputMaybe<UpdateShowingInput>;
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
 };
 
 export type MutationUpdateUserArgs = {
@@ -260,18 +258,18 @@ export enum PaymentType {
 
 export type PublicAttendee = {
   __typename?: "PublicAttendee";
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
   userID: Scalars["UserID"];
   userInfo: PublicUser;
 };
 
 export type PublicUser = {
   __typename?: "PublicUser";
-  avatar?: Maybe<Scalars["String"]>;
-  firstName?: Maybe<Scalars["String"]>;
+  avatarURL?: Maybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   id: Scalars["UserID"];
-  lastName?: Maybe<Scalars["String"]>;
-  name?: Maybe<Scalars["String"]>;
+  lastName: Scalars["String"];
+  name: Scalars["String"];
   nick?: Maybe<Scalars["String"]>;
   phone?: Maybe<Scalars["String"]>;
 };
@@ -283,15 +281,24 @@ export type Query = {
   allUsers: Array<PublicUser>;
   archivedMovies: Array<Movie>;
   currentUser: User;
+  filmstadenCities: Array<FilmstadenCityAlias>;
+  filmstadenShowings: Array<FilmstadenShowing>;
   movie?: Maybe<Movie>;
+  previouslyUsedLocations: Array<Scalars["String"]>;
   publicShowings: Array<Showing>;
   randomCommandment: Commandments;
   showing?: Maybe<Showing>;
   showingForMovie: Array<Showing>;
 };
 
+export type QueryFilmstadenShowingsArgs = {
+  afterDate?: InputMaybe<Scalars["LocalDate"]>;
+  city?: InputMaybe<Scalars["String"]>;
+  movieID: Scalars["UUID"];
+};
+
 export type QueryMovieArgs = {
-  id: Scalars["MovieID"];
+  id: Scalars["UUID"];
 };
 
 export type QueryPublicShowingsArgs = {
@@ -299,12 +306,12 @@ export type QueryPublicShowingsArgs = {
 };
 
 export type QueryShowingArgs = {
-  id?: InputMaybe<Scalars["ShowingID"]>;
+  id?: InputMaybe<Scalars["UUID"]>;
   webID?: InputMaybe<Scalars["Base64ID"]>;
 };
 
 export type QueryShowingForMovieArgs = {
-  movieId?: InputMaybe<Scalars["MovieID"]>;
+  movieId?: InputMaybe<Scalars["UUID"]>;
 };
 
 export type Seat = {
@@ -326,23 +333,24 @@ export type Showing = {
   attendeePaymentDetails?: Maybe<AttendeePaymentDetails>;
   attendees: Array<PublicAttendee>;
   cinemaScreen?: Maybe<CinemaScreen>;
-  createdDate: Scalars["String"];
+  createTime: Scalars["String"];
   date: Scalars["String"];
   filmstadenSeatMap: Array<FilmstadenSeatMap>;
   filmstadenShowingID?: Maybe<Scalars["String"]>;
-  id: Scalars["ShowingID"];
-  lastModifiedDate: Scalars["String"];
+  id: Scalars["UUID"];
   location: Scalars["String"];
   movie: Movie;
-  movieID: Scalars["MovieID"];
+  movieID: Scalars["UUID"];
   movieTitle: Scalars["String"];
   myTickets: Array<Ticket>;
   payToUser: PublicUser;
   price?: Maybe<Scalars["SEK"]>;
+  private: Scalars["Boolean"];
   slug: Scalars["String"];
   ticketRange?: Maybe<TicketRange>;
   ticketsBought: Scalars["Boolean"];
   time: Scalars["String"];
+  updateTime: Scalars["String"];
   webID: Scalars["Base64ID"];
 };
 
@@ -362,7 +370,7 @@ export type Ticket = {
   profileID?: Maybe<Scalars["String"]>;
   screen: Scalars["String"];
   seat: Seat;
-  showingID: Scalars["ShowingID"];
+  showingID: Scalars["UUID"];
   time: Scalars["String"];
 };
 
@@ -385,7 +393,7 @@ export type UpdateShowingInput = {
 export type User = {
   __typename?: "User";
   avatarURL?: Maybe<Scalars["String"]>;
-  calendarFeedID?: Maybe<Scalars["String"]>;
+  calendarFeedID?: Maybe<Scalars["UUID"]>;
   calendarFeedUrl?: Maybe<Scalars["String"]>;
   email: Scalars["String"];
   filmstadenMembershipID?: Maybe<Scalars["FilmstadenMembershipID"]>;
@@ -407,4 +415,628 @@ export type UserDetailsInput = {
   lastName?: InputMaybe<Scalars["String"]>;
   nick?: InputMaybe<Scalars["String"]>;
   phone?: InputMaybe<Scalars["String"]>;
+};
+
+export type ShowingParticipantFragment = {
+  __typename?: "Showing";
+  id: any;
+  attendees: Array<{
+    __typename?: "PublicAttendee";
+    userInfo: {
+      __typename?: "PublicUser";
+      id: any;
+      nick?: string | null | undefined;
+      firstName: string;
+      lastName: string;
+      avatarURL?: string | null | undefined;
+    };
+  }>;
+};
+
+export type AttendShowingMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+  paymentOption: PaymentOption;
+}>;
+
+export type AttendShowingMutation = {
+  __typename?: "Mutation";
+  attendShowing: { __typename?: "Showing" } & ShowingParticipantFragment;
+};
+
+export type UnattendShowingMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+}>;
+
+export type UnattendShowingMutation = {
+  __typename?: "Mutation";
+  unattendShowing: { __typename?: "Showing" } & ShowingParticipantFragment;
+};
+
+export type DeleteShowingMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+}>;
+
+export type DeleteShowingMutation = {
+  __typename?: "Mutation";
+  deleteShowing: Array<{ __typename?: "Showing"; id: any }>;
+};
+
+export type MarkShowingAsBoughtMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+  price: Scalars["SEK"];
+}>;
+
+export type MarkShowingAsBoughtMutation = {
+  __typename?: "Mutation";
+  markAsBought: {
+    __typename?: "Showing";
+    id: any;
+    ticketsBought: boolean;
+    price?: any | null | undefined;
+    private: boolean;
+    date: string;
+    time: string;
+    payToUser: { __typename?: "PublicUser"; id: any };
+    myTickets: Array<{ __typename?: "Ticket"; id: string }>;
+    attendeePaymentDetails?:
+      | {
+          __typename?: "AttendeePaymentDetails";
+          swishLink?: string | null | undefined;
+          hasPaid: boolean;
+          amountOwed: any;
+          payTo: {
+            __typename?: "PublicUser";
+            id: any;
+            nick?: string | null | undefined;
+            firstName: string;
+            lastName: string;
+            phone?: string | null | undefined;
+          };
+        }
+      | null
+      | undefined;
+    adminPaymentDetails?:
+      | {
+          __typename?: "AdminPaymentDetails";
+          attendees: Array<{
+            __typename?: "Attendee";
+            userID: any;
+            hasPaid: boolean;
+            amountOwed: any;
+            user: {
+              __typename?: "PublicUser";
+              id: any;
+              nick?: string | null | undefined;
+              name: string;
+              phone?: string | null | undefined;
+            };
+          }>;
+        }
+      | null
+      | undefined;
+  };
+};
+
+export type PromoteToAdminMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+  userId: Scalars["UserID"];
+}>;
+
+export type PromoteToAdminMutation = {
+  __typename?: "Mutation";
+  promoteToAdmin: {
+    __typename?: "Showing";
+    admin: { __typename?: "PublicUser"; id: any };
+    payToUser: { __typename?: "PublicUser"; id: any };
+    attendeePaymentDetails?:
+      | {
+          __typename?: "AttendeePaymentDetails";
+          swishLink?: string | null | undefined;
+          hasPaid: boolean;
+          amountOwed: any;
+          payTo: {
+            __typename?: "PublicUser";
+            id: any;
+            nick?: string | null | undefined;
+            firstName: string;
+            lastName: string;
+            phone?: string | null | undefined;
+          };
+        }
+      | null
+      | undefined;
+  };
+};
+
+export type TogglePaidChangeMutationVariables = Exact<{
+  paymentInfo: AttendeePaymentInfoInput;
+}>;
+
+export type TogglePaidChangeMutation = {
+  __typename?: "Mutation";
+  updateAttendeePaymentInfo: {
+    __typename?: "Attendee";
+    userID: any;
+    hasPaid: boolean;
+  };
+};
+
+export type UpdateShowingMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+  showing: UpdateShowingInput;
+}>;
+
+export type UpdateShowingMutation = {
+  __typename?: "Mutation";
+  updateShowing: {
+    __typename?: "Showing";
+    id: any;
+    time: string;
+    date: string;
+    ticketsBought: boolean;
+    price?: any | null | undefined;
+    private: boolean;
+    payToUser: { __typename?: "PublicUser"; id: any };
+  };
+};
+
+export type TicketFragment = {
+  __typename?: "Showing";
+  id: any;
+  webID: any;
+  slug: string;
+  admin: { __typename?: "PublicUser"; id: any };
+  ticketRange?:
+    | {
+        __typename?: "TicketRange";
+        rows: Array<number>;
+        seatings: Array<{
+          __typename?: "SeatRange";
+          row: number;
+          numbers: Array<number>;
+        }>;
+      }
+    | null
+    | undefined;
+  filmstadenSeatMap: Array<{
+    __typename?: "FilmstadenSeatMap";
+    row: number;
+    number: number;
+    seatType: string;
+    coordinates: {
+      __typename?: "FilmstadenSeatCoordinates";
+      x: number;
+      y: number;
+    };
+    dimensions: {
+      __typename?: "FilmstadenSeatDimensions";
+      width: number;
+      height: number;
+    };
+  }>;
+  myTickets: Array<{
+    __typename?: "Ticket";
+    id: string;
+    barcode: string;
+    customerType: string;
+    customerTypeDefinition: string;
+    cinema: string;
+    screen: string;
+    profileID?: string | null | undefined;
+    date: any;
+    time: string;
+    movieName: string;
+    movieRating: string;
+    attributes: Array<string>;
+    seat: { __typename?: "Seat"; row: number; number: number };
+  }>;
+};
+
+export type AddTicketsMutationVariables = Exact<{
+  showingId: Scalars["UUID"];
+  tickets?: InputMaybe<Array<Scalars["String"]> | Scalars["String"]>;
+}>;
+
+export type AddTicketsMutation = {
+  __typename?: "Mutation";
+  processTicketUrls: { __typename?: "Showing" } & TicketFragment;
+};
+
+export type UpdateUserMutationVariables = Exact<{
+  user: UserDetailsInput;
+}>;
+
+export type UpdateUserMutation = {
+  __typename?: "Mutation";
+  editedUser: {
+    __typename?: "User";
+    calendarFeedUrl?: string | null | undefined;
+  } & CompleteUserFragment;
+};
+
+export type CompleteUserFragment = {
+  __typename?: "User";
+  id: any;
+  name: string;
+  firstName: string;
+  lastName: string;
+  nick?: string | null | undefined;
+  email: string;
+  filmstadenMembershipID?: any | null | undefined;
+  phone?: string | null | undefined;
+  avatarURL?: string | null | undefined;
+  giftCertificates: Array<{
+    __typename?: "GiftCertificate";
+    number: string;
+    expireTime: any;
+    status: GiftCertificate_Status;
+  }>;
+};
+
+export type FetchMoviesMutationVariables = Exact<{ [key: string]: never }>;
+
+export type FetchMoviesMutation = {
+  __typename?: "Mutation";
+  fetchNewMoviesFromFilmstaden: Array<
+    { __typename?: "Movie"; id: any; releaseDate: string } & MovieFragment
+  >;
+};
+
+export type MovieFragment = {
+  __typename?: "Movie";
+  id: any;
+  poster?: string | null | undefined;
+  title: string;
+  releaseDate: string;
+};
+
+export type ShowingMovieFragment = {
+  __typename?: "Movie";
+  id: any;
+  title: string;
+  poster?: string | null | undefined;
+};
+
+export type OldShowingFragment = {
+  __typename?: "Showing";
+  id: any;
+  webID: any;
+  slug: string;
+  date: string;
+  time: string;
+  location: string;
+  ticketsBought: boolean;
+  movie: { __typename?: "Movie" } & ShowingMovieFragment;
+  admin: {
+    __typename?: "PublicUser";
+    id: any;
+    name: string;
+    nick?: string | null | undefined;
+  };
+};
+
+export type ShowingNeueFragment = {
+  __typename?: "Showing";
+  id: any;
+  date: string;
+  time: string;
+  webID: any;
+  slug: string;
+  movie: {
+    __typename?: "Movie";
+    id: any;
+    poster?: string | null | undefined;
+    title: string;
+  };
+  myTickets: Array<{ __typename?: "Ticket"; id: string }>;
+  attendees: Array<{
+    __typename?: "PublicAttendee";
+    userInfo: {
+      __typename?: "PublicUser";
+      id: any;
+      avatarURL?: string | null | undefined;
+    };
+  }>;
+};
+
+export type BioordQueryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type BioordQueryQuery = {
+  __typename?: "Query";
+  allBiobudord: Array<{
+    __typename?: "Commandments";
+    number: number;
+    phrase: string;
+  }>;
+};
+
+export type EditShowingQueryVariables = Exact<{
+  webID: Scalars["Base64ID"];
+}>;
+
+export type EditShowingQuery = {
+  __typename?: "Query";
+  previouslyUsedLocations: Array<string>;
+  me: { __typename?: "User"; id: any };
+  showing?:
+    | ({
+        __typename?: "Showing";
+        price?: any | null | undefined;
+        private: boolean;
+        filmstadenShowingID?: string | null | undefined;
+        location: string;
+        payToUser: { __typename?: "PublicUser"; id: any };
+      } & OldShowingFragment)
+    | null
+    | undefined;
+};
+
+export type HomeQueryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type HomeQueryQuery = {
+  __typename?: "Query";
+  showings: Array<
+    {
+      __typename?: "Showing";
+      id: any;
+      webID: any;
+      slug: string;
+      date: string;
+      time: string;
+      admin: { __typename?: "PublicUser"; id: any };
+      attendees: Array<{ __typename?: "PublicAttendee"; userID: any }>;
+    } & ShowingNeueFragment
+  >;
+  me: { __typename?: "User"; id: any };
+};
+
+export type CreateShowingQueryQueryVariables = Exact<{
+  movieID: Scalars["UUID"];
+}>;
+
+export type CreateShowingQueryQuery = {
+  __typename?: "Query";
+  previouslyUsedLocations: Array<string>;
+  movie?:
+    | ({ __typename?: "Movie"; releaseDate: string } & ShowingMovieFragment)
+    | null
+    | undefined;
+  me: {
+    __typename?: "User";
+    id: any;
+    nick?: string | null | undefined;
+    name: string;
+  };
+  filmstadenCities: Array<{
+    __typename?: "FilmstadenCityAlias";
+    name: string;
+    alias: string;
+  }>;
+};
+
+export type NewShowingQueryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type NewShowingQueryQuery = {
+  __typename?: "Query";
+  movies: Array<
+    { __typename?: "Movie"; id: any; releaseDate: string } & MovieFragment
+  >;
+};
+
+export type CreateShowingMutationVariables = Exact<{
+  showing: CreateShowingInput;
+}>;
+
+export type CreateShowingMutation = {
+  __typename?: "Mutation";
+  showing: { __typename?: "Showing" } & OldShowingFragment;
+};
+
+export type FsShowingsQueryQueryVariables = Exact<{
+  movieID: Scalars["UUID"];
+  city?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type FsShowingsQueryQuery = {
+  __typename?: "Query";
+  filmstadenShowings: Array<{
+    __typename?: "FilmstadenShowing";
+    cinemaName: string;
+    timeUtc: string;
+    tags: Array<string>;
+    filmstadenRemoteEntityID: string;
+    screen: {
+      __typename?: "FilmstadenLiteScreen";
+      filmstadenID: string;
+      name: string;
+    };
+  }>;
+};
+
+export type TicketQueryQueryVariables = Exact<{
+  webID: Scalars["Base64ID"];
+}>;
+
+export type TicketQueryQuery = {
+  __typename?: "Query";
+  me: { __typename?: "User"; id: any };
+  showing?: ({ __typename?: "Showing" } & TicketFragment) | null | undefined;
+};
+
+export type ShowingsQueryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ShowingsQueryQuery = {
+  __typename?: "Query";
+  showings: Array<
+    {
+      __typename?: "Showing";
+      id: any;
+      webID: any;
+      slug: string;
+      date: string;
+      time: string;
+    } & ShowingNeueFragment
+  >;
+};
+
+export type ShowingAdminFragment = {
+  __typename?: "Showing";
+  id: any;
+  price?: any | null | undefined;
+  private: boolean;
+  filmstadenShowingID?: string | null | undefined;
+  ticketsBought: boolean;
+  cinemaScreen?:
+    | { __typename?: "CinemaScreen"; id: string; name: string }
+    | null
+    | undefined;
+  payToUser: { __typename?: "PublicUser"; id: any };
+  adminPaymentDetails?:
+    | {
+        __typename?: "AdminPaymentDetails";
+        filmstadenBuyLink?: string | null | undefined;
+        attendees: Array<{
+          __typename?: "Attendee";
+          userID: any;
+          hasPaid: boolean;
+          amountOwed: any;
+          filmstadenMembershipID?: string | null | undefined;
+          giftCertificateUsed?:
+            | { __typename?: "GiftCertificate"; number: string }
+            | null
+            | undefined;
+          user: {
+            __typename?: "PublicUser";
+            id: any;
+            nick?: string | null | undefined;
+            firstName: string;
+            lastName: string;
+            phone?: string | null | undefined;
+          };
+        }>;
+      }
+    | null
+    | undefined;
+};
+
+export type BoughtShowingFragment = {
+  __typename?: "Showing";
+  myTickets: Array<{ __typename?: "Ticket"; id: string }>;
+  attendeePaymentDetails?:
+    | {
+        __typename?: "AttendeePaymentDetails";
+        amountOwed: any;
+        swishLink?: string | null | undefined;
+        hasPaid: boolean;
+        payTo: {
+          __typename?: "PublicUser";
+          id: any;
+          phone?: string | null | undefined;
+          firstName: string;
+          nick?: string | null | undefined;
+          lastName: string;
+        };
+      }
+    | null
+    | undefined;
+};
+
+export type PendingShowingFragment = {
+  __typename?: "User";
+  giftCertificates: Array<{
+    __typename?: "GiftCertificate";
+    expireTime: any;
+    number: string;
+    status: GiftCertificate_Status;
+  }>;
+};
+
+export type ParticipantsListFragment = {
+  __typename?: "PublicAttendee";
+  userInfo: {
+    __typename?: "PublicUser";
+    id: any;
+    nick?: string | null | undefined;
+    firstName: string;
+  } & UserItemFragment;
+};
+
+export type UserItemFragment = {
+  __typename?: "PublicUser";
+  avatarURL?: string | null | undefined;
+  firstName: string;
+  nick?: string | null | undefined;
+  lastName: string;
+  phone?: string | null | undefined;
+};
+
+export type SingleShowingQueryVariables = Exact<{
+  webID: Scalars["Base64ID"];
+}>;
+
+export type SingleShowingQuery = {
+  __typename?: "Query";
+  me: { __typename?: "User"; id: any } & PendingShowingFragment;
+  showing?:
+    | ({
+        __typename?: "Showing";
+        webID: any;
+        slug: string;
+        price?: any | null | undefined;
+        private: boolean;
+        movie: { __typename?: "Movie"; imdbID?: any | null | undefined };
+        attendees: Array<
+          { __typename?: "PublicAttendee" } & ParticipantsListFragment
+        >;
+      } & OldShowingFragment &
+        ShowingAdminFragment &
+        BoughtShowingFragment)
+    | null
+    | undefined;
+};
+
+export type UserProfileQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UserProfileQuery = {
+  __typename?: "Query";
+  me: {
+    __typename?: "User";
+    calendarFeedUrl?: string | null | undefined;
+  } & CompleteUserFragment;
+};
+
+export type AddForetagsbiljettMutationVariables = Exact<{
+  tickets?: InputMaybe<Array<GiftCertificateInput> | GiftCertificateInput>;
+}>;
+
+export type AddForetagsbiljettMutation = {
+  __typename?: "Mutation";
+  addGiftCertificates: {
+    __typename?: "User";
+    id: any;
+    giftCertificates: Array<{
+      __typename?: "GiftCertificate";
+      number: string;
+      expireTime: any;
+      status: GiftCertificate_Status;
+    }>;
+  };
+};
+
+export type DeleteForetagsbiljettMutationVariables = Exact<{
+  ticket: GiftCertificateInput;
+}>;
+
+export type DeleteForetagsbiljettMutation = {
+  __typename?: "Mutation";
+  deleteGiftCertificate: {
+    __typename?: "User";
+    id: any;
+    giftCertificates: Array<{
+      __typename?: "GiftCertificate";
+      number: string;
+      expireTime: any;
+      status: GiftCertificate_Status;
+    }>;
+  };
 };

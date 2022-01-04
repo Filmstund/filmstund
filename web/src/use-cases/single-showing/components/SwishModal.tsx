@@ -3,22 +3,19 @@ import React from "react";
 import { QRCode } from "./QRCode";
 import Loader from "../../common/utils/ProjectorLoader";
 import Modal from "../../common/ui/Modal";
-import { SingleShowing_showing_attendeePaymentDetails } from "../containers/__generated__/SingleShowing";
 
 interface SwishModalProps {
-  attendeePaymentDetails: SingleShowing_showing_attendeePaymentDetails | null;
+  swishLink: string | null | undefined;
   closeSwish: () => void;
 }
 
 export const SwishModal: React.VFC<SwishModalProps> = ({
-  attendeePaymentDetails,
+  swishLink,
   closeSwish,
 }) => {
-  if (!attendeePaymentDetails) {
+  if (!swishLink) {
     return <Loader />;
   }
-
-  const { swishLink } = attendeePaymentDetails;
 
   return (
     <Modal>

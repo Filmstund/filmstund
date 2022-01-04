@@ -1,22 +1,23 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import {
-  DeleteShowing,
-  DeleteShowingVariables,
-} from "./__generated__/DeleteShowing";
+  DeleteShowingMutation,
+  DeleteShowingMutationVariables,
+} from "../../../__generated__/types";
 
 const deleteShowingMutation = gql`
   mutation DeleteShowing($showingId: UUID!) {
-    deleteShowing(showingId: $showingId) {
+    deleteShowing(showingID: $showingId) {
       id
     }
   }
 `;
 
 export const useDeleteShowing = () => {
-  const [mutate] = useMutation<DeleteShowing, DeleteShowingVariables>(
-    deleteShowingMutation
-  );
+  const [mutate] = useMutation<
+    DeleteShowingMutation,
+    DeleteShowingMutationVariables
+  >(deleteShowingMutation);
 
   return (showingId: string) =>
     mutate({ variables: { showingId }, refetchQueries: ["ShowingsQuery"] });

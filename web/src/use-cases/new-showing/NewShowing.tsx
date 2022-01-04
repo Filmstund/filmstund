@@ -3,13 +3,13 @@ import React, { useCallback } from "react";
 import { useFetchMovies } from "../../apollo/queries/movies";
 
 import { movieFragment } from "../common/showing/Movie";
-import { NewShowingQuery } from "./__generated__/NewShowingQuery";
+import { NewShowingQueryQuery } from "../../__generated__/types";
 import MovieSelector from "./MovieSelector";
 import { useSearchParams } from "react-router-dom";
 import { CreateShowingForm } from "./CreateShowingForm";
 
 const NewShowing = () => {
-  const [searchParams, setSearchParams] = useSearchParams({ movieId: "" });
+  const [searchParams, setSearchParams] = useSearchParams({ movieID: "" });
 
   const { data } = useAllMovies();
   const [fetchMovies] = useFetchMovies();
@@ -22,17 +22,17 @@ const NewShowing = () => {
 
   const setMovie = useCallback(
     (movie) => {
-      setSearchParams({ movieId: movie.id });
+      setSearchParams({ movieID: movie.id });
     },
     [setSearchParams]
   );
 
-  const movieId = searchParams.get("movieId") || null;
+  const movieID = searchParams.get("movieID") || null;
 
-  if (movieId) {
+  if (movieID) {
     return (
       <CreateShowingForm
-        movieId={movieId}
+        movieID={movieID}
         clearSelectedMovie={clearSelectedMovie}
       />
     );
@@ -48,13 +48,13 @@ const NewShowing = () => {
 };
 
 const useAllMovies = () =>
-  useQuery<NewShowingQuery>(
+  useQuery<NewShowingQueryQuery>(
     gql`
       query NewShowingQuery {
         movies: allMovies {
           ...Movie
           id
-          popularity
+          #          popularity
           releaseDate
         }
       }
