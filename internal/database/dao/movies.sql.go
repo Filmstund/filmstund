@@ -6,6 +6,7 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -54,6 +55,19 @@ func (q *Queries) AllMovies(ctx context.Context, archived bool) ([]Movie, error)
 	return items, nil
 }
 
+const disableMoviePopularity = `-- name: DisableMoviePopularity :exec
+UPDATE movies
+set popularity             = -1,
+    popularity_update_time = CURRENT_TIMESTAMP,
+    update_time            = CURRENT_TIMESTAMP
+WHERE id = $1
+`
+
+func (q *Queries) DisableMoviePopularity(ctx context.Context, movieID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, disableMoviePopularity, movieID)
+	return err
+}
+
 const movie = `-- name: Movie :one
 select id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, popularity, popularity_update_time, archived, update_time, create_time
 FROM movies
@@ -84,6 +98,86 @@ func (q *Queries) Movie(ctx context.Context, id uuid.UUID) (Movie, error) {
 		&i.CreateTime,
 	)
 	return i, err
+}
+
+const outdatedMovies = `-- name: OutdatedMovies :many
+SELECT id,
+       tmdb_id,
+       title,
+       production_year,
+       EXTRACT('YEAR' FROM release_date)::int as release_year,
+       popularity,
+       popularity_update_time
+FROM movies
+WHERE archived = false
+  AND popularity >= 0
+  AND popularity_update_time < CURRENT_TIMESTAMP - INTERVAL '7 day'
+ORDER BY random()
+`
+
+type OutdatedMoviesRow struct {
+	ID                   uuid.UUID     `json:"id"`
+	TmdbID               sql.NullInt64 `json:"tmdbID"`
+	Title                string        `json:"title"`
+	ProductionYear       int32         `json:"productionYear"`
+	ReleaseYear          int32         `json:"releaseYear"`
+	Popularity           float64       `json:"popularity"`
+	PopularityUpdateTime time.Time     `json:"popularityUpdateTime"`
+}
+
+func (q *Queries) OutdatedMovies(ctx context.Context) ([]OutdatedMoviesRow, error) {
+	rows, err := q.db.Query(ctx, outdatedMovies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []OutdatedMoviesRow
+	for rows.Next() {
+		var i OutdatedMoviesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.TmdbID,
+			&i.Title,
+			&i.ProductionYear,
+			&i.ReleaseYear,
+			&i.Popularity,
+			&i.PopularityUpdateTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateMoviePopularity = `-- name: UpdateMoviePopularity :exec
+UPDATE movies
+SET popularity             = $1,
+    popularity_update_time = CURRENT_TIMESTAMP,
+    tmdb_id                = $2,
+    imdb_id                = $3,
+    update_time            = CURRENT_TIMESTAMP
+WHERE id = $4
+`
+
+type UpdateMoviePopularityParams struct {
+	Popularity float64        `json:"popularity"`
+	TmdbID     sql.NullInt64  `json:"tmdbID"`
+	ImdbID     sql.NullString `json:"imdbID"`
+	MovieID    uuid.UUID      `json:"movieID"`
+}
+
+func (q *Queries) UpdateMoviePopularity(ctx context.Context, arg UpdateMoviePopularityParams) error {
+	_, err := q.db.Exec(ctx, updateMoviePopularity,
+		arg.Popularity,
+		arg.TmdbID,
+		arg.ImdbID,
+		arg.MovieID,
+	)
+	return err
 }
 
 const upsertMovie = `-- name: UpsertMovie :one

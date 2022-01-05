@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"edholm.dev/go-logging"
@@ -58,7 +59,7 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 			ID:           uuid.New(),
 			FilmstadenID: item.NcgID,
 			Slug:         item.Slug,
-			Title:        item.OriginalTitle,
+			Title:        strings.TrimSpace(item.OriginalTitle),
 			ReleaseDate: sql.NullTime{
 				Time:  releaseDate,
 				Valid: true,

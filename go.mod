@@ -6,6 +6,7 @@ require (
 	edholm.dev/go-logging v1.0.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/coreos/go-oidc/v3 v3.1.0
+	github.com/filmstund/themoviedb-go v0.2.0
 	github.com/go-logr/logr v1.2.2
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/golang-jwt/jwt/v4 v4.2.0
