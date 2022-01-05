@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
@@ -40,7 +41,7 @@ func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID uuid.UUI
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote string) (*model.Showing, error) {
+func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote uuid.UUID) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -48,7 +49,7 @@ func (r *queryResolver) Showing(ctx context.Context, id *uuid.UUID, webID *strin
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *string) ([]*model.Showing, error) {
+func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *time.Time) ([]*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

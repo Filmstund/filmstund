@@ -12,7 +12,7 @@ type Attendee {
   showingID: UUID!
   type: PaymentType!
   user: PublicUser!
-  userID: UserID!
+  userID: UUID!
 }
 
 type AttendeePaymentDetails {
@@ -27,7 +27,7 @@ input AttendeePaymentInfoInput {
   amountOwed: SEK!
   hasPaid: Boolean!
   showingID: UUID!
-  userID: UserID!
+  userID: UUID!
 }
 
 scalar Base64ID
@@ -149,7 +149,7 @@ type Mutation {
   invalidateCalendarFeed: User!
   markAsBought(price: SEK!, showingID: UUID!): Showing!
   processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing!
-  promoteToAdmin(showingID: UUID!, userToPromote: UserID!): Showing!
+  promoteToAdmin(showingID: UUID!, userToPromote: UUID!): Showing!
   unattendShowing(showingID: UUID!): Showing!
   updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee!
   updateShowing(newValues: UpdateShowingInput, showingID: UUID!): Showing!
@@ -168,14 +168,14 @@ enum PaymentType {
 
 type PublicAttendee {
   showingID: UUID!
-  userID: UserID!
+  userID: UUID!
   userInfo: PublicUser!
 }
 
 type PublicUser {
   avatarURL: String
   firstName: String!
-  id: UserID!
+  id: UUID!
   lastName: String!
   name: String!
   nick: String
@@ -240,7 +240,7 @@ type Showing {
 scalar TMDbID
 
 type Ticket {
-  assignedToUser: UserID!
+  assignedToUser: UUID!
   attributes: [String!]!
   barcode: String!
   cinema: String!
@@ -272,7 +272,7 @@ input UpdateShowingInput {
   date: LocalDate!
   filmstadenRemoteEntityID: String
   location: String!
-  payToUser: UserID!
+  payToUser: UUID!
   price: SEK!
   time: LocalTime!
 }
@@ -302,5 +302,3 @@ input UserDetailsInput {
   nick: String
   phone: String
 }
-
-scalar UserID

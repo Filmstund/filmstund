@@ -7,4 +7,3 @@ scalar Base64ID
 scalar SEK
 scalar LocalDate
 scalar LocalTime
-scalar UserID

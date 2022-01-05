@@ -22,7 +22,7 @@ type AttendeePaymentDetails {
 }
 
 type Attendee {
-    userID: UserID!
+    userID: UUID!
     user: PublicUser!
     showingID: UUID!
     hasPaid: Boolean!
@@ -33,7 +33,7 @@ type Attendee {
 }
 
 input AttendeePaymentInfoInput {
-    userID: UserID!
+    userID: UUID!
     showingID: UUID!
     hasPaid: Boolean!
     amountOwed: SEK!

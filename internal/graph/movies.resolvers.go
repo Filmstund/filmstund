@@ -139,6 +139,6 @@ func (r *queryResolver) ArchivedMovies(ctx context.Context) ([]*model.Movie, err
 	return movies, nil
 }
 
-func (r *queryResolver) FilmstadenShowings(ctx context.Context, movieID uuid.UUID, city *string, afterDate *string) ([]*model.FilmstadenShowing, error) {
+func (r *queryResolver) FilmstadenShowings(ctx context.Context, movieID uuid.UUID, city *string, afterDate *time.Time) ([]*model.FilmstadenShowing, error) {
 	panic(fmt.Errorf("not implemented"))
 }

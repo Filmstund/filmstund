@@ -25,7 +25,6 @@ export type Scalars = {
   TMDbID: any;
   Time: any;
   UUID: any;
-  UserID: any;
 };
 
 export type AdminPaymentDetails = {
@@ -44,7 +43,7 @@ export type Attendee = {
   showingID: Scalars["UUID"];
   type: PaymentType;
   user: PublicUser;
-  userID: Scalars["UserID"];
+  userID: Scalars["UUID"];
 };
 
 export type AttendeePaymentDetails = {
@@ -60,7 +59,7 @@ export type AttendeePaymentInfoInput = {
   amountOwed: Scalars["SEK"];
   hasPaid: Scalars["Boolean"];
   showingID: Scalars["UUID"];
-  userID: Scalars["UserID"];
+  userID: Scalars["UUID"];
 };
 
 export type CinemaScreen = {
@@ -227,7 +226,7 @@ export type MutationProcessTicketUrlsArgs = {
 
 export type MutationPromoteToAdminArgs = {
   showingID: Scalars["UUID"];
-  userToPromote: Scalars["UserID"];
+  userToPromote: Scalars["UUID"];
 };
 
 export type MutationUnattendShowingArgs = {
@@ -260,7 +259,7 @@ export enum PaymentType {
 export type PublicAttendee = {
   __typename?: "PublicAttendee";
   showingID: Scalars["UUID"];
-  userID: Scalars["UserID"];
+  userID: Scalars["UUID"];
   userInfo: PublicUser;
 };
 
@@ -268,7 +267,7 @@ export type PublicUser = {
   __typename?: "PublicUser";
   avatarURL?: Maybe<Scalars["String"]>;
   firstName: Scalars["String"];
-  id: Scalars["UserID"];
+  id: Scalars["UUID"];
   lastName: Scalars["String"];
   name: Scalars["String"];
   nick?: Maybe<Scalars["String"]>;
@@ -357,7 +356,7 @@ export type Showing = {
 
 export type Ticket = {
   __typename?: "Ticket";
-  assignedToUser: Scalars["UserID"];
+  assignedToUser: Scalars["UUID"];
   attributes: Array<Scalars["String"]>;
   barcode: Scalars["String"];
   cinema: Scalars["String"];
@@ -386,7 +385,7 @@ export type UpdateShowingInput = {
   date: Scalars["LocalDate"];
   filmstadenRemoteEntityID?: InputMaybe<Scalars["String"]>;
   location: Scalars["String"];
-  payToUser: Scalars["UserID"];
+  payToUser: Scalars["UUID"];
   price: Scalars["SEK"];
   time: Scalars["LocalTime"];
 };
@@ -520,7 +519,7 @@ export type MarkShowingAsBoughtMutation = {
 
 export type PromoteToAdminMutationVariables = Exact<{
   showingId: Scalars["UUID"];
-  userId: Scalars["UserID"];
+  userId: Scalars["UUID"];
 }>;
 
 export type PromoteToAdminMutation = {

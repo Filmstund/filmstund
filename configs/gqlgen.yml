@@ -59,16 +59,22 @@ models:
   FilmstadenMembershipID:
     model:
       - github.com/filmstund/filmstund/internal/graph/scalars.FilmstadenMembershipID
+  LocalDate:
+    model:
+      - github.com/filmstund/filmstund/internal/graph/scalars.LocalDate
+  LocalTime:
+    model:
+      - github.com/filmstund/filmstund/internal/graph/scalars.LocalTime
   UUID:
     model:
       - github.com/filmstund/filmstund/internal/graph/scalars.UUIDScalar
   User:
     fields:
       giftCertificates:
-        resolver: true # generate an explicit resolver for this field
+        resolver: true  # generate an explicit resolver for this field
   Showing:
     fields:
       attendees:
-        resolver: true # generate an explicit resolver for this field
+        resolver: true  # generate an explicit resolver for this field
       filmstadenSeatMap:
-        resolver: true # generate an explicit resolver for this field
+        resolver: true  # generate an explicit resolver for this field

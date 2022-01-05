@@ -18,7 +18,7 @@ type Mutation {
 
     updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing!
 
-    promoteToAdmin(showingID: UUID!, userToPromote: UserID!): Showing!
+    promoteToAdmin(showingID: UUID!, userToPromote: UUID!): Showing!
 }
 
 type Showing {
@@ -45,7 +45,7 @@ type Showing {
 }
 
 type PublicAttendee {
-    userID: UserID!
+    userID: UUID!
     showingID: UUID!
     userInfo: PublicUser!
 }
@@ -82,7 +82,7 @@ input CreateShowingInput {
 
 input UpdateShowingInput {
     price: SEK!
-    payToUser: UserID!
+    payToUser: UUID!
     location: String!
     filmstadenRemoteEntityID: String
     time: LocalTime!

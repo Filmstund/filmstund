@@ -19,7 +19,7 @@ type AdminPaymentDetails struct {
 }
 
 type Attendee struct {
-	UserID                 string           `json:"userID"`
+	UserID                 uuid.UUID        `json:"userID"`
 	User                   *PublicUser      `json:"user"`
 	ShowingID              uuid.UUID        `json:"showingID"`
 	HasPaid                bool             `json:"hasPaid"`
@@ -38,7 +38,7 @@ type AttendeePaymentDetails struct {
 }
 
 type AttendeePaymentInfoInput struct {
-	UserID     string    `json:"userID"`
+	UserID     uuid.UUID `json:"userID"`
 	ShowingID  uuid.UUID `json:"showingID"`
 	HasPaid    bool      `json:"hasPaid"`
 	AmountOwed string    `json:"amountOwed"`
@@ -60,8 +60,8 @@ type Commandments struct {
 }
 
 type CreateShowingInput struct {
-	Date                     string             `json:"date"`
-	Time                     string             `json:"time"`
+	Date                     time.Time          `json:"date"`
+	Time                     time.Time          `json:"time"`
 	MovieID                  uuid.UUID          `json:"movieID"`
 	Location                 string             `json:"location"`
 	FilmstadenScreen         *CinemaScreenInput `json:"filmstadenScreen"`
@@ -140,19 +140,19 @@ type PaymentOption struct {
 }
 
 type PublicAttendee struct {
-	UserID    string      `json:"userID"`
+	UserID    uuid.UUID   `json:"userID"`
 	ShowingID uuid.UUID   `json:"showingID"`
 	UserInfo  *PublicUser `json:"userInfo"`
 }
 
 type PublicUser struct {
-	ID        string  `json:"id"`
-	Name      string  `json:"name"`
-	FirstName string  `json:"firstName"`
-	LastName  string  `json:"lastName"`
-	Nick      *string `json:"nick"`
-	Phone     *string `json:"phone"`
-	AvatarURL *string `json:"avatarURL"`
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	Nick      *string   `json:"nick"`
+	Phone     *string   `json:"phone"`
+	AvatarURL *string   `json:"avatarURL"`
 }
 
 type Seat struct {
@@ -195,7 +195,7 @@ type Showing struct {
 type Ticket struct {
 	ID                     string    `json:"id"`
 	ShowingID              uuid.UUID `json:"showingID"`
-	AssignedToUser         string    `json:"assignedToUser"`
+	AssignedToUser         uuid.UUID `json:"assignedToUser"`
 	ProfileID              *string   `json:"profileID"`
 	Barcode                string    `json:"barcode"`
 	CustomerType           string    `json:"customerType"`
@@ -204,7 +204,7 @@ type Ticket struct {
 	CinemaCity             *string   `json:"cinemaCity"`
 	Screen                 string    `json:"screen"`
 	Seat                   *Seat     `json:"seat"`
-	Date                   string    `json:"date"`
+	Date                   time.Time `json:"date"`
 	Time                   string    `json:"time"`
 	MovieName              string    `json:"movieName"`
 	MovieRating            string    `json:"movieRating"`
@@ -218,12 +218,12 @@ type TicketRange struct {
 }
 
 type UpdateShowingInput struct {
-	Price                    string  `json:"price"`
-	PayToUser                string  `json:"payToUser"`
-	Location                 string  `json:"location"`
-	FilmstadenRemoteEntityID *string `json:"filmstadenRemoteEntityID"`
-	Time                     string  `json:"time"`
-	Date                     string  `json:"date"`
+	Price                    string    `json:"price"`
+	PayToUser                uuid.UUID `json:"payToUser"`
+	Location                 string    `json:"location"`
+	FilmstadenRemoteEntityID *string   `json:"filmstadenRemoteEntityID"`
+	Time                     time.Time `json:"time"`
+	Date                     time.Time `json:"date"`
 }
 
 type User struct {

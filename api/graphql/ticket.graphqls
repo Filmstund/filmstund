@@ -7,7 +7,7 @@ extend type Showing {
 type Ticket {
     id: String!
     showingID: UUID!
-    assignedToUser: UserID!
+    assignedToUser: UUID!
     profileID: String
     barcode: String!
     customerType: String!
