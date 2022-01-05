@@ -128,6 +128,7 @@ type Movie struct {
 	Runtime        string    `json:"runtime"`
 	Poster         *string   `json:"poster"`
 	Genres         []string  `json:"genres"`
+	Popularity     float64   `json:"popularity"`
 	Archived       bool      `json:"archived"`
 	UpdateTime     string    `json:"updateTime"`
 	CreateTime     string    `json:"createTime"`

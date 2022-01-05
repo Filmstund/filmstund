@@ -132,6 +132,7 @@ type ComplexityRoot struct {
 		Genres         func(childComplexity int) int
 		ID             func(childComplexity int) int
 		ImdbID         func(childComplexity int) int
+		Popularity     func(childComplexity int) int
 		Poster         func(childComplexity int) int
 		ProductionYear func(childComplexity int) int
 		ReleaseDate    func(childComplexity int) int
@@ -666,6 +667,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Movie.ImdbID(childComplexity), true
+
+	case "Movie.popularity":
+		if e.complexity.Movie.Popularity == nil {
+			break
+		}
+
+		return e.complexity.Movie.Popularity(childComplexity), true
 
 	case "Movie.poster":
 		if e.complexity.Movie.Poster == nil {
@@ -1668,6 +1676,7 @@ type Movie {
     runtime: String!
     poster: String
     genres: [String!]!
+    popularity: Float!
     archived: Boolean!
     updateTime: String!
     createTime: String!
@@ -4171,6 +4180,41 @@ func (ec *executionContext) _Movie_genres(ctx context.Context, field graphql.Col
 	res := resTmp.([]string)
 	fc.Result = res
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Movie_popularity(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Movie",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Popularity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Movie_archived(ctx context.Context, field graphql.CollectedField, obj *model.Movie) (ret graphql.Marshaler) {
@@ -9885,6 +9929,11 @@ func (ec *executionContext) _Movie(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Movie_poster(ctx, field, obj)
 		case "genres":
 			out.Values[i] = ec._Movie_genres(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "popularity":
+			out.Values[i] = ec._Movie_popularity(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

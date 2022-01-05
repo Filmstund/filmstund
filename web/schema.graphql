@@ -127,6 +127,7 @@ type Movie {
   genres: [String!]!
   id: UUID!
   imdbID: IMDbID
+  popularity: Float!
   poster: String
   productionYear: Int!
   releaseDate: String!

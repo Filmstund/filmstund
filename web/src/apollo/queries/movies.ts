@@ -10,7 +10,7 @@ export const useFetchMovies = () =>
         fetchNewMoviesFromFilmstaden {
           ...Movie
           id
-          #          popularity
+          popularity
           releaseDate
         }
       }

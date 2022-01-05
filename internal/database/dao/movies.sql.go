@@ -11,7 +11,7 @@ import (
 )
 
 const allMovies = `-- name: AllMovies :many
-SELECT id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, archived, update_time, create_time
+SELECT id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, popularity, popularity_update_time, archived, update_time, create_time
 FROM movies
 WHERE archived = $1
 order by release_date
@@ -38,6 +38,8 @@ func (q *Queries) AllMovies(ctx context.Context, archived bool) ([]Movie, error)
 			&i.Runtime,
 			&i.Poster,
 			&i.Genres,
+			&i.Popularity,
+			&i.PopularityUpdateTime,
 			&i.Archived,
 			&i.UpdateTime,
 			&i.CreateTime,
@@ -53,7 +55,7 @@ func (q *Queries) AllMovies(ctx context.Context, archived bool) ([]Movie, error)
 }
 
 const movie = `-- name: Movie :one
-select id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, archived, update_time, create_time
+select id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, popularity, popularity_update_time, archived, update_time, create_time
 FROM movies
 WHERE id = $1
   AND archived = false
@@ -75,6 +77,8 @@ func (q *Queries) Movie(ctx context.Context, id uuid.UUID) (Movie, error) {
 		&i.Runtime,
 		&i.Poster,
 		&i.Genres,
+		&i.Popularity,
+		&i.PopularityUpdateTime,
 		&i.Archived,
 		&i.UpdateTime,
 		&i.CreateTime,
@@ -89,7 +93,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 ON CONFLICT (filmstaden_id) DO UPDATE SET update_time  = current_timestamp,
                                           poster       = $8,
                                           release_date = $5
-RETURNING id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, archived, update_time, create_time
+RETURNING id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, popularity, popularity_update_time, archived, update_time, create_time
 `
 
 type UpsertMovieParams struct {
@@ -129,6 +133,8 @@ func (q *Queries) UpsertMovie(ctx context.Context, arg UpsertMovieParams) (Movie
 		&i.Runtime,
 		&i.Poster,
 		&i.Genres,
+		&i.Popularity,
+		&i.PopularityUpdateTime,
 		&i.Archived,
 		&i.UpdateTime,
 		&i.CreateTime,

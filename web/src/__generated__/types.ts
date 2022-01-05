@@ -160,6 +160,7 @@ export type Movie = {
   genres: Array<Scalars["String"]>;
   id: Scalars["UUID"];
   imdbID?: Maybe<Scalars["IMDbID"]>;
+  popularity: Scalars["Float"];
   poster?: Maybe<Scalars["String"]>;
   productionYear: Scalars["Int"];
   releaseDate: Scalars["String"];
@@ -678,7 +679,12 @@ export type FetchMoviesMutationVariables = Exact<{ [key: string]: never }>;
 export type FetchMoviesMutation = {
   __typename?: "Mutation";
   fetchNewMoviesFromFilmstaden: Array<
-    { __typename?: "Movie"; id: any; releaseDate: string } & MovieFragment
+    {
+      __typename?: "Movie";
+      id: any;
+      popularity: number;
+      releaseDate: string;
+    } & MovieFragment
   >;
 };
 
@@ -819,7 +825,12 @@ export type NewShowingQueryQueryVariables = Exact<{ [key: string]: never }>;
 export type NewShowingQueryQuery = {
   __typename?: "Query";
   movies: Array<
-    { __typename?: "Movie"; id: any; releaseDate: string } & MovieFragment
+    {
+      __typename?: "Movie";
+      id: any;
+      popularity: number;
+      releaseDate: string;
+    } & MovieFragment
   >;
 };
 

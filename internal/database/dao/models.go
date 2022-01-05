@@ -40,20 +40,22 @@ type GiftCertificate struct {
 }
 
 type Movie struct {
-	ID             uuid.UUID      `json:"id"`
-	FilmstadenID   string         `json:"filmstadenID"`
-	ImdbID         sql.NullString `json:"imdbID"`
-	TmdbID         sql.NullInt64  `json:"tmdbID"`
-	Slug           string         `json:"slug"`
-	Title          string         `json:"title"`
-	ReleaseDate    sql.NullTime   `json:"releaseDate"`
-	ProductionYear int32          `json:"productionYear"`
-	Runtime        int32          `json:"runtime"`
-	Poster         sql.NullString `json:"poster"`
-	Genres         []string       `json:"genres"`
-	Archived       bool           `json:"archived"`
-	UpdateTime     time.Time      `json:"updateTime"`
-	CreateTime     time.Time      `json:"createTime"`
+	ID                   uuid.UUID      `json:"id"`
+	FilmstadenID         string         `json:"filmstadenID"`
+	ImdbID               sql.NullString `json:"imdbID"`
+	TmdbID               sql.NullInt64  `json:"tmdbID"`
+	Slug                 string         `json:"slug"`
+	Title                string         `json:"title"`
+	ReleaseDate          sql.NullTime   `json:"releaseDate"`
+	ProductionYear       int32          `json:"productionYear"`
+	Runtime              int32          `json:"runtime"`
+	Poster               sql.NullString `json:"poster"`
+	Genres               []string       `json:"genres"`
+	Popularity           float64        `json:"popularity"`
+	PopularityUpdateTime time.Time      `json:"popularityUpdateTime"`
+	Archived             bool           `json:"archived"`
+	UpdateTime           time.Time      `json:"updateTime"`
+	CreateTime           time.Time      `json:"createTime"`
 }
 
 type Showing struct {

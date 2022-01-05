@@ -22,6 +22,7 @@ type Movie {
     runtime: String!
     poster: String
     genres: [String!]!
+    popularity: Float!
     archived: Boolean!
     updateTime: String!
     createTime: String!

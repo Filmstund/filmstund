@@ -54,7 +54,7 @@ const useAllMovies = () =>
         movies: allMovies {
           ...Movie
           id
-          #          popularity
+          popularity
           releaseDate
         }
       }
