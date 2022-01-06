@@ -91,14 +91,20 @@ export type CreateShowingInput = {
   time: Scalars["LocalTime"];
 };
 
+export type FilmstadenCinema = {
+  __typename?: "FilmstadenCinema";
+  filmstadenID: Scalars["ID"];
+  name: Scalars["String"];
+};
+
 export type FilmstadenCityAlias = {
   __typename?: "FilmstadenCityAlias";
   alias: Scalars["String"];
   name: Scalars["String"];
 };
 
-export type FilmstadenLiteScreen = {
-  __typename?: "FilmstadenLiteScreen";
+export type FilmstadenScreen = {
+  __typename?: "FilmstadenScreen";
   filmstadenID: Scalars["ID"];
   name: Scalars["String"];
 };
@@ -126,12 +132,11 @@ export type FilmstadenSeatMap = {
 
 export type FilmstadenShowing = {
   __typename?: "FilmstadenShowing";
-  cinemaName: Scalars["String"];
-  filmstadenRemoteEntityID: Scalars["String"];
-  screen: FilmstadenLiteScreen;
-  seatCount: Scalars["Int"];
+  cinema: FilmstadenCinema;
+  id: Scalars["String"];
+  screen: FilmstadenScreen;
   tags: Array<Scalars["String"]>;
-  timeUtc: Scalars["String"];
+  timeUtc: Scalars["Time"];
 };
 
 export type GiftCertificate = {
@@ -780,15 +785,11 @@ export type FilmstadenShowingsQuery = {
 
 export type FilmstadenShowingFragment = {
   __typename?: "FilmstadenShowing";
-  cinemaName: string;
-  timeUtc: string;
+  id: string;
+  timeUtc: import("@js-temporal/polyfill").Temporal.PlainDate;
   tags: Array<string>;
-  filmstadenRemoteEntityID: string;
-  screen: {
-    __typename?: "FilmstadenLiteScreen";
-    filmstadenID: string;
-    name: string;
-  };
+  cinema: { __typename?: "FilmstadenCinema"; name: string; id: string };
+  screen: { __typename?: "FilmstadenScreen"; name: string; id: string };
 };
 
 export type NewShowingQueryVariables = Exact<{ [key: string]: never }>;
@@ -1116,14 +1117,17 @@ export const EditShowingFragment = gql`
 `;
 export const FilmstadenShowingFragment = gql`
   fragment FilmstadenShowingFragment on FilmstadenShowing {
-    cinemaName
+    id
+    cinema {
+      name
+      id: filmstadenID
+    }
     screen {
-      filmstadenID
+      id: filmstadenID
       name
     }
     timeUtc
     tags
-    filmstadenRemoteEntityID
   }
 `;
 export const TicketFragment = gql`

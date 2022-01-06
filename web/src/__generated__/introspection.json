@@ -610,6 +610,49 @@
       },
       {
         "kind": "OBJECT",
+        "name": "FilmstadenCinema",
+        "description": null,
+        "fields": [
+          {
+            "name": "filmstadenID",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "FilmstadenCityAlias",
         "description": null,
         "fields": [
@@ -652,8 +695,18 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "FilmstadenMembershipID",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
-        "name": "FilmstadenLiteScreen",
+        "name": "FilmstadenScreen",
         "description": null,
         "fields": [
           {
@@ -691,16 +744,6 @@
         ],
         "inputFields": null,
         "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "FilmstadenMembershipID",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -887,15 +930,15 @@
         "description": null,
         "fields": [
           {
-            "name": "cinemaName",
+            "name": "cinema",
             "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "FilmstadenCinema",
                 "ofType": null
               }
             },
@@ -903,7 +946,7 @@
             "deprecationReason": null
           },
           {
-            "name": "filmstadenRemoteEntityID",
+            "name": "id",
             "description": null,
             "args": [],
             "type": {
@@ -927,23 +970,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "FilmstadenLiteScreen",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "seatCount",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
+                "name": "FilmstadenScreen",
                 "ofType": null
               }
             },
@@ -983,7 +1010,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Time",
                 "ofType": null
               }
             },

@@ -4,7 +4,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addDays from "date-fns/addDays";
 import React, { useCallback, useState } from "react";
-import { formatLocalTime, formatYMD } from "../../lib/dateTools";
+import { formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
 import { useNavigate } from "react-router-dom";
 import * as navigators from "../common/navigators";
@@ -123,15 +123,15 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
   }, []);
 
   const handleSfTimeSelect = ({
-    cinemaName,
-    filmstadenRemoteEntityID,
+    cinema,
+    id,
     timeUtc,
   }: FilmstadenShowingFragment) => {
     setFormState((state) => ({
       ...state,
-      filmstadenRemoteEntityID: filmstadenRemoteEntityID,
-      location: cinemaName,
-      time: formatLocalTime(timeUtc),
+      filmstadenRemoteEntityID: id,
+      location: cinema.name,
+      time: timeUtc.toString(),
     }));
   };
 
