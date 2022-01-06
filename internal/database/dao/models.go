@@ -79,8 +79,8 @@ type Showing struct {
 
 type Ticket struct {
 	ID                     string         `json:"id"`
-	ShowingID              uuid.NullUUID  `json:"showingID"`
-	AssignedToUser         uuid.NullUUID  `json:"assignedToUser"`
+	ShowingID              uuid.UUID      `json:"showingID"`
+	AssignedToUser         uuid.UUID      `json:"assignedToUser"`
 	ProfileID              sql.NullString `json:"profileID"`
 	Barcode                string         `json:"barcode"`
 	CustomerType           string         `json:"customerType"`

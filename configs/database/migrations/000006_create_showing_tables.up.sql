@@ -59,9 +59,9 @@ create table tickets
 (
     id                       varchar(15)
         constraint ticket_pk primary key,
-    showing_id               uuid
+    showing_id               uuid                     not null
         constraint ticket_showing_fk references showings on delete cascade,
-    assigned_to_user         uuid
+    assigned_to_user         uuid                     not null
         constraint ticket_user_fk references users on delete cascade,
     profile_id               varchar(15)              null,
     barcode                  text                     not null,
