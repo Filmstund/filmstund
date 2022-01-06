@@ -58,17 +58,22 @@ input CreateShowingInput {
   time: LocalTime!
 }
 
+type FilmstadenCinema {
+  filmstadenID: ID!
+  name: String!
+}
+
 type FilmstadenCityAlias {
   alias: String!
   name: String!
 }
 
-type FilmstadenLiteScreen {
+scalar FilmstadenMembershipID
+
+type FilmstadenScreen {
   filmstadenID: ID!
   name: String!
 }
-
-scalar FilmstadenMembershipID
 
 type FilmstadenSeatCoordinates {
   x: Float!
@@ -89,12 +94,11 @@ type FilmstadenSeatMap {
 }
 
 type FilmstadenShowing {
-  cinemaName: String!
-  filmstadenRemoteEntityID: String!
-  screen: FilmstadenLiteScreen!
-  seatCount: Int!
+  cinema: FilmstadenCinema!
+  id: String!
+  screen: FilmstadenScreen!
   tags: [String!]!
-  timeUtc: String!
+  timeUtc: Time!
 }
 
 type GiftCertificate {

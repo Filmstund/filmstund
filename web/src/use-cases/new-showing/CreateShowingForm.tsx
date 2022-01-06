@@ -94,17 +94,15 @@ export const CreateShowingForm: React.FC<Props> = ({
   };
 
   const setShowingTime = (sfTime: FilmstadenShowingFragment) => {
-    const { timeUtc, cinemaName, filmstadenRemoteEntityID, screen } = sfTime;
-
-    const { name, filmstadenID } = screen!;
+    const { timeUtc, cinema, id, screen } = sfTime;
 
     setShowingState((state) => {
       const newState: ShowingState = {
         ...state,
-        filmstadenRemoteEntityID,
+        filmstadenRemoteEntityID: id,
         time: Temporal.PlainDateTime.from(timeUtc).toPlainTime().toString(),
-        location: cinemaName,
-        filmstadenScreen: { name, id: filmstadenID },
+        location: cinema.name,
+        filmstadenScreen: screen,
       };
 
       handleSubmit(newState);

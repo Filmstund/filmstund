@@ -37,7 +37,7 @@ export const FilmstadenShowingSelector: React.FC<
   });
 
   const sfDates = groupBy(data?.filmstadenShowings, (showing) =>
-    formatYMD(showing.timeUtc)
+    showing.timeUtc.toString()
   );
 
   const handleChange = (date: Date) => {

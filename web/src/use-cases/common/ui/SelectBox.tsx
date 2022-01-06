@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import React from "react";
-import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 import { FilmstadenShowingFragment } from "../../../__generated__/types";
 
@@ -51,14 +50,13 @@ const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
   <Box>
     {options.map((option) => (
       <Option
-        key={option.filmstadenRemoteEntityID}
+        key={option.id}
         onClick={() => onChange(option)}
-        selected={option.filmstadenRemoteEntityID === selectedValue}
+        selected={option.id === selectedValue}
       >
         <Lable>
-          {option.timeUtc && formatLocalTime(option.timeUtc)}{" "}
-          {option.screen && option.screen.name},{" "}
-          {option.cinemaName && option.cinemaName.replace(/ ?Filmstaden ?/, "")}
+          {option.timeUtc.toString()} {option.screen.name},{" "}
+          {option.cinema.name.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
           {option.tags.map((tag) => (

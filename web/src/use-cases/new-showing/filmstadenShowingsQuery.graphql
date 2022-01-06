@@ -5,12 +5,15 @@ query FilmstadenShowingsQuery($movieID: UUID!, $city: String) {
 }
 
 fragment FilmstadenShowingFragment on FilmstadenShowing {
-  cinemaName
+  id
+  cinema {
+    name
+    id: filmstadenID
+  }
   screen {
-    filmstadenID
+    id: filmstadenID
     name
   }
   timeUtc
   tags
-  filmstadenRemoteEntityID
 }
