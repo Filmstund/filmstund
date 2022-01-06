@@ -5,6 +5,7 @@ package dao
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -27,6 +28,60 @@ func (q *Queries) AdminOnShowing(ctx context.Context, arg AdminOnShowingParams) 
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const publicAttendees = `-- name: PublicAttendees :many
+SELECT user_id,
+       showing_id,
+       (u.first_name || ' ' || u.last_name)::text as name,
+       u.first_name::text                         as first_name,
+       u.last_name::text                          as last_name,
+       u.nick,
+       u.phone,
+       u.avatar                                   as avatar_url
+FROM attendees
+         left join users u on u.id = attendees.user_id
+where showing_id = $1
+`
+
+type PublicAttendeesRow struct {
+	UserID    uuid.UUID      `json:"userID"`
+	ShowingID uuid.UUID      `json:"showingID"`
+	Name      string         `json:"name"`
+	FirstName string         `json:"firstName"`
+	LastName  string         `json:"lastName"`
+	Nick      sql.NullString `json:"nick"`
+	Phone     sql.NullString `json:"phone"`
+	AvatarURL sql.NullString `json:"avatarUrl"`
+}
+
+func (q *Queries) PublicAttendees(ctx context.Context, showingID uuid.UUID) ([]PublicAttendeesRow, error) {
+	rows, err := q.db.Query(ctx, publicAttendees, showingID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []PublicAttendeesRow
+	for rows.Next() {
+		var i PublicAttendeesRow
+		if err := rows.Scan(
+			&i.UserID,
+			&i.ShowingID,
+			&i.Name,
+			&i.FirstName,
+			&i.LastName,
+			&i.Nick,
+			&i.Phone,
+			&i.AvatarURL,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const publicShowings = `-- name: PublicShowings :many

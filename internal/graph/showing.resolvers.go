@@ -126,7 +126,13 @@ func (r *showingResolver) FilmstadenSeatMap(ctx context.Context, obj *model.Show
 }
 
 func (r *showingResolver) Attendees(ctx context.Context, obj *model.Showing) ([]*model.PublicAttendee, error) {
-	panic(fmt.Errorf("not implemented"))
+	query := database.FromContext(ctx)
+	attendees, err := query.PublicAttendees(ctx, obj.ID)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "query.PublicAttendees failed", "showingID", obj.ID)
+		return nil, fmt.Errorf("failed to fetch attendees")
+	}
+	return dao.Attendees(attendees).GraphModels(), nil
 }
 
 // Mutation returns gql.MutationResolver implementation.
