@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
@@ -87,11 +88,7 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 }
 
 func (r *queryResolver) Movie(ctx context.Context, id uuid.UUID) (*model.Movie, error) {
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup DB query interface: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 	movie, err := q.Movie(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -104,11 +101,7 @@ func (r *queryResolver) Movie(ctx context.Context, id uuid.UUID) (*model.Movie, 
 }
 
 func (r *queryResolver) AllMovies(ctx context.Context) ([]*model.Movie, error) {
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup DB query interface: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 	dbMovies, err := q.AllMovies(ctx, false)
 	if err != nil {
 		logging.FromContext(ctx).Error(err, "failed to fetch movies")
@@ -122,11 +115,7 @@ func (r *queryResolver) AllMovies(ctx context.Context) ([]*model.Movie, error) {
 }
 
 func (r *queryResolver) ArchivedMovies(ctx context.Context) ([]*model.Movie, error) {
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to setup DB query interface: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 	dbMovies, err := q.AllMovies(ctx, true)
 	if err != nil {
 		logging.FromContext(ctx).Error(err, "failed to fetch movies")

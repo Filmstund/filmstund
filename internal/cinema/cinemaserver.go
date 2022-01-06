@@ -22,6 +22,7 @@ import (
 	"github.com/filmstund/filmstund/internal/session"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 type Server struct {
@@ -97,10 +98,10 @@ func (s *Server) graphQLHandler() *handler.Server {
 	// This func checks that operations that have the "auth" directive is asserted.
 	gqlConfig.Directives.Auth = checkAuth
 
-	server := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
+	gqlSrv := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 
 	// handle panics in resolvers
-	server.SetRecoverFunc(func(ctx context.Context, err interface{}) (userMessage error) {
+	gqlSrv.SetRecoverFunc(func(ctx context.Context, err interface{}) (userMessage error) {
 		if e, ok := err.(error); ok {
 			logging.FromContext(ctx).
 				WithCallDepth(4).
@@ -114,20 +115,43 @@ func (s *Server) graphQLHandler() *handler.Server {
 	})
 
 	// inject the db query into the request context
-	server.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+	gqlSrv.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 		// TODO: would it make more sense to have this in a HTTP middleware instead?
-		queries, cleanup, err := s.env.Database().Queries(ctx)
-		if err != nil {
-			logging.FromContext(ctx).Error(err, "failed to get DB queries")
-			return graphql.ErrorResponse(ctx, "internal server error")
-		}
-		defer cleanup()
+		queries := s.env.Database().Queries(ctx)
 		return next(database.WithContext(ctx, queries))
 	})
-	return server
+
+	// logging middleware
+	gqlSrv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+		logger := logging.FromContext(ctx).V(5)
+		if !logger.Enabled() {
+			return next(ctx)
+		}
+
+		oc := graphql.GetOperationContext(ctx)
+		selection := oc.Operation.SelectionSet[0]
+
+		var args map[string]interface{}
+		if field, ok := selection.(*ast.Field); ok {
+			args = make(map[string]interface{}, len(field.Arguments))
+			args = field.ArgumentMap(args)
+		} else {
+			args = map[string]interface{}{
+				"failure": true,
+			}
+		}
+
+		logger.Info("gql request",
+			"operation", oc.OperationName,
+			"arguments", args,
+		)
+		return next(ctx)
+	})
+
+	return gqlSrv
 }
 
-func checkAuth(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
+func checkAuth(ctx context.Context, _ interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
 	if role != model.RoleShowingAdmin {
 		return next(ctx)
 	}

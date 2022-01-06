@@ -10,6 +10,7 @@ import (
 
 	"edholm.dev/go-logging"
 	"github.com/filmstund/filmstund/internal/auth0/principal"
+	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/mappers"
@@ -19,12 +20,7 @@ import (
 func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	princ := principal.FromContext(ctx)
-
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AllCommandments: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	user, err := q.UpdateUser(ctx, mappers.ToUpdateUserParams(newInfo, princ.Subject))
 	if err != nil {
@@ -37,12 +33,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, newInfo model.UserDet
 func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	princ := principal.FromContext(ctx)
-
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AllCommandments: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	user, err := q.RandomizeCalendarFeed(ctx, princ.Subject.String())
 	if err != nil {
@@ -55,12 +46,7 @@ func (r *mutationResolver) InvalidateCalendarFeed(ctx context.Context) (*model.U
 func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	princ := principal.FromContext(ctx)
-
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AllCommandments: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	user, err := q.DisableCalendarFeed(ctx, princ.Subject.String())
 	if err != nil {
@@ -73,11 +59,8 @@ func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User
 func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []*model.GiftCertificateInput) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	prin := principal.FromContext(ctx)
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AddGiftCertificates: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
+
 	// TODO: do all this in a transaction
 	for _, cert := range giftCerts {
 		var expireTime time.Time
@@ -95,17 +78,14 @@ func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []
 			return nil, fmt.Errorf("failed to insert gift certificate")
 		}
 	}
-	return fetchUser(ctx, q, r.siteCfg)
+	return fetchUser(ctx, r.siteCfg)
 }
 
 func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert model.GiftCertificateInput) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	prin := principal.FromContext(ctx)
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AddGiftCertificates: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
+
 	var expireTime time.Time
 	if giftCert.ExpireTime == nil {
 		expireTime = time.Now()
@@ -120,18 +100,11 @@ func (r *mutationResolver) DeleteGiftCertificate(ctx context.Context, giftCert m
 		logger.Info("failed to delete gift certificates", "uid", prin.ID, "err", err)
 		return nil, fmt.Errorf("failed to delete gift certificates")
 	}
-	return fetchUser(ctx, q, r.siteCfg)
+	return fetchUser(ctx, r.siteCfg)
 }
 
 func (r *queryResolver) CurrentUser(ctx context.Context) (*model.User, error) {
-	logger := logging.FromContext(ctx)
-	queries, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		logger.Info("failed to connect to database", "err", err)
-		return nil, fmt.Errorf("failed to connect to database")
-	}
-	defer cleanup()
-	return fetchUser(ctx, queries, r.siteCfg)
+	return fetchUser(ctx, r.siteCfg)
 }
 
 func (r *queryResolver) AllUsers(ctx context.Context) ([]*model.PublicUser, error) {
@@ -140,12 +113,7 @@ func (r *queryResolver) AllUsers(ctx context.Context) ([]*model.PublicUser, erro
 
 func (r *userResolver) GiftCertificates(ctx context.Context, obj *model.User) ([]*model.GiftCertificate, error) {
 	logger := logging.FromContext(ctx)
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		logger.Info("failed to connect to database", "err", err)
-		return nil, fmt.Errorf("failed to connect to database")
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	giftCerts, err := q.GetGiftCertificates(ctx, obj.ID)
 	if err != nil {

@@ -31,10 +31,10 @@ const createUpdateUser = `-- name: CreateUpdateUser :one
 INSERT INTO users
     (subject_id, first_name, last_name, nick, email, avatar)
 VALUES ($1, $2, $3, $4, $5, $6)
-ON CONFLICT (subject_id) DO UPDATE SET last_login_time         = current_timestamp,
-                                       email              = $5,
-                                       avatar             = $6,
-                                       update_time = current_timestamp
+ON CONFLICT (subject_id) DO UPDATE SET last_login_time = current_timestamp,
+                                       email           = $5,
+                                       avatar          = $6,
+                                       update_time     = current_timestamp
 RETURNING id
 `
 
@@ -166,6 +166,43 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+const publicUser = `-- name: PublicUser :one
+SELECT id,
+       (first_name || ' ' || users.last_name)::text as name,
+       first_name,
+       last_name,
+       nick,
+       phone,
+       avatar                               as avatar_url
+FROM users
+WHERE id = $1
+`
+
+type PublicUserRow struct {
+	ID        uuid.UUID      `json:"id"`
+	Name      string         `json:"name"`
+	FirstName string         `json:"firstName"`
+	LastName  string         `json:"lastName"`
+	Nick      sql.NullString `json:"nick"`
+	Phone     sql.NullString `json:"phone"`
+	AvatarURL sql.NullString `json:"avatarUrl"`
+}
+
+func (q *Queries) PublicUser(ctx context.Context, id uuid.UUID) (PublicUserRow, error) {
+	row := q.db.QueryRow(ctx, publicUser, id)
+	var i PublicUserRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.FirstName,
+		&i.LastName,
+		&i.Nick,
+		&i.Phone,
+		&i.AvatarURL,
+	)
+	return i, err
+}
+
 const randomizeCalendarFeed = `-- name: RandomizeCalendarFeed :one
 UPDATE users
 SET calendar_feed_id = uuid_generate_v4()
@@ -201,7 +238,7 @@ SET filmstaden_membership_id = COALESCE(NULLIF(TRIM($1), ''), filmstaden_members
     first_name               = COALESCE(NULLIF(TRIM($3), ''), first_name),
     last_name                = COALESCE(NULLIF(TRIM($4), ''), last_name),
     nick                     = COALESCE(NULLIF(TRIM($5), ''), nick),
-    update_time       = current_timestamp
+    update_time              = current_timestamp
 WHERE subject_id = $6
 RETURNING id, subject_id, filmstaden_membership_id, first_name, last_name, nick, email, phone, avatar, calendar_feed_id, last_login_time, signup_time, update_time
 `

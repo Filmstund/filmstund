@@ -17,7 +17,7 @@ const (
 // MarshalLocalDate is used by the GQL runtime to marshal the LocalDate scalar.
 func MarshalLocalDate(t time.Time) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-		_, _ = io.WriteString(w, t.Format(dateFormat))
+		_, _ = io.WriteString(w, fmt.Sprintf(`"%s"`, t.Format(dateFormat)))
 	})
 }
 
@@ -40,7 +40,7 @@ func UnmarshalLocalDate(v interface{}) (time.Time, error) {
 // MarshalLocalTime is used by the GQL runtime to marshal the LocalDate scalar.
 func MarshalLocalTime(t time.Time) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-		_, _ = io.WriteString(w, t.Format(timeFormat))
+		_, _ = io.WriteString(w, fmt.Sprintf(`"%s"`, t.Format(timeFormat)))
 	})
 }
 

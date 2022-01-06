@@ -8,17 +8,13 @@ import (
 	"fmt"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/graph/model"
 )
 
 func (r *queryResolver) AllCommandments(ctx context.Context) ([]*model.Commandments, error) {
 	logger := logging.FromContext(ctx)
-
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AllCommandments: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	all, err := q.ListCommandments(ctx)
 	if err != nil {
@@ -38,12 +34,7 @@ func (r *queryResolver) AllCommandments(ctx context.Context) ([]*model.Commandme
 
 func (r *queryResolver) RandomCommandment(ctx context.Context) (*model.Commandments, error) {
 	logger := logging.FromContext(ctx)
-
-	q, cleanup, err := r.db.Queries(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("AllCommandments: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	rnd, err := q.RandomCommandment(ctx)
 	if err != nil {

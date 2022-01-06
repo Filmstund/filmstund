@@ -103,12 +103,7 @@ func (s *Handler) startNewSession(w http.ResponseWriter, r *http.Request, token 
 		return fmt.Errorf("failed to extract scope from token")
 	}
 
-	queries, cleanup, err := s.db.Queries(r.Context())
-	if err != nil {
-		return err
-	}
-	defer cleanup()
-
+	queries := s.db.Queries(r.Context())
 	userID, err := queries.CreateUpdateUser(r.Context(), dao.CreateUpdateUserParams{
 		Subject:   idToken.Subject,
 		FirstName: idTokenClaims.GivenName,

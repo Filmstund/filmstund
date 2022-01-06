@@ -5,6 +5,7 @@ package dao
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -26,4 +27,49 @@ func (q *Queries) AdminOnShowing(ctx context.Context, arg AdminOnShowingParams) 
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const publicShowings = `-- name: PublicShowings :many
+SELECT id, web_id, slug, date, time, movie_id, location, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user, private, update_time, create_time
+FROM showings s
+WHERE s.date > $1
+  AND s.private = false
+ORDER BY date DESC
+`
+
+func (q *Queries) PublicShowings(ctx context.Context, afterDate time.Time) ([]Showing, error) {
+	rows, err := q.db.Query(ctx, publicShowings, afterDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Showing
+	for rows.Next() {
+		var i Showing
+		if err := rows.Scan(
+			&i.ID,
+			&i.WebID,
+			&i.Slug,
+			&i.Date,
+			&i.Time,
+			&i.MovieID,
+			&i.Location,
+			&i.CinemaScreenID,
+			&i.FilmstadenShowingID,
+			&i.Price,
+			&i.TicketsBought,
+			&i.Admin,
+			&i.PayToUser,
+			&i.Private,
+			&i.UpdateTime,
+			&i.CreateTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

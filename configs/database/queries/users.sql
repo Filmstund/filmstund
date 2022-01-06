@@ -2,10 +2,10 @@
 INSERT INTO users
     (subject_id, first_name, last_name, nick, email, avatar)
 VALUES (@subject, @first_name, @last_name, @nick, @email, @avatar)
-ON CONFLICT (subject_id) DO UPDATE SET last_login_time         = current_timestamp,
-                                       email              = @email,
-                                       avatar             = @avatar,
-                                       update_time = current_timestamp
+ON CONFLICT (subject_id) DO UPDATE SET last_login_time = current_timestamp,
+                                       email           = @email,
+                                       avatar          = @avatar,
+                                       update_time     = current_timestamp
 RETURNING id;
 
 -- name: UserExistsBySubject :one
@@ -18,7 +18,7 @@ SET filmstaden_membership_id = COALESCE(NULLIF(TRIM(@filmstaden_membership_id), 
     first_name               = COALESCE(NULLIF(TRIM(@first_name), ''), first_name),
     last_name                = COALESCE(NULLIF(TRIM(@last_name), ''), last_name),
     nick                     = COALESCE(NULLIF(TRIM(@nick), ''), nick),
-    update_time       = current_timestamp
+    update_time              = current_timestamp
 WHERE subject_id = @subject_id
 RETURNING *;
 
@@ -26,6 +26,17 @@ RETURNING *;
 SELECT *
 FROM users
 WHERE id = $1;
+
+-- name: PublicUser :one
+SELECT id,
+       (first_name || ' ' || users.last_name)::text as name,
+       first_name,
+       last_name,
+       nick,
+       phone,
+       avatar                               as avatar_url
+FROM users
+WHERE id = @id;
 
 -- name: RandomizeCalendarFeed :one
 UPDATE users

@@ -20,12 +20,7 @@ type updater struct {
 
 func (updater *updater) updateMoviePopularities(ctx context.Context) error {
 	logger := logging.FromContext(ctx)
-
-	q, cleanup, err := updater.db.Queries(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to setup DB query interface: %w", err)
-	}
-	defer cleanup()
+	q := database.FromContext(ctx)
 
 	outdatedMovies, err := q.OutdatedMovies(ctx)
 	if err != nil {

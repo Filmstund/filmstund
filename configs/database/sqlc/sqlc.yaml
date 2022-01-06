@@ -9,3 +9,5 @@ packages:
     queries: "../queries"
     json_tags_case_style: "camel"
     output_db_file_name: "queries.go"
+rename:
+  avatar_url: "AvatarURL"
