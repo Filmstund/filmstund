@@ -1,15 +1,34 @@
+hooks:
+  afterAllFileWrite:
+    - prettier --write --no-config
 schema: ../api/graphql/*.graphqls
 documents:
-  - ./src/**/*.ts*
-  - ./src/**/*.jsx
+  - ./src/**/*.graphql
 
 generates:
   schema.graphql:
     plugins:
       - schema-ast
+  src/__generated__/introspection.json:
+    plugins:
+      - introspection
   ./src/__generated__/types.ts:
     plugins:
       - typescript
       - typescript-operations
+      - typescript-urql
     config:
       inlineFragmentTypes: combine
+      omitOperationSuffix: true
+      avoidOptionals: true
+      dedupeOperationSuffix: true
+      defaultScalarType: unknown
+      scalars:
+        UUID: string
+        UserID: string
+        Base64ID: string
+        SEK: string
+        FilmstadenMembershipID: string
+        Time: import('@js-temporal/polyfill').Temporal.PlainDate
+        LocalTime: import('@js-temporal/polyfill').Temporal.PlainTime
+        LocalDate: import('@js-temporal/polyfill').Temporal.PlainDate

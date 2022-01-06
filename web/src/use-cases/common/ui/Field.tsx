@@ -10,7 +10,7 @@ const Label = styled.label`
 `;
 
 interface UnstyledFieldProps extends ComponentPropsWithoutRef<"div"> {
-  text: string;
+  text?: string;
 }
 
 const UnstyledField: React.FC<UnstyledFieldProps> = ({

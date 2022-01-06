@@ -1,0 +1,8 @@
+mutation FetchMoviesMutation {
+  fetchNewMoviesFromFilmstaden {
+    ...MovieFragment
+    id
+    popularity
+    releaseDate
+  }
+}

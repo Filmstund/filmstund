@@ -1,45 +1,37 @@
-import { ApolloError, gql, NetworkStatus, useQuery } from "@apollo/client";
 import React, { useState } from "react";
 
-import { usePromoteToAdmin } from "../../../apollo/mutations/showings/usePromoteToAdmin";
 import { navigateToShowingTickets } from "../../common/navigators";
 import { MissingShowing } from "../../common/showing/MissingShowing";
-import Showing, { oldShowingFragment } from "../../common/showing/Showing";
+import SimpleShowing from "../../common/showing/SimpleShowing";
 import IMDbLink from "../../common/ui/IMDbLink";
 import { ButtonContainer } from "../../common/ui/MainButton";
-import Loader from "../../common/utils/ProjectorLoader";
-import StatusMessageBox from "../../common/utils/StatusMessageBox";
 import { useScrollToTop } from "../../common/utils/useScrollToTop";
-import AdminAction, { adminActionFragments } from "../AdminAction";
-import ParticipantList, {
-  participantsListFragment,
-} from "../components/ParticipantsList";
+import AdminAction from "../AdminAction";
+import ParticipantList from "../components/ParticipantsList";
 import { SwishModal } from "../components/SwishModal";
 import { userIsAdmin, userIsParticipating } from "../utils/utils";
 import {
   SingleShowingQuery,
-  SingleShowingQueryVariables,
+  SingleShowingQueryDocument,
+  usePromoteToAdminMutation,
+  useSingleShowingQuery,
 } from "../../../__generated__/types";
-import ShowingPaymentContainer from "./ShowingPaymentContainer";
+import { ShowingPaymentContainer } from "./ShowingPaymentContainer";
 import { useNavigate } from "react-router-dom";
+import { urql } from "../../../store/urql";
+import { SingleShowingScreenShowing } from "./types";
 
 interface Props {
   me: SingleShowingQuery["me"];
-  error: ApolloError | undefined;
-  showing: SingleShowingQuery["showing"] | null | undefined;
+  showing: SingleShowingScreenShowing;
   refetch: () => Promise<unknown>;
 }
 
-const SingleShowingContainer: React.FC<Props> = ({
-  me,
-  showing,
-  error,
-  refetch,
-}) => {
+const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
 
-  const promoteToAdmin = usePromoteToAdmin();
+  const [, promoteToAdmin] = usePromoteToAdminMutation();
 
   useScrollToTop();
 
@@ -73,7 +65,7 @@ const SingleShowingContainer: React.FC<Props> = ({
           closeSwish={() => setOpenModal(false)}
         />
       )}
-      <Showing
+      <SimpleShowing
         setTitleTag={true}
         movie={showing.movie}
         date={showing.date + " " + showing.time}
@@ -81,7 +73,6 @@ const SingleShowingContainer: React.FC<Props> = ({
         location={showing.location}
         ticketsBought={showing.ticketsBought}
       />
-      {error && <StatusMessageBox errors={error.graphQLErrors} />}
       <ButtonContainer>
         <IMDbLink imdbId={showing.movie.imdbID} />
         {isAdmin && (
@@ -100,62 +91,38 @@ const SingleShowingContainer: React.FC<Props> = ({
         meId={me.id}
         isAdmin={isAdmin}
         participants={showing.attendees}
-        onClickItem={(userId) => promoteToAdmin(showing.id, userId)}
+        onClickItem={(userId) =>
+          promoteToAdmin({ showingId: showing.id, userId })
+        }
       />
     </>
   );
 };
 
-const useSingleShowingData = (webID: string) =>
-  useQuery<SingleShowingQuery, SingleShowingQueryVariables>(
-    gql`
-      query SingleShowing($webID: Base64ID!) {
-        me: currentUser {
-          ...PendingShowing
-          id
-        }
-        showing(webID: $webID) {
-          ...OldShowing
-          ...ShowingAdmin
-          ...BoughtShowing
-          webID
-          slug
-          price
-          private
-          movie {
-            imdbID
-          }
-          attendees {
-            ...ParticipantsList
-          }
-        }
-      }
-      ${ShowingPaymentContainer.fragments.showing}
-      ${ShowingPaymentContainer.fragments.currentUser}
-      ${oldShowingFragment}
-      ${adminActionFragments}
-      ${participantsListFragment}
-    `,
-    {
-      fetchPolicy: "cache-and-network",
-      variables: { webID },
-    }
-  );
-
 const SingleShowingLoader: React.FC<{ webID: string }> = ({ webID }) => {
-  const { data, loading, error, refetch, networkStatus } =
-    useSingleShowingData(webID);
+  const [{ data, error }] = useSingleShowingQuery({
+    variables: { webID },
+  });
+  const showing = data!.showing;
+  const me = data!.me;
 
-  if (!data || (loading && networkStatus !== NetworkStatus.refetch)) {
-    return <Loader />;
+  if (!showing) {
+    return <MissingShowing />;
   }
 
   return (
     <SingleShowingContainer
-      error={error}
-      showing={data.showing}
-      me={data.me}
-      refetch={refetch}
+      showing={showing}
+      me={me}
+      refetch={() => {
+        return urql
+          .query(
+            SingleShowingQueryDocument,
+            { webID },
+            { requestPolicy: "network-only" }
+          )
+          .toPromise();
+      }}
     />
   );
 };

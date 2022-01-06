@@ -4,15 +4,15 @@ import {
   navigateToShowing,
   navigateToShowingTickets,
 } from "../common/navigators";
-import { ShowingNeueFragment } from "../../__generated__/types";
-import { ShowingNeue as ShowingNeueComponent } from "../common/showing/ShowingNeue";
+import { ShowingNeue as ShowingNeueComponent } from "../common/showing/Showing";
 import { EmptyList } from "../common/ui/EmptyList";
 import { ShowingsGrid } from "../common/ui/ShowingsGrid";
 import { showingDate } from "./utils/filtersCreators";
 import { useNavigate } from "react-router-dom";
+import { ShowingFragment } from "../../__generated__/types";
 
 interface OrderedShowingsListProps {
-  showings: ShowingNeueFragment[];
+  showings: ShowingFragment[];
   order: "asc" | "desc";
 }
 

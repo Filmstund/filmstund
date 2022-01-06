@@ -1,0 +1,59 @@
+fragment BoughtShowingFragment on Showing {
+  myTickets {
+    id
+  }
+  attendeePaymentDetails {
+    amountOwed
+    swishLink
+    hasPaid
+    payTo {
+      id
+      phone
+      firstName
+      nick
+      lastName
+    }
+  }
+}
+
+fragment PendingShowingFragment on User {
+  giftCertificates {
+    expireTime
+    number
+    status
+  }
+}
+
+fragment ShowingAdminFragment on Showing {
+  id
+  price
+  private
+  filmstadenShowingID
+  ticketsBought
+  cinemaScreen {
+    id
+    name
+  }
+  payToUser {
+    id
+  }
+  adminPaymentDetails {
+    filmstadenBuyLink
+    attendees {
+      userID
+      hasPaid
+      amountOwed
+      filmstadenMembershipID
+      giftCertificateUsed {
+        number
+      }
+      user {
+        id
+        nick
+        firstName
+        lastName
+        phone
+      }
+    }
+  }
+}

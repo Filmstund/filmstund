@@ -1,0 +1,27 @@
+query SingleShowingQuery($webID: Base64ID!) {
+  me: currentUser {
+    ...PendingShowingFragment
+    id
+  }
+  showing(webID: $webID) {
+    ...ShowingFragment
+    ...ShowingAdminFragment
+    ...BoughtShowingFragment
+    webID
+    slug
+    price
+    private
+    location
+    admin {
+      id
+      name
+      nick
+    }
+    movie {
+      imdbID
+    }
+    attendees {
+      ...ParticipantsListFragment
+    }
+  }
+}

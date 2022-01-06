@@ -1,0 +1,5 @@
+fragment GiftCertificateFragment on GiftCertificate {
+  number
+  expireTime
+  status
+}

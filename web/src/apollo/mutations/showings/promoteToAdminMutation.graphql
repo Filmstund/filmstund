@@ -1,0 +1,22 @@
+mutation PromoteToAdminMutation($showingId: UUID!, $userId: UUID!) {
+  promoteToAdmin(showingID: $showingId, userToPromote: $userId) {
+    admin {
+      id
+    }
+    payToUser {
+      id
+    }
+    attendeePaymentDetails {
+      payTo {
+        id
+        nick
+        firstName
+        lastName
+        phone
+      }
+      swishLink
+      hasPaid
+      amountOwed
+    }
+  }
+}

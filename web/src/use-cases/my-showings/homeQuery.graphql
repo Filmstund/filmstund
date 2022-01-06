@@ -1,0 +1,19 @@
+query HomeQuery {
+  showings: publicShowings {
+    ...ShowingFragment
+    id
+    webID
+    slug
+    date
+    time
+    admin {
+      id
+    }
+    attendees {
+      userID
+    }
+  }
+  me: currentUser {
+    id
+  }
+}

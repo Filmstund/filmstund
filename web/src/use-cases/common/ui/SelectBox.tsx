@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import React from "react";
 import { formatLocalTime } from "../../../lib/dateTools";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
-import { FilmstadenShowing } from "../../../__generated__/types";
+import { FilmstadenShowingFragment } from "../../../__generated__/types";
 
 const Option = styled.div<{ selected: boolean }>`
   display: flex;
@@ -43,8 +43,8 @@ const RightArrow = styled.div`
 
 interface Props {
   selectedValue?: string;
-  options: FilmstadenShowing[];
-  onChange: (v: FilmstadenShowing) => void;
+  options: FilmstadenShowingFragment[];
+  onChange: (v: FilmstadenShowingFragment) => void;
 }
 
 const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (

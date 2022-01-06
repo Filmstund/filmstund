@@ -1,25 +1,26 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { useTogglePaidChange } from "../../apollo/mutations/showings/useTogglePaidChange";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { PaymentParticipantsList } from "./components/PaymentParticipantsList";
-import { ShowingAdminFragment } from "../../__generated__/types";
+import {
+  ShowingAdminFragment,
+  useTogglePaidChangeMutation,
+} from "../../__generated__/types";
 import { InputSpinner } from "./InputSpinner";
+import { AdminAttendeePaymentDetails } from "./containers/types";
 
 interface AdminModalAfterTicketsBoughtProps {
   showingId: string;
-  participantPaymentInfos: NonNullable<
-    ShowingAdminFragment["adminPaymentDetails"]
-  >["attendees"];
+  participantPaymentInfos: AdminAttendeePaymentDetails[];
 }
 
 export const AdminModalAfterTicketsBought: React.FC<
   AdminModalAfterTicketsBoughtProps
 > = ({ showingId, participantPaymentInfos }) => {
   const [
+    { fetching: mutationInProgress, error: mutationError },
     togglePaidChange,
-    { loading: mutationInProgress, error: mutationError },
-  ] = useTogglePaidChange();
+  ] = useTogglePaidChangeMutation();
 
   const handlePaidChange = useCallback(
     (
@@ -30,13 +31,11 @@ export const AdminModalAfterTicketsBought: React.FC<
       const { user, hasPaid, amountOwed } = info!;
 
       togglePaidChange({
-        variables: {
-          paymentInfo: {
-            amountOwed,
-            hasPaid,
-            showingID: showingId,
-            userID: user.id,
-          },
+        paymentInfo: {
+          amountOwed,
+          hasPaid,
+          showingID: showingId,
+          userID: user.id,
         },
       });
     },

@@ -107,7 +107,7 @@ const TicketDateTime: React.FC<
   Pick<TicketFragment["myTickets"][0], "date" | "time">
 > = ({ date, time }) => (
   <FlexRowContainer style={{ marginBottom: "1rem" }}>
-    <TicketValueWithLabel label="Datum" value={date} />
+    <TicketValueWithLabel label="Datum" value={date.toString()} />
     <TicketValueWithLabel label="Tid" value={time.substring(0, 5)} />
   </FlexRowContainer>
 );

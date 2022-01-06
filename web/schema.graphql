@@ -191,7 +191,11 @@ type Query {
   archivedMovies: [Movie!]!
   currentUser: User!
   filmstadenCities: [FilmstadenCityAlias!]!
-  filmstadenShowings(afterDate: LocalDate, city: String = "GB", movieID: UUID!): [FilmstadenShowing!]!
+  filmstadenShowings(
+    afterDate: LocalDate
+    city: String = "GB"
+    movieID: UUID!
+  ): [FilmstadenShowing!]!
   movie(id: UUID!): Movie
   previouslyUsedLocations: [String!]!
   publicShowings(afterDate: LocalDate): [Showing!]!

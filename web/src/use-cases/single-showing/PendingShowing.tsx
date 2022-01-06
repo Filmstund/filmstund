@@ -1,15 +1,14 @@
-import { gql } from "@apollo/client";
 import React, { ChangeEvent, useMemo, useState } from "react";
-import {
-  useAttendShowing,
-  useUnattendShowing,
-} from "../../apollo/mutations/showings/useAttendShowing";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import Modal from "../common/ui/Modal";
 
 import { SmallHeader } from "../common/ui/Header";
 import { useStateWithHandleChange } from "../common/utils/useStateWithHandleChange";
-import { SingleShowingQuery } from "../../__generated__/types";
+import {
+  GiftCertificateFragment,
+  useAttendShowingMutation,
+  useUnattendShowingMutation,
+} from "../../__generated__/types";
 
 import {
   createPaymentOptions,
@@ -20,7 +19,7 @@ import {
 interface Props {
   showingId: string;
   isParticipating: boolean;
-  foretagsbiljetter: SingleShowingQuery["me"]["giftCertificates"];
+  foretagsbiljetter: GiftCertificateFragment[];
 }
 
 export const PendingShowing: React.FC<Props> = ({
@@ -36,14 +35,14 @@ export const PendingShowing: React.FC<Props> = ({
     [foretagsbiljetter]
   );
 
-  const attendShowing = useAttendShowing();
-  const unattendShowing = useUnattendShowing();
+  const [, attendShowing] = useAttendShowingMutation();
+  const [, unattendShowing] = useUnattendShowingMutation();
 
   const attendWithPaymentOption = (paymentOption: DisplayPaymentOption) => {
     const { type, ticketNumber } = paymentOption;
 
-    attendShowing(showingId, { type, ticketNumber }).then(() =>
-      setModalOpen(false)
+    attendShowing({ showingId, paymentOption: { type, ticketNumber } }).then(
+      () => setModalOpen(false)
     );
   };
 
@@ -72,7 +71,7 @@ export const PendingShowing: React.FC<Props> = ({
         />
       )}
       {isParticipating ? (
-        <GrayButton onClick={() => unattendShowing(showingId)}>
+        <GrayButton onClick={() => unattendShowing({ showingId })}>
           Avanmäl
         </GrayButton>
       ) : (
@@ -116,16 +115,4 @@ const ModalPaymentOptions: React.FC<ModalPaymentOptionsProps> = ({
       </MainButton>
     </Modal>
   );
-};
-
-(PendingShowing as any).fragments = {
-  currentUser: gql`
-    fragment PendingShowing on User {
-      giftCertificates {
-        expireTime
-        number
-        status
-      }
-    }
-  `,
 };

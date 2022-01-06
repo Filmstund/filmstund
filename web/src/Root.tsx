@@ -1,11 +1,10 @@
 import React, { Component, ErrorInfo, lazy, Suspense } from "react";
-import { ApolloProvider } from "@apollo/client";
 import "./index.css";
 
 import { BrowserRouter as Router } from "react-router-dom";
-
-import { client } from "./store/apollo";
 import { Loader } from "./use-cases/common/utils/ProjectorLoader";
+import { Provider as UrqlProvider } from "urql";
+import { urql } from "./store/urql";
 
 const AsyncApp = lazy(() => import("./App"));
 
@@ -44,13 +43,13 @@ export class Root extends Component<{}, State> {
     }
 
     return (
-      <ApolloProvider client={client}>
+      <UrqlProvider value={urql}>
         <Router>
           <Suspense fallback={<Loader />}>
             <AsyncApp />
           </Suspense>
         </Router>
-      </ApolloProvider>
+      </UrqlProvider>
     );
   }
 }

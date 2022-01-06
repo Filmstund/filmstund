@@ -11,10 +11,5 @@ export const completeUserFragment = gql`
     filmstadenMembershipID
     phone
     avatarURL
-    giftCertificates {
-      number
-      expireTime
-      status
-    }
   }
 `;

@@ -1,0 +1,12 @@
+fragment ShowingParticipantFragment on Showing {
+  id
+  attendees {
+    userInfo {
+      id
+      nick
+      firstName
+      lastName
+      avatarURL
+    }
+  }
+}

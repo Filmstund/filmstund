@@ -3,29 +3,25 @@ import React, { ChangeEvent, useState } from "react";
 import {
   CinemaScreenInput,
   CreateShowingInput,
+  CreateShowingQuery,
+  FilmstadenShowingFragment,
   InputMaybe,
   Scalars,
+  useCreateShowingMutation,
+  useCreateShowingQuery,
 } from "../../__generated__/types";
 import { formatLocalTime, formatYMD, parseDate } from "../../lib/dateTools";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
-import Showing from "../common/showing/Showing";
+import SimpleShowing from "../common/showing/SimpleShowing";
 import Field from "../common/ui/Field";
 
 import Header, { SmallHeader } from "../common/ui/Header";
 import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
-import {
-  CreateShowingQueryQuery,
-  CreateShowingQueryQueryVariables,
-  FilmstadenShowing,
-} from "../../__generated__/types";
-import { useCreateShowingMutation } from "./hooks/useCreateShowingMutation";
-import { suspend } from "suspend-react";
-import { createShowingFormQuery } from "./CreateShowingFormFetcher";
-import { client } from "../../store/apollo";
 import { useNavigate } from "react-router-dom";
 import { navigateToShowing } from "../common/navigators";
+import { Temporal } from "@js-temporal/polyfill";
 
 const now = new Date();
 
@@ -41,15 +37,13 @@ interface ShowingState {
   filmstadenRemoteEntityID: string | undefined | null;
   filmstadenScreen: InputMaybe<CinemaScreenInput>;
   movieID: string;
-  admin: CreateShowingQueryQuery["me"];
+  admin: CreateShowingQuery["me"];
 }
 
 const getInitialState = (
-  data: CreateShowingQueryQuery,
+  { me, movie }: Pick<CreateShowingQuery, "me" | "movie">,
   movieID: string
 ): ShowingState => {
-  const { me, movie } = data;
-
   let date = now;
 
   if (movie && isAfter(parseDate(movie.releaseDate), now)) {
@@ -67,31 +61,27 @@ const getInitialState = (
   };
 };
 
-export const CreateShowingForm: React.FC<Props> = (props) => {
-  const { movieID, clearSelectedMovie } = props;
+export const CreateShowingForm: React.FC<Props> = ({
+  clearSelectedMovie,
+  movieID,
+}) => {
   const navigate = useNavigate();
 
-  const { data } = suspend(
-    () =>
-      client.query<CreateShowingQueryQuery, CreateShowingQueryQueryVariables>({
-        query: createShowingFormQuery,
-        fetchPolicy: "network-only",
-        variables: {
-          movieID,
-        },
-      }),
-    ["movie", movieID]
-  );
+  const [{ data }] = useCreateShowingQuery({
+    variables: {
+      movieID,
+    },
+  });
 
-  const { movie, filmstadenCities, previouslyUsedLocations } = data;
+  const { movie, filmstadenCities, previouslyUsedLocations, me } = data!;
 
   const [city, setCity] = useState("GB");
 
   const [showing, setShowingState] = useState<ShowingState>(() =>
-    getInitialState(data, movieID)
+    getInitialState({ movie, me }, movieID)
   );
 
-  const [createShowing] = useCreateShowingMutation();
+  const [, createShowing] = useCreateShowingMutation();
 
   const setShowingValue = <K extends keyof ShowingState>(
     key: K,
@@ -103,7 +93,7 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
     }));
   };
 
-  const setShowingTime = (sfTime: FilmstadenShowing) => {
+  const setShowingTime = (sfTime: FilmstadenShowingFragment) => {
     const { timeUtc, cinemaName, filmstadenRemoteEntityID, screen } = sfTime;
 
     const { name, filmstadenID } = screen!;
@@ -112,7 +102,7 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
       const newState: ShowingState = {
         ...state,
         filmstadenRemoteEntityID,
-        time: formatLocalTime(timeUtc),
+        time: Temporal.PlainDateTime.from(timeUtc).toPlainTime().toString(),
         location: cinemaName,
         filmstadenScreen: { name, id: filmstadenID },
       };
@@ -138,15 +128,15 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
     filmstadenScreen,
   }: ShowingState) => {
     const showing: CreateShowingInput = {
-      time,
+      time: Temporal.PlainTime.from(time),
       movieID,
-      filmstadenRemoteEntityID,
-      date: formatYMD(date),
+      filmstadenRemoteEntityID: filmstadenRemoteEntityID ?? null,
+      date: Temporal.PlainDate.from(date),
       filmstadenScreen,
       location,
     };
 
-    createShowing({ variables: { showing } })
+    createShowing({ showing })
       .then((resp) => {
         const { showing } = resp.data!;
         navigateToShowing(navigate, showing);
@@ -162,7 +152,7 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
     <>
       <Header>Skapa besök</Header>
       <div>
-        <Showing
+        <SimpleShowing
           date={formatYMD(showing.date) + " " + showing.time}
           admin={showing.admin}
           location={locationName}
@@ -187,7 +177,7 @@ export const CreateShowingForm: React.FC<Props> = (props) => {
           onChangeDate={(value) => setShowingValue("date", value)}
           onSelectShowing={setShowingTime}
           city={city}
-          movieId={movieID}
+          movieID={movieID}
         />
         <SmallHeader>...eller skapa egen tid</SmallHeader>
         <Field text="Tid:">

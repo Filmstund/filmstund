@@ -1,9 +1,12 @@
 import parseISO from "date-fns/parseISO";
-import { keys } from "lodash";
+import { groupBy, keys } from "lodash";
 import React, { lazy } from "react";
 import { formatYMD } from "../../../lib/dateTools";
-import { FilmstadenShowing } from "../../../__generated__/types";
-import { useSfShowings } from "../../new-showing/hooks/useSfShowings";
+import {
+  FilmstadenShowing,
+  FilmstadenShowingFragment,
+  useFilmstadenShowingsQuery,
+} from "../../../__generated__/types";
 import { SfTimeSelector } from "../../new-showing/SfTimeSelector";
 import Field from "../ui/Field";
 
@@ -15,22 +18,28 @@ interface FilmstadenShowingSelectorProps {
   date: string;
   filmstadenRemoteEntityId: string | null | undefined;
   onChangeDate: (value: string) => void;
-  onSelectShowing: (sfShowing: FilmstadenShowing) => void;
+  onSelectShowing: (sfShowing: FilmstadenShowingFragment) => void;
   city: string;
-  movieId: string;
+  movieID: string;
 }
 
 export const FilmstadenShowingSelector: React.FC<
   FilmstadenShowingSelectorProps
 > = ({
   city,
-  movieId,
+  movieID,
   date,
   filmstadenRemoteEntityId,
   onChangeDate,
   onSelectShowing,
 }) => {
-  const [sfDates] = useSfShowings(movieId, city);
+  const [{ data }] = useFilmstadenShowingsQuery({
+    variables: { movieID, city },
+  });
+
+  const sfDates = groupBy(data?.filmstadenShowings, (showing) =>
+    formatYMD(showing.timeUtc)
+  );
 
   const handleChange = (date: Date) => {
     onChangeDate(formatYMD(date));

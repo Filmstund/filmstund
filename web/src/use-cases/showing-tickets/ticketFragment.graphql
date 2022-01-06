@@ -1,0 +1,46 @@
+fragment TicketFragment on Showing {
+  id
+  webID
+  slug
+  admin {
+    id
+  }
+  ticketRange {
+    rows
+    seatings {
+      row
+      numbers
+    }
+  }
+  filmstadenSeatMap {
+    row
+    number
+    seatType
+    coordinates {
+      x
+      y
+    }
+    dimensions {
+      width
+      height
+    }
+  }
+  myTickets {
+    id
+    barcode
+    customerType
+    customerTypeDefinition
+    cinema
+    screen
+    profileID
+    seat {
+      row
+      number
+    }
+    date
+    time
+    movieName
+    movieRating
+    attributes
+  }
+}

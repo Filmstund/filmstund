@@ -1,0 +1,8 @@
+fragment ParticipantsListFragment on PublicAttendee {
+  userInfo {
+    ...UserItemFragment
+    id
+    nick
+    firstName
+  }
+}

@@ -1,0 +1,5 @@
+mutation AddTicketsMutation($showingId: UUID!, $tickets: [String!]) {
+  processTicketUrls(showingID: $showingId, ticketUrls: $tickets) {
+    ...TicketFragment
+  }
+}

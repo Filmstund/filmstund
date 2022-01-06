@@ -1,12 +1,11 @@
 import styled from "@emotion/styled";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons/faUserTie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { gql } from "@apollo/client";
 import * as React from "react";
 import { SmallHeader } from "../../common/ui/Header";
 import { ParticipantsListFragment } from "../../../__generated__/types";
 
-import UserItem, { fragments as userItemFragments } from "./UserItem";
+import UserItem from "./UserItem";
 
 const ParticipantContainer = styled.div`
   display: flex;
@@ -66,17 +65,5 @@ const ParticipantsList: React.FC<Props> = ({
     </div>
   );
 };
-
-export const participantsListFragment = gql`
-  fragment ParticipantsList on PublicAttendee {
-    userInfo {
-      ...UserItem
-      id
-      nick
-      firstName
-    }
-  }
-  ${userItemFragments.user}
-`;
 
 export default ParticipantsList;

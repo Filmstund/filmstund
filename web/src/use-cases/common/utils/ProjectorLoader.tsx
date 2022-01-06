@@ -2,6 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import loading from "../../../assets/loading.gif";
 import { ReactComponent as Spinner } from "./Spin.svg";
+import { ErrorBox } from "../../login/components/login-styles";
 
 const LoadingImage = styled.div<{ src: string }>`
   grid-area: center;
@@ -18,7 +19,7 @@ export const ProjectorLoader = () => {
 
 export default ProjectorLoader;
 
-const PageLoaderContainer = styled.div`
+const FullPageContainer = styled.div`
   width: 100%;
   height: 100%;
   min-height: 100vh;
@@ -28,7 +29,13 @@ const PageLoaderContainer = styled.div`
 `;
 
 export const Loader = () => (
-  <PageLoaderContainer>
+  <FullPageContainer>
     <Spinner color={"#d0021b"} width={100} height={100} />
-  </PageLoaderContainer>
+  </FullPageContainer>
+);
+
+export const ErrorScreen = ({ error }: { error: Error }) => (
+  <FullPageContainer style={{ background: "#000" }}>
+    <ErrorBox>{error.message}</ErrorBox>
+  </FullPageContainer>
 );

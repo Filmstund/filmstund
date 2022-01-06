@@ -1,15 +1,14 @@
-import { gql } from "@apollo/client";
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { navigateToEditShowing } from "../common/navigators";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { BuyModal } from "./BuyModal";
-import { SingleShowingQuery } from "../../__generated__/types";
 import { CopyHighlightStringButton } from "./CopyHighlightStringButton";
+import { SingleShowingScreenShowing } from "./containers/types";
 
 interface Props {
   onBeforeOpenBuyModal: () => Promise<any>;
-  showing: NonNullable<SingleShowingQuery["showing"]>;
+  showing: SingleShowingScreenShowing;
 }
 
 interface State {
@@ -80,41 +79,5 @@ const AdminAction: React.FC<Props> = ({ onBeforeOpenBuyModal, showing }) => {
     </>
   );
 };
-
-export const adminActionFragments = gql`
-  fragment ShowingAdmin on Showing {
-    id
-    price
-    private
-    filmstadenShowingID
-    ticketsBought
-    cinemaScreen {
-      id
-      name
-    }
-    payToUser {
-      id
-    }
-    adminPaymentDetails {
-      filmstadenBuyLink
-      attendees {
-        userID
-        hasPaid
-        amountOwed
-        filmstadenMembershipID
-        giftCertificateUsed {
-          number
-        }
-        user {
-          id
-          nick
-          firstName
-          lastName
-          phone
-        }
-      }
-    }
-  }
-`;
 
 export default AdminAction;

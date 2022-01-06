@@ -1,0 +1,8 @@
+query TicketQuery($webID: Base64ID!) {
+    me: currentUser {
+        id
+    }
+    showing(webID: $webID) {
+        ...TicketFragment
+    }
+}

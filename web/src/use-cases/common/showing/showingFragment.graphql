@@ -1,0 +1,19 @@
+fragment ShowingFragment on Showing {
+  id
+  date
+  time
+  webID
+  slug
+  movie {
+    ...MovieFragment
+  }
+  myTickets {
+    id
+  }
+  attendees {
+    userInfo {
+      id
+      avatarURL
+    }
+  }
+}

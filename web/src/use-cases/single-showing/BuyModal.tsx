@@ -7,8 +7,12 @@ import Center from "../../use-cases/common/ui/Center";
 import Modal from "../common/ui/Modal";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { AdminModalAfterTicketsBought } from "./AdminModalAfterTicketsBought";
-import { AdminModalBeforeTicketsBought } from "./AdminModalBeforeTicketsBought.tsx";
-import { SingleShowingQuery } from "../../__generated__/types";
+import { AdminModalBeforeTicketsBought } from "./AdminModalBeforeTicketsBought";
+import {
+  ShowingAdminFragment,
+  ShowingFragment,
+} from "../../__generated__/types";
+import { SingleShowingScreenShowing } from "./containers/types";
 
 const Padding = styled.div`
   padding: 0 1em;
@@ -26,7 +30,7 @@ const Close = styled.div`
 interface BuyModalProps {
   loading: boolean;
   closeModal: () => void;
-  showing: SingleShowingQuery["showing"];
+  showing: SingleShowingScreenShowing;
 }
 
 export const BuyModal: React.FC<BuyModalProps> = ({
@@ -34,7 +38,7 @@ export const BuyModal: React.FC<BuyModalProps> = ({
   closeModal,
   showing,
 }) => {
-  if (loading || !showing?.adminPaymentDetails) {
+  if (loading || !showing.adminPaymentDetails) {
     return (
       <Modal>
         <Center>
@@ -44,8 +48,6 @@ export const BuyModal: React.FC<BuyModalProps> = ({
     );
   }
 
-  const { ticketsBought, adminPaymentDetails } = showing!;
-
   return (
     <Modal>
       <Padding>
@@ -53,17 +55,17 @@ export const BuyModal: React.FC<BuyModalProps> = ({
           <FontAwesomeIcon icon={faTimes} />
         </Close>
         <Padding>
-          {ticketsBought && (
+          {showing.ticketsBought && (
             <AdminModalAfterTicketsBought
-              participantPaymentInfos={adminPaymentDetails?.attendees ?? []}
+              participantPaymentInfos={showing.adminPaymentDetails.attendees}
               showingId={showing.id}
             />
           )}
-          {!ticketsBought && (
+          {!showing.ticketsBought && (
             <AdminModalBeforeTicketsBought
               closeModal={closeModal}
               showing={showing}
-              adminPaymentDetails={adminPaymentDetails!}
+              adminPaymentDetails={showing.adminPaymentDetails}
             />
           )}
         </Padding>

@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { gql } from "@apollo/client";
 import { UserItemFragment } from "../../../__generated__/types";
 import React from "react";
 
@@ -45,18 +44,6 @@ const UserItem: React.FC<Props> = ({
     </PaddingContainer>
   </div>
 );
-
-export const fragments = {
-  user: gql`
-    fragment UserItem on PublicUser {
-      avatarURL
-      firstName
-      nick
-      lastName
-      phone
-    }
-  `,
-};
 
 export default styled(UserItem)`
   background: #fff;

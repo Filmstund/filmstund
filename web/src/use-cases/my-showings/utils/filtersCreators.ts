@@ -1,19 +1,15 @@
 import isAfter from "date-fns/isAfter";
 import isBefore from "date-fns/isBefore";
-import parseISO from "date-fns/parseISO";
 import { getTodaysDate } from "../../../lib/dateTools";
-import {
-  HomeQueryQuery,
-  ShowingNeueFragment,
-} from "../../../__generated__/types";
+import { HomeQuery, ShowingFragment } from "../../../__generated__/types";
+import parseISO from "date-fns/parseISO";
 
-type ShowingFilterFn = (s: HomeQueryQuery["showings"][0]) => boolean;
+type ShowingFilterFn = (s: HomeQuery["showings"][0]) => boolean;
 
 const today = getTodaysDate();
 
-export const showingDate = (
-  showing: Pick<ShowingNeueFragment, "date" | "time">
-) => parseISO(showing.date + " " + showing.time);
+export const showingDate = (showing: Pick<ShowingFragment, "date" | "time">) =>
+  parseISO(showing.date + " " + showing.time);
 
 export const filterShowingsCreatedByMe =
   (meId: string): ShowingFilterFn =>

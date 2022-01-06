@@ -1,0 +1,10 @@
+query ShowingsQuery {
+  showings: publicShowings {
+    ...ShowingFragment
+    id
+    webID
+    slug
+    date
+    time
+  }
+}
