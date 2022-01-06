@@ -21,11 +21,11 @@ export type Scalars = {
   Float: number;
   Base64ID: string;
   FilmstadenMembershipID: string;
-  IMDbID: unknown;
+  IMDbID: string;
   LocalDate: import("@js-temporal/polyfill").Temporal.PlainDate;
   LocalTime: import("@js-temporal/polyfill").Temporal.PlainTime;
   SEK: string;
-  TMDbID: unknown;
+  TMDbID: string;
   Time: import("@js-temporal/polyfill").Temporal.PlainDate;
   UUID: string;
 };
@@ -923,7 +923,7 @@ export type SingleShowingQuery = {
           name: string;
           nick: string | null | undefined;
         };
-        movie: { __typename?: "Movie"; imdbID: unknown | null | undefined };
+        movie: { __typename?: "Movie"; imdbID: string | null | undefined };
         attendees: Array<
           { __typename?: "PublicAttendee" } & ParticipantsListFragment
         >;

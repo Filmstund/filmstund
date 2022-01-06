@@ -27,6 +27,8 @@ generates:
         UUID: string
         UserID: string
         Base64ID: string
+        TMDbID: string
+        IMDbID: string
         SEK: string
         FilmstadenMembershipID: string
         Time: import('@js-temporal/polyfill').Temporal.PlainDate
