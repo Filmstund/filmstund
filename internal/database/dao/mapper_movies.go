@@ -9,12 +9,6 @@ import (
 )
 
 func (m *Movie) GraphModel() *model.Movie {
-	tostr := func(s sql.NullString) *string {
-		if s.Valid {
-			return &s.String
-		}
-		return nil
-	}
 	fromint64 := func(i sql.NullInt64) *string {
 		if i.Valid {
 			s := strconv.FormatInt(i.Int64, 10)
@@ -33,14 +27,14 @@ func (m *Movie) GraphModel() *model.Movie {
 	return &model.Movie{
 		ID:             m.ID,
 		FilmstadenID:   m.FilmstadenID,
-		ImdbID:         tostr(m.ImdbID),
+		ImdbID:         nullString(m.ImdbID),
 		TmdbID:         fromint64(m.TmdbID),
 		Slug:           m.Slug,
 		Title:          m.Title,
 		ReleaseDate:    fromtime(m.ReleaseDate),
 		ProductionYear: int(m.ProductionYear),
 		Runtime:        runtime,
-		Poster:         tostr(m.Poster),
+		Poster:         nullString(m.Poster),
 		Genres:         m.Genres,
 		Archived:       m.Archived,
 		UpdateTime:     m.UpdateTime.Format(time.RFC3339Nano),

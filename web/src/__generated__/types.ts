@@ -333,15 +333,14 @@ export type Showing = {
   attendeePaymentDetails?: Maybe<AttendeePaymentDetails>;
   attendees: Array<PublicAttendee>;
   cinemaScreen?: Maybe<CinemaScreen>;
-  createTime: Scalars["String"];
-  date: Scalars["String"];
+  createTime: Scalars["Time"];
+  date: Scalars["LocalDate"];
   filmstadenSeatMap: Array<FilmstadenSeatMap>;
   filmstadenShowingID?: Maybe<Scalars["String"]>;
   id: Scalars["UUID"];
   location: Scalars["String"];
   movie: Movie;
   movieID: Scalars["UUID"];
-  movieTitle: Scalars["String"];
   myTickets: Array<Ticket>;
   payToUser: PublicUser;
   price?: Maybe<Scalars["SEK"]>;
@@ -349,8 +348,8 @@ export type Showing = {
   slug: Scalars["String"];
   ticketRange?: Maybe<TicketRange>;
   ticketsBought: Scalars["Boolean"];
-  time: Scalars["String"];
-  updateTime: Scalars["String"];
+  time: Scalars["LocalTime"];
+  updateTime: Scalars["Time"];
   webID: Scalars["Base64ID"];
 };
 
@@ -474,8 +473,8 @@ export type MarkShowingAsBoughtMutation = {
     ticketsBought: boolean;
     price?: any | null | undefined;
     private: boolean;
-    date: string;
-    time: string;
+    date: any;
+    time: any;
     payToUser: { __typename?: "PublicUser"; id: any };
     myTickets: Array<{ __typename?: "Ticket"; id: string }>;
     attendeePaymentDetails?:
@@ -571,8 +570,8 @@ export type UpdateShowingMutation = {
   updateShowing: {
     __typename?: "Showing";
     id: any;
-    time: string;
-    date: string;
+    time: any;
+    date: any;
     ticketsBought: boolean;
     price?: any | null | undefined;
     private: boolean;
@@ -707,8 +706,8 @@ export type OldShowingFragment = {
   id: any;
   webID: any;
   slug: string;
-  date: string;
-  time: string;
+  date: any;
+  time: any;
   location: string;
   ticketsBought: boolean;
   movie: { __typename?: "Movie" } & ShowingMovieFragment;
@@ -723,8 +722,8 @@ export type OldShowingFragment = {
 export type ShowingNeueFragment = {
   __typename?: "Showing";
   id: any;
-  date: string;
-  time: string;
+  date: any;
+  time: any;
   webID: any;
   slug: string;
   movie: {
@@ -786,8 +785,8 @@ export type HomeQueryQuery = {
       id: any;
       webID: any;
       slug: string;
-      date: string;
-      time: string;
+      date: any;
+      time: any;
       admin: { __typename?: "PublicUser"; id: any };
       attendees: Array<{ __typename?: "PublicAttendee"; userID: any }>;
     } & ShowingNeueFragment
@@ -883,8 +882,8 @@ export type ShowingsQueryQuery = {
       id: any;
       webID: any;
       slug: string;
-      date: string;
-      time: string;
+      date: any;
+      time: any;
     } & ShowingNeueFragment
   >;
 };

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/graph/scalars"
 	"github.com/google/uuid"
 )
@@ -23,25 +24,25 @@ type Attendee struct {
 	User                   *PublicUser      `json:"user"`
 	ShowingID              uuid.UUID        `json:"showingID"`
 	HasPaid                bool             `json:"hasPaid"`
-	AmountOwed             string           `json:"amountOwed"`
+	AmountOwed             currency.SEK     `json:"amountOwed"`
 	Type                   PaymentType      `json:"type"`
 	GiftCertificateUsed    *GiftCertificate `json:"giftCertificateUsed"`
 	FilmstadenMembershipID *string          `json:"filmstadenMembershipID"`
 }
 
 type AttendeePaymentDetails struct {
-	HasPaid    bool        `json:"hasPaid"`
-	AmountOwed string      `json:"amountOwed"`
-	PayTo      *PublicUser `json:"payTo"`
-	Payer      *PublicUser `json:"payer"`
-	SwishLink  *string     `json:"swishLink"`
+	HasPaid    bool         `json:"hasPaid"`
+	AmountOwed currency.SEK `json:"amountOwed"`
+	PayTo      *PublicUser  `json:"payTo"`
+	Payer      *PublicUser  `json:"payer"`
+	SwishLink  *string      `json:"swishLink"`
 }
 
 type AttendeePaymentInfoInput struct {
-	UserID     uuid.UUID `json:"userID"`
-	ShowingID  uuid.UUID `json:"showingID"`
-	HasPaid    bool      `json:"hasPaid"`
-	AmountOwed string    `json:"amountOwed"`
+	UserID     uuid.UUID    `json:"userID"`
+	ShowingID  uuid.UUID    `json:"showingID"`
+	HasPaid    bool         `json:"hasPaid"`
+	AmountOwed currency.SEK `json:"amountOwed"`
 }
 
 type CinemaScreen struct {
@@ -170,20 +171,19 @@ type Showing struct {
 	WebID                  string                  `json:"webID"`
 	FilmstadenShowingID    *string                 `json:"filmstadenShowingID"`
 	Slug                   string                  `json:"slug"`
-	Date                   string                  `json:"date"`
-	Time                   string                  `json:"time"`
+	Date                   time.Time               `json:"date"`
+	Time                   time.Time               `json:"time"`
 	MovieID                uuid.UUID               `json:"movieID"`
-	MovieTitle             string                  `json:"movieTitle"`
 	Movie                  *Movie                  `json:"movie"`
 	Location               string                  `json:"location"`
 	CinemaScreen           *CinemaScreen           `json:"cinemaScreen"`
-	Price                  *string                 `json:"price"`
+	Price                  *currency.SEK           `json:"price"`
 	TicketsBought          bool                    `json:"ticketsBought"`
 	Admin                  *PublicUser             `json:"admin"`
 	Private                bool                    `json:"private"`
 	PayToUser              *PublicUser             `json:"payToUser"`
-	UpdateTime             string                  `json:"updateTime"`
-	CreateTime             string                  `json:"createTime"`
+	UpdateTime             time.Time               `json:"updateTime"`
+	CreateTime             time.Time               `json:"createTime"`
 	FilmstadenSeatMap      []*FilmstadenSeatMap    `json:"filmstadenSeatMap"`
 	Attendees              []*PublicAttendee       `json:"attendees"`
 	AdminPaymentDetails    *AdminPaymentDetails    `json:"adminPaymentDetails"`
@@ -218,12 +218,12 @@ type TicketRange struct {
 }
 
 type UpdateShowingInput struct {
-	Price                    string    `json:"price"`
-	PayToUser                uuid.UUID `json:"payToUser"`
-	Location                 string    `json:"location"`
-	FilmstadenRemoteEntityID *string   `json:"filmstadenRemoteEntityID"`
-	Time                     time.Time `json:"time"`
-	Date                     time.Time `json:"date"`
+	Price                    currency.SEK `json:"price"`
+	PayToUser                uuid.UUID    `json:"payToUser"`
+	Location                 string       `json:"location"`
+	FilmstadenRemoteEntityID *string      `json:"filmstadenRemoteEntityID"`
+	Time                     time.Time    `json:"time"`
+	Date                     time.Time    `json:"date"`
 }
 
 type User struct {

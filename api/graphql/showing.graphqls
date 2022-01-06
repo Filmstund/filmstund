@@ -26,10 +26,9 @@ type Showing {
     webID: Base64ID!
     filmstadenShowingID: String
     slug: String!
-    date: String!
-    time: String!
+    date: LocalDate!
+    time: LocalTime!
     movieID: UUID!
-    movieTitle: String!
     movie: Movie!
     location: String!
     cinemaScreen: CinemaScreen
@@ -38,8 +37,8 @@ type Showing {
     admin: PublicUser!
     private: Boolean!
     payToUser: PublicUser!
-    updateTime: String!
-    createTime: String!
+    updateTime: Time!
+    createTime: Time!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
     attendees: [PublicAttendee!]!
 }

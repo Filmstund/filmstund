@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
@@ -29,7 +30,7 @@ func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID uuid.UUI
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID, price string) (*model.Showing, error) {
+func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID, price currency.SEK) (*model.Showing, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -54,6 +55,22 @@ func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *time.Time
 }
 
 func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID *uuid.UUID) ([]*model.Showing, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *showingResolver) Movie(ctx context.Context, obj *model.Showing) (*model.Movie, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *showingResolver) CinemaScreen(ctx context.Context, obj *model.Showing) (*model.CinemaScreen, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *showingResolver) Admin(ctx context.Context, obj *model.Showing) (*model.PublicUser, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *showingResolver) PayToUser(ctx context.Context, obj *model.Showing) (*model.PublicUser, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

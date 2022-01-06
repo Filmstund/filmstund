@@ -13,3 +13,11 @@ import (
 func (r *mutationResolver) UpdateAttendeePaymentInfo(ctx context.Context, paymentInfo model.AttendeePaymentInfoInput) (*model.Attendee, error) {
 	panic(fmt.Errorf("not implemented"))
 }
+
+func (r *showingResolver) AdminPaymentDetails(ctx context.Context, obj *model.Showing) (*model.AdminPaymentDetails, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *showingResolver) AttendeePaymentDetails(ctx context.Context, obj *model.Showing) (*model.AttendeePaymentDetails, error) {
+	panic(fmt.Errorf("not implemented"))
+}

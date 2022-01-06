@@ -68,13 +68,32 @@ models:
   UUID:
     model:
       - github.com/filmstund/filmstund/internal/graph/scalars.UUIDScalar
+  SEK:
+    model:
+      - github.com/filmstund/filmstund/internal/currency.SEK
   User:
     fields:
       giftCertificates:
         resolver: true  # generate an explicit resolver for this field
   Showing:
     fields:
-      attendees:
-        resolver: true  # generate an explicit resolver for this field
+      movie:
+        resolver: true
+      cinemaScreen:
+        resolver: true
+      admin:
+        resolver: true
+      payToUser:
+        resolver: true
       filmstadenSeatMap:
-        resolver: true  # generate an explicit resolver for this field
+        resolver: true
+      attendees:
+        resolver: true
+      adminPaymentDetails:
+        resolver: true
+      attendeePaymentDetails:
+        resolver: true
+      myTickets:
+        resolver: true
+      ticketRange:
+        resolver: true

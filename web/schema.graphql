@@ -216,15 +216,14 @@ type Showing {
   attendeePaymentDetails: AttendeePaymentDetails
   attendees: [PublicAttendee!]!
   cinemaScreen: CinemaScreen
-  createTime: String!
-  date: String!
+  createTime: Time!
+  date: LocalDate!
   filmstadenSeatMap: [FilmstadenSeatMap!]!
   filmstadenShowingID: String
   id: UUID!
   location: String!
   movie: Movie!
   movieID: UUID!
-  movieTitle: String!
   myTickets: [Ticket!]!
   payToUser: PublicUser!
   price: SEK
@@ -232,8 +231,8 @@ type Showing {
   slug: String!
   ticketRange: TicketRange
   ticketsBought: Boolean!
-  time: String!
-  updateTime: String!
+  time: LocalTime!
+  updateTime: Time!
   webID: Base64ID!
 }
 

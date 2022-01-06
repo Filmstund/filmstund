@@ -13,6 +13,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/graph/scalars"
 	"github.com/google/uuid"
@@ -152,7 +153,7 @@ type ComplexityRoot struct {
 		DisableCalendarFeed          func(childComplexity int) int
 		FetchNewMoviesFromFilmstaden func(childComplexity int, cityAlias string) int
 		InvalidateCalendarFeed       func(childComplexity int) int
-		MarkAsBought                 func(childComplexity int, showingID uuid.UUID, price string) int
+		MarkAsBought                 func(childComplexity int, showingID uuid.UUID, price currency.SEK) int
 		ProcessTicketUrls            func(childComplexity int, showingID uuid.UUID, ticketUrls []string) int
 		PromoteToAdmin               func(childComplexity int, showingID uuid.UUID, userToPromote uuid.UUID) int
 		UnattendShowing              func(childComplexity int, showingID uuid.UUID) int
@@ -217,7 +218,6 @@ type ComplexityRoot struct {
 		Location               func(childComplexity int) int
 		Movie                  func(childComplexity int) int
 		MovieID                func(childComplexity int) int
-		MovieTitle             func(childComplexity int) int
 		MyTickets              func(childComplexity int) int
 		PayToUser              func(childComplexity int) int
 		Price                  func(childComplexity int) int
@@ -279,7 +279,7 @@ type MutationResolver interface {
 	UnattendShowing(ctx context.Context, showingID uuid.UUID) (*model.Showing, error)
 	CreateShowing(ctx context.Context, showing model.CreateShowingInput) (*model.Showing, error)
 	DeleteShowing(ctx context.Context, showingID uuid.UUID) ([]*model.Showing, error)
-	MarkAsBought(ctx context.Context, showingID uuid.UUID, price string) (*model.Showing, error)
+	MarkAsBought(ctx context.Context, showingID uuid.UUID, price currency.SEK) (*model.Showing, error)
 	ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error)
 	UpdateShowing(ctx context.Context, showingID uuid.UUID, newValues *model.UpdateShowingInput) (*model.Showing, error)
 	PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote uuid.UUID) (*model.Showing, error)
@@ -309,8 +309,20 @@ type QueryResolver interface {
 }
 
 type ShowingResolver interface {
+	Movie(ctx context.Context, obj *model.Showing) (*model.Movie, error)
+
+	CinemaScreen(ctx context.Context, obj *model.Showing) (*model.CinemaScreen, error)
+
+	Admin(ctx context.Context, obj *model.Showing) (*model.PublicUser, error)
+
+	PayToUser(ctx context.Context, obj *model.Showing) (*model.PublicUser, error)
+
 	FilmstadenSeatMap(ctx context.Context, obj *model.Showing) ([]*model.FilmstadenSeatMap, error)
 	Attendees(ctx context.Context, obj *model.Showing) ([]*model.PublicAttendee, error)
+	AdminPaymentDetails(ctx context.Context, obj *model.Showing) (*model.AdminPaymentDetails, error)
+	AttendeePaymentDetails(ctx context.Context, obj *model.Showing) (*model.AttendeePaymentDetails, error)
+	MyTickets(ctx context.Context, obj *model.Showing) ([]*model.Ticket, error)
+	TicketRange(ctx context.Context, obj *model.Showing) (*model.TicketRange, error)
 }
 
 type UserResolver interface {
@@ -827,7 +839,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.MarkAsBought(childComplexity, args["showingID"].(uuid.UUID), args["price"].(string)), true
+		return e.complexity.Mutation.MarkAsBought(childComplexity, args["showingID"].(uuid.UUID), args["price"].(currency.SEK)), true
 
 	case "Mutation.processTicketUrls":
 		if e.complexity.Mutation.ProcessTicketUrls == nil {
@@ -1205,13 +1217,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Showing.MovieID(childComplexity), true
-
-	case "Showing.movieTitle":
-		if e.complexity.Showing.MovieTitle == nil {
-			break
-		}
-
-		return e.complexity.Showing.MovieTitle(childComplexity), true
 
 	case "Showing.myTickets":
 		if e.complexity.Showing.MyTickets == nil {
@@ -1761,10 +1766,9 @@ type Showing {
     webID: Base64ID!
     filmstadenShowingID: String
     slug: String!
-    date: String!
-    time: String!
+    date: LocalDate!
+    time: LocalTime!
     movieID: UUID!
-    movieTitle: String!
     movie: Movie!
     location: String!
     cinemaScreen: CinemaScreen
@@ -1773,8 +1777,8 @@ type Showing {
     admin: PublicUser!
     private: Boolean!
     payToUser: PublicUser!
-    updateTime: String!
-    createTime: String!
+    updateTime: Time!
+    createTime: Time!
     filmstadenSeatMap: [FilmstadenSeatMap!]!
     attendees: [PublicAttendee!]!
 }
@@ -2063,10 +2067,10 @@ func (ec *executionContext) field_Mutation_markAsBought_args(ctx context.Context
 		}
 	}
 	args["showingID"] = arg0
-	var arg1 string
+	var arg1 currency.SEK
 	if tmp, ok := rawArgs["price"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
-		arg1, err = ec.unmarshalNSEK2string(ctx, tmp)
+		arg1, err = ec.unmarshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2619,9 +2623,9 @@ func (ec *executionContext) _Attendee_amountOwed(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(currency.SEK)
 	fc.Result = res
-	return ec.marshalNSEK2string(ctx, field.Selections, res)
+	return ec.marshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Attendee_type(ctx context.Context, field graphql.CollectedField, obj *model.Attendee) (ret graphql.Marshaler) {
@@ -2788,9 +2792,9 @@ func (ec *executionContext) _AttendeePaymentDetails_amountOwed(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(currency.SEK)
 	fc.Result = res
-	return ec.marshalNSEK2string(ctx, field.Selections, res)
+	return ec.marshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _AttendeePaymentDetails_payTo(ctx context.Context, field graphql.CollectedField, obj *model.AttendeePaymentDetails) (ret graphql.Marshaler) {
@@ -4514,7 +4518,7 @@ func (ec *executionContext) _Mutation_markAsBought(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().MarkAsBought(rctx, args["showingID"].(uuid.UUID), args["price"].(string))
+		return ec.resolvers.Mutation().MarkAsBought(rctx, args["showingID"].(uuid.UUID), args["price"].(currency.SEK))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6140,9 +6144,9 @@ func (ec *executionContext) _Showing_date(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNLocalDate2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Showing_time(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
@@ -6175,9 +6179,9 @@ func (ec *executionContext) _Showing_time(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNLocalTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Showing_movieID(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
@@ -6215,41 +6219,6 @@ func (ec *executionContext) _Showing_movieID(ctx context.Context, field graphql.
 	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Showing_movieTitle(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Showing",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MovieTitle, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Showing_movie(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6261,14 +6230,14 @@ func (ec *executionContext) _Showing_movie(ctx context.Context, field graphql.Co
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Movie, nil
+		return ec.resolvers.Showing().Movie(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6331,14 +6300,14 @@ func (ec *executionContext) _Showing_cinemaScreen(ctx context.Context, field gra
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CinemaScreen, nil
+		return ec.resolvers.Showing().CinemaScreen(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6379,9 +6348,9 @@ func (ec *executionContext) _Showing_price(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*currency.SEK)
 	fc.Result = res
-	return ec.marshalOSEK2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOSEK2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Showing_ticketsBought(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
@@ -6430,14 +6399,14 @@ func (ec *executionContext) _Showing_admin(ctx context.Context, field graphql.Co
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Admin, nil
+		return ec.resolvers.Showing().Admin(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6500,14 +6469,14 @@ func (ec *executionContext) _Showing_payToUser(ctx context.Context, field graphq
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PayToUser, nil
+		return ec.resolvers.Showing().PayToUser(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6554,9 +6523,9 @@ func (ec *executionContext) _Showing_updateTime(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Showing_createTime(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
@@ -6589,9 +6558,9 @@ func (ec *executionContext) _Showing_createTime(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Showing_filmstadenSeatMap(ctx context.Context, field graphql.CollectedField, obj *model.Showing) (ret graphql.Marshaler) {
@@ -6675,14 +6644,14 @@ func (ec *executionContext) _Showing_adminPaymentDetails(ctx context.Context, fi
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AdminPaymentDetails, nil
+		return ec.resolvers.Showing().AdminPaymentDetails(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6707,14 +6676,14 @@ func (ec *executionContext) _Showing_attendeePaymentDetails(ctx context.Context,
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AttendeePaymentDetails, nil
+		return ec.resolvers.Showing().AttendeePaymentDetails(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6739,14 +6708,14 @@ func (ec *executionContext) _Showing_myTickets(ctx context.Context, field graphq
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.MyTickets, nil
+		return ec.resolvers.Showing().MyTickets(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6774,14 +6743,14 @@ func (ec *executionContext) _Showing_ticketRange(ctx context.Context, field grap
 		Object:     "Showing",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TicketRange, nil
+		return ec.resolvers.Showing().TicketRange(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9120,7 +9089,7 @@ func (ec *executionContext) unmarshalInputAttendeePaymentInfoInput(ctx context.C
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amountOwed"))
-			it.AmountOwed, err = ec.unmarshalNSEK2string(ctx, v)
+			it.AmountOwed, err = ec.unmarshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9299,7 +9268,7 @@ func (ec *executionContext) unmarshalInputUpdateShowingInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
-			it.Price, err = ec.unmarshalNSEK2string(ctx, v)
+			it.Price, err = ec.unmarshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10461,23 +10430,36 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "movieTitle":
-			out.Values[i] = ec._Showing_movieTitle(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "movie":
-			out.Values[i] = ec._Showing_movie(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_movie(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "location":
 			out.Values[i] = ec._Showing_location(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "cinemaScreen":
-			out.Values[i] = ec._Showing_cinemaScreen(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_cinemaScreen(ctx, field, obj)
+				return res
+			})
 		case "price":
 			out.Values[i] = ec._Showing_price(ctx, field, obj)
 		case "ticketsBought":
@@ -10486,20 +10468,38 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "admin":
-			out.Values[i] = ec._Showing_admin(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_admin(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "private":
 			out.Values[i] = ec._Showing_private(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "payToUser":
-			out.Values[i] = ec._Showing_payToUser(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_payToUser(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "updateTime":
 			out.Values[i] = ec._Showing_updateTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -10539,16 +10539,52 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 				return res
 			})
 		case "adminPaymentDetails":
-			out.Values[i] = ec._Showing_adminPaymentDetails(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_adminPaymentDetails(ctx, field, obj)
+				return res
+			})
 		case "attendeePaymentDetails":
-			out.Values[i] = ec._Showing_attendeePaymentDetails(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_attendeePaymentDetails(ctx, field, obj)
+				return res
+			})
 		case "myTickets":
-			out.Values[i] = ec._Showing_myTickets(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_myTickets(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "ticketRange":
-			out.Values[i] = ec._Showing_ticketRange(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Showing_ticketRange(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11564,6 +11600,10 @@ func (ec *executionContext) marshalNLocalTime2timeᚐTime(ctx context.Context, s
 	return res
 }
 
+func (ec *executionContext) marshalNMovie2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐMovie(ctx context.Context, sel ast.SelectionSet, v model.Movie) graphql.Marshaler {
+	return ec._Movie(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNMovie2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐMovieᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Movie) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -11687,6 +11727,10 @@ func (ec *executionContext) marshalNPublicAttendee2ᚖgithubᚗcomᚋfilmstund�
 	return ec._PublicAttendee(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPublicUser2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUser(ctx context.Context, sel ast.SelectionSet, v model.PublicUser) graphql.Marshaler {
+	return ec._PublicUser(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNPublicUser2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐPublicUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PublicUser) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -11741,19 +11785,14 @@ func (ec *executionContext) marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfil
 	return ec._PublicUser(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSEK2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalString(v)
+func (ec *executionContext) unmarshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx context.Context, v interface{}) (currency.SEK, error) {
+	var res currency.SEK
+	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSEK2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
+func (ec *executionContext) marshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx context.Context, sel ast.SelectionSet, v currency.SEK) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNSeat2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐSeat(ctx context.Context, sel ast.SelectionSet, v *model.Seat) graphql.Marshaler {
@@ -12441,19 +12480,20 @@ func (ec *executionContext) marshalOMovie2ᚖgithubᚗcomᚋfilmstundᚋfilmstun
 	return ec._Movie(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOSEK2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+func (ec *executionContext) unmarshalOSEK2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx context.Context, v interface{}) (*currency.SEK, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalString(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	res := new(currency.SEK)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOSEK2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+func (ec *executionContext) marshalOSEK2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx context.Context, sel ast.SelectionSet, v *currency.SEK) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	return v
 }
 
 func (ec *executionContext) marshalOShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx context.Context, sel ast.SelectionSet, v *model.Showing) graphql.Marshaler {
