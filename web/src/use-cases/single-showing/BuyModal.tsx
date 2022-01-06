@@ -8,10 +8,6 @@ import Modal from "../common/ui/Modal";
 import Loader from "../../use-cases/common/utils/ProjectorLoader";
 import { AdminModalAfterTicketsBought } from "./AdminModalAfterTicketsBought";
 import { AdminModalBeforeTicketsBought } from "./AdminModalBeforeTicketsBought";
-import {
-  ShowingAdminFragment,
-  ShowingFragment,
-} from "../../__generated__/types";
 import { SingleShowingScreenShowing } from "./containers/types";
 
 const Padding = styled.div`

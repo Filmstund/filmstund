@@ -100,7 +100,7 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
 };
 
 const SingleShowingLoader: React.FC<{ webID: string }> = ({ webID }) => {
-  const [{ data, error }] = useSingleShowingQuery({
+  const [{ data }] = useSingleShowingQuery({
     variables: { webID },
   });
   const showing = data!.showing;

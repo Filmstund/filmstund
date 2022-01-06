@@ -30,7 +30,7 @@ export const TicketContainer: React.FC<Props> = ({ webID }) => {
   const navigate = useNavigate();
 
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
-  const [{ error }, addTickets] = useAddTicketsMutation();
+  const [, addTickets] = useAddTicketsMutation();
   const toast = useToaster();
 
   const handleGoBackToShowing = () => {

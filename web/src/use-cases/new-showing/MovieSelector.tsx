@@ -50,11 +50,9 @@ const MovieSelector = ({
   setMovie: (movie: MovieFragment) => void;
 }) => {
   const [{ data }] = useNewShowingQuery();
-  const [mutaitonState, fetchMovies] = useFetchMoviesMutation();
-  console.log(mutaitonState);
-  const { fetching } = mutaitonState;
+  const [{ fetching }, fetchMovies] = useFetchMoviesMutation();
 
-  const movies = data?.movies ?? [];
+  const { movies } = data!;
 
   const [searchTerm, handleChangeSearchTerm] = useStateWithHandleChange("");
 
