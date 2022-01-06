@@ -3,7 +3,6 @@ import { groupBy, keys } from "lodash";
 import React, { lazy } from "react";
 import { formatYMD } from "../../../lib/dateTools";
 import {
-  FilmstadenShowing,
   FilmstadenShowingFragment,
   useFilmstadenShowingsQuery,
 } from "../../../__generated__/types";
