@@ -78,7 +78,13 @@ func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID *uuid.UUID)
 }
 
 func (r *showingResolver) Movie(ctx context.Context, obj *model.Showing) (*model.Movie, error) {
-	panic(fmt.Errorf("not implemented"))
+	query := database.FromContext(ctx)
+	movie, err := query.Movie(ctx, obj.Movie.ID)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "query.Movie failed", "movieID", obj.Movie.ID)
+		return nil, fmt.Errorf("failed to fetch movie")
+	}
+	return movie.GraphModel(), nil
 }
 
 func (r *showingResolver) CinemaScreen(ctx context.Context, obj *model.Showing) (*model.CinemaScreen, error) {
