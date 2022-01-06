@@ -52,7 +52,7 @@ func (s *Handler) LoginHandler() http.Handler {
 		redirectURL := codeflow.RedirectURL(r.URL.Query().Get("to"))
 
 		// If user already logged in, redirect to URL immediately.
-		_, err := s.sessionClient.Lookup(r.Context(), r)
+		_, _, err := s.sessionClient.Lookup(r.Context(), r)
 		if err == nil {
 			http.Redirect(w, r, string(redirectURL), http.StatusFound)
 			return

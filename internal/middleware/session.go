@@ -16,14 +16,15 @@ func AuthorizeSession(sessionClient *session.Client) mux.MiddlewareFunc {
 			logger := logging.FromContext(r.Context()).
 				WithValues("url", r.URL.String(), "from", r.RemoteAddr)
 
-			prin, err := sessionClient.Lookup(r.Context(), r)
+			prin, sessionID, err := sessionClient.Lookup(r.Context(), r)
 			if err != nil {
 				logger.V(1).Info("failed to validate session", "err", err)
 				httputils.Unauthorized(w, r)
 				return
 			}
 
-			ctx := principal.WithPrincipal(r.Context(), prin)
+			ctx := session.WithSessionID(r.Context(), sessionID)
+			ctx = principal.WithPrincipal(ctx, prin)
 			next.ServeHTTP(w, r.Clone(ctx))
 		})
 	}

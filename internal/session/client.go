@@ -62,18 +62,18 @@ func (s *Client) addToCache(ctx context.Context, sessionID string, prin principa
 // Lookup the principal based on the session cookie. Lookup will either be from
 // the local in-mem cache, or from the database.
 // TODO: refresh the principal id token maybe?.
-func (s *Client) Lookup(ctx context.Context, r *http.Request) (*principal.Principal, error) {
+func (s *Client) Lookup(ctx context.Context, r *http.Request) (*principal.Principal, string, error) {
 	sessionCookie, err := r.Cookie(s.cfg.CookieName)
 	if err != nil {
-		return nil, ErrNoSession
+		return nil, "", ErrNoSession
 	}
 	sessionID := sessionCookie.Value
 	prin, err := s.getFromCache(ctx, sessionID)
 	if err != nil {
-		return nil, ErrNoSession
+		return nil, "", ErrNoSession
 	}
 	// TODO: check principal token expiry time and refresh it if needed. (maybe not in this func though..)
-	return prin, nil
+	return prin, sessionID, nil
 }
 
 func (s *Client) getFromCache(ctx context.Context, sessionID string) (*principal.Principal, error) {
