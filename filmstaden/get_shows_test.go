@@ -62,3 +62,18 @@ func TestClient_Shows_error(t *testing.T) {
 	assert.Check(t, cmp.Nil(shows))
 	assert.ErrorContains(t, err, "shows: error fetching Filmstaden data, got 500 Internal Server Error")
 }
+
+const showsForMovie = `{"totalNbrOfItems":9,"items":[{"reId":"20220111-1555-1042","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG12773","ct":"Filmstaden Bergakungen","sId":"NCG12773S11","st":"Salong 11","sa":[],"utc":"2022-01-11T14:55:00Z","res":[]},{"reId":"20220111-1940-2783","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG27333","ct":"Biopalatset","sId":"NCG27333S5","st":"Salong 5","sa":["5.1"],"utc":"2022-01-11T18:40:00Z","res":[]},{"reId":"20220111-2025-1036","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG12773","ct":"Filmstaden Bergakungen","sId":"NCG12773S6","st":"Salong 6","sa":[],"utc":"2022-01-11T19:25:00Z","res":[]},{"reId":"20220112-1555-1042","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG12773","ct":"Filmstaden Bergakungen","sId":"NCG12773S11","st":"Salong 11","sa":[],"utc":"2022-01-12T14:55:00Z","res":[]},{"reId":"20220112-1940-2783","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG27333","ct":"Biopalatset","sId":"NCG27333S5","st":"Salong 5","sa":["5.1"],"utc":"2022-01-12T18:40:00Z","res":[]},{"reId":"20220112-2025-1036","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG12773","ct":"Filmstaden Bergakungen","sId":"NCG12773S6","st":"Salong 6","sa":[],"utc":"2022-01-12T19:25:00Z","res":[]},{"reId":"20220113-1555-1042","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG12773","ct":"Filmstaden Bergakungen","sId":"NCG12773S11","st":"Salong 11","sa":[],"utc":"2022-01-13T14:55:00Z","res":[]},{"reId":"20220113-1940-2783","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG27333","ct":"Biopalatset","sId":"NCG27333S5","st":"Salong 5","sa":["5.1"],"utc":"2022-01-13T18:40:00Z","res":[]},{"reId":"20220113-2025-1036","mId":"NCG522214","mvId":"NCG522214V1","cId":"NCG12773","ct":"Filmstaden Bergakungen","sId":"NCG12773S6","st":"Salong 6","sa":[],"utc":"2022-01-13T19:25:00Z","res":[]}]}`
+
+func TestClient_ShowsForMovie(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(showsForMovie))
+		assert.NilError(t, err)
+	}))
+	defer srv.Close()
+
+	client := filmstaden.NewClient(srv.URL, NoopCache())
+	shows, err := client.ShowsForMovie(context.Background(), 1, "GB", "NCG522214", time.Now())
+	assert.NilError(t, err)
+	assert.Equal(t, shows.TotalCount, 9)
+}
