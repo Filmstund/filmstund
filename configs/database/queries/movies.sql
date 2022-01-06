@@ -49,3 +49,8 @@ set popularity             = -1,
     popularity_update_time = CURRENT_TIMESTAMP,
     update_time            = CURRENT_TIMESTAMP
 WHERE id = @movie_id;
+
+-- name: LookupFilmstadenID :one
+SELECT filmstaden_id
+FROM movies m
+WHERE m.id = @movie_id;

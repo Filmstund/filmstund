@@ -16,16 +16,19 @@ type FilmstadenSeatDimensions {
     height: Int!
 }
 
-type FilmstadenLiteScreen {
+type FilmstadenScreen {
+    filmstadenID: ID!
+    name: String!
+}
+type FilmstadenCinema {
     filmstadenID: ID!
     name: String!
 }
 
 type FilmstadenShowing {
-    cinemaName: String!,
-    screen: FilmstadenLiteScreen!,
-    seatCount: Int!,
-    timeUtc: String!,
+    id: String! # aka remote entity ID
+    cinema: FilmstadenCinema!,
+    screen: FilmstadenScreen!,
+    timeUtc: Time!,
     tags: [String!]!,
-    filmstadenRemoteEntityID: String!
 }
