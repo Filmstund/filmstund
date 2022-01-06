@@ -1,0 +1,10 @@
+mutation DeleteGiftCertificateMutation($ticket: GiftCertificateInput!) {
+  deleteGiftCertificate(giftCert: $ticket) {
+    id
+    giftCertificates {
+      number
+      expireTime
+      status
+    }
+  }
+}

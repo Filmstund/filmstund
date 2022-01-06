@@ -1,21 +1,22 @@
-import React, { useCallback } from "react";
+import React, { Suspense, useCallback } from "react";
 
 import { SmallHeader } from "../common/ui/Header";
 import {
   GiftCertificate_Status,
+  useDeleteGiftCertificateMutation,
   UserProfileQuery,
 } from "../../__generated__/types";
 import EditableForetagsbiljettList from "./EditableForetagsbiljettList";
 
 import Foretagsbiljett from "./Foretagsbiljett";
-import { useDeleteForetagsbiljett } from "./useDeleteForetagsbiljett";
+import { InputSpinner } from "../single-showing/InputSpinner";
 
 interface Props {
   foretagsbiljetter: UserProfileQuery["me"]["giftCertificates"];
 }
 
 export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
-  const [deleteForetagsbiljett] = useDeleteForetagsbiljett();
+  const [, deleteGiftCertificate] = useDeleteGiftCertificateMutation();
 
   const handleDeleteForetagsBiljett = useCallback(
     ({
@@ -26,8 +27,8 @@ export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
       switch (status) {
         case GiftCertificate_Status.Available:
           if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
-            deleteForetagsbiljett({
-              variables: { ticket: { number, expireTime } },
+            deleteGiftCertificate({
+              ticket: { number, expireTime },
             });
           }
           break;
@@ -38,15 +39,15 @@ export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
           break;
         case GiftCertificate_Status.Used:
         case GiftCertificate_Status.Expired:
-          deleteForetagsbiljett({
-            variables: { ticket: { number, expireTime } },
+          deleteGiftCertificate({
+            ticket: { number, expireTime },
           });
           break;
         default:
           throw new Error(`Invalid status ${status}`);
       }
     },
-    [deleteForetagsbiljett]
+    [deleteGiftCertificate]
   );
 
   return (
@@ -62,7 +63,9 @@ export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
           }
         />
       ))}
-      <EditableForetagsbiljettList />
+      <Suspense fallback={<InputSpinner />}>
+        <EditableForetagsbiljettList />
+      </Suspense>
     </div>
   );
 };

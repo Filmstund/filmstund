@@ -1,0 +1,5 @@
+mutation UnattendShowingMutation($showingId: UUID!) {
+  unattendShowing(showingID: $showingId) {
+    ...ShowingParticipantFragment
+  }
+}

@@ -5,13 +5,12 @@ import { formatYMD } from "../../lib/dateTools";
 import Field from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import SelectBox from "../common/ui/SelectBox";
-import { FilmstadenShowing } from "../../__generated__/types";
-import { GroupedFilmstadenShowings } from "./hooks/useSfShowings";
+import { FilmstadenShowingFragment } from "../../__generated__/types";
 
 interface Props {
-  filmstadenShowings: GroupedFilmstadenShowings | null;
+  filmstadenShowings: Record<string, FilmstadenShowingFragment[]> | null;
   selectedValue?: string;
-  onSelect: (v: FilmstadenShowing) => void;
+  onSelect: (v: FilmstadenShowingFragment) => void;
   date: string;
 }
 

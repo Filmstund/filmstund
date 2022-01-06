@@ -8,7 +8,6 @@ checks:\
 	generate \
 	fmt  \
 	build \
-	build-website \
 	lint \
 	test \
 	mod-tidy \
@@ -84,6 +83,6 @@ build-website:
 migrate: build
 	@./.build/migrate
 
-run: build build-website migrate
+run: build migrate
 	@./.build/${PROJECT_NAME}
 .PHONY: run

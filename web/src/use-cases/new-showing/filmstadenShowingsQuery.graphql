@@ -1,0 +1,16 @@
+query FilmstadenShowingsQuery($movieID: UUID!, $city: String) {
+  filmstadenShowings(movieID: $movieID, city: $city) {
+    ...FilmstadenShowingFragment
+  }
+}
+
+fragment FilmstadenShowingFragment on FilmstadenShowing {
+  cinemaName
+  screen {
+    filmstadenID
+    name
+  }
+  timeUtc
+  tags
+  filmstadenRemoteEntityID
+}

@@ -1,0 +1,13 @@
+mutation UpdateShowingMutation($showingId: UUID!, $showing: UpdateShowingInput!) {
+  updateShowing(showingID: $showingId, newValues: $showing) {
+    id
+    time
+    date
+    ticketsBought
+    price
+    private
+    payToUser {
+      id
+    }
+  }
+}

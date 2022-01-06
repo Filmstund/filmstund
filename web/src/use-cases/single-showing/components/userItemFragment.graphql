@@ -1,0 +1,7 @@
+fragment UserItemFragment on PublicUser {
+  avatarURL
+  firstName
+  nick
+  lastName
+  phone
+}

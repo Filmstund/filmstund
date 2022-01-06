@@ -1,0 +1,9 @@
+query UserProfileQuery {
+  me: currentUser {
+    ...CompleteUser
+    calendarFeedUrl
+    giftCertificates {
+      ...GiftCertificateFragment
+    }
+  }
+}

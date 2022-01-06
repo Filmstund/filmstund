@@ -1,7 +1,6 @@
-import { addYears } from "date-fns";
 import { GiftCertificate_Status } from "../../../../__generated__/types";
-import { formatYMD } from "../../../../lib/dateTools";
 import { createPaymentOptions } from "../createPaymentOptions";
+import { Temporal } from "@js-temporal/polyfill";
 
 describe("createPaymentOptions", () => {
   describe("default", () => {
@@ -10,13 +9,13 @@ describe("createPaymentOptions", () => {
     });
 
     it("should map each option to an additional extra alternative", () => {
-      const today = new Date();
-      const expires = formatYMD(addYears(today, 1));
+      const today = Temporal.Now.plainDateISO();
+      today.add(Temporal.Duration.from({ years: 1 }));
 
       expect(
         createPaymentOptions([
           {
-            expireTime: expires,
+            expireTime: today,
             number: "123456",
             status: GiftCertificate_Status.Available,
           },

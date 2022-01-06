@@ -1,11 +1,9 @@
-import { gql, useQuery } from "@apollo/client";
 import React from "react";
-import { showingFragment } from "../common/showing/fragment";
 
 import { Link } from "../common/ui/MainButton";
 import { RedHeader } from "../common/ui/RedHeader";
 import { PageTitle } from "../common/utils/PageTitle";
-import { HomeQueryQuery } from "../../__generated__/types";
+import { useHomeQuery } from "../../__generated__/types";
 import { FeaturedShowing } from "./FeaturedShowing";
 import { OrderedShowingsList } from "./OrderedShowingsList";
 import {
@@ -15,10 +13,10 @@ import {
 } from "./utils/filtersCreators";
 
 const Home: React.FC = () => {
-  const { data } = useHomeScreenData();
+  const [{ data }] = useHomeQuery();
 
-  const showings = data ? data.showings : [];
-  const me = data ? data.me : undefined;
+  const showings = data?.showings ?? [];
+  const me = data?.me;
 
   if (!me) {
     return null;
@@ -53,34 +51,5 @@ const Home: React.FC = () => {
     </>
   );
 };
-
-const useHomeScreenData = () =>
-  useQuery<HomeQueryQuery>(
-    gql`
-      query HomeQuery {
-        showings: publicShowings {
-          ...ShowingNeue
-          id
-          webID
-          slug
-          date
-          time
-          admin {
-            id
-          }
-          attendees {
-            userID
-          }
-        }
-        me: currentUser {
-          id
-        }
-      }
-      ${showingFragment}
-    `,
-    {
-      fetchPolicy: "cache-and-network",
-    }
-  );
 
 export default Home;

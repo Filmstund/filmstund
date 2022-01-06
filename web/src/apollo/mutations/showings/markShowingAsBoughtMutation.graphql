@@ -1,0 +1,41 @@
+mutation MarkShowingAsBought($showingId: UUID!, $price: SEK!) {
+  markAsBought(showingID: $showingId, price: $price) {
+    id
+    ticketsBought
+    price
+    private
+    payToUser {
+      id
+    }
+    date
+    time
+    myTickets {
+      id
+    }
+    attendeePaymentDetails {
+      payTo {
+        id
+        nick
+        firstName
+        lastName
+        phone
+      }
+      swishLink
+      hasPaid
+      amountOwed
+    }
+    adminPaymentDetails {
+      attendees {
+        userID
+        hasPaid
+        amountOwed
+        user {
+          id
+          nick
+          name
+          phone
+        }
+      }
+    }
+  }
+}

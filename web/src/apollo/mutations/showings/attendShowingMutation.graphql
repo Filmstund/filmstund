@@ -1,0 +1,8 @@
+mutation AttendShowingMutation(
+  $showingId: UUID!
+  $paymentOption: PaymentOption!
+) {
+  attendShowing(showingID: $showingId, paymentOption: $paymentOption) {
+    ...ShowingParticipantFragment
+  }
+}

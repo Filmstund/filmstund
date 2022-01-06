@@ -1,29 +1,37 @@
 import React, { useState } from "react";
-import { useAddTickets } from "../../apollo/mutations/useAddTickets";
 import MainButton from "../common/ui/MainButton";
 import TicketURLInput from "../../use-cases/common/ui/TicketURLInput";
-import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import { navigateToShowing } from "../common/navigators";
 
 import { FieldWithoutMaxWidth } from "../common/ui/Field";
 import { SmallHeader } from "../common/ui/Header";
 import { ScreenSeats } from "../ticket/ScreenSeats";
-import { TicketQueryQuery } from "../../__generated__/types";
+import {
+  useAddTicketsMutation,
+  useTicketQuery,
+} from "../../__generated__/types";
 import { SeatRange } from "./SeatRange";
 import { Ticket } from "./Ticket";
 import { useNavigate } from "react-router-dom";
+import { useToaster } from "../../common/toast/ToastContext";
 
 interface Props {
-  showing: NonNullable<TicketQueryQuery["showing"]>;
-  me: NonNullable<TicketQueryQuery["me"]>;
+  webID: string;
 }
 
-export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
+export const TicketContainer: React.FC<Props> = ({ webID }) => {
+  const [{ data }] = useTicketQuery({ variables: { webID } });
+  const { me, showing } = data!;
+
+  if (!showing) {
+    throw new Error("Showing is missing");
+  }
+
   const navigate = useNavigate();
 
   const [cinemaTicketUrls, setCinemaTicketUrls] = useState<string[]>([]);
-  const [addTickets, { error, called, loading }] = useAddTickets();
-  const success = called && !error && !loading;
+  const [{ error }, addTickets] = useAddTicketsMutation();
+  const toast = useToaster();
 
   const handleGoBackToShowing = () => {
     navigateToShowing(navigate, showing);
@@ -34,9 +42,16 @@ export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
       (line) => line.trim().length !== 0
     );
 
-    addTickets({
-      variables: { showingId: showing.id, tickets: nonEmptyUrls },
-    }).then(() => setCinemaTicketUrls([]));
+    addTickets({ showingId: showing.id, tickets: nonEmptyUrls }).then(
+      ({ data, error }) => {
+        setCinemaTicketUrls([]);
+        if (data) {
+          toast({ text: "Uppdaterades!", variant: "success" });
+        } else if (error) {
+          toast({ text: error.message, variant: "danger" });
+        }
+      }
+    );
   };
 
   const { myTickets, ticketRange, filmstadenSeatMap } = showing;
@@ -58,11 +73,6 @@ export const TicketContainer: React.FC<Props> = ({ me, showing }) => {
       {tickets.map((ticket) => (
         <Ticket key={ticket.id} ticket={ticket} />
       ))}
-      <StatusMessageBox
-        success={success}
-        errors={error ? [error] : null}
-        successMessage="Uppdaterades!"
-      />
       {showing.admin.id === me.id && (
         <FieldWithoutMaxWidth text="Lägg till Filmstaden-bokningslänkar">
           <TicketURLInput

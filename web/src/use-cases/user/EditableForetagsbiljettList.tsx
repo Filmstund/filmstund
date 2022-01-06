@@ -5,15 +5,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addYears from "date-fns/addYears";
 import { uniqueId } from "lodash";
 import React, { ChangeEvent, useCallback, useState } from "react";
-import { GiftCertificateInput } from "../../__generated__/types";
-import { formatYMD } from "../../lib/dateTools";
+import {
+  GiftCertificateInput,
+  useAddGiftCertificatesMutation,
+} from "../../__generated__/types";
 
 import { margin } from "../../lib/style-vars";
 
 import MainButton from "../common/ui/MainButton";
-import StatusMessageBox from "../../use-cases/common/utils/StatusMessageBox";
 import Foretagsbiljett from "./Foretagsbiljett";
-import { useAddForetagsbiljett } from "./useAddForetagsbiljett";
+import { useToaster } from "../../common/toast/ToastContext";
+import { Temporal } from "@js-temporal/polyfill";
+import { formatYMD } from "../../lib/dateTools";
 
 const DEFAULT_DATE = addYears(new Date(), 1);
 
@@ -33,7 +36,7 @@ const transformDraftToInput = ({
   expires,
 }: ForetagsbiljettInputDraft): GiftCertificateInput => ({
   number,
-  expireTime: formatYMD(expires),
+  expireTime: Temporal.PlainDate.from(formatYMD(expires)),
 });
 
 interface ForetagsbiljettInputDraft {
@@ -44,9 +47,9 @@ interface ForetagsbiljettInputDraft {
 
 const EditableForetagsbiljettList: React.FC = () => {
   const [tickets, setTickets] = useState<ForetagsbiljettInputDraft[]>([]);
-  const [saveForetagsBiljetter, { called, loading, error }] =
-    useAddForetagsbiljett();
-  const success = called && !error && !loading;
+  const [, saveForetagsBiljetter] = useAddGiftCertificatesMutation();
+
+  const toast = useToaster();
 
   const onClickSubmit = useCallback(() => {
     const ticketsToSubmit = tickets
@@ -54,9 +57,17 @@ const EditableForetagsbiljettList: React.FC = () => {
       .map(transformDraftToInput);
 
     return saveForetagsBiljetter({
-      variables: { tickets: ticketsToSubmit },
-    }).then(() => setTickets([]));
-  }, [saveForetagsBiljetter, tickets]);
+      tickets: ticketsToSubmit,
+    }).then(
+      () => {
+        setTickets([]);
+        toast({ variant: "success", text: "Företagsbiljetter uppdaterades" });
+      },
+      (error: Error) => {
+        toast({ variant: "danger", text: error.message });
+      }
+    );
+  }, [saveForetagsBiljetter, tickets, toast]);
 
   const addForetagsbiljett = useCallback(() => {
     const foretagsbiljett: ForetagsbiljettInputDraft = {
@@ -107,11 +118,6 @@ const EditableForetagsbiljettList: React.FC = () => {
         <IconButton size="2x" icon={faPlusCircle} />
       </AddForetagsbiljettContainer>
       <MainButton onClick={onClickSubmit}>Spara företagsbiljetter</MainButton>
-      <StatusMessageBox
-        errors={error ? error.graphQLErrors : null}
-        success={success}
-        successMessage="Företagsbiljetter uppdaterades!"
-      />
     </>
   );
 };

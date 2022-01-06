@@ -1,0 +1,6 @@
+query BioordQuery {
+  allCommandments {
+    number
+    phrase
+  }
+}

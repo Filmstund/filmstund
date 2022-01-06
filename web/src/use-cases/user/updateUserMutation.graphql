@@ -1,0 +1,6 @@
+mutation UpdateUserMutation($user: UserDetailsInput!) {
+  editedUser: updateUser(newInfo: $user) {
+    ...CompleteUser
+    calendarFeedUrl
+  }
+}

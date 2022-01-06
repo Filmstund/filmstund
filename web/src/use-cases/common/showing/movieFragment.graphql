@@ -1,0 +1,6 @@
+fragment MovieFragment on Movie {
+  id
+  poster
+  title
+  releaseDate
+}

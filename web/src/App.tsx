@@ -1,12 +1,14 @@
 import styled from "@emotion/styled";
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { MissingShowing } from "./use-cases/common/showing/MissingShowing";
 import { Footer } from "./use-cases/common/ui/footer/Footer";
 
-import NavBar from "./use-cases/common/ui/NavBar";
+import { NavBar } from "./use-cases/common/ui/NavBar";
 import { PageTitleTemplate } from "./use-cases/common/utils/PageTitle";
-import { Loader } from "./use-cases/common/utils/ProjectorLoader";
+import { ErrorScreen, Loader } from "./use-cases/common/utils/ProjectorLoader";
+import { ErrorBoundary } from "./common/ErrorBoundary";
+import { Toaster } from "./common/toast/Toaster";
 
 const MainGridContainer = styled.main`
   display: flex;
@@ -36,10 +38,14 @@ const AsyncSingleShowing = lazy(
 interface Props {}
 
 const App: React.FC<Props> = () => {
+  const [errorKey, setErrorKey] = useState(0);
   return (
-    <>
-      <PageTitleTemplate titleTemplate="%s | sefilm">
-        <NavBar />
+    <PageTitleTemplate titleTemplate="%s | sefilm">
+      <NavBar onNavigate={() => setErrorKey((k) => k + 1)} />
+      <ErrorBoundary
+        key={errorKey}
+        fallback={(error) => <ErrorScreen error={error} />}
+      >
         <MainGridContainer>
           <Suspense fallback={<Loader />}>
             <Routes>
@@ -63,9 +69,10 @@ const App: React.FC<Props> = () => {
             </Routes>
           </Suspense>
         </MainGridContainer>
-        <Footer />
-      </PageTitleTemplate>
-    </>
+      </ErrorBoundary>
+      <Toaster />
+      <Footer />
+    </PageTitleTemplate>
   );
 };
 

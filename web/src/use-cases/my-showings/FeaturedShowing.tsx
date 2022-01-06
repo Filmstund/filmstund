@@ -1,16 +1,16 @@
 import isBefore from "date-fns/isBefore";
 import isSameDay from "date-fns/isSameDay";
 import subMinutes from "date-fns/subMinutes";
-import { orderBy } from "lodash";
+import { first, orderBy } from "lodash";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   navigateToShowing,
   navigateToShowingTickets,
 } from "../common/navigators";
-import { ShowingNeue } from "../common/showing/ShowingNeue";
+import { ShowingNeue } from "../common/showing/Showing";
 import { FullWidthWrapper } from "../common/ui/PageWidthWrapper";
-import { HomeQueryQuery, ShowingNeueFragment } from "../../__generated__/types";
+import { HomeQuery } from "../../__generated__/types";
 import { ItsHappeningTitle } from "./ItsHappeningTitle";
 import { Jumbotron, JumbotronBackground } from "./Jumbotron";
 import {
@@ -19,7 +19,7 @@ import {
 } from "./utils/filtersCreators";
 
 interface FeaturedShowingProps {
-  showings: HomeQueryQuery["showings"];
+  showings: HomeQuery["showings"];
   meId: string;
 }
 
@@ -38,11 +38,7 @@ export const FeaturedShowing: React.FC<FeaturedShowingProps> = ({
       isSameDay(compareTime, showingDate(s))
   );
 
-  const featuredShowing: ShowingNeueFragment | undefined = orderBy(
-    todayShowings,
-    [showingDate],
-    ["asc"]
-  )[0];
+  const featuredShowing = first(orderBy(todayShowings, [showingDate], ["asc"]));
 
   if (!featuredShowing) {
     return null;

@@ -5,6 +5,7 @@ export const StatusBox = styled.div<{ error?: boolean }>`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   margin: 1em 0;
   padding: 1em;
+  pointer-events: auto;
   background-color: ${(props) => (props.error ? "#ef5353" : "#66bb6a")};
   color: ${(props) => (props.error ? "white" : "black")};
 `;
@@ -34,11 +35,11 @@ const StatusMessageBox: React.FC<Props> = ({
   success,
   successMessage,
 }) => {
-  if (success) {
-    return <StatusBox>{successMessage}</StatusBox>;
-  } else if (errors) {
+  if (errors) {
     const message = formatErrors(errors);
     return <StatusBox error>{message}</StatusBox>;
+  } else if (success) {
+    return <StatusBox>{successMessage}</StatusBox>;
   } else {
     return null;
   }

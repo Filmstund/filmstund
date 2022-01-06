@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled";
 import GitHubLogo from "./GithubLogo";
-import Bioord from "./Bioord";
+import { Bioord } from "./Bioord";
 import { Row } from "../Layout";
 
 const FooterBox = styled.footer`

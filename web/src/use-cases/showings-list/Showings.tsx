@@ -1,22 +1,20 @@
 import isBefore from "date-fns/isBefore";
-import { gql, useQuery } from "@apollo/client";
 import { groupBy } from "lodash";
 import React from "react";
 
 import { getTodaysDate } from "../../lib/dateTools";
-import { showingFragment } from "../common/showing/fragment";
 import { Link } from "../common/ui/MainButton";
 
 import { RedHeader } from "../common/ui/RedHeader";
 import { PageTitle } from "../common/utils/PageTitle";
 import { OrderedShowingsList } from "../my-showings/OrderedShowingsList";
 import { showingDate } from "../my-showings/utils/filtersCreators";
-import { ShowingsQueryQuery } from "../../__generated__/types";
+import { useShowingsQuery } from "../../__generated__/types";
 
 const today = getTodaysDate();
 
 const Showings: React.FC = () => {
-  const { data } = usePublicShowings();
+  const [{ data }] = useShowingsQuery();
 
   const showings = data ? data.showings : [];
 
@@ -35,25 +33,5 @@ const Showings: React.FC = () => {
     </>
   );
 };
-
-const usePublicShowings = () =>
-  useQuery<ShowingsQueryQuery>(
-    gql`
-      query ShowingsQuery {
-        showings: publicShowings {
-          ...ShowingNeue
-          id
-          webID
-          slug
-          date
-          time
-        }
-      }
-      ${showingFragment}
-    `,
-    {
-      fetchPolicy: "cache-and-network",
-    }
-  );
 
 export default Showings;

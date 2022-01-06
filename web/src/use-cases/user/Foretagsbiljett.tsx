@@ -6,7 +6,6 @@ import {
   GiftCertificateInput,
   UserProfileQuery,
 } from "../../__generated__/types";
-import { formatYMD } from "../../lib/dateTools";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
 import Field from "../common/ui/Field";
@@ -108,7 +107,7 @@ const Foretagsbiljett: React.FC<Props> = (props) => (
           onChange={props.handleSetExpiresForetagsbiljett}
         />
       ) : (
-        <ValueField>{formatYMD(props.biljett.expireTime)}</ValueField>
+        <ValueField>{props.biljett.expireTime.toString()}</ValueField>
       )}
     </BiljettField>
     {"status" in props.biljett && props.biljett.status && (

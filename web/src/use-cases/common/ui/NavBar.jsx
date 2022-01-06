@@ -34,21 +34,25 @@ const InternalLink = styled(ReactRouterLink)`
   }
 `;
 
-const NavBar = () => {
+export const NavBar = ({ onNavigate }) => {
   return (
     <NavBarBackground>
       <NavBarLinksContainer>
         <div>
-          <InternalLink to="/">Mina besök</InternalLink>
-          <InternalLink to="/showings">Alla besök</InternalLink>
+          <InternalLink to="/" onClick={onNavigate}>
+            Mina besök
+          </InternalLink>
+          <InternalLink to="/showings" onClick={onNavigate}>
+            Alla besök
+          </InternalLink>
         </div>
         <div>
-          <InternalLink to="/user">Profil</InternalLink>
+          <InternalLink to="/user" onClick={onNavigate}>
+            Profil
+          </InternalLink>
           <Link href="/logout">Logga ut</Link>
         </div>
       </NavBarLinksContainer>
     </NavBarBackground>
   );
 };
-
-export default NavBar;

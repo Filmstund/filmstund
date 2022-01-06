@@ -1,0 +1,8 @@
+query NewShowingQuery {
+  movies: allMovies {
+    ...MovieFragment
+    id
+    popularity
+    releaseDate
+  }
+}

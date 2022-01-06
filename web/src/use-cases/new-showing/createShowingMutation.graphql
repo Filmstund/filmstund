@@ -1,0 +1,5 @@
+mutation CreateShowingMutation($showing: CreateShowingInput!) {
+  showing: createShowing(showing: $showing) {
+    ...ShowingFragment
+  }
+}

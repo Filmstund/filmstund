@@ -1,0 +1,10 @@
+mutation AddGiftCertificatesMutation($tickets: [GiftCertificateInput!]) {
+  addGiftCertificates(giftCerts: $tickets) {
+    id
+    giftCertificates {
+      number
+      expireTime
+      status
+    }
+  }
+}

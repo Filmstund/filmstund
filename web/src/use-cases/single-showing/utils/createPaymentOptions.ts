@@ -1,18 +1,15 @@
-import isAfter from "date-fns/isAfter";
-import isSameDay from "date-fns/isSameDay";
 import {
   GiftCertificate_Status,
+  GiftCertificateFragment,
   PaymentOption,
   PaymentType,
-  SingleShowingQuery,
 } from "../../../__generated__/types";
-
-import { formatYMD, parseDate } from "../../../lib/dateTools";
+import { Temporal } from "@js-temporal/polyfill";
 
 export interface DisplayPaymentOption extends PaymentOption {
   displayName: string;
   type: PaymentType;
-  ticketNumber?: string | null;
+  ticketNumber: string | null;
   suffix?: string | null;
 }
 
@@ -22,30 +19,27 @@ const createPaymentOption = (
   ticketNumber: string | null = null,
   suffix: string | null = null
 ): DisplayPaymentOption => {
-  if (ticketNumber) {
-    return { displayName, type, ticketNumber, suffix };
-  }
-  return { displayName, type };
+  return { displayName, type, ticketNumber, suffix };
 };
 
 const createForetagsbiljetter = (
-  foretagsbiljetter: SingleShowingQuery["me"]["giftCertificates"]
+  foretagsbiljetter: GiftCertificateFragment[]
 ): DisplayPaymentOption[] => {
-  const now = formatYMD(new Date());
+  const now = Temporal.Now.plainDateISO();
 
   return foretagsbiljetter
     .filter(
       ({ status, expireTime }) =>
-        status === GiftCertificate_Status.Available &&
-        (isSameDay(parseDate(expireTime), parseDate(now)) ||
-          isAfter(parseDate(expireTime), parseDate(now)))
+        (status === GiftCertificate_Status.Available &&
+          expireTime.equals(now)) ||
+        Temporal.PlainDate.compare(expireTime, now) > 0
     )
     .map(({ number, expireTime }) =>
       createPaymentOption(
         "Företagsbiljett",
         PaymentType.GiftCertificate,
         number,
-        expireTime
+        expireTime.toString()
       )
     );
 };
@@ -59,9 +53,7 @@ export const stringifyOption = (option: DisplayPaymentOption): string => {
   }
 };
 
-export const createPaymentOptions = (
-  biljetter: SingleShowingQuery["me"]["giftCertificates"]
-) => [
+export const createPaymentOptions = (biljetter: GiftCertificateFragment[]) => [
   createPaymentOption("Swish", PaymentType.Swish),
   ...createForetagsbiljetter(biljetter),
 ];

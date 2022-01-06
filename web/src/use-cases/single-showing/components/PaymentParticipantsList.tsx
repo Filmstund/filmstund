@@ -4,16 +4,14 @@ import { groupBy } from "lodash";
 import * as React from "react";
 
 import Header from "../../common/ui/Header";
-import { ShowingAdminFragment } from "../../../__generated__/types";
+import { AdminAttendeePaymentDetails } from "../containers/types";
 
 const UserActiveStatus = styled.div<{ active: boolean }>`
   color: ${(props) => (props.active ? "#000" : "#ccc")};
 `;
 
 interface UserWithPriceItemProps {
-  user: NonNullable<
-    ShowingAdminFragment["adminPaymentDetails"]
-  >["attendees"][0]["user"];
+  user: AdminAttendeePaymentDetails["user"];
   active: boolean;
   onPaidChange: () => void;
   hasPaid: boolean;
@@ -35,14 +33,8 @@ const UserWithPriceItem: React.FC<UserWithPriceItemProps> = ({
 );
 
 interface UserWithPriceItemListProps {
-  participantPaymentInfos: NonNullable<
-    ShowingAdminFragment["adminPaymentDetails"]
-  >["attendees"];
-  handlePaidChange: (
-    info: NonNullable<
-      ShowingAdminFragment["adminPaymentDetails"]
-    >["attendees"][0]
-  ) => void;
+  participantPaymentInfos: AdminAttendeePaymentDetails[];
+  handlePaidChange: (info: AdminAttendeePaymentDetails) => void;
   paid: boolean;
 }
 
@@ -67,21 +59,15 @@ const UserWithPriceItemList: React.FC<UserWithPriceItemListProps> = ({
 );
 
 interface PaymentParticipantsListProps {
-  handlePaidChange: (
-    info: NonNullable<
-      ShowingAdminFragment["adminPaymentDetails"]
-    >["attendees"][0]
-  ) => void;
-  participants: NonNullable<
-    ShowingAdminFragment["adminPaymentDetails"]
-  >["attendees"];
+  handlePaidChange: (info: AdminAttendeePaymentDetails) => void;
+  participants: AdminAttendeePaymentDetails[];
 }
 
 export const PaymentParticipantsList: React.FC<
   PaymentParticipantsListProps
 > = ({ handlePaidChange, participants }) => {
   const { hasPaid = [], hasNotPaid = [] } = groupBy(participants, (info) =>
-    info?.hasPaid ? "hasPaid" : "hasNotPaid"
+    info.hasPaid ? "hasPaid" : "hasNotPaid"
   );
 
   return (

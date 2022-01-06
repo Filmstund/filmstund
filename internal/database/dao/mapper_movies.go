@@ -37,6 +37,7 @@ func (m *Movie) GraphModel() *model.Movie {
 		Poster:         nullString(m.Poster),
 		Genres:         m.Genres,
 		Archived:       m.Archived,
+		Popularity:     m.Popularity,
 		UpdateTime:     m.UpdateTime.Format(time.RFC3339Nano),
 		CreateTime:     m.CreateTime.Format(time.RFC3339Nano),
 	}

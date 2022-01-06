@@ -1,0 +1,23 @@
+query EditShowingQuery($webID: Base64ID!) {
+  showing(webID: $webID) {
+    ...EditShowingFragment
+  }
+  previouslyUsedLocations
+}
+
+fragment EditShowingFragment on Showing {
+  ...ShowingFragment
+  price
+  private
+  filmstadenShowingID
+  location
+  ticketsBought
+  admin {
+    id
+    name
+    nick
+  }
+  payToUser {
+    id
+  }
+}

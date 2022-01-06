@@ -1,122 +1,64 @@
-import styled from "@emotion/styled";
-import { gql } from "@apollo/client";
 import React from "react";
-
+import { Header } from "../ui/RedHeader";
+import { faQrcode } from "@fortawesome/free-solid-svg-icons/faQrcode";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons/faChevronRight";
 import { formatShowingDateTime } from "../../../lib/dateTools";
-import PosterBox from "../ui/PosterBox";
-import { PageTitle } from "../utils/PageTitle";
-import { OldShowingFragment } from "../../../__generated__/types";
-
-const VerticalPaddingContainer = styled.div`
-  padding: 1em 0;
-`;
-
-const Status = styled.div<{ ticketsBought?: boolean }>`
-  position: absolute;
-  right: 1em;
-  top: 1em;
-  font-style: ${(props) => (props.ticketsBought ? "" : "italic")};
-`;
-
-const capitilized = (s: string) =>
-  s.substring(0, 1).toUpperCase() + s.substring(1);
-
-const getStatus = (ticketsBought: boolean) => {
-  if (ticketsBought) {
-    return "bokad";
-  } else {
-    return "preliminär";
-  }
-};
-
-const StyledShowing = styled.div<{ disabled?: boolean }>`
-  position: relative;
-  &:not(:last-child) {
-    margin-bottom: 1em;
-  }
-  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
-`;
-
-interface AdminProps {
-  name: string;
-  nick?: string | null | undefined;
-}
+import {
+  Box,
+  ButtonText,
+  CenterColumn,
+  Column,
+  Content,
+  Description,
+  FaIcon,
+  Poster,
+  RedButton,
+} from "./style";
+import { UserHeads } from "./UserHeads";
+import { ShowingFragment } from "../../../__generated__/types";
 
 interface Props {
-  movie?: OldShowingFragment["movie"];
-  admin: AdminProps | undefined | null;
-  location: string;
-  date: string;
-  setTitleTag?: boolean;
-  ticketsBought?: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
+  showing: ShowingFragment;
+  onClick: () => void;
+  onClickTickets?: () => void;
 }
 
-const Showing: React.FC<Props> = ({
-  movie,
-  date,
-  admin,
-  setTitleTag = false,
-  ticketsBought = false,
-  location,
-  disabled = false,
+export const ShowingNeue: React.VFC<Props> = ({
+  showing,
   onClick,
-}) => (
-  <StyledShowing disabled={disabled}>
-    {setTitleTag && (
-      <PageTitle
-        title={`${movie?.title ?? ""} ${formatShowingDateTime(date)}`}
-      />
-    )}
-    <PosterBox
-      headerText={movie?.title}
-      poster={movie?.poster}
-      onClick={onClick}
-    >
-      {ticketsBought !== undefined && (
-        <Status ticketsBought={ticketsBought}>
-          {capitilized(getStatus(ticketsBought))}
-        </Status>
-      )}
-      <VerticalPaddingContainer>
-        {formatShowingDateTime(date)}
-        <br />
-        {location}
-        <br />
-      </VerticalPaddingContainer>
-      {admin && <span>Skapad av {admin.nick ?? admin.name}</span>}
-    </PosterBox>
-  </StyledShowing>
-);
+  onClickTickets,
+}) => {
+  const showingHasTickets = showing.myTickets.length > 0;
 
-export const movieFragment = gql`
-  fragment ShowingMovie on Movie {
-    id
-    title
-    poster
-  }
-`;
-
-export const oldShowingFragment = gql`
-  fragment OldShowing on Showing {
-    id
-    webID
-    slug
-    date
-    time
-    location
-    ticketsBought
-    movie {
-      ...ShowingMovie
-    }
-    admin {
-      id
-      name
-      nick
-    }
-  }
-  ${movieFragment}
-`;
-
-export default Showing;
+  return (
+    <Box onClick={onClick}>
+      <Poster src={showing.movie.poster} />
+      <CenterColumn>
+        <Content>
+          <Header>{showing.movie.title}</Header>
+          <Description>
+            {formatShowingDateTime(showing.date + " " + showing.time)}
+          </Description>
+          <UserHeads users={showing.attendees.map((p) => p.userInfo)} />
+        </Content>
+        {showingHasTickets && (
+          <RedButton
+            disabled={!onClickTickets}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onClickTickets) {
+                onClickTickets();
+              }
+            }}
+          >
+            <FaIcon color="#fff" icon={faQrcode} />
+            <ButtonText>Visa biljett</ButtonText>
+          </RedButton>
+        )}
+      </CenterColumn>
+      <Column>
+        <FaIcon color="#9b9b9b" icon={faChevronRight} />
+      </Column>
+    </Box>
+  );
+};
