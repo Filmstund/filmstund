@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"regexp"
+	"strings"
 )
 
 type FilmstadenMembershipID string
@@ -21,8 +23,11 @@ func (f *FilmstadenMembershipID) Valid() bool {
 		return true
 	}
 
-	// TODO: add validation
-	// https://github.com/Filmstund/filmstund/blob/feature/postgres/backend/api/src/main/kotlin/se/filmstund/domain/id/FilmstadenMembershipId.kt#L10
+	match, err := regexp.MatchString(`^[A-Z0-9]{3}-[A-Z0-9]{3}$`, string(*f))
+	if err != nil || !match {
+		return false
+	}
+
 	return true
 }
 
@@ -35,6 +40,10 @@ func (f *FilmstadenMembershipID) String() string {
 
 func (f *FilmstadenMembershipID) UnmarshalGQL(v interface{}) error {
 	if str, ok := v.(string); ok {
+		str = strings.ToUpper(str)
+		if len(str) == 6 {
+			str = fmt.Sprintf("%s-%s", str[:3], str[3:])
+		}
 		id := FilmstadenMembershipID(str)
 		if !id.Valid() {
 			return fmt.Errorf("invalid format for the Filmstaden membership ID")
