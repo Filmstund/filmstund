@@ -11,7 +11,9 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/filmstund/filmstund/internal/auth0"
+	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
+	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
@@ -92,24 +94,8 @@ func (s *Server) graphQLHandler() *handler.Server {
 	gqlConfig := gql.Config{
 		Resolvers: graph.NewResolver(s.env, s.cfg),
 	}
-
 	// This func checks that operations that have the "auth" directive is asserted.
-	gqlConfig.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
-		if role == model.RoleShowingAdmin {
-			fieldCtx := graphql.GetFieldContext(ctx)
-			if showingID, ok := fieldCtx.Args["showingID"]; ok {
-				if showingID, ok := showingID.(uuid.UUID); ok {
-					// TODO check if admin
-					_ = showingID
-					return next(ctx)
-				}
-				return nil, fmt.Errorf("unexpected showing ID type")
-			}
-			return nil, fmt.Errorf("you must be a showing admin for this")
-		}
-
-		return next(ctx)
-	}
+	gqlConfig.Directives.Auth = checkAuth
 
 	server := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 
@@ -139,4 +125,28 @@ func (s *Server) graphQLHandler() *handler.Server {
 		return next(database.WithContext(ctx, queries))
 	})
 	return server
+}
+
+func checkAuth(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
+	if role != model.RoleShowingAdmin {
+		return next(ctx)
+	}
+
+	fieldCtx := graphql.GetFieldContext(ctx)
+	if showingID, ok := fieldCtx.Args["showingID"]; ok {
+		showingID, ok := showingID.(uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("unexpected showing ID type")
+		}
+
+		q := database.FromContext(ctx)
+		p := principal.FromContext(ctx)
+		if ok, err := q.AdminOnShowing(ctx, dao.AdminOnShowingParams{
+			AdminUserID: p.ID,
+			ShowingID:   showingID,
+		}); ok && err == nil {
+			return next(ctx)
+		}
+	}
+	return nil, fmt.Errorf("you must be a showing admin for this")
 }
