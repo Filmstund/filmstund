@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/filmstund/filmstund/internal/auth0"
+	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
@@ -124,6 +125,18 @@ func (s *Server) graphQLHandler() *handler.Server {
 				Error(nil, "graphQL resolver issued panic", "error", err)
 		}
 		return fmt.Errorf("internal server error")
+	})
+
+	// inject the db query into the request context
+	server.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+		// TODO: would it make more sense to have this in a HTTP middleware instead?
+		queries, cleanup, err := s.env.Database().Queries(ctx)
+		if err != nil {
+			logging.FromContext(ctx).Error(err, "failed to get DB queries")
+			return graphql.ErrorResponse(ctx, "internal server error")
+		}
+		defer cleanup()
+		return next(database.WithContext(ctx, queries))
 	})
 	return server
 }
