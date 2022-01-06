@@ -11,14 +11,14 @@ type Mutation {
     createShowing(showing: CreateShowingInput!): Showing!
 
     # Delete a showing and return all public showings
-    deleteShowing(showingID: UUID!): [Showing!]!
+    deleteShowing(showingID: UUID!): [Showing!]! @auth(requires: SHOWING_ADMIN)
 
-    markAsBought(showingID: UUID!, price: SEK!): Showing!
-    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing!
+    markAsBought(showingID: UUID!, price: SEK!): Showing! @auth(requires: SHOWING_ADMIN)
+    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing! @auth(requires: SHOWING_ADMIN)
 
-    updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing!
+    updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing! @auth(requires: SHOWING_ADMIN)
 
-    promoteToAdmin(showingID: UUID!, userToPromote: UUID!): Showing!
+    promoteToAdmin(showingID: UUID!, userToPromote: UUID!): Showing! @auth(requires: SHOWING_ADMIN)
 }
 
 type Showing {

@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -45,7 +46,9 @@ type ResolverRoot interface {
 	User() UserResolver
 }
 
-type DirectiveRoot struct{}
+type DirectiveRoot struct {
+	Auth func(ctx context.Context, obj interface{}, next graphql.Resolver, requires model.Role) (res interface{}, err error)
+}
 
 type ComplexityRoot struct {
 	AdminPaymentDetails struct {
@@ -1602,6 +1605,12 @@ type Commandments {
     phrase: String!
 }
 `, BuiltIn: false},
+	{Name: "../../api/graphql/directive.graphqls", Input: `directive @auth(requires: Role!) on FIELD_DEFINITION
+
+enum Role {
+    SHOWING_ADMIN
+    USER
+}`, BuiltIn: false},
 	{Name: "../../api/graphql/filmstaden.graphqls", Input: `type FilmstadenSeatMap {
     row: Int!
     number: Int!
@@ -1688,7 +1697,7 @@ type Movie {
 }
 `, BuiltIn: false},
 	{Name: "../../api/graphql/payment.graphqls", Input: `extend type Mutation {
-    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee!
+    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee! @auth(requires: SHOWING_ADMIN)
 }
 
 extend type Showing {
@@ -1751,14 +1760,14 @@ type Mutation {
     createShowing(showing: CreateShowingInput!): Showing!
 
     # Delete a showing and return all public showings
-    deleteShowing(showingID: UUID!): [Showing!]!
+    deleteShowing(showingID: UUID!): [Showing!]! @auth(requires: SHOWING_ADMIN)
 
-    markAsBought(showingID: UUID!, price: SEK!): Showing!
-    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing!
+    markAsBought(showingID: UUID!, price: SEK!): Showing! @auth(requires: SHOWING_ADMIN)
+    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing! @auth(requires: SHOWING_ADMIN)
 
-    updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing!
+    updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing! @auth(requires: SHOWING_ADMIN)
 
-    promoteToAdmin(showingID: UUID!, userToPromote: UUID!): Showing!
+    promoteToAdmin(showingID: UUID!, userToPromote: UUID!): Showing! @auth(requires: SHOWING_ADMIN)
 }
 
 type Showing {
@@ -1955,6 +1964,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) dir_auth_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.Role
+	if tmp, ok := rawArgs["requires"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("requires"))
+		arg0, err = ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["requires"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_addGiftCertificates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -4475,8 +4499,32 @@ func (ec *executionContext) _Mutation_deleteShowing(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteShowing(rctx, args["showingID"].(uuid.UUID))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteShowing(rctx, args["showingID"].(uuid.UUID))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Showing); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4517,8 +4565,32 @@ func (ec *executionContext) _Mutation_markAsBought(ctx context.Context, field gr
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().MarkAsBought(rctx, args["showingID"].(uuid.UUID), args["price"].(currency.SEK))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().MarkAsBought(rctx, args["showingID"].(uuid.UUID), args["price"].(currency.SEK))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Showing); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4559,8 +4631,32 @@ func (ec *executionContext) _Mutation_processTicketUrls(ctx context.Context, fie
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ProcessTicketUrls(rctx, args["showingID"].(uuid.UUID), args["ticketUrls"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().ProcessTicketUrls(rctx, args["showingID"].(uuid.UUID), args["ticketUrls"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Showing); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4601,8 +4697,32 @@ func (ec *executionContext) _Mutation_updateShowing(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateShowing(rctx, args["showingID"].(uuid.UUID), args["newValues"].(*model.UpdateShowingInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateShowing(rctx, args["showingID"].(uuid.UUID), args["newValues"].(*model.UpdateShowingInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Showing); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4643,8 +4763,32 @@ func (ec *executionContext) _Mutation_promoteToAdmin(ctx context.Context, field 
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PromoteToAdmin(rctx, args["showingID"].(uuid.UUID), args["userToPromote"].(uuid.UUID))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().PromoteToAdmin(rctx, args["showingID"].(uuid.UUID), args["userToPromote"].(uuid.UUID))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Showing); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4727,8 +4871,32 @@ func (ec *executionContext) _Mutation_updateAttendeePaymentInfo(ctx context.Cont
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateAttendeePaymentInfo(rctx, args["paymentInfo"].(model.AttendeePaymentInfoInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateAttendeePaymentInfo(rctx, args["paymentInfo"].(model.AttendeePaymentInfoInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Attendee); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Attendee`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11783,6 +11951,16 @@ func (ec *executionContext) marshalNPublicUser2ᚖgithubᚗcomᚋfilmstundᚋfil
 		return graphql.Null
 	}
 	return ec._PublicUser(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx context.Context, v interface{}) (model.Role, error) {
+	var res model.Role
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx context.Context, sel ast.SelectionSet, v model.Role) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNSEK2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋcurrencyᚐSEK(ctx context.Context, v interface{}) (currency.SEK, error) {

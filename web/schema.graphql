@@ -1,3 +1,5 @@
+directive @auth(requires: Role!) on FIELD_DEFINITION
+
 type AdminPaymentDetails {
   attendees: [Attendee!]!
   filmstadenBuyLink: String
@@ -196,6 +198,11 @@ type Query {
   randomCommandment: Commandments!
   showing(id: UUID, webID: Base64ID): Showing
   showingForMovie(movieId: UUID): [Showing!]!
+}
+
+enum Role {
+  SHOWING_ADMIN
+  USER
 }
 
 scalar SEK

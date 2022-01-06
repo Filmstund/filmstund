@@ -314,6 +314,11 @@ export type QueryShowingForMovieArgs = {
   movieId?: InputMaybe<Scalars["UUID"]>;
 };
 
+export enum Role {
+  ShowingAdmin = "SHOWING_ADMIN",
+  User = "USER",
+}
+
 export type Seat = {
   __typename?: "Seat";
   number: Scalars["Int"];

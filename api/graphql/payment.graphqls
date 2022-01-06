@@ -1,5 +1,5 @@
 extend type Mutation {
-    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee!
+    updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee! @auth(requires: SHOWING_ADMIN)
 }
 
 extend type Showing {

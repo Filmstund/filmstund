@@ -8,13 +8,16 @@ import (
 	"path"
 
 	"edholm.dev/go-logging"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/filmstund/filmstund/internal/auth0"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/gql"
+	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/session"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -88,7 +91,28 @@ func (s *Server) graphQLHandler() *handler.Server {
 	gqlConfig := gql.Config{
 		Resolvers: graph.NewResolver(s.env, s.cfg),
 	}
+
+	// This func checks that operations that have the "auth" directive is asserted.
+	gqlConfig.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
+		if role == model.RoleShowingAdmin {
+			fieldCtx := graphql.GetFieldContext(ctx)
+			if showingID, ok := fieldCtx.Args["showingID"]; ok {
+				if showingID, ok := showingID.(uuid.UUID); ok {
+					// TODO check if admin
+					_ = showingID
+					return next(ctx)
+				}
+				return nil, fmt.Errorf("unexpected showing ID type")
+			}
+			return nil, fmt.Errorf("you must be a showing admin for this")
+		}
+
+		return next(ctx)
+	}
+
 	server := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
+
+	// handle panics in resolvers
 	server.SetRecoverFunc(func(ctx context.Context, err interface{}) (userMessage error) {
 		if e, ok := err.(error); ok {
 			logging.FromContext(ctx).
