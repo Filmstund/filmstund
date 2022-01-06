@@ -69,12 +69,17 @@ type CreateShowingInput struct {
 	FilmstadenRemoteEntityID *string            `json:"filmstadenRemoteEntityID"`
 }
 
+type FilmstadenCinema struct {
+	FilmstadenID string `json:"filmstadenID"`
+	Name         string `json:"name"`
+}
+
 type FilmstadenCityAlias struct {
 	Name  string `json:"name"`
 	Alias string `json:"alias"`
 }
 
-type FilmstadenLiteScreen struct {
+type FilmstadenScreen struct {
 	FilmstadenID string `json:"filmstadenID"`
 	Name         string `json:"name"`
 }
@@ -98,12 +103,11 @@ type FilmstadenSeatMap struct {
 }
 
 type FilmstadenShowing struct {
-	CinemaName               string                `json:"cinemaName"`
-	Screen                   *FilmstadenLiteScreen `json:"screen"`
-	SeatCount                int                   `json:"seatCount"`
-	TimeUtc                  string                `json:"timeUtc"`
-	Tags                     []string              `json:"tags"`
-	FilmstadenRemoteEntityID string                `json:"filmstadenRemoteEntityID"`
+	ID      string            `json:"id"`
+	Cinema  *FilmstadenCinema `json:"cinema"`
+	Screen  *FilmstadenScreen `json:"screen"`
+	TimeUtc time.Time         `json:"timeUtc"`
+	Tags    []string          `json:"tags"`
 }
 
 type GiftCertificate struct {

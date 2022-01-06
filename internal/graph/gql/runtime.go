@@ -86,12 +86,17 @@ type ComplexityRoot struct {
 		Phrase func(childComplexity int) int
 	}
 
+	FilmstadenCinema struct {
+		FilmstadenID func(childComplexity int) int
+		Name         func(childComplexity int) int
+	}
+
 	FilmstadenCityAlias struct {
 		Alias func(childComplexity int) int
 		Name  func(childComplexity int) int
 	}
 
-	FilmstadenLiteScreen struct {
+	FilmstadenScreen struct {
 		FilmstadenID func(childComplexity int) int
 		Name         func(childComplexity int) int
 	}
@@ -115,12 +120,11 @@ type ComplexityRoot struct {
 	}
 
 	FilmstadenShowing struct {
-		CinemaName               func(childComplexity int) int
-		FilmstadenRemoteEntityID func(childComplexity int) int
-		Screen                   func(childComplexity int) int
-		SeatCount                func(childComplexity int) int
-		Tags                     func(childComplexity int) int
-		TimeUtc                  func(childComplexity int) int
+		Cinema  func(childComplexity int) int
+		ID      func(childComplexity int) int
+		Screen  func(childComplexity int) int
+		Tags    func(childComplexity int) int
+		TimeUtc func(childComplexity int) int
 	}
 
 	GiftCertificate struct {
@@ -487,6 +491,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Commandments.Phrase(childComplexity), true
 
+	case "FilmstadenCinema.filmstadenID":
+		if e.complexity.FilmstadenCinema.FilmstadenID == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenCinema.FilmstadenID(childComplexity), true
+
+	case "FilmstadenCinema.name":
+		if e.complexity.FilmstadenCinema.Name == nil {
+			break
+		}
+
+		return e.complexity.FilmstadenCinema.Name(childComplexity), true
+
 	case "FilmstadenCityAlias.alias":
 		if e.complexity.FilmstadenCityAlias.Alias == nil {
 			break
@@ -501,19 +519,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FilmstadenCityAlias.Name(childComplexity), true
 
-	case "FilmstadenLiteScreen.filmstadenID":
-		if e.complexity.FilmstadenLiteScreen.FilmstadenID == nil {
+	case "FilmstadenScreen.filmstadenID":
+		if e.complexity.FilmstadenScreen.FilmstadenID == nil {
 			break
 		}
 
-		return e.complexity.FilmstadenLiteScreen.FilmstadenID(childComplexity), true
+		return e.complexity.FilmstadenScreen.FilmstadenID(childComplexity), true
 
-	case "FilmstadenLiteScreen.name":
-		if e.complexity.FilmstadenLiteScreen.Name == nil {
+	case "FilmstadenScreen.name":
+		if e.complexity.FilmstadenScreen.Name == nil {
 			break
 		}
 
-		return e.complexity.FilmstadenLiteScreen.Name(childComplexity), true
+		return e.complexity.FilmstadenScreen.Name(childComplexity), true
 
 	case "FilmstadenSeatCoordinates.x":
 		if e.complexity.FilmstadenSeatCoordinates.X == nil {
@@ -578,19 +596,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FilmstadenSeatMap.SeatType(childComplexity), true
 
-	case "FilmstadenShowing.cinemaName":
-		if e.complexity.FilmstadenShowing.CinemaName == nil {
+	case "FilmstadenShowing.cinema":
+		if e.complexity.FilmstadenShowing.Cinema == nil {
 			break
 		}
 
-		return e.complexity.FilmstadenShowing.CinemaName(childComplexity), true
+		return e.complexity.FilmstadenShowing.Cinema(childComplexity), true
 
-	case "FilmstadenShowing.filmstadenRemoteEntityID":
-		if e.complexity.FilmstadenShowing.FilmstadenRemoteEntityID == nil {
+	case "FilmstadenShowing.id":
+		if e.complexity.FilmstadenShowing.ID == nil {
 			break
 		}
 
-		return e.complexity.FilmstadenShowing.FilmstadenRemoteEntityID(childComplexity), true
+		return e.complexity.FilmstadenShowing.ID(childComplexity), true
 
 	case "FilmstadenShowing.screen":
 		if e.complexity.FilmstadenShowing.Screen == nil {
@@ -598,13 +616,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.FilmstadenShowing.Screen(childComplexity), true
-
-	case "FilmstadenShowing.seatCount":
-		if e.complexity.FilmstadenShowing.SeatCount == nil {
-			break
-		}
-
-		return e.complexity.FilmstadenShowing.SeatCount(childComplexity), true
 
 	case "FilmstadenShowing.tags":
 		if e.complexity.FilmstadenShowing.Tags == nil {
@@ -1629,18 +1640,21 @@ type FilmstadenSeatDimensions {
     height: Int!
 }
 
-type FilmstadenLiteScreen {
+type FilmstadenScreen {
+    filmstadenID: ID!
+    name: String!
+}
+type FilmstadenCinema {
     filmstadenID: ID!
     name: String!
 }
 
 type FilmstadenShowing {
-    cinemaName: String!,
-    screen: FilmstadenLiteScreen!,
-    seatCount: Int!,
-    timeUtc: String!,
+    id: String! # aka remote entity ID
+    cinema: FilmstadenCinema!,
+    screen: FilmstadenScreen!,
+    timeUtc: Time!,
     tags: [String!]!,
-    filmstadenRemoteEntityID: String!
 }
 `, BuiltIn: false},
 	{Name: "../../api/graphql/location.graphqls", Input: `extend type Query {
@@ -3063,6 +3077,76 @@ func (ec *executionContext) _Commandments_phrase(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _FilmstadenCinema_filmstadenID(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenCinema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenCinema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FilmstadenID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenCinema_name(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenCinema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenCinema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _FilmstadenCityAlias_name(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenCityAlias) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3133,7 +3217,7 @@ func (ec *executionContext) _FilmstadenCityAlias_alias(ctx context.Context, fiel
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _FilmstadenLiteScreen_filmstadenID(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenLiteScreen) (ret graphql.Marshaler) {
+func (ec *executionContext) _FilmstadenScreen_filmstadenID(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenScreen) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3141,7 +3225,7 @@ func (ec *executionContext) _FilmstadenLiteScreen_filmstadenID(ctx context.Conte
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "FilmstadenLiteScreen",
+		Object:     "FilmstadenScreen",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3168,7 +3252,7 @@ func (ec *executionContext) _FilmstadenLiteScreen_filmstadenID(ctx context.Conte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _FilmstadenLiteScreen_name(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenLiteScreen) (ret graphql.Marshaler) {
+func (ec *executionContext) _FilmstadenScreen_name(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenScreen) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3176,7 +3260,7 @@ func (ec *executionContext) _FilmstadenLiteScreen_name(ctx context.Context, fiel
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "FilmstadenLiteScreen",
+		Object:     "FilmstadenScreen",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3518,7 +3602,7 @@ func (ec *executionContext) _FilmstadenSeatMap_dimensions(ctx context.Context, f
 	return ec.marshalNFilmstadenSeatDimensions2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatDimensions(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _FilmstadenShowing_cinemaName(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+func (ec *executionContext) _FilmstadenShowing_id(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3536,7 +3620,7 @@ func (ec *executionContext) _FilmstadenShowing_cinemaName(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CinemaName, nil
+		return obj.ID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3551,6 +3635,41 @@ func (ec *executionContext) _FilmstadenShowing_cinemaName(ctx context.Context, f
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilmstadenShowing_cinema(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilmstadenShowing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cinema, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.FilmstadenCinema)
+	fc.Result = res
+	return ec.marshalNFilmstadenCinema2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenCinema(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _FilmstadenShowing_screen(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
@@ -3583,44 +3702,9 @@ func (ec *executionContext) _FilmstadenShowing_screen(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.FilmstadenLiteScreen)
+	res := resTmp.(*model.FilmstadenScreen)
 	fc.Result = res
-	return ec.marshalNFilmstadenLiteScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenLiteScreen(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _FilmstadenShowing_seatCount(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "FilmstadenShowing",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SeatCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFilmstadenScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenScreen(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _FilmstadenShowing_timeUtc(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
@@ -3653,9 +3737,9 @@ func (ec *executionContext) _FilmstadenShowing_timeUtc(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _FilmstadenShowing_tags(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
@@ -3691,41 +3775,6 @@ func (ec *executionContext) _FilmstadenShowing_tags(ctx context.Context, field g
 	res := resTmp.([]string)
 	fc.Result = res
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _FilmstadenShowing_filmstadenRemoteEntityID(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenShowing) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "FilmstadenShowing",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.FilmstadenRemoteEntityID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GiftCertificate_number(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
@@ -9747,6 +9796,38 @@ func (ec *executionContext) _Commandments(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var filmstadenCinemaImplementors = []string{"FilmstadenCinema"}
+
+func (ec *executionContext) _FilmstadenCinema(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenCinema) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenCinemaImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilmstadenCinema")
+		case "filmstadenID":
+			out.Values[i] = ec._FilmstadenCinema_filmstadenID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._FilmstadenCinema_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var filmstadenCityAliasImplementors = []string{"FilmstadenCityAlias"}
 
 func (ec *executionContext) _FilmstadenCityAlias(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenCityAlias) graphql.Marshaler {
@@ -9779,24 +9860,24 @@ func (ec *executionContext) _FilmstadenCityAlias(ctx context.Context, sel ast.Se
 	return out
 }
 
-var filmstadenLiteScreenImplementors = []string{"FilmstadenLiteScreen"}
+var filmstadenScreenImplementors = []string{"FilmstadenScreen"}
 
-func (ec *executionContext) _FilmstadenLiteScreen(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenLiteScreen) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenLiteScreenImplementors)
+func (ec *executionContext) _FilmstadenScreen(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenScreen) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenScreenImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("FilmstadenLiteScreen")
+			out.Values[i] = graphql.MarshalString("FilmstadenScreen")
 		case "filmstadenID":
-			out.Values[i] = ec._FilmstadenLiteScreen_filmstadenID(ctx, field, obj)
+			out.Values[i] = ec._FilmstadenScreen_filmstadenID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._FilmstadenLiteScreen_name(ctx, field, obj)
+			out.Values[i] = ec._FilmstadenScreen_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9933,18 +10014,18 @@ func (ec *executionContext) _FilmstadenShowing(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenShowing")
-		case "cinemaName":
-			out.Values[i] = ec._FilmstadenShowing_cinemaName(ctx, field, obj)
+		case "id":
+			out.Values[i] = ec._FilmstadenShowing_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cinema":
+			out.Values[i] = ec._FilmstadenShowing_cinema(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "screen":
 			out.Values[i] = ec._FilmstadenShowing_screen(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "seatCount":
-			out.Values[i] = ec._FilmstadenShowing_seatCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9955,11 +10036,6 @@ func (ec *executionContext) _FilmstadenShowing(ctx context.Context, sel ast.Sele
 			}
 		case "tags":
 			out.Values[i] = ec._FilmstadenShowing_tags(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "filmstadenRemoteEntityID":
-			out.Values[i] = ec._FilmstadenShowing_filmstadenRemoteEntityID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11391,6 +11467,16 @@ func (ec *executionContext) unmarshalNCreateShowingInput2githubᚗcomᚋfilmstun
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNFilmstadenCinema2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenCinema(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenCinema) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FilmstadenCinema(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNFilmstadenCityAlias2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenCityAliasᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.FilmstadenCityAlias) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -11445,14 +11531,14 @@ func (ec *executionContext) marshalNFilmstadenCityAlias2ᚖgithubᚗcomᚋfilmst
 	return ec._FilmstadenCityAlias(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFilmstadenLiteScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenLiteScreen(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenLiteScreen) graphql.Marshaler {
+func (ec *executionContext) marshalNFilmstadenScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenScreen(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenScreen) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._FilmstadenLiteScreen(ctx, sel, v)
+	return ec._FilmstadenScreen(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFilmstadenSeatCoordinates2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐFilmstadenSeatCoordinates(ctx context.Context, sel ast.SelectionSet, v *model.FilmstadenSeatCoordinates) graphql.Marshaler {
