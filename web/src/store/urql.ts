@@ -9,7 +9,7 @@ import { cacheExchange } from "@urql/exchange-graphcache";
 import customScalarsExchange from "urql-custom-scalars-exchange";
 import schema from "../__generated__/introspection.json";
 import { Temporal } from "@js-temporal/polyfill";
-import { Commandments } from "../__generated__/types";
+import { Commandments, FilmstadenCityAlias } from "../__generated__/types";
 
 export const urql = createClient({
   url: BASE_GRAPHQL_URL,
@@ -43,6 +43,7 @@ export const urql = createClient({
       schema: schema as any,
       keys: {
         Commandments: (d) => String((d as unknown as Commandments).number),
+        FilmstadenCityAlias: (d) => (d as unknown as FilmstadenCityAlias).alias,
       },
     }),
     fetchExchange,

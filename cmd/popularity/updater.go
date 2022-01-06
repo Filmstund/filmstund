@@ -20,7 +20,7 @@ type updater struct {
 
 func (updater *updater) updateMoviePopularities(ctx context.Context) error {
 	logger := logging.FromContext(ctx)
-	q := database.FromContext(ctx)
+	q := updater.db.Queries(ctx)
 
 	outdatedMovies, err := q.OutdatedMovies(ctx)
 	if err != nil {
