@@ -50,3 +50,30 @@ func (client *Client) Shows(ctx context.Context, page int, cityAlias string) (*S
 	}
 	return shows, nil
 }
+
+func (client *Client) ShowsForMovie(
+	ctx context.Context,
+	page int,
+	cityAlias string,
+	movieID string,
+	after time.Time,
+) (*Shows, error) {
+	afterDate := truncateTimeToHour(after).Format("2006-01-02T15:04")
+	url := fmt.Sprintf(
+		"%s/show/stripped/sv/%d/1024?filter.countryAlias=se&filter.cityAlias=%s&filter.movieNcgId=%s&filter.timeUtc.greaterThanOrEqualTo=%s",
+		client.baseURL,
+		page,
+		cityAlias,
+		movieID,
+		afterDate,
+	)
+	shows := new(Shows)
+	if err := client.decodedGet(ctx, url, shows); err != nil {
+		return nil, fmt.Errorf("shows: %w", err)
+	}
+	return shows, nil
+}
+
+func truncateTimeToHour(datetime time.Time) time.Time {
+	return datetime.Round(15 * time.Minute)
+}
