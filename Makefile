@@ -23,7 +23,11 @@ include .tools/gofumpt/rules.mk
 include .tools/commitlint/rules.mk
 include .tools/sqlc/rules.mk
 
-lint: $(golangci-lint_bin)
+yarn-install:
+	@yarn --cwd ./web --silent install
+.PHONY: yarn-install
+
+lint: $(golangci-lint_bin) yarn-install
 	$(info [$@] linting $(PROJECT_NAME)...)
 	@$< run --config .golangci.yaml
 	cd ./web && yarn lint
@@ -74,9 +78,8 @@ build: clean
 	go build -o .build/migrate ./cmd/migrate
 .PHONY: build
 
-build-website:
+build-website: yarn-install
 	$(info [$@] building website...)
-	@yarn --cwd ./web --silent install
 	@yarn --cwd ./web --silent types
 	@yarn --cwd ./web --silent build
 
