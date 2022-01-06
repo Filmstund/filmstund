@@ -88,5 +88,18 @@ func (s *Server) graphQLHandler() *handler.Server {
 	gqlConfig := gql.Config{
 		Resolvers: graph.NewResolver(s.env, s.cfg),
 	}
-	return handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
+	server := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
+	server.SetRecoverFunc(func(ctx context.Context, err interface{}) (userMessage error) {
+		if e, ok := err.(error); ok {
+			logging.FromContext(ctx).
+				WithCallDepth(4).
+				Error(e, "graphQL resolver issued panic")
+		} else {
+			logging.FromContext(ctx).
+				WithCallDepth(4).
+				Error(nil, "graphQL resolver issued panic", "error", err)
+		}
+		return fmt.Errorf("internal server error")
+	})
+	return server
 }
