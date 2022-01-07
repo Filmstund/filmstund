@@ -16,6 +16,7 @@ import {
 } from "./style";
 import { UserHeads } from "./UserHeads";
 import { ShowingFragment } from "../../../__generated__/types";
+import { showingDate } from "../../my-showings/utils/filtersCreators";
 
 interface Props {
   showing: ShowingFragment;
@@ -37,7 +38,7 @@ export const ShowingNeue: React.VFC<Props> = ({
         <Content>
           <Header>{showing.movie.title}</Header>
           <Description>
-            {formatShowingDateTime(showing.date + " " + showing.time)}
+            {formatShowingDateTime(showingDate(showing))}
           </Description>
           <UserHeads users={showing.attendees.map((p) => p.userInfo)} />
         </Content>
