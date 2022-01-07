@@ -19,6 +19,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sethvargo/go-envconfig v0.4.0
 	github.com/spf13/pflag v1.0.5
+	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e
 	github.com/vektah/gqlparser/v2 v2.2.0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	gotest.tools/v3 v3.0.3

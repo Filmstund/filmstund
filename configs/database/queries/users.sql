@@ -34,9 +34,20 @@ SELECT id,
        last_name,
        nick,
        phone,
-       avatar                               as avatar_url
+       avatar                                       as avatar_url
 FROM users
 WHERE id = @id;
+
+-- name: ListPublicUsers :many
+SELECT id,
+       (first_name || ' ' || users.last_name)::text as name,
+       first_name,
+       last_name,
+       nick,
+       phone,
+       avatar                                       as avatar_url
+FROM users
+WHERE id = ANY(@ids::uuid[]);
 
 -- name: RandomizeCalendarFeed :one
 UPDATE users

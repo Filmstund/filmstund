@@ -15,6 +15,7 @@ import (
 	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
+	"github.com/filmstund/filmstund/internal/graph/dataloader"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
@@ -230,33 +231,21 @@ func (r *showingResolver) CinemaScreen(ctx context.Context, obj *model.Showing) 
 }
 
 func (r *showingResolver) Admin(ctx context.Context, obj *model.Showing) (*model.PublicUser, error) {
-	logger := logging.FromContext(ctx).
-		WithValues("showingID", obj.ID,
-			"adminID", obj.Admin.ID,
-		)
-	query := database.FromContext(ctx)
-	user, err := query.PublicUser(ctx, obj.Admin.ID)
+	pu, err := dataloader.FromContext(ctx).Load(obj.Admin.ID)
 	if err != nil {
-		logger.Error(err, "failed to fetch Admin on showing")
-		return nil, fmt.Errorf("failed to fetch (admin) user")
+		logging.FromContext(ctx).Error(err, "failed to dataload admin user", "userID", obj.Admin.ID)
+		return nil, fmt.Errorf("failed to load admin user")
 	}
-
-	return user.GraphModel(), nil
+	return pu, nil
 }
 
 func (r *showingResolver) PayToUser(ctx context.Context, obj *model.Showing) (*model.PublicUser, error) {
-	logger := logging.FromContext(ctx).
-		WithValues("showingID", obj.ID,
-			"payToUserID", obj.PayToUser.ID,
-		)
-	query := database.FromContext(ctx)
-	user, err := query.PublicUser(ctx, obj.PayToUser.ID)
+	pu, err := dataloader.FromContext(ctx).Load(obj.PayToUser.ID)
 	if err != nil {
-		logger.Error(err, "failed to fetch PayToUser on showing")
-		return nil, fmt.Errorf("failed to fetch (pay to) user")
+		logging.FromContext(ctx).Error(err, "failed to dataload pay to user", "userID", obj.PayToUser.ID)
+		return nil, fmt.Errorf("failed to load pay to user")
 	}
-
-	return user.GraphModel(), nil
+	return pu, nil
 }
 
 func (r *showingResolver) FilmstadenSeatMap(ctx context.Context, obj *model.Showing) ([]*model.FilmstadenSeatMap, error) {

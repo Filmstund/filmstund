@@ -16,6 +16,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph"
+	"github.com/filmstund/filmstund/internal/graph/dataloader"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/middleware"
@@ -118,7 +119,11 @@ func (s *Server) graphQLHandler() *handler.Server {
 	gqlSrv.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 		// TODO: would it make more sense to have this in a HTTP middleware instead?
 		queries := s.env.Database().Queries(ctx)
-		return next(database.WithContext(ctx, queries))
+		dbCtx := database.WithContext(ctx, queries)
+
+		loaders := dataloader.NewLoaders(dbCtx)
+		dlc := dataloader.WithContext(dbCtx, loaders)
+		return next(dlc)
 	})
 
 	// logging middleware

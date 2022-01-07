@@ -12,21 +12,37 @@ import (
 	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
+	"github.com/filmstund/filmstund/internal/graph/dataloader"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/swish"
 )
 
 func (r *attendeeResolver) User(ctx context.Context, obj *model.Attendee) (*model.PublicUser, error) {
-	panic(fmt.Errorf("not implemented"))
+	pu, err := dataloader.FromContext(ctx).Load(obj.UserID)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "failed to dataload attendee user", "userID", obj.UserID.ID)
+		return nil, fmt.Errorf("failed to load attendee user")
+	}
+	return pu, nil
 }
 
 func (r *attendeePaymentDetailsResolver) PayTo(ctx context.Context, obj *model.AttendeePaymentDetails) (*model.PublicUser, error) {
-	panic(fmt.Errorf("not implemented"))
+	pu, err := dataloader.FromContext(ctx).Load(obj.PayTo.ID)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "failed to dataload pay to user", "userID", obj.PayTo.ID)
+		return nil, fmt.Errorf("failed to load pay to user")
+	}
+	return pu, nil
 }
 
 func (r *attendeePaymentDetailsResolver) Payer(ctx context.Context, obj *model.AttendeePaymentDetails) (*model.PublicUser, error) {
-	panic(fmt.Errorf("not implemented"))
+	pu, err := dataloader.FromContext(ctx).Load(obj.Payer.ID)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "failed to dataload payer", "userID", obj.Payer.ID)
+		return nil, fmt.Errorf("failed to load payer")
+	}
+	return pu, nil
 }
 
 func (r *mutationResolver) UpdateAttendeePaymentInfo(ctx context.Context, paymentInfo model.AttendeePaymentInfoInput) (*model.Attendee, error) {

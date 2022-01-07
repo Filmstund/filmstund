@@ -166,6 +166,56 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+const listPublicUsers = `-- name: ListPublicUsers :many
+SELECT id,
+       (first_name || ' ' || users.last_name)::text as name,
+       first_name,
+       last_name,
+       nick,
+       phone,
+       avatar                                       as avatar_url
+FROM users
+WHERE id = ANY($1::uuid[])
+`
+
+type ListPublicUsersRow struct {
+	ID        uuid.UUID      `json:"id"`
+	Name      string         `json:"name"`
+	FirstName string         `json:"firstName"`
+	LastName  string         `json:"lastName"`
+	Nick      sql.NullString `json:"nick"`
+	Phone     sql.NullString `json:"phone"`
+	AvatarURL sql.NullString `json:"avatarUrl"`
+}
+
+func (q *Queries) ListPublicUsers(ctx context.Context, ids []uuid.UUID) ([]ListPublicUsersRow, error) {
+	rows, err := q.db.Query(ctx, listPublicUsers, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListPublicUsersRow
+	for rows.Next() {
+		var i ListPublicUsersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.FirstName,
+			&i.LastName,
+			&i.Nick,
+			&i.Phone,
+			&i.AvatarURL,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const publicUser = `-- name: PublicUser :one
 SELECT id,
        (first_name || ' ' || users.last_name)::text as name,
@@ -173,7 +223,7 @@ SELECT id,
        last_name,
        nick,
        phone,
-       avatar                               as avatar_url
+       avatar                                       as avatar_url
 FROM users
 WHERE id = $1
 `
