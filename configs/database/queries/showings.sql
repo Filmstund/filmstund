@@ -30,3 +30,13 @@ insert into showings (id, web_id, slug, date, time, movie_id, location,
 values (@id, @web_id, @slug, @date, @time, @movie_id, @location, @cinema_screen_id,
         @filmstaden_showing_id, @admin, @pay_to_user)
 returning *;
+
+-- name: ShowingByWebID :one
+select *
+from showings
+WHERE web_id = @web_id;
+
+-- name: ShowingByID :one
+select *
+from showings
+WHERE id = @id;

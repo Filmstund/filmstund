@@ -186,3 +186,63 @@ func (q *Queries) PublicShowings(ctx context.Context, afterDate time.Time) ([]Sh
 	}
 	return items, nil
 }
+
+const showingByID = `-- name: ShowingByID :one
+select id, web_id, slug, date, time, movie_id, location, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user, private, update_time, create_time
+from showings
+WHERE id = $1
+`
+
+func (q *Queries) ShowingByID(ctx context.Context, id uuid.UUID) (Showing, error) {
+	row := q.db.QueryRow(ctx, showingByID, id)
+	var i Showing
+	err := row.Scan(
+		&i.ID,
+		&i.WebID,
+		&i.Slug,
+		&i.Date,
+		&i.Time,
+		&i.MovieID,
+		&i.Location,
+		&i.CinemaScreenID,
+		&i.FilmstadenShowingID,
+		&i.Price,
+		&i.TicketsBought,
+		&i.Admin,
+		&i.PayToUser,
+		&i.Private,
+		&i.UpdateTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
+const showingByWebID = `-- name: ShowingByWebID :one
+select id, web_id, slug, date, time, movie_id, location, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user, private, update_time, create_time
+from showings
+WHERE web_id = $1
+`
+
+func (q *Queries) ShowingByWebID(ctx context.Context, webID string) (Showing, error) {
+	row := q.db.QueryRow(ctx, showingByWebID, webID)
+	var i Showing
+	err := row.Scan(
+		&i.ID,
+		&i.WebID,
+		&i.Slug,
+		&i.Date,
+		&i.Time,
+		&i.MovieID,
+		&i.Location,
+		&i.CinemaScreenID,
+		&i.FilmstadenShowingID,
+		&i.Price,
+		&i.TicketsBought,
+		&i.Admin,
+		&i.PayToUser,
+		&i.Private,
+		&i.UpdateTime,
+		&i.CreateTime,
+	)
+	return i, err
+}

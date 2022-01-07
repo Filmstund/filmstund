@@ -151,7 +151,28 @@ func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UU
 }
 
 func (r *queryResolver) Showing(ctx context.Context, id *uuid.UUID, webID *string) (*model.Showing, error) {
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx).
+		WithValues("id", id, "webID", webID)
+	query := database.FromContext(ctx)
+	switch {
+	case id != nil:
+		s, err := query.ShowingByID(ctx, *id)
+		if err != nil {
+			logger.Error(err, "query.ShowingByID failed")
+			return nil, fmt.Errorf("failed to find showing")
+		}
+		return s.GraphModel(), nil
+	case webID != nil:
+		s, err := query.ShowingByWebID(ctx, *webID)
+		if err != nil {
+			logger.Error(err, "query.ShowingByWebID failed")
+			return nil, fmt.Errorf("failed to find showing")
+		}
+		return s.GraphModel(), nil
+	default:
+		logger.Info("no suitable showing ID was supplied")
+		return nil, fmt.Errorf("either an ID or a webID needs to be supplied")
+	}
 }
 
 func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *time.Time) ([]*model.Showing, error) {
