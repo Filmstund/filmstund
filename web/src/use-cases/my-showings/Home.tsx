@@ -13,7 +13,7 @@ import {
 } from "./utils/filtersCreators";
 
 const Home: React.FC = () => {
-  const [{ data }] = useHomeQuery();
+  const [{ data }] = useHomeQuery({ requestPolicy: "cache-and-network" });
 
   const showings = data?.showings ?? [];
   const me = data?.me;

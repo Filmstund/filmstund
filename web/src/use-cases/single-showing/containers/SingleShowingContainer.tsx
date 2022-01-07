@@ -68,7 +68,7 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
       <SimpleShowing
         setTitleTag={true}
         movie={showing.movie}
-        date={showing.date + " " + showing.time}
+        date={`${showing.date.toString()} ${showing.time}`}
         admin={showing.admin}
         location={showing.location}
         ticketsBought={showing.ticketsBought}

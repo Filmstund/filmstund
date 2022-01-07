@@ -14,11 +14,9 @@ import { useShowingsQuery } from "../../__generated__/types";
 const today = getTodaysDate();
 
 const Showings: React.FC = () => {
-  const [{ data }] = useShowingsQuery();
+  const [{ data }] = useShowingsQuery({ requestPolicy: "cache-and-network" });
 
-  const showings = data ? data.showings : [];
-
-  const { previous = [], upcoming = [] } = groupBy(showings, (s) =>
+  const { previous = [], upcoming = [] } = groupBy(data?.showings, (s) =>
     isBefore(showingDate(s), today) ? "previous" : "upcoming"
   );
 
