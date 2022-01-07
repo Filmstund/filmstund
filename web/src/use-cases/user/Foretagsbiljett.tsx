@@ -1,20 +1,17 @@
 import styled from "@emotion/styled";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ChangeEvent, lazy } from "react";
-import {
-  GiftCertificateInput,
-  UserProfileQuery,
-} from "../../__generated__/types";
+import React, { ChangeEvent } from "react";
 import { margin, SMALL_FONT_SIZE } from "../../lib/style-vars";
 
 import Field from "../common/ui/Field";
 import Input from "../../use-cases/common/ui/Input";
-import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
-
-const DatePickerInput = lazy(
-  () => import("../common/ui/date-picker/DatePickerInput")
-);
+import { ForetagsbiljettInputDraft } from "./EditableForetagsbiljettList";
+import {
+  GiftCertificate_Status,
+  GiftCertificateFragment,
+} from "../../__generated__/types";
+import { DateInput } from "./DateInput";
 
 const ForetagsbiljettWrapper = styled.div`
   display: flex;
@@ -37,16 +34,17 @@ const BiljettField = styled(Field)`
   padding: 0 0.5em;
 `;
 
-const localizeTicketStatus = (status: string) => {
+const localizeTicketStatus = (status: GiftCertificate_Status) => {
   switch (status) {
-    case "Available":
+    case GiftCertificate_Status.Available:
       return "Tillgänglig";
-    case "Pending":
-      return "Upptagen";
-    case "Used":
-      return "Använd";
-    case "Expired":
+    case GiftCertificate_Status.Expired:
       return "Utgången";
+    case GiftCertificate_Status.Pending:
+      return "Upptagen";
+    case GiftCertificate_Status.Used:
+      return "Använd";
+    case GiftCertificate_Status.Unknown:
     default:
       return status;
   }
@@ -56,28 +54,16 @@ const ValueField = styled.div`
   font-size: ${SMALL_FONT_SIZE};
 `;
 
-const isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
-
-const DateInput = ({ onChange, ...props }: any) => {
-  const handleChange = useHandleChangeEvent(onChange);
-
-  if (isIOS) {
-    return <Input type="date" onChange={handleChange} {...props} />;
-  } else {
-    return <DatePickerInput onChange={onChange} {...props} />;
-  }
-};
-
 interface EditableForetagsbiljettProps {
-  biljett: GiftCertificateInput;
+  biljett: ForetagsbiljettInputDraft;
   editable: true;
   handleChangeForetagsbiljett: (event: ChangeEvent<HTMLInputElement>) => void;
-  handleSetExpiresForetagsbiljett: (value: Date) => void;
+  handleSetExpiresForetagsbiljett: (value: string) => void;
   handleRemoveForetagsbiljett: () => void;
 }
 
 interface ForetagsbiljettProps {
-  biljett: UserProfileQuery["me"]["giftCertificates"][0];
+  biljett: GiftCertificateFragment;
   editable: false;
   handleChangeForetagsbiljett?: undefined;
   handleSetExpiresForetagsbiljett?: undefined;
@@ -86,7 +72,7 @@ interface ForetagsbiljettProps {
 
 type Props = EditableForetagsbiljettProps | ForetagsbiljettProps;
 
-const Foretagsbiljett: React.FC<Props> = (props) => (
+export const Foretagsbiljett: React.FC<Props> = (props) => (
   <ForetagsbiljettWrapper>
     <BiljettField text="Nummer">
       {props.editable ? (
@@ -103,7 +89,7 @@ const Foretagsbiljett: React.FC<Props> = (props) => (
     <BiljettField text="Utgångsdatum">
       {props.editable ? (
         <DateInput
-          value={props.biljett.expireTime}
+          value={props.biljett.expires.toString()}
           onChange={props.handleSetExpiresForetagsbiljett}
         />
       ) : (
@@ -121,5 +107,3 @@ const Foretagsbiljett: React.FC<Props> = (props) => (
     </div>
   </ForetagsbiljettWrapper>
 );
-
-export default Foretagsbiljett;

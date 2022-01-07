@@ -9,8 +9,7 @@ describe("createPaymentOptions", () => {
     });
 
     it("should map each option to an additional extra alternative", () => {
-      const today = Temporal.Now.plainDateISO();
-      today.add(Temporal.Duration.from({ years: 1 }));
+      const today = Temporal.Now.plainDateISO().add({ years: 1 });
 
       expect(
         createPaymentOptions([

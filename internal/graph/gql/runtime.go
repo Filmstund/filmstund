@@ -1945,7 +1945,7 @@ type PublicUser {
 
 type GiftCertificate {
     number: String!
-    expireTime: Time!
+    expireTime: LocalDate!
     status: GiftCertificate_Status!
 }
 
@@ -1969,7 +1969,7 @@ input UserDetailsInput {
 
 input GiftCertificateInput {
     number: String!
-    expireTime: Time
+    expireTime: LocalDate
 }
 `, BuiltIn: false},
 }
@@ -3844,7 +3844,7 @@ func (ec *executionContext) _GiftCertificate_expireTime(ctx context.Context, fie
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNLocalDate2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GiftCertificate_status(ctx context.Context, field graphql.CollectedField, obj *model.GiftCertificate) (ret graphql.Marshaler) {
@@ -9431,7 +9431,7 @@ func (ec *executionContext) unmarshalInputGiftCertificateInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expireTime"))
-			it.ExpireTime, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			it.ExpireTime, err = ec.unmarshalOLocalDate2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12853,21 +12853,6 @@ func (ec *executionContext) marshalOTicketRange2ᚖgithubᚗcomᚋfilmstundᚋfi
 		return graphql.Null
 	}
 	return ec._TicketRange(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalTime(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalTime(*v)
 }
 
 func (ec *executionContext) unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v interface{}) (*uuid.UUID, error) {

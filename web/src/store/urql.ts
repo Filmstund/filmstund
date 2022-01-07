@@ -9,7 +9,11 @@ import { cacheExchange } from "@urql/exchange-graphcache";
 import customScalarsExchange from "urql-custom-scalars-exchange";
 import schema from "../__generated__/introspection.json";
 import { Temporal } from "@js-temporal/polyfill";
-import { Commandments, FilmstadenCityAlias } from "../__generated__/types";
+import {
+  Commandments,
+  FilmstadenCityAlias,
+  GiftCertificate,
+} from "../__generated__/types";
 
 export const urql = createClient({
   url: BASE_GRAPHQL_URL,
@@ -35,7 +39,7 @@ export const urql = createClient({
           return Temporal.PlainTime.from(value);
         },
         Time(value: string) {
-          return Temporal.ZonedDateTime.from(value);
+          return Temporal.Instant.from(value);
         },
       },
     }),
@@ -44,6 +48,7 @@ export const urql = createClient({
       keys: {
         Commandments: (d) => String((d as unknown as Commandments).number),
         FilmstadenCityAlias: (d) => (d as unknown as FilmstadenCityAlias).alias,
+        GiftCertificate: (d) => (d as unknown as GiftCertificate).number,
       },
     }),
     fetchExchange,

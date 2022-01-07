@@ -9,7 +9,7 @@ type ShowingFilterFn = (s: HomeQuery["showings"][0]) => boolean;
 const today = getTodaysDate();
 
 export const showingDate = (showing: Pick<ShowingFragment, "date" | "time">) =>
-  parseISO(showing.date + " " + showing.time);
+  parseISO(showing.date.toString() + " " + showing.time.toString());
 
 export const filterShowingsCreatedByMe =
   (meId: string): ShowingFilterFn =>

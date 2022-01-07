@@ -1047,7 +1047,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Time",
+                "name": "LocalDate",
                 "ofType": null
               }
             },
@@ -1103,7 +1103,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "Time",
+              "name": "LocalDate",
               "ofType": null
             },
             "defaultValue": null,

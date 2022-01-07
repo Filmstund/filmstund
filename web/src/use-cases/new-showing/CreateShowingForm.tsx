@@ -40,6 +40,14 @@ interface ShowingState {
   admin: CreateShowingQuery["me"];
 }
 
+const cleanFilmstadenScreen = ({
+  id,
+  name,
+}: FilmstadenShowingFragment["screen"]): InputMaybe<CinemaScreenInput> => ({
+  id,
+  name,
+});
+
 const getInitialState = (
   { me, movie }: Pick<CreateShowingQuery, "me" | "movie">,
   movieID: string
@@ -100,9 +108,9 @@ export const CreateShowingForm: React.FC<Props> = ({
       const newState: ShowingState = {
         ...state,
         filmstadenRemoteEntityID: id,
-        time: Temporal.PlainDateTime.from(timeUtc).toPlainTime().toString(),
+        time: timeUtc.toZonedDateTimeISO("utc").toPlainTime().toString(),
         location: cinema.name,
-        filmstadenScreen: screen,
+        filmstadenScreen: cleanFilmstadenScreen(screen),
       };
 
       handleSubmit(newState);
@@ -126,7 +134,9 @@ export const CreateShowingForm: React.FC<Props> = ({
     filmstadenScreen,
   }: ShowingState) => {
     const showing: CreateShowingInput = {
-      time: Temporal.PlainTime.from(time),
+      time: Temporal.PlainTime.from(time).toString({
+        smallestUnit: "minutes",
+      }) as any,
       movieID,
       filmstadenRemoteEntityID: filmstadenRemoteEntityID ?? null,
       date: Temporal.PlainDate.from(date),
