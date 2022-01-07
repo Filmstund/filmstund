@@ -10,7 +10,7 @@ import {
   useCreateShowingMutation,
   useCreateShowingQuery,
 } from "../../__generated__/types";
-import { formatLocalTime, formatYMD, parseDate } from "../../lib/dateTools";
+import { formatYMD, parseDate } from "../../lib/dateTools";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import SimpleShowing from "../common/showing/SimpleShowing";
 import Field from "../common/ui/Field";
@@ -60,7 +60,7 @@ const getInitialState = (
 
   return {
     date: formatYMD(date),
-    time: formatLocalTime(now),
+    time: "19:00",
     location: "",
     filmstadenRemoteEntityID: null,
     filmstadenScreen: null,
