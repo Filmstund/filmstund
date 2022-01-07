@@ -86,31 +86,42 @@ func (q *Queries) AttendeePaymentDetails(ctx context.Context, arg AttendeePaymen
 }
 
 const listAttendees = `-- name: ListAttendees :many
-SELECT user_id,
+SELECT a.user_id,
        showing_id,
        has_paid,
        amount_owed,
        attendee_type,
        gift_certificate_used,
-       u.filmstaden_membership_id
+       u.filmstaden_membership_id,
+       gc.number      as gift_certificate_number,
+       gc.expire_time as gift_certificate_expire_time
 FROM attendees a
          left join users u on u.id = a.user_id
          left outer join showings s on s.id = a.showing_id
+         left outer join gift_certificate gc on gc.user_id = a.user_id and gc.number = a.gift_certificate_used
 WHERE a.showing_id = $1
+  AND s.admin = $2
 `
 
-type ListAttendeesRow struct {
-	UserID                 uuid.UUID      `json:"userID"`
-	ShowingID              uuid.UUID      `json:"showingID"`
-	HasPaid                bool           `json:"hasPaid"`
-	AmountOwed             int32          `json:"amountOwed"`
-	AttendeeType           string         `json:"attendeeType"`
-	GiftCertificateUsed    sql.NullString `json:"giftCertificateUsed"`
-	FilmstadenMembershipID sql.NullString `json:"filmstadenMembershipID"`
+type ListAttendeesParams struct {
+	ShowingID uuid.UUID `json:"showingID"`
+	AdminID   uuid.UUID `json:"adminID"`
 }
 
-func (q *Queries) ListAttendees(ctx context.Context, showingID uuid.UUID) ([]ListAttendeesRow, error) {
-	rows, err := q.db.Query(ctx, listAttendees, showingID)
+type ListAttendeesRow struct {
+	UserID                    uuid.UUID      `json:"userID"`
+	ShowingID                 uuid.UUID      `json:"showingID"`
+	HasPaid                   bool           `json:"hasPaid"`
+	AmountOwed                int32          `json:"amountOwed"`
+	AttendeeType              string         `json:"attendeeType"`
+	GiftCertificateUsed       sql.NullString `json:"giftCertificateUsed"`
+	FilmstadenMembershipID    sql.NullString `json:"filmstadenMembershipID"`
+	GiftCertificateNumber     sql.NullString `json:"giftCertificateNumber"`
+	GiftCertificateExpireTime sql.NullTime   `json:"giftCertificateExpireTime"`
+}
+
+func (q *Queries) ListAttendees(ctx context.Context, arg ListAttendeesParams) ([]ListAttendeesRow, error) {
+	rows, err := q.db.Query(ctx, listAttendees, arg.ShowingID, arg.AdminID)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +137,8 @@ func (q *Queries) ListAttendees(ctx context.Context, showingID uuid.UUID) ([]Lis
 			&i.AttendeeType,
 			&i.GiftCertificateUsed,
 			&i.FilmstadenMembershipID,
+			&i.GiftCertificateNumber,
+			&i.GiftCertificateExpireTime,
 		); err != nil {
 			return nil, err
 		}

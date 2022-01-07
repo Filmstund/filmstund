@@ -94,6 +94,24 @@ func (q *Queries) LookupMovieTitle(ctx context.Context, movieID uuid.UUID) (stri
 	return title, err
 }
 
+const lookupSlugAndFSID = `-- name: LookupSlugAndFSID :one
+SELECT slug, filmstaden_id
+from movies
+where id = $1
+`
+
+type LookupSlugAndFSIDRow struct {
+	Slug         string `json:"slug"`
+	FilmstadenID string `json:"filmstadenID"`
+}
+
+func (q *Queries) LookupSlugAndFSID(ctx context.Context, movieID uuid.UUID) (LookupSlugAndFSIDRow, error) {
+	row := q.db.QueryRow(ctx, lookupSlugAndFSID, movieID)
+	var i LookupSlugAndFSIDRow
+	err := row.Scan(&i.Slug, &i.FilmstadenID)
+	return i, err
+}
+
 const movie = `-- name: Movie :one
 select id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, popularity, popularity_update_time, archived, update_time, create_time
 FROM movies

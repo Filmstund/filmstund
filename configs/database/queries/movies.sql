@@ -59,3 +59,8 @@ WHERE m.id = @movie_id;
 SELECT title
 FROM movies m
 WHERE m.id = @movie_id;
+
+-- name: LookupSlugAndFSID :one
+SELECT slug, filmstaden_id
+from movies
+where id = @movie_id;

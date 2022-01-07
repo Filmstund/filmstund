@@ -3,17 +3,21 @@ insert into attendees (user_id, showing_id, attendee_type, has_paid, amount_owed
 values (@user_id, @showing_id, @attendee_type, @has_paid, @amount_owed, @gift_certificate_used);
 
 -- name: ListAttendees :many
-SELECT user_id,
+SELECT a.user_id,
        showing_id,
        has_paid,
        amount_owed,
        attendee_type,
        gift_certificate_used,
-       u.filmstaden_membership_id
+       u.filmstaden_membership_id,
+       gc.number      as gift_certificate_number,
+       gc.expire_time as gift_certificate_expire_time
 FROM attendees a
          left join users u on u.id = a.user_id
          left outer join showings s on s.id = a.showing_id
-WHERE a.showing_id = @showing_id;
+         left outer join gift_certificate gc on gc.user_id = a.user_id and gc.number = a.gift_certificate_used
+WHERE a.showing_id = @showing_id
+  AND s.admin = @admin_id;
 
 -- name: AttendeePaymentDetails :one
 SELECT user_id,

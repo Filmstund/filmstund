@@ -40,6 +40,8 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Attendee() AttendeeResolver
+	AttendeePaymentDetails() AttendeePaymentDetailsResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Showing() ShowingResolver
@@ -279,6 +281,15 @@ type ComplexityRoot struct {
 		SignupTime             func(childComplexity int) int
 		UpdateTime             func(childComplexity int) int
 	}
+}
+
+type AttendeeResolver interface {
+	User(ctx context.Context, obj *model.Attendee) (*model.PublicUser, error)
+}
+
+type AttendeePaymentDetailsResolver interface {
+	PayTo(ctx context.Context, obj *model.AttendeePaymentDetails) (*model.PublicUser, error)
+	Payer(ctx context.Context, obj *model.AttendeePaymentDetails) (*model.PublicUser, error)
 }
 
 type MutationResolver interface {
@@ -2537,14 +2548,14 @@ func (ec *executionContext) _Attendee_user(ctx context.Context, field graphql.Co
 		Object:     "Attendee",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
+		return ec.resolvers.Attendee().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2846,14 +2857,14 @@ func (ec *executionContext) _AttendeePaymentDetails_payTo(ctx context.Context, f
 		Object:     "AttendeePaymentDetails",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PayTo, nil
+		return ec.resolvers.AttendeePaymentDetails().PayTo(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2881,14 +2892,14 @@ func (ec *executionContext) _AttendeePaymentDetails_payer(ctx context.Context, f
 		Object:     "AttendeePaymentDetails",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Payer, nil
+		return ec.resolvers.AttendeePaymentDetails().Payer(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9646,32 +9657,41 @@ func (ec *executionContext) _Attendee(ctx context.Context, sel ast.SelectionSet,
 		case "userID":
 			out.Values[i] = ec._Attendee_userID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "user":
-			out.Values[i] = ec._Attendee_user(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Attendee_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "showingID":
 			out.Values[i] = ec._Attendee_showingID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "hasPaid":
 			out.Values[i] = ec._Attendee_hasPaid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "amountOwed":
 			out.Values[i] = ec._Attendee_amountOwed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "type":
 			out.Values[i] = ec._Attendee_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "giftCertificateUsed":
 			out.Values[i] = ec._Attendee_giftCertificateUsed(ctx, field, obj)
@@ -9702,23 +9722,41 @@ func (ec *executionContext) _AttendeePaymentDetails(ctx context.Context, sel ast
 		case "hasPaid":
 			out.Values[i] = ec._AttendeePaymentDetails_hasPaid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "amountOwed":
 			out.Values[i] = ec._AttendeePaymentDetails_amountOwed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "payTo":
-			out.Values[i] = ec._AttendeePaymentDetails_payTo(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AttendeePaymentDetails_payTo(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "payer":
-			out.Values[i] = ec._AttendeePaymentDetails_payer(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AttendeePaymentDetails_payer(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "swishLink":
 			out.Values[i] = ec._AttendeePaymentDetails_swishLink(ctx, field, obj)
 		default:

@@ -97,3 +97,13 @@ models:
         resolver: true
       ticketRange:
         resolver: true
+  AttendeePaymentDetails:
+    fields:
+      payTo:
+        resolver: true
+      payer:
+        resolver: true
+  Attendee:
+    fields:
+      user:
+        resolver: true
