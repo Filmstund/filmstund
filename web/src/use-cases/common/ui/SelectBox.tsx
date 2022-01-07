@@ -55,7 +55,11 @@ const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
         selected={option.id === selectedValue}
       >
         <Lable>
-          {option.timeUtc.toString()} {option.screen.name},{" "}
+          {option.timeUtc
+            .toZonedDateTimeISO("utc")
+            .toPlainTime()
+            .toString({ smallestUnit: "minutes" })}{" "}
+          {option.screen.name},{" "}
           {option.cinema.name.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>
