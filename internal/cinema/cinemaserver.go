@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"edholm.dev/go-logging"
 	"github.com/99designs/gqlgen/graphql"
@@ -22,7 +23,6 @@ import (
 	"github.com/filmstund/filmstund/internal/session"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/vektah/gqlparser/v2/ast"
 )
 
 type Server struct {
@@ -122,6 +122,28 @@ func (s *Server) graphQLHandler() *handler.Server {
 	})
 
 	// logging middleware
+	gqlSrv.AroundFields(func(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
+		logger := logging.FromContext(ctx).V(6)
+		fc := graphql.GetFieldContext(ctx)
+		if !fc.IsResolver || !logger.Enabled() {
+			return next(ctx)
+		}
+
+		before := time.Now()
+		i, err := next(ctx)
+		dur := time.Since(before)
+
+		var (
+			queryName = fc.Field.Name
+			args      = fc.Args
+		)
+		logger.Info("qgl resolver called",
+			"name", queryName,
+			"arguments", args,
+			"duration", dur.String(),
+		)
+		return i, err
+	})
 	gqlSrv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
 		logger := logging.FromContext(ctx).V(5)
 		if !logger.Enabled() {
@@ -129,21 +151,8 @@ func (s *Server) graphQLHandler() *handler.Server {
 		}
 
 		oc := graphql.GetOperationContext(ctx)
-		selection := oc.Operation.SelectionSet[0]
-
-		var args map[string]interface{}
-		if field, ok := selection.(*ast.Field); ok {
-			args = make(map[string]interface{}, len(field.Arguments))
-			args = field.ArgumentMap(args)
-		} else {
-			args = map[string]interface{}{
-				"failure": true,
-			}
-		}
-
-		logger.Info("gql request",
+		logger.Info("received gql query/mutation",
 			"operation", oc.OperationName,
-			"arguments", args,
 		)
 		return next(ctx)
 	})
