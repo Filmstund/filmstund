@@ -35,3 +35,96 @@ func (q *Queries) AddAttendee(ctx context.Context, arg AddAttendeeParams) error 
 	)
 	return err
 }
+
+const attendeePaymentDetails = `-- name: AttendeePaymentDetails :one
+SELECT user_id,
+       showing_id,
+       has_paid,
+       amount_owed,
+       attendee_type,
+       s.pay_to_user
+FROM attendees a
+         left outer join showings s on s.id = a.showing_id
+WHERE a.showing_id = $1
+  AND a.user_id = $2
+`
+
+type AttendeePaymentDetailsParams struct {
+	ShowingID uuid.UUID `json:"showingID"`
+	UserID    uuid.UUID `json:"userID"`
+}
+
+type AttendeePaymentDetailsRow struct {
+	UserID       uuid.UUID     `json:"userID"`
+	ShowingID    uuid.UUID     `json:"showingID"`
+	HasPaid      bool          `json:"hasPaid"`
+	AmountOwed   int32         `json:"amountOwed"`
+	AttendeeType string        `json:"attendeeType"`
+	PayToUser    uuid.NullUUID `json:"payToUser"`
+}
+
+func (q *Queries) AttendeePaymentDetails(ctx context.Context, arg AttendeePaymentDetailsParams) (AttendeePaymentDetailsRow, error) {
+	row := q.db.QueryRow(ctx, attendeePaymentDetails, arg.ShowingID, arg.UserID)
+	var i AttendeePaymentDetailsRow
+	err := row.Scan(
+		&i.UserID,
+		&i.ShowingID,
+		&i.HasPaid,
+		&i.AmountOwed,
+		&i.AttendeeType,
+		&i.PayToUser,
+	)
+	return i, err
+}
+
+const listAttendees = `-- name: ListAttendees :many
+SELECT user_id,
+       showing_id,
+       has_paid,
+       amount_owed,
+       attendee_type,
+       gift_certificate_used,
+       u.filmstaden_membership_id
+FROM attendees a
+         left join users u on u.id = a.user_id
+         left outer join showings s on s.id = a.showing_id
+WHERE a.showing_id = $1
+`
+
+type ListAttendeesRow struct {
+	UserID                 uuid.UUID      `json:"userID"`
+	ShowingID              uuid.UUID      `json:"showingID"`
+	HasPaid                bool           `json:"hasPaid"`
+	AmountOwed             int32          `json:"amountOwed"`
+	AttendeeType           string         `json:"attendeeType"`
+	GiftCertificateUsed    sql.NullString `json:"giftCertificateUsed"`
+	FilmstadenMembershipID sql.NullString `json:"filmstadenMembershipID"`
+}
+
+func (q *Queries) ListAttendees(ctx context.Context, showingID uuid.UUID) ([]ListAttendeesRow, error) {
+	rows, err := q.db.Query(ctx, listAttendees, showingID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAttendeesRow
+	for rows.Next() {
+		var i ListAttendeesRow
+		if err := rows.Scan(
+			&i.UserID,
+			&i.ShowingID,
+			&i.HasPaid,
+			&i.AmountOwed,
+			&i.AttendeeType,
+			&i.GiftCertificateUsed,
+			&i.FilmstadenMembershipID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
