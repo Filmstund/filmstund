@@ -23,3 +23,10 @@ SELECT user_id,
 FROM attendees
          left join users u on u.id = attendees.user_id
 where showing_id = @showing_id;
+
+-- name: AddShowing :one
+insert into showings (id, web_id, slug, date, time, movie_id, location,
+                      cinema_screen_id, filmstaden_showing_id, admin, pay_to_user)
+values (@id, @web_id, @slug, @date, @time, @movie_id, @location, @cinema_screen_id,
+        @filmstaden_showing_id, @admin, @pay_to_user)
+returning *;

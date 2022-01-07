@@ -40,18 +40,30 @@ func (db *DB) Queries(ctx context.Context) *dao.Queries {
 	return dao.New(db.Pool)
 }
 
-type FinalizeFunc func(ctx context.Context) error
+type (
+	CommitFunc   func(ctx context.Context) error
+	RollbackFunc func(ctx context.Context)
+)
 
-func (db *DB) TX(ctx context.Context) (q *dao.Queries, commit FinalizeFunc, rollback FinalizeFunc, err error) {
+func (db *DB) TX(ctx context.Context) (q *dao.Queries, commit CommitFunc, rollback RollbackFunc, err error) {
 	tx, err := db.Pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return nil, noopFinalize, noopFinalize, fmt.Errorf("failed to begin TX: %w", err)
+		return nil, noopCommit, noopRollback, fmt.Errorf("failed to begin TX: %w", err)
 	}
-	return dao.New(tx), tx.Commit, tx.Rollback, nil
+	return dao.New(tx), tx.Commit, logWrapper(tx.Rollback), nil
 }
 
-func noopFinalize(ctx context.Context) error {
+func noopCommit(ctx context.Context) error {
 	return nil
+}
+func noopRollback(ctx context.Context) {}
+
+func logWrapper(rollback func(ctx context.Context) error) RollbackFunc {
+	return func(ctx context.Context) {
+		if err := rollback(ctx); err != nil {
+			logging.FromContext(ctx).Error(err, "transaction rollback failed")
+		}
+	}
 }
 
 func (db *DB) Close(ctx context.Context) {

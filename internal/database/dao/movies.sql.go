@@ -81,6 +81,19 @@ func (q *Queries) LookupFilmstadenID(ctx context.Context, movieID uuid.UUID) (st
 	return filmstaden_id, err
 }
 
+const lookupMovieTitle = `-- name: LookupMovieTitle :one
+SELECT title
+FROM movies m
+WHERE m.id = $1
+`
+
+func (q *Queries) LookupMovieTitle(ctx context.Context, movieID uuid.UUID) (string, error) {
+	row := q.db.QueryRow(ctx, lookupMovieTitle, movieID)
+	var title string
+	err := row.Scan(&title)
+	return title, err
+}
+
 const movie = `-- name: Movie :one
 select id, filmstaden_id, imdb_id, tmdb_id, slug, title, release_date, production_year, runtime, poster, genres, popularity, popularity_update_time, archived, update_time, create_time
 FROM movies

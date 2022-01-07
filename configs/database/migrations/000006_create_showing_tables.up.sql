@@ -13,8 +13,11 @@ create table showings
 (
     id                    uuid
         constraint showing_pk primary key,
-    web_id                varchar(10)            not null,
-    slug                  varchar(100)           not null,
+    web_id                varchar(10)            not null
+        constraint showing_webid_uniq unique
+        constraint showing_webid_len check ( char_length(web_id) = 10 ),
+    slug                  varchar(100)           not null
+        constraint showing_slug_len check ( char_length(slug) >= 2 ),
     date                  date                   not null,
     time                  time without time zone not null,
     movie_id              uuid                   not null

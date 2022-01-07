@@ -5,16 +5,20 @@ package graph
 
 import (
 	"context"
+	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"time"
 
 	"edholm.dev/go-logging"
+	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
+	"github.com/gosimple/slug"
 )
 
 func (r *mutationResolver) AttendShowing(ctx context.Context, showingID uuid.UUID, paymentOption model.PaymentOption) (*model.Showing, error) {
@@ -26,7 +30,92 @@ func (r *mutationResolver) UnattendShowing(ctx context.Context, showingID uuid.U
 }
 
 func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.CreateShowingInput) (*model.Showing, error) {
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx).
+		WithValues(
+			"action", "createShowing",
+			"movieID", showing.MovieID,
+			"date", showing.Date,
+			"time", showing.Time,
+		)
+	ctx = logging.WithLogger(ctx, logger)
+
+	adminID := principal.FromContext(ctx).ID
+	query, commit, rollback, err := r.db.TX(ctx)
+	if err != nil {
+		logger.Error(err, "failed to setup DB transaction")
+		return nil, fmt.Errorf("internal server error")
+	}
+
+	movieTitle, err := query.LookupMovieTitle(ctx, showing.MovieID)
+	if err != nil {
+		rollback(ctx)
+		logger.Error(err, "query.LookupMovieTitle failed")
+		return nil, fmt.Errorf("failed to lookup movie")
+	}
+
+	var (
+		showingID      = uuid.New()
+		showSlug       = slug.Make(movieTitle)
+		webID          = base64.RawURLEncoding.EncodeToString(showingID[:])[:10]
+		cinemaScreenID sql.NullString
+		fsShowingID    sql.NullString
+	)
+
+	/*
+		// TODO: needs FK and insert in CinemaScreen table
+		if scr := showing.FilmstadenScreen; scr != nil {
+			cinemaScreenID = sql.NullString{
+				String: scr.ID,
+				Valid:  true,
+			}
+		}
+	*/
+
+	if id := showing.FilmstadenRemoteEntityID; id != nil {
+		fsShowingID = sql.NullString{
+			String: *id,
+			Valid:  true,
+		}
+	}
+
+	insertedShowing, err := query.AddShowing(ctx, dao.AddShowingParams{
+		ID:                  showingID,
+		WebID:               webID,
+		Slug:                showSlug,
+		Date:                showing.Date,
+		Time:                showing.Time,
+		MovieID:             showing.MovieID,
+		Location:            showing.Location,
+		CinemaScreenID:      cinemaScreenID,
+		FilmstadenShowingID: fsShowingID,
+		Admin:               adminID,
+		PayToUser:           adminID,
+	})
+	if err != nil {
+		rollback(ctx)
+		logger.Error(err, "query.AddShowing failed")
+		return nil, fmt.Errorf("failed to add your showing")
+	}
+
+	if err := query.AddAttendee(ctx, dao.AddAttendeeParams{
+		UserID:              adminID,
+		ShowingID:           showingID,
+		AttendeeType:        string(model.PaymentTypeSwish),
+		HasPaid:             true,
+		AmountOwed:          0,
+		GiftCertificateUsed: sql.NullString{}, // nil
+	}); err != nil {
+		rollback(ctx)
+		logger.Error(err, "query.AddAttendee failed")
+		return nil, fmt.Errorf("failed to add you as an attendee")
+	}
+
+	if err := commit(ctx); err != nil {
+		// TODO: do you need to rollback? 🤔
+		logger.Error(err, "failed to commit new showing")
+		return nil, fmt.Errorf("failed to insert new showing")
+	}
+	return insertedShowing.GraphModel(), nil
 }
 
 func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID uuid.UUID) ([]*model.Showing, error) {

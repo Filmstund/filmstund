@@ -11,6 +11,64 @@ import (
 	"github.com/google/uuid"
 )
 
+const addShowing = `-- name: AddShowing :one
+insert into showings (id, web_id, slug, date, time, movie_id, location,
+                      cinema_screen_id, filmstaden_showing_id, admin, pay_to_user)
+values ($1, $2, $3, $4, $5, $6, $7, $8,
+        $9, $10, $11)
+returning id, web_id, slug, date, time, movie_id, location, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user, private, update_time, create_time
+`
+
+type AddShowingParams struct {
+	ID                  uuid.UUID      `json:"id"`
+	WebID               string         `json:"webID"`
+	Slug                string         `json:"slug"`
+	Date                time.Time      `json:"date"`
+	Time                time.Time      `json:"time"`
+	MovieID             uuid.UUID      `json:"movieID"`
+	Location            string         `json:"location"`
+	CinemaScreenID      sql.NullString `json:"cinemaScreenID"`
+	FilmstadenShowingID sql.NullString `json:"filmstadenShowingID"`
+	Admin               uuid.UUID      `json:"admin"`
+	PayToUser           uuid.UUID      `json:"payToUser"`
+}
+
+func (q *Queries) AddShowing(ctx context.Context, arg AddShowingParams) (Showing, error) {
+	row := q.db.QueryRow(ctx, addShowing,
+		arg.ID,
+		arg.WebID,
+		arg.Slug,
+		arg.Date,
+		arg.Time,
+		arg.MovieID,
+		arg.Location,
+		arg.CinemaScreenID,
+		arg.FilmstadenShowingID,
+		arg.Admin,
+		arg.PayToUser,
+	)
+	var i Showing
+	err := row.Scan(
+		&i.ID,
+		&i.WebID,
+		&i.Slug,
+		&i.Date,
+		&i.Time,
+		&i.MovieID,
+		&i.Location,
+		&i.CinemaScreenID,
+		&i.FilmstadenShowingID,
+		&i.Price,
+		&i.TicketsBought,
+		&i.Admin,
+		&i.PayToUser,
+		&i.Private,
+		&i.UpdateTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const adminOnShowing = `-- name: AdminOnShowing :one
 SELECT exists(SELECT 1
               FROM showings s

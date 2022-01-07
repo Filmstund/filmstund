@@ -54,3 +54,8 @@ WHERE id = @movie_id;
 SELECT filmstaden_id
 FROM movies m
 WHERE m.id = @movie_id;
+
+-- name: LookupMovieTitle :one
+SELECT title
+FROM movies m
+WHERE m.id = @movie_id;
