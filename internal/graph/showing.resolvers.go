@@ -61,20 +61,32 @@ func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.Crea
 		fsShowingID    sql.NullString
 	)
 
-	/*
-		// TODO: needs FK and insert in CinemaScreen table
-		if scr := showing.FilmstadenScreen; scr != nil {
-			cinemaScreenID = sql.NullString{
-				String: scr.ID,
-				Valid:  true,
-			}
-		}
-	*/
-
 	if id := showing.FilmstadenRemoteEntityID; id != nil {
 		fsShowingID = sql.NullString{
 			String: *id,
 			Valid:  true,
+		}
+
+		show, err := r.filmstaden.Show(ctx, *id)
+		if err != nil {
+			logger.Error(err, "failed to fetch Filmstaden show", "showID", id)
+		} else {
+			if err := query.AddCinemaScreen(ctx, dao.AddCinemaScreenParams{
+				ID: show.Screen.NcgID,
+				Name: sql.NullString{
+					Valid:  true,
+					String: show.Screen.Title,
+				},
+			}); err != nil {
+				logger.Error(err, "failed to insert CinemaScreen", "screenID", show.Screen.NcgID)
+				rollback(ctx)
+				return nil, fmt.Errorf("failed to insert cinema screen")
+			}
+
+			cinemaScreenID = sql.NullString{
+				String: show.Screen.NcgID,
+				Valid:  true,
+			}
 		}
 	}
 
@@ -177,7 +189,23 @@ func (r *showingResolver) Movie(ctx context.Context, obj *model.Showing) (*model
 }
 
 func (r *showingResolver) CinemaScreen(ctx context.Context, obj *model.Showing) (*model.CinemaScreen, error) {
-	panic(fmt.Errorf("not implemented"))
+	if obj.CinemaScreen == nil {
+		return nil, nil
+	}
+	id := obj.CinemaScreen.ID
+	name, err := database.FromContext(ctx).CinemaScreen(ctx, id)
+	if err != nil {
+		logging.FromContext(ctx).Error(err, "query.CinemaScreen failed")
+		return nil, fmt.Errorf("failed to fetch cinema screen")
+	}
+	var title string
+	if name.Valid {
+		title = name.String
+	}
+	return &model.CinemaScreen{
+		ID:   id,
+		Name: title,
+	}, nil
 }
 
 func (r *showingResolver) Admin(ctx context.Context, obj *model.Showing) (*model.PublicUser, error) {

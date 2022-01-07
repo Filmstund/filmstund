@@ -18,7 +18,7 @@ func (showing *Showing) GraphModel() *model.Showing {
 	return &model.Showing{
 		ID:                  showing.ID,
 		WebID:               showing.WebID,
-		FilmstadenShowingID: nullString(showing.FilmstadenShowingID),
+		FilmstadenShowingID: NullString(showing.FilmstadenShowingID),
 		Slug:                showing.Slug,
 		Date:                showing.Date,
 		Time:                showing.Time,

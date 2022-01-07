@@ -18,8 +18,8 @@ func (pu PublicUserRow) GraphModel() *model.PublicUser {
 		Name:      pu.Name,
 		FirstName: pu.FirstName,
 		LastName:  pu.LastName,
-		Nick:      nullString(pu.Nick),
-		Phone:     nullString(pu.Phone),
-		AvatarURL: nullString(pu.AvatarURL),
+		Nick:      NullString(pu.Nick),
+		Phone:     NullString(pu.Phone),
+		AvatarURL: NullString(pu.AvatarURL),
 	}
 }

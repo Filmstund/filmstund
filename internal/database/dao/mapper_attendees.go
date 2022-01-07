@@ -15,9 +15,9 @@ func (row PublicAttendeesRow) GraphModel() *model.PublicAttendee {
 			Name:      row.Name,
 			FirstName: row.FirstName,
 			LastName:  row.LastName,
-			Nick:      nullString(row.Nick),
-			Phone:     nullString(row.Phone),
-			AvatarURL: nullString(row.AvatarURL),
+			Nick:      NullString(row.Nick),
+			Phone:     NullString(row.Phone),
+			AvatarURL: NullString(row.AvatarURL),
 		},
 	}
 }
