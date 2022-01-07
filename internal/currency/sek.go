@@ -3,6 +3,7 @@ package currency
 import (
 	"fmt"
 	"io"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -17,6 +18,10 @@ const (
 func (sek SEK) String() string {
 	f := float64(sek) / float64(Kronor)
 	return strconv.FormatFloat(f, 'f', -1, 64) + " kr"
+}
+
+func (sek SEK) Kronor() int {
+	return int(math.Round(float64(sek) / float64(Kronor)))
 }
 
 func (sek *SEK) UnmarshalGQL(v interface{}) error {

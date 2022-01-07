@@ -42,9 +42,13 @@ SELECT user_id,
        has_paid,
        amount_owed,
        attendee_type,
-       s.pay_to_user
+       s.pay_to_user,
+       payto.phone::varchar as pay_to_phone,
+       m.title::varchar     as movie_title
 FROM attendees a
          left outer join showings s on s.id = a.showing_id
+         left join movies m on m.id = s.movie_id
+         left join users payto on payto.id = s.pay_to_user
 WHERE a.showing_id = $1
   AND a.user_id = $2
 `
@@ -61,6 +65,8 @@ type AttendeePaymentDetailsRow struct {
 	AmountOwed   int32         `json:"amountOwed"`
 	AttendeeType string        `json:"attendeeType"`
 	PayToUser    uuid.NullUUID `json:"payToUser"`
+	PayToPhone   string        `json:"payToPhone"`
+	MovieTitle   string        `json:"movieTitle"`
 }
 
 func (q *Queries) AttendeePaymentDetails(ctx context.Context, arg AttendeePaymentDetailsParams) (AttendeePaymentDetailsRow, error) {
@@ -73,6 +79,8 @@ func (q *Queries) AttendeePaymentDetails(ctx context.Context, arg AttendeePaymen
 		&i.AmountOwed,
 		&i.AttendeeType,
 		&i.PayToUser,
+		&i.PayToPhone,
+		&i.MovieTitle,
 	)
 	return i, err
 }

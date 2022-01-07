@@ -76,3 +76,34 @@ func TestSEK_MarshalGQL(t *testing.T) {
 	c.MarshalGQL(buf)
 	assert.Equal(t, buf.String(), `"127 kr"`)
 }
+
+func TestSEK_Kronor(t *testing.T) {
+	tests := []struct {
+		name string
+		sek  currency.SEK
+		want int
+	}{
+		{
+			name: "one kronor",
+			sek:  1 * currency.Kronor,
+			want: 1,
+		},
+		{
+			name: "1.5 kronor",
+			sek:  1*currency.Kronor + 50*currency.Oren,
+			want: 2,
+		},
+		{
+			name: "1.4 kronor",
+			sek:  1*currency.Kronor + 40*currency.Oren,
+			want: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.sek.Kronor(); got != tt.want {
+				t.Errorf("Kronor() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -13,6 +13,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/model"
+	"github.com/filmstund/filmstund/swish"
 )
 
 func (r *mutationResolver) UpdateAttendeePaymentInfo(ctx context.Context, paymentInfo model.AttendeePaymentInfoInput) (*model.Attendee, error) {
@@ -40,8 +41,14 @@ func (r *showingResolver) AttendeePaymentDetails(ctx context.Context, obj *model
 	}
 
 	swishLink := new(string)
-	if t := model.PaymentType(attendee.AttendeeType); t.IsValid() && t == model.PaymentTypeSwish {
-		*swishLink = "TODO" // TODO
+	if t := model.PaymentType(attendee.AttendeeType); !attendee.HasPaid && t.IsValid() && t == model.PaymentTypeSwish {
+		amount := currency.SEK(attendee.AmountOwed).Kronor()
+		uri, err := swish.FormatURI(attendee.PayToPhone, amount, attendee.MovieTitle)
+		if err != nil {
+			logger.Error(err, "failed to construct Swish URI")
+		} else {
+			*swishLink = uri
+		}
 	}
 
 	details := &model.AttendeePaymentDetails{

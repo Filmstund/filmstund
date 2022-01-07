@@ -21,8 +21,12 @@ SELECT user_id,
        has_paid,
        amount_owed,
        attendee_type,
-       s.pay_to_user
+       s.pay_to_user,
+       payto.phone::varchar as pay_to_phone,
+       m.title::varchar     as movie_title
 FROM attendees a
          left outer join showings s on s.id = a.showing_id
+         left join movies m on m.id = s.movie_id
+         left join users payto on payto.id = s.pay_to_user
 WHERE a.showing_id = @showing_id
   AND a.user_id = @user_id;
