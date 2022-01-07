@@ -6,6 +6,7 @@ const NavBarBackground = styled.div`
   background-color: #b71c1c;
   position: sticky;
   top: 0;
+  z-index: 1;
 `;
 
 const NavBarLinksContainer = styled.nav`

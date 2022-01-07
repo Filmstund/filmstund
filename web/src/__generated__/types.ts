@@ -26,7 +26,7 @@ export type Scalars = {
   LocalTime: import("@js-temporal/polyfill").Temporal.PlainTime;
   SEK: string;
   TMDbID: string;
-  Time: import("@js-temporal/polyfill").Temporal.PlainDate;
+  Time: import("@js-temporal/polyfill").Temporal.Instant;
   UUID: string;
 };
 
@@ -141,13 +141,13 @@ export type FilmstadenShowing = {
 
 export type GiftCertificate = {
   __typename?: "GiftCertificate";
-  expireTime: Scalars["Time"];
+  expireTime: Scalars["LocalDate"];
   number: Scalars["String"];
   status: GiftCertificate_Status;
 };
 
 export type GiftCertificateInput = {
-  expireTime: InputMaybe<Scalars["Time"]>;
+  expireTime: InputMaybe<Scalars["LocalDate"]>;
   number: Scalars["String"];
 };
 
@@ -786,7 +786,7 @@ export type FilmstadenShowingsQuery = {
 export type FilmstadenShowingFragment = {
   __typename?: "FilmstadenShowing";
   id: string;
-  timeUtc: import("@js-temporal/polyfill").Temporal.PlainDate;
+  timeUtc: import("@js-temporal/polyfill").Temporal.Instant;
   tags: Array<string>;
   cinema: { __typename?: "FilmstadenCinema"; name: string; id: string };
   screen: { __typename?: "FilmstadenScreen"; name: string; id: string };

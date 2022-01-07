@@ -46,7 +46,7 @@ type PublicUser {
 
 type GiftCertificate {
     number: String!
-    expireTime: Time!
+    expireTime: LocalDate!
     status: GiftCertificate_Status!
 }
 
@@ -70,5 +70,5 @@ input UserDetailsInput {
 
 input GiftCertificateInput {
     number: String!
-    expireTime: Time
+    expireTime: LocalDate
 }

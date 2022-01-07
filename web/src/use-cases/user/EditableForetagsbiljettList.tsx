@@ -1,8 +1,6 @@
 import styled from "@emotion/styled";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons/faPlusCircle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import addYears from "date-fns/addYears";
 import { uniqueId } from "lodash";
 import React, { ChangeEvent, useCallback, useState } from "react";
 import {
@@ -13,12 +11,11 @@ import {
 import { margin } from "../../lib/style-vars";
 
 import MainButton from "../common/ui/MainButton";
-import Foretagsbiljett from "./Foretagsbiljett";
+import { Foretagsbiljett } from "./Foretagsbiljett";
 import { useToaster } from "../../common/toast/ToastContext";
 import { Temporal } from "@js-temporal/polyfill";
-import { formatYMD } from "../../lib/dateTools";
 
-const DEFAULT_DATE = addYears(new Date(), 1);
+const DEFAULT_DATE = Temporal.Now.plainDateISO().add({ years: 1 });
 
 const IconButton = styled(FontAwesomeIcon)`
   padding-left: ${margin};
@@ -36,13 +33,13 @@ const transformDraftToInput = ({
   expires,
 }: ForetagsbiljettInputDraft): GiftCertificateInput => ({
   number,
-  expireTime: Temporal.PlainDate.from(formatYMD(expires)),
+  expireTime: expires,
 });
 
-interface ForetagsbiljettInputDraft {
+export interface ForetagsbiljettInputDraft {
   id: string;
   number: string;
-  expires: Date;
+  expires: Temporal.PlainDate;
 }
 
 const EditableForetagsbiljettList: React.FC = () => {
@@ -87,9 +84,11 @@ const EditableForetagsbiljettList: React.FC = () => {
     },
     []
   );
-  const handleSetExpires = useCallback((id: string, value: Date) => {
+  const handleSetExpires = useCallback((id: string, value: string) => {
     setTickets((tickets) => {
-      return tickets.map((t) => (t.id === id ? { ...t, expires: value } : t));
+      return tickets.map((t) =>
+        t.id === id ? { ...t, expires: Temporal.PlainDate.from(value) } : t
+      );
     });
   }, []);
   const handlePressRemove = useCallback((id: string) => {
@@ -104,7 +103,7 @@ const EditableForetagsbiljettList: React.FC = () => {
         {tickets.map((biljett) => (
           <Foretagsbiljett
             key={biljett.id}
-            biljett={transformDraftToInput(biljett)}
+            biljett={biljett}
             editable={true}
             handleChangeForetagsbiljett={(v) => handleChange(biljett.id, v)}
             handleSetExpiresForetagsbiljett={(v) =>

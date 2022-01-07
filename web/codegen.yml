@@ -31,6 +31,6 @@ generates:
         IMDbID: string
         SEK: string
         FilmstadenMembershipID: string
-        Time: import('@js-temporal/polyfill').Temporal.PlainDate
+        Time: import('@js-temporal/polyfill').Temporal.Instant
         LocalTime: import('@js-temporal/polyfill').Temporal.PlainTime
         LocalDate: import('@js-temporal/polyfill').Temporal.PlainDate

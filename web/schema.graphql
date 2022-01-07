@@ -102,13 +102,13 @@ type FilmstadenShowing {
 }
 
 type GiftCertificate {
-  expireTime: Time!
+  expireTime: LocalDate!
   number: String!
   status: GiftCertificate_Status!
 }
 
 input GiftCertificateInput {
-  expireTime: Time
+  expireTime: LocalDate
   number: String!
 }
 

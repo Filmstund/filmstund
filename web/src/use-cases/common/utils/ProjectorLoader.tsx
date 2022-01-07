@@ -2,7 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import loading from "../../../assets/loading.gif";
 import { ReactComponent as Spinner } from "./Spin.svg";
-import { ErrorBox } from "../../login/components/login-styles";
+import StatusMessageBox from "./StatusMessageBox";
 
 const LoadingImage = styled.div<{ src: string }>`
   grid-area: center;
@@ -36,6 +36,6 @@ export const Loader = () => (
 
 export const ErrorScreen = ({ error }: { error: Error }) => (
   <FullPageContainer style={{ background: "#000" }}>
-    <ErrorBox>{error.message}</ErrorBox>
+    <StatusMessageBox success={false} errors={error.message} />
   </FullPageContainer>
 );
