@@ -51,17 +51,27 @@ func newPublicUserLoader(ctx context.Context) PublicUserLoader {
 					err,
 				}
 			}
-
-			for i, user := range users {
-				models[i] = &model.PublicUser{
-					ID:        user.ID,
-					Name:      user.Name,
-					FirstName: user.FirstName,
-					LastName:  user.LastName,
-					Nick:      dao.NullString(user.Nick),
-					Phone:     dao.NullString(user.Phone),
-					AvatarURL: dao.NullString(user.AvatarURL),
+			lookup := func(key uuid.UUID) *model.PublicUser {
+				for _, user := range users {
+					if user.ID == key {
+						return &model.PublicUser{
+							ID:        user.ID,
+							Name:      user.Name,
+							FirstName: user.FirstName,
+							LastName:  user.LastName,
+							Nick:      dao.NullString(user.Nick),
+							Phone:     dao.NullString(user.Phone),
+							AvatarURL: dao.NullString(user.AvatarURL),
+						}
+					}
 				}
+				return nil
+			}
+
+			// the PublicUser at index i in models needs to match the key in keys at index i.
+			// since we can't guarantee that from what the DB returns, we have the lookup func above.
+			for i, key := range keys {
+				models[i] = lookup(key)
 			}
 			return models, nil
 		},
