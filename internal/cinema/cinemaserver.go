@@ -12,17 +12,13 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/filmstund/filmstund/internal/auth0"
-	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/database"
-	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph"
 	"github.com/filmstund/filmstund/internal/graph/dataloader"
 	"github.com/filmstund/filmstund/internal/graph/gql"
-	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/internal/middleware"
 	"github.com/filmstund/filmstund/internal/serverenv"
 	"github.com/filmstund/filmstund/internal/session"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -97,7 +93,7 @@ func (s *Server) graphQLHandler() *handler.Server {
 		Resolvers: graph.NewResolver(s.env, s.cfg),
 	}
 	// This func checks that operations that have the "auth" directive is asserted.
-	gqlConfig.Directives.Auth = checkAuth
+	gqlConfig.Directives.Auth = graph.VerifyShowingAdmin
 
 	gqlSrv := handler.NewDefaultServer(gql.NewExecutableSchema(gqlConfig))
 
@@ -163,28 +159,4 @@ func (s *Server) graphQLHandler() *handler.Server {
 	})
 
 	return gqlSrv
-}
-
-func checkAuth(ctx context.Context, _ interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
-	if role != model.RoleShowingAdmin {
-		return next(ctx)
-	}
-
-	fieldCtx := graphql.GetFieldContext(ctx)
-	if showingID, ok := fieldCtx.Args["showingID"]; ok {
-		showingID, ok := showingID.(uuid.UUID)
-		if !ok {
-			return nil, fmt.Errorf("unexpected showing ID type")
-		}
-
-		q := database.FromContext(ctx)
-		p := principal.FromContext(ctx)
-		if ok, err := q.AdminOnShowing(ctx, dao.AdminOnShowingParams{
-			AdminUserID: p.ID,
-			ShowingID:   showingID,
-		}); ok && err == nil {
-			return next(ctx)
-		}
-	}
-	return nil, fmt.Errorf("you must be a showing admin for this")
 }
