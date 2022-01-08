@@ -69,7 +69,7 @@ func (client *Client) ShowsForMovie(
 	)
 	shows := new(Shows)
 	if err := client.decodedGet(ctx, url, shows); err != nil {
-		return nil, fmt.Errorf("shows: %w", err)
+		return nil, fmt.Errorf("showsForMovie: %w", err)
 	}
 	return shows, nil
 }
