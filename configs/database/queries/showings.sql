@@ -40,3 +40,8 @@ WHERE web_id = @web_id;
 select *
 from showings
 WHERE id = @id;
+
+-- name: DeleteShowing :execrows
+delete
+from showings
+where id = @showing_id;

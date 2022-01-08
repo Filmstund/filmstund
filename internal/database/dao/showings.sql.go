@@ -88,6 +88,20 @@ func (q *Queries) AdminOnShowing(ctx context.Context, arg AdminOnShowingParams) 
 	return exists, err
 }
 
+const deleteShowing = `-- name: DeleteShowing :execrows
+delete
+from showings
+where id = $1
+`
+
+func (q *Queries) DeleteShowing(ctx context.Context, showingID uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteShowing, showingID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const publicAttendees = `-- name: PublicAttendees :many
 SELECT user_id,
        showing_id,

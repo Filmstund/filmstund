@@ -194,8 +194,21 @@ func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.Crea
 }
 
 func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID uuid.UUID) ([]*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx).
+		WithValues("showingID", showingID)
+	query := database.FromContext(ctx)
+
+	rows, err := query.DeleteShowing(ctx, showingID)
+	if err != nil {
+		logger.Error(err, "query.DeleteShowing failed")
+		return nil, fmt.Errorf("failed to delete showing")
+	}
+	if rows == 0 {
+		return nil, fmt.Errorf("showing already removed or didn't exist")
+	}
+
+	logger.Info("deleted showing", "byUser", principal.FromContext(ctx).ID)
+	return r.Query().PublicShowings(ctx, nil)
 }
 
 func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID, price currency.SEK) (*model.Showing, error) {
