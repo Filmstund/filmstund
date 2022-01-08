@@ -158,7 +158,10 @@ func (r *showingResolver) AttendeePaymentDetails(ctx context.Context, obj *model
 	}
 
 	swishLink := new(string)
-	if t := model.PaymentType(attendee.AttendeeType); !attendee.HasPaid && t.IsValid() && t == model.PaymentTypeSwish {
+	if t := model.PaymentType(attendee.AttendeeType); attendee.AmountOwed > 0 &&
+		!attendee.HasPaid &&
+		t.IsValid() &&
+		t == model.PaymentTypeSwish {
 		amount := currency.SEK(attendee.AmountOwed).Kronor()
 		uri, err := swish.FormatURI(attendee.PayToPhone, amount, attendee.MovieTitle)
 		if err != nil {

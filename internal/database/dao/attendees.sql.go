@@ -137,6 +137,26 @@ func (q *Queries) AttendeePaymentDetails(ctx context.Context, arg AttendeePaymen
 	return i, err
 }
 
+const deleteAttendee = `-- name: DeleteAttendee :execrows
+delete
+from attendees
+where user_id = $1
+  AND showing_id = $2
+`
+
+type DeleteAttendeeParams struct {
+	UserID    uuid.UUID `json:"userID"`
+	ShowingID uuid.UUID `json:"showingID"`
+}
+
+func (q *Queries) DeleteAttendee(ctx context.Context, arg DeleteAttendeeParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteAttendee, arg.UserID, arg.ShowingID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const listAttendees = `-- name: ListAttendees :many
 SELECT a.user_id,
        showing_id,

@@ -58,3 +58,9 @@ FROM attendees a
          left outer join gift_certificate gc on gc.user_id = a.user_id and gc.number = a.gift_certificate_used
 WHERE a.showing_id = @showing_id
   AND a.user_id = @user_id;
+
+-- name: DeleteAttendee :execrows
+delete
+from attendees
+where user_id = @user_id
+  AND showing_id = @showing_id;

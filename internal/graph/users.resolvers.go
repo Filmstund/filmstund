@@ -59,9 +59,12 @@ func (r *mutationResolver) DisableCalendarFeed(ctx context.Context) (*model.User
 func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []*model.GiftCertificateInput) (*model.User, error) {
 	logger := logging.FromContext(ctx)
 	prin := principal.FromContext(ctx)
-	q := database.FromContext(ctx)
+	tx, commit, rollback, err := r.db.TX(ctx)
+	if err != nil {
+		logger.Error(err, "failed to init DB transaction")
+		return nil, errInternalServerError
+	}
 
-	// TODO: do all this in a transaction
 	for _, cert := range giftCerts {
 		var expireTime time.Time
 		if cert.ExpireTime == nil {
@@ -69,14 +72,19 @@ func (r *mutationResolver) AddGiftCertificates(ctx context.Context, giftCerts []
 		} else {
 			expireTime = *cert.ExpireTime
 		}
-		if err := q.AddGiftCertificate(ctx, dao.AddGiftCertificateParams{
+		if err := tx.AddGiftCertificate(ctx, dao.AddGiftCertificateParams{
 			UserID:     prin.ID,
 			Number:     cert.Number,
 			ExpireTime: expireTime,
 		}); err != nil {
 			logger.Info("failed to insert gift cert", "uid", prin.ID, "err", err, "number", cert.Number)
+			rollback(ctx)
 			return nil, fmt.Errorf("failed to insert gift certificate")
 		}
+	}
+	if err := commit(ctx); err != nil {
+		logger.Error(err, "gift certificate TX commit failed")
+		return nil, fmt.Errorf("failed to insert gift certificate")
 	}
 	return fetchUser(ctx, r.siteCfg)
 }
@@ -108,6 +116,7 @@ func (r *queryResolver) CurrentUser(ctx context.Context) (*model.User, error) {
 }
 
 func (r *queryResolver) AllUsers(ctx context.Context) ([]*model.PublicUser, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 

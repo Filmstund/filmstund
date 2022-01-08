@@ -60,3 +60,21 @@ func (q *Queries) MyTickets(ctx context.Context, arg MyTicketsParams) ([]Ticket,
 	}
 	return items, nil
 }
+
+const showingTicketsBought = `-- name: ShowingTicketsBought :one
+select tickets_bought, price
+from showings
+where id = $1
+`
+
+type ShowingTicketsBoughtRow struct {
+	TicketsBought bool  `json:"ticketsBought"`
+	Price         int32 `json:"price"`
+}
+
+func (q *Queries) ShowingTicketsBought(ctx context.Context, showingID uuid.UUID) (ShowingTicketsBoughtRow, error) {
+	row := q.db.QueryRow(ctx, showingTicketsBought, showingID)
+	var i ShowingTicketsBoughtRow
+	err := row.Scan(&i.TicketsBought, &i.Price)
+	return i, err
+}

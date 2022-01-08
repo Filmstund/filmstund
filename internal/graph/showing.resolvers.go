@@ -23,11 +23,73 @@ import (
 )
 
 func (r *mutationResolver) AttendShowing(ctx context.Context, showingID uuid.UUID, paymentOption model.PaymentOption) (*model.Showing, error) {
-	panic(fmt.Errorf("not implemented"))
+	userID := principal.FromContext(ctx).ID
+	logger := logging.FromContext(ctx).WithValues(
+		"showingID", showingID,
+		"userID", userID,
+	)
+	query := database.FromContext(ctx)
+
+	priceInfo, err := query.ShowingTicketsBought(ctx, showingID)
+	if err != nil {
+		logger.Error(err, "query.ShowingTicketsBought failed")
+		return nil, errInternalServerError
+	}
+	if priceInfo.TicketsBought {
+		logger.Info("tried to attend a showing that is already bought")
+		return nil, fmt.Errorf("cannot attend a showing that has already been bought")
+	}
+
+	owed := func() int32 {
+		if paymentOption.Type == model.PaymentTypeSwish {
+			return priceInfo.Price
+		}
+		return 0
+	}
+	giftCert := func() (s sql.NullString) {
+		if paymentOption.TicketNumber != nil {
+			s.Valid = true
+			s.String = *paymentOption.TicketNumber
+		}
+
+		return
+	}
+
+	if err := query.AddAttendee(ctx, dao.AddAttendeeParams{
+		UserID:              userID,
+		ShowingID:           showingID,
+		AttendeeType:        paymentOption.Type.String(),
+		HasPaid:             paymentOption.Type == model.PaymentTypeGiftCertificate,
+		AmountOwed:          owed(),
+		GiftCertificateUsed: giftCert(),
+	}); err != nil {
+		logger.Error(err, "query.AddAttendee failed")
+		return nil, fmt.Errorf("failed to add you as an attendee")
+	}
+
+	return r.Query().Showing(ctx, &showingID, nil)
 }
 
 func (r *mutationResolver) UnattendShowing(ctx context.Context, showingID uuid.UUID) (*model.Showing, error) {
-	panic(fmt.Errorf("not implemented"))
+	userID := principal.FromContext(ctx).ID
+	logger := logging.FromContext(ctx).WithValues(
+		"showingID", showingID,
+		"userID", userID,
+	)
+	query := database.FromContext(ctx)
+	rowCount, err := query.DeleteAttendee(ctx, dao.DeleteAttendeeParams{
+		UserID:    userID,
+		ShowingID: showingID,
+	})
+	if err != nil {
+		logger.Error(err, "query.DeleteAttendee failed")
+		return nil, fmt.Errorf("failed to delete attendee")
+	}
+	if rowCount == 0 {
+		return nil, fmt.Errorf("user is not an attendee on the showing")
+	}
+
+	return r.Query().Showing(ctx, &showingID, nil)
 }
 
 func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.CreateShowingInput) (*model.Showing, error) {
@@ -44,7 +106,7 @@ func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.Crea
 	query, commit, rollback, err := r.db.TX(ctx)
 	if err != nil {
 		logger.Error(err, "failed to setup DB transaction")
-		return nil, fmt.Errorf("internal server error")
+		return nil, errInternalServerError
 	}
 
 	movieTitle, err := query.LookupMovieTitle(ctx, showing.MovieID)
@@ -132,22 +194,27 @@ func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.Crea
 }
 
 func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID uuid.UUID) ([]*model.Showing, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID, price currency.SEK) (*model.Showing, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID uuid.UUID, newValues *model.UpdateShowingInput) (*model.Showing, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote uuid.UUID) (*model.Showing, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -197,6 +264,7 @@ func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *time.Time
 }
 
 func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID *uuid.UUID) ([]*model.Showing, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -249,6 +317,7 @@ func (r *showingResolver) PayToUser(ctx context.Context, obj *model.Showing) (*m
 }
 
 func (r *showingResolver) FilmstadenSeatMap(ctx context.Context, obj *model.Showing) ([]*model.FilmstadenSeatMap, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
 

@@ -31,5 +31,6 @@ func (r *showingResolver) MyTickets(ctx context.Context, obj *model.Showing) ([]
 }
 
 func (r *showingResolver) TicketRange(ctx context.Context, obj *model.Showing) (*model.TicketRange, error) {
+	// TODO: implement
 	panic(fmt.Errorf("not implemented"))
 }
