@@ -40,6 +40,10 @@ func (f *FilmstadenMembershipID) String() string {
 
 func (f *FilmstadenMembershipID) UnmarshalGQL(v interface{}) error {
 	if str, ok := v.(string); ok {
+		if str == "" {
+			return nil
+		}
+
 		str = strings.ToUpper(str)
 		if len(str) == 6 {
 			str = fmt.Sprintf("%s-%s", str[:3], str[3:])

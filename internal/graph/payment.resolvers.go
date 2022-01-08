@@ -161,9 +161,10 @@ func (r *showingResolver) AttendeePaymentDetails(ctx context.Context, obj *model
 	if t := model.PaymentType(attendee.AttendeeType); attendee.AmountOwed > 0 &&
 		!attendee.HasPaid &&
 		t.IsValid() &&
-		t == model.PaymentTypeSwish {
+		t == model.PaymentTypeSwish &&
+		attendee.PayToPhone.Valid {
 		amount := currency.SEK(attendee.AmountOwed).Kronor()
-		uri, err := swish.FormatURI(attendee.PayToPhone, amount, attendee.MovieTitle)
+		uri, err := swish.FormatURI(attendee.PayToPhone.String, amount, attendee.MovieTitle)
 		if err != nil {
 			logger.Error(err, "failed to construct Swish URI")
 		} else {

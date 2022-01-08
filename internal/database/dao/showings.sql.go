@@ -102,7 +102,7 @@ func (q *Queries) DeleteShowing(ctx context.Context, showingID uuid.UUID) (int64
 	return result.RowsAffected(), nil
 }
 
-const markAsBought = `-- name: MarkAsBought :exec
+const markShowingAsBought = `-- name: MarkShowingAsBought :exec
 UPDATE showings s
 SET tickets_bought = true,
     price          = $1,
@@ -112,14 +112,35 @@ WHERE s.id = $2
   AND s.admin = $3
 `
 
-type MarkAsBoughtParams struct {
+type MarkShowingAsBoughtParams struct {
 	Price     int32     `json:"price"`
 	ShowingID uuid.UUID `json:"showingID"`
 	AdminID   uuid.UUID `json:"adminID"`
 }
 
-func (q *Queries) MarkAsBought(ctx context.Context, arg MarkAsBoughtParams) error {
-	_, err := q.db.Exec(ctx, markAsBought, arg.Price, arg.ShowingID, arg.AdminID)
+func (q *Queries) MarkShowingAsBought(ctx context.Context, arg MarkShowingAsBoughtParams) error {
+	_, err := q.db.Exec(ctx, markShowingAsBought, arg.Price, arg.ShowingID, arg.AdminID)
+	return err
+}
+
+const promoteNewUserToShowingAdmin = `-- name: PromoteNewUserToShowingAdmin :exec
+UPDATE showings s
+SET admin       = $1,
+    pay_to_user = $1,
+    update_time = current_timestamp
+WHERE s.id = $2
+  AND s.admin = $3
+  AND s.tickets_bought = false
+`
+
+type PromoteNewUserToShowingAdminParams struct {
+	NewAdminID uuid.UUID `json:"newAdminID"`
+	ShowingID  uuid.UUID `json:"showingID"`
+	AdminID    uuid.UUID `json:"adminID"`
+}
+
+func (q *Queries) PromoteNewUserToShowingAdmin(ctx context.Context, arg PromoteNewUserToShowingAdminParams) error {
+	_, err := q.db.Exec(ctx, promoteNewUserToShowingAdmin, arg.NewAdminID, arg.ShowingID, arg.AdminID)
 	return err
 }
 

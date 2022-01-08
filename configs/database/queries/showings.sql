@@ -46,7 +46,7 @@ delete
 from showings
 where id = @showing_id;
 
--- name: MarkAsBought :exec
+-- name: MarkShowingAsBought :exec
 UPDATE showings s
 SET tickets_bought = true,
     price          = @price,
@@ -54,3 +54,12 @@ SET tickets_bought = true,
 WHERE s.id = @showing_id
   AND s.tickets_bought = false
   AND s.admin = @admin_id;
+
+-- name: PromoteNewUserToShowingAdmin :exec
+UPDATE showings s
+SET admin       = @new_admin_id,
+    pay_to_user = @new_admin_id,
+    update_time = current_timestamp
+WHERE s.id = @showing_id
+  AND s.admin = @admin_id
+  AND s.tickets_bought = false;

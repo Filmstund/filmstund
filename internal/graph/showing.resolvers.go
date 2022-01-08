@@ -254,7 +254,7 @@ func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID
 		return nil, errInternalServerError
 	}
 
-	if err := tx.MarkAsBought(ctx, dao.MarkAsBoughtParams{
+	if err := tx.MarkShowingAsBought(ctx, dao.MarkShowingAsBoughtParams{
 		Price:     int32(price),
 		ShowingID: showingID,
 		AdminID:   adminID,
@@ -286,8 +286,24 @@ func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID uuid.UUI
 }
 
 func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote uuid.UUID) (*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	adminID := principal.FromContext(ctx).ID
+	logger := logging.FromContext(ctx).
+		WithValues("showingID", showingID,
+			"userToPromote", userToPromote,
+			"adminID", adminID,
+		)
+	query := database.FromContext(ctx)
+
+	if err := query.PromoteNewUserToShowingAdmin(ctx, dao.PromoteNewUserToShowingAdminParams{
+		NewAdminID: userToPromote,
+		ShowingID:  showingID,
+		AdminID:    adminID,
+	}); err != nil {
+		logger.Error(err, "query.PromoteNewUserToShowingAdmin failed")
+		return nil, fmt.Errorf("failed to promote new user to showing admin")
+	}
+
+	return r.Query().Showing(ctx, &showingID, nil)
 }
 
 func (r *queryResolver) Showing(ctx context.Context, id *uuid.UUID, webID *string) (*model.Showing, error) {
