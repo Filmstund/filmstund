@@ -1726,7 +1726,7 @@ type Movie {
 }
 
 extend type Showing {
-    adminPaymentDetails: AdminPaymentDetails
+    adminPaymentDetails: AdminPaymentDetails @auth(requires: SHOWING_ADMIN)
     attendeePaymentDetails: AttendeePaymentDetails
 }
 
@@ -6878,8 +6878,32 @@ func (ec *executionContext) _Showing_adminPaymentDetails(ctx context.Context, fi
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Showing().AdminPaymentDetails(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Showing().AdminPaymentDetails(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AdminPaymentDetails); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.AdminPaymentDetails`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)

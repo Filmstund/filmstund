@@ -3,6 +3,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"edholm.dev/go-logging"
 	"github.com/99designs/gqlgen/graphql"
@@ -15,14 +16,14 @@ import (
 
 // VerifyShowingAdmin is a GQL middleware that checks if the callee is a showing
 // admin on the query/mutation being called using the "auth" GQL directive.
-func VerifyShowingAdmin(ctx context.Context, _ interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
+func VerifyShowingAdmin(ctx context.Context, i interface{}, next graphql.Resolver, role model.Role) (res interface{}, err error) {
 	if role != model.RoleShowingAdmin {
 		return next(ctx)
 	}
 
 	fieldCtx := graphql.GetFieldContext(ctx)
 	prin := principal.FromContext(ctx)
-	if showingID, ok := extractShowingID(fieldCtx); ok {
+	if showingID, ok := extractShowingID(i, fieldCtx); ok {
 		q := database.FromContext(ctx)
 		if ok, err := q.AdminOnShowing(ctx, dao.AdminOnShowingParams{
 			AdminUserID: prin.ID,
@@ -39,10 +40,31 @@ func VerifyShowingAdmin(ctx context.Context, _ interface{}, next graphql.Resolve
 	return nil, fmt.Errorf("you must be a showing admin for this")
 }
 
-func extractShowingID(fctx *graphql.FieldContext) (uuid.UUID, bool) {
+func extractShowingID(i interface{}, fctx *graphql.FieldContext) (uuid.UUID, bool) {
+	// we got a showing directly
+	if showing, ok := i.(*model.Showing); ok && showing != nil {
+		return showing.ID, true
+	}
+
+	// single argument we can lookup
 	if showingID, ok := fctx.Args["showingID"]; ok {
 		showingID, ok := showingID.(uuid.UUID)
 		return showingID, ok
 	}
+
+	// use reflection to find a "ShowingID" field on the input struct
+	for _, val := range fctx.Args {
+		t := reflect.ValueOf(val)
+		if t.Kind() != reflect.Struct {
+			continue
+		}
+
+		if val := t.FieldByName("ShowingID"); val.IsValid() {
+			if showingID, ok := val.Interface().(uuid.UUID); ok {
+				return showingID, true
+			}
+		}
+	}
+
 	return uuid.Nil, false
 }
