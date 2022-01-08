@@ -274,11 +274,6 @@ func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID
 	return r.Query().Showing(ctx, &showingID, nil)
 }
 
-func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID uuid.UUID, newValues *model.UpdateShowingInput) (*model.Showing, error) {
 	adminID := principal.FromContext(ctx).ID
 	logger := logging.FromContext(ctx).

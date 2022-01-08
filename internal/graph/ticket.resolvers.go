@@ -12,7 +12,13 @@ import (
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/model"
+	"github.com/google/uuid"
 )
+
+func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {
+	// TODO: implement
+	panic(fmt.Errorf("not implemented"))
+}
 
 func (r *showingResolver) MyTickets(ctx context.Context, obj *model.Showing) ([]*model.Ticket, error) {
 	prin := principal.FromContext(ctx)

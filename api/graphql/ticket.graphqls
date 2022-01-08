@@ -3,6 +3,10 @@ extend type Showing {
     ticketRange: TicketRange
 }
 
+extend type Mutation {
+    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing! @auth(requires: SHOWING_ADMIN)
+}
+
 # A ticket assigned to a user that allows access to Filmstaden
 type Ticket {
     id: String!

@@ -14,7 +14,6 @@ type Mutation {
     deleteShowing(showingID: UUID!): [Showing!]! @auth(requires: SHOWING_ADMIN)
 
     markAsBought(showingID: UUID!, price: SEK!): Showing! @auth(requires: SHOWING_ADMIN)
-    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing! @auth(requires: SHOWING_ADMIN)
 
     updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing! @auth(requires: SHOWING_ADMIN)
 

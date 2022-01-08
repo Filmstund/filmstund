@@ -298,11 +298,11 @@ type MutationResolver interface {
 	CreateShowing(ctx context.Context, showing model.CreateShowingInput) (*model.Showing, error)
 	DeleteShowing(ctx context.Context, showingID uuid.UUID) ([]*model.Showing, error)
 	MarkAsBought(ctx context.Context, showingID uuid.UUID, price currency.SEK) (*model.Showing, error)
-	ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error)
 	UpdateShowing(ctx context.Context, showingID uuid.UUID, newValues *model.UpdateShowingInput) (*model.Showing, error)
 	PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote uuid.UUID) (*model.Showing, error)
 	FetchNewMoviesFromFilmstaden(ctx context.Context, cityAlias string) ([]*model.Movie, error)
 	UpdateAttendeePaymentInfo(ctx context.Context, paymentInfo model.AttendeePaymentInfoInput) (*model.Attendee, error)
+	ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error)
 	UpdateUser(ctx context.Context, newInfo model.UserDetailsInput) (*model.User, error)
 	InvalidateCalendarFeed(ctx context.Context) (*model.User, error)
 	DisableCalendarFeed(ctx context.Context) (*model.User, error)
@@ -1788,7 +1788,6 @@ type Mutation {
     deleteShowing(showingID: UUID!): [Showing!]! @auth(requires: SHOWING_ADMIN)
 
     markAsBought(showingID: UUID!, price: SEK!): Showing! @auth(requires: SHOWING_ADMIN)
-    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing! @auth(requires: SHOWING_ADMIN)
 
     updateShowing(showingID: UUID!, newValues: UpdateShowingInput): Showing! @auth(requires: SHOWING_ADMIN)
 
@@ -1865,6 +1864,10 @@ input UpdateShowingInput {
 	{Name: "../../api/graphql/ticket.graphqls", Input: `extend type Showing {
     myTickets: [Ticket!]!
     ticketRange: TicketRange
+}
+
+extend type Mutation {
+    processTicketUrls(showingID: UUID!, ticketUrls: [String!]): Showing! @auth(requires: SHOWING_ADMIN)
 }
 
 # A ticket assigned to a user that allows access to Filmstaden
@@ -4667,72 +4670,6 @@ func (ec *executionContext) _Mutation_markAsBought(ctx context.Context, field gr
 	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_processTicketUrls(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_processTicketUrls_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().ProcessTicketUrls(rctx, args["showingID"].(uuid.UUID), args["ticketUrls"].([]string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.Showing); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Showing)
-	fc.Result = res
-	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mutation_updateShowing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4971,6 +4908,72 @@ func (ec *executionContext) _Mutation_updateAttendeePaymentInfo(ctx context.Cont
 	res := resTmp.(*model.Attendee)
 	fc.Result = res
 	return ec.marshalNAttendee2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐAttendee(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_processTicketUrls(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_processTicketUrls_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().ProcessTicketUrls(rctx, args["showingID"].(uuid.UUID), args["ticketUrls"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalNRole2githubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐRole(ctx, "SHOWING_ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Showing); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/filmstund/filmstund/internal/graph/model.Showing`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Showing)
+	fc.Result = res
+	return ec.marshalNShowing2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐShowing(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -10277,11 +10280,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "processTicketUrls":
-			out.Values[i] = ec._Mutation_processTicketUrls(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateShowing":
 			out.Values[i] = ec._Mutation_updateShowing(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -10299,6 +10297,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateAttendeePaymentInfo":
 			out.Values[i] = ec._Mutation_updateAttendeePaymentInfo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "processTicketUrls":
+			out.Values[i] = ec._Mutation_processTicketUrls(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
