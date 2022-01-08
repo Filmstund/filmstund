@@ -281,8 +281,60 @@ func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid
 }
 
 func (r *mutationResolver) UpdateShowing(ctx context.Context, showingID uuid.UUID, newValues *model.UpdateShowingInput) (*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	adminID := principal.FromContext(ctx).ID
+	logger := logging.FromContext(ctx).
+		WithValues("showingID", showingID,
+			"newValues", newValues,
+		)
+	query := database.FromContext(ctx)
+
+	var fsShowingID sql.NullString
+	var cinemaScreenID sql.NullString
+
+	if id := newValues.FilmstadenRemoteEntityID; id != nil {
+		fsShowingID = sql.NullString{
+			String: *id,
+			Valid:  true,
+		}
+
+		show, err := r.filmstaden.Show(ctx, *id)
+		if err != nil {
+			logger.Error(err, "failed to fetch Filmstaden show", "showID", id)
+		} else {
+			if err := query.AddCinemaScreen(ctx, dao.AddCinemaScreenParams{
+				ID: show.Screen.NcgID,
+				Name: sql.NullString{
+					Valid:  true,
+					String: show.Screen.Title,
+				},
+			}); err != nil {
+				logger.Error(err, "failed to insert CinemaScreen", "screenID", show.Screen.NcgID)
+				return nil, fmt.Errorf("failed to insert cinema screen")
+			}
+
+			cinemaScreenID = sql.NullString{
+				String: show.Screen.NcgID,
+				Valid:  true,
+			}
+		}
+	}
+
+	if err := query.UpdateShowing(ctx, dao.UpdateShowingParams{
+		Price:               int32(newValues.Price),
+		PayToUser:           newValues.PayToUser,
+		Location:            newValues.Location,
+		FilmstadenShowingID: fsShowingID,
+		CinemaScreenID:      cinemaScreenID,
+		Date:                newValues.Date,
+		Time:                newValues.Time,
+		ShowingID:           showingID,
+		AdminID:             adminID,
+	}); err != nil {
+		logger.Error(err, "query.UpdateShowing failed")
+		return nil, fmt.Errorf("failed to update showing")
+	}
+
+	return r.Query().Showing(ctx, &showingID, nil)
 }
 
 func (r *mutationResolver) PromoteToAdmin(ctx context.Context, showingID uuid.UUID, userToPromote uuid.UUID) (*model.Showing, error) {

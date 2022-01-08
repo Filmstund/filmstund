@@ -302,3 +302,44 @@ func (q *Queries) ShowingByWebID(ctx context.Context, webID string) (Showing, er
 	)
 	return i, err
 }
+
+const updateShowing = `-- name: UpdateShowing :exec
+UPDATE showings s
+SET price                 = $1,
+    pay_to_user           = $2,
+    location              = $3,
+    filmstaden_showing_id = $4,
+    cinema_screen_id      = $5,
+    date                  = $6,
+    time                  = $7,
+    update_time           = current_timestamp
+WHERE s.id = $8
+  AND s.admin = $9
+`
+
+type UpdateShowingParams struct {
+	Price               int32          `json:"price"`
+	PayToUser           uuid.UUID      `json:"payToUser"`
+	Location            string         `json:"location"`
+	FilmstadenShowingID sql.NullString `json:"filmstadenShowingID"`
+	CinemaScreenID      sql.NullString `json:"cinemaScreenID"`
+	Date                time.Time      `json:"date"`
+	Time                time.Time      `json:"time"`
+	ShowingID           uuid.UUID      `json:"showingID"`
+	AdminID             uuid.UUID      `json:"adminID"`
+}
+
+func (q *Queries) UpdateShowing(ctx context.Context, arg UpdateShowingParams) error {
+	_, err := q.db.Exec(ctx, updateShowing,
+		arg.Price,
+		arg.PayToUser,
+		arg.Location,
+		arg.FilmstadenShowingID,
+		arg.CinemaScreenID,
+		arg.Date,
+		arg.Time,
+		arg.ShowingID,
+		arg.AdminID,
+	)
+	return err
+}

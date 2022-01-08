@@ -63,3 +63,16 @@ SET admin       = @new_admin_id,
 WHERE s.id = @showing_id
   AND s.admin = @admin_id
   AND s.tickets_bought = false;
+
+-- name: UpdateShowing :exec
+UPDATE showings s
+SET price                 = @price,
+    pay_to_user           = @pay_to_user,
+    location              = @location,
+    filmstaden_showing_id = @filmstaden_showing_id,
+    cinema_screen_id      = @cinema_screen_id,
+    date                  = @date,
+    time                  = @time,
+    update_time           = current_timestamp
+WHERE s.id = @showing_id
+  AND s.admin = @admin_id;
