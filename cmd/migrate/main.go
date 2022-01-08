@@ -36,6 +36,7 @@ func main() {
 
 	if err := realMain(ctx); err != nil && !errors.Is(err, context.Canceled) {
 		logger.Error(err, "migration error")
+		os.Exit(1)
 	}
 }
 
