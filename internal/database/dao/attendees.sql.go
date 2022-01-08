@@ -36,6 +36,58 @@ func (q *Queries) AddAttendee(ctx context.Context, arg AddAttendeeParams) error 
 	return err
 }
 
+const attendee = `-- name: Attendee :one
+SELECT a.user_id,
+       showing_id,
+       has_paid,
+       amount_owed,
+       attendee_type,
+       gift_certificate_used,
+       u.filmstaden_membership_id,
+       gc.number      as gift_certificate_number,
+       gc.expire_time as gift_certificate_expire_time
+FROM attendees a
+         left join users u on u.id = a.user_id
+         left outer join showings s on s.id = a.showing_id
+         left outer join gift_certificate gc on gc.user_id = a.user_id and gc.number = a.gift_certificate_used
+WHERE a.showing_id = $1
+  AND a.user_id = $2
+`
+
+type AttendeeParams struct {
+	ShowingID uuid.UUID `json:"showingID"`
+	UserID    uuid.UUID `json:"userID"`
+}
+
+type AttendeeRow struct {
+	UserID                    uuid.UUID      `json:"userID"`
+	ShowingID                 uuid.UUID      `json:"showingID"`
+	HasPaid                   bool           `json:"hasPaid"`
+	AmountOwed                int32          `json:"amountOwed"`
+	AttendeeType              string         `json:"attendeeType"`
+	GiftCertificateUsed       sql.NullString `json:"giftCertificateUsed"`
+	FilmstadenMembershipID    sql.NullString `json:"filmstadenMembershipID"`
+	GiftCertificateNumber     sql.NullString `json:"giftCertificateNumber"`
+	GiftCertificateExpireTime sql.NullTime   `json:"giftCertificateExpireTime"`
+}
+
+func (q *Queries) Attendee(ctx context.Context, arg AttendeeParams) (AttendeeRow, error) {
+	row := q.db.QueryRow(ctx, attendee, arg.ShowingID, arg.UserID)
+	var i AttendeeRow
+	err := row.Scan(
+		&i.UserID,
+		&i.ShowingID,
+		&i.HasPaid,
+		&i.AmountOwed,
+		&i.AttendeeType,
+		&i.GiftCertificateUsed,
+		&i.FilmstadenMembershipID,
+		&i.GiftCertificateNumber,
+		&i.GiftCertificateExpireTime,
+	)
+	return i, err
+}
+
 const attendeePaymentDetails = `-- name: AttendeePaymentDetails :one
 SELECT user_id,
        showing_id,
@@ -148,4 +200,29 @@ func (q *Queries) ListAttendees(ctx context.Context, arg ListAttendeesParams) ([
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateAttendeePayment = `-- name: UpdateAttendeePayment :exec
+update attendees
+set has_paid    = $1,
+    amount_owed = $2
+where user_id = $3
+  AND showing_id = $4
+`
+
+type UpdateAttendeePaymentParams struct {
+	HasPaid    bool      `json:"hasPaid"`
+	AmountOwed int32     `json:"amountOwed"`
+	UserID     uuid.UUID `json:"userID"`
+	ShowingID  uuid.UUID `json:"showingID"`
+}
+
+func (q *Queries) UpdateAttendeePayment(ctx context.Context, arg UpdateAttendeePaymentParams) error {
+	_, err := q.db.Exec(ctx, updateAttendeePayment,
+		arg.HasPaid,
+		arg.AmountOwed,
+		arg.UserID,
+		arg.ShowingID,
+	)
+	return err
 }

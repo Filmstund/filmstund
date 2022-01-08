@@ -46,7 +46,46 @@ func (r *attendeePaymentDetailsResolver) Payer(ctx context.Context, obj *model.A
 }
 
 func (r *mutationResolver) UpdateAttendeePaymentInfo(ctx context.Context, paymentInfo model.AttendeePaymentInfoInput) (*model.Attendee, error) {
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx).
+		WithValues("userID", paymentInfo.UserID, "showingID", paymentInfo.ShowingID)
+	query := database.FromContext(ctx)
+	if err := query.UpdateAttendeePayment(ctx, dao.UpdateAttendeePaymentParams{
+		HasPaid:    paymentInfo.HasPaid,
+		AmountOwed: int32(paymentInfo.AmountOwed),
+		UserID:     paymentInfo.UserID,
+		ShowingID:  paymentInfo.ShowingID,
+	}); err != nil {
+		logger.Error(err, "query.UpdateAttendeePayment failed")
+		return nil, fmt.Errorf("failed to update attendee payment info")
+	}
+
+	attendee, err := query.Attendee(ctx, dao.AttendeeParams{
+		ShowingID: paymentInfo.ShowingID,
+		UserID:    paymentInfo.UserID,
+	})
+	if err != nil {
+		logger.Error(err, "query.Attendee failed")
+		return nil, fmt.Errorf("failed to fetch attendee")
+	}
+
+	var gcUsed *model.GiftCertificate
+	if attendee.GiftCertificateNumber.Valid {
+		gcUsed = &model.GiftCertificate{
+			Number:     attendee.GiftCertificateNumber.String,
+			ExpireTime: attendee.GiftCertificateExpireTime.Time,
+			Status:     model.GiftCertificateStatusUnknown, // TODO: calculate
+		}
+	}
+	return &model.Attendee{
+		UserID:                 attendee.UserID,
+		User:                   nil, // separate resolver
+		ShowingID:              attendee.ShowingID,
+		HasPaid:                attendee.HasPaid,
+		AmountOwed:             currency.SEK(attendee.AmountOwed),
+		Type:                   model.PaymentType(attendee.AttendeeType),
+		GiftCertificateUsed:    gcUsed,
+		FilmstadenMembershipID: dao.NullString(attendee.FilmstadenMembershipID),
+	}, nil
 }
 
 func (r *showingResolver) AdminPaymentDetails(ctx context.Context, obj *model.Showing) (*model.AdminPaymentDetails, error) {
