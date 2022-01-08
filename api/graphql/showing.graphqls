@@ -1,7 +1,7 @@
 type Query {
     showing(id: UUID, webID: Base64ID): Showing
     publicShowings(afterDate: LocalDate): [Showing!]!
-    showingForMovie(movieId: UUID): [Showing!]!
+    showingForMovie(movieId: UUID!): [Showing!]!
 }
 
 type Mutation {

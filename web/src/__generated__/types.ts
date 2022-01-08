@@ -319,7 +319,7 @@ export type QueryShowingArgs = {
 };
 
 export type QueryShowingForMovieArgs = {
-  movieId: InputMaybe<Scalars["UUID"]>;
+  movieId: Scalars["UUID"];
 };
 
 export enum Role {

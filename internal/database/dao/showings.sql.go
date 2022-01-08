@@ -303,6 +303,51 @@ func (q *Queries) ShowingByWebID(ctx context.Context, webID string) (Showing, er
 	return i, err
 }
 
+const showingsByMovie = `-- name: ShowingsByMovie :many
+SELECT id, web_id, slug, date, time, movie_id, location, cinema_screen_id, filmstaden_showing_id, price, tickets_bought, admin, pay_to_user, private, update_time, create_time
+FROM showings s
+WHERE s.movie_id = $1
+  AND s.private = false
+ORDER BY date DESC
+`
+
+func (q *Queries) ShowingsByMovie(ctx context.Context, movieID uuid.UUID) ([]Showing, error) {
+	rows, err := q.db.Query(ctx, showingsByMovie, movieID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Showing
+	for rows.Next() {
+		var i Showing
+		if err := rows.Scan(
+			&i.ID,
+			&i.WebID,
+			&i.Slug,
+			&i.Date,
+			&i.Time,
+			&i.MovieID,
+			&i.Location,
+			&i.CinemaScreenID,
+			&i.FilmstadenShowingID,
+			&i.Price,
+			&i.TicketsBought,
+			&i.Admin,
+			&i.PayToUser,
+			&i.Private,
+			&i.UpdateTime,
+			&i.CreateTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateShowing = `-- name: UpdateShowing :exec
 UPDATE showings s
 SET price                 = $1,

@@ -205,7 +205,7 @@ type Query {
   publicShowings(afterDate: LocalDate): [Showing!]!
   randomCommandment: Commandments!
   showing(id: UUID, webID: Base64ID): Showing
-  showingForMovie(movieId: UUID): [Showing!]!
+  showingForMovie(movieId: UUID!): [Showing!]!
 }
 
 enum Role {

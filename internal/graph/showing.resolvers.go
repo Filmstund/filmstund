@@ -186,7 +186,6 @@ func (r *mutationResolver) CreateShowing(ctx context.Context, showing model.Crea
 	}
 
 	if err := commit(ctx); err != nil {
-		// TODO: do you need to rollback? 🤔
 		logger.Error(err, "failed to commit new showing")
 		return nil, fmt.Errorf("failed to insert new showing")
 	}
@@ -403,9 +402,17 @@ func (r *queryResolver) PublicShowings(ctx context.Context, afterDate *time.Time
 	return dao.Showings(showings).GraphModel(), nil
 }
 
-func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID *uuid.UUID) ([]*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) ShowingForMovie(ctx context.Context, movieID uuid.UUID) ([]*model.Showing, error) {
+	logger := logging.FromContext(ctx).
+		WithValues("movieID", movieID)
+	query := database.FromContext(ctx)
+	showings, err := query.ShowingsByMovie(ctx, movieID)
+	if err != nil {
+		logger.Error(err, "query.ShowingsByMovie failed")
+		return nil, errInternalServerError
+	}
+
+	return dao.Showings(showings).GraphModel(), nil
 }
 
 func (r *showingResolver) Movie(ctx context.Context, obj *model.Showing) (*model.Movie, error) {

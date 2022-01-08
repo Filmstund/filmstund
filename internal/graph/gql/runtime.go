@@ -200,7 +200,7 @@ type ComplexityRoot struct {
 		PublicShowings          func(childComplexity int, afterDate *time.Time) int
 		RandomCommandment       func(childComplexity int) int
 		Showing                 func(childComplexity int, id *uuid.UUID, webID *string) int
-		ShowingForMovie         func(childComplexity int, movieID *uuid.UUID) int
+		ShowingForMovie         func(childComplexity int, movieID uuid.UUID) int
 	}
 
 	Seat struct {
@@ -313,7 +313,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Showing(ctx context.Context, id *uuid.UUID, webID *string) (*model.Showing, error)
 	PublicShowings(ctx context.Context, afterDate *time.Time) ([]*model.Showing, error)
-	ShowingForMovie(ctx context.Context, movieID *uuid.UUID) ([]*model.Showing, error)
+	ShowingForMovie(ctx context.Context, movieID uuid.UUID) ([]*model.Showing, error)
 	AllCommandments(ctx context.Context) ([]*model.Commandments, error)
 	RandomCommandment(ctx context.Context) (*model.Commandments, error)
 	PreviouslyUsedLocations(ctx context.Context) ([]string, error)
@@ -1122,7 +1122,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ShowingForMovie(childComplexity, args["movieId"].(*uuid.UUID)), true
+		return e.complexity.Query.ShowingForMovie(childComplexity, args["movieId"].(uuid.UUID)), true
 
 	case "Seat.number":
 		if e.complexity.Seat.Number == nil {
@@ -1775,7 +1775,7 @@ scalar LocalTime
 	{Name: "../../api/graphql/showing.graphqls", Input: `type Query {
     showing(id: UUID, webID: Base64ID): Showing
     publicShowings(afterDate: LocalDate): [Showing!]!
-    showingForMovie(movieId: UUID): [Showing!]!
+    showingForMovie(movieId: UUID!): [Showing!]!
 }
 
 type Mutation {
@@ -2326,10 +2326,10 @@ func (ec *executionContext) field_Query_publicShowings_args(ctx context.Context,
 func (ec *executionContext) field_Query_showingForMovie_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *uuid.UUID
+	var arg0 uuid.UUID
 	if tmp, ok := rawArgs["movieId"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("movieId"))
-		arg0, err = ec.unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		arg0, err = ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5616,7 +5616,7 @@ func (ec *executionContext) _Query_showingForMovie(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ShowingForMovie(rctx, args["movieId"].(*uuid.UUID))
+		return ec.resolvers.Query().ShowingForMovie(rctx, args["movieId"].(uuid.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

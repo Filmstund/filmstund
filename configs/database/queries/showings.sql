@@ -5,6 +5,13 @@ WHERE s.date > @after_date
   AND s.private = false
 ORDER BY date DESC;
 
+-- name: ShowingsByMovie :many
+SELECT *
+FROM showings s
+WHERE s.movie_id = @movie_id
+  AND s.private = false
+ORDER BY date DESC;
+
 -- name: AdminOnShowing :one
 SELECT exists(SELECT 1
               FROM showings s
