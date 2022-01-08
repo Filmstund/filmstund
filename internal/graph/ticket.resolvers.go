@@ -16,8 +16,43 @@ import (
 )
 
 func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	for _, url := range ticketUrls {
+		// TODO: check that all tickets are for the same show
+		if !validateTicketURL(ctx, url) {
+			return nil, fmt.Errorf("invalid format for the ticket URL. Example: https://www.filmstaden.se/bokning/mina-e-biljetter/Sys99-SE/20211220-1810-1047/5BZZVDHC9SNS")
+		}
+	}
+	if len(ticketUrls) == 0 {
+		return r.Query().Showing(ctx, &showingID, nil)
+	}
+
+	logger := logging.FromContext(ctx).
+		WithValues("showingID", showingID)
+	ctx = logging.WithLogger(ctx, logger)
+
+	tx, commit, rollback, err := r.db.TX(ctx)
+	if err != nil {
+		logger.Error(err, "failed to setup database transaction")
+		return nil, errInternalServerError
+	}
+
+	// Update the showing to match downloaded FS ticket information.
+	if err := r.updateShowingToMatchTicket(ctx, showingID, tx, ticketUrls); err != nil {
+		rollback(ctx)
+		return nil, err
+	}
+
+	// Download and assign tickets to each attendee
+	if err := r.assignTickets(ctx, tx, showingID, ticketUrls); err != nil {
+		rollback(ctx)
+		return nil, err
+	}
+
+	if err := commit(ctx); err != nil {
+		logger.Error(err, "failed to commit changes")
+		return nil, fmt.Errorf("failed to commit changes")
+	}
+	return r.Query().Showing(ctx, &showingID, nil)
 }
 
 func (r *showingResolver) MyTickets(ctx context.Context, obj *model.Showing) ([]*model.Ticket, error) {

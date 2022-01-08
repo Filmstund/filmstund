@@ -26,7 +26,7 @@ type Ticket struct {
 			} `json:"images"`
 		} `json:"company"`
 		City struct {
-			Name interface{} `json:"name"`
+			Name string `json:"name"`
 		} `json:"city"`
 	} `json:"cinema"`
 	Movie struct {

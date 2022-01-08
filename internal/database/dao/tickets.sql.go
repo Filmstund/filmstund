@@ -5,9 +5,95 @@ package dao
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const addTicket = `-- name: AddTicket :exec
+insert into tickets (id, showing_id, assigned_to_user, profile_id, barcode, customer_type, customer_type_definition,
+                     cinema, cinema_city, screen, date, time, movie_name, movie_rating)
+values ($1, $2, $3, $4, $5, $6, $7, $8,
+        $9, $10, $11, $12, $13, $14)
+`
+
+type AddTicketParams struct {
+	ID                     string         `json:"id"`
+	ShowingID              uuid.UUID      `json:"showingID"`
+	AssignedToUser         uuid.UUID      `json:"assignedToUser"`
+	ProfileID              sql.NullString `json:"profileID"`
+	Barcode                string         `json:"barcode"`
+	CustomerType           string         `json:"customerType"`
+	CustomerTypeDefinition string         `json:"customerTypeDefinition"`
+	Cinema                 string         `json:"cinema"`
+	CinemaCity             sql.NullString `json:"cinemaCity"`
+	Screen                 string         `json:"screen"`
+	Date                   time.Time      `json:"date"`
+	Time                   time.Time      `json:"time"`
+	MovieName              string         `json:"movieName"`
+	MovieRating            string         `json:"movieRating"`
+}
+
+func (q *Queries) AddTicket(ctx context.Context, arg AddTicketParams) error {
+	_, err := q.db.Exec(ctx, addTicket,
+		arg.ID,
+		arg.ShowingID,
+		arg.AssignedToUser,
+		arg.ProfileID,
+		arg.Barcode,
+		arg.CustomerType,
+		arg.CustomerTypeDefinition,
+		arg.Cinema,
+		arg.CinemaCity,
+		arg.Screen,
+		arg.Date,
+		arg.Time,
+		arg.MovieName,
+		arg.MovieRating,
+	)
+	return err
+}
+
+const attendeesIncludingTickets = `-- name: AttendeesIncludingTickets :many
+select a.showing_id, a.user_id, t.id as ticket_id, u.filmstaden_membership_id
+from attendees a
+         left outer join tickets t on a.showing_id = t.showing_id AND t.assigned_to_user = a.user_id
+         left join users u on a.user_id = u.id
+where a.showing_id = $1
+`
+
+type AttendeesIncludingTicketsRow struct {
+	ShowingID              uuid.UUID      `json:"showingID"`
+	UserID                 uuid.UUID      `json:"userID"`
+	TicketID               sql.NullString `json:"ticketID"`
+	FilmstadenMembershipID sql.NullString `json:"filmstadenMembershipID"`
+}
+
+func (q *Queries) AttendeesIncludingTickets(ctx context.Context, showingID uuid.UUID) ([]AttendeesIncludingTicketsRow, error) {
+	rows, err := q.db.Query(ctx, attendeesIncludingTickets, showingID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AttendeesIncludingTicketsRow
+	for rows.Next() {
+		var i AttendeesIncludingTicketsRow
+		if err := rows.Scan(
+			&i.ShowingID,
+			&i.UserID,
+			&i.TicketID,
+			&i.FilmstadenMembershipID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const myTickets = `-- name: MyTickets :many
 SELECT id, showing_id, assigned_to_user, profile_id, barcode, customer_type, customer_type_definition, cinema, cinema_city, screen, seat_row, seat_number, date, time, movie_name, movie_rating, attributes, update_time, create_time
