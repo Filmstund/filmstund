@@ -212,8 +212,67 @@ func (r *mutationResolver) DeleteShowing(ctx context.Context, showingID uuid.UUI
 }
 
 func (r *mutationResolver) MarkAsBought(ctx context.Context, showingID uuid.UUID, price currency.SEK) (*model.Showing, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	logger := logging.FromContext(ctx).
+		WithValues("showingID", showingID)
+	tx, commit, rollback, err := r.db.TX(ctx)
+	if err != nil {
+		logger.Error(err, "failed to setup DB transaction")
+		return nil, errInternalServerError
+	}
+
+	boughtInfo, err := tx.ShowingTicketsBought(ctx, showingID)
+	if err != nil {
+		rollback(ctx)
+		logger.Error(err, "query.ShowingTicketsBought failed")
+		return nil, errInternalServerError
+	}
+	if boughtInfo.TicketsBought {
+		logger.V(1).Info("tickets already bought - nothing to do", "price", boughtInfo.Price)
+		rollback(ctx)
+		return nil, fmt.Errorf("tickets already bought")
+	}
+
+	adminID := principal.FromContext(ctx).ID
+	gcAttendeesUpdated, err := tx.MarkGCAttendeesAsHavingPaid(ctx, dao.MarkGCAttendeesAsHavingPaidParams{
+		AdminID:   adminID,
+		ShowingID: showingID,
+	})
+	if err != nil {
+		rollback(ctx)
+		logger.Error(err, "tx.MarkGCAttendeesAsHavingPaid failed")
+		return nil, errInternalServerError
+	}
+
+	swishAttendeesUpdated, err := tx.UpdateAmountOwedForSwishAttendees(ctx, dao.UpdateAmountOwedForSwishAttendeesParams{
+		AmountOwed: int32(price),
+		AdminID:    adminID,
+		ShowingID:  showingID,
+	})
+	if err != nil {
+		rollback(ctx)
+		logger.Error(err, "tx.UpdateAmountOwedForSwishAttendees failed")
+		return nil, errInternalServerError
+	}
+
+	if err := tx.MarkAsBought(ctx, dao.MarkAsBoughtParams{
+		Price:     int32(price),
+		ShowingID: showingID,
+		AdminID:   adminID,
+	}); err != nil {
+		rollback(ctx)
+		logger.Error(err, "tx.MarkAsBought failed")
+		return nil, errInternalServerError
+	}
+	if err := commit(ctx); err != nil {
+		logger.Error(err, "failed to commit mark as bought")
+		return nil, fmt.Errorf("failed to mark showing as bought")
+	}
+
+	logger.Info("marked showing as bought",
+		"gcAttendeesUpdated", gcAttendeesUpdated,
+		"swishAttendeesUpdated", swishAttendeesUpdated,
+	)
+	return r.Query().Showing(ctx, &showingID, nil)
 }
 
 func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {

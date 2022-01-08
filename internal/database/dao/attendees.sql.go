@@ -222,10 +222,62 @@ func (q *Queries) ListAttendees(ctx context.Context, arg ListAttendeesParams) ([
 	return items, nil
 }
 
+const markGCAttendeesAsHavingPaid = `-- name: MarkGCAttendeesAsHavingPaid :execrows
+UPDATE attendees a
+SET has_paid    = true,
+    amount_owed = 0,
+    update_time = current_timestamp
+FROM showings s
+WHERE a.showing_id = s.id
+  AND s.admin = $1
+  AND a.showing_id = $2
+  AND (a.gift_certificate_used IS NOT NULL OR a.user_id = $1)
+`
+
+type MarkGCAttendeesAsHavingPaidParams struct {
+	AdminID   uuid.UUID `json:"adminID"`
+	ShowingID uuid.UUID `json:"showingID"`
+}
+
+func (q *Queries) MarkGCAttendeesAsHavingPaid(ctx context.Context, arg MarkGCAttendeesAsHavingPaidParams) (int64, error) {
+	result, err := q.db.Exec(ctx, markGCAttendeesAsHavingPaid, arg.AdminID, arg.ShowingID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const updateAmountOwedForSwishAttendees = `-- name: UpdateAmountOwedForSwishAttendees :execrows
+UPDATE attendees a
+SET amount_owed = $1,
+    update_time = current_timestamp
+FROM showings s
+WHERE a.showing_id = s.id
+  AND s.admin = $2
+  AND a.showing_id = $3
+  AND a.gift_certificate_used IS NULL
+  AND has_paid = false
+`
+
+type UpdateAmountOwedForSwishAttendeesParams struct {
+	AmountOwed int32     `json:"amountOwed"`
+	AdminID    uuid.UUID `json:"adminID"`
+	ShowingID  uuid.UUID `json:"showingID"`
+}
+
+func (q *Queries) UpdateAmountOwedForSwishAttendees(ctx context.Context, arg UpdateAmountOwedForSwishAttendeesParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateAmountOwedForSwishAttendees, arg.AmountOwed, arg.AdminID, arg.ShowingID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const updateAttendeePayment = `-- name: UpdateAttendeePayment :exec
 update attendees
 set has_paid    = $1,
-    amount_owed = $2
+    amount_owed = $2,
+    update_time = current_timestamp
 where user_id = $3
   AND showing_id = $4
 `

@@ -102,6 +102,27 @@ func (q *Queries) DeleteShowing(ctx context.Context, showingID uuid.UUID) (int64
 	return result.RowsAffected(), nil
 }
 
+const markAsBought = `-- name: MarkAsBought :exec
+UPDATE showings s
+SET tickets_bought = true,
+    price          = $1,
+    update_time    = current_timestamp
+WHERE s.id = $2
+  AND s.tickets_bought = false
+  AND s.admin = $3
+`
+
+type MarkAsBoughtParams struct {
+	Price     int32     `json:"price"`
+	ShowingID uuid.UUID `json:"showingID"`
+	AdminID   uuid.UUID `json:"adminID"`
+}
+
+func (q *Queries) MarkAsBought(ctx context.Context, arg MarkAsBoughtParams) error {
+	_, err := q.db.Exec(ctx, markAsBought, arg.Price, arg.ShowingID, arg.AdminID)
+	return err
+}
+
 const publicAttendees = `-- name: PublicAttendees :many
 SELECT user_id,
        showing_id,

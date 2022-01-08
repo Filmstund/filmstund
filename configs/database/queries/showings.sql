@@ -45,3 +45,12 @@ WHERE id = @id;
 delete
 from showings
 where id = @showing_id;
+
+-- name: MarkAsBought :exec
+UPDATE showings s
+SET tickets_bought = true,
+    price          = @price,
+    update_time    = current_timestamp
+WHERE s.id = @showing_id
+  AND s.tickets_bought = false
+  AND s.admin = @admin_id;

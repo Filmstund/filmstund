@@ -38,7 +38,8 @@ WHERE a.showing_id = @showing_id
 -- name: UpdateAttendeePayment :exec
 update attendees
 set has_paid    = @has_paid,
-    amount_owed = @amount_owed
+    amount_owed = @amount_owed,
+    update_time = current_timestamp
 where user_id = @user_id
   AND showing_id = @showing_id;
 
@@ -64,3 +65,25 @@ delete
 from attendees
 where user_id = @user_id
   AND showing_id = @showing_id;
+
+-- name: MarkGCAttendeesAsHavingPaid :execrows
+UPDATE attendees a
+SET has_paid    = true,
+    amount_owed = 0,
+    update_time = current_timestamp
+FROM showings s
+WHERE a.showing_id = s.id
+  AND s.admin = @admin_id
+  AND a.showing_id = @showing_id
+  AND (a.gift_certificate_used IS NOT NULL OR a.user_id = @admin_id);
+
+-- name: UpdateAmountOwedForSwishAttendees :execrows
+UPDATE attendees a
+SET amount_owed = @amount_owed,
+    update_time = current_timestamp
+FROM showings s
+WHERE a.showing_id = s.id
+  AND s.admin = @admin_id
+  AND a.showing_id = @showing_id
+  AND a.gift_certificate_used IS NULL
+  AND has_paid = false;
