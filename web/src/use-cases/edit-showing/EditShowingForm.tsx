@@ -16,7 +16,6 @@ import Header, { SmallHeader } from "../common/ui/Header";
 import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { RedButton } from "../common/ui/MainButton";
-import StatusMessageBox from "../common/utils/StatusMessageBox";
 import {
   EditShowingFragment,
   FilmstadenShowingFragment,
@@ -160,7 +159,6 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
           location={formState.location}
           movie={movie}
         />
-        <StatusMessageBox errors={errors} />
         <FilmstadenShowingSelector
           onChangeDate={(value) => setShowingValue("date", value)}
           onSelectShowing={handleSfTimeSelect}
