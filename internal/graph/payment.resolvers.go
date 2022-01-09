@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"edholm.dev/go-logging"
@@ -16,6 +17,7 @@ import (
 	"github.com/filmstund/filmstund/internal/graph/gql"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/filmstund/filmstund/swish"
+	pgx "github.com/jackc/pgx/v4"
 )
 
 func (r *attendeeResolver) User(ctx context.Context, obj *model.Attendee) (*model.PublicUser, error) {
@@ -155,6 +157,9 @@ func (r *showingResolver) AttendeePaymentDetails(ctx context.Context, obj *model
 		UserID:    currentUserID,
 	})
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
 		logger.Error(err, "query.AttendeePaymentDetails failed")
 		return nil, fmt.Errorf("failed to lookup attendee payment details")
 	}
