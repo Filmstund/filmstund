@@ -606,6 +606,8 @@ export type TogglePaidChangeMutation = {
   __typename?: "Mutation";
   updateAttendeePaymentInfo: {
     __typename?: "Attendee";
+    id: string;
+    amountOwed: string;
     userID: string;
     hasPaid: boolean;
   };
@@ -987,6 +989,7 @@ export type ShowingAdminFragment = {
         filmstadenBuyLink: string | null | undefined;
         attendees: Array<{
           __typename?: "Attendee";
+          id: string;
           userID: string;
           hasPaid: boolean;
           amountOwed: string;
@@ -1246,6 +1249,7 @@ export const ShowingAdminFragment = gql`
     adminPaymentDetails {
       filmstadenBuyLink
       attendees {
+        id
         userID
         hasPaid
         amountOwed
@@ -1451,6 +1455,8 @@ export function usePromoteToAdminMutation() {
 export const TogglePaidChangeMutationDocument = gql`
   mutation TogglePaidChangeMutation($paymentInfo: AttendeePaymentInfoInput!) {
     updateAttendeePaymentInfo(paymentInfo: $paymentInfo) {
+      id
+      amountOwed
       userID
       hasPaid
     }
