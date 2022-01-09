@@ -131,13 +131,16 @@ func (r *showingResolver) AdminPaymentDetails(ctx context.Context, obj *model.Sh
 	}
 
 	fsBuyLink := new(string)
-	slugAndFSID, err := query.LookupSlugAndFSID(ctx, obj.MovieID)
-	if err != nil {
-		logger.Error(err, "failed to lookup movie slug and FS ID")
+	if obj.FilmstadenShowingID != nil {
+		*fsBuyLink = fmt.Sprintf("https://www.filmstaden.se/bokning/kop/Sys99-SE/%s", *obj.FilmstadenShowingID)
 	} else {
-		*fsBuyLink = fmt.Sprintf("https://www.filmstaden.se/film/%s/%s", slugAndFSID.FilmstadenID, slugAndFSID.Slug)
+		slugAndFSID, err := query.LookupSlugAndFSID(ctx, obj.MovieID)
+		if err != nil {
+			logger.Error(err, "failed to lookup movie slug and FS ID")
+		} else {
+			*fsBuyLink = fmt.Sprintf("https://www.filmstaden.se/film/%s/%s", slugAndFSID.FilmstadenID, slugAndFSID.Slug)
+		}
 	}
-
 	return &model.AdminPaymentDetails{
 		FilmstadenBuyLink: fsBuyLink,
 		ShowingID:         obj.ID,
