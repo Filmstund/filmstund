@@ -20,6 +20,7 @@ type AdminPaymentDetails struct {
 }
 
 type Attendee struct {
+	ID                     string           `json:"id"`
 	UserID                 uuid.UUID        `json:"userID"`
 	User                   *PublicUser      `json:"user"`
 	ShowingID              uuid.UUID        `json:"showingID"`

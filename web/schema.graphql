@@ -11,6 +11,7 @@ type Attendee {
   filmstadenMembershipID: String
   giftCertificateUsed: GiftCertificate
   hasPaid: Boolean!
+  id: Base64ID!
   showingID: UUID!
   type: PaymentType!
   user: PublicUser!

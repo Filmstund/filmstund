@@ -43,6 +43,7 @@ export type Attendee = {
   filmstadenMembershipID: Maybe<Scalars["String"]>;
   giftCertificateUsed: Maybe<GiftCertificate>;
   hasPaid: Scalars["Boolean"];
+  id: Scalars["Base64ID"];
   showingID: Scalars["UUID"];
   type: PaymentType;
   user: PublicUser;

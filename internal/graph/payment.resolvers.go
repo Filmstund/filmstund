@@ -77,6 +77,7 @@ func (r *mutationResolver) UpdateAttendeePaymentInfo(ctx context.Context, paymen
 		}
 	}
 	return &model.Attendee{
+		ID:                     combineIDs(attendee.UserID, attendee.ShowingID),
 		UserID:                 attendee.UserID,
 		User:                   nil, // separate resolver
 		ShowingID:              attendee.ShowingID,
@@ -115,6 +116,7 @@ func (r *showingResolver) AdminPaymentDetails(ctx context.Context, obj *model.Sh
 		}
 
 		attendees[i] = &model.Attendee{
+			ID:                     combineIDs(a.UserID, a.ShowingID),
 			UserID:                 a.UserID,
 			User:                   &model.PublicUser{ID: a.UserID}, // different resolver
 			ShowingID:              obj.ID,
