@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { orderBy } from "lodash";
 import Header from "../common/ui/Header";
@@ -51,6 +51,7 @@ const MovieSelector = ({
 }) => {
   const [{ data }] = useNewShowingQuery();
   const [{ fetching }, fetchMovies] = useFetchMoviesMutation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const { movies } = data!;
 
@@ -79,8 +80,18 @@ const MovieSelector = ({
     <>
       <PageTitle title="Skapa besök" />
       <FlexHeader>
-        <RefreshButton role="button" onClick={() => fetchMovies({})}>
-          <FontAwesomeIcon icon={faSyncAlt} spin={fetching} />
+        <RefreshButton
+          role="button"
+          onClick={async () => {
+            try {
+              setIsLoading(true);
+              await fetchMovies();
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+        >
+          <FontAwesomeIcon icon={faSyncAlt} spin={isLoading} />
         </RefreshButton>
         Skapa besök
       </FlexHeader>

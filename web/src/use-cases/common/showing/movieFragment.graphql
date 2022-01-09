@@ -3,4 +3,5 @@ fragment MovieFragment on Movie {
   poster
   title
   releaseDate
+  popularity
 }

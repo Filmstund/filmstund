@@ -3,6 +3,7 @@ import {
   dedupExchange,
   errorExchange,
   fetchExchange,
+  gql,
 } from "urql";
 import { BASE_GRAPHQL_URL } from "../lib/withBaseURL";
 import { cacheExchange } from "@urql/exchange-graphcache";
@@ -49,6 +50,23 @@ export const urql = createClient({
         Commandments: (d) => String((d as unknown as Commandments).number),
         FilmstadenCityAlias: (d) => (d as unknown as FilmstadenCityAlias).alias,
         GiftCertificate: (d) => (d as unknown as GiftCertificate).number,
+      },
+      updates: {
+        Mutation: {
+          fetchNewMoviesFromFilmstaden: (result, args, cache, info) => {
+            const AllMovies = gql`
+              {
+                allMovies {
+                  ...MovieFragment
+                }
+              }
+            `;
+            cache.updateQuery({ query: AllMovies }, (data) => {
+              data.allMovies = result.fetchNewMoviesFromFilmstaden;
+              return data;
+            });
+          },
+        },
       },
     }),
     fetchExchange,

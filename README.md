@@ -125,3 +125,10 @@ brew services start redis
 # Optionally configure:
 vim /usr/local/etc/redis.conf
 ```
+
+Or docker/podman:
+
+```shell
+docker run -d --name redis -p 6379:6379 redis
+podman run -d --rm --name redis -p 6379:6379 redis
+```
