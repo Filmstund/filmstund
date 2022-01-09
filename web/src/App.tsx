@@ -40,7 +40,7 @@ interface Props {}
 const App: React.FC<Props> = () => {
   const [errorKey, setErrorKey] = useState(0);
   return (
-    <PageTitleTemplate titleTemplate="%s | sefilm">
+    <PageTitleTemplate titleTemplate="%s | Filmstund">
       <NavBar onNavigate={() => setErrorKey((k) => k + 1)} />
       <ErrorBoundary
         key={errorKey}
