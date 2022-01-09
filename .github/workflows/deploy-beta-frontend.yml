@@ -9,6 +9,7 @@ on:
 
 jobs:
   deploy-packages:
+    environment: preprod
     runs-on: self-hosted # runner label defined in repo settings
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
@@ -25,13 +26,13 @@ jobs:
           cd ./web
           yarn
           yarn build
-          tar cf ../.build/frontend.tar.gz -C build/ .
+          tar cf frontend.tar.gz -C build/ .
       - name: Transfer assets to server
         env:
           USER_FRONTEND: ${{ secrets.USER_FRONTEND }}
           HOST_FRONTEND: ${{ secrets.HOST_FRONTEND }}
         run: |
-          scp .web/build/frontend.tar.gz $USER_FRONTEND@$HOST_FRONTEND:frontend/
+          scp ./web/frontend.tar.gz $USER_FRONTEND@$HOST_FRONTEND:frontend/
       - name: Replace frontend
         run: |
           ssh $USER_FRONTEND@$HOST_FRONTEND rm -r frontend/nonprod/*

@@ -9,6 +9,7 @@ on:
 
 jobs:
   deploy-packages:
+    environment: preprod
     runs-on: self-hosted # runner label defined in repo settings
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
