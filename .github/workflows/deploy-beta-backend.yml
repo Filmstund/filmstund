@@ -1,4 +1,4 @@
-name: deploy beta
+name: deploy beta backend
 
 on:
   workflow_run:
@@ -8,7 +8,7 @@ on:
       - completed
 
 jobs:
-  deploy-packages:
+  deploy-backend:
     environment: preprod
     runs-on: self-hosted # runner label defined in repo settings
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -26,8 +26,17 @@ jobs:
           USER_BACKEND: ${{ secrets.USER_BACKEND }}
           HOST_BACKEND: ${{ secrets.HOST_BACKEND }}
         run: |
-          scp .build/* $USER_BACKEND@$HOST_BACKEND:backend/
-      - name: Restart backend
+          ssh $USER_BACKEND@$HOST_BACKEND mkdir --parents backend-new
+          scp .build/* $USER_BACKEND@$HOST_BACKEND:backend-new/
+      - name: Replace backend
+        env:
+          USER_BACKEND: ${{ secrets.USER_BACKEND }}
+          HOST_BACKEND: ${{ secrets.HOST_BACKEND }}
         run: |
-          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user restart filmstund.service
-          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user restart popularity.service
+          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user stop filmstund.service
+          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user stop popularity.service
+          ssh $USER_BACKEND@$HOST_BACKEND mkdir --parents backend-old
+          ssh $USER_BACKEND@$HOST_BACKEND mv backend/* backend-old/
+          ssh $USER_BACKEND@$HOST_BACKEND mv backend-new/* backend/
+          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user start filmstund.service
+          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user start popularity.service
