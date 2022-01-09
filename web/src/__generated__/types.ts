@@ -644,6 +644,7 @@ export type MovieFragment = {
   poster: string | null | undefined;
   title: string;
   releaseDate: string;
+  popularity: number;
 };
 
 export type ShowingFragment = {
@@ -1072,6 +1073,7 @@ export const MovieFragment = gql`
     poster
     title
     releaseDate
+    popularity
   }
 `;
 export const ShowingFragment = gql`
