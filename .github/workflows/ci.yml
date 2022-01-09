@@ -47,11 +47,6 @@ jobs:
       - name: Build frontend
         run: |
           cd web
-          yarn
-          yarn lint --max-warnings=0
-          yarn types
-          yarn prettier:check
-          yarn build
-          yarn test
+          make all-web
         env:
           CI: true

@@ -27,11 +27,16 @@ yarn-install:
 	@yarn --cwd ./web --silent install
 .PHONY: yarn-install
 
-lint: $(golangci-lint_bin) yarn-install
+lint-go: $(golangci-lint_bin) yarn-install
 	$(info [$@] linting $(PROJECT_NAME)...)
 	@$< run --config .golangci.yaml
-	cd ./web && yarn lint --max-warnings=0
-.PHONY: lint
+.PHONY: lint-go
+
+lint-web:
+	@make -C web lint-web
+.PHONY: lint-web
+
+lint: lint-go lint-web
 
 verify-nodiff:
 	$(info [$@] verifying no git diff...)
