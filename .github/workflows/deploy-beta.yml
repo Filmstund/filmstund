@@ -1,0 +1,43 @@
+name: deploy beta
+
+on:
+  workflow_run:
+    workflows: [ "Backend", "Frontend" ]
+    branches: [ master ]
+    types:
+      - completed
+
+jobs:
+  deploy-packages:
+    runs-on: self-hosted # runner label defined in repo settings
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: Build assets
+        run: |
+          make build
+          cd ./web
+          yarn build
+          tar cf ../.build/frontend.tar.gz -C build/ .
+      - name: Transfer assets to server
+        env:
+          USER_BACKEND: ${{ secrets.USER_BACKEND }}
+          HOST_BACKEND: ${{ secrets.HOST_BACKEND }}
+          USER_FRONTEND: ${{ secrets.USER_FRONTEND }}
+          HOST_FRONTEND: ${{ secrets.HOST_FRONTEND }}
+        run: |
+          scp .build/* $USER_BACKEND@$HOST_BACKEND:backend/
+          scp .web/build/frontend.tar.gz $USER_FRONTEND@$HOST_FRONTEND:frontend/
+      - name: Replace frontend
+        run: |
+          ssh $USER_FRONTEND@$HOST_FRONTEND rm -r frontend/nonprod/*
+          ssh $USER_FRONTEND@$HOST_FRONTEND tar xf frontend/frontend.tar.gz -C frontend/nonprod/
+      - name: Restart backend
+        run: |
+          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user restart filmstund.service
+          ssh $USER_BACKEND@$HOST_BACKEND systemctl --user restart popularity.service

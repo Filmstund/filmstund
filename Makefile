@@ -76,6 +76,7 @@ build: clean
 	$(info [$@] building ${PROJECT_NAME}...)
 	go build -o .build/${PROJECT_NAME} ./cmd/${PROJECT_NAME}
 	go build -o .build/migrate ./cmd/migrate
+	go build -o .build/popularity ./cmd/popularity
 .PHONY: build
 
 build-website: yarn-install
