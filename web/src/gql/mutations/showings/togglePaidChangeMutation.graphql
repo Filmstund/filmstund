@@ -1,5 +1,7 @@
 mutation TogglePaidChangeMutation($paymentInfo: AttendeePaymentInfoInput!) {
   updateAttendeePaymentInfo(paymentInfo: $paymentInfo) {
+    id
+    amountOwed
     userID
     hasPaid
   }
