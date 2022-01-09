@@ -38,5 +38,5 @@ jobs:
           USER_FRONTEND: ${{ secrets.USER_FRONTEND }}
           HOST_FRONTEND: ${{ secrets.HOST_FRONTEND }}
         run: |
-          ssh $USER_FRONTEND@$HOST_FRONTEND rm -r frontend/nonprod/*
+          ssh $USER_FRONTEND@$HOST_FRONTEND rm -rf frontend/nonprod/*
           ssh $USER_FRONTEND@$HOST_FRONTEND tar xf frontend/beta.tar.gz -C frontend/nonprod/
