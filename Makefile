@@ -30,7 +30,7 @@ yarn-install:
 lint: $(golangci-lint_bin) yarn-install
 	$(info [$@] linting $(PROJECT_NAME)...)
 	@$< run --config .golangci.yaml
-	cd ./web && yarn lint
+	cd ./web && yarn lint --max-warnings=0
 .PHONY: lint
 
 verify-nodiff:
