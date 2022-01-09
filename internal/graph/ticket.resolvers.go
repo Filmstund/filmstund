@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"edholm.dev/go-logging"
@@ -13,6 +14,7 @@ import (
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
+	pgx "github.com/jackc/pgx/v4"
 )
 
 func (r *mutationResolver) ProcessTicketUrls(ctx context.Context, showingID uuid.UUID, ticketUrls []string) (*model.Showing, error) {
@@ -72,6 +74,30 @@ func (r *showingResolver) MyTickets(ctx context.Context, obj *model.Showing) ([]
 }
 
 func (r *showingResolver) TicketRange(ctx context.Context, obj *model.Showing) (*model.TicketRange, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	if !obj.TicketsBought {
+		return nil, nil
+	}
+
+	logger := logging.FromContext(ctx).
+		WithValues("showingID", obj.ID)
+	query := database.FromContext(ctx)
+
+	tickets, err := query.TicketSeatings(ctx, obj.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		logger.Error(err, "query.AllTickets failed")
+		return nil, fmt.Errorf("failed to fetch tickets")
+	}
+
+	rowMap := groupRows(tickets)
+	rows := distinctRows(rowMap)
+	seatings := mapToSeatRange(rowMap)
+
+	return &model.TicketRange{
+		Rows:       rows,
+		Seatings:   seatings,
+		TotalCount: len(tickets),
+	}, nil
 }

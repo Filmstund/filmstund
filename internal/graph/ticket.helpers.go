@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/filmstund/filmstund/internal/auth0/principal"
 	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/database/dao"
+	"github.com/filmstund/filmstund/internal/graph/model"
 	"github.com/google/uuid"
 )
 
@@ -167,4 +169,34 @@ func (r *mutationResolver) assignTickets(
 		}
 	}
 	return nil
+}
+
+// groupRows returns a map with the key being the row, and the value being all seats on that row.
+func groupRows(tickets []dao.TicketSeatingsRow) map[int][]int {
+	set := make(map[int][]int, len(tickets))
+	for _, ticket := range tickets {
+		row := int(ticket.SeatRow)
+		set[row] = append(set[row], int(ticket.SeatNumber))
+	}
+	return set
+}
+
+func distinctRows(tickets map[int][]int) []int {
+	rows := make([]int, 0, len(tickets))
+	for row := range tickets {
+		rows = append(rows, row)
+	}
+	sort.Ints(rows)
+	return rows
+}
+
+func mapToSeatRange(tickets map[int][]int) []*model.SeatRange {
+	seatRange := make([]*model.SeatRange, 0, len(tickets))
+	for row, seats := range tickets {
+		seatRange = append(seatRange, &model.SeatRange{
+			Row:     row,
+			Numbers: seats,
+		})
+	}
+	return seatRange
 }

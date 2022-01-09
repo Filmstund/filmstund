@@ -4,6 +4,12 @@ FROM tickets t
 WHERE t.showing_id = @showing_id
   AND t.assigned_to_user = @user_id;
 
+-- name: TicketSeatings :many
+SELECT t.id, t.seat_row, t.seat_number
+FROM tickets t
+WHERE t.showing_id = @showing_id
+order by t.seat_row;
+
 -- name: ShowingTicketsBought :one
 select tickets_bought, price
 from showings

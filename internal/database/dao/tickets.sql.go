@@ -164,3 +164,36 @@ func (q *Queries) ShowingTicketsBought(ctx context.Context, showingID uuid.UUID)
 	err := row.Scan(&i.TicketsBought, &i.Price)
 	return i, err
 }
+
+const ticketSeatings = `-- name: TicketSeatings :many
+SELECT t.id, t.seat_row, t.seat_number
+FROM tickets t
+WHERE t.showing_id = $1
+order by t.seat_row
+`
+
+type TicketSeatingsRow struct {
+	ID         string `json:"id"`
+	SeatRow    int32  `json:"seatRow"`
+	SeatNumber int32  `json:"seatNumber"`
+}
+
+func (q *Queries) TicketSeatings(ctx context.Context, showingID uuid.UUID) ([]TicketSeatingsRow, error) {
+	rows, err := q.db.Query(ctx, ticketSeatings, showingID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TicketSeatingsRow
+	for rows.Next() {
+		var i TicketSeatingsRow
+		if err := rows.Scan(&i.ID, &i.SeatRow, &i.SeatNumber); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
