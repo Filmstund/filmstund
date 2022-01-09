@@ -1,0 +1,57 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  checks:
+    runs-on: self-hosted # runner label defined in repo settings
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: Checks
+        run: make checks
+
+  build-backend:
+    runs-on: self-hosted # runner label defined in repo settings
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: Build application
+        run: make build
+
+  build-frontend:
+    runs-on: self-hosted # runner label defined in repo settings
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: "yarn"
+          cache-dependency-path: "web/yarn.lock"
+      - name: Build frontend
+        run: |
+          cd web
+          yarn
+          yarn lint
+          yarn types
+          yarn prettier:check
+          yarn build
+          yarn test
+        env:
+          CI: true
