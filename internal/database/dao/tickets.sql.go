@@ -13,9 +13,9 @@ import (
 
 const addTicket = `-- name: AddTicket :exec
 insert into tickets (id, showing_id, assigned_to_user, profile_id, barcode, customer_type, customer_type_definition,
-                     cinema, cinema_city, screen, date, time, movie_name, movie_rating)
+                     cinema, cinema_city, screen, seat_row, seat_number, date, time, movie_name, movie_rating)
 values ($1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13, $14)
+        $9, $10, $11, $12, $13, $14, $15, $16)
 `
 
 type AddTicketParams struct {
@@ -29,6 +29,8 @@ type AddTicketParams struct {
 	Cinema                 string         `json:"cinema"`
 	CinemaCity             sql.NullString `json:"cinemaCity"`
 	Screen                 string         `json:"screen"`
+	SeatRow                int32          `json:"seatRow"`
+	SeatNumber             int32          `json:"seatNumber"`
 	Date                   time.Time      `json:"date"`
 	Time                   time.Time      `json:"time"`
 	MovieName              string         `json:"movieName"`
@@ -47,6 +49,8 @@ func (q *Queries) AddTicket(ctx context.Context, arg AddTicketParams) error {
 		arg.Cinema,
 		arg.CinemaCity,
 		arg.Screen,
+		arg.SeatRow,
+		arg.SeatNumber,
 		arg.Date,
 		arg.Time,
 		arg.MovieName,
@@ -61,6 +65,7 @@ from attendees a
          left outer join tickets t on a.showing_id = t.showing_id AND t.assigned_to_user = a.user_id
          left join users u on a.user_id = u.id
 where a.showing_id = $1
+order by random()
 `
 
 type AttendeesIncludingTicketsRow struct {

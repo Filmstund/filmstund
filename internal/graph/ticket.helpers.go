@@ -14,6 +14,7 @@ import (
 	"github.com/filmstund/filmstund/internal/currency"
 	"github.com/filmstund/filmstund/internal/database/dao"
 	"github.com/filmstund/filmstund/internal/graph/model"
+	"github.com/go-logr/logr"
 	"github.com/google/uuid"
 )
 
@@ -88,11 +89,10 @@ func (r *mutationResolver) updateShowingToMatchTicket(
 	return nil
 }
 
-func nextTicketless(as []dao.AttendeesIncludingTicketsRow) *dao.AttendeesIncludingTicketsRow {
-	// TODO: consider fsMembershipID
-	for _, attendee := range as {
-		if !attendee.TicketID.Valid {
-			return &attendee
+func nextTicketless(as map[uuid.UUID]bool) *uuid.UUID {
+	for userID, hasTicket := range as {
+		if !hasTicket {
+			return &userID
 		}
 	}
 
@@ -107,10 +107,9 @@ func (r *mutationResolver) assignTickets(
 ) error {
 	logger := logging.FromContext(ctx)
 
-	attendees, err := tx.AttendeesIncludingTickets(ctx, showingID)
+	assignmentStatus, err := r.fetchTicketAssignments(ctx, tx, showingID, logger)
 	if err != nil {
-		logger.Error(err, "tx.AttendeesIncludingTickets failed")
-		return errInternalServerError
+		return err
 	}
 
 	for _, url := range ticketUrls {
@@ -125,10 +124,15 @@ func (r *mutationResolver) assignTickets(
 			continue
 		}
 		for _, ticket := range tickets {
-			ticketless := nextTicketless(attendees)
+			var assignToUser uuid.UUID
+			ticketless := nextTicketless(assignmentStatus)
 			if ticketless == nil {
-				logger.Info("no more attendees found without an assigned ticket")
-				break
+				logger.Info("no more attendees found without an assigned ticket - assigning the admin",
+					"ticketID", ticket.ID,
+				)
+				assignToUser = principal.FromContext(ctx).ID // current logged in user must be admin
+			} else {
+				assignToUser = *ticketless
 			}
 
 			barcode, err := r.filmstaden.Barcode(ctx, ticket.QrCode)
@@ -151,7 +155,7 @@ func (r *mutationResolver) assignTickets(
 			if err := tx.AddTicket(ctx, dao.AddTicketParams{
 				ID:                     ticket.ID,
 				ShowingID:              showingID,
-				AssignedToUser:         ticketless.UserID,
+				AssignedToUser:         assignToUser,
 				ProfileID:              stringToNullString(ticket.ProfileID),
 				Barcode:                *barcode,
 				CustomerType:           ticket.CustomerType,
@@ -159,6 +163,8 @@ func (r *mutationResolver) assignTickets(
 				Cinema:                 ticket.Cinema.Title,
 				CinemaCity:             stringToNullString(ticket.Cinema.City.Name),
 				Screen:                 ticket.Screen.Title,
+				SeatRow:                int32(ticket.Seat.Row),
+				SeatNumber:             int32(ticket.Seat.Number),
 				Date:                   ticketDate,
 				Time:                   ticketTime,
 				MovieName:              ticket.Movie.Title,
@@ -166,9 +172,30 @@ func (r *mutationResolver) assignTickets(
 			}); err != nil {
 				logger.Error(err, "failed to add ticket", "ticketID", ticket.ID)
 			}
+
+			// This just marks the user at not being ticketless anymore
+			assignmentStatus[assignToUser] = true
 		}
 	}
 	return nil
+}
+
+func (r *mutationResolver) fetchTicketAssignments(
+	ctx context.Context,
+	tx *dao.Queries,
+	showingID uuid.UUID,
+	logger logr.Logger,
+) (map[uuid.UUID]bool, error) {
+	attendees, err := tx.AttendeesIncludingTickets(ctx, showingID)
+	if err != nil {
+		logger.Error(err, "tx.AttendeesIncludingTickets failed")
+		return nil, errInternalServerError
+	}
+	assignmentStatus := make(map[uuid.UUID]bool, len(attendees))
+	for _, a := range attendees {
+		assignmentStatus[a.UserID] = a.TicketID.Valid
+	}
+	return assignmentStatus, nil
 }
 
 // groupRows returns a map with the key being the row, and the value being all seats on that row.
