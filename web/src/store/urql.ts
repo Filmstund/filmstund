@@ -45,7 +45,6 @@ export const urql = createClient({
       },
     }),
     cacheExchange({
-      schema: schema as any,
       keys: {
         Commandments: (d) => String((d as unknown as Commandments).number),
         FilmstadenCityAlias: (d) => (d as unknown as FilmstadenCityAlias).alias,

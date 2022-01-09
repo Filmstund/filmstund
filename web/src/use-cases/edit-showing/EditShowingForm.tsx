@@ -73,7 +73,6 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
   }
 
   const navigate = useNavigate();
-  const [errors, setErrors] = useState<Error[] | null>(null);
   const [formState, setFormState] = useState<EditShowingFormShowing>(() =>
     getInitialState(showing)
   );
@@ -94,29 +93,33 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
     }
   }, [deleteShowing, showing, navigate]);
 
-  const handleSubmit = () => {
-    updateShowing({
-      showingId: showing.id,
-      showing: {
-        date: Temporal.PlainDate.from(formState.date),
-        //      expectedBuyDate: formatYMD(formState.expectedBuyDate), // TODO re-add these two maybe?
-        //      private: showing.private,
-        payToUser: showing.payToUser.id,
-        location: formState.location,
-        time: Temporal.PlainTime.from(formState.time).toString({
-          smallestUnit: "minutes",
-        }) as any,
-        filmstadenRemoteEntityID: formState.filmstadenRemoteEntityID ?? null,
-        price: formState.price,
-      },
-    }).then(({ data, error }) => {
+  const handleSubmit = async () => {
+    try {
+      const { data, error } = await updateShowing({
+        showingId: showing.id,
+        showing: {
+          date: Temporal.PlainDate.from(formState.date),
+          //      expectedBuyDate: formatYMD(formState.expectedBuyDate), // TODO re-add these two maybe?
+          //      private: showing.private,
+          payToUser: showing.payToUser.id,
+          location: formState.location,
+          time: Temporal.PlainTime.from(formState.time).toString({
+            smallestUnit: "minutes",
+          }) as any,
+          filmstadenRemoteEntityID: formState.filmstadenRemoteEntityID ?? null,
+          price: formState.price,
+        },
+      });
+
       if (data) {
         navigators.navigateToShowing(navigate, showing);
         toast({ variant: "success", text: "Visning har sparats" });
       } else if (error) {
         toast({ variant: "danger", text: error.message });
       }
-    });
+    } catch (error) {
+      toast({ variant: "danger", text: error.message });
+    }
   };
 
   const setShowingValue = useCallback<SetShowingValueFn>((key, value) => {
