@@ -188,8 +188,8 @@ type Showing struct {
 	PayToUser              *PublicUser             `json:"payToUser"`
 	UpdateTime             time.Time               `json:"updateTime"`
 	CreateTime             time.Time               `json:"createTime"`
-	FilmstadenSeatMap      []*FilmstadenSeatMap    `json:"filmstadenSeatMap"`
 	Attendees              []*PublicAttendee       `json:"attendees"`
+	FilmstadenSeatMap      []*FilmstadenSeatMap    `json:"filmstadenSeatMap"`
 	AdminPaymentDetails    *AdminPaymentDetails    `json:"adminPaymentDetails"`
 	AttendeePaymentDetails *AttendeePaymentDetails `json:"attendeePaymentDetails"`
 	MyTickets              []*Ticket               `json:"myTickets"`

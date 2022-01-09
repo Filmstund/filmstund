@@ -38,7 +38,6 @@ type Showing {
     payToUser: PublicUser!
     updateTime: Time!
     createTime: Time!
-    filmstadenSeatMap: [FilmstadenSeatMap!]!
     attendees: [PublicAttendee!]!
 }
 

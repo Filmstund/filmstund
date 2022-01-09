@@ -458,11 +458,6 @@ func (r *showingResolver) PayToUser(ctx context.Context, obj *model.Showing) (*m
 	return pu, nil
 }
 
-func (r *showingResolver) FilmstadenSeatMap(ctx context.Context, obj *model.Showing) ([]*model.FilmstadenSeatMap, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *showingResolver) Attendees(ctx context.Context, obj *model.Showing) ([]*model.PublicAttendee, error) {
 	query := database.FromContext(ctx)
 	attendees, err := query.PublicAttendees(ctx, obj.ID)

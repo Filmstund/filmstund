@@ -1,3 +1,11 @@
+extend type Query {
+    filmstadenShowings(movieID: UUID!, city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
+}
+
+extend type Showing {
+    filmstadenSeatMap: [FilmstadenSeatMap!]!
+}
+
 type FilmstadenSeatMap {
     row: Int!
     number: Int!

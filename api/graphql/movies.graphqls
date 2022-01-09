@@ -2,7 +2,6 @@ extend type Query {
     movie(id: UUID!): Movie
     allMovies: [Movie!]!
     archivedMovies: [Movie!]!
-    filmstadenShowings(movieID: UUID!, city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
 }
 
 extend type Mutation {
