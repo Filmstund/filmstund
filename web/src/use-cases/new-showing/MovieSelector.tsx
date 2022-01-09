@@ -50,7 +50,7 @@ const MovieSelector = ({
   setMovie: (movie: MovieFragment) => void;
 }) => {
   const [{ data }] = useNewShowingQuery();
-  const [{ fetching }, fetchMovies] = useFetchMoviesMutation();
+  const [, fetchMovies] = useFetchMoviesMutation();
   const [isLoading, setIsLoading] = useState(false);
 
   const { movies } = data!;
