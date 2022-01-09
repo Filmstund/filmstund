@@ -117,8 +117,8 @@ export type FilmstadenSeatCoordinates = {
 
 export type FilmstadenSeatDimensions = {
   __typename?: "FilmstadenSeatDimensions";
-  height: Scalars["Int"];
-  width: Scalars["Int"];
+  height: Scalars["Float"];
+  width: Scalars["Float"];
 };
 
 export type FilmstadenSeatMap = {

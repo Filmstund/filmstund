@@ -1655,8 +1655,8 @@ type FilmstadenSeatCoordinates {
 }
 
 type FilmstadenSeatDimensions {
-    width: Int!
-    height: Int!
+    width: Float!
+    height: Float!
 }
 
 type FilmstadenScreen {
@@ -3407,9 +3407,9 @@ func (ec *executionContext) _FilmstadenSeatDimensions_width(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _FilmstadenSeatDimensions_height(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatDimensions) (ret graphql.Marshaler) {
@@ -3442,9 +3442,9 @@ func (ec *executionContext) _FilmstadenSeatDimensions_height(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _FilmstadenSeatMap_row(ctx context.Context, field graphql.CollectedField, obj *model.FilmstadenSeatMap) (ret graphql.Marshaler) {

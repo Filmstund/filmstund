@@ -90,8 +90,8 @@ type FilmstadenSeatCoordinates struct {
 }
 
 type FilmstadenSeatDimensions struct {
-	Width  int `json:"width"`
-	Height int `json:"height"`
+	Width  float64 `json:"width"`
+	Height float64 `json:"height"`
 }
 
 type FilmstadenSeatMap struct {

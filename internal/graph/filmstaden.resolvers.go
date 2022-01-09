@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"edholm.dev/go-logging"
@@ -68,6 +69,36 @@ func (r *queryResolver) FilmstadenShowings(ctx context.Context, movieID uuid.UUI
 }
 
 func (r *showingResolver) FilmstadenSeatMap(ctx context.Context, obj *model.Showing) ([]*model.FilmstadenSeatMap, error) {
-	// TODO: implement
-	panic(fmt.Errorf("not implemented"))
+	if obj.FilmstadenShowingID == nil {
+		// No filmstaden ID == no seat map
+		return nil, nil
+	}
+
+	idParts := strings.SplitN(*obj.FilmstadenShowingID, "-", 3)
+	if len(idParts) != 3 {
+		return nil, fmt.Errorf("unknown format for the Filmstaden showing ID")
+	}
+	layout, err := r.filmstaden.ScreenLayout(ctx, idParts[2])
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch screen layout for ID=%s", idParts[2])
+	}
+
+	seats := make([]*model.FilmstadenSeatMap, len(layout.Seats))
+	for i, seat := range layout.Seats {
+		seats[i] = &model.FilmstadenSeatMap{
+			Row:      seat.Row,
+			Number:   seat.Number,
+			SeatType: seat.SeatType,
+			Coordinates: &model.FilmstadenSeatCoordinates{
+				X: seat.Coordinates.X,
+				Y: seat.Coordinates.Y,
+			},
+			Dimensions: &model.FilmstadenSeatDimensions{
+				Width:  seat.Dimensions.Width,
+				Height: seat.Dimensions.Height,
+			},
+		}
+	}
+
+	return seats, nil
 }

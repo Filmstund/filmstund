@@ -81,8 +81,8 @@ type FilmstadenSeatCoordinates {
 }
 
 type FilmstadenSeatDimensions {
-  height: Int!
-  width: Int!
+  height: Float!
+  width: Float!
 }
 
 type FilmstadenSeatMap {
