@@ -25,6 +25,7 @@ import {
   useUpdateShowingMutation,
 } from "../../__generated__/types";
 import { Temporal } from "@js-temporal/polyfill";
+import { useToaster } from "../../common/toast/ToastContext";
 
 const today = new Date();
 
@@ -79,6 +80,7 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
 
   const { movie, admin, ticketsBought } = showing;
 
+  const toast = useToaster();
   const [, updateShowing] = useUpdateShowingMutation();
   const [, deleteShowing] = useDeleteShowingMutation();
 
@@ -101,18 +103,20 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
         //      private: showing.private,
         payToUser: showing.payToUser.id,
         location: formState.location,
-        time: Temporal.PlainTime.from(formState.time),
+        time: Temporal.PlainTime.from(formState.time).toString({
+          smallestUnit: "minutes",
+        }) as any,
         filmstadenRemoteEntityID: formState.filmstadenRemoteEntityID ?? null,
         price: formState.price,
       },
-    })
-      .then(() => {
-        setErrors(null);
+    }).then(({ data, error }) => {
+      if (data) {
         navigators.navigateToShowing(navigate, showing);
-      })
-      .catch((errors) => {
-        setErrors(errors);
-      });
+        toast({ variant: "success", text: "Visning har sparats" });
+      } else if (error) {
+        toast({ variant: "danger", text: error.message });
+      }
+    });
   };
 
   const setShowingValue = useCallback<SetShowingValueFn>((key, value) => {
@@ -131,7 +135,7 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
       ...state,
       filmstadenRemoteEntityID: id,
       location: cinema.name,
-      time: timeUtc.toString(),
+      time: timeUtc.toZonedDateTimeISO("utc").toPlainTime().toString(),
     }));
   };
 
@@ -174,7 +178,7 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
           <LocationSelect
             previousLocations={previouslyUsedLocations}
             value={formState.location}
-            onChange={(value: string) => setShowingValue("location", value)}
+            onChange={(value) => setShowingValue("location", value)}
           />
         </Field>
         <Field text="Pris:">

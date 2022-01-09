@@ -23,6 +23,6 @@ const popAtom = atom(null, (get, set, arg: string) =>
   )
 );
 
-export const useToast = () => useAtomValue(toastAtom);
+export const useToastValue = () => useAtomValue(toastAtom);
 export const useToaster = () => useUpdateAtom(appendAtom);
 export const useEjectToast = () => useUpdateAtom(popAtom);

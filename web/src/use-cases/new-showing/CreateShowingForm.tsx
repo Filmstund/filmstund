@@ -20,8 +20,9 @@ import Input from "../common/ui/Input";
 import { LocationSelect } from "../common/ui/LocationSelect";
 import MainButton, { GrayButton } from "../common/ui/MainButton";
 import { useNavigate } from "react-router-dom";
-import { navigateToShowing } from "../common/navigators";
+import * as navigators from "../common/navigators";
 import { Temporal } from "@js-temporal/polyfill";
+import { useToaster } from "../../common/toast/ToastContext";
 
 const now = new Date();
 
@@ -88,6 +89,7 @@ export const CreateShowingForm: React.FC<Props> = ({
   const [showing, setShowingState] = useState<ShowingState>(() =>
     getInitialState({ movie, me }, movieID)
   );
+  const toast = useToaster();
 
   const [, createShowing] = useCreateShowingMutation();
 
@@ -145,9 +147,13 @@ export const CreateShowingForm: React.FC<Props> = ({
     };
 
     createShowing({ showing })
-      .then((resp) => {
-        const { showing } = resp.data!;
-        navigateToShowing(navigate, showing);
+      .then(({ data, error }) => {
+        if (data) {
+          navigators.navigateToShowing(navigate, data.showing);
+          toast({ variant: "success", text: "Visning har sparats" });
+        } else if (error) {
+          toast({ variant: "danger", text: error.message });
+        }
       })
       .catch((errors) => {
         console.log(errors);
@@ -199,7 +205,7 @@ export const CreateShowingForm: React.FC<Props> = ({
           <LocationSelect
             previousLocations={previouslyUsedLocations}
             value={locationName}
-            onChange={(value: string) => setShowingValue("location", value)}
+            onChange={(value) => setShowingValue("location", value)}
           />
         </Field>
         <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>

@@ -1,5 +1,5 @@
 import React from "react";
-import { useToast, useEjectToast } from "./ToastContext";
+import { useToastValue, useEjectToast } from "./ToastContext";
 import styled from "@emotion/styled";
 import { StatusBox } from "../../use-cases/common/utils/StatusMessageBox";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
@@ -34,7 +34,7 @@ const Container = styled.div`
 `;
 
 export const Toaster = () => {
-  const toasts = useToast();
+  const toasts = useToastValue();
   const ejectToast = useEjectToast();
 
   return (
