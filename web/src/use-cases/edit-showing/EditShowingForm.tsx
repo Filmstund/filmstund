@@ -117,7 +117,7 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
       } else if (error) {
         toast({ variant: "danger", text: error.message });
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({ variant: "danger", text: error.message });
     }
   };
