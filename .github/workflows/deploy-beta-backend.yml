@@ -1,4 +1,4 @@
-name: deploy beta backend
+name: Deploy beta backend
 
 on:
   workflow_run:

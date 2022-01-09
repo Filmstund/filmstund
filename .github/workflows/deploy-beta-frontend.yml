@@ -1,4 +1,4 @@
-name: deploy beta frontend
+name: Deploy beta frontend
 
 on:
   workflow_run:
@@ -9,7 +9,9 @@ on:
 
 jobs:
   deploy-frontend:
-    environment: preprod
+    environment:
+      name: preprod
+      url: https://beta.filmstund.se
     runs-on: self-hosted # runner label defined in repo settings
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
