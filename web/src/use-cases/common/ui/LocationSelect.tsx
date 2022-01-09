@@ -25,7 +25,7 @@ export const LocationSelect: React.VFC<Props> = ({
     onCreateOption={(value) => onChange(value)}
     onChange={(option) => {
       if (option) {
-        onChange(value);
+        onChange(option.value);
       }
     }}
   />
