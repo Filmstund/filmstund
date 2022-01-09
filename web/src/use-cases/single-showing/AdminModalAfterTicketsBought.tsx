@@ -20,7 +20,6 @@ export const AdminModalAfterTicketsBought: React.FC<
     useTogglePaidChangeMutation();
 
   const toast = useToaster();
-  const toastaa = useToaster();
 
   const handlePaidChange = useCallback(
     async (info: AdminAttendeePaymentDetails) => {
