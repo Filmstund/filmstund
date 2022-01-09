@@ -37,7 +37,6 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 		return nil, fmt.Errorf("failed to setup DB")
 	}
 
-	graphMovies := make([]*model.Movie, 0, len(merged.Items))
 	for _, item := range merged.Items {
 		var releaseDate time.Time
 		if item.ReReleaseDate != nil {
@@ -56,7 +55,7 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 			genres[i] = genre.Name
 		}
 
-		movie, err := q.UpsertMovie(ctx, dao.UpsertMovieParams{
+		_, err := q.UpsertMovie(ctx, dao.UpsertMovieParams{
 			ID:           uuid.New(),
 			FilmstadenID: item.NcgID,
 			Slug:         item.Slug,
@@ -77,14 +76,13 @@ func (r *mutationResolver) FetchNewMoviesFromFilmstaden(ctx context.Context, cit
 			logger.Error(err, "failed to insert movie", "movieID", item.NcgID)
 			continue
 		}
-		graphMovies = append(graphMovies, movie.GraphModel())
 	}
 
 	if err := commit(ctx); err != nil {
 		logger.Error(err, "failed to commit movie upsert")
 		return nil, fmt.Errorf("failed to insert movies")
 	}
-	return graphMovies, nil
+	return r.Query().AllMovies(ctx)
 }
 
 func (r *queryResolver) Movie(ctx context.Context, id uuid.UUID) (*model.Movie, error) {
