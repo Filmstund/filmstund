@@ -43,7 +43,7 @@
     "react-dom": "^18.0.0-rc.0",
     "react-modal": "3.14.4",
     "react-router-dom": "^6.2.1",
-    "react-select": "5.2.1",
+    "react-select": "5.2.2",
     "react-transition-group": "^4.4.2",
     "suspend-react": "^0.0.8",
     "typescript": "4.5.4",
