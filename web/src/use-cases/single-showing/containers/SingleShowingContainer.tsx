@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { navigateToShowingTickets } from "../../common/navigators";
 import { MissingShowing } from "../../common/showing/MissingShowing";
 import SimpleShowing from "../../common/showing/SimpleShowing";
-import IMDbLink from "../../common/ui/IMDbLink";
+import { IMDbLink } from "../../common/ui/IMDbLink";
 import { ButtonContainer } from "../../common/ui/MainButton";
 import { useScrollToTop } from "../../common/utils/useScrollToTop";
 import AdminAction from "../AdminAction";
@@ -66,7 +66,7 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
         />
       )}
       <SimpleShowing
-        setTitleTag={true}
+        setTitleTag
         movie={showing.movie}
         date={`${showing.date.toString()} ${showing.time}`}
         admin={showing.admin}
@@ -74,7 +74,7 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
         ticketsBought={showing.ticketsBought}
       />
       <ButtonContainer>
-        <IMDbLink imdbId={showing.movie.imdbID} />
+        {showing.movie.imdbID && <IMDbLink imdbId={showing.movie.imdbID} />}
         {isAdmin && (
           <AdminAction onBeforeOpenBuyModal={refetch} showing={showing} />
         )}

@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import React from "react";
 import { SMALL_FONT_SIZE } from "../../../lib/style-vars";
 import { FilmstadenShowingFragment } from "../../../__generated__/types";
+import { formatInstantInStockholmTz } from "../../../lib/dateTools";
 
 const Option = styled.div<{ selected: boolean }>`
   display: flex;
@@ -55,11 +56,7 @@ const SelectBox: React.FC<Props> = ({ options, onChange, selectedValue }) => (
         selected={option.id === selectedValue}
       >
         <Lable>
-          {option.timeUtc
-            .toZonedDateTimeISO("utc")
-            .toPlainTime()
-            .toString({ smallestUnit: "minutes" })}{" "}
-          {option.screen.name},{" "}
+          {formatInstantInStockholmTz(option.timeUtc)} {option.screen.name},{" "}
           {option.cinema.name.replace(/ ?Filmstaden ?/, "")}
         </Lable>
         <div>

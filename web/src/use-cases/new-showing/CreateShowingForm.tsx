@@ -10,7 +10,11 @@ import {
   useCreateShowingMutation,
   useCreateShowingQuery,
 } from "../../__generated__/types";
-import { formatYMD, parseDate } from "../../lib/dateTools";
+import {
+  formatInstantInStockholmTz,
+  formatYMD,
+  parseDate,
+} from "../../lib/dateTools";
 import { FilmstadenShowingSelector } from "../common/showing/FilmstadenShowingSelector";
 import SimpleShowing from "../common/showing/SimpleShowing";
 import Field from "../common/ui/Field";
@@ -110,7 +114,7 @@ export const CreateShowingForm: React.FC<Props> = ({
       const newState: ShowingState = {
         ...state,
         filmstadenRemoteEntityID: id,
-        time: timeUtc.toZonedDateTimeISO("utc").toPlainTime().toString(),
+        time: formatInstantInStockholmTz(timeUtc),
         location: cinema.name,
         filmstadenScreen: cleanFilmstadenScreen(screen),
       };

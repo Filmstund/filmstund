@@ -3,6 +3,7 @@ import parse from "date-fns/parse";
 import parseISO from "date-fns/parseISO";
 
 import { padStart, take } from "lodash";
+import { Temporal } from "@js-temporal/polyfill";
 
 const DATE_MONTH_TIME = "d MMM HH:mm";
 const HOUR_MINUTE = "HH:mm";
@@ -57,4 +58,15 @@ export const formatYMD = (date: string | number | Date): string => {
     return format(parseISO(date), YMD);
   }
   return format(date, YMD);
+};
+
+export const STOCKHOLM_TZ = "Europe/Stockholm";
+
+export const formatInstantInStockholmTz = (
+  instant: Temporal.Instant
+): string => {
+  return instant
+    .toZonedDateTimeISO(STOCKHOLM_TZ)
+    .toPlainTime()
+    .toString({ smallestUnit: "minutes" });
 };
