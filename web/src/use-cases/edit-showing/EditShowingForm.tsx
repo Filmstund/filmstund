@@ -4,11 +4,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addDays from "date-fns/addDays";
 import React, { useCallback, useState } from "react";
-import {
-  formatInstantInStockholmTz,
-  formatYMD,
-  STOCKHOLM_TZ,
-} from "../../lib/dateTools";
+import { formatInstantInStockholmTz, formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
 import { useNavigate } from "react-router-dom";
 import * as navigators from "../common/navigators";
