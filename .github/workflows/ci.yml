@@ -50,3 +50,7 @@ jobs:
           make all-web
         env:
           CI: true
+          CI_REPO_OWNER: Filmstund
+          CI_REPO_NAME: filmstund
+          CI_COMMIT_SHA: ${{ github.sha }}
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
