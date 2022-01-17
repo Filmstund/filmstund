@@ -3,6 +3,7 @@ all-web: yarn-install lint-web
 	yarn prettier:check
 	yarn build
 	yarn test
+	yarn bundlewatch
 .PHONY: all-web
 
 yarn-install:
