@@ -67,7 +67,7 @@ To run the app you will need to have access to a Postgres instance.
 An easy solution is to run Postgres using docker:
 
 ```shell
-docker run --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund -d -p 5432:5432 postgres:13
+docker run --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund -d -p 5432:5432 postgres:14
 ```
 
 #### Podman
@@ -75,7 +75,7 @@ docker run --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=films
 Alternatively, you can use `podman` instead of docker:
 
 ```shell
-sudo podman run -d --rm -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund postgres:13
+sudo podman run -d --rm -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=filmstund -e POSTGRES_USER=filmstund -e POSTGRES_DB=filmstund postgres:14
 ```
 
 #### Migrations
