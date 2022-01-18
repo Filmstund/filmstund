@@ -9690,7 +9690,6 @@ var adminPaymentDetailsImplementors = []string{"AdminPaymentDetails"}
 
 func (ec *executionContext) _AdminPaymentDetails(ctx context.Context, sel ast.SelectionSet, obj *model.AdminPaymentDetails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, adminPaymentDetailsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9698,14 +9697,29 @@ func (ec *executionContext) _AdminPaymentDetails(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AdminPaymentDetails")
 		case "filmstadenBuyLink":
-			out.Values[i] = ec._AdminPaymentDetails_filmstadenBuyLink(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AdminPaymentDetails_filmstadenBuyLink(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "showingID":
-			out.Values[i] = ec._AdminPaymentDetails_showingID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AdminPaymentDetails_showingID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "attendees":
-			out.Values[i] = ec._AdminPaymentDetails_attendees(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AdminPaymentDetails_attendees(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9724,7 +9738,6 @@ var attendeeImplementors = []string{"Attendee"}
 
 func (ec *executionContext) _Attendee(ctx context.Context, sel ast.SelectionSet, obj *model.Attendee) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, attendeeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9732,18 +9745,29 @@ func (ec *executionContext) _Attendee(ctx context.Context, sel ast.SelectionSet,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Attendee")
 		case "id":
-			out.Values[i] = ec._Attendee_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "userID":
-			out.Values[i] = ec._Attendee_userID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_userID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "user":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -9754,31 +9778,65 @@ func (ec *executionContext) _Attendee(ctx context.Context, sel ast.SelectionSet,
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "showingID":
-			out.Values[i] = ec._Attendee_showingID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_showingID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "hasPaid":
-			out.Values[i] = ec._Attendee_hasPaid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_hasPaid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "amountOwed":
-			out.Values[i] = ec._Attendee_amountOwed(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_amountOwed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "type":
-			out.Values[i] = ec._Attendee_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "giftCertificateUsed":
-			out.Values[i] = ec._Attendee_giftCertificateUsed(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_giftCertificateUsed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "filmstadenMembershipID":
-			out.Values[i] = ec._Attendee_filmstadenMembershipID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Attendee_filmstadenMembershipID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9794,7 +9852,6 @@ var attendeePaymentDetailsImplementors = []string{"AttendeePaymentDetails"}
 
 func (ec *executionContext) _AttendeePaymentDetails(ctx context.Context, sel ast.SelectionSet, obj *model.AttendeePaymentDetails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, attendeePaymentDetailsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9802,18 +9859,29 @@ func (ec *executionContext) _AttendeePaymentDetails(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AttendeePaymentDetails")
 		case "hasPaid":
-			out.Values[i] = ec._AttendeePaymentDetails_hasPaid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AttendeePaymentDetails_hasPaid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "amountOwed":
-			out.Values[i] = ec._AttendeePaymentDetails_amountOwed(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AttendeePaymentDetails_amountOwed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "payTo":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -9824,10 +9892,15 @@ func (ec *executionContext) _AttendeePaymentDetails(ctx context.Context, sel ast
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "payer":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -9838,9 +9911,18 @@ func (ec *executionContext) _AttendeePaymentDetails(ctx context.Context, sel ast
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "swishLink":
-			out.Values[i] = ec._AttendeePaymentDetails_swishLink(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AttendeePaymentDetails_swishLink(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9856,7 +9938,6 @@ var cinemaScreenImplementors = []string{"CinemaScreen"}
 
 func (ec *executionContext) _CinemaScreen(ctx context.Context, sel ast.SelectionSet, obj *model.CinemaScreen) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, cinemaScreenImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9864,12 +9945,22 @@ func (ec *executionContext) _CinemaScreen(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CinemaScreen")
 		case "id":
-			out.Values[i] = ec._CinemaScreen_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CinemaScreen_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._CinemaScreen_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CinemaScreen_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9888,7 +9979,6 @@ var commandmentsImplementors = []string{"Commandments"}
 
 func (ec *executionContext) _Commandments(ctx context.Context, sel ast.SelectionSet, obj *model.Commandments) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commandmentsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9896,12 +9986,22 @@ func (ec *executionContext) _Commandments(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Commandments")
 		case "number":
-			out.Values[i] = ec._Commandments_number(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Commandments_number(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "phrase":
-			out.Values[i] = ec._Commandments_phrase(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Commandments_phrase(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9920,7 +10020,6 @@ var filmstadenCinemaImplementors = []string{"FilmstadenCinema"}
 
 func (ec *executionContext) _FilmstadenCinema(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenCinema) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenCinemaImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9928,12 +10027,22 @@ func (ec *executionContext) _FilmstadenCinema(ctx context.Context, sel ast.Selec
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenCinema")
 		case "filmstadenID":
-			out.Values[i] = ec._FilmstadenCinema_filmstadenID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenCinema_filmstadenID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._FilmstadenCinema_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenCinema_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9952,7 +10061,6 @@ var filmstadenCityAliasImplementors = []string{"FilmstadenCityAlias"}
 
 func (ec *executionContext) _FilmstadenCityAlias(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenCityAlias) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenCityAliasImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9960,12 +10068,22 @@ func (ec *executionContext) _FilmstadenCityAlias(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenCityAlias")
 		case "name":
-			out.Values[i] = ec._FilmstadenCityAlias_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenCityAlias_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "alias":
-			out.Values[i] = ec._FilmstadenCityAlias_alias(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenCityAlias_alias(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9984,7 +10102,6 @@ var filmstadenScreenImplementors = []string{"FilmstadenScreen"}
 
 func (ec *executionContext) _FilmstadenScreen(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenScreen) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenScreenImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -9992,12 +10109,22 @@ func (ec *executionContext) _FilmstadenScreen(ctx context.Context, sel ast.Selec
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenScreen")
 		case "filmstadenID":
-			out.Values[i] = ec._FilmstadenScreen_filmstadenID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenScreen_filmstadenID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._FilmstadenScreen_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenScreen_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10016,7 +10143,6 @@ var filmstadenSeatCoordinatesImplementors = []string{"FilmstadenSeatCoordinates"
 
 func (ec *executionContext) _FilmstadenSeatCoordinates(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenSeatCoordinates) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenSeatCoordinatesImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10024,12 +10150,22 @@ func (ec *executionContext) _FilmstadenSeatCoordinates(ctx context.Context, sel 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenSeatCoordinates")
 		case "x":
-			out.Values[i] = ec._FilmstadenSeatCoordinates_x(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatCoordinates_x(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "y":
-			out.Values[i] = ec._FilmstadenSeatCoordinates_y(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatCoordinates_y(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10048,7 +10184,6 @@ var filmstadenSeatDimensionsImplementors = []string{"FilmstadenSeatDimensions"}
 
 func (ec *executionContext) _FilmstadenSeatDimensions(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenSeatDimensions) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenSeatDimensionsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10056,12 +10191,22 @@ func (ec *executionContext) _FilmstadenSeatDimensions(ctx context.Context, sel a
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenSeatDimensions")
 		case "width":
-			out.Values[i] = ec._FilmstadenSeatDimensions_width(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatDimensions_width(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "height":
-			out.Values[i] = ec._FilmstadenSeatDimensions_height(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatDimensions_height(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10080,7 +10225,6 @@ var filmstadenSeatMapImplementors = []string{"FilmstadenSeatMap"}
 
 func (ec *executionContext) _FilmstadenSeatMap(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenSeatMap) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenSeatMapImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10088,27 +10232,52 @@ func (ec *executionContext) _FilmstadenSeatMap(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenSeatMap")
 		case "row":
-			out.Values[i] = ec._FilmstadenSeatMap_row(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatMap_row(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "number":
-			out.Values[i] = ec._FilmstadenSeatMap_number(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatMap_number(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "seatType":
-			out.Values[i] = ec._FilmstadenSeatMap_seatType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatMap_seatType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "coordinates":
-			out.Values[i] = ec._FilmstadenSeatMap_coordinates(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatMap_coordinates(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "dimensions":
-			out.Values[i] = ec._FilmstadenSeatMap_dimensions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenSeatMap_dimensions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10127,7 +10296,6 @@ var filmstadenShowingImplementors = []string{"FilmstadenShowing"}
 
 func (ec *executionContext) _FilmstadenShowing(ctx context.Context, sel ast.SelectionSet, obj *model.FilmstadenShowing) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, filmstadenShowingImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10135,27 +10303,52 @@ func (ec *executionContext) _FilmstadenShowing(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FilmstadenShowing")
 		case "id":
-			out.Values[i] = ec._FilmstadenShowing_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenShowing_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "cinema":
-			out.Values[i] = ec._FilmstadenShowing_cinema(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenShowing_cinema(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "screen":
-			out.Values[i] = ec._FilmstadenShowing_screen(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenShowing_screen(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "timeUtc":
-			out.Values[i] = ec._FilmstadenShowing_timeUtc(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenShowing_timeUtc(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "tags":
-			out.Values[i] = ec._FilmstadenShowing_tags(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._FilmstadenShowing_tags(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10174,7 +10367,6 @@ var giftCertificateImplementors = []string{"GiftCertificate"}
 
 func (ec *executionContext) _GiftCertificate(ctx context.Context, sel ast.SelectionSet, obj *model.GiftCertificate) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, giftCertificateImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10182,17 +10374,32 @@ func (ec *executionContext) _GiftCertificate(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("GiftCertificate")
 		case "number":
-			out.Values[i] = ec._GiftCertificate_number(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GiftCertificate_number(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "expireTime":
-			out.Values[i] = ec._GiftCertificate_expireTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GiftCertificate_expireTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "status":
-			out.Values[i] = ec._GiftCertificate_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GiftCertificate_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10211,7 +10418,6 @@ var movieImplementors = []string{"Movie"}
 
 func (ec *executionContext) _Movie(ctx context.Context, sel ast.SelectionSet, obj *model.Movie) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, movieImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10219,68 +10425,143 @@ func (ec *executionContext) _Movie(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Movie")
 		case "id":
-			out.Values[i] = ec._Movie_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "filmstadenID":
-			out.Values[i] = ec._Movie_filmstadenID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_filmstadenID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "imdbID":
-			out.Values[i] = ec._Movie_imdbID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_imdbID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tmdbID":
-			out.Values[i] = ec._Movie_tmdbID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_tmdbID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "slug":
-			out.Values[i] = ec._Movie_slug(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_slug(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "title":
-			out.Values[i] = ec._Movie_title(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_title(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "releaseDate":
-			out.Values[i] = ec._Movie_releaseDate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_releaseDate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "productionYear":
-			out.Values[i] = ec._Movie_productionYear(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_productionYear(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "runtime":
-			out.Values[i] = ec._Movie_runtime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_runtime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "poster":
-			out.Values[i] = ec._Movie_poster(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_poster(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "genres":
-			out.Values[i] = ec._Movie_genres(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_genres(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "popularity":
-			out.Values[i] = ec._Movie_popularity(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_popularity(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "archived":
-			out.Values[i] = ec._Movie_archived(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_archived(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updateTime":
-			out.Values[i] = ec._Movie_updateTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_updateTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createTime":
-			out.Values[i] = ec._Movie_createTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Movie_createTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10299,7 +10580,6 @@ var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
-
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
 		Object: "Mutation",
 	})
@@ -10307,81 +10587,161 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "attendShowing":
-			out.Values[i] = ec._Mutation_attendShowing(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_attendShowing(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "unattendShowing":
-			out.Values[i] = ec._Mutation_unattendShowing(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_unattendShowing(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createShowing":
-			out.Values[i] = ec._Mutation_createShowing(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createShowing(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deleteShowing":
-			out.Values[i] = ec._Mutation_deleteShowing(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteShowing(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "markAsBought":
-			out.Values[i] = ec._Mutation_markAsBought(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_markAsBought(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updateShowing":
-			out.Values[i] = ec._Mutation_updateShowing(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateShowing(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "promoteToAdmin":
-			out.Values[i] = ec._Mutation_promoteToAdmin(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_promoteToAdmin(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "fetchNewMoviesFromFilmstaden":
-			out.Values[i] = ec._Mutation_fetchNewMoviesFromFilmstaden(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_fetchNewMoviesFromFilmstaden(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updateAttendeePaymentInfo":
-			out.Values[i] = ec._Mutation_updateAttendeePaymentInfo(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateAttendeePaymentInfo(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "processTicketUrls":
-			out.Values[i] = ec._Mutation_processTicketUrls(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_processTicketUrls(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updateUser":
-			out.Values[i] = ec._Mutation_updateUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "invalidateCalendarFeed":
-			out.Values[i] = ec._Mutation_invalidateCalendarFeed(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_invalidateCalendarFeed(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "disableCalendarFeed":
-			out.Values[i] = ec._Mutation_disableCalendarFeed(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_disableCalendarFeed(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "addGiftCertificates":
-			out.Values[i] = ec._Mutation_addGiftCertificates(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addGiftCertificates(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deleteGiftCertificate":
-			out.Values[i] = ec._Mutation_deleteGiftCertificate(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteGiftCertificate(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10400,7 +10760,6 @@ var publicAttendeeImplementors = []string{"PublicAttendee"}
 
 func (ec *executionContext) _PublicAttendee(ctx context.Context, sel ast.SelectionSet, obj *model.PublicAttendee) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, publicAttendeeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10408,17 +10767,32 @@ func (ec *executionContext) _PublicAttendee(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PublicAttendee")
 		case "userID":
-			out.Values[i] = ec._PublicAttendee_userID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicAttendee_userID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "showingID":
-			out.Values[i] = ec._PublicAttendee_showingID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicAttendee_showingID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "userInfo":
-			out.Values[i] = ec._PublicAttendee_userInfo(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicAttendee_userInfo(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10437,7 +10811,6 @@ var publicUserImplementors = []string{"PublicUser"}
 
 func (ec *executionContext) _PublicUser(ctx context.Context, sel ast.SelectionSet, obj *model.PublicUser) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, publicUserImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10445,31 +10818,66 @@ func (ec *executionContext) _PublicUser(ctx context.Context, sel ast.SelectionSe
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PublicUser")
 		case "id":
-			out.Values[i] = ec._PublicUser_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._PublicUser_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "firstName":
-			out.Values[i] = ec._PublicUser_firstName(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_firstName(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "lastName":
-			out.Values[i] = ec._PublicUser_lastName(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_lastName(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "nick":
-			out.Values[i] = ec._PublicUser_nick(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_nick(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "phone":
-			out.Values[i] = ec._PublicUser_phone(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_phone(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "avatarURL":
-			out.Values[i] = ec._PublicUser_avatarURL(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PublicUser_avatarURL(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10485,7 +10893,6 @@ var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, queryImplementors)
-
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
 		Object: "Query",
 	})
@@ -10493,12 +10900,18 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
 		case "showing":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10506,10 +10919,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_showing(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "publicShowings":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10520,10 +10942,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "showingForMovie":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10534,10 +10965,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "allCommandments":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10548,10 +10988,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "randomCommandment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10562,10 +11011,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "filmstadenShowings":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10576,10 +11034,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "previouslyUsedLocations":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10590,10 +11057,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "filmstadenCities":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10604,10 +11080,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "movie":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10615,10 +11100,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_movie(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "allMovies":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10629,10 +11123,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "archivedMovies":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10643,10 +11146,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "currentUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10657,10 +11169,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "allUsers":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10671,11 +11192,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "__type":
-			out.Values[i] = ec._Query___type(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Query___type(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "__schema":
-			out.Values[i] = ec._Query___schema(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Query___schema(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10691,7 +11230,6 @@ var seatImplementors = []string{"Seat"}
 
 func (ec *executionContext) _Seat(ctx context.Context, sel ast.SelectionSet, obj *model.Seat) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, seatImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10699,12 +11237,22 @@ func (ec *executionContext) _Seat(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Seat")
 		case "row":
-			out.Values[i] = ec._Seat_row(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Seat_row(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "number":
-			out.Values[i] = ec._Seat_number(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Seat_number(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10723,7 +11271,6 @@ var seatRangeImplementors = []string{"SeatRange"}
 
 func (ec *executionContext) _SeatRange(ctx context.Context, sel ast.SelectionSet, obj *model.SeatRange) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, seatRangeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10731,12 +11278,22 @@ func (ec *executionContext) _SeatRange(ctx context.Context, sel ast.SelectionSet
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("SeatRange")
 		case "row":
-			out.Values[i] = ec._SeatRange_row(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SeatRange_row(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "numbers":
-			out.Values[i] = ec._SeatRange_numbers(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._SeatRange_numbers(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10755,7 +11312,6 @@ var showingImplementors = []string{"Showing"}
 
 func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, obj *model.Showing) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, showingImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10763,40 +11319,76 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Showing")
 		case "id":
-			out.Values[i] = ec._Showing_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "webID":
-			out.Values[i] = ec._Showing_webID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_webID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "filmstadenShowingID":
-			out.Values[i] = ec._Showing_filmstadenShowingID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_filmstadenShowingID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "slug":
-			out.Values[i] = ec._Showing_slug(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_slug(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "date":
-			out.Values[i] = ec._Showing_date(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_date(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "time":
-			out.Values[i] = ec._Showing_time(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_time(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "movieID":
-			out.Values[i] = ec._Showing_movieID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_movieID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "movie":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10807,15 +11399,25 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "location":
-			out.Values[i] = ec._Showing_location(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_location(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "cinemaScreen":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10823,17 +11425,32 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 				}()
 				res = ec._Showing_cinemaScreen(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "price":
-			out.Values[i] = ec._Showing_price(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_price(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "ticketsBought":
-			out.Values[i] = ec._Showing_ticketsBought(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_ticketsBought(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "admin":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10844,15 +11461,25 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "private":
-			out.Values[i] = ec._Showing_private(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_private(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "payToUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10863,20 +11490,35 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "updateTime":
-			out.Values[i] = ec._Showing_updateTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_updateTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "createTime":
-			out.Values[i] = ec._Showing_createTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Showing_createTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "attendees":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10887,10 +11529,15 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "filmstadenSeatMap":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10901,10 +11548,15 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "adminPaymentDetails":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10912,10 +11564,15 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 				}()
 				res = ec._Showing_adminPaymentDetails(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "attendeePaymentDetails":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10923,10 +11580,15 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 				}()
 				res = ec._Showing_attendeePaymentDetails(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "myTickets":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10937,10 +11599,15 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "ticketRange":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -10948,6 +11615,10 @@ func (ec *executionContext) _Showing(ctx context.Context, sel ast.SelectionSet, 
 				}()
 				res = ec._Showing_ticketRange(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -10964,7 +11635,6 @@ var ticketImplementors = []string{"Ticket"}
 
 func (ec *executionContext) _Ticket(ctx context.Context, sel ast.SelectionSet, obj *model.Ticket) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ticketImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -10972,76 +11642,156 @@ func (ec *executionContext) _Ticket(ctx context.Context, sel ast.SelectionSet, o
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Ticket")
 		case "id":
-			out.Values[i] = ec._Ticket_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "showingID":
-			out.Values[i] = ec._Ticket_showingID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_showingID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "assignedToUser":
-			out.Values[i] = ec._Ticket_assignedToUser(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_assignedToUser(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "profileID":
-			out.Values[i] = ec._Ticket_profileID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_profileID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "barcode":
-			out.Values[i] = ec._Ticket_barcode(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_barcode(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "customerType":
-			out.Values[i] = ec._Ticket_customerType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_customerType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "customerTypeDefinition":
-			out.Values[i] = ec._Ticket_customerTypeDefinition(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_customerTypeDefinition(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "cinema":
-			out.Values[i] = ec._Ticket_cinema(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_cinema(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "cinemaCity":
-			out.Values[i] = ec._Ticket_cinemaCity(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_cinemaCity(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "screen":
-			out.Values[i] = ec._Ticket_screen(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_screen(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "seat":
-			out.Values[i] = ec._Ticket_seat(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_seat(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "date":
-			out.Values[i] = ec._Ticket_date(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_date(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "time":
-			out.Values[i] = ec._Ticket_time(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_time(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "movieName":
-			out.Values[i] = ec._Ticket_movieName(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_movieName(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "movieRating":
-			out.Values[i] = ec._Ticket_movieRating(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_movieRating(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "attributes":
-			out.Values[i] = ec._Ticket_attributes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Ticket_attributes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11060,7 +11810,6 @@ var ticketRangeImplementors = []string{"TicketRange"}
 
 func (ec *executionContext) _TicketRange(ctx context.Context, sel ast.SelectionSet, obj *model.TicketRange) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ticketRangeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11068,17 +11817,32 @@ func (ec *executionContext) _TicketRange(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TicketRange")
 		case "rows":
-			out.Values[i] = ec._TicketRange_rows(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TicketRange_rows(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "seatings":
-			out.Values[i] = ec._TicketRange_seatings(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TicketRange_seatings(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "totalCount":
-			out.Values[i] = ec._TicketRange_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TicketRange_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11097,7 +11861,6 @@ var userImplementors = []string{"User"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11105,41 +11868,87 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
 		case "id":
-			out.Values[i] = ec._User_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "filmstadenMembershipID":
-			out.Values[i] = ec._User_filmstadenMembershipID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_filmstadenMembershipID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "name":
-			out.Values[i] = ec._User_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "firstName":
-			out.Values[i] = ec._User_firstName(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_firstName(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "lastName":
-			out.Values[i] = ec._User_lastName(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_lastName(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "nick":
-			out.Values[i] = ec._User_nick(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_nick(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "email":
-			out.Values[i] = ec._User_email(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_email(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "phone":
-			out.Values[i] = ec._User_phone(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_phone(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "avatarURL":
-			out.Values[i] = ec._User_avatarURL(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_avatarURL(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "giftCertificates":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -11150,23 +11959,52 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 			})
 		case "calendarFeedID":
-			out.Values[i] = ec._User_calendarFeedID(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_calendarFeedID(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "calendarFeedUrl":
-			out.Values[i] = ec._User_calendarFeedUrl(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_calendarFeedUrl(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "lastLoginTime":
-			out.Values[i] = ec._User_lastLoginTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_lastLoginTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "signupTime":
-			out.Values[i] = ec._User_signupTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_signupTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "updateTime":
-			out.Values[i] = ec._User_updateTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_updateTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -11185,7 +12023,6 @@ var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __DirectiveImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11193,24 +12030,49 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Directive")
 		case "name":
-			out.Values[i] = ec.___Directive_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___Directive_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "locations":
-			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_locations(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "args":
-			out.Values[i] = ec.___Directive_args(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_args(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isRepeatable":
-			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_isRepeatable(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11229,7 +12091,6 @@ var __EnumValueImplementors = []string{"__EnumValue"}
 
 func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.EnumValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __EnumValueImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11237,19 +12098,39 @@ func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__EnumValue")
 		case "name":
-			out.Values[i] = ec.___EnumValue_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___EnumValue_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "isDeprecated":
-			out.Values[i] = ec.___EnumValue_isDeprecated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_isDeprecated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deprecationReason":
-			out.Values[i] = ec.___EnumValue_deprecationReason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_deprecationReason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11265,7 +12146,6 @@ var __FieldImplementors = []string{"__Field"}
 
 func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, obj *introspection.Field) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __FieldImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11273,29 +12153,59 @@ func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Field")
 		case "name":
-			out.Values[i] = ec.___Field_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___Field_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "args":
-			out.Values[i] = ec.___Field_args(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_args(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "type":
-			out.Values[i] = ec.___Field_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isDeprecated":
-			out.Values[i] = ec.___Field_isDeprecated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_isDeprecated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deprecationReason":
-			out.Values[i] = ec.___Field_deprecationReason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_deprecationReason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11311,7 +12221,6 @@ var __InputValueImplementors = []string{"__InputValue"}
 
 func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.InputValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __InputValueImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11319,19 +12228,39 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__InputValue")
 		case "name":
-			out.Values[i] = ec.___InputValue_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___InputValue_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "type":
-			out.Values[i] = ec.___InputValue_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "defaultValue":
-			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_defaultValue(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11347,7 +12276,6 @@ var __SchemaImplementors = []string{"__Schema"}
 
 func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet, obj *introspection.Schema) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __SchemaImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11355,21 +12283,46 @@ func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Schema")
 		case "types":
-			out.Values[i] = ec.___Schema_types(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_types(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "queryType":
-			out.Values[i] = ec.___Schema_queryType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_queryType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "mutationType":
-			out.Values[i] = ec.___Schema_mutationType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_mutationType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscriptionType":
-			out.Values[i] = ec.___Schema_subscriptionType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_subscriptionType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "directives":
-			out.Values[i] = ec.___Schema_directives(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_directives(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11388,7 +12341,6 @@ var __TypeImplementors = []string{"__Type"}
 
 func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, obj *introspection.Type) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __TypeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -11396,26 +12348,71 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Type")
 		case "kind":
-			out.Values[i] = ec.___Type_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec.___Type_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "description":
-			out.Values[i] = ec.___Type_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "fields":
-			out.Values[i] = ec.___Type_fields(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_fields(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "interfaces":
-			out.Values[i] = ec.___Type_interfaces(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_interfaces(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "possibleTypes":
-			out.Values[i] = ec.___Type_possibleTypes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_possibleTypes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "enumValues":
-			out.Values[i] = ec.___Type_enumValues(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_enumValues(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "inputFields":
-			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_inputFields(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "ofType":
-			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_ofType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11790,18 +12787,18 @@ func (ec *executionContext) marshalNFilmstadenShowing2ᚖgithubᚗcomᚋfilmstun
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
-	res, err := graphql.UnmarshalFloat(v)
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
-	res := graphql.MarshalFloat(v)
+	res := graphql.MarshalFloatContext(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 	}
-	return res
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) marshalNGiftCertificate2ᚕᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐGiftCertificateᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.GiftCertificate) graphql.Marshaler {
@@ -11911,11 +12908,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]int, len(vSlice))
@@ -12319,11 +13312,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]string, len(vSlice))
@@ -12521,11 +13510,7 @@ func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Conte
 func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]string, len(vSlice))
@@ -12738,7 +13723,8 @@ func (ec *executionContext) marshalOBase64ID2ᚖstring(ctx context.Context, sel 
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -12747,7 +13733,8 @@ func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interf
 }
 
 func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
-	return graphql.MarshalBoolean(v)
+	res := graphql.MarshalBoolean(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v interface{}) (*bool, error) {
@@ -12762,7 +13749,8 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalBoolean(*v)
+	res := graphql.MarshalBoolean(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOCinemaScreen2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐCinemaScreen(ctx context.Context, sel ast.SelectionSet, v *model.CinemaScreen) graphql.Marshaler {
@@ -12809,11 +13797,7 @@ func (ec *executionContext) unmarshalOGiftCertificateInput2ᚕᚖgithubᚗcomᚋ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.GiftCertificateInput, len(vSlice))
@@ -12839,7 +13823,8 @@ func (ec *executionContext) marshalOIMDbID2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOLocalDate2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
@@ -12854,7 +13839,8 @@ func (ec *executionContext) marshalOLocalDate2ᚖtimeᚐTime(ctx context.Context
 	if v == nil {
 		return graphql.Null
 	}
-	return scalars.MarshalLocalDate(*v)
+	res := scalars.MarshalLocalDate(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOMovie2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐMovie(ctx context.Context, sel ast.SelectionSet, v *model.Movie) graphql.Marshaler {
@@ -12893,7 +13879,8 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 }
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalString(v)
+	res := graphql.MarshalString(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
@@ -12902,11 +13889,7 @@ func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]string, len(vSlice))
@@ -12950,7 +13933,8 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOTMDbID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -12965,7 +13949,8 @@ func (ec *executionContext) marshalOTMDbID2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOTicketRange2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐTicketRange(ctx context.Context, sel ast.SelectionSet, v *model.TicketRange) graphql.Marshaler {
@@ -12987,7 +13972,8 @@ func (ec *executionContext) marshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(
 	if v == nil {
 		return graphql.Null
 	}
-	return scalars.MarshalUUIDScalar(*v)
+	res := scalars.MarshalUUIDScalar(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOUpdateShowingInput2ᚖgithubᚗcomᚋfilmstundᚋfilmstundᚋinternalᚋgraphᚋmodelᚐUpdateShowingInput(ctx context.Context, v interface{}) (*model.UpdateShowingInput, error) {
