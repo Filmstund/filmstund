@@ -1,7 +1,10 @@
 import parseISO from "date-fns/parseISO";
 import { groupBy, keys } from "lodash";
 import React, { lazy } from "react";
-import { formatYMD, STOCKHOLM_TZ } from "../../../lib/dateTools";
+import {
+  formatDateInstantInStockholmTz,
+  formatYMD,
+} from "../../../lib/dateTools";
 import {
   FilmstadenShowingFragment,
   useFilmstadenShowingsQuery,
@@ -37,7 +40,7 @@ export const FilmstadenShowingSelector: React.FC<
   });
 
   const sfDates = groupBy(data?.filmstadenShowings, (showing) =>
-    showing.timeUtc.toZonedDateTimeISO(STOCKHOLM_TZ).toPlainDate().toString()
+    formatDateInstantInStockholmTz(showing.timeUtc)
   );
 
   const handleChange = (date: Date) => {

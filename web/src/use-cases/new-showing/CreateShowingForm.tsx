@@ -11,7 +11,7 @@ import {
   useCreateShowingQuery,
 } from "../../__generated__/types";
 import {
-  formatInstantInStockholmTz,
+  formatTimeInstantInStockholmTz,
   formatYMD,
   parseDate,
 } from "../../lib/dateTools";
@@ -114,7 +114,7 @@ export const CreateShowingForm: React.FC<Props> = ({
       const newState: ShowingState = {
         ...state,
         filmstadenRemoteEntityID: id,
-        time: formatInstantInStockholmTz(timeUtc),
+        time: formatTimeInstantInStockholmTz(timeUtc),
         location: cinema.name,
         filmstadenScreen: cleanFilmstadenScreen(screen),
       };

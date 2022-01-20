@@ -4,7 +4,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import addDays from "date-fns/addDays";
 import React, { useCallback, useState } from "react";
-import { formatInstantInStockholmTz, formatYMD } from "../../lib/dateTools";
+import { formatTimeInstantInStockholmTz, formatYMD } from "../../lib/dateTools";
 import { margin } from "../../lib/style-vars";
 import { useNavigate } from "react-router-dom";
 import * as navigators from "../common/navigators";
@@ -137,7 +137,7 @@ const EditShowingForm: React.VFC<Props> = ({ webID }) => {
       ...state,
       filmstadenRemoteEntityID: id,
       location: cinema.name,
-      time: formatInstantInStockholmTz(timeUtc),
+      time: formatTimeInstantInStockholmTz(timeUtc),
     }));
   };
 
