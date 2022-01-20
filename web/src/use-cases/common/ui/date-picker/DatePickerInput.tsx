@@ -9,7 +9,7 @@ import { DayPickerInputProps } from "react-day-picker/types/Props";
 // Vite & rollup has an issue with cjs default export
 // https://github.com/vitejs/vite/issues/2139#issuecomment-854960323
 function interopDefault<T>(value: T): T {
-  return (value as any).default;
+  return (value as any).default ? (value as any).default : value;
 }
 
 const DayPickerInput = interopDefault(DayPickerInputNS);
