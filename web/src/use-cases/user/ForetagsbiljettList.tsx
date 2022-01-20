@@ -22,13 +22,6 @@ export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
   const handleDeleteForetagsBiljett = useCallback(
     ({ status, number, expireTime }: GiftCertificateFragment) => {
       switch (status) {
-        case GiftCertificate_Status.Available:
-          if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
-            deleteGiftCertificate({
-              ticket: { number, expireTime },
-            });
-          }
-          break;
         case GiftCertificate_Status.Pending:
           window.alert(
             "Biljetten används på en visning som ej har bokats ännu"
@@ -40,8 +33,13 @@ export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
             ticket: { number, expireTime },
           });
           break;
+        case GiftCertificate_Status.Available:
         default:
-          throw new Error(`Invalid status ${status}`);
+          if (window.confirm("Är du säker på att du vill ta bort biljetten?")) {
+            deleteGiftCertificate({
+              ticket: { number, expireTime },
+            });
+          }
       }
     },
     [deleteGiftCertificate]
