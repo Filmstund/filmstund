@@ -7,7 +7,7 @@ import {
   useDeleteGiftCertificateMutation,
   UserProfileQuery,
 } from "../../__generated__/types";
-import EditableForetagsbiljettList from "./EditableForetagsbiljettList";
+import { EditableForetagsbiljettList } from "./EditableForetagsbiljettList";
 
 import { Foretagsbiljett } from "./Foretagsbiljett";
 import { InputSpinner } from "../single-showing/InputSpinner";
