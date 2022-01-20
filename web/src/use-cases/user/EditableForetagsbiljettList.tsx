@@ -42,7 +42,7 @@ export interface ForetagsbiljettInputDraft {
   expires: Temporal.PlainDate;
 }
 
-const EditableForetagsbiljettList: React.FC = () => {
+export const EditableForetagsbiljettList: React.FC = () => {
   const [tickets, setTickets] = useState<ForetagsbiljettInputDraft[]>([]);
   const [, saveForetagsBiljetter] = useAddGiftCertificatesMutation();
 
@@ -120,5 +120,3 @@ const EditableForetagsbiljettList: React.FC = () => {
     </>
   );
 };
-
-export default EditableForetagsbiljettList;
