@@ -62,11 +62,17 @@ export const formatYMD = (date: string | number | Date): string => {
 
 export const STOCKHOLM_TZ = "Europe/Stockholm";
 
-export const formatInstantInStockholmTz = (
+export const formatTimeInstantInStockholmTz = (
   instant: Temporal.Instant
 ): string => {
   return instant
     .toZonedDateTimeISO(STOCKHOLM_TZ)
     .toPlainTime()
     .toString({ smallestUnit: "minutes" });
+};
+
+export const formatDateInstantInStockholmTz = (
+  instant: Temporal.Instant
+): string => {
+  return instant.toZonedDateTimeISO(STOCKHOLM_TZ).toPlainDate().toString();
 };

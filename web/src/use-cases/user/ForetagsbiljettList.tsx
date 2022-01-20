@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback } from "react";
+import React, { useCallback } from "react";
 
 import { SmallHeader } from "../common/ui/Header";
 import {
@@ -10,7 +10,6 @@ import {
 import { EditableForetagsbiljettList } from "./EditableForetagsbiljettList";
 
 import { Foretagsbiljett } from "./Foretagsbiljett";
-import { InputSpinner } from "../single-showing/InputSpinner";
 
 interface Props {
   foretagsbiljetter: UserProfileQuery["me"]["giftCertificates"];
@@ -58,9 +57,7 @@ export const ForetagsbiljettList: React.FC<Props> = ({ foretagsbiljetter }) => {
           }
         />
       ))}
-      <Suspense fallback={<InputSpinner />}>
-        <EditableForetagsbiljettList />
-      </Suspense>
+      <EditableForetagsbiljettList />
     </div>
   );
 };
