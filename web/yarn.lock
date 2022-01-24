@@ -5026,10 +5026,10 @@ jest@^27.4.7:
     import-local "^3.0.2"
     jest-cli "^27.4.7"
 
-jotai@^1.5.2:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.5.2.tgz#0a897187e849fcf4d30be40f03e9401676f55291"
-  integrity sha512-h9rlP7Mxov8BglO6Xh9jttZlxEuPt3r8wJNU3zSNKvVFXmb1fw4808JkyUodVvZTBDZHrukz9Z6aigOh+nxK/A==
+jotai@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.5.3.tgz#0157f962c6cd7d28389f9606a1eefebf223801ed"
+  integrity sha512-iD8MkbehxTjfRUtIJJdyQcjbAe2MqjW1+oFc5lvfgRjLHwjRQyWnZC3gdGAOQCOqUSPZHOBGgWyP/8gBDckaNQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
