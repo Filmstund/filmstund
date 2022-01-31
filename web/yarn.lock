@@ -1311,7 +1311,7 @@
     tslib "~2.3.0"
     value-or-promise "1.0.11"
 
-"@graphql-typed-document-node/core@^3.1.0":
+"@graphql-typed-document-node/core@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.1.1.tgz#076d78ce99822258cf813ecc1e7fa460fa74d052"
   integrity sha512-NQ17ii0rK1b34VZonlmT2QMJFI70m0TRwbknO/ihlbatXyaktDhN/98vBiUU6kNBPljqGqyIrl2T4nY2RpFANg==
@@ -1993,12 +1993,12 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
-"@urql/core@>=2.3.6", "@urql/core@^1.12.3 || ^2.0.0", "@urql/core@^2.3.6":
-  version "2.3.6"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-2.3.6.tgz#ee0a6f8fde02251e9560c5f17dce5cd90f948552"
-  integrity sha512-PUxhtBh7/8167HJK6WqBv6Z0piuiaZHQGYbhwpNL9aIQmLROPEdaUYkY4wh45wPQXcTpnd11l0q3Pw+TI11pdw==
+"@urql/core@>=2.3.6", "@urql/core@^1.12.3 || ^2.0.0", "@urql/core@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-2.4.0.tgz#bf45f2a273e04c9b5e3c44a1e023ee8e3a88429c"
+  integrity sha512-Zc99Czj7FS9+awGrEKuRNIlhQ9n2LyoJMRofqsVlSxiNgJhar9IdNqSk3Xesom74tznQmMoNR0kBsHYwgFdTTg==
   dependencies:
-    "@graphql-typed-document-node/core" "^3.1.0"
+    "@graphql-typed-document-node/core" "^3.1.1"
     wonka "^4.0.14"
 
 "@urql/exchange-graphcache@^4.3.6":
@@ -7182,13 +7182,19 @@ urql-custom-scalars-exchange@^0.1.5:
     graphql "^15.3.0"
     wonka "^4.0.14"
 
-urql@^2.0.6:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/urql/-/urql-2.0.6.tgz#e67f09c83780f13d07d462a669977b3d5b36d964"
-  integrity sha512-ovK9mx7YxD/CKUwVZGbEDBzZjbCcNsr1990nIhDCKe3Ij/0gNcIa+0EIyXKceOPuYDYKavIoaNQV2kOZjQxFcw==
+urql@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-2.1.1.tgz#fa48fb7cb30b8b69bea6156774070338437fe0aa"
+  integrity sha512-fx06r6ZML6ez9y1OKS/MBPjOI3YCoZVCFQ4TiDWBV61gjTEpBoLOeibYekUsJM86K/QOTWa37Zml0WHTQyYJ1g==
   dependencies:
-    "@urql/core" "^2.3.6"
+    "@urql/core" "^2.4.0"
+    use-sync-external-store "1.0.0-rc.0 || ^1.0.0"
     wonka "^4.0.14"
+
+"use-sync-external-store@1.0.0-rc.0 || ^1.0.0":
+  version "1.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-rc.0.tgz#0d8fb7cbc31ddfb3ee01225f6b0a700cf59c449b"
+  integrity sha512-0U9Xlc2QDFzSGMB0DvcJQL0+DIdxDPJC7mnZlYFbl7wrSrPMcs89X5TVkNB6Dzg618m8lZop+U+J6ow3vq9RAQ==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
