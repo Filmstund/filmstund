@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import StatusMessageBox from "../common/utils/StatusMessageBox";
 import { PaymentParticipantsList } from "./components/PaymentParticipantsList";
 import { useTogglePaidChangeMutation } from "../../__generated__/types";

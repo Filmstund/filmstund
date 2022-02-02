@@ -1,5 +1,5 @@
 import isAfter from "date-fns/isAfter";
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import {
   CinemaScreenInput,
   CreateShowingInput,
