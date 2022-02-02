@@ -15,8 +15,7 @@ interface AdminModalAfterTicketsBoughtProps {
 export const AdminModalAfterTicketsBought: React.FC<
   AdminModalAfterTicketsBoughtProps
 > = ({ showingId, participantPaymentInfos }) => {
-  const [isMutating, setIsMutating] = useState(false);
-  const [{ error: mutationError }, togglePaidChange] =
+  const [{ fetching: isMutating, error: mutationError }, togglePaidChange] =
     useTogglePaidChangeMutation();
 
   const toast = useToaster();
@@ -25,23 +24,17 @@ export const AdminModalAfterTicketsBought: React.FC<
     async (info: AdminAttendeePaymentDetails) => {
       const { user, hasPaid, amountOwed } = info;
 
-      try {
-        setIsMutating(true);
+      const { error } = await togglePaidChange({
+        paymentInfo: {
+          amountOwed,
+          hasPaid,
+          showingID: showingId,
+          userID: user.id,
+        },
+      });
 
-        const { error } = await togglePaidChange({
-          paymentInfo: {
-            amountOwed,
-            hasPaid,
-            showingID: showingId,
-            userID: user.id,
-          },
-        });
-
-        if (error) {
-          toast({ variant: "danger", text: error.message });
-        }
-      } finally {
-        setIsMutating(false);
+      if (error) {
+        toast({ variant: "danger", text: error.message });
       }
     },
     [toast, showingId, togglePaidChange]
