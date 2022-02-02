@@ -27,6 +27,7 @@ import { useNavigate } from "react-router-dom";
 import * as navigators from "../common/navigators";
 import { Temporal } from "@js-temporal/polyfill";
 import { useToaster } from "../../common/toast/ToastContext";
+import { InputSpinner } from "../single-showing/InputSpinner";
 
 const now = new Date();
 
@@ -95,7 +96,7 @@ export const CreateShowingForm: React.FC<Props> = ({
   );
   const toast = useToaster();
 
-  const [, createShowing] = useCreateShowingMutation();
+  const [{ fetching: isLoading }, createShowing] = useCreateShowingMutation();
 
   const setShowingValue = <K extends keyof ShowingState>(
     key: K,
@@ -110,26 +111,15 @@ export const CreateShowingForm: React.FC<Props> = ({
   const setShowingTime = (sfTime: FilmstadenShowingFragment) => {
     const { timeUtc, cinema, id, screen } = sfTime;
 
-    setShowingState((state) => {
-      const newState: ShowingState = {
-        ...state,
-        filmstadenRemoteEntityID: id,
-        time: formatTimeInstantInStockholmTz(timeUtc),
-        location: cinema.name,
-        filmstadenScreen: cleanFilmstadenScreen(screen),
-      };
+    const newState: ShowingState = {
+      ...showing,
+      filmstadenRemoteEntityID: id,
+      time: formatTimeInstantInStockholmTz(timeUtc),
+      location: cinema.name,
+      filmstadenScreen: cleanFilmstadenScreen(screen),
+    };
 
-      handleSubmit(newState);
-
-      return newState;
-    });
-  };
-
-  const setShowingValueFromEvent = (
-    key: keyof ShowingState,
-    { target: { value } }: ChangeEvent<HTMLInputElement>
-  ) => {
-    setShowingValue(key, value);
+    handleSubmit(newState);
   };
 
   const handleSubmit = ({
@@ -202,7 +192,7 @@ export const CreateShowingForm: React.FC<Props> = ({
           <Input
             type="time"
             value={showing.time}
-            onChange={(v) => setShowingValueFromEvent("time", v)}
+            onChange={(e) => setShowingValue("time", e.target.value)}
           />
         </Field>
         <Field text="Plats:">
@@ -212,6 +202,7 @@ export const CreateShowingForm: React.FC<Props> = ({
             onChange={(value) => setShowingValue("location", value)}
           />
         </Field>
+        {isLoading && <InputSpinner />}
         <GrayButton onClick={clearSelectedMovie}>Avbryt</GrayButton>
         <MainButton onClick={() => handleSubmit(showing)}>
           Skapa besök

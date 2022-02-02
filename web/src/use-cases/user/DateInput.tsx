@@ -1,6 +1,5 @@
-import { useHandleChangeEvent } from "../common/utils/useHandleChangeEvent";
 import Input from "../common/ui/Input";
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 interface DateInputProps {
   onChange: (value: string) => void;
@@ -11,7 +10,9 @@ export const DateInput: React.VFC<DateInputProps> = ({
   onChange,
   ...props
 }) => {
-  const handleChange = useHandleChangeEvent(onChange);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value);
+  };
 
   return <Input type="date" required onChange={handleChange} {...props} />;
 };
