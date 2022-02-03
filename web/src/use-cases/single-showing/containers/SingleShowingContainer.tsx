@@ -101,6 +101,7 @@ const SingleShowingContainer: React.FC<Props> = ({ me, showing, refetch }) => {
 
 const SingleShowingLoader: React.FC<{ webID: string }> = ({ webID }) => {
   const [{ data }] = useSingleShowingQuery({
+    requestPolicy: "cache-and-network",
     variables: { webID },
   });
   const showing = data!.showing;
