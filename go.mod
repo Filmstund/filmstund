@@ -17,7 +17,7 @@ require (
 	github.com/jackc/pgconn v1.10.1
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/rs/cors v1.8.2
-	github.com/sethvargo/go-envconfig v0.4.0
+	github.com/sethvargo/go-envconfig v0.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e
 	github.com/vektah/gqlparser/v2 v2.3.1
