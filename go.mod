@@ -14,7 +14,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gosimple/slug v1.12.0
-	github.com/jackc/pgconn v1.10.1
+	github.com/jackc/pgconn v1.11.0
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/rs/cors v1.8.2
 	github.com/sethvargo/go-envconfig v0.5.0
