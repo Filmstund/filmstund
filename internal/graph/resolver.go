@@ -3,9 +3,6 @@ package graph
 //go:generate go run github.com/99designs/gqlgen --config ../../configs/gqlgen.yml
 
 import (
-
-	// needed to keep the dependencies needed for the above go generate command.
-	_ "github.com/99designs/gqlgen/cmd"
 	"github.com/filmstund/filmstund/filmstaden"
 	"github.com/filmstund/filmstund/internal/database"
 	"github.com/filmstund/filmstund/internal/serverenv"

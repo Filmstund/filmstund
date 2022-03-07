@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	edholm.dev/go-logging v1.0.0
-	github.com/99designs/gqlgen v0.16.0
+	github.com/99designs/gqlgen v0.17.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/filmstund/themoviedb-go v0.2.0
 	github.com/go-logr/logr v1.2.2
@@ -20,7 +20,7 @@ require (
 	github.com/sethvargo/go-envconfig v0.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e
-	github.com/vektah/gqlparser/v2 v2.3.1
+	github.com/vektah/gqlparser/v2 v2.4.0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	gotest.tools/v3 v3.1.0
 )
@@ -47,6 +47,7 @@ require (
 	github.com/jackc/pgtype v1.10.0 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/lib/pq v1.10.3 // indirect
+	github.com/matryer/moq v0.2.3 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
@@ -56,10 +57,10 @@ require (
 	go.uber.org/zap v1.19.1 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e // indirect
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
+	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.6 // indirect
+	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
