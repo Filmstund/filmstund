@@ -6238,10 +6238,10 @@ react-transition-group@^4.3.0, react-transition-group@^4.4.2:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@^18.0.0-rc.1-next-629036a9c-20220224:
-  version "18.0.0-rc.1-next-629036a9c-20220224"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.1-next-629036a9c-20220224.tgz#ade6dcd907f73360b6c2c557e1f9c98221334078"
-  integrity sha512-cN2rGgoTT1bSlEIaGr+eLji/2LZFJO/Jn6KXNPotXUMu8cDW8HD3sskaS4/8cNxTsyv4TJMsdFySdGE4yKtkHw==
+react@^18.0.0-rc.1:
+  version "18.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.1.tgz#fbaef1cbf8b1eddb36a869ee1ea723044aa670c2"
+  integrity sha512-IdvjOtyeFhITZwDrj+GMvY7kbWnGklRzNByO7/pOVIt0o3VZi++BUybpK3Fen1gDPkOZDP/rag7lSh6RZuWOeQ==
   dependencies:
     loose-envify "^1.1.0"
 
