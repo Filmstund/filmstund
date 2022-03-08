@@ -1,6 +1,6 @@
 import "./polyfills";
 import React from "react";
-import { createRoot } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Root } from "./Root";
 
 createRoot(document.getElementById("root")!).render(
