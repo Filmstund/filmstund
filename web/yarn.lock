@@ -850,16 +850,15 @@
   resolved "https://registry.yarnpkg.com/@emotion/memoize/-/memoize-0.7.5.tgz#2c40f81449a4e554e9fc6396910ed4843ec2be50"
   integrity sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ==
 
-"@emotion/react@11.8.1", "@emotion/react@^11.1.1":
-  version "11.8.1"
-  resolved "https://registry.yarnpkg.com/@emotion/react/-/react-11.8.1.tgz#5358b8c78367063881e26423057c030c57ce52eb"
-  integrity sha512-XGaie4nRxmtP1BZYBXqC5JGqMYF2KRKKI7vjqNvQxyRpekVAZhb6QqrElmZCAYXH1L90lAelADSVZC4PFsrJ8Q==
+"@emotion/react@11.8.2", "@emotion/react@^11.1.1":
+  version "11.8.2"
+  resolved "https://registry.yarnpkg.com/@emotion/react/-/react-11.8.2.tgz#e51f5e6372e22e82780836c9288da19af4b51e70"
+  integrity sha512-+1bcHBaNJv5nkIIgnGKVsie3otS0wF9f1T1hteF3WeVvMNQEtfZ4YyFpnphGoot3ilU/wWMgP2SgIDuHLE/wAA==
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@emotion/babel-plugin" "^11.7.1"
     "@emotion/cache" "^11.7.1"
     "@emotion/serialize" "^1.0.2"
-    "@emotion/sheet" "^1.1.0"
     "@emotion/utils" "^1.1.0"
     "@emotion/weak-memoize" "^0.2.5"
     hoist-non-react-statics "^3.3.1"
@@ -1738,10 +1737,10 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/react@13.0.0-alpha.5":
-  version "13.0.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-13.0.0-alpha.5.tgz#29bfc36b550e2a1025cbebf7254d5a0a46cb58c5"
-  integrity sha512-QrxKC/7pTE0ze3wLZNaenGJqsLcbAJL71XqU/ryJTL2pqZBjiJHuxZavl2ZQAxnBQkDQF9oh9my3bKPstWfnhA==
+"@testing-library/react@13.0.0-alpha.6":
+  version "13.0.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-13.0.0-alpha.6.tgz#6bb543f524a8408bebe81f6c866a8f95951f6d43"
+  integrity sha512-AVJTnwLlnjvXDNe91P6Nt9pN2fMS4csAzTmIbOewja+LVKzhlr53EONhv3ck0J3GzSZ5MIN5qL3BfISX/Wf1Jg==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^8.5.0"
@@ -1899,10 +1898,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^17.0.39":
-  version "17.0.39"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.39.tgz#d0f4cde092502a6db00a1cded6e6bf2abb7633ce"
-  integrity sha512-UVavlfAxDd/AgAacMa60Azl7ygyQNRwC/DsHZmKgNvPmRR5p70AJ5Q9EAmL2NWOJmeV+vVUI4IAP7GZrN8h8Ug==
+"@types/react@*", "@types/react@^17.0.40":
+  version "17.0.40"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.40.tgz#dc010cee6254d5239a138083f3799a16638e6bad"
+  integrity sha512-UrXhD/JyLH+W70nNSufXqMZNuUD2cXHu6UjCllC6pmOQgBX4SGXOH8fjRka0O0Ee0HrFxapDD8Bwn81Kmiz6jQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -5086,10 +5085,10 @@ jest@^27.5.1:
     import-local "^3.0.2"
     jest-cli "^27.5.1"
 
-jotai@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.6.0.tgz#81412756dab42fcb712530fba512e5e43bd0de15"
-  integrity sha512-J/+aD9R1XDcNeY8drg/y/I47eUivQ13HGmLmA33w95SvJJLBStSF5WxYrmLgbuWcDC6MpRecF3g/GBchPJNcZg==
+jotai@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.6.1.tgz#a6379d7dce159474f24963921d55ae8f6e9e8dd6"
+  integrity sha512-iNKHmpKGN31KXDqxGLsplb4HLTroYtiM7oBEQ9leyoXSEGQGUZKK5IOV4kN6fUmkBSJbwb5WnmInYOYzpjIDOw==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
