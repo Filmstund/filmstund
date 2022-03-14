@@ -21,7 +21,7 @@
     "@fortawesome/free-solid-svg-icons": "6.0.0",
     "@fortawesome/react-fontawesome": "0.1.17",
     "@graphql-codegen/introspection": "^2.1.1",
-    "@graphql-codegen/typescript-urql": "^3.5.3",
+    "@graphql-codegen/typescript-urql": "^3.5.5",
     "@js-temporal/polyfill": "^0.3.0",
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "13.0.0-alpha.6",
@@ -55,7 +55,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/schema-ast": "^2.4.1",
-    "@graphql-codegen/typescript": "^2.4.5",
+    "@graphql-codegen/typescript": "^2.4.7",
     "@graphql-codegen/typescript-operations": "^2.3.2",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
