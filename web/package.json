@@ -22,7 +22,7 @@
     "@fortawesome/react-fontawesome": "0.1.17",
     "@graphql-codegen/introspection": "^2.1.1",
     "@graphql-codegen/typescript-urql": "^3.5.5",
-    "@js-temporal/polyfill": "^0.3.0",
+    "@js-temporal/polyfill": "^0.4.0",
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "13.0.0-alpha.6",
     "@types/lodash": "4.14.179",
