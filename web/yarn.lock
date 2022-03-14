@@ -1738,10 +1738,10 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/react@13.0.0-alpha.5":
-  version "13.0.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-13.0.0-alpha.5.tgz#29bfc36b550e2a1025cbebf7254d5a0a46cb58c5"
-  integrity sha512-QrxKC/7pTE0ze3wLZNaenGJqsLcbAJL71XqU/ryJTL2pqZBjiJHuxZavl2ZQAxnBQkDQF9oh9my3bKPstWfnhA==
+"@testing-library/react@13.0.0-alpha.6":
+  version "13.0.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-13.0.0-alpha.6.tgz#6bb543f524a8408bebe81f6c866a8f95951f6d43"
+  integrity sha512-AVJTnwLlnjvXDNe91P6Nt9pN2fMS4csAzTmIbOewja+LVKzhlr53EONhv3ck0J3GzSZ5MIN5qL3BfISX/Wf1Jg==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^8.5.0"
