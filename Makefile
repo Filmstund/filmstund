@@ -24,7 +24,7 @@ include .tools/commitlint/rules.mk
 include .tools/sqlc/rules.mk
 
 yarn-install:
-	@yarn --cwd ./web --silent install
+	@yarn install --cwd ./web --silent --frozen-lockfile
 .PHONY: yarn-install
 
 lint-go: $(golangci-lint_bin) yarn-install
