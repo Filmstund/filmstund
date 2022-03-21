@@ -7,7 +7,7 @@ require (
 	github.com/99designs/gqlgen v0.17.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/filmstund/themoviedb-go v0.2.0
-	github.com/go-logr/logr v1.2.2
+	github.com/go-logr/logr v1.2.3
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
