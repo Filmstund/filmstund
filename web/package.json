@@ -79,7 +79,7 @@
   "bundlewatch": [
     {
       "path": "./build/assets/*.js",
-      "maxSize": "150 kB"
+      "maxSize": "180 kB"
     }
   ],
   "browserslist": [
