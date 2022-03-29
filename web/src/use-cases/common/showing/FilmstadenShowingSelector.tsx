@@ -53,16 +53,9 @@ export const FilmstadenShowingSelector: React.FC<
         <DatePicker
           value={parseISO(date)}
           onChange={handleChange}
-          disabledDays={{ before: today }}
+          disabled={{ before: today }}
           modifiers={{
             filmstadendays: keys(sfDates || {}).map((s) => new Date(s)),
-          }}
-          modifiersStyles={{
-            filmstadendays: {
-              backgroundColor: "#fff",
-              borderColor: "#d0021b",
-              color: "#d0021b",
-            },
           }}
         />
       </Field>
