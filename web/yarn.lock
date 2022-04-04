@@ -6143,10 +6143,10 @@ rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-day-picker@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-8.0.0.tgz#628133fe4d39db73d07e0d734efef0ab688f0eef"
-  integrity sha512-bW6gj4XqiZop7YMUCw1pro2r7qEGSk0IURTXGkuj8cLvm189kTS6p4Kl1UfijP8D2lfMcIWJ73VH8M87XSDIrQ==
+react-day-picker@8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-8.0.2.tgz#abae6563a75225754341405a078b3b20a579e69f"
+  integrity sha512-HNFUuPT8nCu8+TImTWFNUUM60zTHi1c4GmE/23R8zP6yugUm07SnouUUXbJXJmritHachZ9JDmKEhfSZ6wYAqA==
   dependencies:
     "@reach/auto-id" "^0.16.0"
 
