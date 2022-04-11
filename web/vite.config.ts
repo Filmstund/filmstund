@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
 
@@ -21,5 +21,9 @@ export default defineConfig({
       "/login": "http://localhost:8079",
       "/logout": "http://localhost:8079",
     },
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
   },
 });

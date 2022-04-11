@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint src --ext js,jsx,ts,tsx",
     "serve": "vite preview",
-    "test": "jest",
+    "test": "vitest",
     "types": "graphql-codegen",
     "prettier": "prettier --no-config --write 'src/**/*.[tj]s?(x)' 'src/**/*.css'",
     "prettier:check": "prettier --no-config --check 'src/**/*.[tj]s?(x)' 'src/**/*.css'"
@@ -24,7 +24,7 @@
     "@graphql-codegen/typescript-urql": "^3.5.6",
     "@js-temporal/polyfill": "^0.4.0",
     "@testing-library/jest-dom": "5.16.3",
-    "@testing-library/react": "13.0.0-alpha.6",
+    "@testing-library/react": "13.0.1",
     "@types/lodash": "4.14.181",
     "@types/node": "17.0.13",
     "@types/react": "^17.0.43",
@@ -50,6 +50,7 @@
     "uuid": "^8.3.2",
     "vite": "2.9.1",
     "vite-plugin-svgr": "1.1.0",
+    "vitest": "0.9.3",
     "whatwg-fetch": "3.6.2"
   },
   "devDependencies": {
@@ -57,7 +58,6 @@
     "@graphql-codegen/schema-ast": "^2.4.1",
     "@graphql-codegen/typescript": "^2.4.7",
     "@graphql-codegen/typescript-operations": "^2.3.5",
-    "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "babel-eslint": "^10.0.0",
@@ -70,11 +70,9 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^27.5.1",
-    "jest-transform-stub": "^2.0.0",
+    "jsdom": "^19.0.0",
     "prettier": "2.6.0",
-    "source-map-explorer": "2.5.2",
-    "ts-jest": "^27.1.4"
+    "source-map-explorer": "2.5.2"
   },
   "bundlewatch": [
     {
