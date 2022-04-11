@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { Header } from "./RedHeader";
@@ -77,6 +77,7 @@ interface PosterBoxProps {
   onClick?: () => void;
   headerText: string;
   className?: string;
+  children?: ReactNode;
 }
 
 const PosterBox: React.FC<PosterBoxProps> = ({

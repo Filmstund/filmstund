@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, ReactNode, useContext, useEffect } from "react";
 
 const PageTitleContext = createContext<string | null>(null);
 
 interface PageTitleTemplateProps {
   titleTemplate: string | null;
+  children?: ReactNode;
 }
 
 export const PageTitleTemplate: React.FC<PageTitleTemplateProps> = ({

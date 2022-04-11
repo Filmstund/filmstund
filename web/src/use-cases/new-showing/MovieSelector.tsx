@@ -57,7 +57,7 @@ const MovieSelector = ({
   const [searchTerm, handleChangeSearchTerm] = useStateWithHandleChange("");
 
   const filterFn = useCallback(
-    (movie) => {
+    (movie: MovieFragment) => {
       const lowerCaseTerm = searchTerm.toLowerCase();
       if (searchTerm && searchTerm.length > 0) {
         return movie.title.toLowerCase().indexOf(lowerCaseTerm) !== -1;

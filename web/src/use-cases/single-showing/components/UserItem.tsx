@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { UserItemFragment } from "../../../__generated__/types";
-import React from "react";
+import React, { ReactNode } from "react";
 
 const PaddingContainer = styled.div`
   flex: 1;
@@ -25,6 +25,7 @@ interface Props {
   className?: string;
   showPhone: boolean;
   user: UserItemFragment;
+  children?: ReactNode;
 }
 
 const UserItem: React.FC<Props> = ({
