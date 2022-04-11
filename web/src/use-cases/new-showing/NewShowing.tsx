@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import MovieSelector from "./MovieSelector";
 import { useSearchParams } from "react-router-dom";
 import { CreateShowingForm } from "./CreateShowingForm";
+import { MovieFragment } from "../../__generated__/types";
 
 const NewShowing = () => {
   const [searchParams, setSearchParams] = useSearchParams({ movieID: "" });
@@ -11,7 +12,7 @@ const NewShowing = () => {
   }, [setSearchParams]);
 
   const setMovie = useCallback(
-    (movie) => {
+    (movie: MovieFragment) => {
       setSearchParams({ movieID: movie.id });
     },
     [setSearchParams]
