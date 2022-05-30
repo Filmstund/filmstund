@@ -1634,7 +1634,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../../api/graphql/commandments.graphqls", Input: `## Bio Budord / Commandments ##
+	{Name: "../../../api/graphql/commandments.graphqls", Input: `## Bio Budord / Commandments ##
 
 extend type Query {
     allCommandments: [Commandments!]!
@@ -1646,13 +1646,13 @@ type Commandments {
     phrase: String!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/directive.graphqls", Input: `directive @auth(requires: Role!) on FIELD_DEFINITION
+	{Name: "../../../api/graphql/directive.graphqls", Input: `directive @auth(requires: Role!) on FIELD_DEFINITION
 
 enum Role {
     SHOWING_ADMIN
     USER
 }`, BuiltIn: false},
-	{Name: "../../api/graphql/filmstaden.graphqls", Input: `extend type Query {
+	{Name: "../../../api/graphql/filmstaden.graphqls", Input: `extend type Query {
     filmstadenShowings(movieID: UUID!, city: String = "GB", afterDate: LocalDate): [FilmstadenShowing!]!
 }
 
@@ -1695,7 +1695,7 @@ type FilmstadenShowing {
     tags: [String!]!,
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/location.graphqls", Input: `extend type Query {
+	{Name: "../../../api/graphql/location.graphqls", Input: `extend type Query {
     previouslyUsedLocations: [String!]!
 #    location(id: String!): Location
     filmstadenCities: [FilmstadenCityAlias!]!
@@ -1718,7 +1718,7 @@ type FilmstadenCityAlias {
     name: String!
     alias: String!
 }`, BuiltIn: false},
-	{Name: "../../api/graphql/movies.graphqls", Input: `extend type Query {
+	{Name: "../../../api/graphql/movies.graphqls", Input: `extend type Query {
     movie(id: UUID!): Movie
     allMovies: [Movie!]!
     archivedMovies: [Movie!]!
@@ -1747,7 +1747,7 @@ type Movie {
     createTime: String!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/payment.graphqls", Input: `extend type Mutation {
+	{Name: "../../../api/graphql/payment.graphqls", Input: `extend type Mutation {
     updateAttendeePaymentInfo(paymentInfo: AttendeePaymentInfoInput!): Attendee! @auth(requires: SHOWING_ADMIN)
 }
 
@@ -1789,7 +1789,7 @@ input AttendeePaymentInfoInput {
     amountOwed: SEK!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/scalars.graphqls", Input: `scalar IMDbID
+	{Name: "../../../api/graphql/scalars.graphqls", Input: `scalar IMDbID
 scalar TMDbID
 scalar Time
 scalar UUID
@@ -1799,7 +1799,7 @@ scalar SEK
 scalar LocalDate
 scalar LocalTime
 `, BuiltIn: false},
-	{Name: "../../api/graphql/showing.graphqls", Input: `type Query {
+	{Name: "../../../api/graphql/showing.graphqls", Input: `type Query {
     showing(id: UUID, webID: Base64ID): Showing
     publicShowings(afterDate: LocalDate): [Showing!]!
     showingForMovie(movieId: UUID!): [Showing!]!
@@ -1887,7 +1887,7 @@ input UpdateShowingInput {
     date: LocalDate!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/ticket.graphqls", Input: `extend type Showing {
+	{Name: "../../../api/graphql/ticket.graphqls", Input: `extend type Showing {
     myTickets: [Ticket!]!
     ticketRange: TicketRange
 }
@@ -1937,7 +1937,7 @@ type TicketRange {
     totalCount: Int!
 }
 `, BuiltIn: false},
-	{Name: "../../api/graphql/users.graphqls", Input: `extend type Query  {
+	{Name: "../../../api/graphql/users.graphqls", Input: `extend type Query  {
     currentUser: User!
     allUsers: [PublicUser!]!
 }

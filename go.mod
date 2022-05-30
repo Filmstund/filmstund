@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	edholm.dev/go-logging v1.0.0
-	github.com/99designs/gqlgen v0.17.5
+	github.com/99designs/gqlgen v0.17.9
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/filmstund/themoviedb-go v0.2.0
 	github.com/go-logr/logr v1.2.3
@@ -51,7 +51,8 @@ require (
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/urfave/cli/v2 v2.4.0 // indirect
+	github.com/urfave/cli/v2 v2.8.1 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
