@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	edholm.dev/go-logging v1.0.0
-	github.com/99designs/gqlgen v0.17.9
+	github.com/99designs/gqlgen v0.17.10
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/filmstund/themoviedb-go v0.2.0
 	github.com/go-logr/logr v1.2.3
@@ -20,7 +20,7 @@ require (
 	github.com/sethvargo/go-envconfig v0.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e
-	github.com/vektah/gqlparser/v2 v2.4.4
+	github.com/vektah/gqlparser/v2 v2.4.5
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	gotest.tools/v3 v3.2.0
 )
