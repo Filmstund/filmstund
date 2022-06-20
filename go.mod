@@ -22,7 +22,7 @@ require (
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e
 	github.com/vektah/gqlparser/v2 v2.4.4
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	gotest.tools/v3 v3.2.0
+	gotest.tools/v3 v3.3.0
 )
 
 require (
